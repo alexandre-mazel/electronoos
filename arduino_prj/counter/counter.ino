@@ -63,10 +63,12 @@ void setup()
 int nCpt = 0;
 int bPrevLighten = false;
 int nCptHidden = 0;
+unsigned long timeLast = 0;
 void loop()
 {
   int nLight = analogRead(  PHOTO_PIN );
   int bLighten = nLight > 400; 
+  //nLight = map( nLight, 0, 900,10000, 0);
   
   if( bPrevLighten != bLighten )
   {
@@ -77,11 +79,23 @@ void loop()
     else
     {
       ++nCptHidden;
-      Serial.println( nCptHidden, DEC );      
+      //Serial.println( nCptHidden, DEC );
+      const int nNbrBarrePerWheel = 6; // nbr de "rayon"
+      const int nNbrWheelToMeasures = 4;
+      if( nCptHidden == nNbrWheelToMeasures*nNbrBarrePerWheel )
+      {
+        unsigned long nNow = micros();
+        unsigned long nDuration = nNow - timeLast;
+        timeLast = nNow;
+        int rpmicro = nNbrWheelToMeasures / nDuration;
+        Serial.print( "rpmicro: " );
+        Serial.println( rpmicro, DEC );
+        nCptHidden = 0;
+      }
     }
     bPrevLighten = bLighten;
   }
-  nLight = map( nLight, 0, 900,10000, 0);
+  
   ++nCpt;
 }
 

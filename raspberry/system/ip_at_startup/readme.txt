@@ -1,3 +1,4 @@
+# to have the ip at startup on a remove server
 Ma methode a la main:
 1. copier startup_pi.py dans le home
 2. ajouter dans /etc/rc.local un ordre de lancement du script (juste avant le "exit(0)")

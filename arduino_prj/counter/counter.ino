@@ -48,6 +48,7 @@ void setVumeter( int nValue )
     leds[i].g = 0;
     leds[i].b = 0;    
   }
+  ws2811.dim(16);
   ws2811.sendLedData();
 }
 
@@ -60,8 +61,9 @@ void setup()
   ws2811.init(DATA_PIN,NUM_PIXELS);
   leds = (struct CRGB*)ws2811.getRGBData();
   Serial.begin(9600);
-  //setVumeter( 10000 ); // full
-  setVumeter( 1250 ); // 1 led
+  //setVumeter( 10000 ); // full all led
+  //setVumeter( 1250 ); // 1 led full
+  setVumeter( 0 ); // 0 led
   timeFpsBegin = micros();
 }
 
@@ -69,16 +71,20 @@ int nCpt = 0;
 int bPrevLighten = false;
 int nCptHidden = 0;
 unsigned long timeLast = 0;
+int nCptFadeOut = 0;
 void loop()
 {
   int nLight = analogRead(  PHOTO_PIN ); // nLight is big when darker
+  //nLight = map( nLight, 0, 900,10000, 0);
+  
   int bLighten;
   if( bPrevLighten ) // hysteresis
-     bLighten = nLight < 520; 
+    // 520 and 490 are great with 1 only led WS2811, even if running very fast.
+    // 250 and 200 are great with the iphone led
+    bLighten = nLight < 250; 
   else
-     bLighten = nLight < 490; 
+     bLighten = nLight < 200; 
      
-  //nLight = map( nLight, 0, 900,10000, 0);
 
   //Serial.println( nLight, DEC );  
 
@@ -106,9 +112,15 @@ void loop()
         Serial.println( rpmicro );
         timeLast = nNow;
         nCptHidden = 0;
+        nCptFadeOut = rpmicro*2000;
       }
     }
     bPrevLighten = bLighten;
+  }
+  if( nCptFadeOut > -1 )
+  {
+    setVumeter( nCptFadeOut );
+    --nCptFadeOut;
   }
   
   //delay(1);

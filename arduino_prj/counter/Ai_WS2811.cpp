@@ -11,7 +11,17 @@ void Ai_WS2811::init(uint8_t pin, uint16_t nPixels)
   m_pDataEnd = m_pData + m_nLeds; 
 }
 
-void Ai_WS2811::sendLedData(void) 
+void Ai_WS2811::dim( const int nDimCoef )
+{
+  register byte *p = m_pData;
+  register byte *e = m_pDataEnd;
+  while(p != e) 
+  { 
+     *p++ /= nDimCoef;
+   }
+}
+
+void Ai_WS2811::sendLedData(void)
 {
   cli();
   register byte *p = m_pData;

@@ -23,5 +23,6 @@ class Ai_WS2811
     uint8_t *led_arr;
     void init(uint8_t,uint16_t);
     void sendLedData(void);
+    void dim( const int nDimCoef = 2 ); // dim all leds by a coef (to avoid burn my eyes)
     unsigned char *getRGBData() { return m_pData; } 
 };

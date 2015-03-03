@@ -51,13 +51,18 @@ void setVumeter( int nValue )
   ws2811.sendLedData();
 }
 
+int nFpsCpt = 0;
+unsigned long timeFpsBegin;
+
 //some initial values
 void setup()
 {
   ws2811.init(DATA_PIN,NUM_PIXELS);
   leds = (struct CRGB*)ws2811.getRGBData();
   Serial.begin(9600);
-  setVumeter( 10000 );
+  //setVumeter( 10000 ); // full
+  setVumeter( 1250 ); // 1 led
+  timeFpsBegin = micros();
 }
 
 int nCpt = 0;
@@ -66,37 +71,67 @@ int nCptHidden = 0;
 unsigned long timeLast = 0;
 void loop()
 {
-  int nLight = analogRead(  PHOTO_PIN );
-  int bLighten = nLight > 400; 
+  int nLight = analogRead(  PHOTO_PIN ); // nLight is big when darker
+  int bLighten;
+  if( bPrevLighten ) // hysteresis
+     bLighten = nLight < 520; 
+  else
+     bLighten = nLight < 490; 
+     
   //nLight = map( nLight, 0, 900,10000, 0);
-  
+
+  //Serial.println( nLight, DEC );  
+
   if( bPrevLighten != bLighten )
   {
     if( bLighten )
     {
-//      Serial.println( nLight, DEC );
+      //Serial.print( "litten: " );      
+      //Serial.println( nLight, DEC );
     }
     else
     {
       ++nCptHidden;
       //Serial.println( nCptHidden, DEC );
       const int nNbrBarrePerWheel = 6; // nbr de "rayon"
-      const int nNbrWheelToMeasures = 4;
+      const int nNbrWheelToMeasures = 1;
       if( nCptHidden == nNbrWheelToMeasures*nNbrBarrePerWheel )
       {
         unsigned long nNow = micros();
         unsigned long nDuration = nNow - timeLast;
-        timeLast = nNow;
-        int rpmicro = nNbrWheelToMeasures / nDuration;
+        Serial.print( "nDuration: " );
+        Serial.println( nDuration, DEC );        
+        float rpmicro = nNbrWheelToMeasures*1000000. / nDuration;
         Serial.print( "rpmicro: " );
-        Serial.println( rpmicro, DEC );
+        Serial.println( rpmicro );
+        timeLast = nNow;
         nCptHidden = 0;
       }
     }
     bPrevLighten = bLighten;
   }
   
+  //delay(1);
+  
+  
+  // fps computation
   ++nCpt;
+  ++nFpsCpt;
+  const int nNbrFrameToCompute = 10000*2;
+  if( nFpsCpt == nNbrFrameToCompute )
+  {
+    unsigned long nNow = micros();
+    unsigned long nDuration = nNow - timeFpsBegin;
+    
+    Serial.print( "frame: " );
+    Serial.print( nDuration/nNbrFrameToCompute );
+    Serial.print( "us, fps: " );
+    Serial.println( 1000000.*nNbrFrameToCompute/nDuration );
+    timeFpsBegin = nNow;
+    nFpsCpt = 0;
+    
+    // a simple analog read is running at 5413fps (184us per frame)
+  }
 }
 
 /**
@@ -108,7 +143,7 @@ void setHue(int h, uint8_t n) {
   double g=0; 
   double b=0;
 
-  double hf=h/42.5; // Not /60 as range is _not_ 0-360
+//  double hf=h/42.5; // Not /60 as range is _not_ 0-360
 
   int i=(int)floor(h/42.5);
   double f = h/42.5 - i;

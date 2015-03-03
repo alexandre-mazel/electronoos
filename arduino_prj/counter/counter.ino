@@ -48,7 +48,7 @@ void setVumeter( int nValue )
     leds[i].g = 0;
     leds[i].b = 0;    
   }
-  ws2811.dim(16);
+  //ws2811.dim(4);
   ws2811.sendLedData();
 }
 
@@ -71,7 +71,7 @@ int nCpt = 0;
 int bPrevLighten = false;
 int nCptHidden = 0;
 unsigned long timeLast = 0;
-int nCptFadeOut = 0;
+int nCptFadeOut = -1;
 void loop()
 {
   int nLight = analogRead(  PHOTO_PIN ); // nLight is big when darker

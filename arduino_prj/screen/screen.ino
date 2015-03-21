@@ -9,17 +9,16 @@
 
 Ai_WS2811 ws2811;
 
-
 struct CRGB {
   unsigned char g;
   unsigned char r;
   unsigned char b;
 } *leds;
 
-#define TRGB struct CRGB
+//typedef struct sCRGB CRGB; // les typedef ne fonctionnet pas du tout...
+//#define CRGB struct sCRGB
 
-
-//CRGB * leds;
+//struct CRGB * leds;
 
 void setOne( int nNum )
 {
@@ -29,7 +28,7 @@ void setOne( int nNum )
     leds[nNum].b = 20;    
 }
 
-void setV( int nNum, const TCRGB * prgb )
+void setV( int nNum, struct CRGB * prgb )
 {
     memset( leds, 0, NUM_PIXELS*3 );
     for( int i = 0; i < H; ++i )
@@ -38,6 +37,8 @@ void setV( int nNum, const TCRGB * prgb )
       leds[i*W+nNum].g = prgb->g;
       leds[i*W+nNum].b = prgb->b;    
     }
+    ws2811.dim(8);    
+    ws2811.sendLedData();    
 }
 
 void setVumeter( int nValue )
@@ -86,7 +87,7 @@ unsigned long timeFpsBegin;
 void setup()
 {
   ws2811.init(DATA_PIN,NUM_PIXELS);
-  leds = (TRGB*)ws2811.getRGBData();
+  leds = (struct CRGB*)ws2811.getRGBData();
   Serial.begin(9600);
   //setVumeter( 10000 ); // full all led
   //setVumeter( 1250 ); // 1 led full
@@ -118,13 +119,11 @@ void loop()
   for( int i = 0; i < W; ++i )
   {
     setV(i, &rgb );
-    ws2811.sendLedData();
     delay(20);
   }
   for( int i = W-2; i > 0; --i )
   {
     setV(i, &rgb);
-    ws2811.sendLedData();
     delay(20);
   }
   
@@ -147,8 +146,6 @@ void loop()
     // a simple analog read is running at 5413fps (184us per frame)
   }
 }
-
-#if 0
 
 /**
  * HVS to RGB comversion (simplified to the range 0-255)
@@ -200,51 +197,3 @@ void loop()
   pRes->g = constrain((int)255*g,0,255);
   pRes->b = constrain((int)255*b,0,255);
  }
- 
-void setHue(int h, uint8_t n, ) {
-  //this is the algorithm to convert from RGB to HSV
-  double r=0; 
-  double g=0; 
-  double b=0;
-
-//  double hf=h/42.5; // Not /60 as range is _not_ 0-360
-
-  int i=(int)floor(h/42.5);
-  double f = h/42.5 - i;
-  double qv = 1 - f;
-  double tv = f;
-
-  switch (i)
-  {
-  case 0: 
-    r = 1;
-    g = tv;
-    break;
-  case 1: 
-    r = qv;
-    g = 1;
-    break;
-  case 2: 
-    g = 1;
-    b = tv;
-    break;
-  case 3: 
-    g = qv;
-    b = 1;
-    break;
-  case 4:
-    r = tv;
-    b = 1;
-    break;
-  case 5: 
-    r = 1;
-    b = qv;
-    break;
-  }
-
-  leds[n].r = constrain((int)255*r,0,255);
-  leds[n].g = constrain((int)255*g,0,255);
-  leds[n].b = constrain((int)255*b,0,255);
-}
-
-#endif

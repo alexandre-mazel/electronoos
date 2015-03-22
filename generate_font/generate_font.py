@@ -15,33 +15,37 @@ def generateFontRom():
         ey = 24;
 
     if( strName == "tut4-2.png" ):
-        im = cv2.pyrDown( im ); # PyrDown only divide by 2
+        bHalf = 0
+        if(bHalf):
+            im = cv2.pyrDown( im ); # PyrDown only divide by 2
         ox = 0; # origin
         oy = 0;
         sx=16; # size letter
         sy=16;
         ex = 0; # size interletter
         ey = 0;
-        
-        sx/=2;
-        sy/=2;
+
+        if( bHalf):
+            sx/=2;
+            sy/=2;
     
-    bRender = 0
+    bRender = 1
     strOut = "";
     for j in range(16):
         for i in range(16):
             x = ox+i*(sx+ex);
             y = oy+j*(sy+ey);
-            strOut += "// %d,%d: 'A'\n" % (i,j);
-            for jj in range(sy):
-                for ii in range(sx):
-                    val = im[y+jj,x+ii]
-                    #print( "val: %s" % val );
-                    val = val[0]
-                    strOut += "0x%02X, " % val;
-                strOut += "\n" % val;
-            if( bRender ):
-                cv2.rectangle( im, (x, y), (x+sx, y+sy), (0,0,255));
+            if( j*16+i>=ord('0') or True ):
+                strOut += "// %d,%d: '%s'\n" % (i,j,chr(j*16+i));
+                for jj in range(sy):
+                    for ii in range(sx):
+                        val = im[y+jj,x+ii]
+                        #print( "val: %s" % val );
+                        val = val[0]
+                        strOut += "0x%02X, " % val;
+                    strOut += "\n" % val;
+                if( bRender ):
+                    cv2.rectangle( im, (x, y), (x+sx, y+sy), (0,0,255));
     
     if( bRender):
         cv2.imshow( "im", im );

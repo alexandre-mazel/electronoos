@@ -26,14 +26,28 @@ def generateFontRom():
         sx/=2;
         sy/=2;
     
+    bRender = 0
+    strOut = "";
     for j in range(16):
         for i in range(16):
             x = ox+i*(sx+ex);
             y = oy+j*(sy+ey);
-            cv2.rectangle( im, (x, y), (x+sx, y+sy), (0,0,255));
+            strOut += "// %d,%d: 'A'\n" % (i,j);
+            for jj in range(sy):
+                for ii in range(sx):
+                    val = im[y+jj,x+ii]
+                    #print( "val: %s" % val );
+                    val = val[0]
+                    strOut += "0x%02X, " % val;
+                strOut += "\n" % val;
+            if( bRender ):
+                cv2.rectangle( im, (x, y), (x+sx, y+sy), (0,0,255));
     
-    cv2.imshow( "im", im );
-    cv2.waitKey(0);
+    if( bRender):
+        cv2.imshow( "im", im );
+        cv2.waitKey(0);
+        
+    print strOut;
     
 # generateFontRom - end
     

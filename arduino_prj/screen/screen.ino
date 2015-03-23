@@ -1,4 +1,5 @@
 #include "Ai_WS2811.h"
+#include "fonts.h"
 
 #define W 14
 #define H  8
@@ -78,6 +79,25 @@ void setVumeter( int nValue )
   }
   ws2811.dim(4);
   ws2811.sendLedData();
+}
+
+void drawLetter( int nNumLetter, int x, int y )
+{
+   // affiche une lettre a une certaine position x,y: le coin haut gauche de la lettre
+   unsigned char * pPixSrc = &aLetters[(nNumLetter-'0')*LETTER_SIZE_X*LETTER_SIZE_Y];
+   int pix = x+y*W;
+   for( int j; j < LETTER_SIZE_Y; ++j ) 
+   {
+     for( int i; j < LETTER_SIZE_X; ++i )
+     {
+        leds[pix].r = *pPixSrc;
+        leds[pix].g = *pPixSrc;
+        leds[pix].b = *pPixSrc;
+        ++pPixSrc;
+        ++pix;
+     }
+     pix += W-LETTER_SIZE_X;
+    }
 }
 
 int nFpsCpt = 0;

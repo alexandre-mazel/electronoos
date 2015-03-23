@@ -6,8 +6,7 @@ void Ai_WS2811::init(uint8_t pin, uint16_t nPixels)
   digitalWrite(pin, LOW);
   m_nLeds = nPixels * 3; 
   m_nCounter = 0; 
-  m_pData = (unsigned char*)malloc(m_nLeds); 
-_
+  m_pData = (unsigned char*)malloc(m_nLeds);
   m_pDataEnd = m_pData + m_nLeds; 
 }
 

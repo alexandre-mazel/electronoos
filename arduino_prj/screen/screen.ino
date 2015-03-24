@@ -163,6 +163,7 @@ void loop()
   }
  */
 
+/* 
   //Serial.println( "AAAAAAAAA" );
   for( int i = -LETTER_SIZE_X+1; i < W; ++i )
   {
@@ -173,6 +174,20 @@ void loop()
     delay(50);
 //    break;
   }
+  */
+  
+  char szToWrite[] = "Samy";
+  
+  for( int i = W-1; i >= -LETTER_SIZE_X+1; --i )
+  {
+    memset( leds, 0, NUM_PIXELS*3 );
+    drawLetter( szToWrite[nCpt%4], i, 0 );
+    ws2811.dim(16);
+    ws2811.sendLedData();
+    delay(50);
+//    break;
+  }
+  
   
   // fps computation
   ++nCpt;

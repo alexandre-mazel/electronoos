@@ -82,21 +82,24 @@ void setVumeter( int nValue )
 void drawLetter( int nNumLetter, int x, int y )
 {
    // affiche une lettre a une certaine position x,y: le coin haut gauche de la lettre
-   //unsigned char * pPixSrc = &(aLetters[(nNumLetter-'0')*LETTER_SIZE_X*LETTER_SIZE_Y]);
-   unsigned char * pPixSrc = aLetters;
+   unsigned char * pPixSrc = &(aLetters[(nNumLetter-'0')*LETTER_SIZE_X*LETTER_SIZE_Y]);
+   //unsigned char * pPixSrc = aLetters;
    int pix = x+y*W;
    for( int j = 0; j < LETTER_SIZE_Y; ++j ) 
    {
      for( int i = 0; i < LETTER_SIZE_X; ++i )
      {
         unsigned char val = *pPixSrc;
-        Serial.println( "pix:" );
-        Serial.println( int(pPixSrc), HEX );
-        Serial.println( int(aLetters), HEX );        
-        Serial.println( val, HEX );
-        leds[pix].r = val;
-        leds[pix].g = val;
-        leds[pix].b = val;
+//        Serial.println( "pix:" );
+//        Serial.println( int(pPixSrc), HEX );
+//        Serial.println( int(aLetters), HEX );        
+//        Serial.println( val, HEX );
+        if( val > 63 || 1 )
+        {
+          leds[pix].r = val;
+          leds[pix].g = val;
+          leds[pix].b = val;
+        }
         ++pPixSrc;
         ++pix;
      }
@@ -159,10 +162,13 @@ void loop()
  */
 
   Serial.println( "AAAAAAAAA" );
-  drawLetter( 'A', 0, 0 );
-  ws2811.dim(4);
-  ws2811.sendLedData();
-  delay(1000);
+  for( int i = 0; i < W-LETTER_SIZE_X+2; ++i )
+  {
+    drawLetter( '0'+nCpt%10, i, 0 );
+    ws2811.dim(4);
+    ws2811.sendLedData();
+    delay(100);
+  }
   
   // fps computation
   ++nCpt;

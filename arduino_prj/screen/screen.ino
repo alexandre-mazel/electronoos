@@ -85,6 +85,8 @@ void drawLetter( int nNumLetter, int x, int y )
    unsigned char * pPixSrc = &(aLetters[(nNumLetter-LETTER_FIRST)*LETTER_SIZE_X*LETTER_SIZE_Y]);
    //unsigned char * pPixSrc = aLetters;
    int pix = x+y*W;
+   int nLimitX1 = -x;
+   int nLimitX2 = W-x;   
    for( int j = 0; j < LETTER_SIZE_Y; ++j ) 
    {
      for( int i = 0; i < LETTER_SIZE_X; ++i )
@@ -94,7 +96,7 @@ void drawLetter( int nNumLetter, int x, int y )
 //        Serial.println( int(pPixSrc), HEX );
 //        Serial.println( int(aLetters), HEX );        
 //        Serial.println( val, HEX );
-        if( val > 63 || 1 )
+        if( i >= nLimitX1 && i < nLimitX2 )
         {
           leds[pix].r = val;
           leds[pix].g = val;
@@ -162,13 +164,14 @@ void loop()
  */
 
   //Serial.println( "AAAAAAAAA" );
-  for( int i = 0; i < W-LETTER_SIZE_X+2; ++i )
+  for( int i = -LETTER_SIZE_X+1; i < W; ++i )
   {
     memset( leds, 0, NUM_PIXELS*3 );
-    drawLetter( LETTER_FIRST+nCpt%LETTER_FIRST, 0, 0 );
+    drawLetter( LETTER_FIRST+(nCpt%LETTER_NBR), i, 0 );
     ws2811.dim(16);
     ws2811.sendLedData();
-    delay(100);
+    delay(50);
+//    break;
   }
   
   // fps computation

@@ -77,22 +77,26 @@ void setVumeter( int nValue )
     leds[i].g = 0;
     leds[i].b = 0;    
   }
-  ws2811.dim(4);
-  ws2811.sendLedData();
 }
 
 void drawLetter( int nNumLetter, int x, int y )
 {
    // affiche une lettre a une certaine position x,y: le coin haut gauche de la lettre
-   unsigned char * pPixSrc = &aLetters[(nNumLetter-'0')*LETTER_SIZE_X*LETTER_SIZE_Y];
+   //unsigned char * pPixSrc = &(aLetters[(nNumLetter-'0')*LETTER_SIZE_X*LETTER_SIZE_Y]);
+   unsigned char * pPixSrc = aLetters;
    int pix = x+y*W;
-   for( int j; j < LETTER_SIZE_Y; ++j ) 
+   for( int j = 0; j < LETTER_SIZE_Y; ++j ) 
    {
-     for( int i; j < LETTER_SIZE_X; ++i )
+     for( int i = 0; i < LETTER_SIZE_X; ++i )
      {
-        leds[pix].r = *pPixSrc;
-        leds[pix].g = *pPixSrc;
-        leds[pix].b = *pPixSrc;
+        unsigned char val = *pPixSrc;
+        Serial.println( "pix:" );
+        Serial.println( int(pPixSrc), HEX );
+        Serial.println( int(aLetters), HEX );        
+        Serial.println( val, HEX );
+        leds[pix].r = val;
+        leds[pix].g = val;
+        leds[pix].b = val;
         ++pPixSrc;
         ++pix;
      }
@@ -135,17 +139,30 @@ void loop()
   getHue( nCpt%256, &rgb);
 
 
-
+/*
   for( int i = 0; i < W; ++i )
   {
     setV(i, &rgb );
+    ws2811.dim(4);
+    ws2811.sendLedData();    
     delay(20);
   }
   for( int i = W-2; i > 0; --i )
   {
     setV(i, &rgb);
+    drawLetter( 'A', 0, 0 );
+    ws2811.dim(4);
+    ws2811.sendLedData();
+    
     delay(20);
   }
+ */
+
+  Serial.println( "AAAAAAAAA" );
+  drawLetter( 'A', 0, 0 );
+  ws2811.dim(4);
+  ws2811.sendLedData();
+  delay(1000);
   
   // fps computation
   ++nCpt;

@@ -82,6 +82,9 @@ void setVumeter( int nValue )
 void drawLetter( int nNumLetter, int x, int y )
 {
    // affiche une lettre a une certaine position x,y: le coin haut gauche de la lettre
+   if( nNumLetter == ' ' )
+     return;
+     
    unsigned char * pPixSrc = &(aLetters[(nNumLetter-LETTER_FIRST)*LETTER_SIZE_X*LETTER_SIZE_Y]);
    //unsigned char * pPixSrc = aLetters;
    int pix = x+y*W;
@@ -176,17 +179,21 @@ void loop()
   }
   */
   
-  char szToWrite[] = "Samy";
+  char szToWrite[] = "Corto Mazel  ";
+  int nLenMessage = 10;
   
-  for( int i = W-1; i >= -LETTER_SIZE_X+1; --i )
-  {
-    memset( leds, 0, NUM_PIXELS*3 );
-    drawLetter( szToWrite[nCpt%4], i, 0 );
-    ws2811.dim(16);
-    ws2811.sendLedData();
-    delay(50);
-//    break;
-  }
+  int nIdxCurLetter = nCpt/(W+LETTER_SIZE_X-1)*2;
+  
+  memset( leds, 0, NUM_PIXELS*3 );
+  Serial.println( szToWrite[nIdxCurLetter%nLenMessage] );
+  int nX = ((-nCpt)%(W+LETTER_SIZE_X-1))-LETTER_SIZE_X+1+W+6;
+  Serial.println( nX );  
+  drawLetter( szToWrite[nIdxCurLetter%nLenMessage], nX, 0 );
+  drawLetter( szToWrite[(nIdxCurLetter+1)%nLenMessage], nX+9, 0 );
+  drawLetter( szToWrite[(nIdxCurLetter+2)%nLenMessage], nX+9, 0 );  
+  ws2811.dim(16);
+  ws2811.sendLedData();
+  delay(100);
   
   
   // fps computation

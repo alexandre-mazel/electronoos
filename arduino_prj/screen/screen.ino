@@ -82,7 +82,7 @@ void setVumeter( int nValue )
 void drawLetter( int nNumLetter, int x, int y )
 {
    // affiche une lettre a une certaine position x,y: le coin haut gauche de la lettre
-   if( nNumLetter == ' ' )
+   if( nNumLetter == ' ' || nNumLetter < LETTER_FIRST || ( nNumLetter - LETTER_FIRST ) >= LETTER_NBR )
      return;
      
    unsigned char * pPixSrc = &(aLetters[(nNumLetter-LETTER_FIRST)*LETTER_SIZE_X*LETTER_SIZE_Y]);
@@ -115,6 +115,10 @@ void drawLetter( int nNumLetter, int x, int y )
 int nFpsCpt = 0;
 unsigned long timeFpsBegin;
 
+#define NBR_LETTER_DRAW 3
+int aLetterPos[NBR_LETTER_DRAW]; // pixel of the top left
+int aLetterIdx[NBR_LETTER_DRAW]; // point the letter in the message
+
 //some initial values
 void setup()
 {
@@ -125,6 +129,11 @@ void setup()
   //setVumeter( 1250 ); // 1 led full
   setVumeter( 0 ); // 0 led
   timeFpsBegin = micros();
+  for( int i = 0; i < NBR_LETTER_DRAW; ++i )
+  {
+    aLetterPos[i] = W+i*(LETTER_SIZE_X+1);
+    aLetterIdx[i] = i;
+  }
 }
 
 int nCpt = 0;
@@ -178,9 +187,13 @@ void loop()
 //    break;
   }
   */
-  
-  char szToWrite[] = "Corto Mazel  ";
-  int nLenMessage = 10;
+
+  //char szToWrite[] = "<<<Factory Rulez>>>";
+  //char szToWrite[] = "- Un jour un truc 2016 !!! -"; // => timeout!
+  char szToWrite[] = "[Un jour un truc 2016] ";
+  int nLenMessage = sizeof(szToWrite)-1;
+
+  /*
   
   int nIdxCurLetter = nCpt/(W+LETTER_SIZE_X-1)*2;
   
@@ -194,12 +207,28 @@ void loop()
   ws2811.dim(16);
   ws2811.sendLedData();
   delay(100);
+  */
   
+  memset( leds, 0, NUM_PIXELS*3 );
+
+  for( int i = 0; i < NBR_LETTER_DRAW; ++i )
+  {
+    drawLetter( szToWrite[aLetterIdx[i]%nLenMessage], aLetterPos[i], 0 );      
+    --aLetterPos[i];
+    if( aLetterPos[i] < -LETTER_SIZE_X )
+    {
+      aLetterPos[i] += 3*(LETTER_SIZE_X+1);
+      aLetterIdx[i] += 3;      
+    }    
+  }
+  ws2811.dim(16);
+  ws2811.sendLedData();
+  delay(40);
   
   // fps computation
   ++nCpt;
   ++nFpsCpt;
-  const int nNbrFrameToCompute = 10000*2;
+  const int nNbrFrameToCompute = 100; // 10000*2, c'est bien pour du 5000fps :)
   if( nFpsCpt == nNbrFrameToCompute )
   {
     unsigned long nNow = micros();

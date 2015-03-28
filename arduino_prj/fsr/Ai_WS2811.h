@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <util/delay.h>
 
+// v0.61: add CRGB struct definition
 // v0.6: add dim and version !
 
 // Assume Arduino Uno, digital pin 8 lives in Port B
@@ -28,3 +29,9 @@ class Ai_WS2811
     void dim( const int nDimCoef = 2 ); // dim all leds by a coef (to avoid burning my eyes)
     unsigned char *getRGBData() { return m_pData; } 
 };
+
+struct CRGB {
+  unsigned char g;
+  unsigned char r;
+  unsigned char b;
+} ;

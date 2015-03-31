@@ -94,7 +94,7 @@ int TagsList_isInList( const TagsList * t, const  char * buf )
 
 int TagsList_isMagic( const char * buf )
 {
-  for( int i; i < NBR_MAGIC_TAG_DIFFERENT; ++i )
+  for( int i = 0; i < NBR_MAGIC_TAG_DIFFERENT; ++i )
   {
     if( memcmp( buf, &(aMagicTagList_Memorize[i][0]), TAG_LEN ) == 0 )
     {

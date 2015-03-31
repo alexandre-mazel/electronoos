@@ -1,7 +1,7 @@
 #include "Ai_WS2811.h"
 
 #define NUM_PIXELS 8
-#define DATA_PIN 53
+#define DATA_PIN 53 // work fine with 53 but not 23! nor 52 ... ???
 
 Ai_WS2811 ws2811;
 

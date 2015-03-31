@@ -1,3 +1,5 @@
+#include <EEPROM.h>
+
 /*
  * La table des Aromes des Caves du Louvre
  * 
@@ -9,12 +11,21 @@
 #include <avr/pgmspace.h>
 const char pad[3] PROGMEM = { 0, 0, 0 };
 
+
 #include "tags.h"
+#include "Ai_WS2811.h"
+//#include <../../../../libraries/EEPROM/EEPROM.h> // => generate error when in a .c
 
 const int nNbrReader = 3;
 const int nLenCode = 12;
 
-const int nFirstLedPin = 28; // first is green, second is red
+const int nFirstLedPin = 22; // one led per reader
+const int nFirstPresencePin = 48; // one pin per reader
+
+#define NUM_PIXELS 8
+Ai_WS2811 aWs2811[nNbrReader];
+struct CRGB * apLeds[nNbrReader] = {NULL, NULL, NULL};
+
 
 TagsList * pTagsList = NULL;
 
@@ -23,16 +34,9 @@ int anExtraPin_CptEqual[nNbrReader];  // count the number of frame with same val
 int abExtraPin_BoardWasHere[nNbrReader]; // was the board present?
 
 /*
-
 Led phase at ~200fps:
-    0: learn first frame
- 5000: good first frame
-10000: bad first frame
-30000: slow turn off
-59000: turn off
-60000: nothing
 */
-unsigned int anCptLedAnim[nNbrReader*2];
+unsigned int anCptLedAnim[nNbrReader];
 
 void animate_led()
 {
@@ -157,20 +161,52 @@ void animate_led()
 void check_leds( void )
 {
   // check all leds are ok: make the led blink all once (for startup)
+  Serial.println( "check_leds..." );
   int i;
   for( i = 0; i < nNbrReader; ++i )
   {
-    digitalWrite(nFirstLedPin+i*2+0, HIGH);
-    digitalWrite(nFirstLedPin+i*2+1, HIGH);
+    aWs2811[i].setColor( 255,0, 0 );
   }
   delay( 2000 );
   for( i = 0; i < nNbrReader; ++i )
   {
-    digitalWrite(nFirstLedPin+i*2+0, LOW);
-    digitalWrite(nFirstLedPin+i*2+1, LOW);
+    aWs2811[i].setColor( 255, 0, 255 );    
   }
   delay( 1000 );  
 }
+
+/*
+const byte nEepromVersion = 1;
+
+void load_eeprom2(TagsList * pTagsList, int nNbrReader)
+{
+  byte nEepromCurrent = EEPROM.read( 0 );
+  Serial.print( "eeprom current version: " );
+  Serial.println( nEepromCurrent );
+  if( nEepromVersion != nEepromCurrent )
+  {
+    return;
+  }
+  Serial.println( "Loading eeprom..." );
+  int nOffset = 1;
+  for( int i = 0; i < nNbrReader; ++i )
+  {
+    nOffset += TagsList_readFromEprom( &pTagsList[i], nOffset );
+  }  
+}
+
+void save_eeprom2(TagsList * pTagsList, int nNbrReader)
+{
+  Serial.println( "Saving eeprom..." );
+  EEPROM.write( 0, nEepromVersion );
+  int nOffset = 1;
+  for( int i = 0; i < nNbrReader; ++i )
+  {
+    nOffset += TagsList_writeToEprom( &pTagsList[i], nOffset );
+  }  
+}
+*/
+
 void setup()
 {
   pad[0];
@@ -190,15 +226,22 @@ void setup()
   // setup pin
   for( i = 0; i < nNbrReader; ++i )
   {
-    pinMode(nFirstLedPin+i*2+0, OUTPUT);
-    pinMode(nFirstLedPin+i*2+1, OUTPUT);  
+    pinMode( nFirstLedPin+i, OUTPUT );
+    pinMode( nFirstPresencePin+i, INPUT );
   }
+
+  for( i = 0; i < nNbrReader; ++i )
+  {
+    aWs2811[i].init(nFirstLedPin+i,NUM_PIXELS);
+    apLeds[i] = (struct CRGB*)aWs2811[i].getRGBData();
+  }
+  
+  
   check_leds();
 
-  pinMode(40, INPUT);  
   
-  Serial.println( "\nArduino started: Table des Aromes v0.8\n" );
-  // if version match, load old TagsList TODO
+  Serial.println( "\nArduino started: Table des Aromes v0.9\n" );
+  load_eeprom(pTagsList, nNbrReader);
 }
 
 int check_code( const char * buf, int nReaderIdx )
@@ -253,7 +296,10 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
     Serial.print( buf[i], HEX );
     Serial.write( " " );
   }
-  int nRetCode = check_code( &buf[1], nReaderIdx );
+  int nRetCode = TagsList_isMagic( &buf[1] );  
+  
+  
+   nRetCode = check_code( &buf[1], nReaderIdx );
   *pnBufLen = 0;
 
   Serial.write( "\nretcode: " );
@@ -319,26 +365,25 @@ void loop()
  
   animate_led();
   // delay(0);
- 
-  int nVal = digitalRead(40);
-  if( nVal == anExtraPin_PrevState[1] )
+  
+  for( i = 0; i < nNbrReader; ++i )
   {
-    ++anExtraPin_CptEqual[1];
-    if( abExtraPin_BoardWasHere[1] && anExtraPin_CptEqual[1] > 16 )
-    //if( anExtraPin_CptEqual[1] > 16 )
+    int nVal = digitalRead(nFirstPresencePin+i);
+    if( nVal == anExtraPin_PrevState[i] )
     {
-      // tag disappear, turn off led right now!
-      Serial.println( "led disappear!" );
-      abExtraPin_BoardWasHere[1] = false;
-      anCptLedAnim[1*2+0] = 59000;
-      anCptLedAnim[1*2+1] = 59000;
-      
-    }   
+      ++anExtraPin_CptEqual[i];
+      if( abExtraPin_BoardWasHere[i] && anExtraPin_CptEqual[i] > 16 )
+      //if( anExtraPin_CptEqual[1] > 16 )
+      {
+        // tag disappear, turn off led right now!
+        Serial.println( "led disappear!" );
+        abExtraPin_BoardWasHere[i] = false;
+      }   
+    }
+    else
+    {
+      anExtraPin_PrevState[i] = nVal;
+      anExtraPin_CptEqual[i] = 0;
+    }
   }
-  else
-  {
-    anExtraPin_PrevState[1] = nVal;
-    anExtraPin_CptEqual[1] = 0;
-  }
- 
 }

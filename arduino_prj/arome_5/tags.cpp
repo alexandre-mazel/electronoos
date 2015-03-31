@@ -1,5 +1,5 @@
 #include <Arduino.h> // for byte
-#include <../../../../libraries/EEPROM/EEPROM.h> // => generate error when in a .c
+#include <../../../../libraries/EEPROM/EEPROM.h> // => include here for definition, but include also in the .ino for the link to add the lib
 
 
 
@@ -7,6 +7,21 @@
 // WRN: can't write more than 100000 times. initialised at 0xFF but can change => use a pgm version number
 
 #include "tags.h"
+
+#define NBR_MAGIC_TAG_DIFFERENT 2 // we could have many different memorize tag and ...
+char aMagicTagList_Memorize[NBR_MAGIC_TAG_DIFFERENT][TAG_LEN] = 
+{
+  {0x30, 0x36, 0x30, 0x30, 0x36, 0x46, 0x33, 0x42, 0x32, 0x36, 0x37, 0x34,},
+  {0x30, 0x36, 0x30, 0x30, 0x36, 0x46, 0x33, 0x42, 0x32, 0x36, 0x37, 0x34,},  
+};
+
+char aMagicTagList_Forget[NBR_MAGIC_TAG_DIFFERENT][TAG_LEN] = 
+{
+  {0x30, 0x36, 0x30, 0x30, 0x36, 0x46, 0x34, 0x30, 0x31, 0x46, 0x33, 0x36,},
+  {0x30, 0x36, 0x30, 0x30, 0x36, 0x46, 0x34, 0x30, 0x31, 0x46, 0x33, 0x36,},  
+};
+
+
 
 
 void TagsList_init( TagsList * t )
@@ -75,4 +90,52 @@ int TagsList_isInList( const TagsList * t, const  char * buf )
   }
   Serial.println( "TagsList_isInList - end: 0" );
   return 0;
+}
+
+int TagsList_isMagic( const char * buf )
+{
+  for( int i; i < NBR_MAGIC_TAG_DIFFERENT; ++i )
+  {
+    if( memcmp( buf, &(aMagicTagList_Memorize[i][0]), TAG_LEN ) == 0 )
+    {
+      Serial.println( "TagsList_isMagic: Memorize!" );
+      return 1;
+    }
+    if( memcmp( buf, &(aMagicTagList_Forget[i][0]), TAG_LEN ) == 0 )
+    {
+      Serial.println( "TagsList_isMagic: Forget!" );      
+      return 2;
+    }    
+  }
+  return 0;
+}
+
+
+const byte nEepromVersion = 1;
+void load_eeprom(TagsList * pTagsList, int nNbrReader)
+{
+  byte nEepromCurrent = EEPROM.read( 0 );
+  Serial.print( "eeprom current version: " );
+  Serial.println( nEepromCurrent );
+  if( nEepromVersion != nEepromCurrent )
+  {
+    return;
+  }
+  Serial.println( "Loading eeprom..." );
+  int nOffset = 1;
+  for( int i = 0; i < nNbrReader; ++i )
+  {
+    nOffset += TagsList_readFromEprom( &pTagsList[i], nOffset );
+  }  
+}
+
+void save_eeprom(TagsList * pTagsList, int nNbrReader)
+{
+  Serial.println( "Saving eeprom..." );
+  EEPROM.write( 0, nEepromVersion );
+  int nOffset = 1;
+  for( int i = 0; i < nNbrReader; ++i )
+  {
+    nOffset += TagsList_writeToEprom( &pTagsList[i], nOffset );
+  }  
 }

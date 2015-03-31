@@ -82,9 +82,9 @@ int bPushed = 0;
 void loop()
 {
     int nVal = analogRead(  SENSOR_PIN ); // nLight is big when darker
-    if( nVal < 500 )
+    if( nVal < 900 )
     {
-      setVumeter( (500-nVal)*20 );
+      setVumeter( (900-nVal)*20 ); // ca va depasser...
       if( !bPushed )
       {
         bPushed = 1;

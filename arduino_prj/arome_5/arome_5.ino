@@ -33,6 +33,8 @@ int anExtraPin_PrevState[nNbrReader]; // memorize the state of the previous extr
 int anExtraPin_CptEqual[nNbrReader];  // count the number of frame with same value (one per board)
 int abExtraPin_BoardWasHere[nNbrReader]; // was the board present?
 
+int anState[nNbrReader]; // 0: idle, 1: good, 2: bad, 3: memorize, 4: forget
+
 /*
 Led phase at ~200fps:
 */
@@ -248,7 +250,7 @@ int check_code( const char * buf, int nReaderIdx )
 {
    /* 
    is the code the good one for this id ?
-   return 0/1/2, cf analyse_code for meanings
+   return 0/1/2, memorized/good/bad
    */
    if( pTagsList[nReaderIdx].nNbrTags == 0 )
    {
@@ -271,10 +273,8 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
   /*
   Analyse a buffer.
   Return:
-    -1: if nothing found, 0
-    +0: code memorised
-    +1: good id
-    +2: if bad id
+    -1: if nothing found
+    0: if something found (state updated)
   */
   // TODO: check buffer jamais plus grand que nLenCode+2
   int nBufLen = *pnBufLen;
@@ -296,33 +296,24 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
     Serial.print( buf[i], HEX );
     Serial.write( " " );
   }
-  int nRetCode = TagsList_isMagic( &buf[1] );  
+  *pnBufLen = 0;  
+  int nRetCode = TagsList_isMagic( &buf[1] );
+  if( nRetCode != 0 )
+  {
+    anState[nReaderIdx] = nRetCode+2; // 3 or 4
+    return 0;
+  }
   
   
-   nRetCode = check_code( &buf[1], nReaderIdx );
-  *pnBufLen = 0;
+  nRetCode = check_code( &buf[1], nReaderIdx );
 
   Serial.write( "\nretcode: " );
   Serial.print( nRetCode, DEC );
   Serial.write( "\n" );
 
-  if( nRetCode == 0 )
-  {
-    anCptLedAnim[nReaderIdx*2+0] = 0;
-    anCptLedAnim[nReaderIdx*2+1] = 0;
-  }
-  else if( nRetCode == 1 )
-  {
-    anCptLedAnim[nReaderIdx*2+0] = 5000;
-    anCptLedAnim[nReaderIdx*2+1] = 59000;
-  }
-  else
-  {
-    anCptLedAnim[nReaderIdx*2+1] = 10000;
-    anCptLedAnim[nReaderIdx*2+0] = 59000;    
-  }
+  anState[nReaderIdx] = nRetCode;
   
-  return nRetCode;
+  return 0;
 }
 
 

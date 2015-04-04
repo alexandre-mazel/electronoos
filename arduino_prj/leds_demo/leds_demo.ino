@@ -1,15 +1,11 @@
 #include "Ai_WS2811.h"
 
-#define NUM_PIXELS 8
-#define DATA_PIN 53 // work fine with 53 but not 23! nor 52 ... ???
+#define NUM_PIXELS 16 // 8 // 12 // 16
+#define DATA_PIN 53 // work fine with 53 but not 23! nor 52 ... ??? for 53 you'll need to set led bit a 0, 52: led pit a 1 et 51: led bit a 0 cf http://arduino.cc/en/Hacking/PinMapping2560
 
 Ai_WS2811 ws2811;
 
-struct CRGB {
-  unsigned char g;
-  unsigned char r;
-  unsigned char b;
-} *leds;
+struct CRGB *leds;
 
 //some initial values
 void setup()
@@ -34,19 +30,19 @@ void loop()
     {
       for (int led = 0; led < NUM_PIXELS/2; ++led) 
       {
-        leds[3-led].g = 0;
+        leds[NUM_PIXELS/2-1-led].g = 0;
         if( led > j )
-          leds[3-led].r = 0;
+          leds[NUM_PIXELS/2-1-led].r = 0;
         else
-          leds[3-led].r = 255;        
-        leds[3-led].b = 0;      
+          leds[NUM_PIXELS/2-1-led].r = 255;        
+        leds[NUM_PIXELS/2-1-led].b = 0;      
         
-        leds[4+led].g = 0;
+        leds[NUM_PIXELS/2-0+led].g = 0;
         if( led > j )
-          leds[4+led].r = 0;
+          leds[NUM_PIXELS/2-0+led].r = 0;
         else
-          leds[4+led].r = 255;        
-        leds[4+led].b = 0;      
+          leds[NUM_PIXELS/2-0+led].r = 255;        
+        leds[NUM_PIXELS/2-0+led].b = 0;      
         
       }
       ws2811.sendLedData();
@@ -57,19 +53,19 @@ void loop()
     {
       for (int led = 0; led < NUM_PIXELS/2; ++led) 
       {
-        leds[3-led].g = 0;
+        leds[NUM_PIXELS/2-1-led].g = 0;
         if( led > j )
-          leds[3-led].r = 0;
+          leds[NUM_PIXELS/2-1-led].r = 0;
         else
-          leds[3-led].r = 255;        
-        leds[3-led].b = 0;      
+          leds[NUM_PIXELS/2-1-led].r = 255;        
+        leds[NUM_PIXELS/2-1-led].b = 0;      
         
-        leds[4+led].g = 0;
+        leds[NUM_PIXELS/2-0+led].g = 0;
         if( led > j )
-          leds[4+led].r = 0;
+          leds[NUM_PIXELS/2-0+led].r = 0;
         else
-          leds[4+led].r = 255;        
-        leds[4+led].b = 0;      
+          leds[NUM_PIXELS/2-0+led].r = 255;        
+        leds[NUM_PIXELS/2-0+led].b = 0;      
         
       }
       ws2811.sendLedData();
@@ -82,19 +78,19 @@ void loop()
     {
       for (int led = 0; led < NUM_PIXELS/2; ++led) 
       {
-        leds[3-led].r = 0;
+        leds[NUM_PIXELS/2-1-led].r = 0;
         if( led > j )
-          leds[3-led].g = 0;
+          leds[NUM_PIXELS/2-1-led].g = 0;
         else
-          leds[3-led].g = 255;        
-        leds[3-led].b = 0;      
+          leds[NUM_PIXELS/2-1-led].g = 255;        
+        leds[NUM_PIXELS/2-1-led].b = 0;      
         
-        leds[4+led].r = 0;
+        leds[NUM_PIXELS/2-0+led].r = 0;
         if( led > j )
-          leds[4+led].g = 0;
+          leds[NUM_PIXELS/2-0+led].g = 0;
         else
-          leds[4+led].g = 255;        
-        leds[4+led].b = 0;      
+          leds[NUM_PIXELS/2-0+led].g = 255;        
+        leds[NUM_PIXELS/2-0+led].b = 0;      
         
       }
       ws2811.sendLedData();
@@ -105,19 +101,19 @@ void loop()
     {
       for (int led = 0; led < NUM_PIXELS/2; ++led) 
       {
-        leds[3-led].r = 0;
+        leds[NUM_PIXELS/2-1-led].r = 0;
         if( led > j )
-          leds[3-led].g = 0;
+          leds[NUM_PIXELS/2-1-led].g = 0;
         else
-          leds[3-led].g = 255;        
-        leds[3-led].b = 0;      
+          leds[NUM_PIXELS/2-1-led].g = 255;        
+        leds[NUM_PIXELS/2-1-led].b = 0;      
         
-        leds[4+led].r = 0;
+        leds[NUM_PIXELS/2-0+led].r = 0;
         if( led > j )
-          leds[4+led].g = 0;
+          leds[NUM_PIXELS/2-0+led].g = 0;
         else
-          leds[4+led].g = 255;        
-        leds[4+led].b = 0;      
+          leds[NUM_PIXELS/2-0+led].g = 255;        
+        leds[NUM_PIXELS/2-0+led].b = 0;      
         
       }
       ws2811.sendLedData();

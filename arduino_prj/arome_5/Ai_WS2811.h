@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <util/delay.h>
 
+// v0.63: add multi port ability
 // v0.62: add setColor method
 // v0.61: add CRGB struct definition
 // v0.6: add dim and version !
@@ -10,7 +11,7 @@
 #define LED_DDR DDRB
 #define LED_PORT PORTB
 #define LED_PIN PINB
-#define LED_BIT _BV(0)
+#define LED_BIT _BV(m_nNumBit)
 #define NOP __asm__("nop\n\t")
 
 class Ai_WS2811 
@@ -21,6 +22,7 @@ class Ai_WS2811
     unsigned long m_nCounter;
     unsigned char *m_pData;
     unsigned char *m_pDataEnd;
+    unsigned int  m_nNumBit; // 0 => 53, 1 => 51, 2 => 52...
 
   public:
     byte _r, _g, _b;

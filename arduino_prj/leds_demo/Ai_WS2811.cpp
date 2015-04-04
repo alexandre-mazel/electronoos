@@ -8,10 +8,49 @@ void Ai_WS2811::init(uint8_t pin, uint16_t nPixels)
   m_nCounter = 0; 
   m_pData = (unsigned char*)malloc(m_nLeds); 
   memset(m_pData,0,m_nLeds); 
-  m_pDataEnd = m_pData + m_nLeds; 
+  m_pDataEnd = m_pData + m_nLeds;
+  if( pin == 53 )
+  {
+    m_nNumBit = 0;
+  }
+  else if( pin == 52 )
+  {
+    m_nNumBit = 1;
+  }  
+  else if( pin == 51 )
+  {
+    m_nNumBit = 2;
+  }    
+  else if( pin == 50 )
+  {
+    m_nNumBit = 3;
+  }      
 }
 
-void Ai_WS2811::sendLedData(void) 
+void Ai_WS2811::dim( const int nDimCoef )
+{
+  register byte *p = m_pData;
+  register byte *e = m_pDataEnd;
+  while(p != e) 
+  { 
+     *p++ /= nDimCoef;
+   }
+}
+
+void Ai_WS2811::setColor(unsigned char r,unsigned char g,unsigned char b)
+{
+  register byte *p = m_pData;
+  register byte *e = m_pDataEnd;
+  while(p != e) 
+  { 
+     *p++ = r;
+     *p++ = g;
+     *p++ = b;     
+  }  
+  sendLedData();
+}
+
+void Ai_WS2811::sendLedData(void)
 {
   cli();
   register byte *p = m_pData;

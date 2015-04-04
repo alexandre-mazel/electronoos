@@ -8,7 +8,23 @@ void Ai_WS2811::init(uint8_t pin, uint16_t nPixels)
   m_nCounter = 0; 
   m_pData = (unsigned char*)malloc(m_nLeds); 
   memset(m_pData,0,m_nLeds); 
-  m_pDataEnd = m_pData + m_nLeds; 
+  m_pDataEnd = m_pData + m_nLeds;
+  if( pin == 53 )
+  {
+    m_nNumBit = 0;
+  }
+  else if( pin == 52 )
+  {
+    m_nNumBit = 1;
+  }  
+  else if( pin == 51 )
+  {
+    m_nNumBit = 2;
+  }    
+  else if( pin == 50 )
+  {
+    m_nNumBit = 3;
+  }      
 }
 
 void Ai_WS2811::dim( const int nDimCoef )

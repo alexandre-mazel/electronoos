@@ -19,10 +19,10 @@ const char pad[3] PROGMEM = { 0, 0, 0 };
 const int nNbrReader = 3;
 const int nLenCode = 12;
 
-const int nFirstLedPin = 22; // one led per reader
-const int nFirstPresencePin = 48; // one pin per reader
+const int nFirstLedPin = 50; // one led per reader
+const int nFirstPresencePin = 40; // one pin per reader
 
-#define NUM_PIXELS 8
+#define NUM_PIXELS 16
 Ai_WS2811 aWs2811[nNbrReader];
 struct CRGB * apLeds[nNbrReader] = {NULL, NULL, NULL};
 
@@ -37,124 +37,62 @@ int anState[nNbrReader]; // 0: idle, 1: good, 2: bad, 3: memorize, 4: forget
 
 /*
 Led phase at ~200fps:
+      0: memorize anim
+  20000: forget   anim
+  40000: good
+  50000: bad
+  60000: nothing (clear it)
+  
 */
 unsigned int anCptLedAnim[nNbrReader];
 
 void animate_led()
 {
   int i;
-  for( i = 0; i < nNbrReader*2; ++i )
+  for( i = 0; i < nNbrReader; ++i )
   {
     unsigned int val = anCptLedAnim[i];
     if( val > 60000 )
     {
       anCptLedAnim[i] = 60000;
+      break;
     }
     
     // learn anim
-    else if( val == 0 )
+    if( val == 0 )
     {
-      digitalWrite(nFirstLedPin+i, HIGH);
+      aWs2811[i].setColor( 255, 0, 255 );
     }    
-    else if( val == 500 )
+    else if( val == 19999 )
     {
-      digitalWrite(nFirstLedPin+i, LOW);
-    }    
-    else if( val == 1000 )
-    {
-      digitalWrite(nFirstLedPin+i, HIGH);
-    }    
-    else if( val == 2000 )
-    {
-      digitalWrite(nFirstLedPin+i, LOW);
-    }    
-    else if( val == 3000 )
-    {
-      digitalWrite(nFirstLedPin+i, HIGH);
-    }    
-    else if( val == 4000 )
-    {
-      digitalWrite(nFirstLedPin+i, LOW);
       anCptLedAnim[i] = 60000;
-    }    
+    } 
 
-    // good anim
-    else if( val == 5000 )
+    if( val == 20000 )
     {
-      digitalWrite(nFirstLedPin+i, HIGH);
-    }
-    else if( val == 6000 )
+      aWs2811[i].setColor( 0, 255, 255 );
+    }    
+    else if( val == 39999 )
     {
-      digitalWrite(nFirstLedPin+i, LOW);
-    }
-    else if( val == 7000 )
-    {
-      digitalWrite(nFirstLedPin+i, HIGH);
-      anCptLedAnim[i] = 45000;
-      if(i==2)
-        anCptLedAnim[i] = 60000; // temp test alternate patched
+      anCptLedAnim[i] = 60000;
     }
 
-    // bad anim
-    else if( val == 10000 )
+    if( val == 40000 )
     {
-      digitalWrite(nFirstLedPin+i, HIGH);
-    }
-    else if( val == 11000 )
-    {
-      digitalWrite(nFirstLedPin+i, LOW);
-    }
-    else if( val == 12000 )
-    {
-      digitalWrite(nFirstLedPin+i, HIGH);
+      aWs2811[i].setColor( 0, 0, 255 );
+      --anCptLedAnim[i]; // stuck it!
     }    
-    else if( val == 13000 )
-    {
-      digitalWrite(nFirstLedPin+i, LOW);
-    }
-    else if( val == 14000 )
-    {
-      digitalWrite(nFirstLedPin+i, HIGH);
-    }    
-    else if( val == 15000 )
-    {
-      digitalWrite(nFirstLedPin+i, LOW);
-    }
-    else if( val == 16000 )
-    {
-      digitalWrite(nFirstLedPin+i, HIGH);
-    }    
-    else if( val == 17000 )
-    {
-      digitalWrite(nFirstLedPin+i, LOW);
-    }
-    else if( val == 18000 )
-    {
-      digitalWrite(nFirstLedPin+i, HIGH);
-      anCptLedAnim[i] = 45000;
-      if(i==3)
-        anCptLedAnim[i] = 60000; // temp test alternate patched
-      
-    }
 
-    else if( val >= 30000 && val < 59000)
+    if( val == 50000 )
     {
-      int nPinDown = (59000 - val)/(590-300); // will go from 100 to 0
-      nPinDown = (nPinDown*63)/100;
-      if( nPinDown == 0 )
-        nPinDown = 1;
-      //Serial.println( nPinDown, DEC );
-      if( (val & 63) == 0 )
-        digitalWrite(nFirstLedPin+i, HIGH);
-      else if( (val & 63) == nPinDown || (val & 63) == nPinDown+1 ) // si depuis la frame d'avant, pindown est baissé de un et qu'on etait juste sur la frame avant l'extinction, on peut la rater, d'ou le deuxieme test.
-        digitalWrite(nFirstLedPin+i, LOW);
-    }
-
-    else if( val == 59000 )
-    {
-      digitalWrite(nFirstLedPin+i, LOW);
-    }
+      aWs2811[i].setColor( 255, 0, 0 );
+      --anCptLedAnim[i]; // stuck it!
+    }    
     
+    if( anCptLedAnim[i] == 60000 )
+    {
+      aWs2811[i].setColor( 0, 0, 0 );      
+    }
     ++anCptLedAnim[i];
   }
 }
@@ -167,9 +105,9 @@ void check_leds( void )
   int i;
   for( i = 0; i < nNbrReader; ++i )
   {
-    aWs2811[i].setColor( 255,0, 0 );
+    aWs2811[i].setColor( 255, 0, 0 );
   }
-  delay( 2000 );
+  delay( 1000 );
   for( i = 0; i < nNbrReader; ++i )
   {
     aWs2811[i].setColor( 255, 0, 255 );    
@@ -177,38 +115,15 @@ void check_leds( void )
   delay( 1000 );  
 }
 
-/*
-const byte nEepromVersion = 1;
 
-void load_eeprom2(TagsList * pTagsList, int nNbrReader)
-{
-  byte nEepromCurrent = EEPROM.read( 0 );
-  Serial.print( "eeprom current version: " );
-  Serial.println( nEepromCurrent );
-  if( nEepromVersion != nEepromCurrent )
-  {
-    return;
-  }
-  Serial.println( "Loading eeprom..." );
-  int nOffset = 1;
-  for( int i = 0; i < nNbrReader; ++i )
-  {
-    nOffset += TagsList_readFromEprom( &pTagsList[i], nOffset );
-  }  
-}
 
-void save_eeprom2(TagsList * pTagsList, int nNbrReader)
-{
-  Serial.println( "Saving eeprom..." );
-  EEPROM.write( 0, nEepromVersion );
-  int nOffset = 1;
-  for( int i = 0; i < nNbrReader; ++i )
-  {
-    nOffset += TagsList_writeToEprom( &pTagsList[i], nOffset );
-  }  
-}
-*/
 
+
+
+
+
+////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 void setup()
 {
   pad[0];
@@ -237,6 +152,7 @@ void setup()
     aWs2811[i].init(nFirstLedPin+i,NUM_PIXELS);
     apLeds[i] = (struct CRGB*)aWs2811[i].getRGBData();
   }
+  aWs2811[1].m_nLeds = 12;
   
   
   check_leds();
@@ -252,14 +168,16 @@ int check_code( const char * buf, int nReaderIdx )
    is the code the good one for this id ?
    return 0/1/2, memorized/good/bad
    */
+/*   
    if( pTagsList[nReaderIdx].nNbrTags == 0 )
    {
      Serial.println( "\nMemorising this code for this reader\n" );
      TagsList_addToList( &(pTagsList[nReaderIdx]), buf );
      return 0;
    }
+*/   
    abExtraPin_BoardWasHere[nReaderIdx] = true;
-   if( TagsList_isInList( &(pTagsList[nReaderIdx]), buf ) )
+   if( TagsList_isInList( &(pTagsList[nReaderIdx]), buf ) != -1 )
    {
      return 1;
    }
@@ -301,6 +219,13 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
   if( nRetCode != 0 )
   {
     anState[nReaderIdx] = nRetCode+2; // 3 or 4
+    anCptLedAnim[nReaderIdx] = (nRetCode-1)*20000;
+    return 0;
+  }
+  
+  if( anState[nReaderIdx] >= 3 )
+  {
+    memorize_code( &buf[1], anState[nReaderIdx] == 4 );
     return 0;
   }
   
@@ -312,6 +237,7 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
   Serial.write( "\n" );
 
   anState[nReaderIdx] = nRetCode;
+  anCptLedAnim[nReaderIdx] = (nRetCode)*10000+40000;
   
   return 0;
 }
@@ -369,6 +295,8 @@ void loop()
         // tag disappear, turn off led right now!
         Serial.println( "led disappear!" );
         abExtraPin_BoardWasHere[i] = false;
+        anCptLedAnim[i] = 60000;
+
       }   
     }
     else

@@ -75,21 +75,37 @@ int TagsList_addToList( TagsList * t, const  char * buf )
   return 1;
 }
 
+int TagsList_removeFromList( TagsList * t, const  char * buf )
+{
+  // return 0 if not in list, 1 if ok
+  Serial.println( "TagsList_removeFromList - begin" );
+  int nIdx = TagsList_isInList( t, buf );
+  if( nIdx == -1  )
+  {
+    Serial.println( "TagsList_removeFromList - end - NOT FOUND" );
+    return 0;
+  }
+  memcpy( &(t->aaLists[nIdx][0]), &(t->aaLists[nIdx+1][0]), TAG_LEN*(t->nNbrTags-nIdx-1) ); // decale tout
+  --(t->nNbrTags);
+  Serial.println( "TagsList_removeFromList - end - ok" );
+  return 1;
+}
+
 int TagsList_isInList( const TagsList * t, const  char * buf )
 {
-  // return 1 if the tag in buf is in the list
+  // return the index in the list or -1 if not in the list
   Serial.println( "TagsList_isInList - begin" );  
   int i;
   for( i = 0; i < t->nNbrTags; ++i )
   {
     if( memcmp( buf, &(t->aaLists[i][0]), TAG_LEN ) == 0 )
     {
-      Serial.println( "TagsList_isInList - end: 1" );
-      return 1;
+      Serial.println( "TagsList_isInList - end: found" );
+      return i;
     }
   }
-  Serial.println( "TagsList_isInList - end: 0" );
-  return 0;
+  Serial.println( "TagsList_isInList - end: NOT found" );
+  return -1;
 }
 
 int TagsList_isMagic( const char * buf )

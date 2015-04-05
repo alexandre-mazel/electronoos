@@ -24,11 +24,22 @@ void Ai_WS2811::init(uint8_t pin, uint16_t nPixels)
   else if( pin == 50 )
   {
     m_nNumBit = 3;
-  }      
+  } 
+  m_nDimCoef = 1;
+   
 }
 
-void Ai_WS2811::dim( const int nDimCoef )
+void Ai_WS2811::setDim( const int nDimCoef )
 {
+  m_nDimCoef = nDimCoef;
+}
+
+void Ai_WS2811::applyDim( void )
+{
+  if( m_nDimCoef == 1 )
+  {
+    return;
+  }
   register byte *p = m_pData;
   register byte *e = m_pDataEnd;
   while(p != e) 
@@ -50,8 +61,40 @@ void Ai_WS2811::setColor(unsigned char r,unsigned char g,unsigned char b)
   sendLedData();
 }
 
+void Ai_WS2811::setVumeter( int nValue )
+{
+  const int nNbrValuePerLed = 10000/m_nLeds;
+  int nNbrLedToLighten = nValue / nNbrValuePerLed;
+  int nNbrRemaining = nValue - (nNbrLedToLighten * nNbrValuePerLed);
+  
+  nNbrRemaining = map( nNbrRemaining, 0, nNbrValuePerLed, 0, 255 );
+  int i;
+  for( i = 0; i < nNbrLedToLighten; ++i )
+  {
+    leds[i].r = 255;
+    leds[i].g = 255;
+    leds[i].b = 255;    
+  }
+  if( i < m_nLeds )
+  {
+    leds[i].r = nNbrRemaining;
+    leds[i].g = nNbrRemaining;
+    leds[i].b = nNbrRemaining;
+    ++i;
+  }
+  for(; i < m_nLeds; ++i )
+  {
+    leds[i].r = 0;
+    leds[i].g = 0;
+    leds[i].b = 0;    
+  }
+  ws2811.sendLedData();
+}
+
+
 void Ai_WS2811::sendLedData(void)
 {
+  applyDim();
   cli();
   register byte *p = m_pData;
   register byte *e = m_pDataEnd;

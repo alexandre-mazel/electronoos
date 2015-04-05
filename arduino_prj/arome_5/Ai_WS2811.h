@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <util/delay.h>
 
+// v0.64: add setvumetre and change dim method
 // v0.63: add multi port ability
 // v0.62: add setColor method
 // v0.61: add CRGB struct definition
@@ -23,15 +24,27 @@ class Ai_WS2811
     unsigned char *m_pData;
     unsigned char *m_pDataEnd;
     unsigned int  m_nNumBit; // 0 => 53, 1 => 51, 2 => 52...
+    unsigned int  m_nDimCoef; // set a coef to dim
 
   public:
     byte _r, _g, _b;
     uint8_t *led_arr;
     void init(uint8_t,uint16_t);
     void sendLedData(void);
-    void dim( const int nDimCoef = 2 ); // dim all leds by a coef (to avoid burning my eyes)
-    void setColor(unsigned char r,unsigned char g,unsigned char b); // set all color at the same time
+    
+    void setDim( const int nDimCoef = 2 ); // dim all leds by a coef (to avoid burning my eyes)
+    
+    void setColor( unsigned char r,unsigned char g,unsigned char b ); // set all color at the same time
+    
+    // light the vumeter
+    // -nValue: [0..10000]    
+    void setVumeter( int nValue ); 
+    
     unsigned char *getRGBData() { return m_pData; } 
+    
+  private:
+    void applyDim(void);
+  
 };
 
 struct CRGB {

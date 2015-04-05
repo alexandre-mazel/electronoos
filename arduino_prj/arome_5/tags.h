@@ -14,6 +14,7 @@ int TagsList_readFromEprom( TagsList * t, int nOffset );
 int TagsList_writeToEprom( const TagsList * t, int nOffset );
 
 int TagsList_addToList( TagsList * t, const char * buf );
+int TagsList_removeFromList( TagsList * t, const char * buf );
 int TagsList_isInList( const TagsList * t, const char * buf );
 
 int TagsList_isMagic( const char * buf ); // return 0 for standard tag, 1 if tag memorize, 2 if tag forget, 3 if tag demo

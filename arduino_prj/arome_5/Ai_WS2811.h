@@ -18,7 +18,7 @@
 class Ai_WS2811 
 {
   private:
-    int m_nLeds;
+    int m_nLeds; // number of monochrome leds = 3xnbr pixel
     unsigned char m_nDataRate;
     unsigned long m_nCounter;
     unsigned char *m_pData;
@@ -29,7 +29,7 @@ class Ai_WS2811
   public:
     byte _r, _g, _b;
     uint8_t *led_arr;
-    void init(uint8_t,uint16_t);
+    void init( uint8_t nNumPin, uint16_t nNbrPixel );
     void sendLedData(void);
     
     void setDim( const int nDimCoef = 2 ); // dim all leds by a coef (to avoid burning my eyes)
@@ -40,7 +40,9 @@ class Ai_WS2811
     // -nValue: [0..10000]    
     void setVumeter( int nValue ); 
     
-    unsigned char *getRGBData() { return m_pData; } 
+    int reducePixelNumber( int nNewPixelNumber ); // reduce the pixel number to a smaller number (when inited too big or ...) return 1 if ok
+    
+    unsigned char *getRGBData() { return m_pData; }    
     
   private:
     void applyDim(void);

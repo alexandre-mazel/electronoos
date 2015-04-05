@@ -152,7 +152,7 @@ void setup()
     aWs2811[i].init(nFirstLedPin+i,NUM_PIXELS);
     apLeds[i] = (struct CRGB*)aWs2811[i].getRGBData();
   }
-  aWs2811[1].m_nLeds = 12;
+  aWs2811[1].reducePixelNumber( 12 );
   
   
   check_leds();
@@ -183,6 +183,17 @@ int check_code( const char * buf, int nReaderIdx )
    }
    return 2;
 }
+
+void memorize_code( const char * buf, int nReaderIdx, int bForget )
+{
+  if( bForget )
+    TagsList_addToList( &(pTagsList[nReaderIdx]), buf );
+  else
+    TagsList_removeFromList( &(pTagsList[nReaderIdx]), buf );  
+}
+
+
+
 
 
 
@@ -225,7 +236,9 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
   
   if( anState[nReaderIdx] >= 3 )
   {
-    memorize_code( &buf[1], anState[nReaderIdx] == 4 );
+    memorize_code( &buf[1], nReaderIdx, anState[nReaderIdx] == 4 );
+    anState[nReaderIdx] = 0;
+    anCptLedAnim[nReaderIdx] = 60000;
     return 0;
   }
   

@@ -48,16 +48,17 @@ unsigned int anCptLedAnim[nNbrReader];
 
 void animate_led()
 {
+//  return;
   int i;
   for( i = 0; i < nNbrReader; ++i )
   {
     unsigned int val = anCptLedAnim[i];
-    Serial.print( " val: " );
-    Serial.print( val );
+//    Serial.print( " val: " );
+//    Serial.print( val );
     
     if( val > 60000 )
     {
-      anCptLedAnim[i] = 60000;
+      anCptLedAnim[i] = 60001;
       continue;
     }
     
@@ -83,23 +84,25 @@ void animate_led()
     if( val == 40000 )
     {
       aWs2811[i].setColor( 0, 255, 0 );
-      --anCptLedAnim[i]; // stuck it!
     }    
 
     if( val == 50000 )
     {
       aWs2811[i].setColor( 255, 0, 0 );
-      --anCptLedAnim[i]; // stuck it!
     }    
     
     if( anCptLedAnim[i] == 60000 )
     {
       aWs2811[i].setColor( 0, 0, 0 );      
     }
-    ++anCptLedAnim[i];
+    
+    if( val != 49001 && val != 59001 )
+    {
+      ++anCptLedAnim[i];
+    }
   }
   
-  Serial.println("");
+//  Serial.println("");
 }
 
 
@@ -122,9 +125,14 @@ void check_leds( void )
   
   for( i = 0; i < nNbrReader; ++i )
   {
-    aWs2811[i].setColor( 0, 0, 255 );    
+    aWs2811[i].setColor( 0, 0, 255 );
   }
   delay( 1000 );  
+
+  for( i = 0; i < nNbrReader; ++i )
+  {
+    aWs2811[i].setColor( 0, 0, 0 );
+  }
 
 }
 
@@ -310,12 +318,19 @@ void loop()
   }
  
   
-  for( i = 0; i < nNbrReader; ++i )
+  for( i = 0; i < 1; ++i )
   {
     int nVal = digitalRead(nFirstPresencePin+i);
     if( nVal == anExtraPin_PrevState[i] )
     {
       ++anExtraPin_CptEqual[i];
+      Serial.print( "reader: ");
+      Serial.print( i );
+      Serial.print( ", same val: ");
+      Serial.print( nVal );      
+      Serial.print(", cpt: ");      
+      Serial.print( anExtraPin_CptEqual[i] );
+      Serial.println("");
       if( abExtraPin_BoardWasHere[i] && anExtraPin_CptEqual[i] > 16 )
       //if( anExtraPin_CptEqual[1] > 16 )
       {
@@ -335,11 +350,11 @@ void loop()
   }
 
   animate_led();
-  // delay(0);
+  delay(10);
 
   
   ++nFpsCpt;
-  const int nNbrFrameToCompute = 200*2;
+  const int nNbrFrameToCompute = 1000*1;
   if( nFpsCpt == nNbrFrameToCompute )
   {
     unsigned long nNow = micros();

@@ -54,9 +54,9 @@ void Ai_WS2811::setColor(unsigned char r,unsigned char g,unsigned char b)
   register byte *e = m_pDataEnd;
   while(p != e) 
   { 
-     *p++ = r;
      *p++ = g;
-     *p++ = b;     
+     *p++ = r;
+     *p++ = b;
   }  
   sendLedData();
 }

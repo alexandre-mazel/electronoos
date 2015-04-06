@@ -52,16 +52,19 @@ void animate_led()
   for( i = 0; i < nNbrReader; ++i )
   {
     unsigned int val = anCptLedAnim[i];
+    Serial.print( " val: " );
+    Serial.print( val );
+    
     if( val > 60000 )
     {
       anCptLedAnim[i] = 60000;
-      break;
+      continue;
     }
     
     // learn anim
     if( val == 0 )
     {
-      aWs2811[i].setColor( 255, 0, 255 );
+      aWs2811[i].setColor( 0, 255, 255 );
     }    
     else if( val == 19999 )
     {
@@ -70,7 +73,7 @@ void animate_led()
 
     if( val == 20000 )
     {
-      aWs2811[i].setColor( 0, 255, 255 );
+      aWs2811[i].setColor( 255, 0, 255 );
     }    
     else if( val == 39999 )
     {
@@ -79,7 +82,7 @@ void animate_led()
 
     if( val == 40000 )
     {
-      aWs2811[i].setColor( 0, 0, 255 );
+      aWs2811[i].setColor( 0, 255, 0 );
       --anCptLedAnim[i]; // stuck it!
     }    
 
@@ -95,6 +98,8 @@ void animate_led()
     }
     ++anCptLedAnim[i];
   }
+  
+  Serial.println("");
 }
 
 
@@ -108,11 +113,19 @@ void check_leds( void )
     aWs2811[i].setColor( 255, 0, 0 );
   }
   delay( 1000 );
+  
   for( i = 0; i < nNbrReader; ++i )
   {
-    aWs2811[i].setColor( 255, 0, 255 );    
+    aWs2811[i].setColor( 0, 255, 0 );    
   }
   delay( 1000 );  
+  
+  for( i = 0; i < nNbrReader; ++i )
+  {
+    aWs2811[i].setColor( 0, 0, 255 );    
+  }
+  delay( 1000 );  
+
 }
 
 
@@ -250,7 +263,7 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
   Serial.write( "\n" );
 
   anState[nReaderIdx] = nRetCode;
-  anCptLedAnim[nReaderIdx] = (nRetCode)*10000+40000;
+  anCptLedAnim[nReaderIdx] = (nRetCode)*10000+30000;
   
   return 0;
 }
@@ -260,6 +273,9 @@ const int nMaxSizeBuf = (nLenCode+2)*2; // ok just nLenCode+2 is enough, but ...
 char buf1[nMaxSizeBuf]; int nCpt1 = 0;
 char buf2[nMaxSizeBuf]; int nCpt2 = 0;
 char buf3[nMaxSizeBuf]; int nCpt3 = 0;
+
+int nFpsCpt = 0;
+unsigned long timeFpsBegin;
 
 void loop()
 {
@@ -293,8 +309,6 @@ void loop()
     analyse_code( buf3, &nCpt3, 2 );
   }
  
-  animate_led();
-  // delay(0);
   
   for( i = 0; i < nNbrReader; ++i )
   {
@@ -306,7 +320,8 @@ void loop()
       //if( anExtraPin_CptEqual[1] > 16 )
       {
         // tag disappear, turn off led right now!
-        Serial.println( "led disappear!" );
+        Serial.print( "BADGE disappear: " );
+        Serial.println( i );
         abExtraPin_BoardWasHere[i] = false;
         anCptLedAnim[i] = 60000;
 
@@ -318,4 +333,25 @@ void loop()
       anExtraPin_CptEqual[i] = 0;
     }
   }
+
+  animate_led();
+  // delay(0);
+
+  
+  ++nFpsCpt;
+  const int nNbrFrameToCompute = 200*2;
+  if( nFpsCpt == nNbrFrameToCompute )
+  {
+    unsigned long nNow = micros();
+    unsigned long nDuration = nNow - timeFpsBegin;
+    
+    Serial.print( "frame: " );
+    Serial.print( nDuration/nNbrFrameToCompute );
+    Serial.print( "us, fps: " );
+    Serial.println( 1000000.*nNbrFrameToCompute/nDuration );
+    timeFpsBegin = nNow;
+    nFpsCpt = 0;
+    
+    // a simple analog read is running at 5413fps (184us per frame)
+  }  
 }

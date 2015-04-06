@@ -69,7 +69,7 @@ void Ai_WS2811::setColor(unsigned char r,unsigned char g,unsigned char b)
   sendLedData();
 }
 
-void Ai_WS2811::setVumeter( int nValue )
+void Ai_WS2811::setVumeter( int nValue,int bR, int bG, int bB )
 {
   int nNbrPixel = m_nLeds/3;
   int nNbrValuePerPixel = 10000/nNbrPixel;
@@ -81,22 +81,22 @@ void Ai_WS2811::setVumeter( int nValue )
   int i;
   for( i = 0; i < nNbrPixelToLighten; ++i )
   {
-    leds[i].r = 255;
-    leds[i].g = 255;
-    leds[i].b = 255;    
+    if( bR ) leds[i].r = 255;
+    if( bG ) leds[i].g = 255;
+    if( bB ) leds[i].b = 255;    
   }
   if( i < nNbrPixel )
   {
-    leds[i].r = nNbrRemaining;
-    leds[i].g = nNbrRemaining;
-    leds[i].b = nNbrRemaining;
+    if( bR ) leds[i].r = nNbrRemaining;
+    if( bG ) leds[i].g = nNbrRemaining;
+    if( bB ) leds[i].b = nNbrRemaining;
     ++i;
   }
   for(; i < nNbrPixel; ++i )
   {
-    leds[i].r = 0;
-    leds[i].g = 0;
-    leds[i].b = 0;    
+    if( bR ) leds[i].r = 0;
+    if( bG ) leds[i].g = 0;
+    if( bB ) leds[i].b = 0;    
   }
   sendLedData();
 }

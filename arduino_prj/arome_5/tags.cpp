@@ -96,7 +96,8 @@ int TagsList_removeFromList( TagsList * t, const  char * buf )
 int TagsList_isInList( const TagsList * t, const  char * buf )
 {
   // return the index in the list or -1 if not in the list
-  Serial.println( "TagsList_isInList - begin" );  
+  Serial.print( "TagsList_isInList - begin - list had nbr elem: " );  
+  Serial.println( t->nNbrTags );
   int i;
   for( i = 0; i < t->nNbrTags; ++i )
   {

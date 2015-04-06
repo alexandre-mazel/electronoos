@@ -81,9 +81,11 @@ void animate_led()
       anCptLedAnim[i] = 60000;
     }
 
-    if( val == 40000 )
+    if( val >= 40000 && val <= 49000 )
     {
-      aWs2811[i].setColor( 0, 255, 0 );
+      //aWs2811[i].setColor( 0, 255, 0 );
+      if( val <= 40100 )
+        aWs2811[i].setVumeter( (val - 40000)*100 );
     }    
 
     if( val == 50000 )
@@ -207,7 +209,7 @@ int check_code( const char * buf, int nReaderIdx )
 
 void memorize_code( const char * buf, int nReaderIdx, int bForget )
 {
-  if( bForget )
+  if( not bForget )
     TagsList_addToList( &(pTagsList[nReaderIdx]), buf );
   else
     TagsList_removeFromList( &(pTagsList[nReaderIdx]), buf );  
@@ -230,6 +232,7 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
   int nBufLen = *pnBufLen;
   if( buf[nBufLen-1] != 0x3 )
   {
+    Serial.println( "n" );
     return -1;
   }
   int i;
@@ -260,6 +263,7 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
     memorize_code( &buf[1], nReaderIdx, anState[nReaderIdx] == 4 );
     anState[nReaderIdx] = 0;
     anCptLedAnim[nReaderIdx] = 60000;
+    save_eeprom( pTagsList, nNbrReader );
     return 0;
   }
   
@@ -324,13 +328,16 @@ void loop()
     if( nVal == anExtraPin_PrevState[i] )
     {
       ++anExtraPin_CptEqual[i];
-      Serial.print( "reader: ");
-      Serial.print( i );
-      Serial.print( ", same val: ");
-      Serial.print( nVal );      
-      Serial.print(", cpt: ");      
-      Serial.print( anExtraPin_CptEqual[i] );
-      Serial.println("");
+      if( 0 )
+      {
+        Serial.print( "reader: ");
+        Serial.print( i );
+        Serial.print( ", same val: ");
+        Serial.print( nVal );      
+        Serial.print(", cpt: ");      
+        Serial.print( anExtraPin_CptEqual[i] );
+        Serial.println("");
+      }
       if( abExtraPin_BoardWasHere[i] && anExtraPin_CptEqual[i] > 16 )
       //if( anExtraPin_CptEqual[1] > 16 )
       {

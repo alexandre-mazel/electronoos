@@ -38,7 +38,7 @@ class Ai_WS2811
     
     // light the vumeter
     // -nValue: [0..10000]    
-    void setVumeter( int nValue ); 
+    void setVumeter( int nValue, int bR = 1, int bG = 1, int bB = 1 ); 
     
     int reducePixelNumber( int nNewPixelNumber ); // reduce the pixel number to a smaller number (when inited too big or ...) return 1 if ok
     

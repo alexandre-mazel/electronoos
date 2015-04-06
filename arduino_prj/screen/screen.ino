@@ -190,7 +190,8 @@ void loop()
 
   //char szToWrite[] = "<<<Factory Rulez>>>";
   //char szToWrite[] = "- Un jour un truc 2016 !!! -"; // => timeout!
-  char szToWrite[] = "[Un jour un truc 2016] ";
+  //char szToWrite[] = "[Un jour un truc 2016] ";
+  char szToWrite[] = " << O' Chateau  >>";
   int nLenMessage = sizeof(szToWrite)-1;
 
   /*

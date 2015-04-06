@@ -18,6 +18,19 @@ void setup()
 int nCpt = 0;
 void loop()
 {
+  for( int i = 0; i < 16; ++i )
+  {
+    if( i == 15 || i < 7 )
+    {
+      leds[i].r = 0;
+      leds[i].g = 255;
+      leds[i].b = 0;
+    }
+  }
+  ws2811.sendLedData();
+  delay(1000);
+  return;
+  
   //Serial.println( nCpt, DEC );
   if( nCpt > 20 )
   {

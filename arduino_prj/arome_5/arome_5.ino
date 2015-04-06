@@ -85,7 +85,7 @@ void animate_led()
     {
       //aWs2811[i].setColor( 0, 255, 0 );
       if( val <= 40100 )
-        aWs2811[i].setVumeter( (val - 40000)*100 );
+        aWs2811[i].setVumeter( (val - 40000)*100, 0, 1, 0 );
     }    
 
     if( val == 50000 )
@@ -176,6 +176,7 @@ void setup()
     apLeds[i] = (struct CRGB*)aWs2811[i].getRGBData();
   }
   aWs2811[1].reducePixelNumber( 12 );
+  aWs2811[2].reducePixelNumber( 1 );  
   
   
   check_leds();

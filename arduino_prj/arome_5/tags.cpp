@@ -63,17 +63,19 @@ int TagsList_addToList( TagsList * t, const  char * buf )
 {
   // return 0 if nbr max reached, 1 if ok, 2 if already in the list
   Serial.println( "TagsList_addToList - begin" );
-  if( TagsList_isInList( t, buf ) )
+  if( TagsList_isInList( t, buf ) != -1 )
   {
+    Serial.println( "TagsList_addToList - end: already in" );    
     return 2;
   }
   if( t->nNbrTags == TAGS_NBR_MAX )
   {
+    Serial.println( "TagsList_addToList - end: max tags" );
     return 0;
   }
   memcpy( &(t->aaLists[t->nNbrTags][0]), buf, TAG_LEN );
   ++(t->nNbrTags);
-  Serial.println( "TagsList_addToList - end" );  
+  Serial.println( "TagsList_addToList - end: added" );  
   return 1;
 }
 
@@ -96,7 +98,7 @@ int TagsList_removeFromList( TagsList * t, const  char * buf )
 int TagsList_isInList( const TagsList * t, const  char * buf )
 {
   // return the index in the list or -1 if not in the list
-  Serial.print( "TagsList_isInList - begin - list had nbr elem: " );  
+  Serial.print( "TagsList_isInList - begin - list has nbr elem: " );  
   Serial.println( t->nNbrTags );
   int i;
   for( i = 0; i < t->nNbrTags; ++i )

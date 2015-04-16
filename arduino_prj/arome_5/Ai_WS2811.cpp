@@ -44,7 +44,7 @@ void Ai_WS2811::applyDim( void )
   register byte *e = m_pDataEnd;
   while(p != e) 
   { 
-     *p++ /= m_nDimCoef;
+     (*p) /= m_nDimCoef; ++p;
    }
 }
 

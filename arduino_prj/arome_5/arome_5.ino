@@ -31,7 +31,7 @@ TagsList * pTagsList = NULL;
 
 int anExtraPin_PrevState[nNbrReader]; // memorize the state of the previous extra pin (one per board)
 int anExtraPin_CptEqual[nNbrReader];  // count the number of frame with same value (one per board)
-int abExtraPin_BoardWasHere[nNbrReader]; // was the board present?
+int abExtraPin_BadgeWasHere[nNbrReader]; // was the board present?
 
 int anState[nNbrReader]; // 0: idle, 1: good, 2: bad, 3: memorize, 4: forget
 
@@ -174,6 +174,7 @@ void setup()
   {
     aWs2811[i].init(nFirstLedPin+i,NUM_PIXELS);
     apLeds[i] = (struct CRGB*)aWs2811[i].getRGBData();
+    aWs2811[i].setDim( 1 );
   }
   aWs2811[1].reducePixelNumber( 12 );
   aWs2811[2].reducePixelNumber( 1 );  
@@ -200,7 +201,6 @@ int check_code( const char * buf, int nReaderIdx )
      return 0;
    }
 */   
-   abExtraPin_BoardWasHere[nReaderIdx] = true;
    if( TagsList_isInList( &(pTagsList[nReaderIdx]), buf ) != -1 )
    {
      return 1;
@@ -233,9 +233,11 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
   int nBufLen = *pnBufLen;
   if( buf[nBufLen-1] != 0x3 )
   {
-    Serial.println( "n" );
+    Serial.println( "no code yet" );
     return -1;
   }
+   abExtraPin_BadgeWasHere[nReaderIdx] = true;
+
   int i;
   Serial.write( "On " );
   Serial.print( nReaderIdx, DEC);
@@ -275,8 +277,11 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
   Serial.print( nRetCode, DEC );
   Serial.write( "\n" );
 
-  anState[nReaderIdx] = nRetCode;
-  anCptLedAnim[nReaderIdx] = (nRetCode)*10000+30000;
+  if( anState[nReaderIdx] != nRetCode ) // evite de relancer l'animation quand elle est deja en cours (genre mauvais contact sur une anim verte)
+  {
+    anState[nReaderIdx] = nRetCode;
+    anCptLedAnim[nReaderIdx] = (nRetCode)*10000+30000;
+  }
   
   return 0;
 }
@@ -323,35 +328,39 @@ void loop()
   }
  
   
-  for( i = 0; i < 1; ++i )
+  for( i = 0; i < nNbrReader; ++i )
   {
     int nVal = digitalRead(nFirstPresencePin+i);
     if( nVal == anExtraPin_PrevState[i] )
     {
       ++anExtraPin_CptEqual[i];
-      if( 0 )
-      {
-        Serial.print( "reader: ");
-        Serial.print( i );
-        Serial.print( ", same val: ");
-        Serial.print( nVal );      
-        Serial.print(", cpt: ");      
-        Serial.print( anExtraPin_CptEqual[i] );
-        Serial.println("");
-      }
-      if( abExtraPin_BoardWasHere[i] && anExtraPin_CptEqual[i] > 16 )
+
+      if( abExtraPin_BadgeWasHere[i] && anExtraPin_CptEqual[i] > 10 ) // was > 16 (ok when you're at >~90fps...) // the crucial point is it depends of the fps...
       //if( anExtraPin_CptEqual[1] > 16 )
       {
         // tag disappear, turn off led right now!
         Serial.print( "BADGE disappear: " );
         Serial.println( i );
-        abExtraPin_BoardWasHere[i] = false;
+        abExtraPin_BadgeWasHere[i] = false;
+        anState[i] = 0;
         anCptLedAnim[i] = 60000;
-
       }   
     }
     else
     {
+      if( 0 )
+      {
+        Serial.print( "reader: ");
+        Serial.print( i );
+        Serial.print( ", change after same val: ");
+        Serial.print( nVal );      
+        Serial.print(", cpt: ");
+        Serial.print( anExtraPin_CptEqual[i] );
+        Serial.print(", was here: ");
+        Serial.print( abExtraPin_BadgeWasHere[i] );
+        Serial.println("");
+      }
+      
       anExtraPin_PrevState[i] = nVal;
       anExtraPin_CptEqual[i] = 0;
     }

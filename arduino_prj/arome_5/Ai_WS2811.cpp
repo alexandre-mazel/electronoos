@@ -81,22 +81,22 @@ void Ai_WS2811::setVumeter( int nValue,int bR, int bG, int bB )
   int i;
   for( i = 0; i < nNbrPixelToLighten; ++i )
   {
-    if( bR ) leds[i].r = 255;
-    if( bG ) leds[i].g = 255;
-    if( bB ) leds[i].b = 255;    
+    if( bR ) leds[i].r = 255; else leds[i].r = 0;
+    if( bG ) leds[i].g = 255; else leds[i].g = 0;
+    if( bB ) leds[i].b = 255; else leds[i].b = 0;
   }
   if( i < nNbrPixel )
   {
-    if( bR ) leds[i].r = nNbrRemaining;
-    if( bG ) leds[i].g = nNbrRemaining;
-    if( bB ) leds[i].b = nNbrRemaining;
+    if( bR ) leds[i].r = nNbrRemaining; else leds[i].r = 0;
+    if( bG ) leds[i].g = nNbrRemaining; else leds[i].g = 0;
+    if( bB ) leds[i].b = nNbrRemaining; else leds[i].b = 0;
     ++i;
   }
   for(; i < nNbrPixel; ++i )
   {
-    if( bR ) leds[i].r = 0;
-    if( bG ) leds[i].g = 0;
-    if( bB ) leds[i].b = 0;    
+    leds[i].r = 0;
+    leds[i].g = 0;
+    leds[i].b = 0;    
   }
   sendLedData();
 }

@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <util/delay.h>
 
+// v0.65: debug setvumetre
 // v0.64: add setvumetre and change dim method
 // v0.63: add multi port ability
 // v0.62: add setColor method

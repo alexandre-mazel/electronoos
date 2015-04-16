@@ -63,18 +63,27 @@ void animate_led()
     }
     
     // learn anim
-    if( val == 0 )
+    if( val >= 0 && val < 20000 )
     {
-      aWs2811[i].setColor( 0, 255, 255 );
+      // aWs2811[i].setColor( 0, 255, 255 );      
+      if( val <= 1000 )
+        aWs2811[i].setVumeter( (val - 0)*10, 0, 1, 1 );
+      else
+        anCptLedAnim[i] = 0;
     }    
     else if( val == 19999 )
     {
       anCptLedAnim[i] = 60000;
     } 
 
-    if( val == 20000 )
+    if( val >= 20000 && val < 40000 )
     {
-      aWs2811[i].setColor( 255, 0, 255 );
+      // aWs2811[i].setColor( 255, 0, 255 );
+      if( val <= 21000 )
+        aWs2811[i].setVumeter( (val - 20000)*10, 1, 0, 1 );
+      else
+        anCptLedAnim[i] = 20000;
+      
     }    
     else if( val == 39999 )
     {
@@ -233,25 +242,31 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
   int nBufLen = *pnBufLen;
   if( buf[nBufLen-1] != 0x3 )
   {
-    Serial.println( "no code yet" );
+    // Serial.println( "no code yet" );
     return -1;
   }
    abExtraPin_BadgeWasHere[nReaderIdx] = true;
 
-  int i;
-  Serial.write( "On " );
-  Serial.print( nReaderIdx, DEC);
-  Serial.write( ", Code: " );  
-  for( i = 0; i < nBufLen; ++i)
+
+  if( 0 )
   {
-    Serial.print( buf[i], DEC );
+    // print debug
+    int i;
+    Serial.write( "On " );
+    Serial.print( nReaderIdx, DEC);
+    Serial.write( ", Code: " );  
+    for( i = 0; i < nBufLen; ++i)
+    {
+      Serial.print( buf[i], DEC );
+    }
+    Serial.write( " 0x" );
+    for( i = 1; i < nBufLen-1; ++i) // first in 2 and last is 3 => jump it!
+    {
+      Serial.print( buf[i], HEX );
+      Serial.write( " " );
+    }
   }
-  Serial.write( " 0x" );
-  for( i = 1; i < nBufLen-1; ++i) // first in 2 and last is 3 => jump it!
-  {
-    Serial.print( buf[i], HEX );
-    Serial.write( " " );
-  }
+  
   *pnBufLen = 0;  
   int nRetCode = TagsList_isMagic( &buf[1] );
   if( nRetCode != 0 )
@@ -273,9 +288,12 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
   
   nRetCode = check_code( &buf[1], nReaderIdx );
 
-  Serial.write( "\nretcode: " );
-  Serial.print( nRetCode, DEC );
-  Serial.write( "\n" );
+  if( 0 )
+  {
+    Serial.write( "\nanalyse_code: retcode: " );
+    Serial.print( nRetCode, DEC );
+    Serial.write( "\n" );
+  }
 
   if( anState[nReaderIdx] != nRetCode ) // evite de relancer l'animation quand elle est deja en cours (genre mauvais contact sur une anim verte)
   {
@@ -335,15 +353,18 @@ void loop()
     {
       ++anExtraPin_CptEqual[i];
 
-      if( abExtraPin_BadgeWasHere[i] && anExtraPin_CptEqual[i] > 10 ) // was > 16 (ok when you're at >~90fps...) // the crucial point is it depends of the fps...
+      if( abExtraPin_BadgeWasHere[i] && anExtraPin_CptEqual[i] > 12 ) // was > 16 (ok when you're at >~90fps...) // the crucial point is it depends of the fps...
       //if( anExtraPin_CptEqual[1] > 16 )
       {
         // tag disappear, turn off led right now!
         Serial.print( "BADGE disappear: " );
         Serial.println( i );
         abExtraPin_BadgeWasHere[i] = false;
-        anState[i] = 0;
-        anCptLedAnim[i] = 60000;
+        if( anState[i] < 3 )
+        {
+          anState[i] = 0;
+          anCptLedAnim[i] = 60000;
+        }
       }   
     }
     else
@@ -371,7 +392,7 @@ void loop()
 
   
   ++nFpsCpt;
-  const int nNbrFrameToCompute = 1000*1;
+  const int nNbrFrameToCompute = 100*1;
   if( nFpsCpt == nNbrFrameToCompute )
   {
     unsigned long nNow = micros();

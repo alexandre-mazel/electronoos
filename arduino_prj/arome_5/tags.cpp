@@ -1,6 +1,14 @@
 #include <Arduino.h> // for byte
 #include <../../../../libraries/EEPROM/EEPROM.h> // => include here for definition, but include also in the .ino for the link to add the lib
 
+#if 0
+#  define PRINT_DEBUG(x) Serial.println(x)
+#  define PRINT_DEBUG_NO_EOL(x) Serial.println(x)
+#else
+#  define PRINT_DEBUG /* x */
+#  define PRINT_DEBUG_NO_EOL  /* x */
+#endif
+
 
 
 //About eeprom:
@@ -62,54 +70,54 @@ int TagsList_writeToEprom( const TagsList * t, int nOffset )
 int TagsList_addToList( TagsList * t, const  char * buf )
 {
   // return 0 if nbr max reached, 1 if ok, 2 if already in the list
-  Serial.println( "TagsList_addToList - begin" );
+  PRINT_DEBUG( "TagsList_addToList - begin" );
   if( TagsList_isInList( t, buf ) != -1 )
   {
-    Serial.println( "TagsList_addToList - end: already in" );    
+    PRINT_DEBUG( "TagsList_addToList - end: already in" );    
     return 2;
   }
   if( t->nNbrTags == TAGS_NBR_MAX )
   {
-    Serial.println( "TagsList_addToList - end: max tags" );
+    PRINT_DEBUG( "TagsList_addToList - end: max tags" );
     return 0;
   }
   memcpy( &(t->aaLists[t->nNbrTags][0]), buf, TAG_LEN );
   ++(t->nNbrTags);
-  Serial.println( "TagsList_addToList - end: added" );  
+  PRINT_DEBUG( "TagsList_addToList - end: added" );  
   return 1;
 }
 
 int TagsList_removeFromList( TagsList * t, const  char * buf )
 {
   // return 0 if not in list, 1 if ok
-  Serial.println( "TagsList_removeFromList - begin" );
+  PRINT_DEBUG( "TagsList_removeFromList - begin" );
   int nIdx = TagsList_isInList( t, buf );
   if( nIdx == -1  )
   {
-    Serial.println( "TagsList_removeFromList - end - NOT FOUND" );
+    PRINT_DEBUG( "TagsList_removeFromList - end - NOT FOUND" );
     return 0;
   }
   memcpy( &(t->aaLists[nIdx][0]), &(t->aaLists[nIdx+1][0]), TAG_LEN*(t->nNbrTags-nIdx-1) ); // decale tout
   --(t->nNbrTags);
-  Serial.println( "TagsList_removeFromList - end - ok" );
+  PRINT_DEBUG( "TagsList_removeFromList - end - ok" );
   return 1;
 }
 
 int TagsList_isInList( const TagsList * t, const  char * buf )
 {
   // return the index in the list or -1 if not in the list
-  Serial.print( "TagsList_isInList - begin - list has nbr elem: " );  
-  Serial.println( t->nNbrTags );
+  PRINT_DEBUG_NO_EOL( "TagsList_isInList - begin - list has nbr elem: " );  
+  PRINT_DEBUG( t->nNbrTags );
   int i;
   for( i = 0; i < t->nNbrTags; ++i )
   {
     if( memcmp( buf, &(t->aaLists[i][0]), TAG_LEN ) == 0 )
     {
-      Serial.println( "TagsList_isInList - end: found" );
+      PRINT_DEBUG( "TagsList_isInList - end: found" );
       return i;
     }
   }
-  Serial.println( "TagsList_isInList - end: NOT found" );
+  PRINT_DEBUG( "TagsList_isInList - end: NOT found" );
   return -1;
 }
 

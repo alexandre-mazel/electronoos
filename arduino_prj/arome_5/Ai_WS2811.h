@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <util/delay.h>
 
+// v0.66: add setonlyone
 // v0.65: debug setvumetre
 // v0.64: add setvumetre and change dim method
 // v0.63: add multi port ability
@@ -39,7 +40,11 @@ class Ai_WS2811
     
     // light the vumeter
     // -nValue: [0..10000]    
-    void setVumeter( int nValue, int bR = 1, int bG = 1, int bB = 1 ); 
+    void setVumeter( int nValue, int bR = 1, int bG = 1, int bB = 1 );
+    
+    // set the pixel in a group and unset all the other. 
+    // nIdx: an index between 0 and 10000 => the nearest pixel will be set (no interpolation) if nIdx is > 10000 => loop
+    void setOnlyOne( unsigned int nIdx, uint8_t r, uint8_t g, uint8_t b );
     
     int reducePixelNumber( int nNewPixelNumber ); // reduce the pixel number to a smaller number (when inited too big or ...) return 1 if ok
     

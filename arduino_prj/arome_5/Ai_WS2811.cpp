@@ -7,7 +7,7 @@ void Ai_WS2811::init(uint8_t pin, uint16_t nPixels)
   m_nLeds = nPixels * 3; 
   m_nCounter = 0; 
   m_pData = (unsigned char*)malloc(m_nLeds); 
-  memset(m_pData,0,m_nLeds); 
+  memset(m_pData,0,m_nLeds);
   m_pDataEnd = m_pData + m_nLeds;
   if( pin == 53 )
   {
@@ -100,6 +100,21 @@ void Ai_WS2811::setVumeter( int nValue,int bR, int bG, int bB )
   }
   sendLedData();
 }
+
+void Ai_WS2811::setOnlyOne( unsigned int nIdx, uint8_t r, uint8_t g, uint8_t b )
+{
+  int nNbrPixel = m_nLeds/3;  
+  struct CRGB * leds = (struct CRGB *)m_pData;
+  memset( m_pData,0,m_nLeds );
+  long i = (long)nIdx%10000;
+  i = (long)(i*nNbrPixel)/10000;
+//  Serial.print(i);
+  leds[i].r = r;
+  leds[i].g = g;
+  leds[i].b = b;
+  sendLedData();
+}
+
 int Ai_WS2811::reducePixelNumber( int nNewPixelNumber )
 {
   int nNewLedsNumber = nNewPixelNumber*3;

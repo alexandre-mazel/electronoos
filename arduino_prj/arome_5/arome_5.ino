@@ -66,8 +66,9 @@ void animate_led()
     if( val >= 0 && val < 20000 )
     {
       // aWs2811[i].setColor( 0, 255, 255 );      
-      if( val <= 1000 )
-        aWs2811[i].setVumeter( (val - 0)*10, 0, 1, 1 );
+      if( val <= 100 )
+        // aWs2811[i].setVumeter( (val - 0)*10, 0, 1, 1 );
+        aWs2811[i].setOnlyOne( (val - 0)*100, 0, 255, 255 );
       else
         anCptLedAnim[i] = 0;
     }    
@@ -79,8 +80,8 @@ void animate_led()
     if( val >= 20000 && val < 40000 )
     {
       // aWs2811[i].setColor( 255, 0, 255 );
-      if( val <= 21000 )
-        aWs2811[i].setVumeter( (val - 20000)*10, 1, 0, 1 );
+      if( val <= 20100 )
+        aWs2811[i].setOnlyOne( (val - 20000)*100, 255, 0, 255 );
       else
         anCptLedAnim[i] = 20000;
       
@@ -353,7 +354,7 @@ void loop()
     {
       ++anExtraPin_CptEqual[i];
 
-      if( abExtraPin_BadgeWasHere[i] && anExtraPin_CptEqual[i] > 12 ) // was > 16 (ok when you're at >~90fps...) // the crucial point is it depends of the fps...
+      if( abExtraPin_BadgeWasHere[i] && anExtraPin_CptEqual[i] > 11 ) // was > 16 (ok when you're at >~90fps...) // the crucial point is it depends of the fps...
       //if( anExtraPin_CptEqual[1] > 16 )
       {
         // tag disappear, turn off led right now!
@@ -392,7 +393,7 @@ void loop()
 
   
   ++nFpsCpt;
-  const int nNbrFrameToCompute = 100*1;
+  const int nNbrFrameToCompute = 300*1;
   if( nFpsCpt == nNbrFrameToCompute )
   {
     unsigned long nNow = micros();

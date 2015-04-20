@@ -1,0 +1,2400 @@
+ Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+n
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 4
+reader: 0, change after same val: 1, cpt: 4
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+n
+reader: 0, change after same val: 0, cpt: 3
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 5
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+n
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 7
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 4
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 5
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+n
+reader: 0, change after same val: 0, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+n
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+n
+reader: 0, change after same val: 1, cpt: 2
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 4
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 1
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 1
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 5
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 4
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 4
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 3
+n
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 2
+n
+n
+reader: 0, change after same val: 0, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 4
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 2
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 6
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 2
+n
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+n
+reader: 0, change after same val: 0, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+frame: 19497us, fps: 51.29
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 4
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 4
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+n
+reader: 0, change after same val: 1, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 4
+reader: 0, change after same val: 0, cpt: 1
+n
+n
+reader: 0, change after same val: 1, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 4
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 2
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 3
+n
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 6
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 5
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 4
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+n
+reader: 0, change after same val: 0, cpt: 3
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 4
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 3
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 5
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 7
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 1
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 6
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 4
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 4
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 4
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+n
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 1
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 4
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 4
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 3
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 1
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+n
+reader: 0, change after same val: 1, cpt: 2
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 5
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 5
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 7
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 4
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+n
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+n
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 1
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 4
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 4
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 5
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+n
+reader: 0, change after same val: 0, cpt: 2
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 4
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 7
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 1
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 2
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 4
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 7
+reader: 0, change after same val: 0, cpt: 1
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+n
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+n
+reader: 0, change after same val: 0, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 2
+n
+reader: 0, change after same val: 1, cpt: 4
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+n
+reader: 0, change after same val: 1, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 5
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 5
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 3
+n
+reader: 0, change after same val: 1, cpt: 7
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+frame: 31014us, fps: 32.24
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 4
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 5
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+n
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+n
+reader: 0, change after same val: 1, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+n
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 4
+reader: 0, change after same val: 0, cpt: 2
+n
+reader: 0, change after same val: 1, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+n
+reader: 0, change after same val: 0, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 5
+reader: 0, change after same val: 0, cpt: 0
+n
+n
+reader: 0, change after same val: 1, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 5
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 4
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+n
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 4
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 4
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 1
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 5
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+n
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 2
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 4
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+n
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 5
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 6
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 1
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 1
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 4
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+n
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 4
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 5
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 5
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+n
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 3
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 6
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 6
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 1
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+n
+reader: 0, change after same val: 1, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 2
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 1
+n
+reader: 0, change after same val: 1, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+n
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 7
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 4
+reader: 0, change after same val: 1, cpt: 0
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 5
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+n
+reader: 0, change after same val: 0, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 1
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+n
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 4
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 5
+reader: 0, change after same val: 1, cpt: 0
+n
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+n
+reader: 0, change after same val: 0, cpt: 3
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 4
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 4
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 1
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 5
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 1
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 6
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+frame: 32730us, fps: 30.55
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 6
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 5
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+n
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+n
+reader: 0, change after same val: 0, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+n
+n
+reader: 0, change after same val: 0, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 4
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 7
+reader: 0, change after same val: 0, cpt: 1
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+n
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+n
+reader: 0, change after same val: 1, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 6
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 1
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 6
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 1
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+n
+reader: 0, change after same val: 0, cpt: 4
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 4
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+n
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 7
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 3
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 4
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+n
+reader: 0, change after same val: 1, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 6
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+n
+reader: 0, change after same val: 0, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 4
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 3
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 3
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+n
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 1
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 4
+reader: 0, change after same val: 0, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 7
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 1
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+n
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+n
+reader: 0, change after same val: 1, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 4
+reader: 0, change after same val: 0, cpt: 3
+n
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 6
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 4
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+n
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 5
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+n
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 5
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+n
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 2
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 4
+reader: 0, change after same val: 0, cpt: 0
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 3
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 4
+reader: 0, change after same val: 0, cpt: 4
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+n
+reader: 0, change after same val: 1, cpt: 5
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+n
+reader: 0, change after same val: 1, cpt: 2
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+n
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 5
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 3
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 4
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 4
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 3
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 5
+reader: 0, change after same val: 0, cpt: 0
+n
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 4
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 1
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+n
+frame: 31591us, fps: 31.65
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 1
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 5
+reader: 0, change after same val: 0, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 5
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+n
+reader: 0, change after same val: 1, cpt: 2
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 5
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+n
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 2
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+n
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 7
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 4
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 6
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 6
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+n
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 1
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 2
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 6
+reader: 0, change after same val: 0, cpt: 0
+n
+reader: 0, change after same val: 1, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 0, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 2
+reader: 0, change after same val: 1, cpt: 3
+reader: 0, change after same val: 0, cpt: 3
+reader: 0, change after same val: 1, cpt: 1
+reader: 0, change after same val: 0, cpt: 0
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change after same val: 0, cpt: 1
+On 0, Code: 24854484854696753554868683 0x30 36 30 30 36 45 43 35 37 30 44 44 TagsList_isMagic: Memorize!
+reader: 0, change after same val: 1, cpt: 0
+setColor 0, 255, 255
+reader: 0, change after same val: 0, cpt: 1
+reader: 0, change after same val: 1, cpt: 0
+reader: 0, change a

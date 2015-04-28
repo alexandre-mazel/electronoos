@@ -7,22 +7,130 @@ void Ai_WS2811::init(uint8_t pin, uint16_t nPixels)
   m_nLeds = nPixels * 3; 
   m_nCounter = 0; 
   m_pData = (unsigned char*)malloc(m_nLeds); 
-  memset(m_pData,0,m_nLeds); 
-  m_pDataEnd = m_pData + m_nLeds; 
+  memset(m_pData,0,m_nLeds);
+  m_pDataEnd = m_pData + m_nLeds;
+  if( pin == 53 )
+  {
+    m_nNumBit = 0;
+  }
+  else if( pin == 52 )
+  {
+    m_nNumBit = 1;
+  }  
+  else if( pin == 51 )
+  {
+    m_nNumBit = 2;
+  }    
+  else if( pin == 50 )
+  {
+    m_nNumBit = 3;
+  } 
+  m_nDimCoef = 1;
+   
 }
 
-void Ai_WS2811::dim( const int nDimCoef )
+void Ai_WS2811::setDim( const int nDimCoef )
 {
+  m_nDimCoef = nDimCoef;
+}
+
+void Ai_WS2811::applyDim( void )
+{
+  if( m_nDimCoef == 1 )
+  {
+    return;
+  }
   register byte *p = m_pData;
   register byte *e = m_pDataEnd;
   while(p != e) 
   { 
-     *p++ /= nDimCoef;
+     (*p) /= m_nDimCoef; ++p;
    }
 }
 
+void Ai_WS2811::setColor(unsigned char r,unsigned char g,unsigned char b)
+{
+  Serial.print("setColor " );
+  Serial.print(r);
+  Serial.print( ", " );
+  Serial.print(g);
+  Serial.print( ", " );
+  Serial.print(b);
+  Serial.println( "" );
+
+  register byte *p = m_pData;
+  register byte *e = m_pDataEnd;
+  while(p != e) 
+  { 
+     *p++ = g;
+     *p++ = r;
+     *p++ = b;
+  }  
+  sendLedData();
+}
+
+void Ai_WS2811::setVumeter( int nValue,int bR, int bG, int bB )
+{
+  int nNbrPixel = m_nLeds/3;
+  int nNbrValuePerPixel = 10000/nNbrPixel;
+  int nNbrPixelToLighten = nValue / nNbrValuePerPixel;
+  int nNbrRemaining = nValue - (nNbrPixelToLighten * nNbrValuePerPixel);
+  
+  nNbrRemaining = map( nNbrRemaining, 0, nNbrValuePerPixel, 0, 255 );
+  struct CRGB * leds = (struct CRGB *)m_pData;
+  int i;
+  for( i = 0; i < nNbrPixelToLighten; ++i )
+  {
+    if( bR ) leds[i].r = 255; else leds[i].r = 0;
+    if( bG ) leds[i].g = 255; else leds[i].g = 0;
+    if( bB ) leds[i].b = 255; else leds[i].b = 0;
+  }
+  if( i < nNbrPixel )
+  {
+    if( bR ) leds[i].r = nNbrRemaining; else leds[i].r = 0;
+    if( bG ) leds[i].g = nNbrRemaining; else leds[i].g = 0;
+    if( bB ) leds[i].b = nNbrRemaining; else leds[i].b = 0;
+    ++i;
+  }
+  for(; i < nNbrPixel; ++i )
+  {
+    leds[i].r = 0;
+    leds[i].g = 0;
+    leds[i].b = 0;    
+  }
+  sendLedData();
+}
+
+void Ai_WS2811::setOnlyOne( unsigned int nIdx, uint8_t r, uint8_t g, uint8_t b )
+{
+  int nNbrPixel = m_nLeds/3;  
+  struct CRGB * leds = (struct CRGB *)m_pData;
+  memset( m_pData,0,m_nLeds );
+  long i = (long)nIdx%10000;
+  i = (long)(i*nNbrPixel)/10000;
+//  Serial.print(i);
+  leds[i].r = r;
+  leds[i].g = g;
+  leds[i].b = b;
+  sendLedData();
+}
+
+int Ai_WS2811::reducePixelNumber( int nNewPixelNumber )
+{
+  int nNewLedsNumber = nNewPixelNumber*3;
+  if( m_nLeds <= nNewLedsNumber )
+    return 0;
+    
+  m_nLeds = nNewLedsNumber;
+  m_pDataEnd = m_pData + m_nLeds;
+  return 1;
+}
+
+
+
 void Ai_WS2811::sendLedData(void)
 {
+  applyDim();
   cli();
   register byte *p = m_pData;
   register byte *e = m_pDataEnd;

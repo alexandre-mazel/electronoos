@@ -1,5 +1,6 @@
 #include "Ai_WS2811.h"
 #include "fonts.h"
+#include "imgs.h"
 
 #define W 14
 #define H  8
@@ -10,11 +11,7 @@
 
 Ai_WS2811 ws2811;
 
-struct CRGB {
-  unsigned char g;
-  unsigned char r;
-  unsigned char b;
-} *leds;
+struct CRGB  *leds;
 
 //typedef struct sCRGB CRGB; // les typedef ne fonctionnet pas du tout...
 //#define CRGB struct sCRGB
@@ -38,7 +35,7 @@ void setV( int nNum, struct CRGB * prgb )
       leds[i*W+nNum].g = prgb->g;
       leds[i*W+nNum].b = prgb->b;    
     }
-    ws2811.dim(8);    
+    ws2811.setDim(8);
     ws2811.sendLedData();    
 }
 
@@ -112,6 +109,19 @@ void drawLetter( int nNumLetter, int x, int y )
     }
 }
 
+void drawImg( int x, int y )
+{
+  unsigned char * pPixSrc = aImgs;
+  int pix = 0;
+  while(pix<NUM_PIXELS)
+  {
+    leds[pix].b = *pPixSrc; ++pPixSrc;
+    leds[pix].g = *pPixSrc; ++pPixSrc;
+    leds[pix].r = *pPixSrc; ++pPixSrc;
+    ++pix;
+  }
+}
+
 int nFpsCpt = 0;
 unsigned long timeFpsBegin;
 
@@ -134,6 +144,9 @@ void setup()
     aLetterPos[i] = W+i*(LETTER_SIZE_X+1);
     aLetterIdx[i] = i;
   }
+  
+  ws2811.setDim(16);
+
 }
 
 int nCpt = 0;
@@ -209,22 +222,30 @@ void loop()
   ws2811.sendLedData();
   delay(100);
   */
-  
-  memset( leds, 0, NUM_PIXELS*3 );
-
-  for( int i = 0; i < NBR_LETTER_DRAW; ++i )
+  if( 0 )
   {
-    drawLetter( szToWrite[aLetterIdx[i]%nLenMessage], aLetterPos[i], 0 );      
-    --aLetterPos[i];
-    if( aLetterPos[i] < -LETTER_SIZE_X )
+    memset( leds, 0, NUM_PIXELS*3 );
+  
+    for( int i = 0; i < NBR_LETTER_DRAW; ++i )
     {
-      aLetterPos[i] += 3*(LETTER_SIZE_X+1);
-      aLetterIdx[i] += 3;      
+      drawLetter( szToWrite[aLetterIdx[i]%nLenMessage], aLetterPos[i], 0 );      
+      --aLetterPos[i];
+      if( aLetterPos[i] < -LETTER_SIZE_X )
+      {
+        aLetterPos[i] += 3*(LETTER_SIZE_X+1);
+        aLetterIdx[i] += 3;      
+      }    
     }    
+    ws2811.sendLedData();
+    delay(40);
   }
-  ws2811.dim(16);
-  ws2811.sendLedData();
-  delay(40);
+  
+  if( 1 )
+  {
+    drawImg( 0, 0);
+    ws2811.sendLedData();
+    delay(40);    
+  }
   
   // fps computation
   ++nCpt;

@@ -145,7 +145,7 @@ void setup()
     aLetterIdx[i] = i;
   }
   
-  ws2811.setDim(16);
+  //ws2811.setDim(16);
 
 }
 
@@ -154,6 +154,11 @@ int bPrevLighten = false;
 int nCptHidden = 0;
 unsigned long timeLast = 0;
 int nCptFadeOut = -1;
+
+int nBlobX = W/2;
+int nBlobY = H/2;
+int nBlobDX = 1;
+int nBlobDY = 1;
 void loop()
 {
 
@@ -240,11 +245,67 @@ void loop()
     delay(40);
   }
   
-  if( 1 )
+  if( 0 )
   {
     drawImg( (nCpt/40)%IMG_NBR, 0, 0);
     ws2811.sendLedData();
     delay(40);    
+  }
+  
+  if( 1 )
+  {
+    // we will render image, directly in aImgs (in BGR)
+    memset( aImgs, 0, NUM_PIXELS*3 );    
+    int x = nBlobX;
+    int y = nBlobY;
+    int nSize = 1;
+    int nMaxDist = nSize+1;
+    CRGB hue;
+    getHue( nCpt%256,&hue );
+    for( int j = -nSize; j <= nSize; ++j )
+    {
+      for( int i = -nSize; i <= nSize; ++i )
+      {
+        if( x+i >= 0 && x+i < W && y+j >= 0 && y+j < H )
+        {
+          int pix = (x+i+(y+j)*W)*3;
+          float d = sqrt((i)*(i)+(j)*(j));
+          int lum = 255;
+          if( d != 0 )
+            lum = ((nMaxDist-d)*lum)/nMaxDist;
+            if( lum < 0 ) lum = 0;
+            
+//          Serial.print( lum );
+//          Serial.print( " " );
+
+//          getHue( nCpt%256,(CRGB*)&aImgs[pix+0] ); 
+//          aImgs[pix+0] = (aImgs[pix+0]*lum)/255;
+//          aImgs[pix+1] = (aImgs[pix+1]*lum)/255;
+//          aImgs[pix+2] = (aImgs[pix+2]*lum)/255;
+//            if( hue.b > 128 ) aImgs[pix+0] = lum;
+//            if( hue.g > 128 ) aImgs[pix+1] = lum;
+//            if( hue.r > 128 ) aImgs[pix+2] = lum;            
+            aImgs[pix+0] = lum*hue.b/255;
+            aImgs[pix+1] = lum*hue.g/255;
+            aImgs[pix+2] = lum*hue.r/255;
+
+        }
+      }
+//      Serial.println();  
+    }
+     
+    nBlobX += nBlobDX;
+    if( nBlobX+nSize >= W ) nBlobDX = -1;
+    if( nBlobX-nSize < 0 ) nBlobDX = 1;
+   
+    nBlobY += nBlobDY;
+    if( nBlobY+nSize >= H ) nBlobDY = -1;
+    if( nBlobY-nSize < 0 ) nBlobDY = 1;
+    
+    
+    drawImg( 0, 0, 0);
+    ws2811.sendLedData();
+    delay(20);    
   }
   
   // fps computation
@@ -268,7 +329,7 @@ void loop()
 }
 
 /**
- * HVS to RGB comversion (simplified to the range 0-255)
+ * HVS to RGB conversion (simplified to the range 0-255)
  **/
  
  void getHue( int h, CRGB * pRes )

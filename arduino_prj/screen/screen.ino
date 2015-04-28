@@ -109,9 +109,9 @@ void drawLetter( int nNumLetter, int x, int y )
     }
 }
 
-void drawImg( int x, int y )
+void drawImg( int nNumImage, int x, int y )
 {
-  unsigned char * pPixSrc = aImgs;
+  unsigned char * pPixSrc = &aImgs[nNumImage*IMG_SIZE_Y*IMG_SIZE_X*3];
   int pix = 0;
   while(pix<NUM_PIXELS)
   {
@@ -242,7 +242,7 @@ void loop()
   
   if( 1 )
   {
-    drawImg( 0, 0);
+    drawImg( (nCpt/40)%IMG_NBR, 0, 0);
     ws2811.sendLedData();
     delay(40);    
   }

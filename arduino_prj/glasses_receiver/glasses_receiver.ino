@@ -8,6 +8,8 @@
 Ai_WS2811 ws2811;
 struct CRGB * pLeds = NULL;
 
+const int bDebugWithSerial = 0;
+
 
 void debug_with_led( unsigned char B )
 {
@@ -36,19 +38,22 @@ void debug_with_led( unsigned char B )
 void setLeds( unsigned char * buf )
 {
   // change color to buf, with buf: "BGR" composantes in [0..127]
-  Serial.print( "INF: setLeds: " );
-  Serial.print( buf[0] );
-  Serial.print( ", " );
-  Serial.print( buf[1] );
-  Serial.print( ", " );
-  Serial.print( buf[2] );  
-  Serial.println( "." );
-  ws2811.setColor( buf[2]*2, buf[1]*1, buf[0]*2 );
+  if( bDebugWithSerial )
+  {
+    Serial.print( "INF: setLeds: " );
+    Serial.print( buf[0] );
+    Serial.print( ", " );
+    Serial.print( buf[1] );
+    Serial.print( ", " );
+    Serial.print( buf[2] );  
+    Serial.println( "." );
+  }
+  ws2811.setColor( buf[2]*2, buf[1]*2, buf[0]*2 );
 }
 
 void checkLedsRGB( void )
 {
-  Serial.println( "INF: checkLedsRGB: begin..." );
+  if( bDebugWithSerial ) Serial.println( "INF: checkLedsRGB: begin..." );
   unsigned char full[] = {127, 127, 127};
   unsigned char r[] = {0, 0, 127};
   unsigned char g[] = {0, 127,  0 };
@@ -62,13 +67,13 @@ void checkLedsRGB( void )
   delay( nTimeDelay );  
   setLeds( full );
   delay( nTimeDelay );  
-  Serial.println( "INF: checkLedsRGB: end" );  
+  if( bDebugWithSerial ) Serial.println( "INF: checkLedsRGB: end" );  
 }
 
 void setup()
 {  
   Serial.begin(9600);
-  Serial.println( "INF: CdL: Glasses_Receiver v0.6" );
+  if( bDebugWithSerial ) Serial.println( "INF: CdL: Glasses_Receiver v0.6" );
   
   pinMode(LED_DEBUG_PIN, OUTPUT);
   for( int i = 0; i < 5; ++i )
@@ -122,8 +127,8 @@ void loop()
         }
         else
         {
-          Serial.print( "ERR: at end of buffer, buffer hasn't the right side, nSizeBuf: " );
-          Serial.println( nSizeBuf );
+          if( bDebugWithSerial ) Serial.print( "ERR: at end of buffer, buffer hasn't the right side, nSizeBuf: " );
+          if( bDebugWithSerial ) Serial.println( nSizeBuf );
         }
         nSizeBuf = 0;
       }
@@ -133,11 +138,13 @@ void loop()
         buf[nSizeBuf] = c; ++nSizeBuf;
         if( nSizeBuf >= nSizeBufMax )
         {
-          Serial.print( "ERR: when adding a new byte, nSizeBuf more than max: " );
-          Serial.println( nSizeBuf );
+          if( bDebugWithSerial ) Serial.print( "ERR: when adding a new byte, nSizeBuf more than max: " );
+          if( bDebugWithSerial ) Serial.println( nSizeBuf );
           nSizeBuf = 0;
         }
       }
       
-    }
-}
+    } // while serial available
+    
+  delay( 1 ); // wait a bit
+} // end of loop

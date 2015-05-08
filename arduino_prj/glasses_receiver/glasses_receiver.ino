@@ -113,7 +113,7 @@ void loop()
         }
       }
       
-      if( c == 0 )
+      if( c == 127 ) // 127 is the end of message
       {
         // end of message        
         if( nSizeBuf == 3 )

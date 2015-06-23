@@ -186,7 +186,8 @@ void setup()
     apLeds[i] = (struct CRGB*)aWs2811[i].getRGBData();
     aWs2811[i].setDim( 1 );
   }
-  aWs2811[1].reducePixelNumber( 12 );
+  aWs2811[0].reducePixelNumber( 5 );  
+  aWs2811[1].reducePixelNumber( 5 );
   aWs2811[2].reducePixelNumber( 1 );  
   
   

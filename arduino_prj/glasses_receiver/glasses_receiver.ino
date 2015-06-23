@@ -90,7 +90,8 @@ void setup()
   pinMode( LED_RGB_PIN, OUTPUT );
   ws2811.init(LED_RGB_PIN,NUM_PIXELS);
   pLeds = (struct CRGB*)ws2811.getRGBData();
-  ws2811.setDim( 32 );  
+  //ws2811.setDim( 32 );
+  ws2811.setDim( 8 );
   
   checkLedsRGB();  
 }

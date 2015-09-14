@@ -404,10 +404,10 @@ void loop()
       
       if( abExtraPin_BadgeWasHere[i] )
       {
-        if( anExtraPin_CptEqual[i] > 7 ) // was > 16 (ok when you're at >~90fps...) // the crucial point is it depends of the fps... > 11 quand bonne alimentation > 7 or 6
+        if( anExtraPin_CptEqual[i] > 10 ) // was > 16 (ok when you're at >~90fps...) // the crucial point is it depends of the fps... > 11 quand bonne alimentation > 7 or 6
         {
           ++anExtraPin_CptWasLongSame[i];
-          if( anExtraPin_CptWasLongSame[i] > 1 )
+          if( anExtraPin_CptWasLongSame[i] > 0 )
           {
             // tag disappear, turn off led right now!
             if( 0 )
@@ -436,7 +436,7 @@ void loop()
   }
 
   animate_led();
-  delay(5);
+  delay(10);
 
   
   ++nFpsCpt;

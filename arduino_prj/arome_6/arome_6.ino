@@ -31,6 +31,7 @@ TagsList * pTagsList = NULL;
 
 int anExtraPin_PrevState[nNbrReader]; // memorize the state of the previous extra pin (one per board)
 int anExtraPin_CptEqual[nNbrReader];  // count the number of frame with same value (one per board)
+int anExtraPin_CptWasLongSame[nNbrReader]; // count the number of long frame with same value (one per board)
 int abExtraPin_BadgeWasHere[nNbrReader]; // was the board present?
 
 int anState[nNbrReader]; // 0: idle, 1: good, 2: bad, 3: memorize, 4: forget
@@ -90,12 +91,17 @@ void animate_led()
     {
       anCptLedAnim[i] = 60000;
     }
-
+/*
     if( val >= 40000 && val <= 49000 )
     {
       //aWs2811[i].setColor( 0, 255, 0 );
       if( val <= 40100 )
         aWs2811[i].setVumeter( (val - 40000)*100, 0, 1, 0 );
+    }    
+*/
+    if( val == 40000 )
+    {
+      aWs2811[i].setColor( 0, 255, 0 );
     }    
 
     if( val == 50000 )
@@ -172,6 +178,7 @@ void setup()
     anCptLedAnim[i*2+0] = 60000;
     anCptLedAnim[i*2+1] = 60000;
     anExtraPin_CptEqual[i] = 0;
+    anExtraPin_CptWasLongSame[i] = 0;
   }
   // setup pin
   for( i = 0; i < nNbrReader; ++i )
@@ -186,9 +193,9 @@ void setup()
     apLeds[i] = (struct CRGB*)aWs2811[i].getRGBData();
     aWs2811[i].setDim( 1 );
   }
-  aWs2811[0].reducePixelNumber( 5 );  
-  aWs2811[1].reducePixelNumber( 5 );
-  aWs2811[2].reducePixelNumber( 1 );  
+  aWs2811[0].reducePixelNumber( 4 );  
+  aWs2811[1].reducePixelNumber( 4 );
+  aWs2811[2].reducePixelNumber( 4 );  
   
   
   check_leds();
@@ -252,7 +259,7 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
 
   if( 0 )
   {
-    // print debug
+    // print debug code value
     int i;
     Serial.write( "On " );
     Serial.print( nReaderIdx, DEC);
@@ -351,23 +358,34 @@ void loop()
   for( i = 0; i < nNbrReader; ++i )
   {
     int nVal = digitalRead(nFirstPresencePin+i);
+    //int nVal = analogRead(8+i)>512;
+//    if(i==2)
+//       nVal=analogRead( 8 ) > 100;
+    
+    if( i == 1 && 0 )
+    {
+      // store all value to output them later in a raw
+      const int nSizeDebugPin = 1000;
+      static char anBufDebugPin[nSizeDebugPin];
+      static int nCptDebugPin = 0;
+      anBufDebugPin[nCptDebugPin] = (char)nVal;
+      nCptDebugPin++;
+      if( nCptDebugPin == nSizeDebugPin )
+      {
+        // output all in a raw output
+        Serial.println( "NEW DUMP:");
+        for(int iDebugPin = 0; iDebugPin < nCptDebugPin; ++iDebugPin )
+        {
+          Serial.print( anBufDebugPin[iDebugPin], DEC );
+        }
+        Serial.println( "END");
+        nCptDebugPin = 0;
+      }
+    }
+    
     if( nVal == anExtraPin_PrevState[i] )
     {
       ++anExtraPin_CptEqual[i];
-
-      if( abExtraPin_BadgeWasHere[i] && anExtraPin_CptEqual[i] > 11 ) // was > 16 (ok when you're at >~90fps...) // the crucial point is it depends of the fps...
-      //if( anExtraPin_CptEqual[1] > 16 )
-      {
-        // tag disappear, turn off led right now!
-        Serial.print( "BADGE disappear: " );
-        Serial.println( i );
-        abExtraPin_BadgeWasHere[i] = false;
-        if( anState[i] < 3 )
-        {
-          anState[i] = 0;
-          anCptLedAnim[i] = 60000;
-        }
-      }   
     }
     else
     {
@@ -384,18 +402,46 @@ void loop()
         Serial.println("");
       }
       
+      if( abExtraPin_BadgeWasHere[i] )
+      {
+        if( anExtraPin_CptEqual[i] > 7 ) // was > 16 (ok when you're at >~90fps...) // the crucial point is it depends of the fps... > 11 quand bonne alimentation > 7 or 6
+        {
+          ++anExtraPin_CptWasLongSame[i];
+          if( anExtraPin_CptWasLongSame[i] > 1 )
+          {
+            // tag disappear, turn off led right now!
+            if( 0 )
+            {
+              Serial.print( "BADGE disappear: " );
+              Serial.println( i );
+            }
+            abExtraPin_BadgeWasHere[i] = false;
+            anExtraPin_CptWasLongSame[i] = 0;
+            if( anState[i] < 3 ) // don't turn off magic state
+            {
+              anState[i] = 0;
+              anCptLedAnim[i] = 60000;
+            }
+          }
+        }
+        else
+        {
+          anExtraPin_CptWasLongSame[i] = 0;
+        }
+      }      
+      
       anExtraPin_PrevState[i] = nVal;
       anExtraPin_CptEqual[i] = 0;
     }
   }
 
   animate_led();
-  delay(10);
+  delay(5);
 
   
   ++nFpsCpt;
   const int nNbrFrameToCompute = 300*1;
-  if( nFpsCpt == nNbrFrameToCompute )
+  if( nFpsCpt == nNbrFrameToCompute && 0 )
   {
     unsigned long nNow = micros();
     unsigned long nDuration = nNow - timeFpsBegin;

@@ -141,7 +141,11 @@ void animate_victory( int bIsMaster )
     {
       if( ( bIsMaster && i < 3 ) || ( !bIsMaster && i >= 3 ) )
       {
+        if( !bIsMaster )
+          i-=3;
+        aWs2811[i].setColor( 0, 0, 255 ); 
       }
+      delay(200);
     }
   }
 }

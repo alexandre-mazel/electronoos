@@ -22,6 +22,10 @@ const int nLenCode = 12;
 const int nFirstLedPin = 50; // one led per reader
 const int nFirstPresencePin = 40; // one pin per reader
 
+const int nLedPinSendGood3 = 20;
+const int nLedPinReceiveGood3 = 22;
+
+
 #define NUM_PIXELS 16
 Ai_WS2811 aWs2811[nNbrReader];
 struct CRGB * apLeds[nNbrReader] = {NULL, NULL, NULL};
@@ -35,6 +39,10 @@ int anExtraPin_CptWasLongSame[nNbrReader]; // count the number of long frame wit
 int abExtraPin_BadgeWasHere[nNbrReader]; // was the board present?
 
 int anState[nNbrReader]; // 0: idle, 1: good, 2: bad, 3: memorize, 4: forget
+
+unsigned long timeMeLastGood3 = 0; // time in ms since I've finished 3 good
+unsigned long timeOtherLastGood3 = 0; // time when receiving a good3 from the other
+int nStatePinReceiveLastGood3 = 0; // store the state to detect a change
 
 /*
 Led phase at ~200fps:
@@ -123,6 +131,20 @@ void animate_led()
 //  Serial.println("");
 }
 
+void animate_victory( int bIsMaster )
+{
+  const int nNbrTurn = 10;
+  int i;
+  for( int nNumTurn = 0; nNumTurn < nNbrTurn; ++nNumTurn )
+  {
+    for( i = 0; i < nNbrReader*2; ++i )
+    {
+      if( ( bIsMaster && i < 3 ) || ( !bIsMaster && i >= 3 ) )
+      {
+      }
+    }
+  }
+}
 
 void check_leds( void )
 {
@@ -186,6 +208,8 @@ void setup()
     pinMode( nFirstLedPin+i, OUTPUT );
     pinMode( nFirstPresencePin+i, INPUT );
   }
+  pinMode( nLedPinSendGood3, OUTPUT );
+  pinMode( nLedPinReceiveGood3, INPUT );  
 
   for( i = 0; i < nNbrReader; ++i )
   {
@@ -234,6 +258,35 @@ void memorize_code( const char * buf, int nReaderIdx, int bForget )
     TagsList_removeFromList( &(pTagsList[nReaderIdx]), buf );  
 }
 
+int check_all_good(void)
+{
+   /*
+   a new reader has a good one, does we have all ok ?
+   return 1 if yes (no need to use the value, just a luxuary return)
+   */
+   for( i = 0; i < nNbrReader; ++i )
+   {
+      if( anState[nReaderIdx] != 1 )
+      {
+        digitalWrite( nLedPinSendGood3, LOW ); // reset for next time!
+        return 0;
+      }
+   }
+   
+   if( millis() - timeMeLastGood3 > 60000 ) // 1 min to have an animation again
+   {
+     timeMeLastGood3 = millis()
+     if( millis() - timeOtherLastGood3 < 30000 ) // 30 sec to enter the full combination
+     {
+       // everybody ok, launch the animation, i'm the slave
+       animate_victory(0);
+     }
+     else
+     {
+       digitalWrite( nLedPinSendGood3, HIGH );
+     }
+   }
+}
 
 
 
@@ -308,6 +361,12 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
   {
     anState[nReaderIdx] = nRetCode;
     anCptLedAnim[nReaderIdx] = (nRetCode)*10000+30000;
+    
+    if( nRetCode == 1 )
+    {
+      check_all_good();
+      
+    }
   }
   
   return 0;
@@ -433,6 +492,20 @@ void loop()
       anExtraPin_PrevState[i] = nVal;
       anExtraPin_CptEqual[i] = 0;
     }
+  }
+  
+  nVal = digitalRead(nLedPinReceiveGood3);
+  if( nVal != nStatePinReceiveLastGood3 )
+  {
+    if( nVal )
+    {
+       if( millis() - timeMeLastGood3 < 30000 ) // 30 sec to enter the full combination
+       {
+         // everybody ok, launch the animation, i'm the master
+         animate_victory(1);
+       }
+    }
+    nStatePinReceiveLastGood3 = nVal;
   }
 
   animate_led();

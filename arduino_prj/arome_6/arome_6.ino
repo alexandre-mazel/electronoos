@@ -133,19 +133,26 @@ void animate_led()
 
 void animate_victory( int bIsMaster )
 {
+  Serial.print( "INF: Victory !!! master: " );
+  Serial.println( bIsMaster, DEC );
+  
   const int nNbrTurn = 10;
   int i;
   for( int nNumTurn = 0; nNumTurn < nNbrTurn; ++nNumTurn )
   {
     for( i = 0; i < nNbrReader*2; ++i )
     {
-      if( ( bIsMaster && i < 3 ) || ( !bIsMaster && i >= 3 ) )
-      {
-        if( !bIsMaster )
-          i-=3;
-        aWs2811[i].setColor( 0, 0, 255 ); 
-      }
-      delay(200);
+      int nPrev = i-1;
+      if( nPrev < 0 )
+        nPrev = 5;
+
+      if( !bIsMaster )
+        i-=3;
+      if( i >= 0 && i < 3 )
+        aWs2811[i].setColor( 0, 0, 255 );
+      if( nPrev >= 0 && nPrev < 3 )
+        aWs2811[nPrev].setColor( 0, 0, 0 );
+      delay(1000);
     }
   }
 }
@@ -268,9 +275,9 @@ int check_all_good(void)
    a new reader has a good one, does we have all ok ?
    return 1 if yes (no need to use the value, just a luxuary return)
    */
-   for( i = 0; i < nNbrReader; ++i )
+   for( int i = 0; i < nNbrReader; ++i )
    {
-      if( anState[nReaderIdx] != 1 )
+      if( anState[i] != 1 )
       {
         digitalWrite( nLedPinSendGood3, LOW ); // reset for next time!
         return 0;
@@ -279,7 +286,7 @@ int check_all_good(void)
    
    if( millis() - timeMeLastGood3 > 60000 ) // 1 min to have an animation again
    {
-     timeMeLastGood3 = millis()
+     timeMeLastGood3 = millis();
      if( millis() - timeOtherLastGood3 < 30000 ) // 30 sec to enter the full combination
      {
        // everybody ok, launch the animation, i'm the slave
@@ -287,6 +294,7 @@ int check_all_good(void)
      }
      else
      {
+       Serial.println( "INF: Send Good3 !!!" );
        digitalWrite( nLedPinSendGood3, HIGH );
      }
    }
@@ -498,20 +506,25 @@ void loop()
     }
   }
   
-  nVal = digitalRead(nLedPinReceiveGood3);
-  if( nVal != nStatePinReceiveLastGood3 )
+  if( 1 )
   {
-    if( nVal )
+    // victory handling
+    int nVal = digitalRead(nLedPinReceiveGood3);
+    if( nVal != nStatePinReceiveLastGood3 )
     {
-       if( millis() - timeMeLastGood3 < 30000 ) // 30 sec to enter the full combination
-       {
-         // everybody ok, launch the animation, i'm the master
-         animate_victory(1);
-       }
+      if( nVal )
+      {
+         Serial.println( "INF: Receive Good3 !!!" );
+         if( millis() - timeMeLastGood3 < 30000 ) // 30 sec to enter the full combination
+         {
+           // everybody ok, launch the animation, i'm the master
+           animate_victory(1);
+         }
+      }
+      nStatePinReceiveLastGood3 = nVal;
     }
-    nStatePinReceiveLastGood3 = nVal;
   }
-
+  
   animate_led();
   delay(10);
 

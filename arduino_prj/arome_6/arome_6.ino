@@ -111,11 +111,19 @@ void animate_led()
     {
       aWs2811[i].setColor( 0, 255, 0 );
     }    
+    if( val > 40100 && val <= 40600 && (val%10)==0 )
+    {
+      aWs2811[i].setColor( 0, 255-( ((long)170*(val-40100))/500 ), 0 );
+    }    
 
     if( val == 50000 )
     {
       aWs2811[i].setColor( 255, 0, 0 );
     }    
+    if( val > 50100 && val <= 50600 && (val%10)==0 )
+    {
+      aWs2811[i].setColor( 255-( ((long)170*(val-50100))/500 ), 0, 0 );
+    }  
     
     if( anCptLedAnim[i] == 60000 )
     {
@@ -232,8 +240,8 @@ void setup()
   aWs2811[1].reducePixelNumber( 4 );
   aWs2811[2].reducePixelNumber( 4 );  
   
-  timeMeLastGood3 = millis();
-  timeOtherLastGood3 = millis();
+  timeMeLastGood3 = 0;
+  timeOtherLastGood3 = 0;
   
   
   check_leds();
@@ -383,7 +391,7 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
     Serial.write( "\n" );
   }
 
-  if( anState[nReaderIdx] != nRetCode ) // evite de relancer l'animation quand elle est deja en cours (genre mauvais contact sur une anim verte)
+  if( anState[nReaderIdx] != nRetCode || 1 ) // evite de relancer l'animation quand elle est deja en cours (genre mauvais contact sur une anim verte)
   {
     anState[nReaderIdx] = nRetCode;
     anCptLedAnim[nReaderIdx] = (nRetCode)*10000+30000;
@@ -529,7 +537,7 @@ void loop()
       if( nVal )
       {
          Serial.println( "INF: Receive Good3 !!!" );
-         if( millis() - timeMeLastGood3 < 30000 ) // 30 sec to enter the full combination
+         if( millis() - timeMeLastGood3 < 30000 and timeMeLastGood3 != 0 ) // 30 sec to enter the full combination
          {
            // everybody ok, launch the animation, i'm the master
            animate_victory(1);

@@ -22,8 +22,8 @@ const int nLenCode = 12;
 const int nFirstLedPin = 50; // one led per reader
 const int nFirstPresencePin = 40; // one pin per reader
 
-const int nLedPinSendGood3 = 20;
-const int nLedPinReceiveGood3 = 22;
+const int nLedPinSendGood3 = 22;
+const int nLedPinReceiveGood3 = 24;
 
 
 #define NUM_PIXELS 16
@@ -40,8 +40,8 @@ int abExtraPin_BadgeWasHere[nNbrReader]; // was the board present?
 
 int anState[nNbrReader]; // 0: idle, 1: good, 2: bad, 3: memorize, 4: forget
 
-unsigned long timeMeLastGood3 = 0; // time in ms since I've finished 3 good
-unsigned long timeOtherLastGood3 = 0; // time when receiving a good3 from the other
+unsigned long timeMeLastGood3; // time in ms since I've finished 3 good
+unsigned long timeOtherLastGood3; // time when receiving a good3 from the other
 int nStatePinReceiveLastGood3 = 0; // store the state to detect a change
 
 /*
@@ -119,7 +119,7 @@ void animate_led()
     
     if( anCptLedAnim[i] == 60000 )
     {
-      aWs2811[i].setColor( 0, 0, 0 );      
+      aWs2811[i].setColor( 18, 14, 14 );      
     }
     
     if( val != 49001 && val != 59001 )
@@ -232,6 +232,9 @@ void setup()
   aWs2811[1].reducePixelNumber( 4 );
   aWs2811[2].reducePixelNumber( 4 );  
   
+  timeMeLastGood3 = millis();
+  timeOtherLastGood3 = millis();
+  
   
   check_leds();
 
@@ -284,6 +287,17 @@ int check_all_good(void)
       }
    }
    
+   if( 1 )
+   {
+     Serial.println( "INF: All good!" );   
+     Serial.print( "INF: time: " );   
+     Serial.print( millis(), DEC );        
+     Serial.print( ",  timeMeLastGood3: " );   
+     Serial.print( timeMeLastGood3, DEC );        
+     Serial.print( ",  timeOtherLastGood3: " );   
+     Serial.println( timeOtherLastGood3, DEC );        
+   }
+     
    if( millis() - timeMeLastGood3 > 60000 ) // 1 min to have an animation again
    {
      timeMeLastGood3 = millis();
@@ -475,7 +489,7 @@ void loop()
       
       if( abExtraPin_BadgeWasHere[i] )
       {
-        if( anExtraPin_CptEqual[i] > 10 ) // was > 16 (ok when you're at >~90fps...) // the crucial point is it depends of the fps... > 11 quand bonne alimentation > 7 or 6
+        if( anExtraPin_CptEqual[i] > 8 ) // was > 16 (ok when you're at >~90fps...) // the crucial point is it depends of the fps... > 11 quand bonne alimentation > 7 or 6
         {
           ++anExtraPin_CptWasLongSame[i];
           if( anExtraPin_CptWasLongSame[i] > 0 )

@@ -122,12 +122,13 @@ void animate_led()
     }    
     if( val > 50100 && val <= 50600 && (val%10)==0 )
     {
-      aWs2811[i].setColor( 255-( ((long)170*(val-50100))/500 ), 0, 0 );
+      aWs2811[i].setColor( 255-( ((long)
+      170*(val-50100))/500 ), 0, 0 );
     }  
     
     if( anCptLedAnim[i] == 60000 )
     {
-      aWs2811[i].setColor( 18, 14, 14 );      
+      aWs2811[i].setColor( 16, 16, 14 );      
     }
     
     if( val != 49001 && val != 59001 )
@@ -141,7 +142,7 @@ void animate_led()
 
 void animate_victory( int bIsMaster )
 {
-  Serial.print( "INF: Victory !!! master: " );
+  Serial.print( "INF: Victory !! master: " );
   Serial.println( bIsMaster, DEC );
   
   const int nNbrTurn = 10;
@@ -316,7 +317,7 @@ int check_all_good(void)
      }
      else
      {
-       Serial.println( "INF: Send Good3 !!!" );
+       Serial.println( "INF: Send Good3 !!" );
        digitalWrite( nLedPinSendGood3, HIGH );
      }
    }
@@ -393,6 +394,7 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
 
   if( anState[nReaderIdx] != nRetCode || 1 ) // evite de relancer l'animation quand elle est deja en cours (genre mauvais contact sur une anim verte)
   {
+    //Serial.write( "B\n" );
     anState[nReaderIdx] = nRetCode;
     anCptLedAnim[nReaderIdx] = (nRetCode)*10000+30000;
     
@@ -508,6 +510,7 @@ void loop()
               Serial.print( "BADGE disappear: " );
               Serial.println( i );
             }
+            //Serial.write( "D\n" );
             abExtraPin_BadgeWasHere[i] = false;
             anExtraPin_CptWasLongSame[i] = 0;
             if( anState[i] < 3 ) // don't turn off magic state
@@ -536,7 +539,7 @@ void loop()
     {
       if( nVal )
       {
-         Serial.println( "INF: Receive Good3 !!!" );
+         Serial.println( "INF: Receive Good3 !!" );
          if( millis() - timeMeLastGood3 < 30000 and timeMeLastGood3 != 0 ) // 30 sec to enter the full combination
          {
            // everybody ok, launch the animation, i'm the master

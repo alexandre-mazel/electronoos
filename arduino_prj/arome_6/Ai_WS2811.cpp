@@ -50,6 +50,7 @@ void Ai_WS2811::applyDim( void )
 
 void Ai_WS2811::setColor(unsigned char r,unsigned char g,unsigned char b)
 {
+  /*
   Serial.print("setColor " );
   Serial.print(r);
   Serial.print( ", " );
@@ -57,6 +58,7 @@ void Ai_WS2811::setColor(unsigned char r,unsigned char g,unsigned char b)
   Serial.print( ", " );
   Serial.print(b);
   Serial.println( "" );
+  */
 
   register byte *p = m_pData;
   register byte *e = m_pDataEnd;

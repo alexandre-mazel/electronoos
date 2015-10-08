@@ -1,5 +1,6 @@
 #include "Ai_WS2811.h"
 #include "fonts.h"
+#include "imgs.h"
 
 #define W 14
 #define H  8
@@ -10,11 +11,7 @@
 
 Ai_WS2811 ws2811;
 
-struct CRGB {
-  unsigned char g;
-  unsigned char r;
-  unsigned char b;
-} *leds;
+struct CRGB  *leds;
 
 //typedef struct sCRGB CRGB; // les typedef ne fonctionnet pas du tout...
 //#define CRGB struct sCRGB
@@ -38,7 +35,7 @@ void setV( int nNum, struct CRGB * prgb )
       leds[i*W+nNum].g = prgb->g;
       leds[i*W+nNum].b = prgb->b;    
     }
-    ws2811.dim(8);    
+    ws2811.setDim(8);
     ws2811.sendLedData();    
 }
 
@@ -112,6 +109,19 @@ void drawLetter( int nNumLetter, int x, int y )
     }
 }
 
+void drawImg( int nNumImage, int x, int y )
+{
+  unsigned char * pPixSrc = &aImgs[nNumImage*IMG_SIZE_Y*IMG_SIZE_X*3];
+  int pix = 0;
+  while(pix<NUM_PIXELS)
+  {
+    leds[pix].b = *pPixSrc; ++pPixSrc;
+    leds[pix].g = *pPixSrc; ++pPixSrc;
+    leds[pix].r = *pPixSrc; ++pPixSrc;
+    ++pix;
+  }
+}
+
 int nFpsCpt = 0;
 unsigned long timeFpsBegin;
 
@@ -134,6 +144,9 @@ void setup()
     aLetterPos[i] = W+i*(LETTER_SIZE_X+1);
     aLetterIdx[i] = i;
   }
+  
+  //ws2811.setDim(16);
+
 }
 
 int nCpt = 0;
@@ -141,6 +154,11 @@ int bPrevLighten = false;
 int nCptHidden = 0;
 unsigned long timeLast = 0;
 int nCptFadeOut = -1;
+
+int nBlobX = W/2;
+int nBlobY = H/2;
+int nBlobDX = 1;
+int nBlobDY = 1;
 void loop()
 {
 
@@ -209,22 +227,86 @@ void loop()
   ws2811.sendLedData();
   delay(100);
   */
-  
-  memset( leds, 0, NUM_PIXELS*3 );
-
-  for( int i = 0; i < NBR_LETTER_DRAW; ++i )
+  if( 0 )
   {
-    drawLetter( szToWrite[aLetterIdx[i]%nLenMessage], aLetterPos[i], 0 );      
-    --aLetterPos[i];
-    if( aLetterPos[i] < -LETTER_SIZE_X )
+    memset( leds, 0, NUM_PIXELS*3 );
+  
+    for( int i = 0; i < NBR_LETTER_DRAW; ++i )
     {
-      aLetterPos[i] += 3*(LETTER_SIZE_X+1);
-      aLetterIdx[i] += 3;      
+      drawLetter( szToWrite[aLetterIdx[i]%nLenMessage], aLetterPos[i], 0 );      
+      --aLetterPos[i];
+      if( aLetterPos[i] < -LETTER_SIZE_X )
+      {
+        aLetterPos[i] += 3*(LETTER_SIZE_X+1);
+        aLetterIdx[i] += 3;      
+      }    
     }    
+    ws2811.sendLedData();
+    delay(40);
   }
-  ws2811.dim(16);
-  ws2811.sendLedData();
-  delay(40);
+  
+  if( 0 )
+  {
+    drawImg( (nCpt/40)%IMG_NBR, 0, 0);
+    ws2811.sendLedData();
+    delay(40);    
+  }
+  
+  if( 1 )
+  {
+    // we will render image, directly in aImgs (in BGR)
+    memset( aImgs, 0, NUM_PIXELS*3 );    
+    int x = nBlobX;
+    int y = nBlobY;
+    int nSize = 1;
+    int nMaxDist = nSize+1;
+    CRGB hue;
+    getHue( nCpt%256,&hue );
+    for( int j = -nSize; j <= nSize; ++j )
+    {
+      for( int i = -nSize; i <= nSize; ++i )
+      {
+        if( x+i >= 0 && x+i < W && y+j >= 0 && y+j < H )
+        {
+          int pix = (x+i+(y+j)*W)*3;
+          float d = sqrt((i)*(i)+(j)*(j));
+          int lum = 255;
+          if( d != 0 )
+            lum = ((nMaxDist-d)*lum)/nMaxDist;
+            if( lum < 0 ) lum = 0;
+            
+//          Serial.print( lum );
+//          Serial.print( " " );
+
+//          getHue( nCpt%256,(CRGB*)&aImgs[pix+0] ); 
+//          aImgs[pix+0] = (aImgs[pix+0]*lum)/255;
+//          aImgs[pix+1] = (aImgs[pix+1]*lum)/255;
+//          aImgs[pix+2] = (aImgs[pix+2]*lum)/255;
+//            if( hue.b > 128 ) aImgs[pix+0] = lum;
+//            if( hue.g > 128 ) aImgs[pix+1] = lum;
+//            if( hue.r > 128 ) aImgs[pix+2] = lum;            
+            aImgs[pix+0] = lum*hue.b/255;
+            aImgs[pix+1] = lum*hue.g/255;
+            aImgs[pix+2] = lum*hue.r/255;
+
+        }
+      }
+//      Serial.println();  
+    }
+     
+    nBlobX += nBlobDX;
+    if( nBlobX+nSize >= W ) nBlobDX = -1;
+    if( nBlobX-nSize < 0 ) nBlobDX = 1;
+   
+    nBlobY += nBlobDY;
+    if( nBlobY+nSize >= H ) nBlobDY = -1;
+    if( nBlobY-nSize < 0 ) nBlobDY = 1;
+    
+    
+    drawImg( 0, 0, 0);
+    ws2811.sendLedData();
+    delay(20);    
+  }
   
   // fps computation
   ++nCpt;
@@ -247,7 +329,7 @@ void loop()
 }
 
 /**
- * HVS to RGB comversion (simplified to the range 0-255)
+ * HVS to RGB conversion (simplified to the range 0-255)
  **/
  
  void getHue( int h, CRGB * pRes )

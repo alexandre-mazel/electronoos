@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <util/delay.h>
 
+// v0.67: move macro to .cpp
 // v0.66: add setonlyone
 // v0.65: debug setvumetre
 // v0.64: add setvumetre and change dim method
@@ -10,12 +11,6 @@
 // v0.6: add dim and version !
 
 // Assume Arduino Uno, digital pin 8 lives in Port B
-
-#define LED_DDR DDRB
-#define LED_PORT PORTB
-#define LED_PIN PINB
-#define LED_BIT _BV(m_nNumBit)
-#define NOP __asm__("nop\n\t")
 
 class Ai_WS2811 
 {

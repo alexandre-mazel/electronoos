@@ -22,6 +22,10 @@ const int nLenCode = 12;
 const int nFirstLedPin = 50; // one led per reader
 const int nFirstPresencePin = 40; // one pin per reader
 
+const int nLedPinSendGood3 = 22;
+const int nLedPinReceiveGood3 = 24;
+
+
 #define NUM_PIXELS 16
 Ai_WS2811 aWs2811[nNbrReader];
 struct CRGB * apLeds[nNbrReader] = {NULL, NULL, NULL};
@@ -31,9 +35,14 @@ TagsList * pTagsList = NULL;
 
 int anExtraPin_PrevState[nNbrReader]; // memorize the state of the previous extra pin (one per board)
 int anExtraPin_CptEqual[nNbrReader];  // count the number of frame with same value (one per board)
+int anExtraPin_CptWasLongSame[nNbrReader]; // count the number of long frame with same value (one per board)
 int abExtraPin_BadgeWasHere[nNbrReader]; // was the board present?
 
 int anState[nNbrReader]; // 0: idle, 1: good, 2: bad, 3: memorize, 4: forget
+
+unsigned long timeMeLastGood3; // time in ms since I've finished 3 good
+unsigned long timeOtherLastGood3; // time when receiving a good3 from the other
+int nStatePinReceiveLastGood3 = 0; // store the state to detect a change
 
 /*
 Led phase at ~200fps:
@@ -90,22 +99,36 @@ void animate_led()
     {
       anCptLedAnim[i] = 60000;
     }
-
+/*
     if( val >= 40000 && val <= 49000 )
     {
       //aWs2811[i].setColor( 0, 255, 0 );
       if( val <= 40100 )
         aWs2811[i].setVumeter( (val - 40000)*100, 0, 1, 0 );
     }    
+*/
+    if( val == 40000 )
+    {
+      aWs2811[i].setColor( 0, 255, 0 );
+    }    
+    if( val > 40100 && val <= 40600 && (val%10)==0 )
+    {
+      aWs2811[i].setColor( 0, 255-( ((long)170*(val-40100))/500 ), 0 );
+    }    
 
     if( val == 50000 )
     {
       aWs2811[i].setColor( 255, 0, 0 );
     }    
+    if( val > 50100 && val <= 50600 && (val%10)==0 )
+    {
+      aWs2811[i].setColor( 255-( ((long)
+      170*(val-50100))/500 ), 0, 0 );
+    }  
     
     if( anCptLedAnim[i] == 60000 )
     {
-      aWs2811[i].setColor( 0, 0, 0 );      
+      aWs2811[i].setColor( 16, 16, 14 );      
     }
     
     if( val != 49001 && val != 59001 )
@@ -117,6 +140,31 @@ void animate_led()
 //  Serial.println("");
 }
 
+void animate_victory( int bIsMaster )
+{
+  Serial.print( "INF: Victory !! master: " );
+  Serial.println( bIsMaster, DEC );
+  
+  const int nNbrTurn = 10;
+  int i;
+  for( int nNumTurn = 0; nNumTurn < nNbrTurn; ++nNumTurn )
+  {
+    for( i = 0; i < nNbrReader*2; ++i )
+    {
+      int nPrev = i-1;
+      if( nPrev < 0 )
+        nPrev = 5;
+
+      if( !bIsMaster )
+        i-=3;
+      if( i >= 0 && i < 3 )
+        aWs2811[i].setColor( 0, 0, 255 );
+      if( nPrev >= 0 && nPrev < 3 )
+        aWs2811[nPrev].setColor( 0, 0, 0 );
+      delay(1000);
+    }
+  }
+}
 
 void check_leds( void )
 {
@@ -172,6 +220,7 @@ void setup()
     anCptLedAnim[i*2+0] = 60000;
     anCptLedAnim[i*2+1] = 60000;
     anExtraPin_CptEqual[i] = 0;
+    anExtraPin_CptWasLongSame[i] = 0;
   }
   // setup pin
   for( i = 0; i < nNbrReader; ++i )
@@ -179,6 +228,8 @@ void setup()
     pinMode( nFirstLedPin+i, OUTPUT );
     pinMode( nFirstPresencePin+i, INPUT );
   }
+  pinMode( nLedPinSendGood3, OUTPUT );
+  pinMode( nLedPinReceiveGood3, INPUT );  
 
   for( i = 0; i < nNbrReader; ++i )
   {
@@ -186,9 +237,12 @@ void setup()
     apLeds[i] = (struct CRGB*)aWs2811[i].getRGBData();
     aWs2811[i].setDim( 1 );
   }
-  aWs2811[0].reducePixelNumber( 5 );  
-  aWs2811[1].reducePixelNumber( 5 );
-  aWs2811[2].reducePixelNumber( 1 );  
+  aWs2811[0].reducePixelNumber( 4 );  
+  aWs2811[1].reducePixelNumber( 4 );
+  aWs2811[2].reducePixelNumber( 4 );  
+  
+  timeMeLastGood3 = 0;
+  timeOtherLastGood3 = 0;
   
   
   check_leds();
@@ -227,6 +281,47 @@ void memorize_code( const char * buf, int nReaderIdx, int bForget )
     TagsList_removeFromList( &(pTagsList[nReaderIdx]), buf );  
 }
 
+int check_all_good(void)
+{
+   /*
+   a new reader has a good one, does we have all ok ?
+   return 1 if yes (no need to use the value, just a luxuary return)
+   */
+   for( int i = 0; i < nNbrReader; ++i )
+   {
+      if( anState[i] != 1 )
+      {
+        digitalWrite( nLedPinSendGood3, LOW ); // reset for next time!
+        return 0;
+      }
+   }
+   
+   if( 1 )
+   {
+     Serial.println( "INF: All good!" );   
+     Serial.print( "INF: time: " );   
+     Serial.print( millis(), DEC );        
+     Serial.print( ",  timeMeLastGood3: " );   
+     Serial.print( timeMeLastGood3, DEC );        
+     Serial.print( ",  timeOtherLastGood3: " );   
+     Serial.println( timeOtherLastGood3, DEC );        
+   }
+     
+   if( millis() - timeMeLastGood3 > 60000 ) // 1 min to have an animation again
+   {
+     timeMeLastGood3 = millis();
+     if( millis() - timeOtherLastGood3 < 30000 ) // 30 sec to enter the full combination
+     {
+       // everybody ok, launch the animation, i'm the slave
+       animate_victory(0);
+     }
+     else
+     {
+       Serial.println( "INF: Send Good3 !!" );
+       digitalWrite( nLedPinSendGood3, HIGH );
+     }
+   }
+}
 
 
 
@@ -252,7 +347,7 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
 
   if( 0 )
   {
-    // print debug
+    // print debug code value
     int i;
     Serial.write( "On " );
     Serial.print( nReaderIdx, DEC);
@@ -297,10 +392,17 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
     Serial.write( "\n" );
   }
 
-  if( anState[nReaderIdx] != nRetCode ) // evite de relancer l'animation quand elle est deja en cours (genre mauvais contact sur une anim verte)
+  if( anState[nReaderIdx] != nRetCode || 1 ) // evite de relancer l'animation quand elle est deja en cours (genre mauvais contact sur une anim verte)
   {
+    //Serial.write( "B\n" );
     anState[nReaderIdx] = nRetCode;
     anCptLedAnim[nReaderIdx] = (nRetCode)*10000+30000;
+    
+    if( nRetCode == 1 )
+    {
+      check_all_good();
+      
+    }
   }
   
   return 0;
@@ -351,23 +453,34 @@ void loop()
   for( i = 0; i < nNbrReader; ++i )
   {
     int nVal = digitalRead(nFirstPresencePin+i);
+    //int nVal = analogRead(8+i)>512;
+//    if(i==2)
+//       nVal=analogRead( 8 ) > 100;
+    
+    if( i == 1 && 0 )
+    {
+      // store all value to output them later in a raw
+      const int nSizeDebugPin = 1000;
+      static char anBufDebugPin[nSizeDebugPin];
+      static int nCptDebugPin = 0;
+      anBufDebugPin[nCptDebugPin] = (char)nVal;
+      nCptDebugPin++;
+      if( nCptDebugPin == nSizeDebugPin )
+      {
+        // output all in a raw output
+        Serial.println( "NEW DUMP:");
+        for(int iDebugPin = 0; iDebugPin < nCptDebugPin; ++iDebugPin )
+        {
+          Serial.print( anBufDebugPin[iDebugPin], DEC );
+        }
+        Serial.println( "END");
+        nCptDebugPin = 0;
+      }
+    }
+    
     if( nVal == anExtraPin_PrevState[i] )
     {
       ++anExtraPin_CptEqual[i];
-
-      if( abExtraPin_BadgeWasHere[i] && anExtraPin_CptEqual[i] > 11 ) // was > 16 (ok when you're at >~90fps...) // the crucial point is it depends of the fps...
-      //if( anExtraPin_CptEqual[1] > 16 )
-      {
-        // tag disappear, turn off led right now!
-        Serial.print( "BADGE disappear: " );
-        Serial.println( i );
-        abExtraPin_BadgeWasHere[i] = false;
-        if( anState[i] < 3 )
-        {
-          anState[i] = 0;
-          anCptLedAnim[i] = 60000;
-        }
-      }   
     }
     else
     {
@@ -384,18 +497,66 @@ void loop()
         Serial.println("");
       }
       
+      if( abExtraPin_BadgeWasHere[i] )
+      {
+        if( anExtraPin_CptEqual[i] > 8 ) // was > 16 (ok when you're at >~90fps...) // the crucial point is it depends of the fps... > 11 quand bonne alimentation > 7 or 6
+        {
+          ++anExtraPin_CptWasLongSame[i];
+          if( anExtraPin_CptWasLongSame[i] > 0 )
+          {
+            // tag disappear, turn off led right now!
+            if( 0 )
+            {
+              Serial.print( "BADGE disappear: " );
+              Serial.println( i );
+            }
+            //Serial.write( "D\n" );
+            abExtraPin_BadgeWasHere[i] = false;
+            anExtraPin_CptWasLongSame[i] = 0;
+            if( anState[i] < 3 ) // don't turn off magic state
+            {
+              anState[i] = 0;
+              anCptLedAnim[i] = 60000;
+            }
+          }
+        }
+        else
+        {
+          anExtraPin_CptWasLongSame[i] = 0;
+        }
+      }      
+      
       anExtraPin_PrevState[i] = nVal;
       anExtraPin_CptEqual[i] = 0;
     }
   }
-
+  
+  if( 1 )
+  {
+    // victory handling
+    int nVal = digitalRead(nLedPinReceiveGood3);
+    if( nVal != nStatePinReceiveLastGood3 )
+    {
+      if( nVal )
+      {
+         Serial.println( "INF: Receive Good3 !!" );
+         if( millis() - timeMeLastGood3 < 30000 and timeMeLastGood3 != 0 ) // 30 sec to enter the full combination
+         {
+           // everybody ok, launch the animation, i'm the master
+           animate_victory(1);
+         }
+      }
+      nStatePinReceiveLastGood3 = nVal;
+    }
+  }
+  
   animate_led();
   delay(10);
 
   
   ++nFpsCpt;
   const int nNbrFrameToCompute = 300*1;
-  if( nFpsCpt == nNbrFrameToCompute )
+  if( nFpsCpt == nNbrFrameToCompute && 0 )
   {
     unsigned long nNow = micros();
     unsigned long nDuration = nNow - timeFpsBegin;

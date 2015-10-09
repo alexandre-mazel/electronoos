@@ -148,7 +148,7 @@ int TagsList_isMagic( const char * buf )
 }
 
 
-const byte nEepromVersion = 1;
+const byte nEepromVersion = 2;
 void load_eeprom(TagsList * pTagsList, int nNbrReader)
 {
   byte nEepromCurrent = EEPROM.read( 0 );

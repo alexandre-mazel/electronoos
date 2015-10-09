@@ -80,7 +80,7 @@ void animate_led()
         aWs2811[i].setOnlyOne( (val - 0)*100, 0, 255, 255 );
       else
         anCptLedAnim[i] = 0;
-    }    
+    }
     else if( val == 19999 )
     {
       anCptLedAnim[i] = 60000;
@@ -158,10 +158,10 @@ void animate_victory( int bIsMaster )
       if( !bIsMaster )
         i-=3;
       if( i >= 0 && i < 3 )
-        aWs2811[i].setColor( 0, 0, 255 );
+        aWs2811[i].setColor( 0, 255, 100 );
       if( nPrev >= 0 && nPrev < 3 )
         aWs2811[nPrev].setColor( 0, 0, 0 );
-      delay(1000);
+      delay(300);
     }
   }
 }

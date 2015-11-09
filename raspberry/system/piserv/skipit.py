@@ -10,6 +10,9 @@ def getUserName( clientAddress, strUserAgent ):
 class User:
     def __init__( self, strUserName ):
         self.strUserName = strUserName
+        self.reset()
+        
+    def reset( self ):
         self.listSong = ["song1", "song2", "song3", "song4", "song5", "song6", "song7", "song8"]
         self.listSong += self.listSong
         
@@ -48,7 +51,8 @@ users = Users()
 def getAllCommands():
     return [
                 "next",
-                "neg"
+                "neg",
+                "reset"
                 ]
 
 def generateCommandsLinks():
@@ -61,16 +65,18 @@ def run( clientAddress, strUserAgent, astrCommand = [] ):
     print( "INF: skipit.run: astrCommand: %s" % astrCommand )
     strOut = ""
     strUserName = getUserName(clientAddress, strUserAgent)
-    strOut  += "User: %s\n" % strUserName
+    strOut  += "User: %s<br>\n" % strUserName
     user = users.getUser(strUserName)
     for strCommand in astrCommand:
-        strOut  += "Command: %s\n" % strCommand
+        strOut  += "Command: %s<br>\n" % strCommand
         if( strCommand == "next" ):
             user.gotoNext()
         if( strCommand == "neg" ):
             user.neg()
+        if( strCommand == "reset" ):
+            user.reset()
             
-    strOut  += "Next List: %s\n" % str(user.getPlaylist())
+    strOut  += "Next List: %s<br>\n" % str(user.getPlaylist())
     
     strOut += generateCommandsLinks()
     return strOut
@@ -83,3 +89,4 @@ if __name__ == "__main__":
     print run(clientAddress, strUserAgent)
     print run(clientAddress, strUserAgent, ["next"])
     print run(clientAddress, strUserAgent, ["neg"])
+    print run(clientAddress, strUserAgent, ["reset"])

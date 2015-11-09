@@ -1,8 +1,11 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import SimpleHTTPServer
 import SocketServer
 
 import os
+import time
 
 def analysePath( strPath ):
     """
@@ -23,11 +26,14 @@ def analysePath( strPath ):
     strFilename = os.path.basename( strPathWithoutParameters )
     print( "strFilename: %s" % strFilename )
     
+    parameters = []    
     if( len( astrPathSplittedMark ) > 1 ):
-        parameters = []
         aRawParameters = astrPathSplittedMark[1].split("=")
         for i in range(0,len(aRawParameters),2):
-            parameters.append([ aRawParameters[i], aRawParameters[i+1] ] )
+            value = None
+            if( len(aRawParameters) > i+1 ):
+                value = aRawParameters[i+1]
+            parameters.append([ aRawParameters[i], value ] )
 
     return [strFilename, strDirectoryName, parameters]
     
@@ -38,7 +44,16 @@ def analysePath( strPath ):
 
 class MyRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     def do_GET(self):
+        print( "INF: MyRequestHandler.get: dir: %s" % str(dir(self)) )
         print( "INF: MyRequestHandler.get: path: %s" % self.path )
+        print( "INF: MyRequestHandler.get: client address: %s" % str(self.client_address) )
+        print( "INF: MyRequestHandler.get: headers: %s" % str(self.headers) )
+        print( "INF: MyRequestHandler.get: headers k: %s" % str(self.headers.keys()) )
+        print( "INF: MyRequestHandler.get: headers ua: %s" % str(self.headers['user-agent']) )
+        clientAddress = self.client_address
+        strUserAgent = self.headers['user-agent']
+        
+        #~ self.wfile.write( "coucou test" )
         
         # parse command
         retval = analysePath(self.path)
@@ -59,6 +74,21 @@ class MyRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                     self.wfile.write("Return: Success: %s" % (retcall==0))
             return;
 
+        if( strPageName == "skipit" ):
+            self.wfile.write( "<html>skipit_test" )
+            timeBegin = time.time()
+            import skipit
+            #~ reload( skipit)
+            actions = []
+            if len(params)>0:
+                actions = params[0]
+            ret = skipit.run( clientAddress, strUserAgent, actions )
+            self.wfile.write( ret )
+            rDuration = time.time() - timeBegin
+            self.wfile.write( "computation time: %5.2fs" % rDuration )
+            return
+
+        return; # prevent showing sources !
         
         #~ if self.path == '/':
             #~ self.path = '/simplehttpwebpage_content.html'
@@ -66,8 +96,12 @@ class MyRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
 Handler = MyRequestHandler
 #~ print(dir(Handler))
-server = SocketServer.TCPServer(('0.0.0.0', 8000), Handler)
+server = SocketServer.TCPServer(('0.0.0.0', 80), Handler)
 
+# print(dir(server))
 print( "running..." )
-print(dir(server))
-server.serve_forever()
+try:
+    server.serve_forever()
+except:
+    pass
+server.server_close()

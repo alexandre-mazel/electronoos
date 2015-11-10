@@ -36,4 +36,10 @@ def publishIP():
     os.system( "wget -O /tmp/out.log 'http://perso.ovh.net/~mangedisf/mangedisque//Alma/info/inform.php?host=%s&ip=%s'" % (strHostname,strIP) );
 # publishIP - end
 
+def launch_sound_server():
+    os.chdir( "/home/pi/sound_server" )
+    os.system( "python sound_server.py 2>>/var/log/sound_server.log &" )
+# launch_sound_server - end
+
 publishIP();
+launch_sound_server();

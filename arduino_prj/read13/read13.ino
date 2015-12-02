@@ -26,7 +26,7 @@ void loop() // run over and over
       Serial.print( buf[i], DEC );
     }
     Serial.write( " 0x" );
-    for( i = 0; i < nBufLen; ++i) // first in 2 and last is 3 => jump it!
+    for( i = 0; i < nBufLen; ++i)
     {
       Serial.print( buf[i], HEX );
       Serial.write( " " );

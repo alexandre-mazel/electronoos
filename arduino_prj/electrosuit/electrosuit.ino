@@ -131,12 +131,20 @@ void loop()
   //r = g = b = 255;
   //hueToRGB( (nNumSequence + 255) % 255, &r, &g, &b );
   r = 100; g = 255; b = 100;
-  aWs2811[0].setOneBrightOtherLow( 8, 0, nNumFrame-1, r, g, b, rLow, gLow, bLow );
-  aWs2811[0].setOneBrightOtherLow( 10, 8, 10-nNumFrame, r, g, b, rLow, gLow, bLow );
-  aWs2811[0].setOneBrightOtherLow( 11, 18, nNumFrame, r, g, b, rLow, gLow, bLow );
-  aWs2811[0].setOneBrightOtherLow( 10, 29, (10-nNumFrame)-1, r, g, b, rLow, gLow, bLow );
-  aWs2811[0].setOneBrightOtherLow( 4, 39, nNumFrame, r, g, b, rLow, gLow, bLow );  
-  aWs2811[0].sendLedData();
+  if( 0 )
+  {
+    // flash!
+    aWs2811[0].setColor( 255,255,255 );
+  }
+  else
+  {
+    aWs2811[0].setOneBrightOtherLow( 8, 0, nNumFrame-1, r, g, b, rLow, gLow, bLow );
+    aWs2811[0].setOneBrightOtherLow( 10, 8, 10-nNumFrame, r, g, b, rLow, gLow, bLow );
+    aWs2811[0].setOneBrightOtherLow( 11, 18, nNumFrame, r, g, b, rLow, gLow, bLow );
+    aWs2811[0].setOneBrightOtherLow( 10, 29, (10-nNumFrame)-1, r, g, b, rLow, gLow, bLow );
+    aWs2811[0].setOneBrightOtherLow( 4, 39, nNumFrame, r, g, b, rLow, gLow, bLow );  
+    aWs2811[0].sendLedData();
+  }
   ++nNumFrame;
   delay( 30 );  
 }

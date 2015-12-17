@@ -46,8 +46,14 @@ class Ai_WS2811
     // nIdx: an index between 0 and 10000 => the nearest pixel will be set (no interpolation) if nIdx is > 10000 => loop
     void setOnlyOne( unsigned int nIdx, uint8_t r, uint8_t g, uint8_t b );
     
-    int reducePixelNumber( int nNewPixelNumber ); // reduce the pixel number to a smaller number (when inited too big or ...) return 1 if ok
+    // Work on a segment of a length of nNbrLeds, beginning at nNumFirst
+    // Set one color with others lighten with low color
+    // nNumBright is relative to nNumFirst
+    void setOneBrightOtherLow( unsigned int nNbrLeds, unsigned int nNumFirst, unsigned int nNumBright, uint8_t r, uint8_t g, uint8_t b, uint8_t rLow = 30, uint8_t gLow = 30, uint8_t bLow = 30 );
     
+    
+    int reducePixelNumber( int nNewPixelNumber ); // reduce the pixel number to a smaller number (when inited too big or ...) return 1 if ok
+        
     unsigned char *getRGBData() { return m_pData; }    
     
   private:

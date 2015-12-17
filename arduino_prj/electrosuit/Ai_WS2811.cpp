@@ -117,6 +117,24 @@ void Ai_WS2811::setOnlyOne( unsigned int nIdx, uint8_t r, uint8_t g, uint8_t b )
   sendLedData();
 }
 
+void Ai_WS2811::setOneBrightOtherLow( unsigned int nNbrLeds, unsigned int nNumFirst, unsigned int nNumBright, uint8_t r, uint8_t g, uint8_t b, uint8_t rLow, uint8_t gLow, uint8_t bLow )
+{
+//  int nNbrPixel = m_nLeds/3;  
+  struct CRGB * leds = (struct CRGB *)m_pData;
+  for( unsigned int j = 0; j < nNbrLeds; ++j )
+  {
+    leds[j+nNumFirst].r = rLow;
+    leds[j+nNumFirst].g = gLow;
+    leds[j+nNumFirst].b = bLow;
+  }
+  if( nNumBright < nNbrLeds )
+  {
+    leds[nNumBright+nNumFirst].r = r;
+    leds[nNumBright+nNumFirst].g = g;
+    leds[nNumBright+nNumFirst].b = b;
+  }
+}
+
 int Ai_WS2811::reducePixelNumber( int nNewPixelNumber )
 {
   int nNewLedsNumber = nNewPixelNumber*3;

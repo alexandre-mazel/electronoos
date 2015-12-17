@@ -138,7 +138,12 @@ void handHeartBeat()
     aWs2811[nNumHand].setOneBrightOtherLow( 4, 39, nNumFrame, r, g, b, rLow, gLow, bLow );  
     aWs2811[nNumHand].sendLedData();
   }
+  // head
   ++nNumFrame;
+  aWs2811[2].setOneBrightOtherLow( 0, 23, (23-nNumFrame), r, g, b, rLow, gLow, bLow );
+  aWs2811[2].setOneBrightOtherLow( 22, 23, nNumFrame, r, g, b, rLow, gLow, bLow );  
+  aWs2811[2].sendLedData();
+  
   delay( 30 );      
 }
 void loop()
@@ -150,6 +155,8 @@ void loop()
   {
     // flash!
     aWs2811[0].setColor( 255,255,255 );
+    aWs2811[1].setColor( 255,255,255 );    
+    aWs2811[2].setColor( 255,255,255 );
     delay( 3 );
   }
   else

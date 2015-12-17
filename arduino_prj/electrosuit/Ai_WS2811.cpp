@@ -1,5 +1,53 @@
 #include "Ai_WS2811.h"
 
+void hueToRGB( int nHue, uint8_t * prRet, uint8_t * pgRet, uint8_t * pbRet )
+{
+  //this is the algorithm to convert from RGB to HSV
+  double r=0; 
+  double g=0; 
+  double b=0;
+
+  double hf=nHue/42.5; // Not /60 as range is _not_ 0-360
+
+  int i=(int)floor(nHue/42.5);
+  double f = nHue/42.5 - i;
+  double qv = 1 - f;
+  double tv = f;
+
+  switch (i)
+  {
+  case 0: 
+    r = 1;
+    g = tv;
+    break;
+  case 1: 
+    r = qv;
+    g = 1;
+    break;
+  case 2: 
+    g = 1;
+    b = tv;
+    break;
+  case 3: 
+    g = qv;
+    b = 1;
+    break;
+  case 4:
+    r = tv;
+    b = 1;
+    break;
+  case 5: 
+    r = 1;
+    b = qv;
+    break;
+  }
+  
+  (*prRet) = constrain((int)255*r,0,255);
+  (*pgRet) = constrain((int)255*g,0,255);  
+  (*pbRet) = constrain((int)255*b,0,255);  
+}
+
+
 void Ai_WS2811::init(uint8_t pin, uint16_t nPixels) 
 {
   pinMode(pin, OUTPUT);
@@ -69,6 +117,17 @@ void Ai_WS2811::setColor(unsigned char r,unsigned char g,unsigned char b)
      *p++ = b;
   }  
   sendLedData();
+}
+
+
+void Ai_WS2811::setHue(uint8_t nNumPixel, int nHue)
+{
+  struct CRGB * leds = (struct CRGB *)m_pData;
+  uint8_t r, g, b;
+  hueToRGB( nHue, &r, &g, &b );
+  leds[nNumPixel].r = constrain((int)255*r,0,255);
+  leds[nNumPixel].g = constrain((int)255*g,0,255);
+  leds[nNumPixel].b = constrain((int)255*b,0,255);
 }
 
 void Ai_WS2811::setVumeter( int nValue,int bR, int bG, int bB )

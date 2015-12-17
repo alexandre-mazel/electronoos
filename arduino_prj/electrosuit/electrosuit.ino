@@ -1,7 +1,7 @@
 #include <EEPROM.h>
 
 /*
- * La table des Aromes des Caves du Louvre
+ * La combinaison d'Electro de Samy
  * 
  * Version number: cf the message in the print of the setup function
  * Author: Alexandre Mazel
@@ -95,24 +95,48 @@ unsigned long timeFpsBegin;
 
 int nNumFrame = 0;
 int nNumSequence = 0;
+int nBackGroundSequence = 0;
+int nBackGroundSequenceInc = 1;
 void loop()
 {
-  if( nNumFrame >= 11 )
+  if( nNumFrame >= 12 ) // the 11 will light off
   {
     nNumFrame = 0;
     ++nNumSequence;
     if( (nNumSequence % 2 == 1) )
     {
-      delay( 1000 );
+      delay( 400 );
     }
   }
-  aWs2811[0].setOneBrightOtherLow( 8, 0, nNumFrame-1, 255,255,255 );
-  aWs2811[0].setOneBrightOtherLow( 10, 8, 10-nNumFrame, 255,255,255 );
-  aWs2811[0].setOneBrightOtherLow( 11, 18, nNumFrame, 255,255,255 );
-  aWs2811[0].setOneBrightOtherLow( 10, 29, (10-nNumFrame)-1, 255,255,255 );
-  aWs2811[0].setOneBrightOtherLow( 4, 39, nNumFrame, 255,255,255 );  
+  
+  nBackGroundSequence += nBackGroundSequenceInc;
+  if( nBackGroundSequence > 40 )
+  {
+    nBackGroundSequenceInc = -2;
+  }
+  else if( nBackGroundSequence < 4 )
+  {
+    nBackGroundSequenceInc = 2;
+    //delay( 400 );
+  }
+  
+  Serial.println( nBackGroundSequence, DEC );
+  
+  
+  uint8_t r, g, b;
+  uint8_t rLow = 4, gLow = 20, bLow = 4;
+  
+  //rLow = nBackGroundSequence; gLow = nBackGroundSequence*1.5; bLow = nBackGroundSequence;
+  
+  //r = g = b = 255;
+  //hueToRGB( (nNumSequence + 255) % 255, &r, &g, &b );
+  r = 100; g = 255; b = 100;
+  aWs2811[0].setOneBrightOtherLow( 8, 0, nNumFrame-1, r, g, b, rLow, gLow, bLow );
+  aWs2811[0].setOneBrightOtherLow( 10, 8, 10-nNumFrame, r, g, b, rLow, gLow, bLow );
+  aWs2811[0].setOneBrightOtherLow( 11, 18, nNumFrame, r, g, b, rLow, gLow, bLow );
+  aWs2811[0].setOneBrightOtherLow( 10, 29, (10-nNumFrame)-1, r, g, b, rLow, gLow, bLow );
+  aWs2811[0].setOneBrightOtherLow( 4, 39, nNumFrame, r, g, b, rLow, gLow, bLow );  
   aWs2811[0].sendLedData();
   ++nNumFrame;
-  delay( 50 );  
-
+  delay( 30 );  
 }

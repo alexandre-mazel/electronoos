@@ -140,8 +140,8 @@ void handHeartBeat()
   }
   // head
   ++nNumFrame;
-  aWs2811[2].setOneBrightOtherLow( 0, 23, (23-nNumFrame), r, g, b, rLow, gLow, bLow );
-  aWs2811[2].setOneBrightOtherLow( 22, 23, nNumFrame, r, g, b, rLow, gLow, bLow );  
+  aWs2811[2].setOneBrightOtherLow( 23, 0, (23-nNumFrame), r, g, b, rLow, gLow, bLow );
+  aWs2811[2].setOneBrightOtherLow( 23, 22, nNumFrame, r, g, b, rLow, gLow, bLow );  
   aWs2811[2].sendLedData();
   
   delay( 30 );      

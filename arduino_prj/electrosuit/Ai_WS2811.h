@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <util/delay.h>
 
+// v0.70: setOneBrightOtherLow
 // v0.66: add setonlyone
 // v0.65: debug setvumetre
 // v0.64: add setvumetre and change dim method

@@ -1,5 +1,3 @@
-// Pin à connecter à la LED
-int LEDPin = 13;
 // Pin à connecter à la feuille de papier
 int capSensePin = 3;
 // Seuil de détection du capteur, à régler par essais
@@ -53,11 +51,12 @@ void loop(){
   delay(5);
 }
 
-// readCapacitivePin
-//  Entrée: Arduino pin number
-//  Sortie: Un nombre, de 0 à 17, représentant la capacité.
-//  Lorsqu'on touche la sortie (ou quoi que ce soit attache), le nombre va augmenter
-uint8_t readCapacitivePin(int pinToMeasure){
+
+// read a capacitive value
+//  pinToMeasure: the pin to which is attached the capacitive
+//  Return: a number, increased when finger approach
+uint8_t readCapacitivePin(int pinToMeasure)
+{
   // This is how you declare a variable which
   //  will hold the PORT, PIN, and DDR registers
   //  on an AVR

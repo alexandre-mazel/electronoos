@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <util/delay.h>
 
+// v0.70: setOneBrightOtherLow
 // v0.66: add setonlyone
 // v0.65: debug setvumetre
 // v0.64: add setvumetre and change dim method
@@ -16,6 +17,10 @@
 #define LED_PIN PINB
 #define LED_BIT _BV(m_nNumBit)
 #define NOP __asm__("nop\n\t")
+
+// transform hue to RGB
+void hueToRGB( int nHue, uint8_t * prRet, uint8_t * pgRet, uint8_t * pbRet );
+
 
 class Ai_WS2811 
 {
@@ -46,8 +51,16 @@ class Ai_WS2811
     // nIdx: an index between 0 and 10000 => the nearest pixel will be set (no interpolation) if nIdx is > 10000 => loop
     void setOnlyOne( unsigned int nIdx, uint8_t r, uint8_t g, uint8_t b );
     
-    int reducePixelNumber( int nNewPixelNumber ); // reduce the pixel number to a smaller number (when inited too big or ...) return 1 if ok
+    // Work on a segment of a length of nNbrLeds, beginning at nNumFirst
+    // Set one color with others lighten with low color
+    // nNumBright is relative to nNumFirst
+    void setOneBrightOtherLow( unsigned int nNbrLeds, unsigned int nNumFirst, unsigned int nNumBright, uint8_t r, uint8_t g, uint8_t b, uint8_t rLow = 10, uint8_t gLow = 10, uint8_t bLow = 10 );
     
+    // Set one pixel at a specific hue. Don't touch others // NOT TESTED !!!
+    void setHue( uint8_t nNumPixel, int nHue );    
+    
+    int reducePixelNumber( int nNewPixelNumber ); // reduce the pixel number to a smaller number (when inited too big or ...) return 1 if ok
+        
     unsigned char *getRGBData() { return m_pData; }    
     
   private:
@@ -59,4 +72,5 @@ struct CRGB {
   unsigned char g;
   unsigned char r;
   unsigned char b;
-} ;
+} ;    
+ 

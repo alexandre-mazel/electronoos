@@ -20,7 +20,8 @@ const int nNbrReader = 3;
 const int nLenCode = 12;
 
 const int nFirstLedPin = 50; // one led per reader
-const int nFirstPresencePin = 40; // one pin per reader
+const int nFirstPresencePin = 30; // one pin per reader // default: 40
+const int nPresencePinInc = 8; // increment to add to jump to next presence pin (default 1)
 
 const int nLedPinSendGood3 = 22;
 const int nLedPinReceiveGood3 = 24;
@@ -62,8 +63,8 @@ void animate_led()
   for( i = 0; i < nNbrReader; ++i )
   {
     unsigned int val = anCptLedAnim[i];
-//    Serial.print( " val: " );
-//    Serial.print( val );
+    //Serial.print( " val: " );
+    //Serial.println( val );
     
     if( val > 60000 )
     {
@@ -122,16 +123,23 @@ void animate_led()
     }    
     if( val > 50100 && val <= 50600 && (val%10)==0 )
     {
-      aWs2811[i].setColor( 255-( ((long)
-      170*(val-50100))/500 ), 0, 0 );
+      aWs2811[i].setColor( 255-( ((long)170*(val-50100))/500 ), 0, 0 );
     }  
+
+    // force auto turn off red and green, after "some time"
+    if( val == 41000 || val == 51000 )
+    {
+      //Serial.println("force turn off green and red" );
+      anCptLedAnim[i] = 60000;
+    }
     
     if( anCptLedAnim[i] == 60000 )
     {
       aWs2811[i].setColor( 16, 16, 14 );      
     }
     
-    if( val != 49001 && val != 59001 )
+    
+    if( val != 49001 && val != 59001 ) // prevent turning red and green off (mais en fait je sais plus trop)
     {
       ++anCptLedAnim[i];
     }
@@ -226,7 +234,7 @@ void setup()
   for( i = 0; i < nNbrReader; ++i )
   {
     pinMode( nFirstLedPin+i, OUTPUT );
-    pinMode( nFirstPresencePin+i, INPUT );
+    pinMode( nFirstPresencePin+i*nPresencePinInc, INPUT );
   }
   pinMode( nLedPinSendGood3, OUTPUT );
   pinMode( nLedPinReceiveGood3, INPUT );  
@@ -248,7 +256,13 @@ void setup()
   check_leds();
 
   
-  Serial.println( "\nArduino started: Table des Aromes v0.9\n" );
+  Serial.println( "\nArduino started: Table des Aromes v0.9b\n" );
+  
+  Serial.print( "First presence pin: " );
+  Serial.print( nFirstPresencePin, DEC );
+  Serial.print( ", presence pin inc: " );
+  Serial.println( nPresencePinInc, DEC );
+  
   load_eeprom(pTagsList, nNbrReader);
 }
 
@@ -452,7 +466,7 @@ void loop()
   
   for( i = 0; i < nNbrReader; ++i )
   {
-    int nVal = digitalRead(nFirstPresencePin+i);
+    int nVal = digitalRead(nFirstPresencePin+i*nPresencePinInc);
     //int nVal = analogRead(8+i)>512;
 //    if(i==2)
 //       nVal=analogRead( 8 ) > 100;
@@ -531,7 +545,7 @@ void loop()
     }
   }
   
-  if( 1 )
+  if( 0 )
   {
     // victory handling
     int nVal = digitalRead(nLedPinReceiveGood3);

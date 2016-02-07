@@ -126,7 +126,7 @@ void animate_led()
       aWs2811[i].setColor( 255-( ((long)170*(val-50100))/500 ), 0, 0 );
     }  
 
-    // force auto turn off red and green, after "some time"
+    // force auto turn off red and green, after "some time" ~10 sec
     if( val == 41000 || val == 51000 )
     {
       //Serial.println("force turn off green and red" );

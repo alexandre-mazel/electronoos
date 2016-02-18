@@ -46,9 +46,23 @@ class FastScheme:
         self.listClosedFiguresCirc = []
         self.listClosedFigures = [self.listClosedFiguresRect, self.listClosedFiguresRectTitle, self.listClosedFiguresCirc] # not owned
         
+        # this is an image used for shape sorting: each inner shape will be paint with a specific color 
+        # and then a direct piking from mouse pointing will tell us, if we're inside or outside...
+        # index => index of shape
+        # 0 .. 1023 => rect (actually 0 .. kNbrFiguresPerShapeStyle
+        # 1024.. 2047 => rect with title
+        # ...
+        self.kNbrFiguresPerShapeStyle = 1024
+        #self.sortbuf = numpy.zeros((nResolutionH,nResolutionW,1), numpy.uint16)
+        self.repaintSortBuf()
+        
+        
         self.nGridSize = 20
         self.bMouseDown = False
+        self.aMouseDownPos = []
         self.mutexMouse = mutex.mutex()
+        
+        self.shapeMoved = None # a shape currently moving with mouse
 
         self.strSaveFilename = "/tmp/fastscheme.dat"
         self.loadFromDisk()
@@ -77,6 +91,7 @@ class FastScheme:
         self.listClosedFiguresRectTitle = aList[idx]; idx +=1
         self.listClosedFiguresCirc = aList[idx]; idx +=1
         self.listClosedFigures = [self.listClosedFiguresRect, self.listClosedFiguresRectTitle, self.listClosedFiguresCirc] # not owned
+        self.repaintSortBuf()
         
         print( "INF: FastScheme.loadFromDisk: at end: %s" % self.__str__() )
         return 1
@@ -96,6 +111,25 @@ class FastScheme:
         
     def computeShapeBuffer( self ):
         pass
+        
+    def repaintSortBuf( self ):
+        self.sortbuf = numpy.zeros((self.nResolutionH,self.nResolutionW,1), numpy.uint16)
+        for j in range( len(self.listClosedFigures) ):
+            for i in range( len(self.listClosedFigures[j]) ):
+                center = geo.compute_shape_median(self.listClosedFigures[j][i])
+                self.paintSortBuf( i+j*self.kNbrFiguresPerShapeStyle, center )
+        
+    def paintSortBuf( self, nFigID, center ):
+        """
+        fill the sort buffer with the right color ID
+        """
+        #print(dir(cv2))
+        #cv2.floodFill( self.sortbuf, nFigID, center, 255 )
+        cv2.circle( self.sortbuf, (center[0],center[1]), 40, (nFigID), 100 )
+        print( self.sortbuf[0,0] )
+        print( self.sortbuf[center[1],center[0]] )
+        pass
+        
         
     def analyseShape( self, shape ):
         """
@@ -117,21 +151,24 @@ class FastScheme:
         if( rLastFirstDist * 6 < rPerimeter ): # 8
             # nearly ClosedFigure            
             shape.append( shape[0] )
+            center = geo.median( bb[0], bb[1] )            
+            self.gridify( center )            
             if( rDistToBB < rSizeBB *0.4 ):
                 print( "Rectangle!")
                 shape = cornerBB
                 shape.append(cornerBB[0])
                 self.gridifyShape( shape )
                 self.listClosedFiguresRect.append(shape[:])
+                nFigID = len(self.listClosedFiguresRect) - 1
             else:
                 print( "Circle!")
-                center = geo.median( bb[0], bb[1] )
-                self.gridify( center )
                 radius = abs( bb[0][0]-center[0] )
                 radius = ((radius+(self.nGridSize/2))/self.nGridSize)*self.nGridSize
                 shape = generateCircle( center, radius )
                 #self.gridifyShape( shape )
                 self.listClosedFiguresCirc.append(shape[:])
+                nFigID = len(self.listClosedFiguresCirc) - 1 + self.kNbrFiguresPerShapeStyle*2
+            self.paintSortBuf( nFigID, center )
             nRet = 1
         print( "INF: FastScheme.analyseShape: at end: %s" % self.__str__() )
         return nRet
@@ -142,18 +179,30 @@ class FastScheme:
     def mouseDown(self, x, y ):
         while( not self.mutexMouse.testandset() ):
             time.sleep(0.01)
-        self.listPts.append([])
         self.bMouseDown = True
-        self._mouseMove( x, y )
+            
+        if( self.sortbuf[y,x] != 0 ): # or len(self.listClosedFiguresRect)>1
+            nFigID = self.sortbuf[y,x]            
+            self.aMouseDownPos = [x,y]
+            nShapeFamily = nFigID / self.kNbrFiguresPerShapeStyle
+            nShapeIdx = nFigID % self.kNbrFiguresPerShapeStyle
+            self.shapeMoved = self.listClosedFigures[nShapeFamily][nShapeIdx]
+        else:
+            self.listPts.append([])
+            self._mouseMove( x, y )
         self.mutexMouse.unlock()
 
     def mouseUp(self, x, y ):
         while( not self.mutexMouse.testandset() ):
             time.sleep(0.01)        
-        self._mouseMove( x, y )
+        self._mouseMove( x, y )        
         self.bMouseDown = False
-        if( self.analyseShape( self.listPts[-1] ) ):
-            self.listPts = []
+        if( self.shapeMoved != None ):
+            self.shapeMoved = None
+            self.repaintSortBuf()
+        else:
+            if( self.analyseShape( self.listPts[-1] ) ):
+                self.listPts = []
         self.mutexMouse.unlock()
         
     def _mouseMove( self, x, y ):
@@ -161,7 +210,12 @@ class FastScheme:
         unarmored moveMove version
         """
         if( self.bMouseDown ):
-            self.listPts[-1].append([x,y])
+            if( self.shapeMoved != None ):
+                # moving shape
+                geo.translate_shape(self.shapeMoved, [x-self.aMouseDownPos[0], y-self.aMouseDownPos[1]] )
+                self.aMouseDownPos = [x,y]
+            else:
+                self.listPts[-1].append([x,y])
         
     def mouseMove(self, x, y ):
         while( not self.mutexMouse.testandset() ):

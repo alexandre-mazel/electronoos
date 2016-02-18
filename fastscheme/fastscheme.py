@@ -12,12 +12,12 @@ import numpy
 import sys
 import time
 
-sys.path.append( "../../protolab" )
+sys.path.insert( 0, "../../protolab" )
 import protolab.geometry as geo
 
 def computePerimeter(shape):
     rDist = 0
-    for i in range(len(shape)-1): # we don't add the distance between last and first
+    for i in range(len(shape)-1): # we don't add the distance between last and first
         rDist += geo.distance( shape[i], shape[(i+1)%len(shape)] ) # modulo in the case of we want the distance to first and last
     return rDist
 
@@ -28,19 +28,59 @@ class FastScheme:
         # but for the moment, they are of the same size
         self.listPts = [] # a list of list of coord (one for each trace)
         self.listObject = [] # a list of object to render
-        self.listClosedFigures = [] # list of closed figures (square, circle, ...)
+        # we've got 4 types of figures: rect, circle, and rect_with_title
+        self.listClosedFiguresRect = []
+        self.listClosedFiguresRectTitle = []
+        self.listClosedFiguresCirc = []
+        self.listClosedFigures = [self.listClosedFiguresRect, self.listClosedFiguresRectTitle, self.listClosedFiguresCirc] # not owned
+        
         self.nGridSize = 20
         self.bMouseDown = False
         self.mutexMouse = mutex.mutex()
+
+        self.strSaveFilename = "/tmp/fastscheme.dat"
+        self.loadFromDisk()
         
     def __del__( self ):
         self.exit()
+    
+    def saveToDisk(self):
+        print( "INF: FastScheme.saveToDisk: saving to '%s'" % self.strSaveFilename )
+        file = open( self.strSaveFilename, "wt" )
+        file.write( repr(self.listClosedFigures) )
+        file.close()
+        
+    def loadFromDisk(self):
+        try:
+            file = open( self.strSaveFilename, "rt" )
+            aList = file.read()
+            file.close()
+        except:
+            return 0
+            
+        print( "INF: FastScheme.loadFromDisk: loading from '%s'" % self.strSaveFilename );        
+        aList = eval(aList)
+        idx = 0        
+        self.listClosedFiguresRect = aList[idx]; idx +=1
+        self.listClosedFiguresRectTitle = aList[idx]; idx +=1
+        self.listClosedFiguresCirc = aList[idx]; idx +=1
+        self.listClosedFigures = [self.listClosedFiguresRect, self.listClosedFiguresRectTitle, self.listClosedFiguresCirc] # not owned
+        
+        print( "INF: FastScheme.loadFromDisk: at end: %s" % self.__str__() )
+        return 1
         
     def exit( self ):
-        print( "INF: FastScheme: exiting..." );
-        file = open( "/tmp/fast" + str(time.time()) + ".dat", "wt" )
-        file.write( str(self.listPts) )
-        file.close()
+        print( "INF: FastScheme.exit: exiting..." );
+        self.saveToDisk()
+        
+    def __str__( self ):
+        strOut = ""
+        strOut += "closed figures: %s\n" % (len(self.listClosedFigures[0])+len(self.listClosedFigures[1])+len(self.listClosedFigures[2]))
+        strOut += "closed rect: %s\n" % (len(self.listClosedFiguresRect))
+        strOut += "closed rect w title: %s\n" % (len(self.listClosedFiguresRectTitle))
+        strOut += "closed circle: %s\n" % (len(self.listClosedFiguresCirc))
+        strOut += "full list: \n%s\n" % str(self.listClosedFigures)
+        return strOut
         
     def computeShapeBuffer( self ):
         pass
@@ -56,7 +96,8 @@ class FastScheme:
         if( rLastFirstDist * 6 < rPerimeter ): # 8
             # nearly bClosedFigure
             shape.append( shape[0] )
-            self.listClosedFigures.append(shape[:])
+            self.listClosedFiguresRect.append(shape[:])
+        print( "INF: FastScheme.analyseShape: at end: %s" % self.__str__() )
             
             
 
@@ -124,10 +165,10 @@ class FastScheme:
                 pt1 = pt2
         # for listPts - end
         
-        for fig in self.listClosedFigures:
-            for pt in fig:
+        for listFig in self.listClosedFigures:
+            for fig in listFig:
                 pt1 = fig[0]
-                for pt2 in shape[1:]:
+                for pt2 in fig[1:]:
                     cv2.line( img, (pt1[0], pt1[1]), (pt2[0], pt2[1]), (255,0,0), 2 )
                     pt1 = pt2
 

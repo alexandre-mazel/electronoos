@@ -124,8 +124,8 @@ class FastScheme:
         fill the sort buffer with the right color ID
         """
         #print(dir(cv2))
-        #cv2.floodFill( self.sortbuf, nFigID, center, 255 )
-        cv2.circle( self.sortbuf, (center[0],center[1]), 40, (nFigID), 100 )
+        #cv2.floodFill( self.sortbuf, nFigID, center, 255 ) # todo: find right command
+        cv2.circle( self.sortbuf, (center[0],center[1]), 40, (nFigID), 100 ) # temp sprout
         print( self.sortbuf[0,0] )
         print( self.sortbuf[center[1],center[0]] )
         pass

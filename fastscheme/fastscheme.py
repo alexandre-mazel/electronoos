@@ -112,12 +112,37 @@ class FastScheme:
     def computeShapeBuffer( self ):
         pass
         
+    def getShapeFamilyAndIdxFromColor( self, nColor ):
+        nShapeFamily = ( nColor / self.kNbrFiguresPerShapeStyle ) - 2
+        nShapeIdx = nColor % self.kNbrFiguresPerShapeStyle
+        return nShapeFamily, nShapeIdx
+        
+    def getColorFromShapeFamilyAndIdx( self, nShapeFamily, nShapeIdx ):
+        nColor = nShapeIdx+(nShapeFamily+2)*self.kNbrFiguresPerShapeStyle
+        return nColor
+        
     def repaintSortBuf( self ):
         self.sortbuf = numpy.zeros((self.nResolutionH,self.nResolutionW,1), numpy.uint16)
         for j in range( len(self.listClosedFigures) ):
             for i in range( len(self.listClosedFigures[j]) ):
                 center = geo.compute_shape_median(self.listClosedFigures[j][i])
-                self.paintSortBuf( i+j*self.kNbrFiguresPerShapeStyle, center )
+                nColor = self.getColorFromShapeFamilyAndIdx( j, i )
+                #self.paintSortBuf( nColor, center )
+                if j != 2:
+                    bb = geo.computeBoudingBox( self.listClosedFigures[j][i] )
+                    cv2.rectangle( self.sortbuf, tuple(bb[0]), tuple(bb[1]), nColor, -1 )
+                else:
+                    bb = geo.computeBoudingBox( self.listClosedFigures[j][i] )
+                    radius = abs( bb[0][0]-center[0] )
+                    #radius = ((radius+(self.nGridSize/2))/self.nGridSize)*self.nGridSize                    
+                    cv2.circle( self.sortbuf, (center[0],center[1]), radius-2, (nColor), -1 ) # radius-2 to be able to draw from border without moving them. -1 for full filled (cv2.CV_FILLED)
+                    
+        
+        strWinName = "zbuf"
+        cv2.namedWindow( strWinName, cv2.WINDOW_NORMAL )
+        cv2.resizeWindow( strWinName, 320,240 )
+        cv2.moveWindow( strWinName, 640,0 )
+        cv2.imshow( strWinName, self.sortbuf )
         
     def paintSortBuf( self, nFigID, center ):
         """
@@ -156,10 +181,10 @@ class FastScheme:
             if( rDistToBB < rSizeBB *0.4 ):
                 print( "Rectangle!")
                 shape = cornerBB
-                shape.append(cornerBB[0])
+                shape.append(cornerBB[0][:])
                 self.gridifyShape( shape )
                 self.listClosedFiguresRect.append(shape[:])
-                nFigID = len(self.listClosedFiguresRect) - 1
+                nFigID = self.getColorFromShapeFamilyAndIdx( 0, len(self.listClosedFiguresCirc) - 1 )
             else:
                 print( "Circle!")
                 radius = abs( bb[0][0]-center[0] )
@@ -167,7 +192,7 @@ class FastScheme:
                 shape = generateCircle( center, radius )
                 #self.gridifyShape( shape )
                 self.listClosedFiguresCirc.append(shape[:])
-                nFigID = len(self.listClosedFiguresCirc) - 1 + self.kNbrFiguresPerShapeStyle*2
+                nFigID = self.getColorFromShapeFamilyAndIdx( 2, len(self.listClosedFiguresCirc) - 1 )
             self.paintSortBuf( nFigID, center )
             nRet = 1
         print( "INF: FastScheme.analyseShape: at end: %s" % self.__str__() )
@@ -184,8 +209,7 @@ class FastScheme:
         if( self.sortbuf[y,x] != 0 ): # or len(self.listClosedFiguresRect)>1
             nFigID = self.sortbuf[y,x]            
             self.aMouseDownPos = [x,y]
-            nShapeFamily = nFigID / self.kNbrFiguresPerShapeStyle
-            nShapeIdx = nFigID % self.kNbrFiguresPerShapeStyle
+            nShapeFamily, nShapeIdx= self.getShapeFamilyAndIdxFromColor( nFigID )
             self.shapeMoved = self.listClosedFigures[nShapeFamily][nShapeIdx]
         else:
             self.listPts.append([])

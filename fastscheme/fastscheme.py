@@ -91,16 +91,23 @@ class Figure:
 # class Figure - end  
 
 class Link:
-    def __init__( self, nIdxFrom, nIdxTo, rRatioW, rRatioH ):
-        self.nIdxFrom = nIdxFrom # idx of figures
-        self.nIdxTo = nIdxTo
+    def __init__( self, figFrom, figTo, rRatioW = 0, rRatioH = 0 ):
+        self.figFrom = figFrom # figure pointed by link (not owned)
+        self.figTo = figTo
         self.rRatioW = rRatioW # ratio of anchor exprimed in the [-1..1] of each dimension
         self.rRatioH = rRatioH
+        self.recompute()
+        
+    def recompute( self ):
+        # recompute point from and to
+        self.listPts = []
+        self.listPts.append( self.figFrom.center)
+        self.listPts.append( self.figTo.center)
         
     def __repr__( self ):
         strOut = "["
-        strOut += "%d,%d, %f, %f" % (self.nIdxFrom, self.nIdxTo, self.rRatioW, self.rRatioH)
-        strOut = "]"
+        strOut += "%d,%d, %f, %f" % (self.figFrom.idx, self.figTo.idx, self.rRatioW, self.rRatioH)
+        strOut += "]"
         return strOut
         
     def __str__( self ):
@@ -186,7 +193,7 @@ class FastScheme:
         
         for elem in aList[1]:
             print( "Elem Link: %s" % elem )
-            self.listLinks.append( Figure(elem[0], elem[1], elem[2], elem[3] ) )
+            self.listLinks.append( Link(self.listFigures[elem[0]], self.listFigures[elem[1]], elem[2], elem[3] ) )
         
         
         print( "INF: FastScheme.loadFromDisk: at end: %s" % self.__str__() )
@@ -213,7 +220,16 @@ class FastScheme:
         nColor = nShapeIdx + 2048
         return nColor
         
+    def recomputeGeometry( self ):
+        for i in range( len(self.listFigures) ):
+            fig = self.listFigures[i]
+            fig.idx = i # WRN: here we do more than just repainting buffer !
+            
+        for i in range( len(self.listLinks) ):
+            self.listLinks[i].recompute()
+        
     def repaintSortBuf( self ):
+        self.recomputeGeometry()
         self.sortbuf = numpy.zeros((self.nResolutionH,self.nResolutionW,1), numpy.uint16)
         nBorderMargin = 4 # clicking from a border don't move it, but instead trace a link
         for i in range( len(self.listFigures) ):
@@ -303,6 +319,7 @@ class FastScheme:
             print( "idxFrom: %d, idxTo: %d" % (idxFrom, idxTo) )
             if( idxFrom != -1 and idxTo != -1 and idxFrom != idxTo ):
                 print( "Link between %d and %d!" % (idxFrom, idxTo) )
+                self.listLinks.append(Link(self.listFigures[idxFrom],self.listFigures[idxTo] ) )
                 
         print( "INF: FastScheme.analyseShape: at end: %s" % self.__str__() )
         return nRet
@@ -348,6 +365,8 @@ class FastScheme:
             if( self.figMoved != None ):
                 # moving shape
                 geo.translate_shape(self.figMoved.shape, [x-self.aMouseDownPos[0], y-self.aMouseDownPos[1]] )
+                self.figMoved.recompute()
+                self.recomputeGeometry()
                 self.aMouseDownPos = [x,y]
             else:
                 self.listPts[-1].append([x,y])
@@ -417,6 +436,9 @@ class FastScheme:
                 cv2.line( img, (pt1[0], pt1[1]), (pt2[0], pt2[1]), nColor, 2 )
                 pt1 = pt2
 
+        for nIdx, link in enumerate(self.listLinks):
+            nColor = (255,200,0)
+            cv2.line( img, tuple(link.listPts[0]),tuple(link.listPts[1]), nColor, 2 )
         
         self.mutexMouse.unlock()
     # render - end

@@ -107,6 +107,7 @@ class FastScheme:
         self.mutexMouse = mutex.mutex()
         
         self.figMoved = None # a shape currently moving with mouse
+        self.nIdxFigSelected = -1
 
         self.strSaveFilename = "/tmp/fastscheme.dat"
         self.loadFromDisk()
@@ -166,14 +167,15 @@ class FastScheme:
         
     def repaintSortBuf( self ):
         self.sortbuf = numpy.zeros((self.nResolutionH,self.nResolutionW,1), numpy.uint16)
+        nBorderMargin = 4 # clicking from a border don't move it, but instead trace a link
         for i in range( len(self.listFigures) ):
             fig = self.listFigures[i]
             nColor = self.getColorFromShapeIdx( i )
             shape = fig.getShape()
             if fig.nType != Figure.kCircle:
-                cv2.rectangle( self.sortbuf, tuple(fig.bb[0]), tuple(fig.bb[1]), nColor, -1 )
+                cv2.rectangle( self.sortbuf, tuple(geo.add(fig.bb[0][:],nBorderMargin)), tuple(geo.add(fig.bb[1][:],-nBorderMargin)), nColor, -1 )
             else:
-                cv2.circle( self.sortbuf, (fig.center[0],fig.center[1]), fig.radius-2, (nColor), -1 ) # radius-2 to be able to draw from border without moving them. -1 for full filled (cv2.CV_FILLED)
+                cv2.circle( self.sortbuf, (fig.center[0],fig.center[1]), fig.radius-nBorderMargin, (nColor), -1 ) # -1 for full filled (cv2.CV_FILLED)
                     
         
         strWinName = "zbuf"
@@ -249,6 +251,7 @@ class FastScheme:
             self.aMouseDownPos = [x,y]
             nShapeIdx= self.getShapeIdxFromColor( nFigID )
             self.figMoved = self.listFigures[nShapeIdx]
+            self.nIdxFigSelected = nShapeIdx
         else:
             self.listPts.append([])
             self._mouseMove( x, y )
@@ -335,16 +338,25 @@ class FastScheme:
                 pt1 = pt2
         # for listPts - end
         
-        for fig in self.listFigures:
+        for nIdx,fig in enumerate(self.listFigures):
             shape = fig.getShape()
             pt1 = shape[0]
+            nColor = (255,0,0)
+            if( nIdx == self.nIdxFigSelected ):
+                nColor = (0,255,0)
             for pt2 in shape[1:]:
-                cv2.line( img, (pt1[0], pt1[1]), (pt2[0], pt2[1]), (255,0,0), 2 )
+                cv2.line( img, (pt1[0], pt1[1]), (pt2[0], pt2[1]), nColor, 2 )
                 pt1 = pt2
 
         
         self.mutexMouse.unlock()
     # render - end
+    
+    def handleSuppr( self ):
+        if( self.nIdxFigSelected != -1 ):
+            self.listFigures.pop(self.nIdxFigSelected)
+            self.nIdxFigSelected = -1
+            self.repaintSortBuf()
         
 # class FastScheme - end
 
@@ -388,9 +400,16 @@ def runApp(initFakeListListPts = None):
         # read user events (background)
         fast.render( screen )
         cv2.imshow( screenName, screen )
-        nKey =  cv2.waitKey(1) & 0xFF;
-        if( chr(nKey) == 'q' ):
-            break;
+        nExtendedKey = cv2.waitKey(1)
+        if( nExtendedKey != -1 ):
+            print( "INF: nExtendedKey: %s" % nExtendedKey )
+            nKey =  nExtendedKey & 0xFF;
+            print( "INF: nKey: %s" % nKey )
+            if( chr(nKey) == 'q' ):
+                break;
+            if( nKey == 255 ):
+                # suppr
+                fast.handleSuppr()
 
     
         time.sleep(0.02) # 0.03

@@ -62,6 +62,16 @@ class Figure:
             
     def getShape(self):
         return self.shape
+    
+    def computeDistanceToBorder( self, pt ):
+        """
+        return the distance between a point and the nearest point in the border of a figure
+        """
+        if( self.nType == Figure.kCircle ):
+            return geo.compute_distance_shape_to_points( self.shape, [pt] )
+            
+        return geo.compute_distance_rect_to_point( self.bb[0], self.bb[1], pt ) # TODO: compute_distance_rect_to_point !
+            
         
     def __repr__( self ):
         strOut = "["
@@ -79,7 +89,25 @@ class Figure:
         strOut += "TextBody: %s" % self.txtBody
         return strOut        
          
-# class Figure - end        
+# class Figure - end  
+
+class Link:
+    def __init__( self, nIdxFrom, nIdxTo, rRatioW, rRatioH ):
+        self.nIdxFrom = nIdxFrom # idx of figures
+        self.nIdxTo = nIdxTo
+        self.rRatioW = rRatioW # ratio of anchor exprimed in the [-1..1] of each dimension
+        self.rRatioH = rRatioH
+        
+    def __repr__( self ):
+        strOut = "["
+        strOut += "%d,%d, %f, %f" % (self.nIdxFrom, self.nIdxTo, self.rRatioW, self.rRatioH)
+        strOut = "]"
+        return strOut
+        
+    def __str__( self ):
+        return self.__repr__()
+
+# class Link - end
 
 class FastScheme:
     def __init__( self, nResolutionW, nResolutionH ):
@@ -88,7 +116,8 @@ class FastScheme:
         # but for the moment, they are of the same size
         self.listPts = [] # a list of list of coord (one for each trace) (currently traced)
         
-        self.listFigures = [] # not owned
+        self.listFigures = []
+        self.listLinks = []
         
         # this is an image used for shape sorting: each inner shape will be paint with a specific color 
         # and then a direct piking from mouse pointing will tell us, if we're inside or outside...
@@ -120,9 +149,19 @@ class FastScheme:
         file = open( self.strSaveFilename, "wt" )
         #file.write( repr(self.listClosedFigures) )
         file.write( "[ " )
+        
+        file.write( "[ " )
         for fig in self.listFigures:
             file.write( fig.__repr__() + ", " )
+        file.write( "]," )
+        
+        file.write( "[" )
+        for link in self.listLinks:
+            file.write( link.__repr__() + ", " )
         file.write( "]" )
+        
+        file.write( "]" )
+        
         file.close()
         
     def loadFromDisk(self):
@@ -133,14 +172,23 @@ class FastScheme:
         except:
             return 0
             
-        print( "INF: FastScheme.loadFromDisk: loading from '%s'" % self.strSaveFilename );        
+        print( "INF: FastScheme.loadFromDisk: loading from '%s'" % self.strSaveFilename );
         aList = eval(aList)
+        if( len(aList)<2):
+            return 0
+            
         print( "aList: %s" % aList )
         self.listFigures = []
-        for elem in aList:
-            print( "Elem: %s" % elem )
-            self.listFigures.append( Figure(elem[0], elem[1], elem[2], elem[3] ) )
+        self.listLinks = []
+        for elem in aList[0]:
+            print( "Elem Figures: %s" % elem )
+            self.listFigures.append( Figure(elem[0], elem[1], elem[2], elem[3] ) )            
         self.repaintSortBuf()
+        
+        for elem in aList[1]:
+            print( "Elem Link: %s" % elem )
+            self.listLinks.append( Figure(elem[0], elem[1], elem[2], elem[3] ) )
+        
         
         print( "INF: FastScheme.loadFromDisk: at end: %s" % self.__str__() )
         return 1
@@ -151,7 +199,8 @@ class FastScheme:
         
     def __str__( self ):
         strOut = ""
-        strOut += "full list: \n%s\n" % str(self.listFigures)
+        strOut += "full figs: \n%s\n" % str(self.listFigures)
+        strOut += "full link: \n%s\n" % str(self.listLinks)
         return strOut
         
     def computeShapeBuffer( self ):
@@ -212,7 +261,7 @@ class FastScheme:
         rSizeBB = geo.distance( bb[0], bb[1] )
         print( "rSizeBB: %s" % rSizeBB )
         cornerBB = [ [bb[0][0],bb[0][1]], [bb[1][0],bb[0][1]], [bb[1][0],bb[1][1]], [bb[0][0],bb[1][1]]  ]
-        rDistToBB = geo.compute_distance_to_points( shape, cornerBB )
+        rDistToBB = geo.compute_distance_shape_to_points( shape, cornerBB )
         print( "rDistToBB: %s" % rDistToBB )
         if( rLastFirstDist * 6 < rPerimeter ): # 8
             # nearly ClosedFigure            
@@ -235,6 +284,27 @@ class FastScheme:
             nFigID = self.getColorFromShapeIdx( len(self.listFigures) - 1 )
             self.paintSortBuf( nFigID, center )
             nRet = 1
+        else:
+            # not closed.
+            # is it a link ?
+            idxFrom = -1
+            for i in range(len(self.listFigures)):
+                rDist = self.listFigures[i].computeDistanceToBorder( shape[0] )
+                print( "dist first: %d" % rDist)
+                if( rDist < 8 ):
+                    idxFrom = i
+                    break
+            idxTo = -1
+            for i in range(len(self.listFigures)):
+                rDist = self.listFigures[i].computeDistanceToBorder( shape[-1] )
+                print( "dist second: %d" % rDist)
+                if( rDist < 8 ):
+                    idxTo = i
+                    break
+            print( "idxFrom: %d, idxTo: %d" % (idxFrom, idxTo) )
+            if( idxFrom != -1 and idxTo != -1 and idxFrom != idxTo ):
+                print( "Link between %d and %d!" % (idxFrom, idxTo) )
+                
         print( "INF: FastScheme.analyseShape: at end: %s" % self.__str__() )
         return nRet
     # analyseShape - end

@@ -70,8 +70,7 @@ class Figure:
         if( self.nType == Figure.kCircle ):
             return geo.compute_distance_shape_to_points( self.shape, [pt] )
             
-        return geo.compute_distance_rect_to_point( self.bb[0], self.bb[1], pt ) # TODO: compute_distance_rect_to_point !
-            
+        return geo.compute_distance_rect_to_point( self.bb[0], self.bb[1], pt ) # TODO: compute_distance_rect_to_point !            
         
     def __repr__( self ):
         strOut = "["

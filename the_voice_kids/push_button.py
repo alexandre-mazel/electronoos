@@ -19,6 +19,8 @@ import time
 # gpio Gnd to thumb joystick gnd
 # and pin 18 to tj SW
 
+# results: https://youtu.be/yFyVE12KcRg
+
 GPIO.setmode(GPIO.BCM)
 
 GPIO.setup(18, GPIO.IN, pull_up_down=GPIO.PUD_UP)

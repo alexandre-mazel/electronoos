@@ -354,6 +354,7 @@ class FastScheme:
             self.repaintSortBuf()
         else:
             if( self.analyseShape( self.listPts[-1] ) ):
+                self.recomputeGeometry()
                 self.listPts = []
         self.mutexMouse.unlock()
         

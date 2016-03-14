@@ -16,11 +16,13 @@ import time
 sys.path.insert( 0, "../../protolab" )
 import protolab.geometry as geo
 
-def renderRoadMap(aListTask):
+def renderRoadMap( strStartDate, nNbrMonth, aListTask ):
     nSizeX = 800
     nSizeY = 600
     img = numpy.zeros((nSizeY,nSizeX,3), numpy.uint8)
     img[::] = (255,255,255)
+    for nNumMonth in range(nNbrMonth):
+        pass
     windowName = "roadmap"
     cv2.namedWindow( windowName )
     cv2.imshow( windowName, img )
@@ -30,4 +32,4 @@ def renderRoadMap(aListTask):
 
 
 taskList = []
-renderRoadMap( taskList )
+renderRoadMap( "03/2016", 6, taskList )

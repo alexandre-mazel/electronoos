@@ -45,9 +45,6 @@ def drawRoundedRectangle( img, topLeft, bottomRight, lineColor, nThickness, nCor
     cv2.ellipse( img, (p2[0]-nCornerRadius, p2[1]+nCornerRadius), ( nCornerRadius, nCornerRadius ), 270, 0., 90., lineColor, nThickness, lineType );
     cv2.ellipse( img, (p3[0]-nCornerRadius, p3[1]-nCornerRadius), ( nCornerRadius, nCornerRadius ), 0, 0., 90., lineColor, nThickness, lineType );
     cv2.ellipse( img, (p4[0]+nCornerRadius, p4[1]-nCornerRadius), ( nCornerRadius, nCornerRadius ), 90, 0., 90., lineColor, nThickness, lineType );
-    #~ cv2.ellipse( img, p2+(-nCornerRadius, nCornerRadius), ( nCornerRadius, nCornerRadius ), 270.0, 0, 90, lineColor, nThickness, lineType );
-    #~ cv2.ellipse( img, p3+(-nCornerRadius, -nCornerRadius), ( nCornerRadius, nCornerRadius ), 0.0, 0, 90, lineColor, nThickness, lineType );
-    #~ cv2.ellipse( img, p4+(nCornerRadius, -nCornerRadius), ( nCornerRadius, nCornerRadius ), 90.0, 0, 90, lineColor, nThickness, lineType );
     
     if( fillColor != None ):
         if( fillColor == 0 ):
@@ -56,6 +53,43 @@ def drawRoundedRectangle( img, topLeft, bottomRight, lineColor, nThickness, nCor
         center = ( (topLeft[0]+bottomRight[0])/2, (topLeft[1]+bottomRight[1])/2 )
         cv2.floodFill( img, None, center, lineColor )
 # drawRoundedRectangle - end
+
+def drawBigArrow( img, topLeft, bottomRight, lineColor, nThickness = 2, nArrowOffset=40, fillColor = None ):
+    """
+    
+    - nArrowOffset: an offset representing the size of the pointe (if > 0 the point goes to the right)
+    - fillColor: the fill color. if set to None: no fill, if set to 0: same as border
+    """
+    
+    """
+    corners:
+       p1 --------------- p2
+          \                   \
+       p5 \                   \ p6
+           /                    /
+          /                    /
+       p4 ---------------- p3
+    """
+    p1 = topLeft;
+    p2 = (bottomRight[0], topLeft[1]);
+    p3 = bottomRight;
+    p4 = (topLeft[0], bottomRight[1]);
+    p5 = (p1[0]+nArrowOffset,( p1[1]+p4[1] ) / 2 )
+    p6 = (p2[0]+nArrowOffset,( p1[1]+p4[1] ) / 2 )
+
+    lineType = 2
+    
+    listPoint = [p1, p2, p6, p3, p4, p5]
+    for i in range(len(listPoint) ):
+        cv2.line( img, listPoint[i], listPoint[(i+1)%len(listPoint)], lineColor, nThickness, lineType );
+    
+    if( fillColor != None ):
+        if( fillColor == 0 ):
+            fillColor = lineColor
+        mask = numpy.zeros( (img.shape[0]+2,img.shape[1]+2,1), numpy.uint8)
+        center = ( (topLeft[0]+bottomRight[0])/2, (topLeft[1]+bottomRight[1])/2 )
+        cv2.floodFill( img, None, center, lineColor )
+# drawBigArrow - end
 
 def getTextScaleToFit( strText, rectToFit, fontFace, nThickness = 1 ):
     """
@@ -108,6 +142,10 @@ def renderRoadMap( strStartDate, nNbrMonth, aListTask ):
         rScale, bl = getTextScaleToFit( strText, (nW-nMonthTextMargin*2, 40), nMonthFont, nMonthFontThickness )
         cv2.putText( img, strText, (x+bl[0]+nMonthTextMargin,y+bl[1]+nMonthTextMargin), nMonthFont, rScale, monthColorText, nMonthFontThickness )
 
+    nNbrTaskLine = len(aListTask)
+    nTaskWidth = 50
+    for nNumTask in range(2):
+        drawBigArrow( img, (100,100), (500, 200), (15, 56, 56), 2, 40, 0 )
     return img
     
 # renderRoadMap - end    

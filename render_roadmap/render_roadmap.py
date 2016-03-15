@@ -57,25 +57,56 @@ def drawRoundedRectangle( img, topLeft, bottomRight, lineColor, nThickness, nCor
         cv2.floodFill( img, None, center, lineColor )
 # drawRoundedRectangle - end
 
+def getTextScaleToFit( strText, rectToFit, fontFace, nThickness = 1 ):
+    """
+    Compute the biggest scale to fit in some rectangle
+    return [rScale, tl_to_center]
+        - rScale: scale to render
+        - tl_to_center: the bottom left point to render the font in the rectToFit for the font to be centered
+    """
+    rScale = 2.
+    while( rScale > 0. ):
+        rcRendered, baseline = cv2.getTextSize( strText, fontFace, rScale, nThickness )
+        if( rcRendered[0] < rectToFit[0] and rcRendered[1] < rectToFit[1] ):
+            break
+        rScale -= 0.1
+    
+    return [rScale, ( (rectToFit[0]-rcRendered[0]) / 2,rectToFit[1]-(rectToFit[1]-rcRendered[1]) / 2 )]
+    
+def getMonthName( nNumMonth ):
+    aMonth = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    return aMonth[nNumMonth]
+
+def getMonthNameAbbrev( nNumMonth ):
+    aMonth = ["Jan", "Feb", "March", "April", "May", "June", "July", "August", "Sept", "Oct", "Nov", "Dec"]
+    return aMonth[nNumMonth]
+
 def renderRoadMap( strStartDate, nNbrMonth, aListTask ):
-    nSizeX = 800
-    nSizeY = 600
-    nMargin = 100
-    nRealSizeX = nSizeX - nMargin/2
-    nRealSizeY = nSizeY - nMargin/2
+    nSizeX = 1600
+    nSizeY = 800
+    nMargin = 20
+    nRealSizeX = nSizeX - nMargin*2
+    nRealSizeY = nSizeY - nMargin*2
     img = numpy.zeros((nSizeY,nSizeX,3), numpy.uint8)
     img[::] = (255,255,255)
 
     nCornerRadius = 20
-    
     monthColor = (243, 226, 207)
-    nMonthSpacing = 10
+    monthColorText = (212, 161, 99)
+    nMonthSpacing = 20
+    nMonthFont = cv2.FONT_HERSHEY_SIMPLEX
+    nMonthFontThickness = 2
+    nMonthTextMargin = 20
     nW = ( nRealSizeX / nNbrMonth ) - nMonthSpacing
     nH = nRealSizeY
+    #~ nH = 50
     for nNumMonth in range(nNbrMonth):
         x = nMargin+nNumMonth*(nW+nMonthSpacing)
         y = nMargin
         drawRoundedRectangle( img, (x, y), (x+nW, y+nH), monthColor, 2, nCornerRadius, 0 )
+        strText = getMonthNameAbbrev( nNumMonth ) + " 2016"
+        rScale, bl = getTextScaleToFit( strText, (nW-nMonthTextMargin*2, 40), nMonthFont, nMonthFontThickness )
+        cv2.putText( img, strText, (x+bl[0]+nMonthTextMargin,y+bl[1]+nMonthTextMargin), nMonthFont, rScale, monthColorText, nMonthFontThickness )
 
     return img
     
@@ -86,7 +117,8 @@ taskList = []
 img = renderRoadMap( "03/2016", 6, taskList )
 
 strWindowName = "roadmap"
-cv2.namedWindow( strWindowName )
-cv2.imshow( strWindowName, img )
+cv2.namedWindow( strWindowName, 0 )
 cv2.moveWindow( strWindowName, 0,0 )
-cv2.waitKey(1500)
+cv2.resizeWindow( strWindowName, img.shape[1]/2,img.shape[0]/2 )
+cv2.imshow( strWindowName, img )
+cv2.waitKey(2500)

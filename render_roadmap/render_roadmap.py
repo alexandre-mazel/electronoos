@@ -80,15 +80,33 @@ def drawBigArrow( img, topLeft, bottomRight, lineColor, nThickness = 2, nArrowOf
     lineType = 2
     
     listPoint = [p1, p2, p6, p3, p4, p5]
+    print fillColor
+    if( fillColor != None ):
+        # use an intermediate copy to fill it (bouh) (TODO: optim?)
+        imgt = img.copy()
+        imgt[::] = (0,0,0)
+    else:
+        imgt = img # shallow copy
+    
     for i in range(len(listPoint) ):
-        cv2.line( img, listPoint[i], listPoint[(i+1)%len(listPoint)], lineColor, nThickness, lineType );
+        cv2.line( imgt, listPoint[i], listPoint[(i+1)%len(listPoint)], lineColor, nThickness, lineType );
     
     if( fillColor != None ):
         if( fillColor == 0 ):
             fillColor = lineColor
-        mask = numpy.zeros( (img.shape[0]+2,img.shape[1]+2,1), numpy.uint8)
+        mask = numpy.zeros( (imgt.shape[0]+2,imgt.shape[1]+2,1), numpy.uint8)
         center = ( (topLeft[0]+bottomRight[0])/2, (topLeft[1]+bottomRight[1])/2 )
-        cv2.floodFill( img, None, center, lineColor )
+        cv2.floodFill( imgt, None, center, lineColor )
+        
+        # add imgt to img
+        
+        # create invert mask
+        mask_gray = cv2.cvtColor(imgt,cv2.COLOR_BGR2GRAY)
+        ret, mask_gray = cv2.threshold(mask_gray, 10, 255, cv2.THRESH_BINARY_INV)
+        
+        img[:] = cv2.bitwise_or(img,imgt,mask = mask_gray) # remove part under the new shape
+        img[:] = cv2.add( img, imgt ) # add two
+        
 # drawBigArrow - end
 
 def getTextScaleToFit( strText, rectToFit, fontFace, nThickness = 1 ):
@@ -116,6 +134,12 @@ def getMonthNameAbbrev( nNumMonth ):
     return aMonth[nNumMonth]
 
 def renderRoadMap( strStartDate, nNbrMonth, aListTask ):
+    """
+    aListTask: a list of task line to render: a task line is a bunch of task at the same line
+        eg:
+            [    [t1, t2], [t3, t4, t5]  ]
+            a task is a list: start date, duration in month, name
+    """
     nSizeX = 1600
     nSizeY = 800
     nMargin = 20
@@ -131,27 +155,45 @@ def renderRoadMap( strStartDate, nNbrMonth, aListTask ):
     nMonthFont = cv2.FONT_HERSHEY_SIMPLEX
     nMonthFontThickness = 2
     nMonthTextMargin = 20
-    nW = ( nRealSizeX / nNbrMonth ) - nMonthSpacing
-    nH = nRealSizeY
-    #~ nH = 50
+    nMonthW = ( nRealSizeX / nNbrMonth ) - nMonthSpacing
+    nMonthH = nRealSizeY
+    #~ nMonthH = 50
     for nNumMonth in range(nNbrMonth):
-        x = nMargin+nNumMonth*(nW+nMonthSpacing)
+        x = nMargin+nNumMonth*(nMonthW+nMonthSpacing)
         y = nMargin
-        drawRoundedRectangle( img, (x, y), (x+nW, y+nH), monthColor, 2, nCornerRadius, 0 )
+        drawRoundedRectangle( img, (x, y), (x+nMonthW, y+nMonthH), monthColor, 2, nCornerRadius, 0 )
         strText = getMonthNameAbbrev( nNumMonth ) + " 2016"
-        rScale, bl = getTextScaleToFit( strText, (nW-nMonthTextMargin*2, 40), nMonthFont, nMonthFontThickness )
+        rScale, bl = getTextScaleToFit( strText, (nMonthW-nMonthTextMargin*2, 40), nMonthFont, nMonthFontThickness )
         cv2.putText( img, strText, (x+bl[0]+nMonthTextMargin,y+bl[1]+nMonthTextMargin), nMonthFont, rScale, monthColorText, nMonthFontThickness )
 
     nNbrTaskLine = len(aListTask)
-    nTaskWidth = 50
-    for nNumTask in range(2):
-        drawBigArrow( img, (100,100), (500, 200), (15, 56, 56), 2, 40, 0 )
+    nTaskWidth = 30
+    aTaskLineColor = [ (199, 133,62), (1, 255, 0), (50, 195,241), (120,76,125) ]
+    nTaskLineW = 60
+    nTaskLineSpacing = 20
+    for nNumTaskLine in range(len(aListTask)):
+        y = 60 + nMargin + nMonthTextMargin + (nNumTaskLine*(nTaskLineW+nTaskLineSpacing))
+        for nNumTask in range(len(aListTask[nNumTaskLine])):
+            start, rDuration, strText = aListTask[nNumTaskLine][nNumTask]
+            wTask = int(rDuration * nMonthW)
+            #~ startTime = getTimeInMonth
+            x = nMargin
+            drawBigArrow( img, (x,y), (x+wTask, y+nTaskLineW), aTaskLineColor[nNumTaskLine], 2, 40, 0 )
     return img
     
 # renderRoadMap - end    
 
+tl1 = [
+                [ "03/2016", 6., "Conception du banc"],
+                [ "09/2016", 6., "Assemblage du banc"],
+        ]
+        
+tl2 = [
+                [ "04/2016", 6., "Etude hydraulique"],
+        ]        
+                
+taskList = [tl1, tl2]
 
-taskList = []
 img = renderRoadMap( "03/2016", 6, taskList )
 
 strWindowName = "roadmap"

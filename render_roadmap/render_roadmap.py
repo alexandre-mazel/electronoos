@@ -5,7 +5,9 @@
 # (c) 2016 A.Mazel
 #
 
+
 import cv2
+import datetime
 
 import math
 import mutex
@@ -54,11 +56,12 @@ def drawRoundedRectangle( img, topLeft, bottomRight, lineColor, nThickness, nCor
         cv2.floodFill( img, None, center, lineColor )
 # drawRoundedRectangle - end
 
-def drawBigArrow( img, topLeft, bottomRight, lineColor, nThickness = 2, nArrowOffset=40, fillColor = None ):
+def drawBigArrow( img, topLeft, bottomRight, lineColor, nThickness = 2, nArrowOffset=40, fillColor = None, nArrowFlag = 3 ):
     """
     
     - nArrowOffset: an offset representing the size of the pointe (if > 0 the point goes to the right)
     - fillColor: the fill color. if set to None: no fill, if set to 0: same as border
+    - nArrowFlag: 0: no arrow flag, 1: just right arrow (p6), 2: just left arrow, 3: both arrow
     """
     
     """
@@ -70,17 +73,33 @@ def drawBigArrow( img, topLeft, bottomRight, lineColor, nThickness = 2, nArrowOf
           /                    /
        p4 ---------------- p3
     """
+    
+    print( "DBG: drawBigArrow: topLeft: %s, bottomRight: %s" % (str(topLeft),str(bottomRight)) )  6 et 5 inversé dans un cas !?!
+    
     p1 = topLeft;
     p2 = (bottomRight[0], topLeft[1]);
     p3 = bottomRight;
     p4 = (topLeft[0], bottomRight[1]);
-    p5 = (p1[0]+nArrowOffset,( p1[1]+p4[1] ) / 2 )
-    p6 = (p2[0]+nArrowOffset,( p1[1]+p4[1] ) / 2 )
+    
+    ycenter = ( p1[1]+p4[1] ) / 2
+
+    print nArrowFlag
+    print nArrowFlag & 2
+    print nArrowFlag & 1
+    if( ( nArrowFlag & 2 ) != 0 ):
+        p5 = (p1[0]+nArrowOffset, ycenter)
+    else:
+        p5 = (p1[0], ycenter )
+        
+    if( ( nArrowFlag & 1 ) != 0 ):
+        p6 = (p2[0]+nArrowOffset, ycenter )
+    else:
+        p6 = (p2[0]-10, ycenter )
 
     lineType = 2
     
     listPoint = [p1, p2, p6, p3, p4, p5]
-    print fillColor
+    
     if( fillColor != None ):
         # use an intermediate copy to fill it (bouh) (TODO: optim?)
         imgt = img.copy()
@@ -96,6 +115,7 @@ def drawBigArrow( img, topLeft, bottomRight, lineColor, nThickness = 2, nArrowOf
             fillColor = lineColor
         mask = numpy.zeros( (imgt.shape[0]+2,imgt.shape[1]+2,1), numpy.uint8)
         center = ( (topLeft[0]+bottomRight[0])/2, (topLeft[1]+bottomRight[1])/2 )
+        print( "topLeft: %s, bottomRight: %s, center: %s" % (str(topLeft),str(bottomRight),str(center)) )
         cv2.floodFill( imgt, None, center, lineColor )
         
         # add imgt to img
@@ -132,6 +152,31 @@ def getMonthName( nNumMonth ):
 def getMonthNameAbbrev( nNumMonth ):
     aMonth = ["Jan", "Feb", "March", "April", "May", "June", "July", "August", "Sept", "Oct", "Nov", "Dec"]
     return aMonth[nNumMonth]
+    
+    
+def getDateFromString( strDate ):
+    if( len(strDate) == 7 ):
+        fmt = "%m/%Y"
+        date = datetime.datetime.strptime( strDate, fmt )
+    else:
+        fmt = "%d/%m/%Y"
+        date = datetime.datetime.strptime( strDate, fmt )        
+    return date
+    
+def getDurationInMonth( strStart, strEnd ):
+    """
+    return a floating time of month between two date.
+    eg:
+        "03/2016", "06/2016" => 3.
+        "01/03/2016", "15/06/2016" => 3.5 # approximation could occurs
+    """
+    timeStart = getDateFromString( strStart )
+    timeEnd = getDateFromString( strEnd )        
+    timeDelta = timeEnd - timeStart
+    print( "timeDelta.days: %s" % timeDelta.days )
+    rDuration = timeDelta.days/30
+    print( "INF: duration between %s and %s => %f" % (strStart, strEnd, rDuration) )
+    return rDuration
 
 def renderRoadMap( strStartDate, nNbrMonth, aListTask ):
     """
@@ -169,23 +214,41 @@ def renderRoadMap( strStartDate, nNbrMonth, aListTask ):
     nNbrTaskLine = len(aListTask)
     nTaskWidth = 30
     aTaskLineColor = [ (199, 133,62), (1, 255, 0), (50, 195,241), (120,76,125) ]
+    taskColorText = (0, 0, 0)
     nTaskLineW = 60
     nTaskLineSpacing = 20
+    nTaskFont = cv2.FONT_HERSHEY_SIMPLEX
+    nTaskFontThickness = 2    
+    nTaskTextMargin = 14
+    nTaskSizeArrow = 40
     for nNumTaskLine in range(len(aListTask)):
         y = 60 + nMargin + nMonthTextMargin + (nNumTaskLine*(nTaskLineW+nTaskLineSpacing))
         for nNumTask in range(len(aListTask[nNumTaskLine])):
-            start, rDuration, strText = aListTask[nNumTaskLine][nNumTask]
-            wTask = int(rDuration * nMonthW)
-            #~ startTime = getTimeInMonth
-            x = nMargin
-            drawBigArrow( img, (x,y), (x+wTask, y+nTaskLineW), aTaskLineColor[nNumTaskLine], 2, 40, 0 )
+            nArrowFlag = 3
+            strStartTask, rDuration, strText = aListTask[nNumTaskLine][nNumTask]
+            wTask = int(rDuration*nMonthW) + (int(rDuration+0.5)-1)*nMonthSpacing
+            decayTime = getDurationInMonth(strStartDate, strStartTask)
+            x = nMargin + int(decayTime * nMonthW)
+            if( decayTime > 1. ):
+                x += (int(decayTime+0.5)-1)*nMonthSpacing
+            
+            xRight = x+wTask-nTaskSizeArrow
+            if( xRight > nSizeY - nMargin - nTaskSizeArrow ):
+                xRight = nSizeY - nMargin
+            nArrowFlag = 2
+            drawBigArrow( img, (x,y), (xRight, y+nTaskLineW), aTaskLineColor[nNumTaskLine], 2, nTaskSizeArrow, None, nArrowFlag = nArrowFlag )
+            
+            rScale, bl = getTextScaleToFit( strText, (wTask-nTaskTextMargin*2, nTaskLineW-nTaskTextMargin*2), nTaskFont, nTaskFontThickness )
+            print( "rScale: %s" % rScale )
+            cv2.putText( img, strText, (x+bl[0]+nTaskTextMargin,y+bl[1]+nTaskTextMargin), nTaskFont, rScale, taskColorText, nTaskFontThickness )
+            
     return img
     
 # renderRoadMap - end    
 
 tl1 = [
-                [ "03/2016", 6., "Conception du banc"],
-                [ "09/2016", 6., "Assemblage du banc"],
+                [ "03/2016", 3., "Conception du banc"],
+                [ "09/2016", 3., "Assemblage du banc"],
         ]
         
 tl2 = [

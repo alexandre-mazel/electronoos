@@ -224,9 +224,10 @@ def renderRoadMap( strStartDate, nNbrMonth, aListTaskGroups ):
     nTaskFontThickness = 2    
     nTaskTextMargin = 14
     nTaskSizeArrow = 40
+    y = 60 + nMargin + nMonthTextMargin
     for nNumTaskLineGroup in range(len(aListTaskGroups)):
         for nNumTaskLine in range(len(aListTaskGroups[nNumTaskLineGroup])):
-            y = 60 + nMargin + nMonthTextMargin + (nNumTaskLine*(nTaskLineW+nTaskLineSpacing))
+            y  += (nTaskLineW+nTaskLineSpacing)
             for nNumTask in range(len(aListTaskGroups[nNumTaskLineGroup][nNumTaskLine])):
                 nArrowFlag = 3
                 strStartTask, rDuration, strText = aListTaskGroups[nNumTaskLineGroup][nNumTaskLine][nNumTask]
@@ -240,6 +241,9 @@ def renderRoadMap( strStartDate, nNbrMonth, aListTaskGroups ):
                 if( xRight > nSizeX - nMargin*2 - nTaskSizeArrow ):
                     xRight = nSizeX - nMargin*2
                     nArrowFlag = 2
+                if( x < nMargin ):
+                    x = nMargin
+                    nArrowFlag &= 1 # remove the 2 bit if set
                 print( "x: %s, xr: %s" % (x, xRight) )
                 drawBigArrow( img, (x,y), (xRight, y+nTaskLineW), aTaskLineColor[nNumTaskLineGroup], 2, nTaskSizeArrow, 0, nArrowFlag = nArrowFlag )
                 
@@ -254,7 +258,7 @@ def renderRoadMap( strStartDate, nNbrMonth, aListTaskGroups ):
 startDate = "03/2016"
 tl1 = [
                 [ startDate, 6., "Ensemble Learning for Face Detection (2D)"],
-                [ "06/2016", 3., "Assemblage du banc"],
+                #~ [ "06/2016", 3., "Assemblage du banc"],
         ]
         
 tl2 = [

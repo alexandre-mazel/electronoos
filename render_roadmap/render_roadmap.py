@@ -74,7 +74,7 @@ def drawBigArrow( img, topLeft, bottomRight, lineColor, nThickness = 2, nArrowOf
        p4 ---------------- p3
     """
     
-    print( "DBG: drawBigArrow: topLeft: %s, bottomRight: %s" % (str(topLeft),str(bottomRight)) )  6 et 5 inversé dans un cas !?!
+    print( "DBG: drawBigArrow: topLeft: %s, bottomRight: %s" % (str(topLeft),str(bottomRight)) ) # 6 et 5 inversé dans un cas !?!
     
     p1 = topLeft;
     p2 = (bottomRight[0], topLeft[1]);
@@ -94,7 +94,7 @@ def drawBigArrow( img, topLeft, bottomRight, lineColor, nThickness = 2, nArrowOf
     if( ( nArrowFlag & 1 ) != 0 ):
         p6 = (p2[0]+nArrowOffset, ycenter )
     else:
-        p6 = (p2[0]-10, ycenter )
+        p6 = (p2[0], ycenter )
 
     lineType = 2
     
@@ -178,13 +178,16 @@ def getDurationInMonth( strStart, strEnd ):
     print( "INF: duration between %s and %s => %f" % (strStart, strEnd, rDuration) )
     return rDuration
 
-def renderRoadMap( strStartDate, nNbrMonth, aListTask ):
+def renderRoadMap( strStartDate, nNbrMonth, aListTaskGroups ):
     """
-    aListTask: a list of task line to render: a task line is a bunch of task at the same line
+    aListTaskGroups: a list of group of task line to render: a task line is a bunch of task at the same line. a group of task line are a group of task line with same colors
         eg:
-            [    [t1, t2], [t3, t4, t5]  ]
+            [    [  [t1, t2], [t3, t4, t5]  ] ,  [  [t6], [t7,t8, t9, t10]  ]     ]
+                  -- a group of task list --                 --- a tasklist ---
+            
             a task is a list: start date, duration in month, name
     """
+    
     nSizeX = 1600
     nSizeY = 800
     nMargin = 20
@@ -211,7 +214,7 @@ def renderRoadMap( strStartDate, nNbrMonth, aListTask ):
         rScale, bl = getTextScaleToFit( strText, (nMonthW-nMonthTextMargin*2, 40), nMonthFont, nMonthFontThickness )
         cv2.putText( img, strText, (x+bl[0]+nMonthTextMargin,y+bl[1]+nMonthTextMargin), nMonthFont, rScale, monthColorText, nMonthFontThickness )
 
-    nNbrTaskLine = len(aListTask)
+    #~ nNbrTaskLine = len(aListTask)
     nTaskWidth = 30
     aTaskLineColor = [ (199, 133,62), (1, 255, 0), (50, 195,241), (120,76,125) ]
     taskColorText = (0, 0, 0)
@@ -221,43 +224,63 @@ def renderRoadMap( strStartDate, nNbrMonth, aListTask ):
     nTaskFontThickness = 2    
     nTaskTextMargin = 14
     nTaskSizeArrow = 40
-    for nNumTaskLine in range(len(aListTask)):
-        y = 60 + nMargin + nMonthTextMargin + (nNumTaskLine*(nTaskLineW+nTaskLineSpacing))
-        for nNumTask in range(len(aListTask[nNumTaskLine])):
-            nArrowFlag = 3
-            strStartTask, rDuration, strText = aListTask[nNumTaskLine][nNumTask]
-            wTask = int(rDuration*nMonthW) + (int(rDuration+0.5)-1)*nMonthSpacing
-            decayTime = getDurationInMonth(strStartDate, strStartTask)
-            x = nMargin + int(decayTime * nMonthW)
-            if( decayTime > 1. ):
-                x += (int(decayTime+0.5)-1)*nMonthSpacing
-            
-            xRight = x+wTask-nTaskSizeArrow
-            if( xRight > nSizeY - nMargin - nTaskSizeArrow ):
-                xRight = nSizeY - nMargin
-            nArrowFlag = 2
-            drawBigArrow( img, (x,y), (xRight, y+nTaskLineW), aTaskLineColor[nNumTaskLine], 2, nTaskSizeArrow, None, nArrowFlag = nArrowFlag )
-            
-            rScale, bl = getTextScaleToFit( strText, (wTask-nTaskTextMargin*2, nTaskLineW-nTaskTextMargin*2), nTaskFont, nTaskFontThickness )
-            print( "rScale: %s" % rScale )
-            cv2.putText( img, strText, (x+bl[0]+nTaskTextMargin,y+bl[1]+nTaskTextMargin), nTaskFont, rScale, taskColorText, nTaskFontThickness )
+    for nNumTaskLineGroup in range(len(aListTaskGroups)):
+        for nNumTaskLine in range(len(aListTaskGroups[nNumTaskLineGroup])):
+            y = 60 + nMargin + nMonthTextMargin + (nNumTaskLine*(nTaskLineW+nTaskLineSpacing))
+            for nNumTask in range(len(aListTaskGroups[nNumTaskLineGroup][nNumTaskLine])):
+                nArrowFlag = 3
+                strStartTask, rDuration, strText = aListTaskGroups[nNumTaskLineGroup][nNumTaskLine][nNumTask]
+                wTask = int(rDuration*nMonthW) + (int(rDuration+0.5)-1)*nMonthSpacing
+                decayTime = getDurationInMonth(strStartDate, strStartTask)
+                x = nMargin + int(decayTime * nMonthW)
+                if( decayTime >= 1. ):
+                    x += (int(decayTime+0.5)+0)*nMonthSpacing
+                
+                xRight = x+wTask-nTaskSizeArrow
+                if( xRight > nSizeX - nMargin*2 - nTaskSizeArrow ):
+                    xRight = nSizeX - nMargin*2
+                    nArrowFlag = 2
+                print( "x: %s, xr: %s" % (x, xRight) )
+                drawBigArrow( img, (x,y), (xRight, y+nTaskLineW), aTaskLineColor[nNumTaskLineGroup], 2, nTaskSizeArrow, 0, nArrowFlag = nArrowFlag )
+                
+                rScale, bl = getTextScaleToFit( strText, (wTask-nTaskTextMargin*2, nTaskLineW-nTaskTextMargin*2), nTaskFont, nTaskFontThickness )
+                print( "rScale: %s" % rScale )
+                cv2.putText( img, strText, (x+bl[0]+nTaskTextMargin,y+bl[1]+nTaskTextMargin), nTaskFont, rScale, taskColorText, nTaskFontThickness )
             
     return img
     
 # renderRoadMap - end    
 
+startDate = "03/2016"
 tl1 = [
-                [ "03/2016", 3., "Conception du banc"],
-                [ "09/2016", 3., "Assemblage du banc"],
+                [ startDate, 6., "Ensemble Learning for Face Detection (2D)"],
+                [ "06/2016", 3., "Assemblage du banc"],
         ]
         
 tl2 = [
-                [ "04/2016", 6., "Etude hydraulique"],
+                [ "04/2016", 3., "Top Body Skeleton Tracker (3D)"],
         ]        
-                
-taskList = [tl1, tl2]
 
-img = renderRoadMap( "03/2016", 6, taskList )
+tl3 = [
+                [ "04/2016", 6., "User Recognition (Audio)"],
+        ]                
+
+tl4 = [
+                [ "02/2016", 9., "Simple Activity Recognition (with static Pepper)"],
+        ]              
+        
+tl20 = [
+                [ "02/2016", 2., "Depth Camera Selection"],
+        ]              
+tl21 = [
+                [ "05/2016", 2., "Object Recognition (2D)"],
+        ]
+        
+taskGroup1 = [tl1, tl2,tl3,tl4]
+taskGroup2 = [tl20,tl21]
+taskGroupList = [taskGroup1, taskGroup2]
+
+img = renderRoadMap( "03/2016", 6, taskGroupList )
 
 strWindowName = "roadmap"
 cv2.namedWindow( strWindowName, 0 )

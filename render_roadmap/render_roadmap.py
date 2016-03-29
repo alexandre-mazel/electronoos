@@ -189,7 +189,7 @@ def renderRoadMap( strStartDate, nNbrMonth, aListTaskGroups ):
     """
     
     nSizeX = 1600
-    nSizeY = 800
+    nSizeY = 1040
     nMargin = 20
     nRealSizeX = nSizeX - nMargin*2
     nRealSizeY = nSizeY - nMargin*2
@@ -203,31 +203,33 @@ def renderRoadMap( strStartDate, nNbrMonth, aListTaskGroups ):
     nMonthFont = cv2.FONT_HERSHEY_SIMPLEX
     nMonthFontThickness = 2
     nMonthTextMargin = 20
-    nMonthW = ( nRealSizeX / nNbrMonth ) - nMonthSpacing
+    nMonthW = ( (nRealSizeX + nMonthSpacing) / nNbrMonth ) - nMonthSpacing # nMonthSpacing: the last month spacing won't be rendered
     nMonthH = nRealSizeY
     #~ nMonthH = 50
     for nNumMonth in range(nNbrMonth):
         x = nMargin+nNumMonth*(nMonthW+nMonthSpacing)
         y = nMargin
         drawRoundedRectangle( img, (x, y), (x+nMonthW, y+nMonthH), monthColor, 2, nCornerRadius, 0 )
-        strText = getMonthNameAbbrev( nNumMonth ) + " 2016"
+        strText = getMonthNameAbbrev( nNumMonth + int(strStartDate[:2]) - 1 ) + " 2016"
         rScale, bl = getTextScaleToFit( strText, (nMonthW-nMonthTextMargin*2, 40), nMonthFont, nMonthFontThickness )
         cv2.putText( img, strText, (x+bl[0]+nMonthTextMargin,y+bl[1]+nMonthTextMargin), nMonthFont, rScale, monthColorText, nMonthFontThickness )
 
     #~ nNbrTaskLine = len(aListTask)
-    nTaskWidth = 30
+    #~ nTaskWidth = 30
     aTaskLineColor = [ (199, 133,62), (1, 255, 0), (50, 195,241), (120,76,125) ]
     taskColorText = (0, 0, 0)
-    nTaskLineW = 60
+    nTaskLineH = 50
     nTaskLineSpacing = 20
     nTaskFont = cv2.FONT_HERSHEY_SIMPLEX
     nTaskFontThickness = 2    
-    nTaskTextMargin = 14
+    nTaskTextMarginW = 0
+    nTaskTextMarginH = 12
     nTaskSizeArrow = 40
-    y = 60 + nMargin + nMonthTextMargin
+    nTaskGroupMarginH = 30
+    y = 40 + nMargin + nMonthTextMargin
     for nNumTaskLineGroup in range(len(aListTaskGroups)):
         for nNumTaskLine in range(len(aListTaskGroups[nNumTaskLineGroup])):
-            y  += (nTaskLineW+nTaskLineSpacing)
+            y  += (nTaskLineH+nTaskLineSpacing)
             for nNumTask in range(len(aListTaskGroups[nNumTaskLineGroup][nNumTaskLine])):
                 nArrowFlag = 3
                 strStartTask, rDuration, strText = aListTaskGroups[nNumTaskLineGroup][nNumTaskLine][nNumTask]
@@ -238,26 +240,37 @@ def renderRoadMap( strStartDate, nNbrMonth, aListTaskGroups ):
                     x += (int(decayTime+0.5)+0)*nMonthSpacing
                 
                 xRight = x+wTask-nTaskSizeArrow
+                xText = x+bl[0]+nTaskTextMarginW+nTaskSizeArrow
                 if( xRight > nSizeX - nMargin*2 - nTaskSizeArrow ):
-                    xRight = nSizeX - nMargin*2
+                    xRight = nSizeX - nMargin*1
                     nArrowFlag = 2
+                bCutLeft = False
                 if( x < nMargin ):
+                    wTask -= (-x-nMargin)-10
                     x = nMargin
                     nArrowFlag &= 1 # remove the 2 bit if set
+                    bCutLeft = True
                 print( "x: %s, xr: %s" % (x, xRight) )
-                drawBigArrow( img, (x,y), (xRight, y+nTaskLineW), aTaskLineColor[nNumTaskLineGroup], 2, nTaskSizeArrow, 0, nArrowFlag = nArrowFlag )
+                drawBigArrow( img, (x,y), (xRight, y+nTaskLineH), aTaskLineColor[nNumTaskLineGroup], 2, nTaskSizeArrow, 0, nArrowFlag = nArrowFlag )
                 
-                rScale, bl = getTextScaleToFit( strText, (wTask-nTaskTextMargin*2, nTaskLineW-nTaskTextMargin*2), nTaskFont, nTaskFontThickness )
+                rScale, bl = getTextScaleToFit( strText, (wTask-nTaskTextMarginW*2-nTaskSizeArrow*2, nTaskLineH-nTaskTextMarginH*2), nTaskFont, nTaskFontThickness )
                 print( "rScale: %s" % rScale )
-                cv2.putText( img, strText, (x+bl[0]+nTaskTextMargin,y+bl[1]+nTaskTextMargin), nTaskFont, rScale, taskColorText, nTaskFontThickness )
-            
+                xText = x+bl[0]+nTaskTextMarginW+nTaskSizeArrow
+                if( bCutLeft ):
+                    xText = nMargin
+                cv2.putText( img, strText, (xText,y+bl[1]+nTaskTextMarginH), nTaskFont, rScale, taskColorText, nTaskFontThickness )
+        # for task line - end
+        y += nTaskGroupMarginH
+        
+    # effacage du texte qui deborde
+    cv2.rectangle( img, (nSizeX - nMargin,0),(nSizeX,nSizeY), (255,255,255),  -1 ) # -1 for full filled (cv2.CV_FILLED)
+
     return img
     
 # renderRoadMap - end    
 
-startDate = "03/2016"
 tl1 = [
-                [ startDate, 6., "Ensemble Learning for Face Detection (2D)"],
+                [ "04/2016", 6., "Ensemble Learning for Face Detection (2D)"],
                 #~ [ "06/2016", 3., "Assemblage du banc"],
         ]
         
@@ -266,7 +279,7 @@ tl2 = [
         ]        
 
 tl3 = [
-                [ "04/2016", 6., "User Recognition (Audio)"],
+                [ "03/2016", 6., "User Recognition (Audio)"],
         ]                
 
 tl4 = [
@@ -275,14 +288,42 @@ tl4 = [
         
 tl20 = [
                 [ "02/2016", 2., "Depth Camera Selection"],
+                [ "04/2016", 4., "Pointing, grasping and planning"],
         ]              
 tl21 = [
-                [ "05/2016", 2., "Object Recognition (2D)"],
+
+                [ "05/2016", 1.1, "Romeo Stereo Cam"],
+                [ "06/2016", 2., "Romeo Eyes/Hands calibration"],
+                
+                [ "08/2016", 2., "Object Recognition (2D)"],
         ]
+        
+tl30 = [
+
+                [ "04/2016", 7., "Localisation topologique de robots humanoides en environnement intérieur"],
+            ]
+            
+tl31 = [
+                [ "04/2016", 3., "Random wandering and social behaviour"],
+        ]                    
+
+tl40 = [
+                [ "04/2016", 6., "Sombrero: Immersive teleoperation with Romeo"],
+        ] 
+tl41 = [
+                [ "01/2016", 6., "Romeo2: Hopital Testing"],
+        ]         
+tl42 = [
+                [ "03/2016", 6., "RoboHow: Evaluation of skill-learning algorithms on Pepper"],
+        ]         
+        
+        
         
 taskGroup1 = [tl1, tl2,tl3,tl4]
 taskGroup2 = [tl20,tl21]
-taskGroupList = [taskGroup1, taskGroup2]
+taskGroup3 = [tl30,tl31]
+taskGroup4 = [tl40,tl41,tl42]
+taskGroupList = [taskGroup1, taskGroup2,taskGroup3,taskGroup4]
 
 img = renderRoadMap( "03/2016", 6, taskGroupList )
 
@@ -291,4 +332,5 @@ cv2.namedWindow( strWindowName, 0 )
 cv2.moveWindow( strWindowName, 0,0 )
 cv2.resizeWindow( strWindowName, img.shape[1]/2,img.shape[0]/2 )
 cv2.imshow( strWindowName, img )
-cv2.waitKey(2500)
+cv2.waitKey(0)
+cv2.imwrite( "/tmp/roadmap.png", img )

@@ -270,51 +270,51 @@ def renderRoadMap( strStartDate, nNbrMonth, aListTaskGroups ):
 # renderRoadMap - end    
 
 tl1 = [
-                [ "04/2016", 6., "Ensemble Learning for Face Detection (2D)"],
+                [ "04/2016", 6., "TB: Ensemble Learning for Face Detection (2D)"],
                 #~ [ "06/2016", 3., "Assemblage du banc"],
         ]
         
 tl2 = [
-                [ "04/2016", 3., "Top Body Skeleton Tracker (3D)"],
+                [ "04/2016", 3., "JM: Top Body Skeleton Tracker (3D)"],
         ]        
 
 tl3 = [
-                [ "03/2016", 6., "User Recognition (Audio)"],
+                [ "03/2016", 6., "MG: User Recognition (Audio)"],
         ]                
 
 tl4 = [
-                [ "02/2016", 9., "Simple Activity Recognition (with static Pepper)"],
+                [ "02/2016", 9., "MM: Simple Activity Recognition (with static Pepper)"],
         ]              
         
 tl20 = [
-                [ "02/2016", 2., "Depth Camera Selection"],
-                [ "04/2016", 4., "Pointing, grasping and planning"],
+                [ "02/2016", 2., "NL: Depth Camera Selection"],
+                [ "04/2016", 4., "NL: Pointing, grasping and planning"],
         ]              
 tl21 = [
 
-                [ "05/2016", 1.1, "Romeo Stereo Cam"],
-                [ "06/2016", 2., "Romeo Eyes/Hands calibration"],
+                [ "05/2016", 1.1, "EL: Romeo Stereo Cam"],
+                [ "06/2016", 2., "EL: Romeo Eyes/Hands calibration"],
                 
-                [ "08/2016", 2., "Object Recognition (2D)"],
+                [ "08/2016", 2., "EL: Object Recognition (2D)"],
         ]
         
 tl30 = [
 
-                [ "04/2016", 7., "Localisation topologique de robots humanoides en environnement intérieur"],
+                [ "04/2016", 7., "MM: Localisation topologique de robots humanoides en environnement intérieur"],
             ]
             
 tl31 = [
-                [ "04/2016", 3., "Random wandering and social behaviour"],
+                [ "04/2016", 3., "AM: Random wandering and social behaviour"],
         ]                    
 
 tl40 = [
-                [ "04/2016", 6., "Sombrero: Immersive teleoperation with Romeo"],
+                [ "04/2016", 6., "MB: Sombrero: Immersive teleoperation with Romeo"],
         ] 
 tl41 = [
-                [ "01/2016", 6., "Romeo2: Hopital Testing"],
+                [ "01/2016", 6., "MC: Romeo2: Hopital Testing"],
         ]         
 tl42 = [
-                [ "03/2016", 6., "RoboHow: Evaluation of skill-learning algorithms on Pepper"],
+                [ "03/2016", 6., "AG: RoboHow: Evaluation of skill-learning algorithms on Pepper"],
         ]         
         
         

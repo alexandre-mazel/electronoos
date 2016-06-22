@@ -114,7 +114,7 @@ void animate_led()
     }    
     if( val > 40100 && val <= 40600 && (val%10)==0 )
     {
-      aWs2811[i].setColor( 0, 255-( ((long)170*(val-40100))/500 ), 0 );
+      aWs2811[i].setColor( 0, 255-( ((long)170*(val-40100))/400 ), 0 );
     }    
 
     if( val == 50000 )
@@ -123,11 +123,11 @@ void animate_led()
     }    
     if( val > 50100 && val <= 50600 && (val%10)==0 )
     {
-      aWs2811[i].setColor( 255-( ((long)170*(val-50100))/500 ), 0, 0 );
+      aWs2811[i].setColor( 255-( ((long)170*(val-50100))/400 ), 0, 0 );
     }  
 
-    // force auto turn off red and green, after "some time" ~10 sec
-    if( val == 41000 || val == 51000 )
+    // force auto turn off red and green, after "some time" ~10 sec // 5 sec
+    if( val == 40500 || val == 50500 )
     {
       //Serial.println("force turn off green and red" );
       anCptLedAnim[i] = 60000;
@@ -464,7 +464,8 @@ void loop()
   }
  
   
-  for( i = 0; i < nNbrReader; ++i )
+  //for( i = 0; i < nNbrReader; ++i )
+  if( 0 )
   {
     int nVal = digitalRead(nFirstPresencePin+i*nPresencePinInc);
     //int nVal = analogRead(8+i)>512;

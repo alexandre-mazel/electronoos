@@ -18,6 +18,16 @@ import time
 sys.path.insert( 0, "../../protolab" )
 import protolab.geometry as geo
 
+def isInImage( pt, img ):
+    w  = img.shape[1]
+    h  = img.shape[0]
+    if( pt[0] < 0 or pt[0] > w ):
+        return False
+    if( pt[1] < 0 or pt[1] > h ):
+        return False
+    return True
+# isInImage - end    
+    
 def drawRoundedRectangle( img, topLeft, bottomRight, lineColor, nThickness, nCornerRadius, fillColor = None ):
     """
     - cornerRadius A positive int value defining the radius of the round corners.
@@ -116,7 +126,8 @@ def drawBigArrow( img, topLeft, bottomRight, lineColor, nThickness = 2, nArrowOf
         mask = numpy.zeros( (imgt.shape[0]+2,imgt.shape[1]+2,1), numpy.uint8)
         center = ( (topLeft[0]+bottomRight[0])/2, (topLeft[1]+bottomRight[1])/2 )
         print( "topLeft: %s, bottomRight: %s, center: %s" % (str(topLeft),str(bottomRight),str(center)) )
-        cv2.floodFill( imgt, None, center, lineColor )
+        if isInImage( center, imgt ):
+            cv2.floodFill( imgt, None, center, lineColor )
         
         # add imgt to img
         
@@ -151,7 +162,7 @@ def getMonthName( nNumMonth ):
 
 def getMonthNameAbbrev( nNumMonth ):
     aMonth = ["Jan", "Feb", "March", "April", "May", "June", "July", "August", "Sept", "Oct", "Nov", "Dec"]
-    return aMonth[nNumMonth]
+    return aMonth[nNumMonth%12]
     
     
 def getDateFromString( strDate ):
@@ -175,64 +186,78 @@ def getDurationInMonth( strStart, strEnd ):
     timeDelta = timeEnd - timeStart
     print( "timeDelta.days: %s" % timeDelta.days )
     rDuration = timeDelta.days/30
+    if( rDuration < -1 ):
+        rDuration += 1 # TODO: why is there an error in this case?
     print( "INF: duration between %s and %s => %f" % (strStart, strEnd, rDuration) )
     return rDuration
 
-def renderRoadMap( strStartDate, nNbrMonth, aListTaskGroups ):
+def renderRoadMap( strStartDate, nNbrMonth, aListTaskGroups, aLegends = [] ):
     """
     aListTaskGroups: a list of group of task line to render: a task line is a bunch of task at the same line. a group of task line are a group of task line with same colors
         eg:
             [    [  [t1, t2], [t3, t4, t5]  ] ,  [  [t6], [t7,t8, t9, t10]  ]     ]
                   -- a group of task list --                 --- a tasklist ---
             
-            a task is a list: start date, duration in month, name
+            a task is a list: start date, duration in month, name, [color group] => you can manually give a color index of another group. eg 1 => the color of the 2nd group
+            
+        - strStartDate: the start date, eg: "09/2016"
+        - aLegends: a list of legends (one per group of tasks)
+        
     """
-    
-    nSizeX = 1600
-    nSizeY = 1040
-    nMargin = 20
+    rMagnify = 2
+    nSizeX = 1600*rMagnify
+    nSizeY = 1040*rMagnify
+    nMargin = 20*rMagnify
     nRealSizeX = nSizeX - nMargin*2
     nRealSizeY = nSizeY - nMargin*2
     img = numpy.zeros((nSizeY,nSizeX,3), numpy.uint8)
     img[::] = (255,255,255)
 
-    nCornerRadius = 20
+    nCornerRadius = 20*rMagnify
     monthColor = (243, 226, 207)
     monthColorText = (212, 161, 99)
-    nMonthSpacing = 20
+    nMonthSpacing = 20*rMagnify
     nMonthFont = cv2.FONT_HERSHEY_SIMPLEX
     nMonthFontThickness = 2
-    nMonthTextMargin = 20
+    nMonthTextMargin = 20*rMagnify
     nMonthW = ( (nRealSizeX + nMonthSpacing) / nNbrMonth ) - nMonthSpacing # nMonthSpacing: the last month spacing won't be rendered
     nMonthH = nRealSizeY
     #~ nMonthH = 50
+    nStartYear = int(strStartDate[3:])
     for nNumMonth in range(nNbrMonth):
         x = nMargin+nNumMonth*(nMonthW+nMonthSpacing)
         y = nMargin
         drawRoundedRectangle( img, (x, y), (x+nMonthW, y+nMonthH), monthColor, 2, nCornerRadius, 0 )
-        strText = getMonthNameAbbrev( nNumMonth + int(strStartDate[:2]) - 1 ) + " 2016"
+        nCurrentNumMonth = nNumMonth + int(strStartDate[:2]) - 1
+        strText = getMonthNameAbbrev( nCurrentNumMonth ) + (" %d" % (nStartYear+nCurrentNumMonth/12) )
         rScale, bl = getTextScaleToFit( strText, (nMonthW-nMonthTextMargin*2, 40), nMonthFont, nMonthFontThickness )
         cv2.putText( img, strText, (x+bl[0]+nMonthTextMargin,y+bl[1]+nMonthTextMargin), nMonthFont, rScale, monthColorText, nMonthFontThickness )
 
     #~ nNbrTaskLine = len(aListTask)
     #~ nTaskWidth = 30
-    aTaskLineColor = [ (199, 133,62), (1, 255, 0), (50, 195,241), (120,76,125) ]
+    aTaskLineColor = [ (199, 133,62), (50, 255, 100), (50, 195,241), (120,76,125) ]
     taskColorText = (0, 0, 0)
-    nTaskLineH = 50
-    nTaskLineSpacing = 20
+    nTaskLineH = 48*rMagnify # was 50
+    nTaskLineSpacing = 13*rMagnify # change here to have more or less spaces between each task line (was 20)
     nTaskFont = cv2.FONT_HERSHEY_SIMPLEX
     nTaskFontThickness = 2    
-    nTaskTextMarginW = 0
-    nTaskTextMarginH = 12
-    nTaskSizeArrow = 40
-    nTaskGroupMarginH = 30
-    y = 40 + nMargin + nMonthTextMargin
+    nTaskTextMarginW = 0*rMagnify
+    nTaskTextMarginH = 12*rMagnify
+    nTaskSizeArrow = 40*rMagnify
+    nTaskGroupMarginH = 30*rMagnify
+    y = 40*rMagnify + nMargin + nMonthTextMargin - 20 # -40: remontes les barres plus pres des mois
     for nNumTaskLineGroup in range(len(aListTaskGroups)):
         for nNumTaskLine in range(len(aListTaskGroups[nNumTaskLineGroup])):
             y  += (nTaskLineH+nTaskLineSpacing)
             for nNumTask in range(len(aListTaskGroups[nNumTaskLineGroup][nNumTaskLine])):
                 nArrowFlag = 3
-                strStartTask, rDuration, strText = aListTaskGroups[nNumTaskLineGroup][nNumTaskLine][nNumTask]
+                
+                task = aListTaskGroups[nNumTaskLineGroup][nNumTaskLine][nNumTask]
+                if( len(task) == 3 ):
+                    task.append(nNumTaskLineGroup) # default color
+                    
+                strStartTask, rDuration, strText, nColorGroupIndex = task
+                
                 wTask = int(rDuration*nMonthW) + (int(rDuration+0.5)-1)*nMonthSpacing
                 decayTime = getDurationInMonth(strStartDate, strStartTask)
                 x = nMargin + int(decayTime * nMonthW)
@@ -251,7 +276,7 @@ def renderRoadMap( strStartDate, nNbrMonth, aListTaskGroups ):
                     nArrowFlag &= 1 # remove the 2 bit if set
                     bCutLeft = True
                 print( "x: %s, xr: %s" % (x, xRight) )
-                drawBigArrow( img, (x,y), (xRight, y+nTaskLineH), aTaskLineColor[nNumTaskLineGroup], 2, nTaskSizeArrow, 0, nArrowFlag = nArrowFlag )
+                drawBigArrow( img, (x,y), (xRight, y+nTaskLineH), aTaskLineColor[nColorGroupIndex], 2, nTaskSizeArrow, 0, nArrowFlag = nArrowFlag )
                 
                 rScale, bl = getTextScaleToFit( strText, (wTask-nTaskTextMarginW*2-nTaskSizeArrow*2, nTaskLineH-nTaskTextMarginH*2), nTaskFont, nTaskFontThickness )
                 print( "rScale: %s" % rScale )
@@ -264,68 +289,113 @@ def renderRoadMap( strStartDate, nNbrMonth, aListTaskGroups ):
         
     # effacage du texte qui deborde
     cv2.rectangle( img, (nSizeX - nMargin,0),(nSizeX,nSizeY), (255,255,255),  -1 ) # -1 for full filled (cv2.CV_FILLED)
-
+    
+    # legends
+    xLegend = int(nSizeX*0.79)
+    yLegend = int((nTaskLineH+nMargin)*rMagnify)
+    nNumLegend = 0
+    rScale /= 1.5
+    nMarginLegend = int(20*rScale)
+        
+    if len(aLegends) > 0:
+        nSizeBullet = int(12*rScale)
+        nSizeBulletMargin = int(10*rScale)
+        wText = 0
+        hText = 0
+        
+        for txt in aLegends:
+            rcRendered, baseline = cv2.getTextSize( txt, nTaskFont, rScale, nTaskFontThickness )
+            print rcRendered
+            if wText < rcRendered[0]:
+                wText = rcRendered[0]+nSizeBullet
+            if hText < rcRendered[1]:
+                hText = rcRendered[1]
+        cv2.rectangle( img, (xLegend-nMarginLegend, yLegend-nMarginLegend-1*hText), (xLegend+wText+nMarginLegend+nSizeBulletMargin, yLegend+(len(aLegends)-1)*hText*2+nMarginLegend), monthColorText, -1 )
+    
+        for txt in aLegends:
+            cv2.rectangle( img, (xLegend,yLegend-hText/2-nSizeBullet/2),(xLegend+nSizeBullet,yLegend+nSizeBullet-hText/2-nSizeBullet/2), aTaskLineColor[nNumLegend], -1 )
+            cv2.putText( img, txt, (xLegend+nSizeBullet+nSizeBulletMargin,yLegend), nTaskFont, rScale, aTaskLineColor[nNumLegend], nTaskFontThickness )
+            yLegend += hText*2
+            nNumLegend += 1
+            
+    # is legend - end
+    
     return img
     
 # renderRoadMap - end    
 
 tl1 = [
-                [ "04/2016", 6., "TB: Ensemble Learning for Face Detection (2D)"],
-                #~ [ "06/2016", 3., "Assemblage du banc"],
+                [ "08/2016", 3., "EL: Tanuki Demo"],
         ]
         
 tl2 = [
-                [ "04/2016", 3., "JM: Top Body Skeleton Tracker (3D)"],
+                [ "08/2016", 3., "MB: Tanuki Demo"],
         ]        
 
 tl3 = [
-                [ "03/2016", 6., "MG: User Recognition (Audio)"],
-        ]                
+                [ "08/2016", 2.5, "JM: Top Body Skeleton (3D)"],                
+        ]       
 
 tl4 = [
-                [ "02/2016", 9., "MM: Simple Activity Recognition (with static Pepper)"],
-        ]              
+                [ "08/2016", 2.5, "AM: Romeo Software Release"],                
+        ]            
+           
         
 tl20 = [
-                [ "02/2016", 2., "NL: Depth Camera Selection"],
-                [ "04/2016", 4., "NL: Pointing, grasping and planning"],
+                [ "11/2016", 1, "JM: Dodging Obstacles"],
+                [ "12/2016", 1., "JM: Integration"],
         ]              
 tl21 = [
-
-                [ "05/2016", 1.1, "EL: Romeo Stereo Cam"],
-                [ "06/2016", 2., "EL: Romeo Eyes/Hands calibration"],
+                [ "10/2016", 1.75, "EL: Basic Blob Grasping"],
+                [ "12/2016", 2., "EL: User Recognition Implementation (Audio)", 2],
                 
-                [ "08/2016", 2., "EL: Object Recognition (2D)"],
+        ]
+
+tl22 = [
+                [ "10/2016", 1.75, "MB: Reco & Short Dialog"],
+                [ "12/2016", 3., "MB: Conversational Dialog based on internal knowledge", 2],
+                
+        ]
+        
+tl23 = [
+                [ "09/2016", 1, "MB: Romeo2: pre-test"],
+                [ "10/2016", 6, "MB: Romeo2: Hospital test"],
+                
         ]
         
 tl30 = [
 
-                [ "04/2016", 7., "MM: Localisation topologique de robots humanoides en environnement intérieur"],
+                [ "09/2016", 4., "NL: Object Detection using Depth, grasping with planification"],
             ]
             
 tl31 = [
-                [ "04/2016", 3., "AM: Random wandering and social behaviour"],
-        ]                    
+                [ "01/2016", 36, "MM: Simple Activity Recognition (with static Pepper)"],
+        ]            
+        
+tl32 = [
+                [ "01/2016", 36, "MN: Localisation topologique de robots humanoides"],
+        ]            
+
 
 tl40 = [
-                [ "04/2016", 6., "MB: Sombrero: Immersive teleoperation with Romeo"],
+                [ "09/2016", 6., "BP: Evaluation of skill-learning algorithms on Pepper (2)"],
         ] 
 tl41 = [
-                [ "01/2016", 6., "MC: Romeo2: Hopital Testing"],
+                [ "10/2016", 6., "??: Learning to identify traversable terrain for Pepper (2D)"],
         ]         
 tl42 = [
-                [ "03/2016", 6., "AG: RoboHow: Evaluation of skill-learning algorithms on Pepper"],
         ]         
         
         
         
 taskGroup1 = [tl1, tl2,tl3,tl4]
-taskGroup2 = [tl20,tl21]
-taskGroup3 = [tl30,tl31]
+taskGroup2 = [tl20,tl21,tl22,tl23]
+taskGroup3 = [tl30,tl31,tl32]
 taskGroup4 = [tl40,tl41,tl42]
 taskGroupList = [taskGroup1, taskGroup2,taskGroup3,taskGroup4]
-
-img = renderRoadMap( "03/2016", 6, taskGroupList )
+legends = ["Previous task to finish", "Pepper@Work", "Exploratory", "Applied Intern AI Lab" ]
+    
+img = renderRoadMap( "09/2016", 6, taskGroupList, legends )
 
 strWindowName = "roadmap"
 cv2.namedWindow( strWindowName, 0 )
@@ -333,4 +403,4 @@ cv2.moveWindow( strWindowName, 0,0 )
 cv2.resizeWindow( strWindowName, img.shape[1]/2,img.shape[0]/2 )
 cv2.imshow( strWindowName, img )
 cv2.waitKey(0)
-cv2.imwrite( "/tmp/roadmap.png", img )
+cv2.imwrite( "/tmp2/roadmap.png", img )

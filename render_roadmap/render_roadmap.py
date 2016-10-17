@@ -342,8 +342,9 @@ tl4 = [
            
         
 tl20 = [
-                [ "11/2016", 1, "JM: Dodging Obstacles"],
+                [ "11/2016", 1, "JM: Random Goal"],
                 [ "12/2016", 1., "JM: Integration"],
+                [ "01/2017", 1.5, "JM: Navigation Experimentation", 2],
         ]              
 tl21 = [
                 [ "10/2016", 1.75, "EL: Basic Blob Grasping"],

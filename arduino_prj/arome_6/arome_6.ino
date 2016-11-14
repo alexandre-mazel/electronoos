@@ -391,7 +391,7 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
    abExtraPin_BadgeWasHere[nReaderIdx] = true;
 
 
-  if( 1 )
+  if( 0 )
   {
     // print debug code value
     int i;
@@ -408,6 +408,7 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
       Serial.print( buf[i], HEX );
       Serial.write( " " );
     }
+    Serial.println( "" );
   }
   
   *pnBufLen = 0;  

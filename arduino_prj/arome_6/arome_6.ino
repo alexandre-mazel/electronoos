@@ -359,7 +359,7 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
    abExtraPin_BadgeWasHere[nReaderIdx] = true;
 
 
-  if( 0 )
+  if( 1 )
   {
     // print debug code value
     int i;
@@ -465,7 +465,7 @@ void loop()
  
   
   //for( i = 0; i < nNbrReader; ++i )
-  if( 0 )
+  if( 0 ) // disable presence ping handling
   {
     int nVal = digitalRead(nFirstPresencePin+i*nPresencePinInc);
     //int nVal = analogRead(8+i)>512;

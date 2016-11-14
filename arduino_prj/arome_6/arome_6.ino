@@ -6,6 +6,8 @@
  * Version number: cf the message in the print of the setup function
  * Author: Alexandre Mazel
  * copyright (c) A.Mazel 2015
+ 
+ * compiled with Arduino 1.0.6
  */
 
 #include <avr/pgmspace.h>
@@ -45,6 +47,8 @@ unsigned long timeMeLastGood3; // time in ms since I've finished 3 good
 unsigned long timeOtherLastGood3; // time when receiving a good3 from the other
 int nStatePinReceiveLastGood3 = 0; // store the state to detect a change
 
+int bRainbowMode = 0;
+
 /*
 Led phase at ~200fps:
       0: memorize anim
@@ -56,8 +60,36 @@ Led phase at ~200fps:
 */
 unsigned int anCptLedAnim[nNbrReader];
 
+void animate_rainbow_mode()
+{
+  static int static_nHueColor = 0;
+  const int nCoefRalentisseur = 16;
+  
+  int i;
+  for( i = 0; i < nNbrReader; ++i )
+  {
+    for( int j = 0; j < aWs2811[i].getPixelNumber(); ++j )
+    {
+      aWs2811[i].setHue( j, static_nHueColor/nCoefRalentisseur ); // not optimal: recomputing many times, same rgbs
+    }
+    aWs2811[i].sendLedData();
+  }
+  ++static_nHueColor;
+  if( static_nHueColor >= 255*nCoefRalentisseur )
+  {
+    static_nHueColor = 0;
+  }
+}
+
+
 void animate_led()
 {
+  if( bRainbowMode )
+  {
+    animate_rainbow_mode();
+    
+    return;
+  }
 //  return;
   int i;
   for( i = 0; i < nNbrReader; ++i )
@@ -263,7 +295,7 @@ void setup()
   Serial.print( ", presence pin inc: " );
   Serial.println( nPresencePinInc, DEC );
   
-  load_eeprom(pTagsList, nNbrReader);
+  bRainbowMode = load_eeprom(pTagsList, nNbrReader);
 }
 
 int check_code( const char * buf, int nReaderIdx )
@@ -382,6 +414,25 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
   int nRetCode = TagsList_isMagic( &buf[1] );
   if( nRetCode != 0 )
   {
+    if( nRetCode == 3 )
+    {
+      if( ! bRainbowMode )
+      {
+        bRainbowMode = 1;
+        Serial.println( "RAINBOW MODE ON" );
+        save_eeprom( pTagsList, nNbrReader, bRainbowMode );
+        return 0;
+      }
+      
+    }
+    else if( bRainbowMode )
+    {
+        bRainbowMode = 0;
+        Serial.println( "RAINBOW MODE OFF" );        
+        save_eeprom( pTagsList, nNbrReader, bRainbowMode );
+        return 0;
+    }
+    // not a rainbow mode nor an exit from a rainbow mode
     anState[nReaderIdx] = nRetCode+2; // 3 or 4
     anCptLedAnim[nReaderIdx] = (nRetCode-1)*20000;
     return 0;
@@ -392,7 +443,7 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
     memorize_code( &buf[1], nReaderIdx, anState[nReaderIdx] == 4 );
     anState[nReaderIdx] = 0;
     anCptLedAnim[nReaderIdx] = 60000;
-    save_eeprom( pTagsList, nNbrReader );
+    save_eeprom( pTagsList, nNbrReader, bRainbowMode );
     return 0;
   }
   

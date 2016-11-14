@@ -20,5 +20,5 @@ int TagsList_isInList( const TagsList * t, const char * buf );
 int TagsList_isMagic( const char * buf ); // return 0 for standard tag, 1 if tag memorize, 2 if tag forget, 3 if tag demo
 
 // load and save all tags list from eeprom (should'nt be here but inclusion of eeprom generate a lot of error, so...)
-void load_eeprom(TagsList * pTagsList, int nNbrReader);
-void save_eeprom(TagsList * pTagsList, int nNbrReader);
+int load_eeprom(TagsList * pTagsList, int nNbrReader); // return currentmode: bRainbowMode:1 or normal: 0
+void save_eeprom(TagsList * pTagsList, int nNbrReader, int bRainbowMode);

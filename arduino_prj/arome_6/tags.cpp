@@ -142,6 +142,11 @@ int TagsList_isInList( const TagsList * t, const  char * buf )
 
 int TagsList_isMagic( const char * buf )
 {
+  // return a specific value if the tags is a magic one
+  // 1: memorize
+  // 2: forget
+  // 3: rainbow
+  
   for( int i = 0; i < NBR_MAGIC_TAG_DIFFERENT; ++i )
   {
     if( memcmp( buf, &(aMagicTagList_Memorize[i][0]), TAG_LEN ) == 0 )
@@ -154,30 +159,37 @@ int TagsList_isMagic( const char * buf )
       Serial.println( "TagsList_isMagic: Forget!" );      
       return 2;
     }    
+    if( memcmp( buf, &(aMagicTagList_Rainbow[i][0]), TAG_LEN ) == 0 )
+    {
+      Serial.println( "TagsList_isMagic: Rainbow!" );
+      return 3;
+    }        
   }
   return 0;
 }
 
 
 const byte nEepromVersion = 2;
-void load_eeprom(TagsList * pTagsList, int nNbrReader)
+int load_eeprom(TagsList * pTagsList, int nNbrReader)
 {
   byte nEepromCurrent = EEPROM.read( 0 );
   Serial.print( "eeprom current version: " );
   Serial.println( nEepromCurrent );
   if( nEepromVersion != nEepromCurrent )
   {
-    return;
+    return 0;
   }
   Serial.println( "Loading eeprom..." );
   int nOffset = 1;
   for( int i = 0; i < nNbrReader; ++i )
   {
     nOffset += TagsList_readFromEprom( &pTagsList[i], nOffset );
-  }  
+  }
+  byte brm = EEPROM.read( nOffset );
+  return (int)brm;
 }
 
-void save_eeprom(TagsList * pTagsList, int nNbrReader)
+void save_eeprom(TagsList * pTagsList, int nNbrReader, int bRainbowMode )
 {
   Serial.println( "Saving eeprom..." );
   EEPROM.write( 0, nEepromVersion );
@@ -185,5 +197,7 @@ void save_eeprom(TagsList * pTagsList, int nNbrReader)
   for( int i = 0; i < nNbrReader; ++i )
   {
     nOffset += TagsList_writeToEprom( &pTagsList[i], nOffset );
-  }  
+  }
+  byte brm = (byte)bRainbowMode;
+  EEPROM.write( nOffset, brm );  
 }

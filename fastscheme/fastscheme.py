@@ -5,6 +5,12 @@
 # (c) 2016 A.Mazel
 #
 
+#
+# Current way:
+# left click: draw a rect or a circle
+#
+# When a shape is selected: suppr delete it
+
 import cv2
 
 import math
@@ -65,12 +71,12 @@ class Figure:
     
     def computeDistanceToBorder( self, pt ):
         """
-        return the distance between a point and the nearest point in the border of a figure
+        return the distance between a point and the nearest point in the border of a figure return also the point
         """
         if( self.nType == Figure.kCircle ):
-            return geo.compute_distance_shape_to_points( self.shape, [pt] )
+            return geo.compute_distance_shape_to_point_return_dist_and_pt( self.shape, pt )
             
-        return geo.compute_distance_rect_to_point( self.bb[0], self.bb[1], pt ) # TODO: compute_distance_rect_to_point !            
+        return geo.compute_distance_rect_to_point_return_dist_and_pt( self.bb[0], self.bb[1], pt )
         
     def __repr__( self ):
         strOut = "["
@@ -304,14 +310,14 @@ class FastScheme:
             # is it a link ?
             idxFrom = -1
             for i in range(len(self.listFigures)):
-                rDist = self.listFigures[i].computeDistanceToBorder( shape[0] )
+                rDist, nearptfirst = self.listFigures[i].computeDistanceToBorder( shape[0] )
                 print( "dist first: %d" % rDist)
                 if( rDist < 8 ):
                     idxFrom = i
                     break
             idxTo = -1
             for i in range(len(self.listFigures)):
-                rDist = self.listFigures[i].computeDistanceToBorder( shape[-1] )
+                rDist, nearptsec = self.listFigures[i].computeDistanceToBorder( shape[-1] )
                 print( "dist second: %d" % rDist)
                 if( rDist < 8 ):
                     idxTo = i
@@ -319,7 +325,7 @@ class FastScheme:
             print( "idxFrom: %d, idxTo: %d" % (idxFrom, idxTo) )
             if( idxFrom != -1 and idxTo != -1 and idxFrom != idxTo ):
                 print( "Link between %d and %d!" % (idxFrom, idxTo) )
-                self.listLinks.append(Link(self.listFigures[idxFrom],self.listFigures[idxTo] ) )
+                self.listLinks.append(Link(self.listFigures[idxFrom],self.listFigures[idxTo] ), nearptfirst, nearptsec )
                 
         print( "INF: FastScheme.analyseShape: at end: %s" % self.__str__() )
         return nRet

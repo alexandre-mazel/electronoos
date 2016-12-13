@@ -6,6 +6,8 @@
  * Version number: cf the message in the print of the setup function
  * Author: Alexandre Mazel
  * copyright (c) A.Mazel 2015
+ 
+ * compiled with Arduino 1.0.6
  */
 
 #include <avr/pgmspace.h>
@@ -45,6 +47,8 @@ unsigned long timeMeLastGood3; // time in ms since I've finished 3 good
 unsigned long timeOtherLastGood3; // time when receiving a good3 from the other
 int nStatePinReceiveLastGood3 = 0; // store the state to detect a change
 
+int bRainbowMode = 0;
+
 /*
 Led phase at ~200fps:
       0: memorize anim
@@ -56,8 +60,36 @@ Led phase at ~200fps:
 */
 unsigned int anCptLedAnim[nNbrReader];
 
+void animate_rainbow_mode()
+{
+  static int static_nHueColor = 0;
+  const int nCoefRalentisseur = 16;
+  
+  int i;
+  for( i = 0; i < nNbrReader; ++i )
+  {
+    for( int j = 0; j < aWs2811[i].getPixelNumber(); ++j )
+    {
+      aWs2811[i].setHue( j, static_nHueColor/nCoefRalentisseur ); // not optimal: recomputing many times, same rgbs
+    }
+    aWs2811[i].sendLedData();
+  }
+  ++static_nHueColor;
+  if( static_nHueColor >= 255*nCoefRalentisseur )
+  {
+    static_nHueColor = 0;
+  }
+}
+
+
 void animate_led()
 {
+  if( bRainbowMode )
+  {
+    animate_rainbow_mode();
+    
+    return;
+  }
 //  return;
   int i;
   for( i = 0; i < nNbrReader; ++i )
@@ -114,7 +146,7 @@ void animate_led()
     }    
     if( val > 40100 && val <= 40600 && (val%10)==0 )
     {
-      aWs2811[i].setColor( 0, 255-( ((long)170*(val-40100))/500 ), 0 );
+      aWs2811[i].setColor( 0, 255-( ((long)170*(val-40100))/400 ), 0 );
     }    
 
     if( val == 50000 )
@@ -123,11 +155,11 @@ void animate_led()
     }    
     if( val > 50100 && val <= 50600 && (val%10)==0 )
     {
-      aWs2811[i].setColor( 255-( ((long)170*(val-50100))/500 ), 0, 0 );
+      aWs2811[i].setColor( 255-( ((long)170*(val-50100))/400 ), 0, 0 );
     }  
 
-    // force auto turn off red and green, after "some time" ~10 sec
-    if( val == 41000 || val == 51000 )
+    // force auto turn off red and green, after "some time" ~10 sec // 5 sec
+    if( val == 40500 || val == 50500 )
     {
       //Serial.println("force turn off green and red" );
       anCptLedAnim[i] = 60000;
@@ -263,7 +295,7 @@ void setup()
   Serial.print( ", presence pin inc: " );
   Serial.println( nPresencePinInc, DEC );
   
-  load_eeprom(pTagsList, nNbrReader);
+  bRainbowMode = load_eeprom(pTagsList, nNbrReader);
 }
 
 int check_code( const char * buf, int nReaderIdx )
@@ -376,12 +408,32 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
       Serial.print( buf[i], HEX );
       Serial.write( " " );
     }
+    Serial.println( "" );
   }
   
   *pnBufLen = 0;  
   int nRetCode = TagsList_isMagic( &buf[1] );
   if( nRetCode != 0 )
   {
+    if( nRetCode == 3 )
+    {
+      if( ! bRainbowMode )
+      {
+        bRainbowMode = 1;
+        Serial.println( "RAINBOW MODE ON" );
+        save_eeprom( pTagsList, nNbrReader, bRainbowMode );
+        return 0;
+      }
+      
+    }
+    else if( bRainbowMode )
+    {
+        bRainbowMode = 0;
+        Serial.println( "RAINBOW MODE OFF" );        
+        save_eeprom( pTagsList, nNbrReader, bRainbowMode );
+        return 0;
+    }
+    // not a rainbow mode nor an exit from a rainbow mode
     anState[nReaderIdx] = nRetCode+2; // 3 or 4
     anCptLedAnim[nReaderIdx] = (nRetCode-1)*20000;
     return 0;
@@ -392,7 +444,7 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
     memorize_code( &buf[1], nReaderIdx, anState[nReaderIdx] == 4 );
     anState[nReaderIdx] = 0;
     anCptLedAnim[nReaderIdx] = 60000;
-    save_eeprom( pTagsList, nNbrReader );
+    save_eeprom( pTagsList, nNbrReader, bRainbowMode );
     return 0;
   }
   
@@ -464,7 +516,8 @@ void loop()
   }
  
   
-  for( i = 0; i < nNbrReader; ++i )
+  //for( i = 0; i < nNbrReader; ++i )
+  if( 0 ) // disable presence ping handling
   {
     int nVal = digitalRead(nFirstPresencePin+i*nPresencePinInc);
     //int nVal = analogRead(8+i)>512;

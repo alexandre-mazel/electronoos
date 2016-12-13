@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <util/delay.h>
 
+// v0.71: document and debug setHue
 // v0.70: setOneBrightOtherLow
 // v0.66: add setonlyone
 // v0.65: debug setvumetre
@@ -56,10 +57,11 @@ class Ai_WS2811
     // nNumBright is relative to nNumFirst
     void setOneBrightOtherLow( unsigned int nNbrLeds, unsigned int nNumFirst, unsigned int nNumBright, uint8_t r, uint8_t g, uint8_t b, uint8_t rLow = 10, uint8_t gLow = 10, uint8_t bLow = 10 );
     
-    // Set one pixel at a specific hue. Don't touch others // NOT TESTED !!!
-    void setHue( uint8_t nNumPixel, int nHue );    
+    // Set one pixel at a specific hue. Don't touch others
+    void setHue( uint8_t nNumPixel, int nHue );    // nHue between 0 and 254
     
     int reducePixelNumber( int nNewPixelNumber ); // reduce the pixel number to a smaller number (when inited too big or ...) return 1 if ok
+    int getPixelNumber() { return m_nLeds; }
         
     unsigned char *getRGBData() { return m_pData; }    
     

@@ -3,6 +3,7 @@
 void hueToRGB( int nHue, uint8_t * prRet, uint8_t * pgRet, uint8_t * pbRet )
 {
   //this is the algorithm to convert from RGB to HSV
+  // nHue between 0 and 254
   double r=0; 
   double g=0; 
   double b=0;
@@ -125,9 +126,9 @@ void Ai_WS2811::setHue(uint8_t nNumPixel, int nHue)
   struct CRGB * leds = (struct CRGB *)m_pData;
   uint8_t r, g, b;
   hueToRGB( nHue, &r, &g, &b );
-  leds[nNumPixel].r = constrain((int)255*r,0,255);
-  leds[nNumPixel].g = constrain((int)255*g,0,255);
-  leds[nNumPixel].b = constrain((int)255*b,0,255);
+  leds[nNumPixel].r = r;
+  leds[nNumPixel].g = g;
+  leds[nNumPixel].b = b;
 }
 
 void Ai_WS2811::setVumeter( int nValue,int bR, int bG, int bB )

@@ -53,14 +53,22 @@ def get_webcam_available_resolution(camera):
     
     
 def computeDiff( im1, im2 ):
-    print( "im1: %s" % im1[:16] )
-    print( "im2: %s" % im1[:16] )
-    diff = im1 - im2
+    """
+    compute difference between two images.
+    return nbr_different_pixels, ratio compared to nbr pixel in images
+    """
+    #~ print( "im1: %s" % im1[8][:16] )
+    #~ print( "im2: %s" % im2[8][:16] )
+    diff = abs(im1.astype("int16") - im2.astype("int16"))
     
-    print( "diff: %s" % diff[:16] )    
-    ret,thresh1 = cv2.threshold(diff,32,1,cv2.THRESH_BINARY)
-    print( "thresh1: %s" % thresh1[:16] )
-    return cv2.mean(thresh1)
+    print( "diff: %s" % diff[8][:16] )    
+    ret,thresh1 = cv2.threshold( diff, 32, 1, cv2.THRESH_BINARY ) # nbr of different pixel
+    #~ print( "thresh1: %s" % thresh1[8][:16] )
+    #~ retVal = cv2.mean(thresh1)[0] # 0.13 for HD on Raspv2
+    retVal = cv2.countNonZero(thresh1)
+    retVal = ( int(retVal),float(retVal)/( im1.shape[0]*im1.shape[1] ) )
+    print( "retVal: %s" % str(retVal) )
+    return retVal
     
 
 def mse(imageA, imageB):
@@ -205,6 +213,7 @@ def watchAndSend( nNumCameraPort ):
     
     availableResolution = get_webcam_available_resolution(camera)
     print( "availableResolution: %s" % availableResolution )
+    print( "using Resolution: %s" % availableResolution[-1] )
     
     camera.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH,availableResolution[-1][0])
     camera.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT,availableResolution[-1][1])    
@@ -234,16 +243,25 @@ def watchAndSend( nNumCameraPort ):
 
     while( 1 ):
         #~ print( "DBG: %s: getting..." % ti    me.time() )
-        im = get_image(camera) # it seems like we've got a buffer of 6 images, so even if taking time to send, we've got 6 images of moving datas in raw stored! great
+        timeBegin = time.time()        
+        im = get_image(camera) # it seems like camera got a buffer of 6 images, so even if taking time to send, we've got 6 images of moving datas in raw stored! great
+        print( "DBG: %5.02f: getting takes: (%5.2fs)" % ( time.time(), time.time()-timeBegin ) )
     
         #~ print( "DBG: %s: analysing..." % time.time() )
+        timeBegin = time.time()
         imGrey = cv2.cvtColor( im, cv2.COLOR_BGR2GRAY )
-        #rDiff = computeDiff( imGrey, imPrevGrey )
+        print( "DBG: %5.02f: converting takes: (%5.2fs)" % ( time.time(), time.time()-timeBegin ) )
+        
+        timeBegin = time.time()
+        #~ rDiff = computeDiff( imGrey, imPrevGrey )[1]
         rDiff = mse( imGrey, imPrevGrey )
         #~ rDiff = ssim(mGrey, imPrevGrey )
-        print( "DBG: %5.02f: rDiff: %5.1f" % ( time.time(), rDiff) )
+        print( "DBG: %5.02f: rDiff: %5.1f (%5.2fs)" % ( time.time(), rDiff,time.time()-timeBegin ) )
         
-        if rDiff > 120: # 120 dans une piece, 50 sur une vue d'ensemble
+        # mse: en640x480: 120 dans une piece, 50 sur une vue d'ensemble par la fenetre de la chambre
+        # diff: en HD 170°: 0.009 en interieur quand rien de bouge
+        
+        if rDiff > 1000000.012: 
             timeBegin = time.time()
             print( "DBG: %s: storing..." % time.time() )
             if 0:

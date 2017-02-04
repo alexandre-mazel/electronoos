@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import cv2
+import datetime
 import mutex
 import numpy as np
 import os
@@ -14,6 +15,42 @@ def get_image(camera):
      # read is the easiest way to get a full image out of a VideoCapture object.
      retval, im = camera.read()
      return im
+
+def is_available_resolution(cam,x,y):
+    cam.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, int(x))
+    cam.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, int(y))
+    return cam.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH) == int(x) and cam.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT) == int(y)
+    
+def get_webcam_available_resolution(camera):
+    aTestRes = [
+                            160,120,
+                            320,240,
+                            640,480,
+                            800,600,
+                            1024,768,
+                            1280,960,
+                            1280,1024,
+                            1600,1200,
+                            1920,1080, # HD
+                            1920,1440,
+                            2048,1280,
+                            2560,1080,
+                            4096,2304,
+                            ]
+                            
+    aRes = []
+    i = 0
+    while i < len(aTestRes ):
+        if is_available_resolution( camera, aTestRes[i], aTestRes[i+1] ):
+            aRes.append( [ aTestRes[i], aTestRes[i+1] ] )
+        i += 2
+        
+    # after testing, set standard camera resolution
+    camera.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH,640)
+    camera.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT,480)    
+        
+    return aRes
+    
     
 def computeDiff( im1, im2 ):
     print( "im1: %s" % im1[:16] )
@@ -131,7 +168,29 @@ class BackgroundSender:
         self.listWaiting.append( (src, dst) )
         self.mutex.unlock()
 # class BackgroundSender - end
-    
+
+def getFilenameFromTime(timestamp=None):
+  """
+  get a string usable as a filename relative to the current datetime stamp.
+  eg: "2012_12_18-11h44m49s049ms"
+  
+  timestamp : time.time()
+  """
+  if timestamp is None:
+      datetimeObject = datetime.datetime.now()
+  elif isinstance(timestamp, datetime.datetime):
+      datetimeObject = timestamp
+  else:
+      datetimeObject = datetime.datetime.fromtimestamp(timestamp)
+  strTimeStamp = datetimeObject.strftime( "%Y_%m_%d-%Hh%Mm%Ss%fms" );
+  strTimeStamp = strTimeStamp.replace( "000ms", "ms" ); # because there's no flags for milliseconds
+  return strTimeStamp;
+# getFilenameFromTime - end
+
+def getHostName():
+    "get the computer name as given by user"
+    return os.uname()[1]
+# getHostName - end
 
 
 def watchAndSend( nNumCameraPort ):
@@ -143,8 +202,12 @@ def watchAndSend( nNumCameraPort ):
     # Now we can initialize the camera capture object with the cv2.VideoCapture class.
     # All it needs is the index to a camera port.
     camera = cv2.VideoCapture(camera_port)
-    camera.set(3,640)
-    camera.set(4,480)    
+    
+    availableResolution = get_webcam_available_resolution(camera)
+    print( "availableResolution: %s" % availableResolution )
+    
+    camera.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH,availableResolution[-1][0])
+    camera.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT,availableResolution[-1][1])    
 
     print("INF: Warming up...")         
     # Ramp the camera - these frames will be discarded and are only used to allow v4l2
@@ -154,9 +217,15 @@ def watchAndSend( nNumCameraPort ):
          #~ time.sleep( 0.05 )
 
     bStoreTmp = False
+    strHostname = getHostName()
+    strPrevDstFolderName = ""
+    
+    # NB: ssh-copy-id from this machine should have been done previously
+    strRemoteHostName = "protolab.aldebaran.com"
+    strRemoteUserName = "amazel"
     
     if not bStoreTmp:
-        bgs = BackgroundSender( "protolab.aldebaran.com", "amazel" )
+        bgs = BackgroundSender( strRemoteHostName, strRemoteUserName )
         
     print("INF: Taking image for real...")
     
@@ -177,13 +246,24 @@ def watchAndSend( nNumCameraPort ):
         if rDiff > 120: # 120 dans une piece, 50 sur une vue d'ensemble
             timeBegin = time.time()
             print( "DBG: %s: storing..." % time.time() )
-            dstFile = "~/images/%09.03f.jpg"  % time.time()            
+            if 0:
+                dstFile = "~/images/%09.03f.jpg"  % time.time()            
+            else:
+                dstFile = getFilenameFromTime() + ".jpg"
+                # folder by hostname
+                strDstFolderName = "~/images/" + strHostname + "/" + dstFile[:10] + "/" # one folder by day
+                if strPrevDstFolderName != strDstFolderName:
+                    os.system( "ssh %s@%s 'mkdir -p %s'" % (strRemoteUserName, strRemoteHostName, strDstFolderName) )
+                    strPrevDstFolderName = strDstFolderName
+                dstFile = strDstFolderName + dstFile
+                
             if bStoreTmp:
                 # store in tmp, send image on the fly
                 file = "/tmp/last.jpg" # to store nothing locally enable this line                
             else:
                 # store locally every images and send last one to remote
-                file = "/home/pi/images/%09.03f.jpg" % time.time()                
+                #file = "/home/pi/images/%09.03f.jpg" % time.time()                
+                file = "/home/pi/images/" + getFilenameFromTime() + ".jpg"
             cv2.imwrite(file, im,[int(cv2.IMWRITE_JPEG_QUALITY), 50])
             if bStoreTmp:
                 sendFileToRemote( "protolab.aldebaran.com", "amazel", file, dstFile )

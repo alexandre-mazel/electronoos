@@ -50,6 +50,21 @@ def get_webcam_available_resolution(camera):
     camera.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT,480)    
         
     return aRes
+# get_webcam_available_resolution - end
+
+def find_nearest_resolution( aAvailableResolution, nApproximativeWidth ):
+    """
+    find nearest resolution 
+    """
+    nMinDiff = 999999
+    resBest = []
+    for res in aAvailableResolution:
+        nDiff = abs( res[0] - nApproximativeWidth )
+        if nMinDiff > nDiff:
+            nMinDiff = nDiff
+            resBest = res
+    return resBest
+# find_nearest_resolution - end
     
     
 def computeDiff( im1, im2 ):
@@ -70,17 +85,27 @@ def computeDiff( im1, im2 ):
     print( "retVal: %s" % str(retVal) )
     return retVal
     
-
-def mse(imageA, imageB):
+def mseFloat(imageA, imageB):
 	# the 'Mean Squared Error' between the two images is the
 	# sum of the squared difference between the two images;
 	# NOTE: the two images must have the same dimension
-	err = np.sum((imageA.astype("float") - imageB.astype("float")) ** 2)
+	err = np.sum( ((imageA.astype("float") - imageB.astype("float")) ** 2) )
 	err /= float(imageA.shape[0] * imageA.shape[1])
 	
 	# return the MSE, the lower the error, the more "similar"
 	# the two images are
 	return err
+
+def mse(imageA, imageB):
+	# the 'Mean Squared Error' between the two images is the
+	# sum of the squared difference between the two images;
+	# NOTE: the two images must have the same dimension
+	err = np.sum( ((imageA.astype("int16") - imageB.astype("int16")) ** 2) ) # astype("float"): 0.28s in HD astype("int"): 0.15s astype("int16"): 0.11s
+	err /= float(imageA.shape[0] * imageA.shape[1])
+	
+	# return the MSE, the lower the error, the more "similar"
+	# the two images are
+	return abs(err)
 
 def sendFileToRemoteParamiko( server, user, srcfilename, dstfilename ):
     import paramiko
@@ -200,8 +225,12 @@ def getHostName():
     return os.uname()[1]
 # getHostName - end
 
+def launchAlarmSound():
+    os.system( "aplay ~/salut_bureau.wav&" )
+
 
 def watchAndSend( nNumCameraPort ):
+    timeLastAlarmSound = time.time() - 100000
     #Number of frames to throw away while the camera adjusts to light levels
     ramp_frames = 1 # 30
     
@@ -213,10 +242,13 @@ def watchAndSend( nNumCameraPort ):
     
     availableResolution = get_webcam_available_resolution(camera)
     print( "availableResolution: %s" % availableResolution )
-    print( "using Resolution: %s" % availableResolution[-1] )
+    #~ aResToUse = availableResolution[-1]
+    aResToUse = find_nearest_resolution( availableResolution, 1280 )
+    print( "using Resolution: %s" % aResToUse )
     
-    camera.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH,availableResolution[-1][0])
-    camera.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT,availableResolution[-1][1])    
+    
+    camera.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH,aResToUse[0])
+    camera.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT,aResToUse[1])    
 
     print("INF: Warming up...")         
     # Ramp the camera - these frames will be discarded and are only used to allow v4l2
@@ -244,24 +276,24 @@ def watchAndSend( nNumCameraPort ):
     while( 1 ):
         #~ print( "DBG: %s: getting..." % ti    me.time() )
         timeBegin = time.time()        
-        im = get_image(camera) # it seems like camera got a buffer of 6 images, so even if taking time to send, we've got 6 images of moving datas in raw stored! great
-        print( "DBG: %5.02f: getting takes: (%5.2fs)" % ( time.time(), time.time()-timeBegin ) )
+        im = get_image(camera) # it seems like camera got a buffer of 6 images, so even if taking time to send, we've got 6 images of moving datas in raw stored! great
+        #~ print( "DBG: %5.02f: getting takes: (%5.2fs)" % ( time.time(), time.time()-timeBegin ) )
     
         #~ print( "DBG: %s: analysing..." % time.time() )
         timeBegin = time.time()
         imGrey = cv2.cvtColor( im, cv2.COLOR_BGR2GRAY )
-        print( "DBG: %5.02f: converting takes: (%5.2fs)" % ( time.time(), time.time()-timeBegin ) )
+        #~ print( "DBG: %5.02f: converting takes: (%5.2fs)" % ( time.time(), time.time()-timeBegin ) )
         
         timeBegin = time.time()
         #~ rDiff = computeDiff( imGrey, imPrevGrey )[1]
         rDiff = mse( imGrey, imPrevGrey )
         #~ rDiff = ssim(mGrey, imPrevGrey )
-        print( "DBG: %5.02f: rDiff: %5.1f (%5.2fs)" % ( time.time(), rDiff,time.time()-timeBegin ) )
+        #~ print( "DBG: %5.02f: rDiff: %5.1f (%5.2fs)" % ( time.time(), rDiff,time.time()-timeBegin ) )
         
         # mse: en640x480: 120 dans une piece, 50 sur une vue d'ensemble par la fenetre de la chambre
-        # diff: en HD 170°: 0.009 en interieur quand rien de bouge
+        # diff: en HD 170°: 0.009 en interieur quand rien de bouge (parfois 0.011)
         
-        if rDiff > 1000000.012: 
+        if rDiff > 150.012: 
             timeBegin = time.time()
             print( "DBG: %s: storing..." % time.time() )
             if 0:
@@ -280,19 +312,24 @@ def watchAndSend( nNumCameraPort ):
                 file = "/tmp/last.jpg" # to store nothing locally enable this line                
             else:
                 # store locally every images and send last one to remote
-                #file = "/home/pi/images/%09.03f.jpg" % time.time()                
-                file = "/home/pi/images/" + getFilenameFromTime() + ".jpg"
+                #file = "/home/pi/images/%09.03f.jpg" % time.time()
+                strQuality = "%08.03f" % rDiff
+                file = "/home/pi/images/" + getFilenameFromTime() + "__" + strQuality + ".jpg"
             cv2.imwrite(file, im,[int(cv2.IMWRITE_JPEG_QUALITY), 50])
             if bStoreTmp:
                 sendFileToRemote( "protolab.aldebaran.com", "amazel", file, dstFile )
             else:
                 bgs.addFile( file, dstFile )
                 
+            if ( time.time() - timeLastAlarmSound ) > 60*10:
+                timeLastAlarmSound = time.time()
+                launchAlarmSound()
+                
             duration = time.time() - timeBegin
             print( "DBG: time to store: %5.2fs" % duration )      
             
         imPrevGrey = imGrey
-        time.sleep( 0.03 ) # leave a bit of cpu to background task
+        time.sleep( 0.1 ) # leave a bit of cpu to background task
      
     # You'll want to release the camera, otherwise you won't be able to create a new
     # capture object until your script exits

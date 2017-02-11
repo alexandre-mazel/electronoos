@@ -41,6 +41,9 @@ def createDirectoryForFile( strName ):
     except: pass
 
 def generateExifNameToTagNum():
+    """
+    Add to PIL library a dictionnary of name and index of tag
+    """
     PIL.ExifTags.tag2Num = dict()
     for num, name in PIL.ExifTags.TAGS.iteritems():
         PIL.ExifTags.tag2Num[name] = num 
@@ -98,6 +101,9 @@ def getShootDateAndApnModel( strImgFilename ):
 #~ exit(1)
 
 def classifyPath( strPathSrc, strPathDest ):
+    """
+    Take a raw path containing image with mostly exif tagged files, and generate a classified path with subfolder classified by apn, model and year of shoot
+    """
     cpt = 0
     cptMid = 0
     cptLarge = 0

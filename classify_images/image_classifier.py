@@ -91,13 +91,27 @@ def getShootDateAndApnModel( strImgFilename ):
     
     
     return [strDate, strCameraName, strCameraOwnerName]
-    
-
 # getShootDateAndApnModel - end
     
 #~ print getShootDateAndApnModel(  "/home/a/recup3//recup_dir.187/f606058464.jpg" );
 #~ print getShootDateAndApnModel(  "/home/a/recup3//recup_dir.81/f358798112.jpg" )
 #~ print getShootDateAndApnModel(  "/home/a/recup3//recup_dir.10/f58786880.jpg" )
+#~ exit(1)
+
+def getPreciseShootDate( strImgFilename ):
+    """
+    get the detailed time stamp from an exif tagged image
+    return a [nYear, nMonth, nDay, nHour, nMin, nSec] or [] if no exif information
+    """
+    strDate, strCameraName, strCameraOwnerName = getShootDateAndApnModel(strImgFilename)    
+    if strDate == None: return []
+    if strDate == "1900": return []
+    splitted = strDate.replace(" ", ":").split(":")
+    splitted = [int(s) for s in splitted]
+    #~ return nYear, nMonth, nDay, nHour, nMin, nSec
+    return splitted
+# getPreciseShootDate - end
+#~ print getPreciseShootDate("/tmp_image_ren/IMG_9354.JPG" )
 #~ exit(1)
 
 def classifyPath( strPathSrc, strPathDest ):
@@ -171,4 +185,37 @@ def classifyPath( strPathSrc, strPathDest ):
     
 # classifyPath - end
 
-classifyPath( "/home/a/recup3/", "/home/a/img_classified/" )
+#~ classifyPath( "/home/a/recup3/", "/home/a/img_classified/" )
+
+def renamePathUsingExif( strPathSrc, bAndroidStyle = True ):
+    """
+    rename all files in a path, using the exif shoot time stamp
+    IMG_9354 => 20170207_105754__IMG_9354 # AndroidStyle
+    or
+    IMG_9354 => 2017_02_07_-_10_57_54__IMG_9354 # Alexandre Style (NDEV?)
+    """
+    cpt = 0
+    cptRenamed = 0
+    for file in sorted(os.listdir( strPathSrc )):
+        cpt += 1
+        if "IMG_" != file[:4]:
+            continue
+        strSrc = strPathSrc + "/" + file
+        timeStamp = getPreciseShootDate( strSrc )
+        if timeStamp == []:
+            continue            
+        cptRenamed += 1
+        nYear, nMonth, nDay, nHour, nMin, nSec = timeStamp
+        if bAndroidStyle:
+            strPre = "%4d%02d%02d_%02d%02d%02d" % (nYear, nMonth, nDay, nHour, nMin, nSec)
+        else:
+            strPre = "%4d_%02d_%02d_-_%02d_%02d_%02d" % (nYear, nMonth, nDay, nHour, nMin, nSec)
+        strDest = strPathSrc + strPre + "__" + file
+        print( "INF: renamePathUsingExif: %s => %s" % (strSrc, strDest) )    
+        os.rename( strSrc, strDest )
+        
+    print( "INF: renamePathUsingExif: analysed: %d, renamed: %d" % (cpt,cptRenamed) )
+# renamePathUsingExif - end
+#renamePathUsingExif( "C:/tmp_image_ren/" )
+renamePathUsingExif( "/photos/photos17_i/2017-02-05_-_Florence/" )
+

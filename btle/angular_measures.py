@@ -8,8 +8,8 @@ class EKF:
     produce an Enhanced Kalman Filter on a measured variable 
     """
     def __init__( self ):
-        self.R = 0.1**2 # estimate of measurement variance, change to see effect 
-        self.Q = 1e-5 # process variance
+        self.R = 0.1**2 # estimate of measurement variance, change to see effect  # 0.1**2
+        self.Q = 1e-5 # process variance (1e-5)
         
         self.xhat = 0.0
         self.P = 1.0
@@ -50,7 +50,9 @@ def renderAngular( aData ):
         
         listX.append(x)        
         listPlot.append( angle )        
-        listPlotFiltered.append( ekf.update(angle) )
+        angleFiltered = ekf.update(angle)
+        listPlotFiltered.append( angleFiltered )
+        print( "%7.3f => %7.3f" % (angle, angleFiltered ) )
         
         if nPrevHour != hour:
             xLabels.append(i)

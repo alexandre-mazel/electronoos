@@ -8,14 +8,26 @@ class EKF:
     produce an Enhanced Kalman Filter on a measured variable 
     """
     def __init__( self ):
-        n_iter = 50
-        sz = (n_iter,) # size of array        
+        self.R = 0.1**2 # estimate of measurement variance, change to see effect 
+        self.Q = 1e-5 # process variance
         
-    def update( self, r ):
+        self.xhat = 0.0
+        self.P = 1.0
+        
+    def update( self, value ):
         """
         receive a value and return the filtered results
         """
-        return r+20
+        # time update
+        xhatminus = self.xhat
+        Pminus = self.P+self.Q
+
+        # measurement update
+        K = Pminus/( Pminus+self.R )
+        self.xhat = xhatminus+K*(value-xhatminus)
+        self.P = (1-K)*Pminus
+        return self.xhat
+
         
 # class EKF - end
 
@@ -97,7 +109,7 @@ def analyseAngularFile( filename ):
     print( "nbr: %s, nMin: %s, nMax: %s, nAvg: %s" % ( len(hrs), rMin, rMax, rSum/len(hrs) ) )
     
     # draw it
-    renderAngular( hrs[-1000:] )
+    renderAngular( hrs[:] )
     
 # analyseAngularFile - end
 

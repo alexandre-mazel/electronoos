@@ -12,7 +12,7 @@ def renderHr( aData ):
     xMin = 0
     nPrevHour = -1
     for i in range(len(aData)):
-        bpm = aData[i][-1]
+        bpm = aData[i][-1]                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
         x = i
         hour =  aData[i][1]
         #x = hour
@@ -33,7 +33,7 @@ def renderHr( aData ):
     plt.plot(listX, listPlot)
     plt.ylabel('bpm')
     plt.annotate('min: ' + str(nMin), xy=(xMin, nMin), xytext=(xMin+len(aData)/10, nMin), arrowprops=dict(facecolor='black', shrink=0.05), )    
-    plt.grid(True)
+    plt.grid(True)                                                                                                                                                                                                                                                                                                              
     plt.show()    
 
 

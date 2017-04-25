@@ -8,8 +8,8 @@ class EKF:
     produce an Enhanced Kalman Filter on a measured variable 
     """
     def __init__( self ):
-        self.R = 0.1**2 # estimate of measurement variance, change to see effect  # 0.1**2
-        self.Q = 1e-5 # process variance (1e-5)
+        self.R = 1. # estimate of measurement variance, change to see effect  # 0.1**2
+        self.Q = 5e-4 # process variance (1e-5)
         
         self.xhat = 0.0
         self.P = 1.0
@@ -34,7 +34,11 @@ class EKF:
 def renderAngular( aData ):
     listPlot = []
     listPlotFiltered = []
+    listPlotAveraged30 = []
+    listPlotAveraged300 = []
     listX = []
+    rCumulErrorEKF = 0 # compare to avg300
+    rCumulErrorAvg30 = 0
 
     xLabels = []
     textLabels = []
@@ -52,7 +56,13 @@ def renderAngular( aData ):
         listPlot.append( angle )        
         angleFiltered = ekf.update(angle)
         listPlotFiltered.append( angleFiltered )
-        print( "%7.3f => %7.3f" % (angle, angleFiltered ) )
+        angleAveraged30 = sum(listPlot[-30:])/len(listPlot[-30:])
+        angleAveraged300 = sum(listPlot[-300:])/len(listPlot[-300:])
+        listPlotAveraged30.append(angleAveraged30)
+        listPlotAveraged300.append(angleAveraged300)
+        rCumulErrorEKF += abs(angleAveraged300-angleFiltered)
+        rCumulErrorAvg30 += abs(angleAveraged300-angleAveraged30)
+        print( "%7.3f => %7.3f (%7.3f/%7.3f)" % (angle, angleFiltered, angleAveraged30,angleAveraged300  ) )
         
         if nPrevHour != hour:
             xLabels.append(i)
@@ -65,11 +75,14 @@ def renderAngular( aData ):
         
     plt.xticks(xLabels, textLabels) # draw just new hour
     plt.plot(listX, listPlot)
-    plt.plot(listX, listPlotFiltered)
-    plt.ylabel('bpm')
+    plt.plot(listX, listPlotFiltered) # green
+    plt.plot(listX, listPlotAveraged30) # red
+    plt.plot(listX, listPlotAveraged300) # cyan
+    plt.ylabel(['angle', 'filtered', 'avg'])
     plt.annotate('min: ' + str(nMin), xy=(xMin, nMin), xytext=(xMin+len(aData)/10, nMin), arrowprops=dict(facecolor='black', shrink=0.05), )    
     plt.grid(True)                                                                                                                                                                                                                                                                                                              
-    plt.show()   
+    plt.show()
+    print( "cumulated error: rCumulErrorEKF: %7.3f, rCumulErrorAvg30: %7.3f" % (rCumulErrorEKF,rCumulErrorAvg30) )
 # renderAngular - end    
 
 
@@ -111,7 +124,7 @@ def analyseAngularFile( filename ):
     print( "nbr: %s, nMin: %s, nMax: %s, nAvg: %s" % ( len(hrs), rMin, rMax, rSum/len(hrs) ) )
     
     # draw it
-    renderAngular( hrs[:] )
+    renderAngular( hrs[:1000] )
     
 # analyseAngularFile - end
 

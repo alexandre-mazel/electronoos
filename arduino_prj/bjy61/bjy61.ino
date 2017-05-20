@@ -1,3 +1,8 @@
+// Handle BJY61 angle reading on an arduino using serial3 for read and serial0 for debug
+// v0.6
+// based on: https://www.scribd.com/document/276841798/JY-61-MPU6050-module-User-Manual-by-Elecmaster
+// bought from: https://www.amazon.fr/gp/product/B01LXXHUDR/ref=oh_aui_detailpage_o03_s00?ie=UTF8&psc=1
+
 int incomingByte = 0;   // for incoming serial data
 byte aTrame[20];
 int nTrameLen = 0;

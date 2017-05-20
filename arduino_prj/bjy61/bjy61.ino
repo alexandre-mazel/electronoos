@@ -13,31 +13,31 @@ void setup() {
 void printBuf( byte * pTrame, int len )
 {
   int i;
-  Serial.print( "trame to analyse: " );
+  Serial.print( "buf: " );
   for( i = 0; i < len; ++i )
   {
     Serial.print( pTrame[i], HEX );
     Serial.print( " " );
   }
   Serial.println("");
-  
-  short int a1 = ((short) (pTrame[1]<<8|pTrame[0]))/32768.0*180;
-  Serial.println( a1, DEC );  
 }
 
 void analyse( byte * pTrame, int len )
 {
-  int i;
-  Serial.print( "trame to analyse: " );
-  for( i = 0; i < len; ++i )
-  {
-    Serial.print( pTrame[i], HEX );
-    Serial.print( " " );
-  }
-  Serial.println("");
-  
-  short int a1 = ((short) (pTrame[1]<<8|pTrame[0]))/32768.0*180;
-  Serial.println( a1, DEC );  
+  short int aX = ((short) (pTrame[1]<<8|pTrame[0]))/32768.0*180;
+  short int aY = ((short) (pTrame[3]<<8|pTrame[2]))/32768.0*180;
+  short int aZ = ((short) (pTrame[5]<<8|pTrame[4]))/32768.0*180;  
+  short int t =  ((short) (pTrame[7]<<8|pTrame[6]))/340.0+36.53; // 13 when at 8, <2 when at -18 (also seen: +36.25)
+  Serial.print( millis(), DEC );
+  Serial.print( ": " );
+  Serial.print( aX, DEC );
+  Serial.print( ", " );
+  Serial.print( aY, DEC );
+  Serial.print( ", " );
+  Serial.print( aZ, DEC );
+  Serial.print( ", " );  
+  Serial.print( t, DEC );
+  Serial.println( "." );    
 }
 
 byte computeChecksum( byte * pTrame, int len )
@@ -64,6 +64,8 @@ void receiveBytes(signed short s)
   // Temperature calculated formular: T=((TH<<8)|TL) /340+36.53 ℃
   
   // Checksum：Sum=0x55+0x53+RollH+RollL+PitchH+PitchL+YawH+YawL+TH+TL  
+  
+  const int bDebug = 0;
 
   
   const int nTrameSize = 8;
@@ -85,18 +87,35 @@ void receiveBytes(signed short s)
   {
     if( nTrameLen == nTrameSize )
     {
-      Serial.println("trame finite");
+      if( bDebug )
+      {
+        Serial.println("trame finite");
+        printBuf( aTrame, nTrameLen );
+      }
+      
       // s is now the checksum
       byte nComputedCheckSum = computeChecksum( aTrame, nTrameLen ); // don't forget to add 55 et 53
       nComputedCheckSum += startMark[0]+startMark[1];
-      printBuf( aTrame, nTrameLen );
+
+      if( bDebug )
+      {
+        Serial.print("computed crc: 0x");
+        Serial.println(nComputedCheckSum, HEX);
+        Serial.print("coded crc: 0x");
+        Serial.println(s, HEX);      
+      }
+      
+      
       if( nComputedCheckSum == s )
       {
         analyse( aTrame, nTrameLen );
       }
       else
       {
-        Serial.println( "bad checksum" );
+        if( bDebug )
+        {
+          Serial.println( "bad checksum" );
+        }
       }
       nTrameStatus = 0;
       nTrameLen = 0;

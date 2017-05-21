@@ -29,10 +29,10 @@ void printBuf( byte * pTrame, int len )
 
 void analyse( byte * pTrame, int len )
 {
-  short int aX = ((short) (pTrame[1]<<8|pTrame[0]))/32768.0*180;
-  short int aY = ((short) (pTrame[3]<<8|pTrame[2]))/32768.0*180;
-  short int aZ = ((short) (pTrame[5]<<8|pTrame[4]))/32768.0*180;  
-  short int t =  ((short) (pTrame[7]<<8|pTrame[6]))/340.0+36.53; // 13 when at 8, <2 when at -18 (also seen: +36.25)
+  short int aX = ((short) (pTrame[1]<<8|pTrame[0]))/32768.0*1800;
+  short int aY = ((short) (pTrame[3]<<8|pTrame[2]))/32768.0*1800;
+  short int aZ = ((short) (pTrame[5]<<8|pTrame[4]))/32768.0*1800;  
+  short int t =  ((short) (pTrame[7]<<8|pTrame[6]))/34.0+365.30; // 13 when at 8, <2 when at -18 (also seen: +36.25) // add a x10 to see difference
   Serial.print( millis(), DEC );
   Serial.print( ": " );
   Serial.print( aX, DEC );

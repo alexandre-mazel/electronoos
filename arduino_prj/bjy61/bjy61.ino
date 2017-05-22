@@ -7,12 +7,23 @@ int incomingByte = 0;   // for incoming serial data
 byte aTrame[20];
 int nTrameLen = 0;
 int nTrameStatus = 0; // -1: ?, 0: waiting for first mark, 1: waiting for 2nd start mark, 2: in the trame
-void setup() {
+void setup() 
+{
   
-        Serial.begin(9600);
-        Serial.println("DBG: Opening port...");
-        Serial3.begin(115200);
-        Serial.println("DBG: Open...");        
+    Serial.begin(9600);
+    Serial.println("DBG: Opening port...");
+    Serial3.begin(115200);
+    Serial.println("DBG: Open...");   
+ 
+   // send command
+   if( 1 )
+   {  
+     // force a Z axis zero reset
+     Serial3.write( 0XFF );
+     Serial3.write( 0XAA );
+     Serial3.write( 0X52 );
+   }
+   
 }
 
 void printBuf( byte * pTrame, int len )
@@ -29,10 +40,11 @@ void printBuf( byte * pTrame, int len )
 
 void analyse( byte * pTrame, int len )
 {
-  short int aX = ((short) (pTrame[1]<<8|pTrame[0]))/32768.0*1800;
+  short int aX = ((short) (pTrame[1]<<8|pTrame[0]))/32768.0*1800; // // add a x10 to see difference (peut etre qu'un x8 serait plius précis) 
   short int aY = ((short) (pTrame[3]<<8|pTrame[2]))/32768.0*1800;
   short int aZ = ((short) (pTrame[5]<<8|pTrame[4]))/32768.0*1800;  
-  short int t =  ((short) (pTrame[7]<<8|pTrame[6]))/34.0+365.30; // 13 when at 8, <2 when at -18 (also seen: +36.25) // add a x10 to see difference
+  short int t =  ((short) (pTrame[7]<<8|pTrame[6]))/34.0+365.30; // 13 when at 8, <2 when at -18 (also seen: +36.25)
+                                                                 // 26 when at 26, but then 33: the sensor should arise by itself
   Serial.print( millis(), DEC );
   Serial.print( ": " );
   Serial.print( aX, DEC );

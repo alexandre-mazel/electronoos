@@ -4,26 +4,40 @@
 // bought from: https://www.amazon.fr/gp/product/B01LXXHUDR/ref=oh_aui_detailpage_o03_s00?ie=UTF8&psc=1
 
 int incomingByte = 0;   // for incoming serial data
-byte aTrame[20];
-int nTrameLen = 0;
-int nTrameStatus = 0; // -1: ?, 0: waiting for first mark, 1: waiting for 2nd start mark, 2: in the trame
+
+const int nNbrSensor = 3;
+
+HardwareSerial hs[] = {Serial1, Serial2, Serial3};
+
+byte aaTrame[nNbrSensor][20]; // for each sensor
+int anTrameLen[nNbrSensor] = {0,0,0};
+int anTrameStatus[nNbrSensor] = {0, 0,0}; // -1: ?, 0: waiting for first mark, 1: waiting for 2nd start mark, 2: in the trame
+
+
 void setup() 
 {
   
     Serial.begin(9600);
     Serial.println("DBG: Opening port...");
-    Serial3.begin(115200);
+    for( int i = 0; i < nNbrSensor; ++i )
+    {
+      hs[i].begin(115200);
+    }
     Serial.println("DBG: Open...");   
  
    // send command
    if( 1 )
    {  
-     // force a Z axis zero reset
-     Serial3.write( 0XFF );
-     Serial3.write( 0XAA );
-     Serial3.write( 0X52 );
+      for( int i = 0; i < nNbrSensor; ++i )
+      {
+         // force a Z axis zero reset
+         hs[i].write( 0XFF );
+         hs[i].write( 0XAA );
+         hs[i].write( 0X52 );
+      }
    }
-   
+ 
+   Serial.println("DBG: Running...");      
 }
 
 void printBuf( byte * pTrame, int len )
@@ -38,7 +52,7 @@ void printBuf( byte * pTrame, int len )
   Serial.println("");
 }
 
-void analyse( byte * pTrame, int len )
+void analyse( int nNumSensor, byte * pTrame, int len )
 {
   
   short int aX = ((short) (pTrame[1]<<8|pTrame[0]))/32768.0*1800; // // add a x10 to see difference (peut etre qu'un x8 serait plius précis) 
@@ -47,6 +61,8 @@ void analyse( byte * pTrame, int len )
   short int t =  ((short) (pTrame[7]<<8|pTrame[6]))/34.0+365.30; // 13 when at 8, <2 when at -18 (also seen: +36.25)
                                                                  // 26 when at 26, but then 33: the sensor should arise by itself
   Serial.print( millis(), DEC );
+  Serial.print( ": " );  
+  Serial.print( nNumSensor, DEC );
   Serial.print( ": " );
   Serial.print( aX, DEC );
   Serial.print( ", " );
@@ -69,7 +85,7 @@ byte computeChecksum( byte * pTrame, int len )
   return crc;
 }
 
-void receiveBytes(signed short s)
+void receiveBytes(int nNumSensor, signed short s)
 {
   // it looks like (in hex):
   // 55 51 ax_lo ax_hi ay_lo ay_hi az_lo az_hi temp_lo temp_hi checksum; 55 52 and 55 53 are headers for angular velocity and total angle, respectively.
@@ -89,31 +105,31 @@ void receiveBytes(signed short s)
   const int nTrameSize = 8;
   const byte startMark[] = {0x55, 0X53};
 
-  if( nTrameStatus < 2 )
+  if( anTrameStatus[nNumSensor] < 2 )
   {
-    if( s == startMark[nTrameStatus] )
+    if( s == startMark[anTrameStatus[nNumSensor]] )
     {
-      ++nTrameStatus;
+      ++anTrameStatus[nNumSensor];
     }
     else
     {
       //Serial.println(".");
-      nTrameStatus = 0;
+      anTrameStatus[nNumSensor] = 0;
     }
   }
-  else if( nTrameStatus == 2 )
+  else if( anTrameStatus[nNumSensor] == 2 )
   {
-    if( nTrameLen == nTrameSize )
+    if( anTrameLen[nNumSensor] == nTrameSize )
     {
       if( bDebug )
       {
-        Serial.println("trame finite");
-        printBuf( aTrame, nTrameLen );
+        Serial.println( "trame finite" );
+        printBuf( aaTrame[nNumSensor], anTrameLen[nNumSensor] );
       }
       
       // s is now the checksum
-      byte nComputedCheckSum = computeChecksum( aTrame, nTrameLen ); // don't forget to add 55 et 53
-      nComputedCheckSum += startMark[0]+startMark[1];
+      byte nComputedCheckSum = computeChecksum( aaTrame[nNumSensor], anTrameLen[nNumSensor] );
+      nComputedCheckSum += startMark[0]+startMark[1]; // don't forget to add 55 et 53
 
       if( bDebug )
       {
@@ -126,7 +142,7 @@ void receiveBytes(signed short s)
       
       if( nComputedCheckSum == s )
       {
-        analyse( aTrame, nTrameLen );
+        analyse( nNumSensor, aaTrame[nNumSensor], anTrameLen[nNumSensor] );
       }
       else
       {
@@ -135,31 +151,37 @@ void receiveBytes(signed short s)
           Serial.println( "bad checksum" );
         }
       }
-      nTrameStatus = 0;
-      nTrameLen = 0;
+      anTrameStatus[nNumSensor] = 0;
+      anTrameLen[nNumSensor] = 0;
     }
     else
     {
-      aTrame[nTrameLen] = s; ++nTrameLen;
+      aaTrame[nNumSensor][anTrameLen[nNumSensor]] = s; ++anTrameLen[nNumSensor];
     }
     //Serial.println(s, HEX);
   }
   
 }
 
-void loop() {
+void loop() 
+{
+   for( int i = 0; i < nNbrSensor; ++i )
+   {
+        if( hs[i].available() > 0 )
+        {
+            // read the incoming byte:
+            incomingByte = hs[i].read();
+            receiveBytes(i, incomingByte);
 
-        // send data only when you receive data:
-        if (Serial3.available() > 0) {
-                // read the incoming byte:
-                incomingByte = Serial3.read();
-                receiveBytes(incomingByte);
-
-                if( 0 )
-                {
-                  // say what you got:
-                  Serial.print("I received: ");
-                  Serial.println(incomingByte, DEC);
-                }
+            if( 0 )
+            {
+              // say what you got:
+              Serial.print("Sensor");              
+              Serial.print(i, DEC);              
+              Serial.print(": ");
+              Serial.print("received: ");
+              Serial.println(incomingByte, DEC);
+            }
         }
+   }
 }

@@ -11,13 +11,16 @@ HardwareSerial hs[] = {Serial1, Serial2, Serial3};
 
 byte aaTrame[nNbrSensor][20]; // for each sensor
 int anTrameLen[nNbrSensor] = {0,0,0};
-int anTrameStatus[nNbrSensor] = {0, 0,0}; // -1: ?, 0: waiting for first mark, 1: waiting for 2nd start mark, 2: in the trame
+int anTrameStatus[nNbrSensor] = {0,0,0}; // -1: ?, 0: waiting for first mark, 1: waiting for 2nd start mark, 2: in the trame
+int anLastX[nNbrSensor] = {0,0,0};
+int nCptFrame = 0;
+unsigned long timeLastOutput = 0;
 
-
-void setup() 
+void setup()
 {
   
-    Serial.begin(9600);
+    Serial.begin(9600); // Not only for debug, but also for external communication
+    
     Serial.println("DBG: Opening port...");
     for( int i = 0; i < nNbrSensor; ++i )
     {
@@ -60,18 +63,28 @@ void analyse( int nNumSensor, byte * pTrame, int len )
   short int aZ = ((short) (pTrame[5]<<8|pTrame[4]))/32768.0*1800;  
   short int t =  ((short) (pTrame[7]<<8|pTrame[6]))/34.0+365.30; // 13 when at 8, <2 when at -18 (also seen: +36.25)
                                                                  // 26 when at 26, but then 33: the sensor should arise by itself
-  Serial.print( millis(), DEC );
-  Serial.print( ": " );  
-  Serial.print( nNumSensor, DEC );
-  Serial.print( ": " );
-  Serial.print( aX, DEC );
-  Serial.print( ", " );
-  Serial.print( aY, DEC );
-  Serial.print( ", " );
-  Serial.print( aZ, DEC );
-  Serial.print( ", " );  
-  Serial.print( t, DEC );
-  Serial.println( "." );    
+                                                                 
+  anLastX[nNumSensor] = aX;
+  if( 0 )
+  {
+    Serial.print( "# " );                                                                 
+    Serial.print( millis(), DEC );
+    Serial.print( ": " );  
+    Serial.print( nNumSensor, DEC );
+    Serial.print( ": " );
+    for( int i = 0; i < nNumSensor; ++i )
+    {
+      Serial.print( "                    " );
+    }
+    Serial.print( aX, DEC );
+    Serial.print( ", " );
+    Serial.print( aY, DEC );
+    Serial.print( ", " );
+    Serial.print( aZ, DEC );
+    Serial.print( ", " );  
+    Serial.print( t, DEC );
+    Serial.println( "." );    
+  }
 }
 
 byte computeChecksum( byte * pTrame, int len )
@@ -184,4 +197,40 @@ void loop()
             }
         }
    }
+   ++nCptFrame;
+   if( millis() - timeLastOutput > 200 )
+   {
+      if( 1 )
+      {
+        Serial.print( "# " );     
+        Serial.print( millis(), DEC );
+        Serial.print( ", fps: " );
+        Serial.println( ((long)nCptFrame * 1000.) / (millis() - timeLastOutput) );
+      }
+      timeLastOutput = millis();      
+      nCptFrame = 0;
+      
+      Serial.print("XXX");
+      for( int i = 0; i < nNbrSensor; ++i )
+      {
+        // output as a sign and 4 chars: +9999 zeropadded
+        short int v = anLastX[i];
+        char s = '+';
+        if( v < 0 )
+        {
+          s = '-';
+          v = -v;
+        }
+        Serial.print(s);
+        Serial.print(v/1000, DEC);
+        v -= (v/1000)*1000;        
+        Serial.print(v/100, DEC);
+        v -= (v/100)*100;
+        Serial.print(v/10, DEC);
+        v -= (v/10)*10;        
+        Serial.print(v, DEC);
+      }
+      Serial.println( "" );            
+   }
+   //delay(0); // fps (outputted every sec): delay(1) => 860fps, delay(0) => 6500fps // pas de delay => 6687fps
 }

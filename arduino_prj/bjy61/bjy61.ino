@@ -40,6 +40,7 @@ void printBuf( byte * pTrame, int len )
 
 void analyse( byte * pTrame, int len )
 {
+  
   short int aX = ((short) (pTrame[1]<<8|pTrame[0]))/32768.0*1800; // // add a x10 to see difference (peut etre qu'un x8 serait plius précis) 
   short int aY = ((short) (pTrame[3]<<8|pTrame[2]))/32768.0*1800;
   short int aZ = ((short) (pTrame[5]<<8|pTrame[4]))/32768.0*1800;  

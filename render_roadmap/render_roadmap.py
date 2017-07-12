@@ -349,6 +349,7 @@ tl20 = [
 tl21 = [
                 [ "10/2016", 1.75, "EL: Basic Blob Grasping"],
                 [ "12/2016", 2., "EL: User Recognition Implementation (Audio)", 2],
+                [ "02/2017", 2., "EL: Hopias News", 1],
                 
         ]
 
@@ -396,7 +397,7 @@ taskGroup4 = [tl40,tl41,tl42]
 taskGroupList = [taskGroup1, taskGroup2,taskGroup3,taskGroup4]
 legends = ["Previous task to finish", "Pepper@Work", "Exploratory", "Applied Intern AI Lab" ]
     
-img = renderRoadMap( "09/2016", 6, taskGroupList, legends )
+img = renderRoadMap( "09/2016", 7, taskGroupList, legends )
 
 strWindowName = "roadmap"
 cv2.namedWindow( strWindowName, 0 )

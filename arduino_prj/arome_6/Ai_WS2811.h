@@ -28,7 +28,7 @@
 // transform hue to RGB
 void hueToRGB( int nHue, uint8_t * prRet, uint8_t * pgRet, uint8_t * pbRet );
 
-# on a good compilator, we should use enum...
+//on a good compilator, we should use enum...
 #define BANK_A 0
 #define BANK_B 1
 #define BANK_C 2
@@ -87,6 +87,10 @@ class Ai_WS2811
     
   private:
     void applyDim(void);
+    
+    void sendLedData_BankB(void);
+    void sendLedData_BankC(void);    
+    void sendLedData_BankL(void);    
   
 };
 

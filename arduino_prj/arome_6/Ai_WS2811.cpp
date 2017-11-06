@@ -139,8 +139,8 @@ void Ai_WS2811::init(uint8_t pin, uint16_t nPixels)
   else if( pin == 30 )
   {
     m_nNumBit = 7;
-    m  
-  
+    m_nNumBank = BANK_C; 
+  }
   // bank L
   
   else if( pin == 49 )  // a partir de la c'est aussi not tested!

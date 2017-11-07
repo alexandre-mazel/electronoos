@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <util/delay.h>
 
+// v0.72: add multi pin/port/ddr handling
 // v0.71: document and debug setHue
 // v0.70: setOneBrightOtherLow
 // v0.66: add setonlyone
@@ -12,15 +13,33 @@
 // v0.6: add dim and version !
 
 // Assume Arduino Uno, digital pin 8 lives in Port B
+// changed also to handle Mega2560
 
-#define LED_DDR DDRB
-#define LED_PORT PORTB
-#define LED_PIN PINB
+/*
+#define LED_DDR DDRB # input or output ?
+#define LED_PORT PORTB # high or low?
+#define LED_PIN PINB # read value
+*/
+
 #define LED_BIT _BV(m_nNumBit)
 #define NOP __asm__("nop\n\t")
 
+
 // transform hue to RGB
 void hueToRGB( int nHue, uint8_t * prRet, uint8_t * pgRet, uint8_t * pbRet );
+
+//on a good compilator, we should use enum...
+#define BANK_A 0
+#define BANK_B 1
+#define BANK_C 2
+#define BANK_D 3
+#define BANK_E 4
+#define BANK_F 5
+#define BANK_G 6
+#define BANK_H 7
+#define BANK_I 8
+#define BANK_K 9
+#define BANK_L 10
 
 
 class Ai_WS2811 
@@ -33,6 +52,7 @@ class Ai_WS2811
     unsigned char *m_pDataEnd;
     unsigned int  m_nNumBit; // 0 => 53, 1 => 51, 2 => 52...
     unsigned int  m_nDimCoef; // set a coef to dim
+    unsigned int  m_nNumBank; // the letter of the bank to use: BANK_x
 
   public:
     byte _r, _g, _b;
@@ -67,6 +87,10 @@ class Ai_WS2811
     
   private:
     void applyDim(void);
+    
+    void sendLedData_BankB(void);
+    void sendLedData_BankC(void);    
+    void sendLedData_BankL(void);    
   
 };
 

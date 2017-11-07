@@ -235,7 +235,7 @@ def renderRoadMap( strStartDate, nNbrMonth, aListTaskGroups, aLegends = [] ):
 
     #~ nNbrTaskLine = len(aListTask)
     #~ nTaskWidth = 30
-    aTaskLineColor = [ (199, 133,62), (50, 255, 100), (50, 195,241), (120,76,125) ]
+    aTaskLineColor = [ (50, 255, 100), (50, 195,241), (120,76,125), (199, 133,62) ]
     taskColorText = (0, 0, 0)
     nTaskLineH = 48*rMagnify # was 50
     nTaskLineSpacing = 13*rMagnify # change here to have more or less spaces between each task line (was 20)
@@ -253,6 +253,8 @@ def renderRoadMap( strStartDate, nNbrMonth, aListTaskGroups, aLegends = [] ):
                 nArrowFlag = 3
                 
                 task = aListTaskGroups[nNumTaskLineGroup][nNumTaskLine][nNumTask]
+                if len(task) < 1:
+                    continue
                 if( len(task) == 3 ):
                     task.append(nNumTaskLineGroup) # default color
                     
@@ -291,8 +293,13 @@ def renderRoadMap( strStartDate, nNbrMonth, aListTaskGroups, aLegends = [] ):
     cv2.rectangle( img, (nSizeX - nMargin,0),(nSizeX,nSizeY), (255,255,255),  -1 ) # -1 for full filled (cv2.CV_FILLED)
     
     # legends
+    # up right
     xLegend = int(nSizeX*0.79)
-    yLegend = int((nTaskLineH+nMargin)*rMagnify)
+    yLegend = int((nTaskLineH+nMargin)*rMagnify*1.7) # *1.2: modifier to move it down
+    # bottom left
+    xLegend = int(nSizeX*0.04)
+    yLegend = int(nSizeY*0.9)
+    
     nNumLegend = 0
     rScale /= 1.5
     nMarginLegend = int(20*rScale)
@@ -325,49 +332,51 @@ def renderRoadMap( strStartDate, nNbrMonth, aListTaskGroups, aLegends = [] ):
 # renderRoadMap - end    
 
 tl1 = [
-                [ "08/2016", 3., "EL: Tanuki Demo"],
+                [ "07/2017", 1., "MM+EL+MB+JM: Grasp: SOA"],
+                [ "08/2017", 3., "EL+MB+JM: Grasping: Scenario 1"],
+                [ "11/2017", 3., "EL+MB+JM+NL: Grasping: Scenario 2"],
+                
         ]
         
 tl2 = [
-                [ "08/2016", 3., "MB: Tanuki Demo"],
+                [ "07/2017", 3, "NL+AM: Adapted Pepper"],           
         ]        
 
 tl3 = [
-                [ "08/2016", 2.5, "JM: Top Body Skeleton (3D)"],                
         ]       
 
-tl4 = [
-                [ "08/2016", 2.5, "AM: Romeo Software Release"],                
+tl4 = [  
         ]            
            
         
 tl20 = [
-                [ "11/2016", 1, "JM: Random Goal"],
-                [ "12/2016", 1., "JM: Integration"],
-                [ "01/2017", 1.5, "JM: Navigation Experimentation", 2],
+                [ "07/2017", 8, "JM: Follow Audio Group"],
         ]              
 tl21 = [
-                [ "10/2016", 1.75, "EL: Basic Blob Grasping"],
-                [ "12/2016", 2., "EL: User Recognition Implementation (Audio)", 2],
-                [ "02/2017", 2., "EL: Hopias News", 1],
-                
+                [ "07/2017", 2, "EL: Launch Vision Group"],  
+                [ "09/2017", 6, "EL: Follow Vision Group"],                  
         ]
 
 tl22 = [
-                [ "10/2016", 1.75, "MB: Reco & Short Dialog"],
-                [ "12/2016", 3., "MB: Conversational Dialog based on internal knowledge", 2],
+                [ "07/2017", 8, "MB/VP: Follow Semantic Group"],
                 
         ]
         
-tl23 = [
-                [ "09/2016", 1, "MB: Romeo2: pre-test"],
-                [ "10/2016", 6, "MB: Romeo2: Hospital test"],
-                
+tl23 = [    
+                [ "07/2017", 8, "AM: Follow Navigation Progress"],
+        ]
+
+tl24 = [    
+                [ "07/2017", 8, "AI Lab: Fundamental Research on Developmental Robotics"],
+        ]
+        
+tl25 = [    
+                [ "07/2017", 8, "All: Collaborative Projects and future works specifications"],
         ]
         
 tl30 = [
 
-                [ "09/2016", 4., "NL: Object Detection using Depth, grasping with planification"],
+                [ "06/2017", 36., "VP: Social co-learning for personal robots"],
             ]
             
 tl31 = [
@@ -376,28 +385,33 @@ tl31 = [
         
 tl32 = [
                 [ "01/2016", 36, "MN: Localisation topologique de robots humanoides"],
-        ]            
+        ]
+        
+tl33 = [
+                [ "09/2017", 7., "?+?+?: Social Interactions"],
+            ]       
 
 
 tl40 = [
-                [ "09/2016", 6., "BP: Evaluation of skill-learning algorithms on Pepper (2)"],
+              
         ] 
 tl41 = [
-                [ "10/2016", 6., "??: Learning to identify traversable terrain for Pepper (2D)"],
+                
         ]         
 tl42 = [
         ]         
         
         
         
-taskGroup1 = [tl1, tl2,tl3,tl4]
-taskGroup2 = [tl20,tl21,tl22,tl23]
-taskGroup3 = [tl30,tl31,tl32]
+taskGroup1 = [tl1, tl2]
+taskGroup2 = [tl20,tl21,tl22,tl23,tl24,tl25]
+taskGroup3 = [tl30,tl31,tl32,tl33]
 taskGroup4 = [tl40,tl41,tl42]
-taskGroupList = [taskGroup1, taskGroup2,taskGroup3,taskGroup4]
-legends = ["Previous task to finish", "Pepper@Work", "Exploratory", "Applied Intern AI Lab" ]
+#~ taskGroupList = [taskGroup1, taskGroup2,taskGroup3,taskGroup4]
+taskGroupList = [taskGroup1, taskGroup2,taskGroup3]
+legends = ["Main Task", "Background task", "PhD" ]
     
-img = renderRoadMap( "09/2016", 7, taskGroupList, legends )
+img = renderRoadMap( "07/2017", 7, taskGroupList, legends )
 
 strWindowName = "roadmap"
 cv2.namedWindow( strWindowName, 0 )

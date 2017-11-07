@@ -21,9 +21,10 @@ const char pad[3] PROGMEM = { 0, 0, 0 };
 const int nNbrReader = 3;
 const int nLenCode = 12;
 
-const int nFirstLedPin = 50; // one led per reader
-const int nFirstPresencePin = 30; // one pin per reader // default: 40
-const int nPresencePinInc = 8; // increment to add to jump to next presence pin (default 1)
+const int nFirstLedPin = 42; // one led per reader
+const int nLedPinInc = 1;
+const int nFirstPresencePin = 31; // one pin per reader // default: 40
+const int nPresencePinInc = 2; // increment to add to jump to next presence pin (default 1)
 
 const int nLedPinSendGood3 = 22;
 const int nLedPinReceiveGood3 = 24;
@@ -265,7 +266,7 @@ void setup()
   // setup pin
   for( i = 0; i < nNbrReader; ++i )
   {
-    pinMode( nFirstLedPin+i, OUTPUT );
+    pinMode( nFirstLedPin+i*nLedPinInc, OUTPUT );
     pinMode( nFirstPresencePin+i*nPresencePinInc, INPUT );
   }
   pinMode( nLedPinSendGood3, OUTPUT );
@@ -273,7 +274,7 @@ void setup()
 
   for( i = 0; i < nNbrReader; ++i )
   {
-    aWs2811[i].init(nFirstLedPin+i,NUM_PIXELS);
+    aWs2811[i].init(nFirstLedPin+i*nLedPinInc,NUM_PIXELS);
     apLeds[i] = (struct CRGB*)aWs2811[i].getRGBData();
     aWs2811[i].setDim( 1 );
   }

@@ -22,7 +22,7 @@ const int nNbrReader = 3;
 const int nLenCode = 12;
 
 const int nFirstLedPin = 42; // one led per reader
-const int nLedPinInc = 1;
+const int nLedPinInc = 4;
 const int nFirstPresencePin = 31; // one pin per reader // default: 40
 const int nPresencePinInc = 2; // increment to add to jump to next presence pin (default 1)
 

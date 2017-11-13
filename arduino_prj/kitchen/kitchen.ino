@@ -18,8 +18,8 @@ const int nNbrLeds = 90;
 Ai_WS2811 ws2811;
 struct CRGB * apLeds[1] = {NULL};
 
-const int nPinUsTrig = 8;
-const int nPinUsEcho = 9;
+const int nPinUsTrig = 12;
+const int nPinUsEcho = 11;
 
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
@@ -56,10 +56,9 @@ int readDistance()
   
     delay(150);
     int uS = sonar.ping();
-    Serial.println( uS );  
-  if( uS==0 && 0 )
+  if( uS==0 || 1 )
   {
-    Serial.println("MAX: resetting sensor");
+    //Serial.println("MAX: resetting sensor");
     pinMode(nPinUsEcho, OUTPUT);
     delay(150);
     digitalWrite(nPinUsEcho, LOW);
@@ -67,6 +66,7 @@ int readDistance()
     pinMode(nPinUsEcho, INPUT);
     delay(150);
   }    
+    Serial.println( uS );  // problem du capteur: http://therandomlab.blogspot.fr/2015/05/repair-and-solve-faulty-hc-sr04.html
     return uS;
   
   

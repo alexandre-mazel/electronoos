@@ -17,6 +17,8 @@ const int nNbrLeds = 90;
 Ai_WS2811 ws2811;
 struct CRGB * apLeds[1] = {NULL};
 
+const int nPinUsTrig = 9;
+const int nPinUsEcho = 10;
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 void setup()
@@ -34,6 +36,53 @@ void setup()
   
   Serial.print( "nFirstLedPin: " );
   Serial.println( nFirstLedPin, DEC );
+  
+  pinMode(nPinUsTrig, OUTPUT);
+  digitalWrite(nPinUsTrig, LOW); // La broche TRIGGER doit être à LOW au repos
+  pinMode(nPinUsEcho, INPUT);  
+}
+
+const unsigned long MEASURE_TIMEOUT = 25000UL; // Constantes pour le timeout: 25ms = ~8m à 340m/s
+const float SOUND_SPEED = 340.0 / 1000; // Vitesse du son dans l'air en mm/us
+
+// return the distance in mm
+int readDistance()
+{
+  // 1. Lance une mesure de distance en envoyant une impulsion HIGH de 10µs sur la broche TRIGGER
+  digitalWrite(nPinUsTrig, LOW);
+  delayMicroseconds(2);
+  
+  digitalWrite(nPinUsTrig, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(nPinUsTrig, LOW);
+  
+  // Mesure le temps entre l'envoi de l'impulsion ultrasonique et son écho (si il existe)
+  //long measure = pulseIn(nPinUsEcho, HIGH, MEASURE_TIMEOUT); // if 0 => timeout
+  long measure = pulseIn(nPinUsEcho, HIGH, MEASURE_TIMEOUT );
+  Serial.println( measure );
+  if (measure==0)
+  {
+    Serial.println("MAX: resetting sensor");
+    pinMode(nPinUsEcho, OUTPUT);
+    delay(150);
+    digitalWrite(nPinUsEcho, LOW);
+    delay(150);
+    pinMode(nPinUsEcho, INPUT);
+    delay(150);
+  }
+   
+  // 3. Calcul la distance à partir du temps mesuré
+  float distance_mm = measure / 2.0 * SOUND_SPEED;
+   
+  // Affiche les résultats en mm, cm et m
+  Serial.print(F("Distance: "));
+  Serial.print(distance_mm);
+  Serial.print(F("mm ("));
+  Serial.print(distance_mm / 10.0, 2);
+  Serial.print(F("cm, "));
+  Serial.print(distance_mm / 1000.0, 2);
+  Serial.println(F("m)"));
+  delay(500);
 }
 
 int nFrame = 0;
@@ -45,5 +94,6 @@ void loop()
     ws2811.setColor( nFrame/nCoef, 0, 0 );
     ++nFrame;
   }
+  readDistance();
   delay(1);
 }

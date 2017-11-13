@@ -10,6 +10,7 @@
  * compiled with Arduino 1.0.6
  */
 
+#include "NewPing.h"
 #include "Ai_WS2811.h"
 
 const int nFirstLedPin = 53; // one led per reader
@@ -17,8 +18,9 @@ const int nNbrLeds = 90;
 Ai_WS2811 ws2811;
 struct CRGB * apLeds[1] = {NULL};
 
-const int nPinUsTrig = 9;
-const int nPinUsEcho = 10;
+const int nPinUsTrig = 8;
+const int nPinUsEcho = 9;
+
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 void setup()
@@ -45,9 +47,29 @@ void setup()
 const unsigned long MEASURE_TIMEOUT = 25000UL; // Constantes pour le timeout: 25ms = ~8m à 340m/s
 const float SOUND_SPEED = 340.0 / 1000; // Vitesse du son dans l'air en mm/us
 
+#define MAX_DISTANCE 300
+NewPing sonar(nPinUsTrig, nPinUsEcho, MAX_DISTANCE);
+
 // return the distance in mm
 int readDistance()
 {
+  
+    delay(150);
+    int uS = sonar.ping();
+    Serial.println( uS );  
+  if( uS==0 && 0 )
+  {
+    Serial.println("MAX: resetting sensor");
+    pinMode(nPinUsEcho, OUTPUT);
+    delay(150);
+    digitalWrite(nPinUsEcho, LOW);
+    delay(150);
+    pinMode(nPinUsEcho, INPUT);
+    delay(150);
+  }    
+    return uS;
+  
+  
   // 1. Lance une mesure de distance en envoyant une impulsion HIGH de 10µs sur la broche TRIGGER
   digitalWrite(nPinUsTrig, LOW);
   delayMicroseconds(2);
@@ -58,9 +80,9 @@ int readDistance()
   
   // Mesure le temps entre l'envoi de l'impulsion ultrasonique et son écho (si il existe)
   //long measure = pulseIn(nPinUsEcho, HIGH, MEASURE_TIMEOUT); // if 0 => timeout
-  long measure = pulseIn(nPinUsEcho, HIGH, MEASURE_TIMEOUT );
+  long measure = pulseIn(nPinUsEcho, HIGH );
   Serial.println( measure );
-  if (measure==0)
+  if( measure==0 && 0 )
   {
     Serial.println("MAX: resetting sensor");
     pinMode(nPinUsEcho, OUTPUT);

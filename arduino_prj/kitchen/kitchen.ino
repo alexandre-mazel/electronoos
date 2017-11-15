@@ -55,16 +55,17 @@ int readDistance()
 {
   
     delay(150);
-    int uS = sonar.ping();
-  if( uS==0 || 1 )
+    
+    int uS = sonar.ping_cm(500)*10;
+  if( uS==0 || 0 )
   {
     //Serial.println("MAX: resetting sensor");
     pinMode(nPinUsEcho, OUTPUT);
-    delay(150);
+    //delay(150);
     digitalWrite(nPinUsEcho, LOW);
-    delay(150);
+    delayMicroseconds(200);
     pinMode(nPinUsEcho, INPUT);
-    delay(150);
+    //delay(150);
   }    
     Serial.println( uS );  // problem du capteur: http://therandomlab.blogspot.fr/2015/05/repair-and-solve-faulty-hc-sr04.html
     return uS;
@@ -107,15 +108,41 @@ int readDistance()
   delay(500);
 }
 
-int nFrame = 0;
+int nAnimFrame=0;
+int nLightTimeOut=0;
+int nStage = 0; // 0: wait, 1: on
+int nIntensity=0;
 void loop()
 {
-  int nCoef = 2;
-  if( nFrame <= 255*nCoef )
+  int nDist = readDistance();
+  if( nDist < 200 )
   {
-    ws2811.setColor( nFrame/nCoef, 0, 0 );
-    ++nFrame;
+   if( nStage == 0 )
+   {
+    nStage=1;    
+   }
+   nLightTimeOut = 100;
   }
-  readDistance();
+  
+  if( nStage == 1 )
+  {
+    --nLightTimeOut;
+    if( nLightTimeOut == 0 )
+    {
+      nStage = 0;
+    }      
+  }
+  
+  if( nStage == 0 && nIntensity > 0 )
+  {
+    --nIntensity;
+    ws2811.setColor( nIntensity, 0, 0 );    
+  }
+  if( nStage == 1 && nIntensity < 255 )
+  {
+    ++nIntensity;
+    ws2811.setColor( nIntensity, 0, 0 );
+  }
+  
   delay(1);
 }

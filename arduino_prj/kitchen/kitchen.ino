@@ -51,10 +51,11 @@ const float SOUND_SPEED = 340.0 / 1000; // Vitesse du son dans l'air en mm/us
 NewPing sonar(nPinUsTrig, nPinUsEcho, MAX_DISTANCE);
 
 // return the distance in mm
+int nPrev=0;
 int readDistance()
 {
   
-    delay(150);
+    //delay(150);
     
     int uS = sonar.ping_cm(500)*10;
   if( uS==0 || 0 )
@@ -67,6 +68,9 @@ int readDistance()
     pinMode(nPinUsEcho, INPUT);
     //delay(150);
   }    
+    uS = (nPrev*7+uS*1)/8;
+    nPrev = uS;
+  
     Serial.println( uS );  // problem du capteur: http://therandomlab.blogspot.fr/2015/05/repair-and-solve-faulty-hc-sr04.html
     return uS;
   
@@ -112,23 +116,32 @@ int nAnimFrame=0;
 int nLightTimeOut=0;
 int nStage = 0; // 0: wait, 1: on
 int nIntensity=0;
+int nCptNoMeasure = 0;
 void loop()
 {
-  int nDist = readDistance();
-  if( nDist < 200 )
+  ++nCptNoMeasure;
+  if( nCptNoMeasure > 10 )
   {
-   if( nStage == 0 )
-   {
-    nStage=1;    
-   }
-   nLightTimeOut = 100;
+      int nDist = readDistance();
+      if( nDist < 1800 && nDist != 0 )
+      {
+       if( nStage == 0 )
+       {
+         Serial.println("light on");
+        nStage=1;
+       }
+       nLightTimeOut = 100*5; // 1 min
+      }
+      
+      nCptNoMeasure = 0;
   }
-  
+
   if( nStage == 1 )
   {
     --nLightTimeOut;
     if( nLightTimeOut == 0 )
     {
+     Serial.println("light off");      
       nStage = 0;
     }      
   }
@@ -136,13 +149,13 @@ void loop()
   if( nStage == 0 && nIntensity > 0 )
   {
     --nIntensity;
-    ws2811.setColor( nIntensity, 0, 0 );    
+    ws2811.setColor( nIntensity, nIntensity, nIntensity );    
   }
   if( nStage == 1 && nIntensity < 255 )
   {
     ++nIntensity;
-    ws2811.setColor( nIntensity, 0, 0 );
+    ws2811.setColor( nIntensity, nIntensity, nIntensity );
   }
   
-  delay(1);
+  delay(10);
 }

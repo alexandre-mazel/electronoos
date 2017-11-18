@@ -14,7 +14,7 @@
 #include "Ai_WS2811.h"
 
 const int nFirstLedPin = 53; // one led per reader
-const int nNbrLeds = 90;
+const int nNbrLeds = 250; // 90
 Ai_WS2811 ws2811;
 struct CRGB * apLeds[1] = {NULL};
 
@@ -117,13 +117,15 @@ int nLightTimeOut=0;
 int nStage = 0; // 0: wait, 1: on
 int nIntensity=0;
 int nCptNoMeasure = 0;
-void loop()
+
+void reactUS( void )
 {
-  ++nCptNoMeasure;
+    ++nCptNoMeasure;
   if( nCptNoMeasure > 10 )
   {
-      int nDist = readDistance();
-      if( nDist < 1800 && nDist != 0 )
+      //int nDist = readDistance();
+      //if( nDist < 1800 && nDist != 0 )
+      if(1)
       {
        if( nStage == 0 )
        {
@@ -156,6 +158,25 @@ void loop()
     ++nIntensity;
     ws2811.setColor( nIntensity, nIntensity, nIntensity );
   }
+ 
+}
+void justLightOn( void )
+{
+  if( nAnimFrame <= 255 )
+  {
+    ws2811.setColor( nAnimFrame, nAnimFrame, nAnimFrame );
+  }
+  else if( nAnimFrame % 100 == 0 )
+  {
+    ws2811.setColor( 255, 255, 255 );    
+  }
   
+  ++nAnimFrame;  
+  
+}
+void loop()
+{
+ // reactUS();
+ justLightOn();
   delay(10);
 }

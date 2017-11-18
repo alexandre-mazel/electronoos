@@ -14,7 +14,7 @@
 #include "Ai_WS2811.h"
 
 const int nFirstLedPin = 53; // one led per reader
-const int nNbrLeds = 250; // 90
+const int nNbrLeds = 90; // 90
 Ai_WS2811 ws2811;
 struct CRGB * apLeds[1] = {NULL};
 
@@ -157,26 +157,39 @@ void reactUS( void )
   {
     ++nIntensity;
     ws2811.setColor( nIntensity, nIntensity, nIntensity );
-  }
- 
+  } 
 }
+
 void justLightOn( void )
 {
-  if( nAnimFrame <= 255 )
+  if( nAnimFrame <= 196 )
   {
     ws2811.setColor( nAnimFrame, nAnimFrame, nAnimFrame );
+    ++nAnimFrame;    
   }
-  else if( nAnimFrame % 100 == 0 )
-  {
-    ws2811.setColor( 255, 255, 255 );    
-  }
-  
-  ++nAnimFrame;  
-  
 }
+
+void vuMeterOn( void )
+{
+  ws2811.setDim( 2 );
+  if( nAnimFrame <= 10000/80 )
+  {
+    ws2811.setVumeter( nAnimFrame*80 );
+    ++nAnimFrame;    
+  }
+  else if( nAnimFrame < 10000/80+4 )
+  {
+    ws2811.setDim( 1 );    
+    ws2811.setColor( 200, 200, 200 );    
+    ++nAnimFrame;
+  }
+}
+
 void loop()
 {
  // reactUS();
- justLightOn();
+ // justLightOn();
+ vuMeterOn();
+ 
   delay(10);
 }

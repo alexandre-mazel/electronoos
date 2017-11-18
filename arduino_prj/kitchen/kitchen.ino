@@ -180,8 +180,26 @@ void vuMeterOn( void )
   else if( nAnimFrame < 10000/80+4 )
   {
     ws2811.setDim( 1 );    
-    ws2811.setColor( 200, 200, 200 );    
+    ws2811.setColor( 200, 200, 200 );  
     ++nAnimFrame;
+  }
+  else
+  {
+    // extinction automatique
+    int i;
+    for( i = 0; i < 20*60; ++i ) // 20min
+    {
+      delay(1000);
+    }
+    for( i=200;i>=0;--i)
+     {
+       ws2811.setColor( i, i, i );
+       delay(20);
+     }
+     for(;;)
+     {
+       delay(10000); // end of program
+     }
   }
 }
 

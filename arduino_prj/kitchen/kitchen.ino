@@ -180,14 +180,21 @@ void vuMeterOn( void )
   else if( nAnimFrame < 10000/80+4 )
   {
     ws2811.setDim( 1 );    
-    ws2811.setColor( 200, 200, 200 );  
+    ws2811.setColor( 200, 200, 200 );
+    for( int j = 0; j < 5; ++j )
+    {
+      // 5 first one full bright for cuisiniere
+      apLeds[0][j].g = 255;
+      apLeds[0][j].r = 255;
+      apLeds[0][j].b = 255;      
+    }
     ++nAnimFrame;
   }
   else
   {
     // extinction automatique
     int i;
-    for( i = 0; i < 20*60; ++i ) // 20min
+    for( i = 0; i < 30*60; ++i ) // 30min
     {
       delay(1000);
     }
@@ -196,6 +203,7 @@ void vuMeterOn( void )
        ws2811.setColor( i, i, i );
        delay(20);
      }
+     ws2811.setOnlyOne( 45, 0, 255, 0 );
      for(;;)
      {
        delay(10000); // end of program

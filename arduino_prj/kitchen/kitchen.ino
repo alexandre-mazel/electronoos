@@ -188,7 +188,9 @@ void vuMeterOn( void )
       apLeds[0][j].r = 255;
       apLeds[0][j].b = 255;      
     }
+    ws2811.sendLedData();
     ++nAnimFrame;
+    
   }
   else
   {
@@ -210,12 +212,55 @@ void vuMeterOn( void )
      }
   }
 }
+int nLifeMax = 500; // 2000
+int nLife = nLifeMax;
+int nColor=1; // red/green/blue/violet/...
+int nIdx = 0;
+int nDir = 1;
+int nMotif = 0;
+void party()
+{
+  if( nLife > 0 )
+  {
+    if( nMotif == 0 )
+    {
+      ws2811.setOneBrightOtherLow( nNbrLeds, 0, nIdx, 255, 0, 0, 10, 10, 10 );
+      ws2811.sendLedData();
+      //delay(10);
+    }
+    else if( nMotif == 1 )
+    {
+      ws2811.setOnlyOne( random(10000), 255, 50, 50 );
+      //delay(80);
+    }
+    
+    nIdx += nDir;
+    if( nIdx >= nNbrLeds || nIdx < 0 )
+    {
+      nDir *= -1;
+      nIdx += nDir;
+      nIdx += nDir;
+    }
+    --nLife;
+  }
+  else
+  {
+    nLife = nLifeMax;
+    nMotif +=1;
+    if( nMotif > 1 )
+    {
+      nMotif = 0;
+    }
+  }
+ 
+}
 
 void loop()
 {
  // reactUS();
  // justLightOn();
- vuMeterOn();
+  //vuMeterOn();
+ party();
  
   delay(10);
 }

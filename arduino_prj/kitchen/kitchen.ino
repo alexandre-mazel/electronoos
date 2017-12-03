@@ -211,13 +211,14 @@ void vuMeterOn( void )
        delay(10000); // end of program
      }
   }
+  delay(20);
 }
-int nLifeMax = 500; // 2000
+int nLifeMax = 2000; // 2000
 int nLife = nLifeMax;
 int nColor=1; // red/green/blue/violet/...
 int nIdx = 0;
 int nDir = 1;
-int nMotif = 0;
+int nMotif = 2;
 void party()
 {
   if( nLife > 0 )
@@ -233,7 +234,34 @@ void party()
       ws2811.setOnlyOne( random(10000), 255, 50, 50 );
       //delay(80);
     }
-    
+    else if( nMotif == 2 )
+    {
+      ws2811.setOnlyOne( random(10000), 255, 50, 50 );
+      ws2811.sendLedData();
+      for( int i=0; i < 20; ++i )
+      {
+        uint8_t grey = random(256);
+        int pix = random(nNbrLeds);
+        apLeds[0][pix].g = grey;
+        apLeds[0][pix].r = grey;
+        apLeds[0][pix].b = grey;
+      }
+      ws2811.sendLedData();
+      delay(4);      
+    }
+    else if( nMotif == 3 )
+    {
+      ws2811.setOnlyOne( random(10000), 255, 50, 50 );
+      ws2811.sendLedData();
+      for( int i=0; i < 20; ++i )
+      {
+        apLeds[0][random(nNbrLeds)].g = random(256);
+        apLeds[0][random(nNbrLeds)].r = random(256);
+        apLeds[0][random(nNbrLeds)].b = random(256);        
+      }
+      ws2811.sendLedData();
+      delay(4);
+    }    
     nIdx += nDir;
     if( nIdx >= nNbrLeds || nIdx < 0 )
     {
@@ -247,7 +275,7 @@ void party()
   {
     nLife = nLifeMax;
     nMotif +=1;
-    if( nMotif > 1 )
+    if( nMotif > 3 )
     {
       nMotif = 0;
     }
@@ -262,5 +290,5 @@ void loop()
   //vuMeterOn();
  party();
  
-  delay(10);
+  delay(1);
 }

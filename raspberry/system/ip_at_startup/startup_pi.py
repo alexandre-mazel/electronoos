@@ -32,7 +32,7 @@ def executeAndGetResults(strCommand, bVerbose = False ):
 
 def publishIP():
     strHostname = executeAndGetResults( "hostname" );
-    strIP = executeAndGetResults( "hostname -I" );
+    strIP = executeAndGetResults( "hostname -I" ).strip().replace(" ","/");
     os.system( "wget -O /tmp/out.log 'http://perso.ovh.net/~mangedisf/mangedisque//Alma/info/inform.php?host=%s&ip=%s'" % (strHostname,strIP) );
 # publishIP - end
 

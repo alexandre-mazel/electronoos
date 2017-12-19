@@ -169,6 +169,8 @@ void justLightOn( void )
   }
 }
 
+void christmas();
+
 void vuMeterOn( void )
 {
   ws2811.setDim( 2 );
@@ -206,9 +208,16 @@ void vuMeterOn( void )
        delay(20);
      }
      ws2811.setOnlyOne( 45, 0, 255, 0 );
-     for(;;)
+     if( 0 )
      {
-       delay(10000); // end of program
+       for(;;)
+       {
+         delay(10000); // end of program
+       }
+     }
+     else
+     {
+       christmas();
      }
   }
   delay(20);
@@ -283,12 +292,59 @@ void party()
  
 }
 
+void christmas()
+{
+   while( 1 )
+   {
+     int nSwitch = random( 2 ); // 3 => 2 coup sur 3 la guirlande cool
+     //nSwitch = 0;
+     if( nSwitch != 0 )
+     {
+       for( int j = 0; j < 10; ++j )
+       {
+         int nPause = 500;
+         ws2811.setColor( 255, 0, 0 );
+         delay(nPause);
+         ws2811.setColor( 0, 255, 0 );
+         delay(nPause); 
+         ws2811.setColor( 0, 0, 255 );
+         delay(nPause);
+         ws2811.setColor( 128, 0, 128 );
+         delay(nPause);
+         ws2811.setColor( 128, 128, 0 );
+         delay(nPause);       
+         ws2811.setColor( 0, 128, 128 );
+         delay(nPause);              
+       }
+     }
+     else
+     {
+       for( int j = 0; j < 300; ++j )
+       {         
+          ws2811.setOnlyOne( random(10000), 255, 50, 50 );
+          //ws2811.sendLedData();
+          for( int i=0; i < 30; ++i )
+          {
+            uint8_t grey = random(256);
+            int pix = random(nNbrLeds);
+            apLeds[0][pix].g = grey;
+            apLeds[0][pix].r = grey;
+            apLeds[0][pix].b = grey;
+          }
+          ws2811.sendLedData();
+          delay(40);       
+       }
+     }
+   }
+}
+
+
 void loop()
 {
  // reactUS();
  // justLightOn();
-  //vuMeterOn();
- party();
+  vuMeterOn();
+ //party();
  
   delay(1);
 }

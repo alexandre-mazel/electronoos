@@ -8,7 +8,7 @@ par exemple:
 # rc.local
 ...
 
-python /home/pi/startup_pi.py
+python /home/pi/startup_pi.py&
 
 exit 0
 <eof>

@@ -34,7 +34,7 @@ def executeAndGetResults(strCommand, bVerbose = False ):
 def publishIP():
     time.sleep(20); # time for network to be started
     strHostname = executeAndGetResults( "hostname" );
-    strIP = executeAndGetResults( "hostname -I" ).strip().replace(" ","/");
+    strIP = executeAndGetResults( "hostname -I" ).strip().replace(" ", "/");
     os.system( "wget -O /tmp/out.log 'http://perso.ovh.net/~mangedisf/mangedisque//Alma/info/inform.php?host=%s&ip=%s'" % (strHostname,strIP) );
 # publishIP - end
 
@@ -44,4 +44,5 @@ def launch_sound_server():
 # launch_sound_server - end
 
 publishIP();
-launch_sound_server();
+#launch_sound_server();
+

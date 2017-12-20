@@ -169,6 +169,8 @@ void justLightOn( void )
   }
 }
 
+void christmas();
+
 void vuMeterOn( void )
 {
   ws2811.setDim( 2 );
@@ -188,7 +190,9 @@ void vuMeterOn( void )
       apLeds[0][j].r = 255;
       apLeds[0][j].b = 255;      
     }
+    ws2811.sendLedData();
     ++nAnimFrame;
+    
   }
   else
   {
@@ -204,18 +208,143 @@ void vuMeterOn( void )
        delay(20);
      }
      ws2811.setOnlyOne( 45, 0, 255, 0 );
-     for(;;)
+     if( 0 )
      {
-       delay(10000); // end of program
+       for(;;)
+       {
+         delay(10000); // end of program
+       }
+     }
+     else
+     {
+       christmas();
      }
   }
+  delay(20);
 }
+int nLifeMax = 2000; // 2000
+int nLife = nLifeMax;
+int nColor=1; // red/green/blue/violet/...
+int nIdx = 0;
+int nDir = 1;
+int nMotif = 2;
+void party()
+{
+  if( nLife > 0 )
+  {
+    if( nMotif == 0 )
+    {
+      ws2811.setOneBrightOtherLow( nNbrLeds, 0, nIdx, 255, 0, 0, 10, 10, 10 );
+      ws2811.sendLedData();
+      //delay(10);
+    }
+    else if( nMotif == 1 )
+    {
+      ws2811.setOnlyOne( random(10000), 255, 50, 50 );
+      //delay(80);
+    }
+    else if( nMotif == 2 )
+    {
+      ws2811.setOnlyOne( random(10000), 255, 50, 50 );
+      ws2811.sendLedData();
+      for( int i=0; i < 20; ++i )
+      {
+        uint8_t grey = random(256);
+        int pix = random(nNbrLeds);
+        apLeds[0][pix].g = grey;
+        apLeds[0][pix].r = grey;
+        apLeds[0][pix].b = grey;
+      }
+      ws2811.sendLedData();
+      delay(4);      
+    }
+    else if( nMotif == 3 )
+    {
+      ws2811.setOnlyOne( random(10000), 255, 50, 50 );
+      ws2811.sendLedData();
+      for( int i=0; i < 20; ++i )
+      {
+        apLeds[0][random(nNbrLeds)].g = random(256);
+        apLeds[0][random(nNbrLeds)].r = random(256);
+        apLeds[0][random(nNbrLeds)].b = random(256);        
+      }
+      ws2811.sendLedData();
+      delay(4);
+    }    
+    nIdx += nDir;
+    if( nIdx >= nNbrLeds || nIdx < 0 )
+    {
+      nDir *= -1;
+      nIdx += nDir;
+      nIdx += nDir;
+    }
+    --nLife;
+  }
+  else
+  {
+    nLife = nLifeMax;
+    nMotif +=1;
+    if( nMotif > 3 )
+    {
+      nMotif = 0;
+    }
+  }
+ 
+}
+
+void christmas()
+{
+   while( 1 )
+   {
+     int nSwitch = random( 2 ); // 3 => 2 coup sur 3 la guirlande cool
+     //nSwitch = 0;
+     if( nSwitch != 0 )
+     {
+       for( int j = 0; j < 10; ++j )
+       {
+         int nPause = 500;
+         ws2811.setColor( 255, 0, 0 );
+         delay(nPause);
+         ws2811.setColor( 0, 255, 0 );
+         delay(nPause); 
+         ws2811.setColor( 0, 0, 255 );
+         delay(nPause);
+         ws2811.setColor( 128, 0, 128 );
+         delay(nPause);
+         ws2811.setColor( 128, 128, 0 );
+         delay(nPause);       
+         ws2811.setColor( 0, 128, 128 );
+         delay(nPause);              
+       }
+     }
+     else
+     {
+       for( int j = 0; j < 300; ++j )
+       {         
+          ws2811.setOnlyOne( random(10000), 255, 50, 50 );
+          //ws2811.sendLedData();
+          for( int i=0; i < 30; ++i )
+          {
+            uint8_t grey = random(256);
+            int pix = random(nNbrLeds);
+            apLeds[0][pix].g = grey;
+            apLeds[0][pix].r = grey;
+            apLeds[0][pix].b = grey;
+          }
+          ws2811.sendLedData();
+          delay(40);       
+       }
+     }
+   }
+}
+
 
 void loop()
 {
  // reactUS();
  // justLightOn();
- vuMeterOn();
+  vuMeterOn();
+ //party();
  
-  delay(10);
+  delay(1);
 }

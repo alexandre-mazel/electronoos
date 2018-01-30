@@ -208,8 +208,9 @@ void vuMeterOn( void )
        delay(20);
      }
      ws2811.setOnlyOne( 45, 0, 255, 0 );
-     if( 0 )
+     if( 1 )
      {
+       // version boucle infini
        for(;;)
        {
          delay(10000); // end of program
@@ -217,6 +218,7 @@ void vuMeterOn( void )
      }
      else
      {
+       // version de Noel
        christmas();
      }
   }

@@ -198,7 +198,7 @@ void vuMeterOn( void )
   {
     // extinction automatique
     int i;
-    for( i = 0; i < 30*60; ++i ) // 30min
+    for( i = 0; i < 60*60; ++i ) // 1h00min
     {
       delay(1000);
     }
@@ -207,9 +207,20 @@ void vuMeterOn( void )
        ws2811.setColor( i, i, i );
        delay(20);
      }
+     // juste une verte:
      ws2811.setOnlyOne( 45, 0, 255, 0 );
-     if( 0 )
+     
+     // 4 leds blanche
+    for( int i=0; i < 5; ++i )
+    {
+      apLeds[0][i/5*nNbrLeds].g = 200;
+      apLeds[0][i/5*nNbrLeds].r = 200;
+      apLeds[0][i/5*nNbrLeds].b = 150;        
+    }
+    ws2811.sendLedData();
+     if( 1 )
      {
+       // version boucle infini
        for(;;)
        {
          delay(10000); // end of program
@@ -217,6 +228,7 @@ void vuMeterOn( void )
      }
      else
      {
+       // version de Noel
        christmas();
      }
   }

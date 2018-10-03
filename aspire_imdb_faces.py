@@ -1,20 +1,8 @@
 # get 1000 faces of actors and name
 
+import os
 
-def store_from_page(strAdress):
-    if 0:
-        # python 3.x
-        import urllib.request
-        f = urllib.request.urlopen( strAdress )        
-    else:
-        import urllib
-        f = urllib.urlopen(strAdress)
-    page = f.read()
-    print( page )
-    
-    """
-    Page look like that:
-    
+strPageSample="""
 <a href="/name/nm0000046/?ref_=nmls_pst"
 > <img alt="Vivien Leigh"
 height="209"
@@ -51,18 +39,69 @@ width="140" />
 <a href="/name/nm0001401?ref_=nmls_hd"
 > Angelina Jolie
 </a>            </h3>
-
-    goal: look for 
-    '<a href="/name/nm0000046/?ref_=nmls_pst"
-> <img alt="'
-
-    then height="209"
-src="
-    
     """
+    
+def getWebPage( strAddress ):
+    if 0:
+        # python 3.x
+        import urllib.request
+        f = urllib.request.urlopen( strAddress )        
+    else:
+        import urllib
+        f = urllib.urlopen(strAddress)
+    page = f.read()
+    return page
+
+def store_from_page(strAddress):
+    strPathDst = "./imdb_faces/"
+    try:
+        os.makedirs(strPathDst)
+    except: pass
+    
+    if 0:
+        page = strPageSample
+    else:
+        page =getWebPage( strAddress )
+    #print( page )
+    
+    count = 0
+    
+    while 1:
+        strFirst = '/?ref_=nmls_pst"\n> <img alt="'
+        idxBegin = page.find( strFirst )
+        if idxBegin == -1:
+            break
+        idxBegin += len(strFirst)
+        idxEnd = page[idxBegin:].find('"')
+        strName = page[idxBegin:idxBegin+idxEnd]
+
+        print("strName: %s" % strName )
+        page = page[idxBegin+idxEnd:]
+
+        strSecond = 'height="209"\nsrc="'
+        idxBegin = page.find( strSecond )
+        if idxBegin == -1:
+            break
+        idxBegin += len(strSecond)
+        idxEnd = page[idxBegin:].find('"')
+        strImg = page[idxBegin:idxBegin+idxEnd]
+        print("strImg: %s" % strImg )
+        page = page[idxBegin+idxEnd:]
+        
+        img = getWebPage( strImg )
+        filename = strPathDst + strName.replace( " ", "__" ) + "." + strImg.split(".")[-1]
+        print( "saving to %s" % filename )
+        f = open( filename, "wb" )
+        f.write( img )
+        f.close()
+        
+        count += 1
+        print( "count: %d" % count )
+        
+# store_from_page - end
+    
     
 for i in range( 10 ):
     strPage = "https://www.imdb.com/list/ls058011111/?sort=list_order,asc&mode=detail&page=%d" % (i+1)
     store_from_page( strPage )
-    break
     

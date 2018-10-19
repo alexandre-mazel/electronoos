@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 import sys
 sys.path.append( "C:/Users/amazel/dev/git/protolab_group/abcdk/sdk" )
 
@@ -32,9 +32,9 @@ class Boum:
     def isFinished(self):
         return self.bIsFinished
 
-def generateSong():
+def generateSong( strFilenameDest ):
     aBoum = []
-    rSoundDuration = 90
+    rSoundDuration = 74
     rFrequency = 40
    ##### TODO: rewrite with np !!!
     timeBegin = time.time()
@@ -110,10 +110,27 @@ def generateSong():
             
         rT += 1./nSampling
         # w.addData( [nVal] ) # not optimal
-    
         
+        # fade in & fade out
+        
+        rTimeFadeIn = 2.
+        if rT < rTimeFadeIn:
+            nVal *= rT/rTimeFadeIn
+            
+        rTimeFadeOut = 6. 
+        if rT > rSoundDuration - rTimeFadeOut:
+            nVal *= 1 - ( (rT-(rSoundDuration - rTimeFadeOut))/rTimeFadeOut )
+
+        # hard clipping (l'effet est sympa) (mais on perd des basses saturés)
+        if 0:
+            if( nVal > nMax ):
+                nVal = nMax
+            if( nVal < -nMax ):
+                nVal = -nMax
+            
         #dataBuf += struct.pack( strFormat, nVal )
-        dataBuf.append(nVal)
+
+        dataBuf.append(int(nVal))
         
         # print advancing & more
         nCurT = int(rT)
@@ -126,35 +143,65 @@ def generateSong():
                 if (nCurT%4) == 0:
                     nVol *= 0.7
                 aBoum.append(Boum(40,nVol))
-                # petit delai
+                # petit delai en plus
                 aBoum.append(Boum(40,nVol*0.5, rOffset=0.23))
                 
             #ajout un gros son disto
-            #if nCurT >= 8 and (nCurT % 8)== 1:
-            if nCurT == 32 or nCurT == 48 or nCurT == 64:
-                aBoum.append(Boum(40,nMax*10))
+            if 0:
+                #if nCurT >= 8 and (nCurT % 8)== 1:
+                if nCurT == 32 or nCurT == 48 or nCurT == 64:
+                    aBoum.append(Boum(40,nMax*10))
+                    
+            # petite montée de piano
+            if 1:
+                if nCurT >= 32 and nCurT <= 64 and (nCurT%4)==2:
+                    aBoum.append(Boum(nCurT*10,nMax*0.3))
+            
+            # petit tic
+            if nCurT >= 32 and nCurT < 76:
+                for i in range(2):
+                    dataBuf[-i] = 0
             
             #rFrequency +=(nCurT%4)*6
         #rFrequency+=(45-nCurT) / 1000. #nice aigu
         #rFrequency+=(45-nCurT) / 1000000.
-        rFrequency= 160-abs(rT-45)
+        rFrequency= 100-abs(rT-45)/2
         
-        #~ if rT > 16:
-            #~ break
+        if rT > 40 and 0:
+            break
         
     # while - end
     w.data = np.array(dataBuf, dtype=np.int16)
     w.updateHeaderSizeFromDataLength()
     
-    w.write( "/tmp2/generated.wav" )
+    w.write( strFilenameDest )
     rDuration = time.time()-timeBegin
     print( "INF: sound.generateFatBass: generating a sound of %5.3fs in %5.3fs (%5.2fx RT)" % (rSoundDuration,rDuration,rSoundDuration/rDuration) )
 
     
- # idee: faire un son comme un cylindre ou chaque pixel est une rondeur de son (ou un sinus)
- # puis balancer des images dans ce cylindre (qui vont eteindre certains sinus)
- # ou des visages
- # ou des animaux
- #ou des points caracteristiques d'image/de visages...
-generateSong()
-os.system( '"C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe" c:\\tmp2\\generated.wav' )
+# idee: faire un son comme un cylindre ou chaque pixel est une rondeur de son (ou un sinus)
+# puis balancer des images dans ce cylindre (qui vont eteindre certains sinus)
+# ou des visages
+# ou des animaux
+#ou des points caracteristiques d'image/de visages...
+strFilename  = "c:/tmp2/generated.wav"
+generateSong(strFilename)
+os.system( '"C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe"' + " " + strFilename )
+
+"""
+J'aime a naviguer sur les mers du savoir
+et croire en le bien fondé de la chose.
+Important est le sens du fleuve qui
+décrit a son tour le reve de l'ame.
+Ainsi l'humain aurait été un tout
+sans son unicité virtuelle imbriqué dans sa tete ?
+Mais en quoi le situer la, au lieu de n'importe ou ailleurs ?
+En son centre, en son organe sexué ? 
+en ses pieds racine et lien terrestre ?
+Et pourquoi le dieu ne serait en chacun de nous
+cette chose qui différencie la vie de l'objet ?
+Dans le livre ceci est donné, tel qu'il apparaitrait.
+Car donc toi le connaisseur, aide les autres.
+Apportes leur tes savoirs et doutes.
+Mais jamais ne renchérit.
+"""

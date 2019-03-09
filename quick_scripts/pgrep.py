@@ -5,6 +5,7 @@ import sys
 
 def findInFile( filename, strToMatch ):
     #~ print("INF:findInFile: searching in %s" % filename )
+    strToMatchLower = strToMatch.lower()
     bFirstTime = True
     file = open(filename,"rt")
     nCptLine = 1
@@ -13,13 +14,28 @@ def findInFile( filename, strToMatch ):
         if line == None or len(line) == 0:
             break
         #~ print(l)
-        if strToMatch in line.lower():
+        if strToMatchLower in line.lower():
             if bFirstTime:
                 bFirstTime = False
                 print( "\n***** %s:" % filename )
                 line=line.replace(chr(13),"")
             print( "%5d: %s" % (nCptLine,line) ), # , because each line already finished by a \n, so removing the print eol
         nCptLine += 1
+    #~ print("%s: nbrLines: %d" % (filename,nCptLine))
+    
+    bBinary = True
+    if bBinary:
+        SEEK_SET = 0
+        file = open(filename,"rb") # reopen as binary
+        file.seek(0,SEEK_SET)
+        buf = file.read()
+        #~ if strToMatch in buf:  # search in binary is case sentitiv
+        lenToMatch = len(strToMatch)
+        for i in range(len(buf)-lenToMatch+1):
+            if strToMatch == buf[i:i+lenToMatch]:
+                print( "\n***** %s: (binary file, containing this string)" % filename )
+                break
+
     file.close()
 
 

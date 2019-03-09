@@ -34,7 +34,7 @@ class Boum:
 
 def generateSong( strFilenameDest ):
     aBoum = []
-    rSoundDuration = 74
+    rSoundDuration = 90 # 74
     rFrequency = 40
    ##### TODO: rewrite with np !!!
     timeBegin = time.time()
@@ -121,7 +121,7 @@ def generateSong( strFilenameDest ):
         if rT > rSoundDuration - rTimeFadeOut:
             nVal *= 1 - ( (rT-(rSoundDuration - rTimeFadeOut))/rTimeFadeOut )
 
-        # hard clipping (l'effet est sympa) (mais on perd des basses saturés)
+        # hard clipping (l'effet est sympa) (mais on perd des basses saturÃ©s)
         if 0:
             if( nVal > nMax ):
                 nVal = nMax
@@ -152,7 +152,7 @@ def generateSong( strFilenameDest ):
                 if nCurT == 32 or nCurT == 48 or nCurT == 64:
                     aBoum.append(Boum(40,nMax*10))
                     
-            # petite montée de piano
+            # petite montÃ©e de piano
             if 1:
                 if nCurT >= 32 and nCurT <= 64 and (nCurT%4)==2:
                     aBoum.append(Boum(nCurT*10,nMax*0.3))
@@ -190,18 +190,18 @@ os.system( '"C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe"' + " " + strFilena
 
 """
 J'aime a naviguer sur les mers du savoir
-et croire en le bien fondé de la chose.
+et croire en le bien fondÃ© de la chose.
 Important est le sens du fleuve qui
-décrit a son tour le reve de l'ame.
-Ainsi l'humain aurait été un tout
-sans son unicité virtuelle imbriqué dans sa tete ?
+dÃ©crit a son tour le reve de l'ame.
+Ainsi l'humain aurait Ã©tÃ© un tout
+sans son unicitÃ© virtuelle imbriquÃ© dans sa tete ?
 Mais en quoi le situer la, au lieu de n'importe ou ailleurs ?
-En son centre, en son organe sexué ? 
+En son centre, en son organe sexuÃ© ? 
 en ses pieds racine et lien terrestre ?
 Et pourquoi le dieu ne serait en chacun de nous
-cette chose qui différencie la vie de l'objet ?
-Dans le livre ceci est donné, tel qu'il apparaitrait.
+cette chose qui diffÃ©rencie la vie de l'objet ?
+Dans le livre ceci est donnÃ©, tel qu'il apparaitrait.
 Car donc toi le connaisseur, aide les autres.
 Apportes leur tes savoirs et doutes.
-Mais jamais ne renchérit.
+Mais jamais ne renchÃ©rit.
 """

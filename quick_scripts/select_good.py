@@ -63,6 +63,7 @@ def selectInFolder( strPath ):
     while 1:
         if bReload:
             bReload = False
+            bToDel = False
             if im != None:
                 # draw a computing sign
                 cv2.circle( im, (30,30),20, (255,0,0), -1 )
@@ -152,22 +153,28 @@ def selectInFolder( strPath ):
                     strText = "%d/%d, r:%s/%s"%(int(rSharp), int(rLum),minColor,maxColor)
                     cv2.putText( im, strText, (headOffsetX+40, headOffsetY+50), cv2.FONT_HERSHEY_SIMPLEX, 2, colorText, 4 )
                 headOffsetY += headSizeY
-
-            if nQuality > 0:
-                for i in range(nQuality):
-                    cv2.circle( im, (30+i*40,30),30, (0,255,0), -1 )
-            #~ cv2.rectangle( im, (0, 0), (1000, 1000), (255, 255, 255), 3 ) 
-            #~ print(dir(cv2.cv))
-            cv2.namedWindow( "im", cv2.WND_PROP_FULLSCREEN)
-            cv2.setWindowProperty( "im", cv2.WND_PROP_FULLSCREEN,cv2.cv.CV_WINDOW_FULLSCREEN)
-            #~ return
-            cv2.imshow("im", im )
-            cv2.moveWindow( "im", 0,0 )
             print("DBG: analysing takes: %5.3fs" % (time.time()-timeBegin))
 
-            
+        
+        if nQuality > 0 or 1:
+            for i in range(nQuality):
+                cv2.circle( im, (30+i*80,30),30, (0,255,0), -1 )
+                
+        if bToDel:
+                cv2.circle( im, (100,100),100, (0,0,255), -1 )
+                
+        #~ cv2.rectangle( im, (0, 0), (1000, 1000), (255, 255, 255), 3 ) 
+        #~ print(dir(cv2.cv))
+        cv2.namedWindow( "im", cv2.WND_PROP_FULLSCREEN)
+        cv2.setWindowProperty( "im", cv2.WND_PROP_FULLSCREEN,cv2.cv.CV_WINDOW_FULLSCREEN)
+        #~ return
+        cv2.imshow("im", im )
+        cv2.moveWindow( "im", 0,0 )
+
         key = cv2.waitKey(0)
         print( "key: %d" % key )
+        if key == 3014656:
+            bToDel = True
         if key == 2424832:
             nNumPhoto -= 1
             bReload = True
@@ -185,6 +192,16 @@ def selectInFolder( strPath ):
             nQuality += 1
             if nQuality > 3:
                 nQuality = 0
+                cv2.rectangle( im, (0+0*80,0),(30+3*80,60), (0,0,0), -1 )
+            astrQuality = ["","_pm", "_good", "_perfect"]
+            newname = files[nNumPhoto]
+            for sq in astrQuality:
+                newname = newname.replace(sq, "")
+            newname = newname.replace(".", astrQuality[nQuality]+'.')
+            print("INF: renaming '%s' in '%s'"%(files[nNumPhoto],newname) )
+            os.rename(strPath + files[nNumPhoto],strPath + newname)
+            files[nNumPhoto]=newname
+            
     
 strPath = "C:/Users/amazel/perso/photo18b/2018-07-01_-_CelineStGermain/"
 selectInFolder( strPath )

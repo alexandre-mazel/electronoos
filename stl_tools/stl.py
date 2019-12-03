@@ -7,7 +7,7 @@
 ###########################################################
 
 """
-When invoked from command line, two functionnality are offered:
+When invoked from command line, two functionnalities are offered:
 
 1) quick viewer
 scriptname <stl_file>: will render the file on screen
@@ -375,4 +375,6 @@ if( __name__ == "__main__" ):
     if len(sys.argv)==2:
         viewStl( sys.argv[1])
     if len(sys.argv)==3:
-        splitStl( sys.argv[1], sys.argv[2] )        
+        splitStl( sys.argv[1], sys.argv[2] )
+        
+    splitStl( "C:/Users/amazel/Downloads/PepperBackSmall(5).stl", "/tmp/t" )        

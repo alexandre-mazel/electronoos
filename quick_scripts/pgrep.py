@@ -22,7 +22,10 @@ def findInFile( filename, strToMatch ):
         if line == None or len(line) == 0:
             break
         #~ print(l)
-        if strToMatchLower in line.lower():
+        # try with a double test
+        #if stringmatch.isMatch(line.lower(),strToMatchLower): # will force to enclose the word to look for between * (boring)
+        # if strToMatchLower in line.lower(): # work with singe word, but not with two word separated by a *
+        if strToMatchLower in line.lower() or stringmatch.isMatch(line.lower(),strToMatchLower):
             if bFirstTime:
                 bFirstTime = False
                 print( "\n***** %s:" % filename )
@@ -51,7 +54,7 @@ def findInFile( filename, strToMatch ):
     return nNbrMatch
 
 
-def findInFiles( strPath, strToMatch, mask = '*' ):
+def findInFiles( strPath, strToMatch, strFileMask = '*' ):
     """
     return nbr files analysed, nbr file where match is found and nbr total lines
     """
@@ -69,7 +72,7 @@ def findInFiles( strPath, strToMatch, mask = '*' ):
             nbrFilesWithMatch += nf
             nbrLines += nl
             continue
-        if stringmatch.isMatch(strFile, mask):
+        if stringmatch.isMatch(strFile, strFileMask):
             nl = findInFile(strFullPath,strToMatch)
             if nl > 0:
                 nbrFilesWithMatch += 1
@@ -79,10 +82,10 @@ def findInFiles( strPath, strToMatch, mask = '*' ):
         
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print( "Grep clone\nsyntax: %s <string_to_match> <files_mask>\neg: %s my_string *.py" % ((sys.argv[0],)*2))
+        print( "\n  My Grep-clone v1.0\n\n  syntax: %s <string_to_match> <files_mask>\n\n  eg: %s a_word_in_a_line *.py\n  eg: %s *word1*word2* face*\n  eg: %s any_string_with_some* *" % ((sys.argv[0],)*4))
         exit(-1)
     print("\n")
     strToMatch,mask = sys.argv[1:3]
     na,nf,nl = findInFiles(".",strToMatch,mask.lower())
-    print("Nbr Analysed Files: %d\nNbr Matching Files: %d\nNbr Total Line With Match: %d" % (na,nf,nl) )
+    print("\nNbr Analysed Files: %d\nNbr Matching Files: %d\nNbr Total Line With Match: %d" % (na,nf,nl) )
             

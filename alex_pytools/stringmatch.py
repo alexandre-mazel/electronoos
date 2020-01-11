@@ -24,15 +24,18 @@ def isMatchFill( s, ref ):
     numCurWild = 1
     bInStar = False
     bMatch = False
+    sEatStar = ""
     while 1:
         if len(s) == js:
             if len(ref) == jref:
                 bMatch = True
                 break
             if ref[jref] == '*' and len(ref)==jref+1: # * was the last char
-                dOut["$"+str(numCurWild)] = ""
+                # if not bInStar, sEatStar is ""
+                dOut["$"+str(numCurWild)] = sEatStar
                 bMatch = True
             else:
+                #~ print("DBG: arrived at end of s and not ref: '%s'"% ref)
                 bMatch = False
             break
             
@@ -53,16 +56,18 @@ def isMatchFill( s, ref ):
                 
         if not bInStar:
             if s[js] != ref[jref]:
+                #~ print("DBG: no match of current char: remaining '%s' and '%s'"% (s[js:],ref[jref:]))
                 bMatch = False
                 break
         else:
-            if not isMatch( s[js+1:], ref[jref+1:] ): # and (len(ref) == jref+1 or ref[jref+1] != '*'):
+            if not isMatch( s[js:], ref[jref+1:] ): # and (len(ref) == jref+1 or ref[jref+1] != '*'):
                 # so it remains to eat
                 sEatStar += s[js]
             else:
-                dOut["$"+str(numCurWild)] = sEatStar + s[js]
+                dOut["$"+str(numCurWild)] = sEatStar
                 numCurWild += 1
                 bInStar = False
+                jref += 1
             
             
         js += 1
@@ -102,7 +107,10 @@ def autoTest():
     #assert_check( isMatchFill( "Je m'appelle Alexandre et je suis content.", "*appelle **" ), (True, {"$1":"Je m'", "$2":"A", "$3": "lexandre et je suis content."} ) )
     assert_check( isMatchFill( "Je m'appelle Alexandre et je suis content.", "*appelle **" ), (True, {"$1":"Je m'", "$2":"", "$3": "Alexandre et je suis content."} ) )
         
-        
+    assert_check( isMatch( "define", "*def*" ), True )
+    assert_check( isMatch( "define", "def*" ), True )
+    assert_check( isMatch( "it's defined", "def*" ), False )
+    assert_check( isMatch( "it's defined", "*def*" ), True )
         
         
 if __name__ == "__main__":

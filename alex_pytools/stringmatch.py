@@ -1,5 +1,8 @@
+global_nCountAssert = 0
 def assert_check( value, reference = True ):
-    print( "assert_check: %s ? %s" % (value, reference) )
+    global global_nCountAssert
+    global_nCountAssert += 1
+    print( "%d: assert_check: %s  ?  %s" % (global_nCountAssert,value, reference) )
     if( value != reference ):
         print( "ERR: assert_check: '%s' != '%s'" % (value, reference) )
         assert(0)    
@@ -18,34 +21,50 @@ def isMatchFill( s, ref ):
     dOut = {}
     js = 0 # because "is" is a keyword
     jref = 0
-    numCurWild = 0
+    numCurWild = 1
     bInStar = False
     bMatch = False
     while 1:
         if len(s) == js:
             if len(ref) == jref:
                 bMatch = True
+                break
+            if ref[jref] == '*' and len(ref)==jref+1: # * was the last char
+                dOut["$"+str(numCurWild)] = ""
+                bMatch = True
             else:
                 bMatch = False
             break
+            
         if len(ref) == jref:
-            assert(0)
+            print("DBG: arrived at end of ref: '%s'"% ref)
+            bMatch = False
+            break
                 
         if not bInStar:
             if ref[jref] == '*':
                 bInStar = True
                 sEatStar = ""
+                
         if not bInStar:
             if s[js] != ref[jref]:
                 bMatch = False
                 break
         else:
-            sEatStar += s[js]
+            if not isMatch( s[js+1:], ref[jref+1:] ):
+                # so it remains to eat
+                sEatStar += s[js]
+            else:
+                dOut["$"+str(numCurWild)] = sEatStar + s[js]
+                numCurWild += 1
+                bInStar = False
+            
+            
         js += 1
         if not bInStar:
             jref += 1
            
-    print("DBG: isMatchFill: %s and %s => (%s,%s)" % (s,ref,bMatch,dOut) )
+    print("DBG: isMatchFill: '%s' and '%s' => (%s,%s)" % (s,ref,bMatch,dOut) )
     return bMatch, dOut
 # isMatchFill - end
     
@@ -61,13 +80,14 @@ def autoTest():
     assert_check( isMatch( "tu", "tu" ) )
     assert_check( isMatch( "tu", "ta" ), False )
     assert_check( isMatch( "tu", "tua" ), False )
-    assert_check( isMatch( "tu", "tu*" ) )
-    assert_check( isMatch( "toto.py", "*.py" ) )
+    assert_check( isMatchFill( "tu", "tu*" ), (True, {"$1":""} )  )
+    assert_check( isMatchFill( "toto.py", "*.py" ), (True, {"$1":"toto"} )  )
     assert_check( isMatch( "toto.pa.py", "*.py" ) )
     assert_check( isMatch( "toto.pya", "*.py" ), False )
-    assert_check( isMatch( "toto.pya", "*.py*" ), False )
+    assert_check( isMatch( "toto.pya", "*.py*" ), True )
     assert_check( isMatchFill( "toto.pya", "*.py*" ), (True, {"$1":"toto", "$2":"a"} ) )
-    assert_check( isMatchFill( "Je m'appelle coco et je suis content.", "*appelle * *" ), (True, {"$1":"Je m'", "$2":"coco", "$3": "et je suis content."} ) )
+    assert_check( isMatchFill( "Je m'appelle Alexandre et je suis content.", "*appelle * *" ), (True, {"$1":"Je m'", "$2":"Alexandre", "$3": "et je suis content."} ) )
+    assert_check( isMatchFill( "Je m'appelle Alexandre et je suis content.", "*appelle **" ), (True, {"$1":"Je m'", "$2":"Alexandre", "$3": "et je suis content."} ) )
         
         
         

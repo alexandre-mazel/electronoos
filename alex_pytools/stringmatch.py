@@ -77,6 +77,18 @@ def isMatchFill( s, ref ):
     #~ print("DBG: isMatchFill: '%s' and '%s' => (%s,%s)" % (s,ref,bMatch,dOut) )
     return bMatch, dOut
 # isMatchFill - end
+
+def isMatchFillVar( s, ref ):
+    """
+    same as isMatchFill, but ref can mix some * and some $variable_name
+    eg: "je m'appelle alexandre", "*appelle $name"
+    """
+    js = 0
+    #~ while 1:
+            #~ look for $name, and create a dict idx => name, puis ensuite on remplacera $idx par name
+    #~ for s in ref:
+        #~ if s == '*'
+    
     
     
         
@@ -112,6 +124,8 @@ def autoTest():
     assert_check( isMatch( "it's defined", "def*" ), False )
     assert_check( isMatch( "it's defined", "*def*" ), True )
         
-        
+    assert_check( isMatchFillVar( "Salut, Je m'appelle Alexandre et je suis content!", "*appelle $name *" ), (True, {"$1":"Je m'", "$name":"Alexandre", "$2": "et je suis content."} ) )
+    assert_check( isMatchFillVar( "My adress is 12 Candiotti street.", "My $attribute is $value." ), (True, {"$1":"Je m'", "$name":"Alexandre", "$2": "et je suis content."} ) )
+          
 if __name__ == "__main__":
     autoTest();

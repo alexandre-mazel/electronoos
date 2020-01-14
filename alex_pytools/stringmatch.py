@@ -10,6 +10,20 @@ def assert_check( value, reference = True ):
 def isMatch( s, ref ):
     return isMatchFill(s,ref)[0]
     
+def getFirstWord( s ):
+    """
+    return the first  word in s
+    return "" if word start with a space or ...
+    """
+    sep = " .,;:?!"
+    for i,c in enumerate(s):
+        if c in sep:
+            break
+    else:
+        return s
+    return s[:i]
+    
+    
 def isMatchFill( s, ref ):
     """
     is s match the ref.
@@ -74,20 +88,50 @@ def isMatchFill( s, ref ):
         if not bInStar:
             jref += 1
            
-    #~ print("DBG: isMatchFill: '%s' and '%s' => (%s,%s)" % (s,ref,bMatch,dOut) )
+    print("DBG: isMatchFill: '%s' and '%s' => (%s,%s)" % (s,ref,bMatch,dOut) )
     return bMatch, dOut
 # isMatchFill - end
 
 def isMatchFillVar( s, ref ):
     """
     same as isMatchFill, but ref can mix some * and some $variable_name
+    - variable_name is a string without spaces
     eg: "je m'appelle alexandre", "*appelle $name"
+    
     """
-    js = 0
-    #~ while 1:
-            #~ look for $name, and create a dict idx => name, puis ensuite on remplacera $idx par name
-    #~ for s in ref:
-        #~ if s == '*'
+    jref = 0
+    dIdx = {} # index => var name
+    nNumIdx = 1
+    newref = ""
+    while jref < len(ref):
+        if ref[jref] == '$':
+            w = getFirstWord( ref[jref+1:] )
+            dIdx["$"+str(nNumIdx)] = w
+            jref += len(w)
+            newref += "*"
+            nNumIdx += 1
+        elif ref[jref] == '*':
+            nNumIdx += 1
+            newref += "*"
+        else:
+            newref += ref[jref]
+        jref += 1
+        
+    print("DBG: isMatchFillVar: dIdx:%s" % dIdx )
+    retVal = isMatchFill( s, newref )
+    if not retVal[0]:
+        return retVal
+        
+    dNew = {}
+    nNumStar = 1
+    for k,v in sorted(retVal[1].items()):
+        if k in dIdx:
+            dNew[dIdx[k]] = v
+        else:
+            dNew["$"+str(nNumStar)] = v
+            nNumStar += 1
+    return retVal[0], dNew
+# isMatchFillVar - end
     
     
     
@@ -98,6 +142,12 @@ def isMatchFillVar( s, ref ):
         
         
 def autoTest():
+    assert_check( getFirstWord("toto est la" ), "toto" )
+    assert_check( getFirstWord("tota," ), "tota" )
+    assert_check( getFirstWord("tutu" ), "tutu" )
+    assert_check( getFirstWord("t" ), "t" )
+    assert_check( getFirstWord("," ), "" )
+    assert_check( getFirstWord("" ), "" )
     assert_check( isMatch( "", "" ) )
     assert_check( isMatch( "tu", "tu" ) )
     assert_check( isMatch( "tu", "ta" ), False )
@@ -124,8 +174,9 @@ def autoTest():
     assert_check( isMatch( "it's defined", "def*" ), False )
     assert_check( isMatch( "it's defined", "*def*" ), True )
         
-    assert_check( isMatchFillVar( "Salut, Je m'appelle Alexandre et je suis content!", "*appelle $name *" ), (True, {"$1":"Je m'", "$name":"Alexandre", "$2": "et je suis content."} ) )
-    assert_check( isMatchFillVar( "My adress is 12 Candiotti street.", "My $attribute is $value." ), (True, {"$1":"Je m'", "$name":"Alexandre", "$2": "et je suis content."} ) )
-          
+    assert_check( isMatchFillVar( "Salut, je m'appelle Alexandre et je suis content!", "*appelle $name *" ), (True, {"$1":"Salut, je m'", "name":"Alexandre", "$2": "et je suis content!"} ) )
+    assert_check( isMatchFillVar( "My adress is 12 Candiotti street.", "My $attribute is $value." ), (True, {'attribute': 'adress', 'value': '12 Candiotti street'} ) )
+    assert_check( isMatchFillVar( "My bizness is 43 Main street", "My $attribute is $value" ), (True,  {'attribute': 'bizness', 'value': '43 Main street'} ) )
+            
 if __name__ == "__main__":
     autoTest();

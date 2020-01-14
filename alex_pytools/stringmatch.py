@@ -90,7 +90,7 @@ def isMatchFill( s, ref ):
         if not bInStar:
             jref += 1
            
-    print("DBG: isMatchFill: '%s' and '%s' => (%s,%s)" % (s,ref,bMatch,dOut) )
+    #~ print("DBG: isMatchFill: '%s' and '%s' => (%s,%s)" % (s,ref,bMatch,dOut) )
     return bMatch, dOut
 # isMatchFill - end
 

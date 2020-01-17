@@ -16,7 +16,7 @@ def generate(strPath):
     listImg = sorted(os.listdir(strPath))
     nCpt = 0
     fd = face_detector.FaceDetectOpenCV()
-    for f in listImg[3:]:
+    for f in listImg[:]:
         print("t:%5.2f, f:%s" % (time.time(),f ) )
         filename = strPath+f
         im = cv2.imread(filename)
@@ -27,22 +27,38 @@ def generate(strPath):
         faces = fd.detect_face( im, bCompleteSearch = True )
         print("faces: %s" % str(faces) )
         faces = face_detector.filterFaces(faces, (minFaceSize,minFaceSize))
-        face = faces[0]
-        xf,yf,wf,hf = face
+
         #~ print abcdk.image.getExifInfo( filename, ["Model", "DateTime"] );
+
+        # respect original ratio
+        rOrigRatio = float(w)/h
+        rRenderRatio = float(wrender)/hrender
+        ratioOrigRender = rOrigRatio/rRenderRatio
+        rRatioToApply = rOrigRatio/ratioOrigRender
+        print("ratio: orig: %5.3f, render: %5.3f, ratio: %5.3f, rRatioToApply:%5.3f" % (rOrigRatio,rRenderRatio,ratioOrigRender,rRatioToApply) )
+        
+        
+        
+
+        
+        nSpeedX = 0
+        nSpeedY = 0
+        rZoomX = 0
+        rZoomY = 0
         
         # compute start of crop
-        if 1:
-            margin = 0.1
+        if len(faces)>0:
+            face = faces[0]
+            xf,yf,wf,hf = face
+            margin = 0.5
             while 1:
                 x1o = max(xf-int(wf*margin),0)
                 x2o = min(xf+wf+int(wf*margin),w)
                 y1o = max(yf-int(hf*margin),0)
                 y2o = min(yf+hf+int(hf*margin),h)
-                # respect rendering ratio
-                ratioModifOrigRender = (hrender/float(wrender))/(h/float(w))
+
                 hr = y2o-y1o
-                wr = hr / ratioModifOrigRender
+                wr = hr * rRatioToApply
                 x1o = ((x1o+x2o)/2)-(wr/2)
                 x2o = x1o + wr
         
@@ -58,17 +74,23 @@ def generate(strPath):
                     
                 print("start of crop: %d:%d %d:%d" % (x1o,x2o,y1o,y2o) )
                 
+                if x2o < w and y2o < h:
+                    break
+                margin -= 0.1
+                
+            rZoomX = 0.5
+            rZoomY = 0.5
+                
         else:
-            x1o,x2o = 1000,2000
-            y1o,y2o = 800,800+( (x2o-x1o)*h/w )
+            assert(wrender>=hrender)
+            # center picture in rendering in x, and start from bottom of image
+            x1o,x2o = 0,w
+            y1o,y2o = h-(w/rRatioToApply),h
+            if w<h:
+                nSpeedY = -4
             
+        print("start of crop: %d:%d %d:%d" % (x1o,x2o,y1o,y2o) )
 
-
-        
-        nSpeedX = 0
-        nSpeedY = 0
-        rZoomX = 0
-        rZoomY = 0
         for inc in range(200):
             i = inc
             j = inc
@@ -86,8 +108,9 @@ def generate(strPath):
             if key == 27:
                 return
         nCpt += 1
-        if nCpt > 4:
-            break
+        
+        #~ if nCpt > 4:
+            #~ break
     
     
 generate("D:/temp_photo_pour_auto_montage/")

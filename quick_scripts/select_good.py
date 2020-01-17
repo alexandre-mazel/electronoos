@@ -45,7 +45,7 @@ def filterFacesOnQuality( im, faces ):
 def selectInFolder( strPath ):
     """
     filename will be changed in:
-    IMG_7334_r.JPG
+    IMG_7334_r.JPG or _r1 or _r2 or r3 ... (each a rot of 90deg)
     or
     IMG_7334_r_pm.JPG
     or
@@ -56,10 +56,12 @@ def selectInFolder( strPath ):
     files = filterOnExts( files, ["jpg"] )
         
     fd = face_detector.FaceDetectOpenCV()
-    nNumPhoto = -1 # -1 # -4
+    nNumPhoto = 7 # -1 # -4
     bReload = True
-    nRotate = 0
     im = None
+
+    renderSizeX = 2736
+    renderSizeY = 1824
     while 1:
         if bReload:
             bReload = False
@@ -74,20 +76,30 @@ def selectInFolder( strPath ):
             if nNumPhoto >= len(files):
                 nNumPhoto = nNumPhoto - len(files)
             fname = strPath + files[nNumPhoto]
-            print("INF: loading %s" % files[nNumPhoto] )
+            print("\n\nINF: loading %s" % files[nNumPhoto] )
             timeBegin = time.time()
             photo = cv2.imread( fname ) # IM_READ_IGNORE_ORIENTATION
             print("DBG: loading takes: %5.3fs (%dx%d)" % ((time.time()-timeBegin),photo.shape[1], photo.shape[0]) )
-            if "_r" in files[nNumPhoto]:
-                photo = np.rot90(photo,axes=(0, 1))
+            while photo.shape[0] > renderSizeY:
+                print("INF: This is a big photo, resizing it" )
+                photo = cv2.resize(photo,(photo.shape[1]/2,photo.shape[0]/2))
+                print("INF: newshape: %s" % str(photo.shape))
+                
+            nRotate = 0
+            if "_r1" in files[nNumPhoto]:
+                nRotate = 1
+            elif "_r2" in files[nNumPhoto]:
+                nRotate = 2
+            elif "_r3" in files[nNumPhoto]:
+                nRotate = 3
                 
             nQuality = 0
             if "_pm" in files[nNumPhoto]:
-                nQuality += 1
-            if "_good" in files[nNumPhoto]:
-                nQuality += 1
-            if "_perfect" in files[nNumPhoto]:
-                nQuality += 1
+                nQuality = 1
+            elif "_good" in files[nNumPhoto]:
+                nQuality = 2
+            elif "_perfect" in files[nNumPhoto]:
+                nQuality = 3
                 
             for i in range(nRotate):
                 photo = np.rot90(photo,axes=(0, 1))
@@ -109,13 +121,11 @@ def selectInFolder( strPath ):
                 if len(faces) > 0 or 0:
                     print("INF: Rotating!" )
                     photo = photorot
-                    nRotate = 1
+                    nRotate += 1
             
-            if 1:
+            if 0:
                 photo = face_detector.drawRectForFaces( photo, faces )
             
-            renderSizeX = 2736
-            renderSizeY = 1824
             im = np.zeros( (renderSizeY,renderSizeX,3), np.uint8 )
             
             ratioPhoto = photo.shape[1]/float(photo.shape[0])
@@ -126,16 +136,27 @@ def selectInFolder( strPath ):
             else:
                 photosizeX = renderSizeX
                 photosizeY = int(photosizeX/ratioPhoto)
+                if photosizeY > renderSizeY:
+                    photosizeY = renderSizeY
+                    photosizeX = int(renderSizeY*ratioPhoto)
                 
+            print("photosizeX: %d, photosizeY: %d" % (photosizeX,photosizeY))
+            print("renderSizeX: %d, renderSizeY: %d" % (renderSizeX,renderSizeY))
+            assert(photosizeY<=renderSizeY)
             im[0:photosizeY,0:photosizeX] = cv2.resize(photo,(photosizeX,photosizeY))
             
+            print("nbr faces found: %d" % (len(faces)))
             headOffsetX = photosizeX
             headOffsetY = 0
-            headSizeX = renderSizeX-photosizeX
+            headSizeX = (renderSizeX-photosizeX)
+            if len(faces)>2:
+                headSizeX /= len(faces)
             print("headSizeX: %d" % headSizeX )
             if headSizeX == 0:
                 headSizeX = renderSizeX*1/3
                 headOffsetX = renderSizeX - headSizeX
+
+            
             for (x,y,w,h) in faces:
                 face = photo[y:y+h,x:x+w]
                 headSizeY = (headSizeX*w)/h
@@ -144,6 +165,7 @@ def selectInFolder( strPath ):
                 rFaceSizeYInScreen = headSizeY
                 if headOffsetY+headSizeY > renderSizeY:
                     rFaceSizeYInScreen = renderSizeY-headOffsetY
+                print("headOffsetX: %d, headOffsetY: %d" % (headOffsetX,headOffsetY))
                 im[headOffsetY:headOffsetY+headSizeY,headOffsetX:headOffsetX+headSizeX] = face[0:rFaceSizeYInScreen,]
                 if 1:
                     colorText = (255,255,255)
@@ -161,7 +183,11 @@ def selectInFolder( strPath ):
                 cv2.circle( im, (30+i*80,30),30, (0,255,0), -1 )
                 
         if bToDel:
-                cv2.circle( im, (100,100),100, (0,0,255), -1 )
+                xc = 300
+                yc = 300
+                sizec=100
+                cv2.circle( im, (xc,yc),sizec, (0,0,255), -1 )
+                cv2.putText(im, "y?",(xc-sizec/2,yc),0,4,(255,255,255),4)
                 
         #~ cv2.rectangle( im, (0, 0), (1000, 1000), (255, 255, 255), 3 ) 
         #~ print(dir(cv2.cv))
@@ -174,21 +200,40 @@ def selectInFolder( strPath ):
         key = cv2.waitKey(0)
         print( "key: %d" % key )
         if key == 3014656:
-            bToDel = True
+            bToDel = True # ask to del, must press y to validate
+        if key == ord('y'):
+            if bToDel:
+                os.unlink(strPath + files[nNumPhoto])
+                del files[nNumPhoto]
+                bReload = True
+                continue
         if key == 2424832:
+            # fleche gauche: prev
             nNumPhoto -= 1
             bReload = True
-            nRotate=0
+            continue
         if key == 2555904:
+            # fleche gauche: next
             nNumPhoto += 1
             bReload = True
-            nRotate=0
+            continue
         if key == 27 or key == ord('q'):
             break
         if key == ord('r'):
             nRotate += 1
+            nRotate %= 4
+            astrRot = ["","_r1", "_r2", "_r3"]
+            newname = files[nNumPhoto]
+            for sr in astrRot:
+                newname = newname.replace(sr, "")
+            newname = newname.replace(".", astrRot[nRotate]+'.')
+            print("INF: renaming '%s' to '%s'"%(files[nNumPhoto],newname) )
+            os.rename(strPath + files[nNumPhoto],strPath + newname)
+            files[nNumPhoto]=newname
             bReload = True
+        
         if key == 32:
+            # space: change quality
             nQuality += 1
             if nQuality > 3:
                 nQuality = 0
@@ -198,10 +243,11 @@ def selectInFolder( strPath ):
             for sq in astrQuality:
                 newname = newname.replace(sq, "")
             newname = newname.replace(".", astrQuality[nQuality]+'.')
-            print("INF: renaming '%s' in '%s'"%(files[nNumPhoto],newname) )
+            print("INF: renaming '%s' to '%s'"%(files[nNumPhoto],newname) )
             os.rename(strPath + files[nNumPhoto],strPath + newname)
             files[nNumPhoto]=newname
             
     
-strPath = "C:/Users/amazel/perso/photo18b/2018-07-01_-_CelineStGermain/"
+#strPath = "C:/Users/amazel/perso/photo18b/2018-07-01_-_CelineStGermain/"
+strPath = "D:/temp_photo_pour_auto_montage/"
 selectInFolder( strPath )

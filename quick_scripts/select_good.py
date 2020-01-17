@@ -172,7 +172,7 @@ def selectInFolder( strPath ):
                     rSharp,rLum = abcdk.image.getImageSharpness( photo[y:y+h,x:x+w] )
                     minColor = photo[y:y+h,x:x+w].min()
                     maxColor = photo[y:y+h,x:x+w].max()
-                    strText = "%d/%d, r:%s/%s"%(int(rSharp), int(rLum),minColor,maxColor)
+                    strText = "sh/lum:%d/%d, r:%s/%s"%(int(rSharp), int(rLum),minColor,maxColor)
                     cv2.putText( im, strText, (headOffsetX+40, headOffsetY+50), cv2.FONT_HERSHEY_SIMPLEX, 2, colorText, 4 )
                 headOffsetY += headSizeY
             print("DBG: analysing takes: %5.3fs" % (time.time()-timeBegin))

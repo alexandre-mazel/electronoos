@@ -56,7 +56,7 @@ def selectInFolder( strPath ):
     files = filterOnExts( files, ["jpg"] )
         
     fd = face_detector.FaceDetectOpenCV()
-    nNumPhoto = 7 # -1 # -4
+    nNumPhoto = 0 # -1 # -4
     bReload = True
     im = None
 

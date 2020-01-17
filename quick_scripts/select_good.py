@@ -248,6 +248,6 @@ def selectInFolder( strPath ):
             files[nNumPhoto]=newname
             
     
-#strPath = "C:/Users/amazel/perso/photo18b/2018-07-01_-_CelineStGermain/"
-strPath = "D:/temp_photo_pour_auto_montage/"
+strPath = "C:/Users/amazel/perso/photo18b/2018-07-01_-_CelineStGermain/"
+#~ strPath = "D:/temp_photo_pour_auto_montage/"
 selectInFolder( strPath )

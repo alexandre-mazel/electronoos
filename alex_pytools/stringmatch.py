@@ -225,7 +225,8 @@ def autoTest():
     
     assert_check( isMatchFillVar( "m'appelle jean et je suis nul", "m'appelle $name_value*"),  (True, {'name_value': 'jean', '$1': ' et je suis nul'}) )
     assert_check( isMatchFillVar( "m'appelle john", "m'appelle $name_value*" ),  (True, {'name_value': 'john', '$1': ''}) )
-    assert_check( isMatchFillVar( "Je m'appelle patrick.", "* m'appelle $name_value *", {"attr":"name"} ),  (True, {'name_value': 'patrick', 'attr': 'name', '$1': 'Je'}) )
+    # assert_check( isMatchFillVar( "Je m'appelle patrick.", "* m'appelle $name_value *", {"attr":"name"} ),  (True, {'name_value': 'patrick', 'attr': 'name', '$1': 'Je'}) )
+    assert_check( isMatchFillVar( "Je m'appelle patrick.", "* m'appelle $name_value *", {"attr":"name"} ),  (False, {}) ) # require the space to match !
     
 if __name__ == "__main__":
     autoTest();

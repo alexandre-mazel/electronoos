@@ -3,6 +3,7 @@
 ###########################################################
 # Aldebaran Behavior Complementary Development Kit
 # match string tools - re for dummies
+# v0.8
 # Alexandre Mazel
 ###########################################################
 

@@ -87,7 +87,7 @@ def isMatchFill( s, ref ):
                 sEatStar = ""
                 if len(ref) != jref+1 and ref[jref+1] == '*': # and (ref[jref+1] == '*' or ref[jref+1:] == ' *'):
                     # specific case to correct bug of the "**"
-                    print("DBG: specific case to correct bug of the **, remaining '%s' and '%s'"% (s[js:],ref[jref:]) )
+                    #~ print("DBG: specific case to correct bug of the **, remaining '%s' and '%s'"% (s[js:],ref[jref:]) )
                     if 0:
                         jref += 1
                         dOut["$"+str(numCurWild)] = ""
@@ -103,13 +103,13 @@ def isMatchFill( s, ref ):
                 
         if not bInStar:
             if s[js] != ref[jref] and ref[jref] != '*':
-                print("DBG: no match of current char: remaining '%s' and '%s'"% (s[js:],ref[jref:]))
+                #~ print("DBG: no match of current char: remaining '%s' and '%s'"% (s[js:],ref[jref:]))
                 bMatch = False
                 break
         else:
-            print("DB: calling isMatch for sub: '%s' and '%s'" % (s[js:],ref[jref+1:]) )
+            #~ print("DB: calling isMatch for sub: '%s' and '%s'" % (s[js:],ref[jref+1:]) )
             bMatch = isMatch( s[js:], ref[jref+1:] )
-            print( "DB: => %s" % bMatch )
+            #~ print( "DB: => %s" % bMatch )
             if not bMatch: # and (len(ref) == jref+1 or ref[jref+1] != '*'):
                 # so it remains to eat
                 sEatStar += sOrig[js]
@@ -124,7 +124,7 @@ def isMatchFill( s, ref ):
         if not bInStar:
             jref += 1
            
-    print("DBG: isMatchFill: '%s' and '%s' => (%s,%s)" % (s,ref,bMatch,dOut) )
+    #~ print("DBG: isMatchFill: '%s' and '%s' => (%s,%s)" % (s,ref,bMatch,dOut) )
     return bMatch, dOut
 # isMatchFill - end
 
@@ -153,7 +153,7 @@ def isMatchFillVar( s, ref, defaultDict = {} ):
             newref += ref[jref]
         jref += 1
         
-    print("DBG: isMatchFillVar: s:'%s', newref: '%s', dIdx:%s" % (s, newref, dIdx) )
+    #~ print("DBG: isMatchFillVar: s:'%s', newref: '%s', dIdx:%s" % (s, newref, dIdx) )
     retVal = isMatchFill( s, newref )
     if not retVal[0]:
         return retVal

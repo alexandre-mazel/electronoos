@@ -16,8 +16,8 @@ def assert_check( value, reference = True ):
         print( "ERR: assert_check: \n'%s'\n!=\n'%s'" % (value, reference) )
         assert(0)    
         
-def isMatch( s, ref, bPunctuationAsSpace = False ):
-    return isMatchFill(s,ref,bPunctuationAsSpace = bPunctuationAsSpace)[0]
+def isMatch( s, ref ):
+    return isMatchFill(s,ref)[0]
     
 def getPunctuationChars():
     return " .,;:?!"
@@ -38,7 +38,7 @@ def getFirstWord( s, bAddStarAsSeparator = False ):
     return s[:i]
     
     
-def isMatchFill( s, ref, bPunctuationAsSpace = True ):
+def isMatchFill( s, ref ):
     """
     is s match the ref.
     - s: a string
@@ -108,7 +108,7 @@ def isMatchFill( s, ref, bPunctuationAsSpace = True ):
                 break
         else:
             print("DB: calling isMatch for sub: '%s' and '%s'" % (s[js:],ref[jref+1:]) )
-            bMatch = isMatch( s[js:], ref[jref+1:], bPunctuationAsSpace = bPunctuationAsSpace )
+            bMatch = isMatch( s[js:], ref[jref+1:] )
             print( "DB: => %s" % bMatch )
             if not bMatch: # and (len(ref) == jref+1 or ref[jref+1] != '*'):
                 # so it remains to eat
@@ -189,11 +189,11 @@ def autoTest():
     assert_check( isMatch( "tu", "ta" ), False )
     assert_check( isMatch( "tu", "tua" ), False )
     assert_check( isMatchFill( "tu", "tu*" ), (True, {"$1":""} )  )
-    assert_check( isMatchFill( "toto.py", "*.py", bPunctuationAsSpace = False ), (True, {"$1":"toto"} )  )
+    assert_check( isMatchFill( "toto.py", "*.py" ), (True, {"$1":"toto"} )  )
     assert_check( isMatch( "toto.pa.py", "*.py" ) )
     assert_check( isMatch( "toto.pya", "*.py" ), False )
     assert_check( isMatch( "toto.pya", "*.py*" ), True )
-    assert_check( isMatchFill( "toto.pya", "*.py*", bPunctuationAsSpace = False ), (True, {"$1":"toto", "$2":"a"} ) )
+    assert_check( isMatchFill( "toto.pya", "*.py*" ), (True, {"$1":"toto", "$2":"a"} ) )
     assert_check( isMatchFill( "Je m'appelle Alexandre et je suis content.", "*appelle * *" ), (True, {"$1":"Je m'", "$2":"Alexandre", "$3": "et je suis content."} ) )
     
     # le suivant est un peu tordu, le resultat attendu pourrait etre:

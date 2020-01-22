@@ -51,9 +51,9 @@ def isMatchFill( s, ref, bPunctuationAsSpace = True ):
     """
     #~ ref = ref.replace("**", "* *" )
     sOrig = s
-    if bPunctuationAsSpace and 0:
-        for c in getPunctuationChars():
-            s = s.replace( c, " " )
+    #~ if bPunctuationAsSpace and 0:
+        #~ for c in getPunctuationChars():
+            #~ s = s.replace( c, " " )
     
     dOut = {}
     js = 0 # because "is" is a keyword
@@ -225,6 +225,8 @@ def autoTest():
     
     assert_check( isMatchFillVar( "m'appelle jean et je suis nul", "m'appelle $name_value*"),  (True, {'name_value': 'jean', '$1': ' et je suis nul'}) )
     assert_check( isMatchFillVar( "m'appelle john", "m'appelle $name_value*" ),  (True, {'name_value': 'john', '$1': ''}) )
+    assert_check( isMatchFillVar( "m'appelle pierre.", "m'appelle $name_value*" ),  (True, {'name_value': 'pierre', '$1': '.'}) )
+    assert_check( isMatchFillVar( "m'appelle paul.", "m'appelle $name_value" ),  (True, {'name_value': 'paul.'}) )
     # assert_check( isMatchFillVar( "Je m'appelle patrick.", "* m'appelle $name_value *", {"attr":"name"} ),  (True, {'name_value': 'patrick', 'attr': 'name', '$1': 'Je'}) )
     assert_check( isMatchFillVar( "Je m'appelle patrick.", "* m'appelle $name_value *", {"attr":"name"} ),  (False, {}) ) # require the space to match !
     

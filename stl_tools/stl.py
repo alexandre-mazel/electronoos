@@ -273,58 +273,60 @@ class Stl:
         
     def render( self ):
         prind( "DBG: Stl.render: starting..." )
-        import numpy as np
-        import matplotlib.pyplot as plt
-        from mpl_toolkits.mplot3d import Axes3D
-        from matplotlib import cm
-        fig = plt.figure()
-        ax = fig.add_subplot(111,projection='3d')
-        x = []
-        y = []
-        z = []
-        colors=[]
-        if 0:
-            for nNumObject in range(len(self.aObjects)):
-                for nNumTriangle in range(len(self.aObjects[nNumObject].aTriangles)):
-                    for j in range(3):
-                        x.append(self.aObjects[nNumObject].aTriangles[nNumTriangle].v[j][0])
-                        y.append(self.aObjects[nNumObject].aTriangles[nNumTriangle].v[j][1])
-                        z.append(self.aObjects[nNumObject].aTriangles[nNumTriangle].v[j][2])
-                        colors.append(['y','y','y'])
-                    #~ if nNumTriangle > 2:
-                        #~ break
-            print x
-            print y
-            print z
-            print colors
-            x = np.array(x)
-            y = np.array(y)
-            z = np.array(z)
-            colors = np.array(colors)
-            print colors.shape
-            #~ ax.plot_surface(x, y, z, cmap=cm.coolwarm, linewidth=0, antialiased=False)
-            ax.plot_trisurf(x, y, z, linewidth=0.2, antialiased=True) # , color=colors
-        else:
-            colors = ['r','b','g','y'] 
-            for nNumObject in range(len(self.aObjects)):
-                for nNumTriangle in range(len(self.aObjects[nNumObject].aTriangles)):
-                    x = []
-                    y = []
-                    z = []
-                    for j in range(3):
-                        x.append(self.aObjects[nNumObject].aTriangles[nNumTriangle].v[j][0]+j*0.0001) # need to have always differet x and y (we're rendering shape in a data visualisator...)
-                        y.append(self.aObjects[nNumObject].aTriangles[nNumTriangle].v[j][1]+j*0.0001)
-                        z.append(self.aObjects[nNumObject].aTriangles[nNumTriangle].v[j][2])
-                    x = np.array(x)
-                    y = np.array(y)
-                    z = np.array(z)
-                    #~ print x
-                    #~ print y
-                    #~ print z
-                    ax.plot_trisurf(x, y, z, linewidth=0.2, antialiased=True, color=colors[nNumObject%len(colors)])                    
+        try:
+            import numpy as np
+            import matplotlib.pyplot as plt
+            from mpl_toolkits.mplot3d import Axes3D
+            from matplotlib import cm
+            fig = plt.figure()
+            ax = fig.add_subplot(111,projection='3d')
+            x = []
+            y = []
+            z = []
+            colors=[]
+            if 0:
+                for nNumObject in range(len(self.aObjects)):
+                    for nNumTriangle in range(len(self.aObjects[nNumObject].aTriangles)):
+                        for j in range(3):
+                            x.append(self.aObjects[nNumObject].aTriangles[nNumTriangle].v[j][0])
+                            y.append(self.aObjects[nNumObject].aTriangles[nNumTriangle].v[j][1])
+                            z.append(self.aObjects[nNumObject].aTriangles[nNumTriangle].v[j][2])
+                            colors.append(['y','y','y'])
+                        #~ if nNumTriangle > 2:
+                            #~ break
+                print x
+                print y
+                print z
+                print colors
+                x = np.array(x)
+                y = np.array(y)
+                z = np.array(z)
+                colors = np.array(colors)
+                print colors.shape
+                #~ ax.plot_surface(x, y, z, cmap=cm.coolwarm, linewidth=0, antialiased=False)
+                ax.plot_trisurf(x, y, z, linewidth=0.2, antialiased=True) # , color=colors
+            else:
+                colors = ['r','b','g','y'] 
+                for nNumObject in range(len(self.aObjects)):
+                    for nNumTriangle in range(len(self.aObjects[nNumObject].aTriangles)):
+                        x = []
+                        y = []
+                        z = []
+                        for j in range(3):
+                            x.append(self.aObjects[nNumObject].aTriangles[nNumTriangle].v[j][0]+j*0.0001) # need to have always differet x and y (we're rendering shape in a data visualisator...)
+                            y.append(self.aObjects[nNumObject].aTriangles[nNumTriangle].v[j][1]+j*0.0001)
+                            z.append(self.aObjects[nNumObject].aTriangles[nNumTriangle].v[j][2])
+                        x = np.array(x)
+                        y = np.array(y)
+                        z = np.array(z)
+                        #~ print x
+                        #~ print y
+                        #~ print z
+                        ax.plot_trisurf(x, y, z, linewidth=0.2, antialiased=True, color=colors[nNumObject%len(colors)])                    
 
-        plt.show()
-        
+            plt.show()
+        except BaseException as err:
+            print("ERR: Stl.render: error: %s" % str(err) ) # once in plot_trisurf:  Error in qhull Delaunay triangulation calculation: singular input data (exitcode=2); use python verbose option (-v) to see original qhull error. 
         
         
     def getNbrObjects( self ):
@@ -349,10 +351,10 @@ def viewStl( strFilename ):
     stl.load(strFilename)
     stl.render()
     
-def splitStl( strFilename, strDstFilenameStart ):
+def splitStl( strFilename, strDstFilenameStart, bRenderEachSavedObject = False ):
     stl = Stl()
     stl.load(strFilename)
-    stl.saveByObject( strDstFilenameStart, bRenderThem = True ) 
+    stl.saveByObject( strDstFilenameStart, bRenderThem = bRenderEachSavedObject ) 
     
 def autoTest():
     stl = Stl()
@@ -377,4 +379,5 @@ if( __name__ == "__main__" ):
     if len(sys.argv)==3:
         splitStl( sys.argv[1], sys.argv[2] )
         
-    splitStl( "C:/Users/amazel/Downloads/PepperBackSmall(5).stl", "/tmp/t" )        
+    #splitStl( "C:/Users/amazel/Downloads/PepperBackSmall(5).stl", "/tmp/t" )
+splitStl( "C:/Users/amazel/Downloads/Meuble SDB.stl", "/tmp/sdb" )    

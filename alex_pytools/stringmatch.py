@@ -1,4 +1,12 @@
-# match string tools
+# -*- coding: utf-8 -*-
+
+###########################################################
+# Aldebaran Behavior Complementary Development Kit
+# match string tools - re for dummies
+# v0.8
+# Alexandre Mazel
+###########################################################
+
 
 global_nCountAssert = 0
 def assert_check( value, reference = True ):
@@ -6,18 +14,23 @@ def assert_check( value, reference = True ):
     global_nCountAssert += 1
     print( "%d: assert_check: %s  ?  %s" % (global_nCountAssert,value, reference) )
     if( value != reference ):
-        print( "ERR: assert_check: '%s' != '%s'" % (value, reference) )
+        print( "ERR: assert_check: \n'%s'\n!=\n'%s'" % (value, reference) )
         assert(0)    
         
 def isMatch( s, ref ):
     return isMatchFill(s,ref)[0]
     
-def getFirstWord( s ):
+def getPunctuationChars():
+    return " .,;:?!"
+    
+def getFirstWord( s, bAddStarAsSeparator = False ):
     """
     return the first  word in s
     return "" if word start with a space or ...
     """
-    sep = " .,;:?!"
+    sep = getPunctuationChars()
+    if bAddStarAsSeparator:
+        sep += '*'
     for i,c in enumerate(s):
         if c in sep:
             break
@@ -32,8 +45,17 @@ def isMatchFill( s, ref ):
     - s: a string
     - ref: a string to match, eg: "*toto*", "*.py", "je m'appelle *".
       with '*': 0 or n char
+      
+    NB: we decide than matching "**" will match "* *"
+    
     Return a pair: [bool, dict] with bool: True if it match and dict, a dict with filled wildcard, eg "$1": "Alexandre"
     """
+    #~ ref = ref.replace("**", "* *" )
+    sOrig = s
+    #~ if bPunctuationAsSpace and 0:
+        #~ for c in getPunctuationChars():
+            #~ s = s.replace( c, " " )
+    
     dOut = {}
     js = 0 # because "is" is a keyword
     jref = 0
@@ -64,21 +86,34 @@ def isMatchFill( s, ref ):
             if ref[jref] == '*':
                 bInStar = True
                 sEatStar = ""
-                if len(ref) != jref+1 and ref[jref+1] == '*':
+                if len(ref) != jref+1 and ref[jref+1] == '*': # and (ref[jref+1] == '*' or ref[jref+1:] == ' *'):
                     # specific case to correct bug of the "**"
-                    jref += 1
-                    dOut["$"+str(numCurWild)] = ""
-                    numCurWild += 1
+                    #~ print("DBG: specific case to correct bug of the **, remaining '%s' and '%s'"% (s[js:],ref[jref:]) )
+                    if 0:
+                        jref += 1
+                        dOut["$"+str(numCurWild)] = ""
+                        numCurWild += 1
+                    else:
+                        sFirstWord = getFirstWord(s[js:],bAddStarAsSeparator=True)
+                        dOut["$"+str(numCurWild)] = sFirstWord
+                        numCurWild += 1                        
+                        js += len(sFirstWord)
+                        jref += 1
+                        continue
+                        
                 
         if not bInStar:
-            if s[js] != ref[jref]:
+            if s[js] != ref[jref] and ref[jref] != '*':
                 #~ print("DBG: no match of current char: remaining '%s' and '%s'"% (s[js:],ref[jref:]))
                 bMatch = False
                 break
         else:
-            if not isMatch( s[js:], ref[jref+1:] ): # and (len(ref) == jref+1 or ref[jref+1] != '*'):
+            #~ print("DB: calling isMatch for sub: '%s' and '%s'" % (s[js:],ref[jref+1:]) )
+            bMatch = isMatch( s[js:], ref[jref+1:] )
+            #~ print( "DB: => %s" % bMatch )
+            if not bMatch: # and (len(ref) == jref+1 or ref[jref+1] != '*'):
                 # so it remains to eat
-                sEatStar += s[js]
+                sEatStar += sOrig[js]
             else:
                 dOut["$"+str(numCurWild)] = sEatStar
                 numCurWild += 1
@@ -94,7 +129,7 @@ def isMatchFill( s, ref ):
     return bMatch, dOut
 # isMatchFill - end
 
-def isMatchFillVar( s, ref ):
+def isMatchFillVar( s, ref, defaultDict = {} ):
     """
     same as isMatchFill, but ref can mix some * and some $variable_name
     - variable_name is a string without spaces
@@ -107,7 +142,7 @@ def isMatchFillVar( s, ref ):
     newref = ""
     while jref < len(ref):
         if ref[jref] == '$':
-            w = getFirstWord( ref[jref+1:] )
+            w = getFirstWord( ref[jref+1:], bAddStarAsSeparator = True )
             dIdx["$"+str(nNumIdx)] = w
             jref += len(w)
             newref += "*"
@@ -119,12 +154,12 @@ def isMatchFillVar( s, ref ):
             newref += ref[jref]
         jref += 1
         
-    print("DBG: isMatchFillVar: dIdx:%s" % dIdx )
+    #~ print("DBG: isMatchFillVar: s:'%s', newref: '%s', dIdx:%s" % (s, newref, dIdx) )
     retVal = isMatchFill( s, newref )
     if not retVal[0]:
         return retVal
         
-    dNew = {}
+    dNew = defaultDict.copy() # else the default dict store after each call
     nNumStar = 1
     for k,v in sorted(retVal[1].items()):
         if k in dIdx:
@@ -169,7 +204,10 @@ def autoTest():
     # couramment on a ca (bug of the "**") => patched
     # $2 = A, $3=lexandre et je suis content.
     #assert_check( isMatchFill( "Je m'appelle Alexandre et je suis content.", "*appelle **" ), (True, {"$1":"Je m'", "$2":"A", "$3": "lexandre et je suis content."} ) )
-    assert_check( isMatchFill( "Je m'appelle Alexandre et je suis content.", "*appelle **" ), (True, {"$1":"Je m'", "$2":"", "$3": "Alexandre et je suis content."} ) )
+    #~ assert_check( isMatchFill( "Je m'appelle Alexandre et je suis content.", "*appelle **" ), (True, {"$1":"Je m'", "$2":"", "$3": "Alexandre et je suis content."} ) )
+
+    # modified to have a more natural match: NDEV
+    #assert_check( isMatchFill( "Je m'appelle Alexandre et je suis content.", "*appelle **" ), (True, {"$1":"Je m'", "$2":"Alexandre", "$3": "et je suis content."} ) )
         
     assert_check( isMatch( "define", "*def*" ), True )
     assert_check( isMatch( "define", "def*" ), True )
@@ -179,6 +217,19 @@ def autoTest():
     assert_check( isMatchFillVar( "Salut, je m'appelle Alexandre et je suis content!", "*appelle $name *" ), (True, {"$1":"Salut, je m'", "name":"Alexandre", "$2": "et je suis content!"} ) )
     assert_check( isMatchFillVar( "My adress is 12 Candiotti street.", "My $attribute is $value." ), (True, {'attribute': 'adress', 'value': '12 Candiotti street'} ) )
     assert_check( isMatchFillVar( "My bizness is 43 Main street", "My $attribute is $value" ), (True,  {'attribute': 'bizness', 'value': '43 Main street'} ) )
-            
+    assert_check( isMatchFillVar( "toto", "*", {"name":"alex"} ),  (True, {'name': 'alex', '$1': 'toto'}) )
+    assert_check( isMatchFillVar( "my color is pink", "my $attr is $value", {"attr":"name"} ),  (True, {'attr': 'color', 'value': 'pink'}) )
+    assert_check( isMatchFillVar( "Je m'appelle alex", "* m'appelle $name_value", {"attr":"name"} ),  (True, {'name_value': 'alex', 'attr': 'name', '$1': 'Je'}) )
+    assert_check( isMatchFillVar( "Je m'appelle francois et toi?", "* m'appelle $name_value *", {"attr":"name"} ),  (True, {'name_value': 'francois', '$2': 'et toi?', 'attr': 'name', '$1': 'Je'}) )
+    
+    assert_check( isMatchFillVar( "Je m'appelle jp", "* m'appelle $name_value", {"attr":"name"} ),  (True, {'name_value': 'jp', 'attr': 'name', '$1': 'Je'}) )
+    
+    assert_check( isMatchFillVar( "m'appelle jean et je suis nul", "m'appelle $name_value*"),  (True, {'name_value': 'jean', '$1': ' et je suis nul'}) )
+    assert_check( isMatchFillVar( "m'appelle john", "m'appelle $name_value*" ),  (True, {'name_value': 'john', '$1': ''}) )
+    assert_check( isMatchFillVar( "m'appelle pierre.", "m'appelle $name_value*" ),  (True, {'name_value': 'pierre', '$1': '.'}) )
+    assert_check( isMatchFillVar( "m'appelle paul.", "m'appelle $name_value" ),  (True, {'name_value': 'paul.'}) )
+    # assert_check( isMatchFillVar( "Je m'appelle patrick.", "* m'appelle $name_value *", {"attr":"name"} ),  (True, {'name_value': 'patrick', 'attr': 'name', '$1': 'Je'}) )
+    assert_check( isMatchFillVar( "Je m'appelle patrick.", "* m'appelle $name_value *", {"attr":"name"} ),  (False, {}) ) # require the space to match !
+    
 if __name__ == "__main__":
     autoTest();

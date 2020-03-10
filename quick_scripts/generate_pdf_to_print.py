@@ -16,7 +16,7 @@ def pdfMultiCell( pdf, x, y, txt, hInterlign, bCentered = False ):
         pdf.text(xp,y,line )
         y += hInterlign
 
-def genereatePdfFromImages( listImgs, strOutPdfFilename, nOuputType=0 ):
+def genereatePdfFromImages_and_text( listImgs, strOutPdfFilename, strVersoText = "", nOuputType=0 ):
     """
     Generate a pdf files from a list of images
     nRectoVersoHandling:
@@ -51,20 +51,7 @@ def genereatePdfFromImages( listImgs, strOutPdfFilename, nOuputType=0 ):
             break
             
     # add some text
-    txt = """
-Rejoins l'équipe des héroines:
-
-Dimanche 29 Mars 2020,
-de 14h30 à 18h30,
-au 12, Villa Candiotti.
-
-Tu peux venir avec tes
-supers pouvoirs!
-
-Confirme ta présence
-avant le 25 Mars,
-au 06.10.60.19.79
-"""
+    txt = strVersoText
     pdf.add_page()
     pdf.set_font('Arial', 'B', 16)
     #pdf.write(8, txt) # text as normal text
@@ -86,6 +73,21 @@ au 06.10.60.19.79
     pdf.output( strOutPdfFilename, 'F' )
     
         
-fn = "C:/Users/amazel/perso/retouches/anniv_gaia_7_affiche copy.png"
-listImages = [fn]*4
-genereatePdfFromImages(listImages, '/tmp/generated.pdf')
+if 1:
+    fn = "C:/Users/amazel/perso/retouches/anniv_gaia_7_affiche copy.png"
+    listImages = [fn]*4
+    strVersoText = """
+    Rejoins l'équipe des héroines:
+
+    Dimanche 29 Mars 2020,
+    de 14h30 à 18h30,
+    au 12, Villa Candiotti.
+
+    Tu peux venir avec tes
+    supers pouvoirs!
+
+    Confirme ta présence
+    avant le 25 Mars,
+    au 06.10.60.19.79
+    """
+    genereatePdfFromImages_and_text(listImages, '/tmp/generated.pdf', strVersoText)

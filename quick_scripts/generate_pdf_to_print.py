@@ -4,6 +4,7 @@ import os
 import numpy as np
 from cv2 import aruco # pip3 install opencv-contrib-python
 from fpdf import FPDF # pip3 install fpdf
+import time
 
 
 def pdfMultiCell( pdf, x, y, txt, hInterlign, bCentered = False ):
@@ -26,10 +27,14 @@ def generatePdfFromImagesAndText( listImgs, strOutPdfFilename, strVersoText = No
     #~ pdf.set_font('Arial', 'B', 16)
     #~ pdf.cell(40, 10, 'Hello World!')
     #~ pdf.output(strOutPdfFilename, 'F')
-    nImageW = 105
-    nImageH = (nImageW*297)//210
+    wA4 = 210
+    hA4 = 297
+    if nNbrImagePerPage > 1:
+        nImageW = wA4/(nNbrImagePerPage//2)
+    else:
+        nImageW = wA4
+    nImageH = (nImageW*hA4)//wA4
     nNumImage = 0
-    nNbrImagePerPage = 4
     bDoubleForVerso = False # prepare for being printed with verso corresponding to same image
     nIdxArea = 0
     nNbrImageThisPage = 1000
@@ -39,20 +44,23 @@ def generatePdfFromImagesAndText( listImgs, strOutPdfFilename, strVersoText = No
             nNbrImageThisPage = 0
 
         strFilename = listImgs[nNumImage]
+        bDeleteImg = False
         if aListArea != None:
             im = cv2.imread(strFilename)
             r = aListArea[nIdxArea]
-            im = im[r[0]:r[2],r[1]:r[3]]
-            strFilename = "/tmp/crop.png"
-            cv2.imwrite(im, strFilename)
+            im = im[r[1]:r[3],r[0]:r[2]]
+            strFilename = "/tmp/crop%s.png" % str(time.time() )
+            cv2.imwrite(strFilename, im)
             nIdxArea += 1
-            if nIdxArea <= len(aListArea):
+            if nIdxArea >= len(aListArea):
                 nIdxArea = 0
                 nNumImage += 1
+            bDeleteImg = True
         else:
             nNumImage += 1
             
         pdf.image(strFilename,x=int(nImageW*(nNbrImageThisPage%2)), y=int(nImageH*(nNbrImageThisPage//2)), w=nImageW)
+        if bDeleteImg: os.remove(strFilename)
         
         nNbrImageThisPage += 1
         
@@ -107,11 +115,13 @@ def generateSchoolBook():
     strSkul = "C:/Users/amazel/perso/manuel_scolaire/cp_je_lis_tome1__%03d.png"
     listImages = []
     aListArea = [(320,334,1344,1480),(1392,334,2386,1480)] # one area per page
-    for nNumPage in range(500):
+    for nNumPage in range(50):
         strFileName = strSkul%nNumPage
         if os.path.isfile( strFileName ):
             listImages.append(strFileName)
             
+        
+    print("listImages: %s" % listImages )
     generatePdfFromImagesAndText(listImages, '/tmp/generated.pdf', nNbrImagePerPage = 1, aListArea=aListArea)
 # generateSchoolBook - end
 

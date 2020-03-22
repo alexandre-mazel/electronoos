@@ -39,6 +39,7 @@ def generatePdfFromImagesAndText( listImgs, strOutPdfFilename, strVersoText = No
     nIdxArea = 0
     nNbrImageThisPage = 1000
     while 1:
+        print("image %d/%d" % (nNumImage,len(listImgs)) )
         if nNbrImageThisPage >= nNbrImagePerPage:
             pdf.add_page()
             nNbrImageThisPage = 0
@@ -49,8 +50,8 @@ def generatePdfFromImagesAndText( listImgs, strOutPdfFilename, strVersoText = No
             im = cv2.imread(strFilename)
             r = aListArea[nIdxArea]
             im = im[r[1]:r[3],r[0]:r[2]]
-            strFilename = "/tmp/crop%s.png" % str(time.time() )
-            cv2.imwrite(strFilename, im)
+            strFilename = "/tmp/crop%s.jpg" % str(time.time() )
+            cv2.imwrite(strFilename, im, [int(cv2.IMWRITE_JPEG_QUALITY), 70])
             nIdxArea += 1
             if nIdxArea >= len(aListArea):
                 nIdxArea = 0
@@ -87,7 +88,7 @@ def generatePdfFromImagesAndText( listImgs, strOutPdfFilename, strVersoText = No
         pdfMultiCell( pdf, x+nMarginLeft, 148+nMarginTop, txt, hInterlign, bCentered=bCentered )
         pdfMultiCell( pdf, x+nCenter+nMarginLeft, 148+nMarginTop, txt, hInterlign, bCentered=bCentered )
     
-    print( "INF: genereatePdfFromImages: outputting to '%s'" % (strOutPdfFilename) )
+    print( "INF: generatePdfFromImages: outputting to '%s'" % (strOutPdfFilename) )
     pdf.output( strOutPdfFilename, 'F' )
 # generatePdfFromImagesAndText - end
     
@@ -115,7 +116,7 @@ def generateSchoolBook():
     strSkul = "C:/Users/amazel/perso/manuel_scolaire/cp_je_lis_tome1__%03d.png"
     listImages = []
     aListArea = [(320,334,1344,1480),(1392,334,2386,1480)] # one area per page
-    for nNumPage in range(50):
+    for nNumPage in range(500):
         strFileName = strSkul%nNumPage
         if os.path.isfile( strFileName ):
             listImages.append(strFileName)

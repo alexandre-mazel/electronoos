@@ -123,13 +123,31 @@ class Stater:
     def __init__( self ):
         self.dStatPerDay = {} # for each day: for each mac: (nUptime,bPresent) the elapsed time and a flag saying present or not
         self.nLastTime = 0
+        self.strDate = ""
+        self.loadLabels()
+        
+    def loadLabels( self ):
+        """
+        load list mac => label
+        """
+        self.labels = {
+            "B8:27:EB:C1:69:F7": "rasp2",
+            "D0:F8:8C:A5:9D:82": "?",
+            "F4:CA:E5:5F:16:56": "FreeBox",
+        }
+        
+    def getLabels(self, strMAC ):
+        try:
+            return self.labels[strMAC]
+        except: pass
+        return "???"
         
     def updateConnected( self ):
-        strDate = getDateStamp()        
+        self.strDate = getDateStamp()    
         listUp = getHostUp()
-        if not strDate in self.dStatPerDay.keys():
-            self.dStatPerDay[strDate]={}
-        statToday = self.dStatPerDay[strDate]
+        if not self.strDate in self.dStatPerDay.keys():
+            self.dStatPerDay[self.strDate]={}
+        statToday = self.dStatPerDay[self.strDate]
         tempUpMacList = []
         for info in listUp:
             ip, mac, d1,d2 = info
@@ -147,6 +165,22 @@ class Stater:
         self.nLastTime = time.time()
         
         print(self.dStatPerDay)
+    
+    def generatePage( self ):
+        statToday = self.dStatPerDay[self.strDate]
+        strPage = "<html><head></head><body>"
+        for k,v in statToday.items():
+            strPage += "<tr>"
+            strPage += "<td>%s</td>" % self.getLabels(k)
+            strPage += "<td>%s sec</td>" % v[0]
+            strPage += "<td>Up: %s</td>" % v[1]
+            strPage += "</tr>"
+        strPage += "</table></body></html>"
+        f = open("/var/www/html/stat_up.html", "wt")
+        f.write(strPage)
+        f.close()
+            
+            
         
 # class Stater - end
 
@@ -155,6 +189,7 @@ def loopUpdate():
     nCnt = 0
     while 1:
             stats.updateConnected()
+            stats.generatePage()
             nCnt += 1
             #~ if nCnt>3:
                 #~ break

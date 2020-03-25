@@ -46,7 +46,7 @@ def get_ip_and_mac_address( strInterfaceName ):
             #~ print( "ret: '%s'" % ret );
             ret = ret[18:24]
             #~ print( "ret: '%s'" % ret );
-            strMAC = ':'.join(['%02x' % ord(char) for char in ret])
+            strMAC = ':'.join(['%02X' % ord(char) for char in ret])
         except BaseException, err:
             print( "ERR: get_ip_address(2): %s" % str(err) )
     except BaseException, err:
@@ -121,7 +121,7 @@ def getDateStamp():
 class Stater:
     
     def __init__( self ):
-        self.dStatPerDay = {} # for each day: for each mac: (nUptime,bPresent) the elapsed time and a flag saying present or not
+        self.dStatPerDay = {} # for each day: for each mac: (ip, nUptime,bPresent) the elapsed time and a flag saying present or not
         self.nLastTime = 0
         self.strDate = ""
         self.loadLabels()
@@ -132,15 +132,19 @@ class Stater:
         """
         self.labels = {
             "B8:27:EB:C1:69:F7": "rasp2",
-            "D0:F8:8C:A5:9D:82": "?",
+            "D0:F8:8C:A5:9D:82": "???",
             "F4:CA:E5:5F:16:56": "FreeBox",
+            "B8:27:EB:41:86:24": "RaspRee",
+            "BC:83:85:00:24:35": "TabPro4",
+            "B8:8A:EC:C7:73:14": "SwitchCorto",
+            "48:4B:AA:68:E4:41": "IphoneAlex",
         }
         
     def getLabels(self, strMAC ):
         try:
             return self.labels[strMAC]
         except: pass
-        return "???"
+        return "?"
         
     def updateConnected( self ):
         self.strDate = getDateStamp()    
@@ -153,27 +157,30 @@ class Stater:
             ip, mac, d1,d2 = info
             tempUpMacList.append(mac)
             if mac not in statToday.keys():
-                statToday[mac] = [0,False]
-            if statToday[mac][1]:
-                statToday[mac][0] += time.time() - self.nLastTime
+                statToday[mac] = [ip, 0,False]
+            if statToday[mac][2]:
+                statToday[mac][0] = ip
+                statToday[mac][1] += time.time() - self.nLastTime
             else:
-                statToday[mac][1] = True
+                statToday[mac][2] = True
         
         for k,v in statToday.items():
             if k not in tempUpMacList:
-                v[1] = False
+                statToday[k][2] = False
         self.nLastTime = time.time()
         
         print(self.dStatPerDay)
     
     def generatePage( self ):
         statToday = self.dStatPerDay[self.strDate]
-        strPage = "<html><head></head><body>"
+        strPage = "<html><head></head><body><table>"
         for k,v in statToday.items():
             strPage += "<tr>"
+            strPage += "<td>%s</td>" % k
             strPage += "<td>%s</td>" % self.getLabels(k)
-            strPage += "<td>%s sec</td>" % v[0]
-            strPage += "<td>Up: %s</td>" % v[1]
+            strPage += "<td>%s</td>" % v[0]
+            strPage += "<td>%5.1f sec</td>" % v[1]
+            strPage += "<td>Up: %s</td>" % v[2]
             strPage += "</tr>"
         strPage += "</table></body></html>"
         f = open("/var/www/html/stat_up.html", "wt")
@@ -193,7 +200,7 @@ def loopUpdate():
             nCnt += 1
             #~ if nCnt>3:
                 #~ break
-            time.sleep(5)
+            time.sleep(60)
     
 loopUpdate()
     

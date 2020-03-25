@@ -1,4 +1,5 @@
 import os
+import datetime
 import time
 
 def runCommandGetResults( strCommand ):
@@ -24,7 +25,7 @@ def get_ip_and_mac_address( strInterfaceName ):
     strMAC = ""
     try:
         sock = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
-        print( "sock: '%s'" % str( sock ) )
+        #~ print( "sock: '%s'" % str( sock ) )
         #~ print( "strInterfaceName: " + str( strInterfaceName ) )
         strInterfaceName = strInterfaceName[:15]
         #~ print( "strInterfaceName: " + str( strInterfaceName ) )
@@ -43,9 +44,9 @@ def get_ip_and_mac_address( strInterfaceName ):
         try:                
             ret = fcntl.ioctl( sock.fileno(),  0x8927,  packedInterfaceName  )
             #~ print( "ret: '%s'" % ret );
-            ret = ret[20:24]
+            ret = ret[18:24]
             #~ print( "ret: '%s'" % ret );
-            strMAC = ':'.join(['%02x' % ord(char) for char in info[18:24]])
+            strMAC = ':'.join(['%02x' % ord(char) for char in ret])
         except BaseException, err:
             print( "ERR: get_ip_address(2): %s" % str(err) )
     except BaseException, err:
@@ -54,6 +55,12 @@ def get_ip_and_mac_address( strInterfaceName ):
     # get_ip_address - end
     
 def getHostUp():
+    """
+    Retrieve a list of all machine on the lan.
+    Return ["ip", "mac", "system guess from mac", "system guess from nmap(optionnally)"
+    WRN: need to be launched by root, or no mac information
+    """
+    listUp = []
     strMyIP, strMyMAC = get_ip_and_mac_address("eth0")
     print( "strMyIP: '%s'" % strMyIP )
     print( "strMyMAC: '%s'" % strMyMAC )
@@ -75,7 +82,7 @@ MAC Address: B8:27:EB:C1:69:F7 (Raspberry Pi Foundation)
     strMAC = ""
     strHostHint = ""
     for l in lines:
-        print("l: %s" % l )
+        #~ print("l: %s" % l )
         strIpLine = "Nmap scan report for "
         if strIpLine in l and not "[host down]" in l:
             idx = l.find( strIpLine )
@@ -89,23 +96,69 @@ MAC Address: B8:27:EB:C1:69:F7 (Raspberry Pi Foundation)
         if strMacLine in l:
             idx = l.find( strMacLine )
             strMAC = l[idx+len(strMacLine):].split(" ")[0]
-            strHostHint = l[idx+len(strMacLine) + len(strMac):].strip()
+            strHostHint = l[idx+len(strMacLine) + len(strMAC):].strip()
         if strIP == strMyIP:
             strMAC = strMyMAC
         if strMAC != "" and strIP != "":
+            strDetectedOS = ""
+            if 1:
+                # probe system (not interesting: take long and so, let's use a map of labelled)
+                pass
             print( "strIP: '%s'" % strIP )
             print( "strMAC: '%s'" % strMAC )
             print( "strHostHint: '%s'" % strHostHint )
+            listUp.append( (strIP, strMAC, strHostHint, strDetectedOS) )
             strIP = ""
+    return listUp
+# getHostUp - end
             
             
+def getDateStamp():
+    datetimeObject = datetime.datetime.now()
+    strStamp = datetimeObject.strftime( "%Y_%m_%d")
+    return strStamp
     
+class Stater:
+    
+    def __init__( self ):
+        self.dStatPerDay = {} # for each day: for each mac: (nUptime,bPresent) the elapsed time and a flag saying present or not
+        self.nLastTime = 0
+        
+    def updateConnected( self ):
+        strDate = getDateStamp()        
+        listUp = getHostUp()
+        if not strDate in self.dStatPerDay.keys():
+            self.dStatPerDay[strDate]={}
+        statToday = self.dStatPerDay[strDate]
+        tempUpMacList = []
+        for info in listUp:
+            ip, mac, d1,d2 = info
+            tempUpMacList.append(mac)
+            if mac not in statToday.keys():
+                statToday[mac] = [0,False]
+            if statToday[mac][1]:
+                statToday[mac][0] += time.time() - self.nLastTime
+            else:
+                statToday[mac][1] = True
+        
+        for k,v in statToday.items():
+            if k not in tempUpMacList:
+                v[1] = False
+        self.nLastTime = time.time()
+        
+        print(self.dStatPerDay)
+        
+# class Stater - end
 
+def loopUpdate():
+    stats = Stater()
+    nCnt = 0
+    while 1:
+            stats.updateConnected()
+            nCnt += 1
+            #~ if nCnt>3:
+                #~ break
+            time.sleep(5)
     
-    
-def updateConnected():
-    getHostUp()
-    
-    
-updateConnected()
+loopUpdate()
     

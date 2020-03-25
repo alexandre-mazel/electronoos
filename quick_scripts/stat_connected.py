@@ -20,6 +20,8 @@ def get_ip_and_mac_address( strInterfaceName ):
     import socket
     import struct
 
+    strIP = ""
+    strMAC = ""
     try:
         sock = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
         print( "sock: '%s'" % str( sock ) )
@@ -28,20 +30,38 @@ def get_ip_and_mac_address( strInterfaceName ):
         #~ print( "strInterfaceName: " + str( strInterfaceName ) )
         packedInterfaceName = struct.pack( '256s', strInterfaceName )
         #~ print( "packedInterfaceName: " + str( packedInterfaceName ) )
-        ret = fcntl.ioctl( sock.fileno(),  0x8915,  packedInterfaceName        )
-        #~ print( "ret: '%s'" % ret );
-        ret = ret[20:24]
-        #~ print( "ret: '%s'" % ret );
-        return socket.inet_ntoa( ret )
+        
+        try:                
+            ret = fcntl.ioctl( sock.fileno(),  0x8915,  packedInterfaceName  )
+            #~ print( "ret: '%s'" % ret );
+            ret = ret[20:24]
+            #~ print( "ret: '%s'" % ret );
+            strIP = socket.inet_ntoa( ret )
+        except BaseException, err:
+            print( "ERR: get_ip_address(1): %s" % str(err) )
+        
+        try:                
+            ret = fcntl.ioctl( sock.fileno(),  0x8927,  packedInterfaceName  )
+            #~ print( "ret: '%s'" % ret );
+            ret = ret[20:24]
+            #~ print( "ret: '%s'" % ret );
+            strMAC = ':'.join(['%02x' % ord(char) for char in info[18:24]])
+        except BaseException, err:
+            print( "ERR: get_ip_address(2): %s" % str(err) )
     except BaseException, err:
         print( "ERR: get_ip_address: %s" % str(err) )
-        return ''
+    return (strIP, strMAC)
     # get_ip_address - end
     
 def getHostUp():
-    strMyIP = get_ip_address("eth0")
+    strMyIP, strMyMAC = get_ip_and_mac_address("eth0")
     print( "strMyIP: '%s'" % strMyIP )
-    strFirstIP = "192.168.0.1" # TODO: auto detect
+    print( "strMyMAC: '%s'" % strMyMAC )
+    strFirstIP = strMyIP.split('.')[:-1]
+    strFirstIP.append('1')
+    strFirstIP = '.'.join(strFirstIP)
+    print( "strFirstIP: '%s'" % strFirstIP )
+    
     strRange = "/24"
     #~ strRange = "-10" # to debug
     buf = runCommandGetResults( "nmap -sP %s%s -v" % (strFirstIP,strRange) )
@@ -52,21 +72,31 @@ MAC Address: B8:27:EB:C1:69:F7 (Raspberry Pi Foundation)
 """
     lines = buf.split("\n")
     strIP = ""
+    strMAC = ""
+    strHostHint = ""
     for l in lines:
         print("l: %s" % l )
         strIpLine = "Nmap scan report for "
         if strIpLine in l and not "[host down]" in l:
             idx = l.find( strIpLine )
             strIP = l[idx+len(strIpLine):]
-            print( "strIP: '%s'" % strIP )
+            print( "New Found: strIP: '%s'" % strIP )
+            # new found
+            strMAC = ""
+            strHostHint = ""
         strMacLine = "MAC Address: "
         strHostHint = ""
         if strMacLine in l:
             idx = l.find( strMacLine )
-            strMac = l[idx+len(strMacLine):].split(" ")[0]
-            print( "strMac: '%s'" % strMac )
+            strMAC = l[idx+len(strMacLine):].split(" ")[0]
             strHostHint = l[idx+len(strMacLine) + len(strMac):].strip()
+        if strIP == strMyIP:
+            strMAC = strMyMAC
+        if strMAC != "" and strIP != "":
+            print( "strIP: '%s'" % strIP )
+            print( "strMAC: '%s'" % strMAC )
             print( "strHostHint: '%s'" % strHostHint )
+            strIP = ""
             
             
     

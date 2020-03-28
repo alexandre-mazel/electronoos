@@ -2,6 +2,60 @@ import os
 import datetime
 import time
 
+def timeToString( rTimeSec ):
+    "convert a time in second to a string"
+    "convert to be compact and meaning full"
+    "v0.6"
+    # we will limit to 2 values
+    nCptValue = 0;
+    strOut = "";
+#    strOut = "(%5.2f) " % rTimeSec;
+
+    if( rTimeSec < 0.001 ):
+        return "0 ms";
+
+    nDividend = 60*60*24*30; # 30 day per month as an average!
+    if( rTimeSec >= nDividend and nCptValue < 2 ):
+        nVal = int( rTimeSec / nDividend );
+        strOut += "%d min " % nVal;
+        rTimeSec -= nVal * nDividend;
+        nCptValue += 1;
+
+    nDividend = 60*60*24;
+    if( rTimeSec >= nDividend and nCptValue < 2 ):
+        nVal = int( rTimeSec / nDividend );
+        strOut += "%d j " % nVal;
+        rTimeSec -= nVal * nDividend;
+        nCptValue += 1;
+
+    nDividend = 60*60;
+    if( rTimeSec >= nDividend and nCptValue < 2 ):
+        nVal = int( rTimeSec / nDividend );
+        strOut += "%d hour " % nVal;
+        rTimeSec -= nVal * nDividend;
+        nCptValue += 1;
+
+    nDividend = 60;
+    if( rTimeSec >= nDividend and nCptValue < 2 ):
+        nVal = int( rTimeSec / nDividend );
+        strOut += "%d min " % nVal;
+        rTimeSec -= nVal * nDividend;
+        nCptValue += 1;
+
+    nDividend = 1;
+    if( rTimeSec >= nDividend and nCptValue < 2 ):
+        nVal = int( rTimeSec / nDividend );
+        strOut += "%d s " % nVal;
+        rTimeSec -= nVal * nDividend;
+        nCptValue += 1;
+
+    if( rTimeSec > 0. and nCptValue < 2 ):
+        strOut += "%3d ms" % int( rTimeSec*1000 );
+        nCptValue += 1;
+
+    return strOut;
+# timeToString - end
+
 def runCommandGetResults( strCommand ):
     strFilename = "/tmp/" + str(time.time())
     os.system(strCommand + " > " + strFilename )
@@ -11,6 +65,7 @@ def runCommandGetResults( strCommand ):
     os.remove(strFilename)
     return buf
     
+
 def get_ip_and_mac_address( strInterfaceName ):
     """
     get the ip associated to a linux network interface
@@ -121,7 +176,7 @@ def getDateStamp():
 class Stater:
     
     def __init__( self ):
-        self.dStatPerDay = {} # for each day: for each mac: (ip, nUptime,bPresent) the elapsed time and a flag saying present or not
+        self.dStatPerDay = {} # for each day: for each mac: (ip, nUptime,bPresent, d1, d2) the elapsed time and a flag saying present or not
         self.nLastTime = 0
         self.strDate = ""
         self.loadLabels()
@@ -132,12 +187,16 @@ class Stater:
         """
         self.labels = {
             "B8:27:EB:C1:69:F7": "rasp2",
-            "D0:F8:8C:A5:9D:82": "???",
+            "D0:F8:8C:A5:9D:82": "TabletCorto",
             "F4:CA:E5:5F:16:56": "FreeBox",
             "B8:27:EB:41:86:24": "RaspRee",
             "BC:83:85:00:24:35": "TabPro4",
             "B8:8A:EC:C7:73:14": "SwitchCorto",
             "48:4B:AA:68:E4:41": "IphoneAlex",
+            "90:21:81:27:D5:58": "TabletGaia",
+            "64:27:37:D3:31:67": "OrdiCorto", #E4:9E:12:26:39:E1
+            "E4:9E:12:26:39:E1": "FreeBoxTV",
+            #:60: elsaphone
         }
         
     def getLabels(self, strMAC ):
@@ -163,6 +222,8 @@ class Stater:
                 statToday[mac][1] += time.time() - self.nLastTime
             else:
                 statToday[mac][2] = True
+                statToday[mac][3] = d1
+                statToday[mac][4] = d2
         
         for k,v in statToday.items():
             if k not in tempUpMacList:
@@ -175,12 +236,15 @@ class Stater:
         statToday = self.dStatPerDay[self.strDate]
         strPage = "<html><head></head><body><table>"
         for k,v in statToday.items():
+            strUp = "Down"
+            if v[2]: strUp = "Up"
             strPage += "<tr>"
             strPage += "<td>%s</td>" % k
-            strPage += "<td>%s</td>" % self.getLabels(k)
+            if v[2]: strPage += "<td><b>%s</b></td>" % self.getLabels(k)
+            else: strPage += "<td>%s</td>" % self.getLabels(k)
             strPage += "<td>%s</td>" % v[0]
-            strPage += "<td>%5.1f sec</td>" % v[1]
-            strPage += "<td>Up: %s</td>" % v[2]
+            strPage += "<td>%s</td>" % timeToString(v[1])
+            strPage += "<td>%s</td>" % strUp
             strPage += "</tr>"
         strPage += "</table></body></html>"
         f = open("/var/www/html/stat_up.html", "wt")
@@ -194,13 +258,15 @@ class Stater:
 def loopUpdate():
     stats = Stater()
     nCnt = 0
+    nTimeSleep = 1 # at start, we sleep less for debug purpose, and it will become higher during time pass
     while 1:
             stats.updateConnected()
             stats.generatePage()
             nCnt += 1
             #~ if nCnt>3:
                 #~ break
-            time.sleep(60)
-    
+            time.sleep( nTimeSleep )
+            if nTimeSleep < 300:
+                nTimeSleep += 1
 loopUpdate()
     

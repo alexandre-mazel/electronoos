@@ -216,7 +216,7 @@ class Stater:
             ip, mac, d1,d2 = info
             tempUpMacList.append(mac)
             if mac not in statToday.keys():
-                statToday[mac] = [ip, 0,False]
+                statToday[mac] = [ip, 0,False, "", ""]
             if statToday[mac][2]:
                 statToday[mac][0] = ip
                 statToday[mac][1] += time.time() - self.nLastTime

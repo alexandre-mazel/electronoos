@@ -4,10 +4,11 @@ some classic handy class
 import datetime
 import cv2 # made with cv 3.2.0-dev
 import numpy as np
+import os
 import select
 import time
 import sys
-import v4l2capture  # can be found here : https://github.com/gebart/python-v4l2capture/blob/master/capture_picture.py
+import v4l2capture  # can be found here : https://github.com/gebart/python-v4l2capture
 """
 sudo apt-get install libv4l-dev
 git clone https://github.com/gebart/python-v4l2capture.gitlibv4l-dev
@@ -180,7 +181,7 @@ class WebCam():
             image_data = self.video.read_and_queue()
         except BaseException as err:
             print( "WRN: skipping image: %s" % str(err) )
-            time.sleep( 0.2 )
+            time.sleep( 0.5 )
             return None
             
         rEndAquisition = time.time()
@@ -227,3 +228,69 @@ def renderGraphBar( cv2_im, listValue, nNbrElementInListMax, tl_corner, br_corne
 		br = ( int(tl_corner[0] + (i+1)*w_bar), br_corner[1] )
 		cv2.rectangle( cv2_im, tl, br, front_color, -1 )		
 # renderGraphBar - end
+
+
+def timeToString( rTimeSec ):
+    "convert a time in second to a string"
+    "convert to be compact and meaning full"
+    "v0.6"
+    # we will limit to 2 values
+    nCptValue = 0;
+    strOut = "";
+#    strOut = "(%5.2f) " % rTimeSec;
+
+    if( rTimeSec < 0.001 ):
+        return "0 ms";
+
+    nDividend = 60*60*24*30; # 30 day per month as an average!
+    if( rTimeSec >= nDividend and nCptValue < 2 ):
+        nVal = int( rTimeSec / nDividend );
+        strOut += "%d min " % nVal;
+        rTimeSec -= nVal * nDividend;
+        nCptValue += 1;
+
+    nDividend = 60*60*24;
+    if( rTimeSec >= nDividend and nCptValue < 2 ):
+        nVal = int( rTimeSec / nDividend );
+        strOut += "%d j " % nVal;
+        rTimeSec -= nVal * nDividend;
+        nCptValue += 1;
+
+    nDividend = 60*60;
+    if( rTimeSec >= nDividend and nCptValue < 2 ):
+        nVal = int( rTimeSec / nDividend );
+        strOut += "%d hour " % nVal;
+        rTimeSec -= nVal * nDividend;
+        nCptValue += 1;
+
+    nDividend = 60;
+    if( rTimeSec >= nDividend and nCptValue < 2 ):
+        nVal = int( rTimeSec / nDividend );
+        strOut += "%d min " % nVal;
+        rTimeSec -= nVal * nDividend;
+        nCptValue += 1;
+
+    nDividend = 1;
+    if( rTimeSec >= nDividend and nCptValue < 2 ):
+        nVal = int( rTimeSec / nDividend );
+        strOut += "%d s " % nVal;
+        rTimeSec -= nVal * nDividend;
+        nCptValue += 1;
+
+    if( rTimeSec > 0. and nCptValue < 2 ):
+        strOut += "%3d ms" % int( rTimeSec*1000 );
+        nCptValue += 1;
+
+    return strOut;
+# timeToString - end
+
+            
+def getDateStamp():
+    datetimeObject = datetime.datetime.now()
+    strStamp = datetimeObject.strftime( "%Y_%m_%d")
+    return strStamp
+    
+def makeDirsQuiet( strPath ):
+    #os.makedirs(strPath,exist_ok=True) # exist_ok only in python3
+    try: os.makedirs(strPath)
+    except OSError as err: pass

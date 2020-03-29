@@ -55,6 +55,7 @@ class WebCam():
         webcam = WebCam();
         im = webcam.getImage();
         cv2.imwrite( "/tmp/test.jpg", im )
+    ver: v0.8
     """
     def __init__( self, strDeviceName = "/dev/video0", nWidth = 640, nHeight = 480, nNbrBuffer = 1, fps = 10 ):
         """
@@ -85,6 +86,18 @@ class WebCam():
     def __del__( self ):
         self.video.close()
     
+    def getImageRetry(self, bVerbose =  True ):  
+        nCpt = 0
+        while 1:
+            im = self.getImage()
+            if not im is None:
+                return im
+            
+            nCpt += 1
+            if ( nCpt % 10 ) == 0: 
+                print( "DBG: getImageRetry: 10 retry later... still trying..." )
+                time.sleep(2.)
+            
     def getImage(self, bVerbose =  True ):
         """
         return an image, None on error
@@ -98,7 +111,7 @@ class WebCam():
             image_data = self.video.read_and_queue()
         except BaseException as err:
             print( "WRN: skipping image: %s" % str(err) )
-            time.sleep( 0.2 )
+            time.sleep( 0.5 )
             return None
             
         rEndAquisition = time.time()

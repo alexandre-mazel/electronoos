@@ -2,59 +2,10 @@ import os
 import datetime
 import time
 
-def timeToString( rTimeSec ):
-    "convert a time in second to a string"
-    "convert to be compact and meaning full"
-    "v0.6"
-    # we will limit to 2 values
-    nCptValue = 0;
-    strOut = "";
-#    strOut = "(%5.2f) " % rTimeSec;
+import sys
+sys.path.append("../alex_pytools/")
+import misctools
 
-    if( rTimeSec < 0.001 ):
-        return "0 ms";
-
-    nDividend = 60*60*24*30; # 30 day per month as an average!
-    if( rTimeSec >= nDividend and nCptValue < 2 ):
-        nVal = int( rTimeSec / nDividend );
-        strOut += "%d min " % nVal;
-        rTimeSec -= nVal * nDividend;
-        nCptValue += 1;
-
-    nDividend = 60*60*24;
-    if( rTimeSec >= nDividend and nCptValue < 2 ):
-        nVal = int( rTimeSec / nDividend );
-        strOut += "%d j " % nVal;
-        rTimeSec -= nVal * nDividend;
-        nCptValue += 1;
-
-    nDividend = 60*60;
-    if( rTimeSec >= nDividend and nCptValue < 2 ):
-        nVal = int( rTimeSec / nDividend );
-        strOut += "%d hour " % nVal;
-        rTimeSec -= nVal * nDividend;
-        nCptValue += 1;
-
-    nDividend = 60;
-    if( rTimeSec >= nDividend and nCptValue < 2 ):
-        nVal = int( rTimeSec / nDividend );
-        strOut += "%d min " % nVal;
-        rTimeSec -= nVal * nDividend;
-        nCptValue += 1;
-
-    nDividend = 1;
-    if( rTimeSec >= nDividend and nCptValue < 2 ):
-        nVal = int( rTimeSec / nDividend );
-        strOut += "%d s " % nVal;
-        rTimeSec -= nVal * nDividend;
-        nCptValue += 1;
-
-    if( rTimeSec > 0. and nCptValue < 2 ):
-        strOut += "%3d ms" % int( rTimeSec*1000 );
-        nCptValue += 1;
-
-    return strOut;
-# timeToString - end
 
 def runCommandGetResults( strCommand ):
     strFilename = "/tmp/" + str(time.time())
@@ -167,11 +118,7 @@ MAC Address: B8:27:EB:C1:69:F7 (Raspberry Pi Foundation)
     return listUp
 # getHostUp - end
             
-            
-def getDateStamp():
-    datetimeObject = datetime.datetime.now()
-    strStamp = datetimeObject.strftime( "%Y_%m_%d")
-    return strStamp
+
     
 class Stater:
     
@@ -206,7 +153,7 @@ class Stater:
         return "?"
         
     def updateConnected( self ):
-        self.strDate = getDateStamp()    
+        self.strDate = misctools.getDateStamp()    
         listUp = getHostUp()
         if not self.strDate in self.dStatPerDay.keys():
             self.dStatPerDay[self.strDate]={}
@@ -243,7 +190,7 @@ class Stater:
             if v[2]: strPage += "<td><b>%s</b></td>" % self.getLabels(k)
             else: strPage += "<td>%s</td>" % self.getLabels(k)
             strPage += "<td>%s</td>" % v[0]
-            strPage += "<td>%s</td>" % timeToString(v[1])
+            strPage += "<td>%s</td>" % misctools.timeToString(v[1])
             strPage += "<td>%s</td>" % strUp
             strPage += "</tr>"
         strPage += "</table></body></html>"

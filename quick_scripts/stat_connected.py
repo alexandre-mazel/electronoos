@@ -1,9 +1,22 @@
+#!/usr/bin/python
+
+def logDebug(txt):
+    pass
+    #file = open("/home/pi/pi_error.log", "at" )
+    #file.write(txt + "\n")
+    #file.close()
+    
+logDebug("Started")
 import os
 import datetime
 import time
 
 import sys
-sys.path.append("../alex_pytools/")
+
+
+strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
+logDebug("strLocalPath: " + strLocalPath)
+sys.path.append(strLocalPath+"/../alex_pytools/")
 import misctools
 
 
@@ -193,22 +206,30 @@ class Stater:
             strPage += "<td>%s</td>" % misctools.timeToString(v[1])
             strPage += "<td>%s</td>" % strUp
             strPage += "</tr>"
-        strPage += "</table></body></html>"
+        strPage += "</table>"
+        strPage += "<font size=-10>last computed: %s</font>" % misctools.getTimeStamp()
+        strPage += "</body></html>"
         f = open("/var/www/html/stat_up.html", "wt")
         f.write(strPage)
         f.close()
-            
-            
         
 # class Stater - end
 
 def loopUpdate():
+    logDebug("loopUpdate: begin")
     stats = Stater()
     nCnt = 0
     nTimeSleep = 1 # at start, we sleep less for debug purpose, and it will become higher during time pass
     while 1:
-            stats.updateConnected()
-            stats.generatePage()
+            try:
+                logDebug("loopUpdate: avant update connected")
+                stats.updateConnected()
+                logDebug("loopUpdate: avant generatePage")
+                stats.generatePage()
+            except BaseException as err:
+                strErr = "ERR: loopUpdate: err: %s" % str(err)
+                print(strErr)
+                logDebug(strErr)
             nCnt += 1
             #~ if nCnt>3:
                 #~ break

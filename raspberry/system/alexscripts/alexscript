@@ -1,0 +1,23 @@
+#!/bin/sh -e
+### BEGIN INIT INFO
+# Provides:          
+# Required-Start:    
+# Required-Stop:
+# Default-Start:     S
+# Default-Stop:
+# Short-Description: Start systemd-udevd, populate /dev and load drivers.
+### END INIT INFO
+
+case "$1" in
+    start)
+        /home/pi/alexscript/main.sh
+	exit 1
+    ;;
+
+    stop)
+    ;;
+
+esac
+
+exit 0
+

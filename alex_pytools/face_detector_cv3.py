@@ -1,4 +1,5 @@
 import cv2 # >= cv 3.3.0
+import numpy as np
 import os
 import sys
 
@@ -25,7 +26,21 @@ class FaceDetector:
         self.net = cv2.dnn.readNetFromCaffe( strProtoTxt, strModel )
         
     def detect( self, im ):
-        pass
+        blob = cv2.dnn.blobFromImage( im, 1.0, (300, 300), (104.0, 177.0, 123.0) )
+        h,w,n=im.shape
+        print("DBG: src is %dx%d" % (w,h) )
+
+        print("DBG: computing face detections...")
+        self.net.setInput(blob)
+        detections = self.net.forward()
+        print("INF: detections: %s" % str(detections))
+        for i in range(0, detections.shape[2]):
+            confidence = detections[0, 0, i, 2]
+            if confidence > 0.5:
+                box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
+                (startX, startY, endX, endY) = box.astype("int")
+                print("DBG: box: %s" % str(box))
+                print("DBG: x,y: %d,%d" % (startX, startY))
         
 # class FaceDetector - end
 
@@ -33,4 +48,5 @@ facedetector = FaceDetector()
 
         
 if __name__ == "__main__":
+    im = cv2.imread("../data/girl_face.jpg")
     facedetector.detect(im)

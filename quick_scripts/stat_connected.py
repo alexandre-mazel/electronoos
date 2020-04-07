@@ -173,7 +173,7 @@ class Stater:
         statToday = self.dStatPerDay[self.strDate]
         tempUpMacList = []
         for info in listUp:
-            ip, mac, d1,d2 = info
+            ip, mac, strHostHint,strDetectedOS = info
             tempUpMacList.append(mac)
             if mac not in statToday.keys():
                 statToday[mac] = [ip, 0,False, "", ""]
@@ -182,8 +182,8 @@ class Stater:
                 statToday[mac][1] += time.time() - self.nLastTime
             else:
                 statToday[mac][2] = True
-                statToday[mac][3] = d1
-                statToday[mac][4] = d2
+                statToday[mac][3] = strHostHint
+                statToday[mac][4] = strDetectedOS
         
         for k,v in statToday.items():
             if k not in tempUpMacList:
@@ -202,6 +202,7 @@ class Stater:
             strPage += "<td>%s</td>" % k
             if v[2]: strPage += "<td><b>%s</b></td>" % self.getLabels(k)
             else: strPage += "<td>%s</td>" % self.getLabels(k)
+            strPage += "<td><font size=-2>%s</font></td>" % v[3]
             strPage += "<td>%s</td>" % v[0]
             strPage += "<td>%s</td>" % misctools.timeToString(v[1])
             strPage += "<td>%s</td>" % strUp

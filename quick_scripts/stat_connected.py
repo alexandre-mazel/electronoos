@@ -206,7 +206,8 @@ class Stater:
     def generatePage( self ):
         statToday = self.dStatPerDay[self.strDate]
         strPage = "<html><head></head><body><table>"
-        for k,v in statToday.items():
+        #for k,v in statToday.items():
+        for k,v in sorted(statToday.items(), key=lambda v: v[1][1], reverse=True ):
             strUp = "Down"
             if v[2]: strUp = "Up"
             strPage += "<tr>"

@@ -15,6 +15,7 @@ import sys
 
 
 strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
+if strLocalPath == "": strLocalPath = "./"
 logDebug("strLocalPath: " + strLocalPath)
 sys.path.append(strLocalPath+"/../alex_pytools/")
 import misctools
@@ -143,7 +144,7 @@ class Stater:
         
     def loadLabels( self ):
         """
-        load list mac => label
+        load list mac => label and hint => label
         """
         self.labels = {
             "B8:27:EB:C1:69:F7": "rasp2",
@@ -158,11 +159,21 @@ class Stater:
             "E4:9E:12:26:39:E1": "FreeBoxTV",
             #:60: elsaphone
         }
-        
-    def getLabels(self, strMAC ):
+
+        self.hostLabels = {
+            "Speed Dragon": "Adapt Usb => Eth",
+            "Wistron Neweb": "NAO6 Wifi",
+        }
+            
+    def getLabels(self, strMAC, strHostHint = "" ):
         try:
             return self.labels[strMAC]
         except: pass
+        if strHostHint != "":
+            # search in host hint table
+            for k,v in self.hostLabels.items():
+                if k in strHostHint:
+                    return v
         return "?"
         
     def updateConnected( self ):
@@ -200,8 +211,8 @@ class Stater:
             if v[2]: strUp = "Up"
             strPage += "<tr>"
             strPage += "<td>%s</td>" % k
-            if v[2]: strPage += "<td><b>%s</b></td>" % self.getLabels(k)
-            else: strPage += "<td>%s</td>" % self.getLabels(k)
+            if v[2]: strPage += "<td><b>%s</b></td>" % self.getLabels(k, v[3])
+            else: strPage += "<td>%s</td>" % self.getLabels(k, v[3])
             strPage += "<td><font size=-2>%s</font></td>" % v[3]
             strPage += "<td>%s</td>" % v[0]
             strPage += "<td>%s</td>" % misctools.timeToString(v[1])

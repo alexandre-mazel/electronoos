@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+"""
+script launched during summer with Patricia coming
+"""
 import cv2
 import datetime
 import mutex

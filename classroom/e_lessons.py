@@ -11,9 +11,11 @@ def drawAndInteract( strLessonFilename = "lesson.pdf" ):
         pix.writePNG(output)
         strLessonFilename = output
         
-    im = cv2.imread(strLessonFilename)
-    cv2.imshow("lesson",im)
-    cv2.waitKey(0)
+    im = cv2.imread(strLessonFilename)    
+    drawer = CV2_Drawer( im)
+    while 1:
+        if drawer.isFinished():
+            break
 
 
 drawAndInteract()

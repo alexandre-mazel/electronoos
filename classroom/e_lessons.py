@@ -19,8 +19,16 @@ def drawAndInteract( strLessonFilename = "lesson.pdf" ):
         pix.writePNG(output)
         strLessonFilename = output
         
-    im = cv2.imread(strLessonFilename)    
-    drawer = draw_on_cv2.CV2_Drawer( im)
+    im = cv2.imread(strLessonFilename)
+    
+    # found each rect
+    gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+    gray = (255-gray)
+    (contours, hierarchy) = cv2.findContours(gray.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    print( "contours: %s" % str(contours) )
+    print( "hierarchy: %s" % str(hierarchy) )
+    
+    drawer = draw_on_cv2.CV2_Drawer( im )
     while 1:
         if drawer.isFinished():
             break

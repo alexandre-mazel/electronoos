@@ -22,18 +22,29 @@ class CV2_Drawer:
         
         winFlags = cv2.WINDOW_NORMAL | cv2.WINDOW_FREERATIO | cv2.WINDOW_GUI_EXPANDED
         print("winFlags: %X" % winFlags )
-        winFlags = cv2.WINDOW_AUTOSIZE | cv2.WINDOW_FREERATIO | cv2.WINDOW_GUI_EXPANDED
-        print("winFlags: %X" % winFlags )
-        winFlags = cv2.WINDOW_NORMAL | cv2.WINDOW_FREERATIO | cv2.WINDOW_FULLSCREEN
-        print("winFlags: %X" % winFlags )
+        #~ winFlags = cv2.WINDOW_AUTOSIZE | cv2.WINDOW_FREERATIO | cv2.WINDOW_GUI_EXPANDED
+        #~ print("winFlags: %X" % winFlags )
+        #~ winFlags = cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO | cv2.WINDOW_FULLSCREEN
+        #~ print("winFlags: %X" % winFlags )
         
         cv2.namedWindow( self.strWindowName, winFlags )
         h,w,p = self.screen.shape
-        rZoomFactor = 3.
+        
+        from win32api import GetSystemMetrics
+
+        wScreen = GetSystemMetrics(0)
+        hScreen = GetSystemMetrics(1)
+        #~ wScreen *= 2
+        #~ hScreen *= 2
+        print("screen reso: %dx%d" % (wScreen, hScreen) )
+        
+        print("im reso: %dx%d" % (w, h) )
+
+        self.rZoomFactor = 2.
         cv2.imshow( self.strWindowName, self.screen )
         cv2.moveWindow( self.strWindowName, 10, 10 )       
-        cv2.resizeWindow(self.strWindowName, int(rZoomFactor*w),int(rZoomFactor*h)) 
-        cv2.createTrackbar("tb", self.strWindowName, 0, 100, self.onTrackBarChange)
+        cv2.resizeWindow(self.strWindowName, int(self.rZoomFactor*w),int(self.rZoomFactor*h)) 
+        #~ cv2.createTrackbar("tb", self.strWindowName, 0, 100, self.onTrackBarChange)
             
         cv2.setMouseCallback( self.strWindowName, self.on_mouse_event )
         cv2.waitKey(1)
@@ -70,9 +81,28 @@ class CV2_Drawer:
         
         
     def _update( self ):
+        bMustRedraw = False
+        
         key = cv2.waitKey(1) & 0xFF
+        if key != 255: print("key: %d" % key )
         if key == ord('q') or key == 27:
             self.bQuit = True
+        
+        if key == 171 or key == 43: # '+' on num keyboard
+            self.rZoomFactor *=2
+            bMustRedraw = True
+            print("zoom+")
+        elif key == 173 or key == 45: # '-' on num keyboard
+            self.rZoomFactor /=2.
+            bMustRedraw = True
+            print("zoom-")
+            
+        if bMustRedraw:
+            h,w,p = self.screen.shape
+            cv2.imshow( self.strWindowName, self.screen )
+            cv2.resizeWindow(self.strWindowName, int(self.rZoomFactor*w),int(self.rZoomFactor*h)) 
+            
+            
 
     def isFinished( self ):
         self._update()

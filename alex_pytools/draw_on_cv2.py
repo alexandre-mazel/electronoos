@@ -18,7 +18,7 @@ class CV2_Drawer:
         self.strWindowName = strWindowName
         self.bQuit = False
         self.bMouseDown = False
-        self.screen = image[:]
+        self.image = image
         
         winFlags = cv2.WINDOW_NORMAL | cv2.WINDOW_FREERATIO | cv2.WINDOW_GUI_EXPANDED
         print("winFlags: %X" % winFlags )
@@ -28,7 +28,7 @@ class CV2_Drawer:
         #~ print("winFlags: %X" % winFlags )
         
         cv2.namedWindow( self.strWindowName, winFlags )
-        h,w,p = self.screen.shape
+        h,w,p = self.image.shape
         
         from win32api import GetSystemMetrics
 
@@ -41,7 +41,11 @@ class CV2_Drawer:
         print("im reso: %dx%d" % (w, h) )
 
         self.rZoomFactor = 2.
-        cv2.imshow( self.strWindowName, self.screen )
+        self.rZoomFactor = wScreen/w
+        self.hSeen = int( hScreen / self.rZoomFactor )
+        self.yOrig = 0
+        self.yOrigMax = h - self.hSeen
+        self._redraw()
         cv2.moveWindow( self.strWindowName, 10, 10 )       
         cv2.resizeWindow(self.strWindowName, int(self.rZoomFactor*w),int(self.rZoomFactor*h)) 
         #~ cv2.createTrackbar("tb", self.strWindowName, 0, 100, self.onTrackBarChange)
@@ -83,8 +87,8 @@ class CV2_Drawer:
     def _update( self ):
         bMustRedraw = False
         
-        key = cv2.waitKey(1) & 0xFF
-        if key != 255: print("key: %d" % key )
+        key = cv2.waitKey(1)
+        if key != -1: print("key: %d" % key )
         if key == ord('q') or key == 27:
             self.bQuit = True
         
@@ -97,12 +101,27 @@ class CV2_Drawer:
             bMustRedraw = True
             print("zoom-")
             
+        if key == 36: # '$ or up
+            self.yOrig -= 4
+            if self.yOrig < 0:
+                self.yOrig = 0
+            bMustRedraw = True
+        if key == 42: # '* or down
+            self.yOrig += 4
+            if self.yOrig > self.yOrigMax:
+                self.yOrig = self.yOrigMax-1
+            bMustRedraw = True
+
+            
         if bMustRedraw:
-            h,w,p = self.screen.shape
-            cv2.imshow( self.strWindowName, self.screen )
-            cv2.resizeWindow(self.strWindowName, int(self.rZoomFactor*w),int(self.rZoomFactor*h)) 
+            self._redraw()
             
-            
+    def _redraw( self ):
+        self.screen = self.image[self.yOrig:self.yOrig+self.hSeen,:]
+        h,w,p = self.screen.shape
+        
+        cv2.imshow( self.strWindowName, self.screen )
+        cv2.resizeWindow(self.strWindowName, int(self.rZoomFactor*w),int(self.rZoomFactor*h)) 
 
     def isFinished( self ):
         self._update()

@@ -19,9 +19,27 @@ class CV2_Drawer:
         self.bQuit = False
         self.bMouseDown = False
         self.screen = image[:]
+        
+        winFlags = cv2.WINDOW_NORMAL | cv2.WINDOW_FREERATIO | cv2.WINDOW_GUI_EXPANDED
+        print("winFlags: %X" % winFlags )
+        winFlags = cv2.WINDOW_AUTOSIZE | cv2.WINDOW_FREERATIO | cv2.WINDOW_GUI_EXPANDED
+        print("winFlags: %X" % winFlags )
+        winFlags = cv2.WINDOW_NORMAL | cv2.WINDOW_FREERATIO | cv2.WINDOW_FULLSCREEN
+        print("winFlags: %X" % winFlags )
+        
+        cv2.namedWindow( self.strWindowName, winFlags )
+        h,w,p = self.screen.shape
+        rZoomFactor = 3.
         cv2.imshow( self.strWindowName, self.screen )
+        cv2.moveWindow( self.strWindowName, 10, 10 )       
+        cv2.resizeWindow(self.strWindowName, int(rZoomFactor*w),int(rZoomFactor*h)) 
+        cv2.createTrackbar("tb", self.strWindowName, 0, 100, self.onTrackBarChange)
+            
         cv2.setMouseCallback( self.strWindowName, self.on_mouse_event )
         cv2.waitKey(1)
+        
+    def onTrackBarChange( self, count ):
+        print("tb: %d" % count )
         
     def on_mouse_event(self,event, x, y, flags, param):
         #~ print(x, y)
@@ -45,7 +63,7 @@ class CV2_Drawer:
     def _mouseMove( self, x, y ):
         if self.bMouseDown:
             if self.lastPos != None:
-                cv2.line(self.screen, self.lastPos, (x,y), (0,0,0) )
+                cv2.line(self.screen, self.lastPos, (x,y), (0,0,0), 2 )
                 cv2.imshow( self.strWindowName, self.screen )
             self.lastPos = (x,y)
             

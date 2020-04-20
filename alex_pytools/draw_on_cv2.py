@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import cv2
 
 class CV2_Drawer:
@@ -15,25 +16,49 @@ class CV2_Drawer:
     def __init__( self, image, strWindowName = "CV2 Draw" ):
         self.listSegment = [] # list of all mouse drawed segment
         self.strWindowName = strWindowName
-        cv2.imshow("lesson",im)
-        cv2.setMouseCallback( strWindowName, on_mouse_event )
-        cv2.waitKey(0)
+        self.bQuit = False
+        self.bMouseDown = False
+        self.screen = image[:]
+        cv2.imshow( self.strWindowName, self.screen )
+        cv2.setMouseCallback( self.strWindowName, self.on_mouse_event )
+        cv2.waitKey(1)
         
-    def on_mouse_event(event, x, y, flags, param):
-        #print (x, y)
+    def on_mouse_event(self,event, x, y, flags, param):
+        #~ print(x, y)
         pt = (x, y)
         if event == cv2.EVENT_LBUTTONUP:
-            fast.mouseUp( x, y )
+            self._mouseUp( x, y )
         elif event == cv2.EVENT_LBUTTONDOWN:
-            fast.mouseDown( x, y )
+            self._mouseDown( x, y )
         elif event == cv2.EVENT_MOUSEMOVE: # and (flags & cv2.CV_EVENT_FLAG_LBUTTON) :
-            fast.mouseMove( x, y )
+            self._mouseMove( x, y )
     # on_mouse_event - end
     
-    def renderOnImage( self, image ):
-        """
-        render last position on image
-        """
+    def _mouseDown( self, x, y ):
+        self.bMouseDown = True
+        self.lastPos = None
+        self._mouseMove(x,y)
+        
+    def _mouseUp( self, x, y ):
+        self.bMouseDown = False
+        
+    def _mouseMove( self, x, y ):
+        if self.bMouseDown:
+            if self.lastPos != None:
+                cv2.line(self.screen, self.lastPos, (x,y), (0,0,0) )
+                cv2.imshow( self.strWindowName, self.screen )
+            self.lastPos = (x,y)
+            
+        
+        
+    def _update( self ):
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord('q') or key == 27:
+            self.bQuit = True
+
+    def isFinished( self ):
+        self._update()
+        return self.bQuit
         
 # class Drawer - end
 
@@ -41,7 +66,7 @@ class CV2_Drawer:
     #~ cv2.namedWindow( screenName )
     
     
-    """
-    On peut multiplier le numérateur et le dénominateur par un meme nombre sans changer la valeur de la
+"""
+    On peut multiplier le numerateur et le denominateur par un meme nombre sans changer la valeur de la
     fraction, donc 3/5 = 3*2/5*2 =  6/10 soit 0.6
-    """
+"""

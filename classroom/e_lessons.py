@@ -1,6 +1,7 @@
 #~ from fpdf import FPDF # pip3 install fpdf
 import fitz # pip install PyMuPDF # https://pypi.org/project/PyMuPDF/#files
 import cv2
+import time
 
 import os
 import sys
@@ -32,6 +33,8 @@ def drawAndInteract( strLessonFilename = "lesson.pdf" ):
     while 1:
         if drawer.isFinished():
             break
+            
+    cv2.imwrite( "/tmp/" + str(time.time()) + ".png", drawer.image )
 
 
-drawAndInteract()
+drawAndInteract("lesson2.pdf")

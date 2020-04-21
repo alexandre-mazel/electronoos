@@ -19,6 +19,16 @@ class CV2_Drawer:
         self.bQuit = False
         self.bMouseDown = False
         self.image = image
+
+        
+        from win32api import GetSystemMetrics
+        wScreen = GetSystemMetrics(0)
+        hScreen = GetSystemMetrics(1)
+        #~ wScreen *= 2
+        #~ hScreen *= 2
+        print("screen reso: %dx%d" % (wScreen, hScreen) )
+        if wScreen > 2*self.image.shape[1]:
+            self.image = cv2.resize( self.image, (-1,-1), fx=2,fy=2)
         
         winFlags = cv2.WINDOW_NORMAL | cv2.WINDOW_FREERATIO | cv2.WINDOW_GUI_EXPANDED
         print("winFlags: %X" % winFlags )
@@ -29,14 +39,7 @@ class CV2_Drawer:
         
         cv2.namedWindow( self.strWindowName, winFlags )
         h,w,p = self.image.shape
-        
-        from win32api import GetSystemMetrics
 
-        wScreen = GetSystemMetrics(0)
-        hScreen = GetSystemMetrics(1)
-        #~ wScreen *= 2
-        #~ hScreen *= 2
-        print("screen reso: %dx%d" % (wScreen, hScreen) )
         
         print("im reso: %dx%d" % (w, h) )
 
@@ -70,16 +73,23 @@ class CV2_Drawer:
     def _mouseDown( self, x, y ):
         self.bMouseDown = True
         self.lastPos = None
+        self.lenTrait = 0
         self._mouseMove(x,y)
         
     def _mouseUp( self, x, y ):
+        self._mouseMove(x,y)
+        if self.bMouseDown:
+            if self.lenTrait < 2:
+                cv2.circle(self.screen, (x,y), 2, (0,0,0), 0 )
+                cv2.imshow( self.strWindowName, self.screen )
         self.bMouseDown = False
         
     def _mouseMove( self, x, y ):
         if self.bMouseDown:
             if self.lastPos != None:
-                cv2.line(self.screen, self.lastPos, (x,y), (0,0,0), 2 )
+                cv2.line(self.screen, self.lastPos, (x,y), (0,0,0), 2, 0 )
                 cv2.imshow( self.strWindowName, self.screen )
+                self.lenTrait += 1
             self.lastPos = (x,y)
             
         
@@ -102,12 +112,12 @@ class CV2_Drawer:
             print("zoom-")
             
         if key == 36: # '$ or up
-            self.yOrig -= 4
+            self.yOrig -= 10
             if self.yOrig < 0:
                 self.yOrig = 0
             bMustRedraw = True
         if key == 42: # '* or down
-            self.yOrig += 4
+            self.yOrig += 10
             if self.yOrig > self.yOrigMax:
                 self.yOrig = self.yOrigMax-1
             bMustRedraw = True

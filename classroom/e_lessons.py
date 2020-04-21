@@ -46,6 +46,6 @@ def drawAndInteract( strLessonFilename = "lesson.pdf" ):
     cv2.imwrite( "/tmp/" + str(time.time()) + ".png", drawer.image )
 
 
-strLesson = "lesson2.pdf"
+strLesson = "lesson.pdf"
 #~ strLesson = "C:/Users/amazel/Downloads/2020-04-20_-_article_de_Le_Monde_remis_en_page_-_demographie_Paris_confinement_PDF.pdf"
 drawAndInteract(strLesson)

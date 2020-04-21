@@ -14,8 +14,16 @@ import draw_on_cv2
 def drawAndInteract( strLessonFilename = "lesson.pdf" ):
     if ".pdf" in strLessonFilename:
         doc = fitz.open(strLessonFilename)
+        #~ print("doc page number: %d" % (doc.pageCount) )
+        #~ print("doc meta: %s" % (doc.metadata) )
         page = doc.loadPage(0) #number of page
-        pix = page.getPixmap()
+        if 0:
+            zoom_x = 2.0  # 2 => double resolution 72 dpi => 144
+            zoom_y = 2.0  # vertical zoom
+            mat = fitz.Matrix(zoom_x, zoom_y)  # zoom factor 2 in each dimension
+            pix = page.getPixmap(matrix = mat)
+        else:
+            pix = page.getPixmap()
         output = "/tmp/outfile.png"
         pix.writePNG(output)
         strLessonFilename = output
@@ -33,8 +41,11 @@ def drawAndInteract( strLessonFilename = "lesson.pdf" ):
     while 1:
         if drawer.isFinished():
             break
-            
+     
+    print("writing last rendered!")
     cv2.imwrite( "/tmp/" + str(time.time()) + ".png", drawer.image )
 
 
-drawAndInteract("lesson2.pdf")
+strLesson = "lesson2.pdf"
+#~ strLesson = "C:/Users/amazel/Downloads/2020-04-20_-_article_de_Le_Monde_remis_en_page_-_demographie_Paris_confinement_PDF.pdf"
+drawAndInteract(strLesson)

@@ -76,21 +76,25 @@ class CV2_Drawer:
     
     def _mouseDown( self, x, y ):
         self.bMouseDown = True
+        while self.nIndexLastRecord != -1 and self.nIndexLastRecord < len(self.recordedMouseDraw):
+            # after an undo
+            del self.recordedMouseDraw[-1]
         self.recordedMouseDraw.append([])
         self.nIndexLastRecord = len(self.recordedMouseDraw)
-        self.writeStart(x,y)
+        print( "DBG: self.nIndexLastRecord: %s" % self.nIndexLastRecord )
+        self.writeStart(x,y+self.yOrig)
         self._mouseMove(x,y)
         
     def _mouseUp( self, x, y ):
         if self.bMouseDown:
             self._mouseMove(x, y)
-            self.writeEnd(x,y)
+            self.writeEnd(x,y+self.yOrig)
             self.bMouseDown = False
         
     def _mouseMove( self, x, y ):
         if self.bMouseDown:
-            self.recordedMouseDraw[-1].append((x,y))
-            self.writeContinue(x,y)
+            self.recordedMouseDraw[-1].append((x,y+self.yOrig))
+            self.writeContinue(x,y+self.yOrig)
             cv2.imshow( self.strWindowName, self.screen )
             
     def writeStart( self, x, y ):
@@ -99,13 +103,13 @@ class CV2_Drawer:
         
     def writeContinue( self, x, y ):
         if self.lastPos != None:
-            cv2.line(self.screen, self.lastPos, (x,y), (0,0,0), 2, 0 )
+            cv2.line(self.image, self.lastPos, (x,y), (0,0,0), 2, 0 )
         self.lenTrait += 1
         self.lastPos = (x,y)
         
     def writeEnd( self, x, y ):
         if self.lenTrait < 2:
-            cv2.circle(self.screen, (x,y), 2, (0,0,0), 0 )
+            cv2.circle(self.image, (x,y), 2, (0,0,0), 0 )
             cv2.imshow( self.strWindowName, self.screen )
         
     def _update( self ):
@@ -137,8 +141,15 @@ class CV2_Drawer:
             bMustRedraw = True
 
         if key == ord('z'): # z: undo
+            print("undo")
             self.nIndexLastRecord -= 1
             self._redrawAllDrawing()
+
+        if key == ord('y'): # y: redo
+            print("redo")
+            if self.nIndexLastRecord < len(self.recordedMouseDraw):
+                self.nIndexLastRecord += 1
+                self._redrawAllDrawing()
 
             
         if bMustRedraw:
@@ -153,6 +164,8 @@ class CV2_Drawer:
 
     def _redrawAllDrawing( self ):
         self.image = self.imageOriginal.copy()
+        self._redraw()
+        print("recordedMouseDraw: %s" % self.recordedMouseDraw )
         for draw in self.recordedMouseDraw[0:self.nIndexLastRecord]:
             self.writeStart(draw[0][0], draw[0][1])
             for pt in draw:

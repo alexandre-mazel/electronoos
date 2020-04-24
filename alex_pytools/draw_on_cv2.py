@@ -18,7 +18,11 @@ class CV2_Drawer:
         self.strWindowName = strWindowName
         self.bQuit = False
         self.bMouseDown = False
-        self.image = image
+        self.imageOriginal = image
+        self.image = self.imageOriginal.copy()
+        
+        self.recordedMouseDraw = [] # record all position of drawing: a list of all position
+        self.nIndexLastRecord = -1 # point the last recorded (will point the end unless during undo navigation)  
 
         
         from win32api import GetSystemMetrics
@@ -72,27 +76,37 @@ class CV2_Drawer:
     
     def _mouseDown( self, x, y ):
         self.bMouseDown = True
-        self.lastPos = None
-        self.lenTrait = 0
+        self.recordedMouseDraw.append([])
+        self.nIndexLastRecord = len(self.recordedMouseDraw)
+        self.writeStart(x,y)
         self._mouseMove(x,y)
         
     def _mouseUp( self, x, y ):
-        self._mouseMove(x,y)
         if self.bMouseDown:
-            if self.lenTrait < 2:
-                cv2.circle(self.screen, (x,y), 2, (0,0,0), 0 )
-                cv2.imshow( self.strWindowName, self.screen )
-        self.bMouseDown = False
+            self._mouseMove(x, y)
+            self.writeEnd(x,y)
+            self.bMouseDown = False
         
     def _mouseMove( self, x, y ):
         if self.bMouseDown:
-            if self.lastPos != None:
-                cv2.line(self.screen, self.lastPos, (x,y), (0,0,0), 2, 0 )
-                cv2.imshow( self.strWindowName, self.screen )
-                self.lenTrait += 1
-            self.lastPos = (x,y)
+            self.recordedMouseDraw[-1].append((x,y))
+            self.writeContinue(x,y)
+            cv2.imshow( self.strWindowName, self.screen )
             
+    def writeStart( self, x, y ):
+        self.lenTrait = 0
+        self.lastPos = None
         
+    def writeContinue( self, x, y ):
+        if self.lastPos != None:
+            cv2.line(self.screen, self.lastPos, (x,y), (0,0,0), 2, 0 )
+        self.lenTrait += 1
+        self.lastPos = (x,y)
+        
+    def writeEnd( self, x, y ):
+        if self.lenTrait < 2:
+            cv2.circle(self.screen, (x,y), 2, (0,0,0), 0 )
+            cv2.imshow( self.strWindowName, self.screen )
         
     def _update( self ):
         bMustRedraw = False
@@ -122,6 +136,10 @@ class CV2_Drawer:
                 self.yOrig = self.yOrigMax-1
             bMustRedraw = True
 
+        if key == ord('z'): # z: undo
+            self.nIndexLastRecord -= 1
+            self._redrawAllDrawing()
+
             
         if bMustRedraw:
             self._redraw()
@@ -133,6 +151,15 @@ class CV2_Drawer:
         cv2.imshow( self.strWindowName, self.screen )
         cv2.resizeWindow(self.strWindowName, int(self.rZoomFactor*w),int(self.rZoomFactor*h)) 
 
+    def _redrawAllDrawing( self ):
+        self.image = self.imageOriginal.copy()
+        for draw in self.recordedMouseDraw[0:self.nIndexLastRecord]:
+            self.writeStart(draw[0][0], draw[0][1])
+            for pt in draw:
+                self.writeContinue(pt[0],pt[1])
+            self.writeEnd(draw[-1][0],draw[-1][1])
+        self._redraw()
+        
     def isFinished( self ):
         self._update()
         return self.bQuit

@@ -17,7 +17,7 @@ def drawAndInteract( strLessonFilename = "lesson.pdf" ):
         #~ print("doc page number: %d" % (doc.pageCount) )
         #~ print("doc meta: %s" % (doc.metadata) )
         page = doc.loadPage(0) #number of page
-        if 0:
+        if 1:
             zoom_x = 2.0  # 2 => double resolution 72 dpi => 144
             zoom_y = 2.0  # vertical zoom
             mat = fitz.Matrix(zoom_x, zoom_y)  # zoom factor 2 in each dimension
@@ -48,4 +48,5 @@ def drawAndInteract( strLessonFilename = "lesson.pdf" ):
 
 strLesson = "lesson.pdf"
 #~ strLesson = "C:/Users/amazel/Downloads/2020-04-20_-_article_de_Le_Monde_remis_en_page_-_demographie_Paris_confinement_PDF.pdf"
+strLesson = "C:/Users/amazel/Downloads/23_01.pdf"
 drawAndInteract(strLesson)

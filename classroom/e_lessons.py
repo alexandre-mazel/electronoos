@@ -42,7 +42,8 @@ def drawAndInteract( strLessonFilename = "lesson.pdf" ):
         print( "contours: %s" % str(contours) )
         print( "hierarchy: %s" % str(hierarchy) )
     
-    drawer = draw_on_cv2.CV2_Drawer( im )
+    drawer = draw_on_cv2.CV2_Drawable()
+    drawer.create(im)
     while 1:
         if drawer.isFinished():
             break

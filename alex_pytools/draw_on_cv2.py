@@ -1,7 +1,14 @@
 # -*- coding: utf-8 -*-
 import cv2
+import time
 
-class CV2_Drawer:
+def getScreenResolution():
+    from win32api import GetSystemMetrics
+    wScreen = GetSystemMetrics(0)
+    hScreen = GetSystemMetrics(1)
+    return wScreen, hScreen
+
+class CV2_Drawable:
     """
     handle all mouse handling to draw on a cv2 drawed image.
     eg:
@@ -13,21 +20,33 @@ class CV2_Drawer:
         
     
     """
-    def __init__( self, image, strWindowName = "CV2 Draw" ):
+    def __init__( self ):
+        self.strWindowName = None
+        self.reset()
+        
+    def reset( self ):
+        if self.strWindowName != None:
+            cv2.destroyWindow(self.strWindowName)
         self.listSegment = [] # list of all mouse drawed segment
-        self.strWindowName = strWindowName
         self.bQuit = False
         self.bMouseDown = False
+        self.imageOriginal = None
+        self.image = None
+        self.screen = None
+        self.bInScrollMode = False
+        
+        
+    def create(self, image, strWindowName = "Draw on img"):
+        self.reset()
+        
+        self.strWindowName = strWindowName
         self.imageOriginal = image
         self.image = self.imageOriginal.copy()
         
         self.recordedMouseDraw = [] # record all position of drawing: a list of all position
         self.nIndexLastRecord = -1 # point the last recorded (will point the end unless during undo navigation)  
 
-        
-        from win32api import GetSystemMetrics
-        wScreen = GetSystemMetrics(0)
-        hScreen = GetSystemMetrics(1)
+        wScreen, hScreen = getScreenResolution() 
         #~ wScreen *= 2
         #~ hScreen *= 2
         print("screen reso: %dx%d" % (wScreen, hScreen) )
@@ -58,6 +77,7 @@ class CV2_Drawer:
         #~ cv2.createTrackbar("tb", self.strWindowName, 0, 100, self.onTrackBarChange)
             
         cv2.setMouseCallback( self.strWindowName, self.on_mouse_event )
+        self._redraw()
         cv2.waitKey(1)
         
     def onTrackBarChange( self, count ):
@@ -75,7 +95,19 @@ class CV2_Drawer:
     # on_mouse_event - end
     
     def _mouseDown( self, x, y ):
-        self.bMouseDown = True
+
+        if x < 30:
+            # control mode
+            print("INF: _mouseDown: control down: y: %d, screen shape: %d" % (y,self.screen.shape[0]) )
+            nSizeBorderUndo = 30
+            if y < nSizeBorderUndo:
+                self.undo()
+            elif y > self.screen.shape[0] - nSizeBorderUndo:
+                self.redo()
+            self.nControlModeStartY = y
+            self.bInScrollMode = True
+            return
+            
         while self.nIndexLastRecord != -1 and self.nIndexLastRecord < len(self.recordedMouseDraw):
             # after an undo
             del self.recordedMouseDraw[-1]
@@ -83,6 +115,7 @@ class CV2_Drawer:
         self.nIndexLastRecord = len(self.recordedMouseDraw)
         print( "DBG: self.nIndexLastRecord: %s" % self.nIndexLastRecord )
         self.writeStart(x,y+self.yOrig)
+        self.bMouseDown = True
         self._mouseMove(x,y)
         
     def _mouseUp( self, x, y ):
@@ -90,12 +123,27 @@ class CV2_Drawer:
             self._mouseMove(x, y)
             self.writeEnd(x,y+self.yOrig)
             self.bMouseDown = False
+        self.bInScrollMode = False
         
     def _mouseMove( self, x, y ):
         if self.bMouseDown:
             self.recordedMouseDraw[-1].append((x,y+self.yOrig))
             self.writeContinue(x,y+self.yOrig)
             cv2.imshow( self.strWindowName, self.screen )
+        else:
+            if self.bInScrollMode:
+                # control mode
+                dyScroll = self.nControlModeStartY - y
+                print( "dyScroll: %d" % dyScroll )
+                self.yOrig += dyScroll
+                if self.yOrig < 0:
+                    self.yOrig = 0
+                if self.yOrig > self.yOrigMax:
+                    self.yOrig = self.yOrigMax-1
+                self.nControlModeStartY = y
+                self._redraw()
+                
+                
             
     def writeStart( self, x, y ):
         self.lenTrait = 0
@@ -118,7 +166,9 @@ class CV2_Drawer:
         key = cv2.waitKey(1)
         if key != -1: print("key: %d" % key )
         if key == ord('q') or key == 27:
+            cv2.destroyWindow(self.strWindowName)
             self.bQuit = True
+            return
         
         if key == 171 or key == 43: # '+' on num keyboard
             self.rZoomFactor *=2
@@ -141,19 +191,25 @@ class CV2_Drawer:
             bMustRedraw = True
 
         if key == ord('z'): # z: undo
-            print("undo")
-            self.nIndexLastRecord -= 1
-            self._redrawAllDrawing()
+            self.undo()
 
         if key == ord('y'): # y: redo
-            print("redo")
-            if self.nIndexLastRecord < len(self.recordedMouseDraw):
-                self.nIndexLastRecord += 1
-                self._redrawAllDrawing()
-
+            self.redo()
             
         if bMustRedraw:
             self._redraw()
+            
+            
+    def undo( self ):
+        print("undo")
+        self.nIndexLastRecord -= 1
+        self._redrawAllDrawing()
+            
+    def redo( self ):
+        print("redo")
+        if self.nIndexLastRecord < len(self.recordedMouseDraw):
+            self.nIndexLastRecord += 1
+            self._redrawAllDrawing()        
             
     def _redraw( self ):
         self.screen = self.image[self.yOrig:self.yOrig+self.hSeen,:]
@@ -177,11 +233,22 @@ class CV2_Drawer:
         self._update()
         return self.bQuit
         
-# class Drawer - end
+# class CV2_Drawable - end
 
-    #~ screen = numpy.zeros((nSizeY,nSizeX,3), numpy.uint8)
-    #~ cv2.namedWindow( screenName )
+def autoTest():
+    import numpy
+    nSizeX, nSizeY = (800, 600)
+    screen = numpy.zeros((nSizeY,nSizeX,3), numpy.uint8)
+    screen[:] = (255,255,255)
+    drawable = CV2_Drawable()
+    drawable.create(screen)
     
+    while 1:
+        if drawable.isFinished(): # if you don't wait for that, it will crash at exit ?!? (seen 05/2020: windows10 mstablet)
+            break
+            
+if __name__ == "__main__":
+    autoTest()
     
 """
     On peut multiplier le numerateur et le denominateur par un meme nombre sans changer la valeur de la

@@ -34,6 +34,7 @@ class CV2_Drawable:
         self.image = None
         self.screen = None
         self.bInScrollMode = False
+        self.colorDraw = (0,0,0)
         
         
     def create(self, image, strWindowName = "Draw on img"):
@@ -84,22 +85,22 @@ class CV2_Drawable:
         print("tb: %d" % count )
         
     def on_mouse_event(self,event, x, y, flags, param):
-        #~ print(x, y)
+        print( "DBG: event: 0x%x, pos: (%d, %d), flags: %x, param: %s" % (event,x, y,flags, param) )
         pt = (x, y)
         if event == cv2.EVENT_LBUTTONUP:
             self._mouseUp( x, y )
         elif event == cv2.EVENT_LBUTTONDOWN:
             self._mouseDown( x, y )
         elif event == cv2.EVENT_MOUSEMOVE: # and (flags & cv2.CV_EVENT_FLAG_LBUTTON) :
-            self._mouseMove( x, y )
+            self._mouseMove( x, y, bErase = (flags==1) )
     # on_mouse_event - end
     
     def _mouseDown( self, x, y ):
 
-        if x < 30:
+        if x < 40:
             # control mode
             print("INF: _mouseDown: control down: y: %d, screen shape: %d" % (y,self.screen.shape[0]) )
-            nSizeBorderUndo = 30
+            nSizeBorderUndo = 40
             if y < nSizeBorderUndo:
                 self.undo()
             elif y > self.screen.shape[0] - nSizeBorderUndo:
@@ -125,10 +126,10 @@ class CV2_Drawable:
             self.bMouseDown = False
         self.bInScrollMode = False
         
-    def _mouseMove( self, x, y ):
+    def _mouseMove( self, x, y, bErase = False ):
         if self.bMouseDown:
             self.recordedMouseDraw[-1].append((x,y+self.yOrig))
-            self.writeContinue(x,y+self.yOrig)
+            self.writeContinue(x,y+self.yOrig, bErase)
             cv2.imshow( self.strWindowName, self.screen )
         else:
             if self.bInScrollMode:
@@ -149,15 +150,19 @@ class CV2_Drawable:
         self.lenTrait = 0
         self.lastPos = None
         
-    def writeContinue( self, x, y ):
+    def writeContinue( self, x, y, bErase = False ):
         if self.lastPos != None:
-            cv2.line(self.image, self.lastPos, (x,y), (0,0,0), 2, 0 )
+            if bErase:
+                col = (127,127,127)
+            else:
+                col= self.colorDraw
+            cv2.line(self.image, self.lastPos, (x,y), col, 2, 0 )
         self.lenTrait += 1
         self.lastPos = (x,y)
         
     def writeEnd( self, x, y ):
         if self.lenTrait < 2:
-            cv2.circle(self.image, (x,y), 2, (0,0,0), 0 )
+            cv2.circle(self.image, (x,y), 2, self.colorDraw, 0 )
             cv2.imshow( self.strWindowName, self.screen )
         
     def _update( self ):
@@ -232,6 +237,9 @@ class CV2_Drawable:
     def isFinished( self ):
         self._update()
         return self.bQuit
+        
+    def setDrawColor( self, color = (0,0,0) ):
+        self.colorDraw = color
         
 # class CV2_Drawable - end
 

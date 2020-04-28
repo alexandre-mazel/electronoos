@@ -14,8 +14,11 @@ import draw_on_cv2
 
 def drawAndInteract( strLessonFilename = "lesson.pdf" ):
     if ".pdf" in strLessonFilename:
+        
         print("INF: drawAndInteract: loading pdf '%s'" % strLessonFilename )
+        
         import fitz # pip install PyMuPDF # https://pypi.org/project/PyMuPDF/#files
+        
         doc = fitz.open(strLessonFilename)
         #~ print("doc page number: %d" % (doc.pageCount) )
         #~ print("doc meta: %s" % (doc.metadata) )
@@ -44,6 +47,7 @@ def drawAndInteract( strLessonFilename = "lesson.pdf" ):
     
     drawer = draw_on_cv2.CV2_Drawable()
     drawer.create(im)
+    drawer.setDrawColor((180,40,43))
     while 1:
         if drawer.isFinished():
             break
@@ -56,5 +60,6 @@ def drawAndInteract( strLessonFilename = "lesson.pdf" ):
 strLesson = "lesson.pdf"
 #~ strLesson = "C:/Users/amazel/Downloads/2020-04-20_-_article_de_Le_Monde_remis_en_page_-_demographie_Paris_confinement_PDF.pdf"
 strLesson = "C:/Users/amazel/Downloads/24_04.pdf"
+strLesson = "C:/Users/amazel/Downloads/28_4.pdf"
 #~ strLesson = "/tmp/1587730327.8424518.png"
 drawAndInteract(strLesson)

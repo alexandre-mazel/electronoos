@@ -60,6 +60,6 @@ def drawAndInteract( strLessonFilename = "lesson.pdf" ):
 strLesson = "lesson.pdf"
 #~ strLesson = "C:/Users/amazel/Downloads/2020-04-20_-_article_de_Le_Monde_remis_en_page_-_demographie_Paris_confinement_PDF.pdf"
 strLesson = "C:/Users/amazel/Downloads/24_04.pdf"
-strLesson = "C:/Users/amazel/Downloads/28_4.pdf"
+strLesson = "C:/Users/amazel/Downloads/0504_4.pdf"
 #~ strLesson = "/tmp/1587730327.8424518.png"
 drawAndInteract(strLesson)

@@ -151,6 +151,7 @@ class CV2_Drawable:
         self.lastPos = None
         
     def writeContinue( self, x, y, bErase = False ):
+        bErase = False
         if self.lastPos != None:
             if bErase:
                 col = (127,127,127)

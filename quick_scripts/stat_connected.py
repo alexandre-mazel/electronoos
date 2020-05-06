@@ -154,10 +154,16 @@ class Stater:
             "BC:83:85:00:24:35": "TabPro4",
             "B8:8A:EC:C7:73:14": "SwitchCorto",
             "48:4B:AA:68:E4:41": "IphoneAlex",
+            "B8:FF:61:54:81:FA": "IpadAlex",
             "90:21:81:27:D5:58": "TabletGaia",
             "64:27:37:D3:31:67": "OrdiCorto", #E4:9E:12:26:39:E1
             "E4:9E:12:26:39:E1": "FreeBoxTV",
+            "E4:9E:12:26:39:E0": "FreeBoxTV Eth",
             #:60: elsaphone
+            "00:13:95:1C:0E:C6": "PepperAlex9 Eth",
+            "48:A9:D2:8C:75:F8": "PepperAlex9 Wifi",
+            "00:08:22:66:0C:FC": "PepperAlex9 Tab",
+            
         }
 
         self.hostLabels = {

@@ -23,6 +23,7 @@ def generatePdfFromImagesAndText( listImgs, strOutPdfFilename, strVersoText = No
     - aListArea: for each area one image will be generated and copied as a new image (one area per page if nbr_image_per_page = 1)
     """
     pdf = FPDF('P', 'mm', 'A4') # Portrait, measures in mm, format is A4
+    #~ pdf.SetAuthor("amazel")
     #~ pdf.add_page()
     #~ pdf.set_font('Arial', 'B', 16)
     #~ pdf.cell(40, 10, 'Hello World!')

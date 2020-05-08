@@ -8,7 +8,9 @@ import os
 import select
 import time
 import sys
-import v4l2capture  # can be found here : https://github.com/gebart/python-v4l2capture
+try: import v4l2capture  # can be found here : https://github.com/gebart/python-v4l2capture
+except: pass # can be skipped if no use of v4l2 function
+
 """
 sudo apt-get install libv4l-dev
 git clone https://github.com/gebart/python-v4l2capture.gitlibv4l-dev

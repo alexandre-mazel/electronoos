@@ -12,6 +12,18 @@ import struct
 import time
 import multiprocessing
 
+def getFreeDiskSpace():
+    """
+    return current disk space in bytes
+    """
+    if os.name == 'posix':
+        s = os.statvfs('/')
+        nSize = (s.f_bavail * s.f_frsize)
+        return nSize
+    import psutil # pip install psutil
+    usa = psutil.disk_usage('/')
+    return usa.free
+
 class FlushableFile:
     """
     A flushable multi os multi python version file encapsulation
@@ -50,7 +62,7 @@ class FlushableFile:
                 #~ print("flush 1")
                 win32file.FlushFileBuffers( self.handle )
                 #~ print("flush 2")
-                #~ os.fsync( win32file._get_osfhandle(self.handle) )
+                #~ os.fsync( win32file._get_osfhandle(self.handle) ) # _get_osfhandle to go from fd from file.open() to system handle not from this win32 handle...
                 #~ print("flush 3")
                 pass
             except win32file.error as err:
@@ -83,10 +95,10 @@ def clear_caches():
     
 
 def print_version():
-    print( "python version : %d.%d.%d (%dbits) (%d core(s))" % (sys.version_info.major,sys.version_info.minor,sys.version_info.micro,8 * struct.calcsize("P"),multiprocessing.cpu_count()) )
+    print( "python version   : %d.%d.%d (%dbits) (%d core(s))" % (sys.version_info.major,sys.version_info.minor,sys.version_info.micro,8 * struct.calcsize("P"),multiprocessing.cpu_count()) )
     
 def test_cpu_int( bPrint = True ):
-    if bPrint: sys.stdout.write( "test_cpu_int2  : " )
+    if bPrint: sys.stdout.write( "test_cpu_int2    : " )
     timeBegin = time.time();
     x = 18
     for i in range( 20 ):
@@ -100,7 +112,7 @@ def test_cpu_int( bPrint = True ):
 #test_cpu_int - end
 
 def test_cpu_float( bPrint = True ):
-    if bPrint: sys.stdout.write( "test_cpu_float2: " )
+    if bPrint: sys.stdout.write( "test_cpu_float2  : " )
     timeBegin = time.time();
     x = 18.2
     for i in range( 20 ):
@@ -118,17 +130,17 @@ def test_numpy( bPrint = True ):
         import numpy
         import numpy.random
     except:
-        if bPrint: print( "numpy: not found")
+        if bPrint: print( "numpy        : not found")
         return 0
 
     try:
         import scipy.fftpack
     except:
-        if bPrint: print( "scipy.fftpack: not found")
+        if bPrint: print( "scipy.fftpack    : not found")
         return 0
         
     
-    if bPrint: sys.stdout.write( "test_scipy_xxt : " )
+    if bPrint: sys.stdout.write( "test_scipy_xxt   : " )
     timeBegin = time.time();
     nLengthSec = 10
     for i in range(20):
@@ -148,13 +160,13 @@ def test_opencv_orb( bPrint = True ):
     try:
         import cv2
     except:
-        if bPrint: print( "opencv: not found")
+        if bPrint: print( "opencv  : not found")
         return 0
         
     import math
     import numpy
     
-    if bPrint: sys.stdout.write( "test_orb%-7s: " % cv2.__version__ )
+    if bPrint: sys.stdout.write( "test_orb%-9s: " % cv2.__version__ )
     h = 640
     w = 480    
     img = numpy.zeros((h,w,1), numpy.uint8)
@@ -201,9 +213,9 @@ def test_opencv_orb_realcase( bPrint = True ):
     global bFirstTime
     if bFirstTime:
         bFirstTime = False
-        if bPrint: sys.stdout.write( "test_orbcv imgs: " )
+        if bPrint: sys.stdout.write( "test_orbcv imgs  : " )
     else:
-        if bPrint: sys.stdout.write( "test_orbcv bis : " )
+        if bPrint: sys.stdout.write( "test_orbcv bis   : " )
     h = 640
     w = 480    
     img = numpy.zeros((h,w,1), numpy.uint8)
@@ -255,34 +267,34 @@ def test_opencv_orb_realcase( bPrint = True ):
 
         
 
-def test_disk_write( nMB=200 ):
-    sys.stdout.write( "test_disk_write: " )
+def test_disk_write( nMB=200, nPacketSize = 1024 ):
+    sys.stdout.write( "disk_write %4dKB: " %  (nPacketSize/1024) )
     timeBegin = time.time();
     file = FlushableFile( "temp.tmp", "w" );
-    nTimePerLoop = int(100000*nMB / 200);
+    nTimePerLoop = int(1024*1024*nMB / (20*nPacketSize));
     for i in range( 20 ):
         for i in range(nTimePerLoop):
-            file.write( "A"*100 );
+            file.write( "A" * nPacketSize );
         sys.stdout.write( "#" );
         sys.stdout.flush();
     file.flush();
     file.close();
     rDuration = time.time() - timeBegin;
-    print("%7.2fs (%5.2f Mo/s)" % (rDuration,20*nTimePerLoop*100/(rDuration*1024*1024)));
+    print("%7.2fs (%5.2f Mo/s)" % (rDuration,20*nTimePerLoop*nPacketSize/(rDuration*1024*1024)));
     return rDuration;
 #test_disk_write - end
         
         
         
-def test_disk_read( nMB=200 ):
-    sys.stdout.write( "test_disk_read : " )
+def test_disk_read( nMB=200, nPacketSize = 1024 ):
+    sys.stdout.write( "disk_read  %4dKB: " %  (nPacketSize/1024) )
     clear_caches()
     timeBegin = time.time();
     file = FlushableFile( "temp.tmp", "r" );
-    nTimePerLoop = int(100000*nMB / 200);
+    nTimePerLoop = int(1024*1024*nMB / (20*nPacketSize));
     for i in range( 20 ):
         for i in range(nTimePerLoop):
-            dummy = file.read(1*100);
+            dummy = file.read(1*nPacketSize);
         sys.stdout.write( "#" );
         sys.stdout.flush();
     file.flush();
@@ -294,7 +306,7 @@ def test_disk_read( nMB=200 ):
         #~ strMsg = "ERR: test_disk_read: while fsyncing: %s" % str(err);
     file.close();
     rDuration = time.time() - timeBegin;
-    print("%7.2fs (%5.2f Mo/s)" % (rDuration,20*nTimePerLoop*100/(rDuration*1024*1024)));
+    print("%7.2fs (%5.2f Mo/s)" % (rDuration,20*nTimePerLoop*nPacketSize/(rDuration*1024*1024)));
     if( strMsg != "" ):
         print( strMsg )
     return rDuration;
@@ -306,7 +318,7 @@ def simple_test(bToto):
 def test_multithreading():
     # It shows us that
     import platform
-    if platform.system() == 'Windows':
+    if platform.system() == 'Windows' or 1:
         return 0
 
     rTotalDuration = 0
@@ -346,15 +358,24 @@ def test_perf(nDiskTestSizeMB=200):
         # multithreading
         rTotalTime += test_multithreading();
             
-    rTotalTime += test_disk_write(nMB=nDiskTestSizeMB);
-    rTotalTime += test_disk_read(nMB=nDiskTestSizeMB);
+    rTotalTime += test_disk_write(nMB=nDiskTestSizeMB, nPacketSize=1024);
+    rTotalTime += test_disk_read(nMB=nDiskTestSizeMB, nPacketSize=1024);
+    
+    rTotalTime += test_disk_write(nMB=nDiskTestSizeMB, nPacketSize=1024*1024);
+    rTotalTime += test_disk_read(nMB=nDiskTestSizeMB, nPacketSize=1024*1024);
+    
     os.unlink( "temp.tmp" );
 # test_perf - end
     
-nDiskTestSizeMB = 200;    
+nDiskTestSizeMB = 1000;    
 if( len(sys.argv)> 1 ):
     nDiskTestSizeMB=int(sys.argv[1]);
-    print( "Changing disk test size to %d MB" % nDiskTestSizeMB );
+    print( "INF: Changing disk test size to %d MB" % nDiskTestSizeMB );
+    
+if getFreeDiskSpace() /(1024*1024) < nDiskTestSizeMB:
+    nDiskTestSizeMB = int( (getFreeDiskSpace()*0.9)/(1024*1024) )
+    print( "INF: Due to low empty disk space, reducing disk test size to %d MB" % nDiskTestSizeMB );
+    
 test_perf(nDiskTestSizeMB=nDiskTestSizeMB);
 
 #####################################
@@ -433,6 +454,133 @@ test_orbcv bis : test_perf_vga_*.png: not found
 test_disk_write: #################### 562.11s ( 6.79 Mo/s)
 test_disk_read : #################### 123.60s (30.86 Mo/s)
 
+
+D:\>python c:test_perf.py
+INF: Due to low empty disk space, reducing disk test size to 439 MB
+python version : 3.8.2 (32bits) (4 core(s))
+test_cpu_int2    : ####################   1.06s
+test_cpu_float2  : ####################   0.45s
+scipy.fftpack    : not found
+test_orb4.2.0    : ####################   0.36s (278.26fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : test_perf_vga_*.png: not found
+disk_write    1KB: ####################  21.37s (20.55 Mo/s)
+disk_read     1KB: ####################   1.58s (278.03 Mo/s)
+disk_write 1024KB: ####################  17.76s (23.65 Mo/s)
+disk_read  1024KB: ####################   0.20s (2069.58 Mo/s)
+
+SSD
+python version   : 3.8.2 (32bits) (4 core(s))
+test_cpu_int2    : ####################   1.03s
+test_cpu_float2  : ####################   0.45s
+scipy.fftpack    : not found
+test_orb4.2.0    : ####################   0.36s (278.23fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : test_perf_vga_*.png: not found
+disk_write    1KB: ####################   9.49s (105.35 Mo/s)
+disk_read     1KB: ####################   3.72s (268.89 Mo/s)
+disk_write 1024KB: ####################   7.05s (141.80 Mo/s)
+disk_read  1024KB: ####################   0.47s (2134.67 Mo/s)
+
+
+SD128
+INF: Due to low empty disk space, reducing disk test size to 439 MB
+python version : 3.8.2 (32bits) (4 core(s))
+test_cpu_int2    : ####################   1.06s
+test_cpu_float2  : ####################   0.45s
+scipy.fftpack    : not found
+test_orb4.2.0    : ####################   0.36s (278.26fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : test_perf_vga_*.png: not found
+disk_write    1KB: ####################  21.37s (20.55 Mo/s)
+disk_read     1KB: ####################   1.58s (278.03 Mo/s)
+disk_write 1024KB: ####################  17.76s (23.65 Mo/s)
+disk_read  1024KB: ####################   0.20s (2069.58 Mo/s)
+
+USB nvidia
+python version   : 3.8.2 (32bits) (4 core(s))
+test_cpu_int2    : ####################   1.05s
+test_cpu_float2  : ####################   0.45s
+scipy.fftpack    : not found
+test_orb4.2.0    : ####################   0.36s (278.23fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : test_perf_vga_*.png: not found
+disk_write    1KB: #################### 154.01s ( 6.49 Mo/s)
+disk_read     1KB: ####################   4.83s (207.25 Mo/s)
+disk_write 1024KB: #################### 144.02s ( 6.94 Mo/s)
+disk_read  1024KB: ####################   1.58s (633.58 Mo/s)
+
+Raspberry3:
+
+Use raspi-config to set the country before use.
+
+pi@rasp3thermal:~ $ python3 therm_test.py
+python3: can't open file 'therm_test.py': [Errno 2] No such file or directory
+pi@rasp3thermal:~ $ python test_perf.py
+python version   : 2.7.16 (32bits) (4 core(s))
+test_cpu_int2    : #################### 327.49s
+test_cpu_float2  : ####################   0.95s
+scipy.fftpack    : not found
+test_orb3.2.0    : ####################   2.70s (37.08fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : test_perf_vga_*.png: not found
+disk_write    1KB: ####################  80.71s (12.39 Mo/s)
+disk_read     1KB: ####################  46.41s (21.55 Mo/s)
+disk_write 1024KB: ####################  79.09s (12.64 Mo/s)
+disk_read  1024KB: ####################  44.53s (22.45 Mo/s)
+pi@rasp3thermal:~ $ python test_perf.py
+python version   : 2.7.16 (32bits) (4 core(s))
+test_cpu_int2    : ####################   5.60s
+test_cpu_float2  : ####################   0.94s
+scipy.fftpack    : not found
+^C^C^Copencv  : not found
+test_orbcv imgs  : test_perf_vga_*.png: not found
+^Ctest_orbcv bis   : Traceback (most recent call last):
+  File "test_perf.py", line 379, in <module>
+    test_perf(nDiskTestSizeMB=nDiskTestSizeMB);
+  File "test_perf.py", line 356, in test_perf
+    rTotalTime += test_opencv_orb_realcase(); # because on some computer the previous one takes time initialise stuffs
+  File "test_perf.py", line 224, in test_opencv_orb_realcase
+    img[j,i,0] = math.sin(w*h)*1000
+KeyboardInterrupt
+^C
+pi@rasp3thermal:~ $ python3 test_perf.py
+python version   : 3.7.3 (32bits) (4 core(s))
+test_cpu_int2    : ####################   5.59s
+test_cpu_float2  : ####################   1.02s
+numpy        : not found
+opencv  : not found
+opencv: not found
+opencv: not found
+disk_write    1KB: ####################  79.74s (12.54 Mo/s)
+disk_read     1KB: ####################  46.46s (21.53 Mo/s)
+
+biga:
+am@biga:~$ sudo python test_perf.py
+python version   : 2.7.12 (64bits) (8 core(s))
+test_cpu_int2    : ####################   0.55s
+test_cpu_float2  : ####################   0.13s
+scipy.fftpack    : not found
+test_orb2.4.9.1  : ####################   0.29s (347.60fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : test_perf_vga_*.png: not found
+disk_write    1KB: ####################  12.05s (82.98 Mo/s)
+disk_read     1KB: ####################  11.55s (86.58 Mo/s)
+disk_write 1024KB: ####################  10.57s (94.59 Mo/s)
+disk_read  1024KB: ####################   9.88s (101.20 Mo/s)
+
+am@biga:~$ sudo python3 test_perf.py
+python version   : 3.5.2 (64bits) (8 core(s))
+test_cpu_int2    : ####################   0.54s
+test_cpu_float2  : ####################   0.15s
+numpy        : not found
+opencv  : not found
+opencv: not found
+opencv: not found
+disk_write    1KB: ####################  12.30s (81.28 Mo/s)
+disk_read     1KB: ####################  10.74s (93.13 Mo/s)
+disk_write 1024KB: ####################  11.36s (88.00 Mo/s)
+disk_read  1024KB: ####################   0.77s (1291.93 Mo/s)
 
 
 """

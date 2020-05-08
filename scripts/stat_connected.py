@@ -15,6 +15,7 @@ import sys
 
 
 strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
+if strLocalPath == "": strLocalPath = "./"
 logDebug("strLocalPath: " + strLocalPath)
 if strLocalPath == "": strLocalPath = './'
 sys.path.append(strLocalPath+"/../alex_pytools/")
@@ -144,7 +145,7 @@ class Stater:
         
     def loadLabels( self ):
         """
-        load list mac => label
+        load list mac => label and hint => label
         """
         self.labels = {
             "B8:27:EB:C1:69:F7": "rasp2",
@@ -154,16 +155,32 @@ class Stater:
             "BC:83:85:00:24:35": "TabPro4",
             "B8:8A:EC:C7:73:14": "SwitchCorto",
             "48:4B:AA:68:E4:41": "IphoneAlex",
+            "B8:FF:61:54:81:FA": "IpadAlex",
             "90:21:81:27:D5:58": "TabletGaia",
             "64:27:37:D3:31:67": "OrdiCorto", #E4:9E:12:26:39:E1
             "E4:9E:12:26:39:E1": "FreeBoxTV",
+            "E4:9E:12:26:39:E0": "FreeBoxTV Eth",
             #:60: elsaphone
+            "00:13:95:1C:0E:C6": "PepperAlex9 Eth",
+            "48:A9:D2:8C:75:F8": "PepperAlex9 Wifi",
+            "00:08:22:66:0C:FC": "PepperAlex9 Tab",
+            
         }
-        
-    def getLabels(self, strMAC ):
+
+        self.hostLabels = {
+            "Speed Dragon": "Adapt Usb => Eth",
+            "Wistron Neweb": "NAO6 Wifi",
+        }
+            
+    def getLabels(self, strMAC, strHostHint = "" ):
         try:
             return self.labels[strMAC]
         except: pass
+        if strHostHint != "":
+            # search in host hint table
+            for k,v in self.hostLabels.items():
+                if k in strHostHint:
+                    return v
         return "?"
         
     def updateConnected( self ):
@@ -196,13 +213,14 @@ class Stater:
     def generatePage( self ):
         statToday = self.dStatPerDay[self.strDate]
         strPage = "<html><head></head><body><table>"
-        for k,v in statToday.items():
+        #for k,v in statToday.items():
+        for k,v in sorted(statToday.items(), key=lambda v: v[1][1], reverse=True ):
             strUp = "Down"
             if v[2]: strUp = "Up"
             strPage += "<tr>"
             strPage += "<td>%s</td>" % k
-            if v[2]: strPage += "<td><b>%s</b></td>" % self.getLabels(k)
-            else: strPage += "<td>%s</td>" % self.getLabels(k)
+            if v[2]: strPage += "<td><b>%s</b></td>" % self.getLabels(k, v[3])
+            else: strPage += "<td>%s</td>" % self.getLabels(k, v[3])
             strPage += "<td><font size=-2>%s</font></td>" % v[3]
             strPage += "<td>%s</td>" % v[0]
             strPage += "<td>%s</td>" % misctools.timeToString(v[1])

@@ -21,29 +21,48 @@ def isPilImgEqual(im1, im2):
 # isPilImgEqual - end
 
 def bipInform():
-    import winsound
-    frequency = 500 # Set Frequency To 2500 Hertz
-    duration = 50  # Set Duration To 1000 ms == 1 second
-    winsound.Beep(frequency, duration)
+    frequency = 200 # Set Frequency To 2500 Hertz
+    duration = 250  # Set Duration To 1000 ms == 1 second
+    misctools.beep(frequency, duration)
+
+    
+global_lastBeep = (-1,-1)
+def beepEveryHalf():
+    global global_lastBeep
+    h,m,s = misctools.getTime()
+    if (h,m) == global_lastBeep:
+        return
+    if m == 0 or m == 30:
+        global_lastBeep = (h,m)
+        misctools.beep(440, 1000)
+    
+    
 
 def continuousSave():
     print("INF: continuousSaveOfClipbBoardImage...")
     img_prev = None
+    nFrameWithoutSave = 0
     while 1:
+        beepEveryHalf()
         img = ImageGrab.grabclipboard()
         # or ImageGrab.grab() to grab the whole screen!
         if img == None:
-            time.sleep(0.2)
+            time.sleep(0.5)
             continue
         if not isPilImgEqual( img, img_prev ):
             img_prev = img
-            name = "/tmp/" + misctools.getFilenameFromTime() + ".png"
+            name = "/tmp_scr/" + misctools.getFilenameFromTime() + ".png"
             print( "INF: saving to '%s'" % name ) 
             img.save( name, 'PNG' )
             bipInform()
+            nFrameWithoutSave = 0
         else:
-            time.sleep(0.2)
+            if nFrameWithoutSave > 20:
+                time.sleep(0.4)
+            else:
+                time.sleep(0.05)
+            nFrameWithoutSave += 1
 # continuousSave - end
 
-
-continuousSave()
+if __name__ == "__main__":
+    continuousSave()

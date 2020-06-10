@@ -18,9 +18,15 @@ def findInFile( filename, strToMatch ):
     nCptLine = 1
     nNbrMatch = 0
     while 1:
-        line = file.readline()
-        if line == None or len(line) == 0:
-            break
+        try:
+            line = file.readline()
+            if line == None or len(line) == 0:
+                break
+        except UnicodeDecodeError as err:
+            print( "WRN: decode error: %s\n=> skipping line %d in '%s'" % (str(err),nCptLine, filename) )
+            nCptLine += 1
+            continue
+            
         #~ print(l)
         # try with a double test
         #if stringmatch.isMatch(line.lower(),strToMatchLower): # will force to enclose the word to look for between * (boring)

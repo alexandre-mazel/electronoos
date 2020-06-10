@@ -34,6 +34,14 @@ def mse(imageA, imageB, bDenoise = False):
     return abs(err)
 
 
+    
+def getTime():
+    """
+    return (hour,min,second)
+    """
+    datetimeObject = datetime.datetime.now()
+    return datetimeObject.hour, datetimeObject.minute, datetimeObject.second 
+
 def getTimeStamp():
     datetimeObject = datetime.datetime.now()
     strTimeStamp = datetimeObject.strftime( "%Y/%m/%d: %Hh%Mm%Ss" )
@@ -296,3 +304,8 @@ def makeDirsQuiet( strPath ):
     #os.makedirs(strPath,exist_ok=True) # exist_ok only in python3
     try: os.makedirs(strPath)
     except OSError as err: pass
+    
+def beep(frequency, duration):
+    # duration in ms
+    import winsound
+    winsound.Beep(frequency, duration)

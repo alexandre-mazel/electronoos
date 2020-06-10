@@ -145,7 +145,7 @@ def test_numpy( bPrint = True ):
     nLengthSec = 10
     for i in range(20):
         nSizeArray = nLengthSec*48000*2
-        n = numpy.random.random_integers( -32000,32000,nSizeArray)
+        n = numpy.random.randint( -32000,32000+1,nSizeArray)
         res = scipy.fftpack.fft(n)
         n = numpy.zeros(nSizeArray, dtype=numpy.float)
         res = scipy.fftpack.dct(n)
@@ -555,7 +555,8 @@ opencv: not found
 disk_write    1KB: ####################  79.74s (12.54 Mo/s)
 disk_read     1KB: ####################  46.46s (21.53 Mo/s)
 
-biga:
+*** biga ***
+
 am@biga:~$ sudo python test_perf.py
 python version   : 2.7.12 (64bits) (8 core(s))
 test_cpu_int2    : ####################   0.55s
@@ -582,5 +583,18 @@ disk_read     1KB: ####################  10.74s (93.13 Mo/s)
 disk_write 1024KB: ####################  11.36s (88.00 Mo/s)
 disk_read  1024KB: ####################   0.77s (1291.93 Mo/s)
 
+*** Raspberry4-therm ***
+pi@raspberrypi:~/dev/git/electronoos/scripts $ python test_perf.py
+python version   : 2.7.16 (32bits) (4 core(s))
+test_cpu_int2    : ####################   1.72s
+test_cpu_float2  : ####################   0.28s
+scipy.fftpack    : not found
+test_orb3.2.0    : ####################   1.34s (74.62fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : test_perf_vga_*.png: not found
+disk_write    1KB: ####################  83.26s (12.01 Mo/s)
+disk_read     1KB: ####################  24.85s (40.24 Mo/s)
+disk_write 1024KB: ####################  78.17s (12.79 Mo/s)
+disk_read  1024KB: ####################  22.93s (43.62 Mo/s)
 
 """

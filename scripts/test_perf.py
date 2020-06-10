@@ -555,6 +555,7 @@ opencv: not found
 disk_write    1KB: ####################  79.74s (12.54 Mo/s)
 disk_read     1KB: ####################  46.46s (21.53 Mo/s)
 
+
 *** biga ***
 
 am@biga:~$ sudo python test_perf.py
@@ -583,12 +584,45 @@ disk_read     1KB: ####################  10.74s (93.13 Mo/s)
 disk_write 1024KB: ####################  11.36s (88.00 Mo/s)
 disk_read  1024KB: ####################   0.77s (1291.93 Mo/s)
 
+
+*** Raspberry3-ree ***
+
+pi@robot-enhanced-education:~/dev/git/electronoos $ python scripts/test_perf.py 
+INF: Due to low empty disk space, reducing disk test size to 290 MB
+python version   : 2.7.13 (32bits) (4 core(s))
+test_cpu_int2    : ####################  15.37s
+test_cpu_float2  : ####################   2.79s
+scipy.fftpack    : not found
+test_orb3.3.0    : ####################   5.98s (16.71fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : test_perf_vga_*.png: not found
+disk_write    1KB: ####################  32.02s ( 9.06 Mo/s)
+disk_read     1KB: ####################  15.61s (18.57 Mo/s)
+disk_write 1024KB: ####################  29.93s ( 9.36 Mo/s)
+disk_read  1024KB: ####################  15.84s (17.68 Mo/s)
+
+pi@robot-enhanced-education:~/dev/git/electronoos $ python3 scripts/test_perf.py
+INF: Due to low empty disk space, reducing disk test size to 557 MB
+python version   : 3.5.3 (32bits) (4 core(s))
+test_cpu_int2    : ####################  10.64s
+test_cpu_float2  : ####################   2.83s
+scipy.fftpack    : not found
+opencv  : not found
+opencv: not found
+opencv: not found
+disk_write    1KB: ####################  59.25s ( 9.40 Mo/s)
+disk_read     1KB: ####################  38.92s (14.31 Mo/s)
+disk_write 1024KB: ####################  59.05s ( 9.15 Mo/s)
+disk_read  1024KB: ####################  35.36s (15.27 Mo/s)
+
+
 *** Raspberry4-therm ***
+
 pi@raspberrypi:~/dev/git/electronoos/scripts $ python test_perf.py
 python version   : 2.7.16 (32bits) (4 core(s))
 test_cpu_int2    : ####################   1.72s
 test_cpu_float2  : ####################   0.28s
-scipy.fftpack    : not found
+test_scipy_xxt   : ####################   6.99s (57.19x)
 test_orb3.2.0    : ####################   1.34s (74.62fps)
 test_orbcv imgs  : test_perf_vga_*.png: not found
 test_orbcv bis   : test_perf_vga_*.png: not found
@@ -596,5 +630,19 @@ disk_write    1KB: ####################  83.26s (12.01 Mo/s)
 disk_read     1KB: ####################  24.85s (40.24 Mo/s)
 disk_write 1024KB: ####################  78.17s (12.79 Mo/s)
 disk_read  1024KB: ####################  22.93s (43.62 Mo/s)
+
+pi@raspberrypi:~/dev/git/electronoos/scripts $ LD_PRELOAD=/usr/lib/gcc/arm-linux-gnueabihf/8/libatomic.so python3 test_perf.py
+python version   : 3.7.3 (32bits) (4 core(s))
+test_cpu_int2    : ####################   1.72s
+test_cpu_float2  : ####################   0.26s
+test_scipy_xxt   : ####################   8.82s (45.35x)
+test_orb4.1.1    : ####################   1.12s (88.94fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : test_perf_vga_*.png: not found
+disk_write    1KB: ####################  79.69s (12.55 Mo/s)
+disk_read     1KB: ####################  24.57s (40.71 Mo/s)
+disk_write 1024KB: ####################  78.36s (12.76 Mo/s)
+disk_read  1024KB: ####################  22.93s (43.61 Mo/s)
+
 
 """

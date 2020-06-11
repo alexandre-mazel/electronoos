@@ -184,9 +184,26 @@ class Stater:
         return "?"
         
     def updateConnected( self ):
+        """
+        return True if a new day has started
+        """
+        bNewDay = False
         self.strDate = misctools.getDateStamp()    
+        print("self.strDate: %s" % self.strDate )
+        if 0:
+            # debug to simulate many days
+            if self.nLastTime == 0:
+                self.nCpt = 0
+            else:
+                self.nCpt += 1
+                if self.nCpt == 1:
+                    self.strDate = "2020_05_09"
+                if self.nCpt == 2:
+                    self.strDate = "2020_05_10"
+
         listUp = getHostUp()
         if not self.strDate in self.dStatPerDay.keys():
+            bNewDay = True
             self.dStatPerDay[self.strDate]={}
         statToday = self.dStatPerDay[self.strDate]
         tempUpMacList = []
@@ -209,9 +226,10 @@ class Stater:
         self.nLastTime = time.time()
         
         print(self.dStatPerDay)
+        return bNewDay
     
-    def generatePage( self ):
-        statToday = self.dStatPerDay[self.strDate]
+    def generatePage( self, strDate, strOutputFileName ):
+        statToday = self.dStatPerDay[strDate]
         strPage = "<html><head></head><body><table>"
         #for k,v in statToday.items():
         for k,v in sorted(statToday.items(), key=lambda v: v[1][1], reverse=True ):
@@ -229,7 +247,7 @@ class Stater:
         strPage += "</table>"
         strPage += "<font size=-10>last computed: %s</font>" % misctools.getTimeStamp()
         strPage += "</body></html>"
-        f = open("/var/www/html/stat_up.html", "wt")
+        f = open( strOutputFileName, "wt" )
         f.write(strPage)
         f.close()
         
@@ -243,9 +261,12 @@ def loopUpdate():
     while 1:
             try:
                 logDebug("loopUpdate: avant update connected")
-                stats.updateConnected()
+                bNewDay = stats.updateConnected()
+                if bNewDay and len(stats.dStatPerDay) > 1:
+                    strDatePrev = sorted(stats.dStatPerDay.keys())[-2]
+                    stats.generatePage(strDatePrev, "/var/www/html/stat_up_%s.html" % strDatePrev )
                 logDebug("loopUpdate: avant generatePage")
-                stats.generatePage()
+                stats.generatePage(stats.strDate, "/var/www/html/stat_up.html")
             except BaseException as err:
                 strErr = "ERR: loopUpdate: err: %s" % str(err)
                 print(strErr)

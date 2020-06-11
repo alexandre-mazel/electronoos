@@ -4,7 +4,7 @@
 # Sound Acceptance test
 # v0.81: add core handling
 #
-# Author: A. Mazel & L. George
+# Author: A. Mazel
 
 import sys
 import os
@@ -160,7 +160,7 @@ def test_opencv_orb( bPrint = True ):
     try:
         import cv2
     except:
-        if bPrint: print( "opencv  : not found")
+        if bPrint: print( "opencv (orb)      : not found")
         return 0
         
     import math
@@ -204,7 +204,7 @@ def test_opencv_orb_realcase( bPrint = True ):
     try:
         import cv2
     except:
-        if bPrint: print( "opencv: not found")
+        if bPrint: print( "opencv (orb)    : not found")
         return 0
         
     import math
@@ -380,7 +380,27 @@ test_perf(nDiskTestSizeMB=nDiskTestSizeMB);
 
 #####################################
 """
-Some results sur la Surface Pro 4:
+
+*** Some results sur la Surface Pro 4 ***
+
+C:>python test_perf.py
+INF: Due to low empty disk space, reducing disk test size to 373 MB
+python version   : 3.8.2 (32bits) (4 core(s))
+test_cpu_int2    : ####################   1.04s
+test_cpu_float2  : ####################   0.48s
+scipy.fftpack    : not found
+test_orb4.2.0    : ####################   0.42s (240.35fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : test_perf_vga_*.png: not found
+disk_write    1KB: ####################  22.77s (16.38 Mo/s)
+disk_read     1KB: ####################   1.56s (238.94 Mo/s)
+disk_write 1024KB: ####################   9.49s (37.95 Mo/s)
+disk_read  1024KB: ####################   0.20s (1797.94 Mo/s)
+
+therm_test (blob detection et threshold) sur images_thermal_from_sbre_accueil:
+INF: detectHuman total: 2274 file(s), duration:  6.38s, im/sec: 356.67 (en ligne de commande)
+INF: detectHuman total: 2274 file(s), duration:  2.43s, im/sec: 934.42 (depuis scite (buffering output)
+INF: detectHuman total: 2274 file(s), duration:  2.15s, im/sec: 1058.93 (en ligne de commande > tutu)
 
 c:>python c:test_perf.py
 python version : 3.8.2 (32bits) (4 core(s))
@@ -510,6 +530,15 @@ disk_read     1KB: ####################   4.83s (207.25 Mo/s)
 disk_write 1024KB: #################### 144.02s ( 6.94 Mo/s)
 disk_read  1024KB: ####################   1.58s (633.58 Mo/s)
 
+
+
+therm_test (blob detection et threshold) sur images_thermal_from_sbre_accueil:
+INF: detectHuman total: 2274 file(s), duration:  6.46s, im/sec: 352.01 (en ligne de commande)
+INF: detectHuman total: 2274 file(s), duration:  2.12s, im/sec: 1072.19 (en ligne de commande >tutu)
+
+
+
+
 Raspberry3:
 
 Use raspi-config to set the country before use.
@@ -556,6 +585,9 @@ disk_write    1KB: ####################  79.74s (12.54 Mo/s)
 disk_read     1KB: ####################  46.46s (21.53 Mo/s)
 
 
+
+
+
 *** biga ***
 
 am@biga:~$ sudo python test_perf.py
@@ -584,6 +616,35 @@ disk_read     1KB: ####################  10.74s (93.13 Mo/s)
 disk_write 1024KB: ####################  11.36s (88.00 Mo/s)
 disk_read  1024KB: ####################   0.77s (1291.93 Mo/s)
 
+*** Raspberry1-web ***
+
+pi@rasp2 ~/dev/git $ python ~/test_perf.py
+python version   : 2.7.3 (32bits) (1 core(s))
+test_cpu_int2    : ####################  22.58s
+test_cpu_float2  : ####################   4.33s
+scipy.fftpack    : not found
+test_orb2.4.1    : ####################   9.60s (10.41fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : test_perf_vga_*.png: not found
+disk_write    1KB: #################### 113.29s ( 8.83 Mo/s)
+disk_read     1KB: ####################  63.54s (15.74 Mo/s)
+disk_write 1024KB: ####################  97.65s (10.24 Mo/s)
+disk_read  1024KB: ####################  60.82s (16.44 Mo/s)
+
+pi@rasp2 ~/dev/git $ sudo python3 ~/test_perf.py
+python version   : 3.2.3 (32bits) (1 core(s))
+test_cpu_int2    : ####################  22.83s
+test_cpu_float2  : ####################   6.68s
+scipy.fftpack    : not found
+opencv           : not found
+opencv           : not found
+opencv: not found
+disk_write    1KB: #################### 151.80s ( 6.59 Mo/s)
+disk_read     1KB: #################### 234.50s ( 4.26 Mo/s)
+disk_write 1024KB: #################### 106.76s ( 9.37 Mo/s)
+disk_read  1024KB: #################### 222.23s ( 4.50 Mo/s)
+
+
 
 *** Raspberry3-ree ***
 
@@ -601,6 +662,11 @@ disk_read     1KB: ####################  15.61s (18.57 Mo/s)
 disk_write 1024KB: ####################  29.93s ( 9.36 Mo/s)
 disk_read  1024KB: ####################  15.84s (17.68 Mo/s)
 
+therm_test (blob detection et threshold) sur images_thermal_from_sbre_accueil:
+INF: detectHuman total: 2274 file(s), duration: 25.80s, im/sec: 88.13 (cli)
+INF: detectHuman total: 2274 file(s), duration: 24.30s, im/sec: 93.57 (cli>tutu)
+
+
 pi@robot-enhanced-education:~/dev/git/electronoos $ python3 scripts/test_perf.py
 INF: Due to low empty disk space, reducing disk test size to 557 MB
 python version   : 3.5.3 (32bits) (4 core(s))
@@ -614,6 +680,12 @@ disk_write    1KB: ####################  59.25s ( 9.40 Mo/s)
 disk_read     1KB: ####################  38.92s (14.31 Mo/s)
 disk_write 1024KB: ####################  59.05s ( 9.15 Mo/s)
 disk_read  1024KB: ####################  35.36s (15.27 Mo/s)
+
+therm_test (blob detection et threshold) sur images_thermal_from_sbre_accueil:
+INF: detectHuman total: 2274 file(s), duration: 20.95s, im/sec: 108.56 (cli)
+INF: detectHuman total: 2274 file(s), duration: 19.63s, im/sec: 115.82 (cli>tutu)
+
+
 
 
 *** Raspberry4-therm ***
@@ -643,6 +715,12 @@ disk_write    1KB: ####################  79.69s (12.55 Mo/s)
 disk_read     1KB: ####################  24.57s (40.71 Mo/s)
 disk_write 1024KB: ####################  78.36s (12.76 Mo/s)
 disk_read  1024KB: ####################  22.93s (43.61 Mo/s)
+
+therm_test (blob detection et threshold) sur images_thermal_from_sbre_accueil:
+INF: detectHuman total: 2274 file(s), duration:  4.85s, im/sec: 468.76
+INF: detectHuman total: 2274 file(s), duration:  4.46s, im/sec: 509.36 (output > tutu)
+
+
 
 
 """

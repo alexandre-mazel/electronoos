@@ -200,7 +200,7 @@ def test_opencv_orb( bPrint = True ):
     return rDuration;
     
 bFirstTime=True
-bFirstTime_img_not_found = True
+global_bFirstTime_img_not_found = True
 def test_opencv_orb_realcase( bPrint = True ):
     try:
         import cv2
@@ -230,8 +230,9 @@ def test_opencv_orb_realcase( bPrint = True ):
         if img1 is None or img2 is None:
             raise BaseException("")
     except:
-        if bFirstTime_img_not_found:
-            bFirstTime_img_not_found = False
+        global global_bFirstTime_img_not_found
+        if global_bFirstTime_img_not_found:
+            global_bFirstTime_img_not_found = False
             print( "test_perf_vga_*.png: not found")
         return 0
     timeBegin = time.time();

@@ -200,6 +200,7 @@ def test_opencv_orb( bPrint = True ):
     return rDuration;
     
 bFirstTime=True
+bFirstTime_img_not_found = True
 def test_opencv_orb_realcase( bPrint = True ):
     try:
         import cv2
@@ -229,7 +230,9 @@ def test_opencv_orb_realcase( bPrint = True ):
         if img1 is None or img2 is None:
             raise BaseException("")
     except:
-        print( "test_perf_vga_*.png: not found")
+        if bFirstTime_img_not_found:
+            bFirstTime_img_not_found = False
+            print( "test_perf_vga_*.png: not found")
         return 0
     timeBegin = time.time();
     bOpenCV3 = True
@@ -318,7 +321,7 @@ def simple_test(bToto):
 def test_multithreading():
     # It shows us that
     import platform
-    if platform.system() == 'Windows' or 1:
+    if platform.system() == 'Windows' or 0:
         return 0
 
     rTotalDuration = 0
@@ -617,6 +620,7 @@ disk_write 1024KB: ####################  11.36s (88.00 Mo/s)
 disk_read  1024KB: ####################   0.77s (1291.93 Mo/s)
 
 *** Raspberry1-web ***
+(sd card de 32Go)
 
 pi@rasp2 ~/dev/git $ python ~/test_perf.py
 python version   : 2.7.3 (32bits) (1 core(s))

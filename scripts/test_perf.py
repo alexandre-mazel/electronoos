@@ -769,6 +769,37 @@ therm_test (blob detection et threshold) sur images_thermal_from_sbre_accueil:
 INF: detectHuman total: 2274 file(s), duration:  4.85s, im/sec: 468.76
 INF: detectHuman total: 2274 file(s), duration:  4.46s, im/sec: 509.36 (output > tutu)
 
+*** Jetson AGX ***
+
+am@am-desktop:~/dev/git/electronoos$ sudo python scripts/test_perf.py
+python version   : 2.7.17 (64bits) (4 core(s))
+test_cpu_int2    : ####################   0.91s
+test_cpu_float2  : ####################   0.35s
+scipy.fftpack    : not found
+test_orb4.1.1    : ####################   0.60s (165.99fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : multiprocess x4 :  1.01s /  1.12s /  0.04s /  1.18s /  0.36s /  0.35s =>    4.05s
+multiprocess x8 :  1.83s /  0.80s /  0.08s /  2.10s /  0.71s /  0.70s =>   10.26s
+multiprocess x32:  7.35s /  3.23s /  0.24s /  8.60s /  3.14s /  2.65s =>   35.47s
+disk_write    1KB: ####################  14.69s (68.08 Mo/s)
+disk_read     1KB: ####################   4.14s (241.62 Mo/s)
+disk_write 1024KB: ####################  10.99s (90.98 Mo/s)
+disk_read  1024KB: ####################   3.47s (288.31 Mo/s)
+
+python version   : 3.6.9 (64bits) (4 core(s))
+test_cpu_int2    : ####################   0.88s
+test_cpu_float2  : ####################   0.37s
+test_scipy_xxt   : ####################   3.25s (122.89x)
+test_orb4.1.1    : ####################   0.65s (154.49fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : multiprocess x4 :  0.93s /  0.36s /  2.77s /  0.98s /  0.36s /  0.37s =>    5.79s
+multiprocess x8 :  2.10s /  0.68s /  4.92s /  2.03s /  0.78s /  0.76s =>   17.05s
+multiprocess x32:  7.29s /  2.69s / 19.25s /  8.57s /  3.03s /  3.06s =>   60.94s
+disk_write    1KB: ####################  16.14s (61.97 Mo/s)
+disk_read     1KB: ####################   7.33s (136.34 Mo/s)
+disk_write 1024KB: ####################  11.51s (86.87 Mo/s)
+disk_read  1024KB: ####################   3.46s (288.89 Mo/s)
+
 
 
 

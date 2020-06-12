@@ -619,6 +619,50 @@ disk_read     1KB: ####################  10.74s (93.13 Mo/s)
 disk_write 1024KB: ####################  11.36s (88.00 Mo/s)
 disk_read  1024KB: ####################   0.77s (1291.93 Mo/s)
 
+
+*** biga ubuntu18, ssd 120Go ***
+
+python version   : 2.7.17 (64bits) (8 core(s))
+test_cpu_int2    : ####################   0.57s
+test_cpu_float2  : ####################   0.11s
+scipy.fftpack    : not found
+test_orb3.2.0    : ####################   0.26s (387.43fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : test_perf_vga_*.png: not found
+disk_write    1KB: ####################  18.50s (54.06 Mo/s)
+disk_read     1KB: ####################   4.80s (208.50 Mo/s)
+disk_write 1024KB: ####################  16.43s (60.86 Mo/s)
+disk_read  1024KB: ####################   4.30s (232.83 Mo/s)
+
+python version   : 3.6.9 (64bits) (8 core(s))
+test_cpu_int2    : ####################   0.58s
+test_cpu_float2  : ####################   0.13s
+scipy.fftpack    : not found
+test_orb3.2.0    : ####################   0.27s (365.51fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : test_perf_vga_*.png: not found
+disk_write    1KB: ####################  15.39s (65.00 Mo/s)
+disk_read     1KB: ####################   4.82s (207.60 Mo/s)
+disk_write 1024KB: ####################  14.99s (66.69 Mo/s)
+disk_read  1024KB: ####################   3.60s (277.75 Mo/s)
+am@amT7500:~/dev/git/electronoos$ nano scripts/test_perf.py 
+
+python version   : 3.6.9 (64bits) (8 core(s))
+test_cpu_int2    : ####################   0.57s
+test_cpu_float2  : ####################   0.13s
+scipy.fftpack    : not found
+test_orb3.2.0    : ####################   0.27s (369.71fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : test_perf_vga_*.png: not found
+multiprocess x4 :  0.82s /  0.23s /  0.01s /  0.67s / 0.22s /  0.25s =>    2.22s
+multiprocess x8 :  1.18s /  0.32s /  0.02s /  0.95s /  0.33s /  0.34s =>    5.35s
+multiprocess x32:  4.30s /  1.06s /  0.06s /  3.53s /  1.21s /  1.20s =>   16.71s
+disk_write    1KB: ####################  18.05s (55.41 Mo/s)
+disk_read     1KB: ####################   4.77s (209.54 Mo/s)
+disk_write 1024KB: ####################  13.26s (75.44 Mo/s)
+disk_read  1024KB: ####################   4.32s (231.54 Mo/s)
+
+
 *** Raspberry1-web ***
 (sd card de 32Go)
 

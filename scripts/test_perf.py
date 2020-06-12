@@ -231,9 +231,9 @@ def test_opencv_orb_realcase( bPrint = True ):
             raise BaseException("")
     except:
         global global_bFirstTime_img_not_found
-        if global_bFirstTime_img_not_found:
+        if global_bFirstTime_img_not_found or 1:
             global_bFirstTime_img_not_found = False
-            print( "test_perf_vga_*.png: not found")
+            if bPrint: print( "test_perf_vga_*.png: not found")
         return 0
     timeBegin = time.time();
     bOpenCV3 = True

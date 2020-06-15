@@ -43,6 +43,12 @@ def getTime():
     return datetimeObject.hour, datetimeObject.minute, datetimeObject.second 
 
 def getTimeStamp():
+    """
+    
+    # REM: linux command:
+    # timedatectl list-timezones: list all timezones
+    # sudo timedatectl set-timezone Europe/Paris => set paris
+    """
     datetimeObject = datetime.datetime.now()
     strTimeStamp = datetimeObject.strftime( "%Y/%m/%d: %Hh%Mm%Ss" )
     return strTimeStamp

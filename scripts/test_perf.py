@@ -229,7 +229,7 @@ def test_opencv_orb_realcase( bPrint = True ):
         if img1 is None or img2 is None:
             raise BaseException("")
     except:
-        print( "test_perf_vga_*.png: not found")
+        if bPrint: print( "test_perf_vga_*.png: not found")
         return 0
     timeBegin = time.time();
     bOpenCV3 = True
@@ -318,7 +318,7 @@ def simple_test(bToto):
 def test_multithreading():
     # It shows us that
     import platform
-    if platform.system() == 'Windows' or 1:
+    if platform.system() == 'Windows' or 0:
         return 0
 
     rTotalDuration = 0
@@ -616,7 +616,52 @@ disk_read     1KB: ####################  10.74s (93.13 Mo/s)
 disk_write 1024KB: ####################  11.36s (88.00 Mo/s)
 disk_read  1024KB: ####################   0.77s (1291.93 Mo/s)
 
+
+*** biga ubuntu18, ssd 120Go ***
+
+python version   : 2.7.17 (64bits) (8 core(s))
+test_cpu_int2    : ####################   0.57s
+test_cpu_float2  : ####################   0.11s
+scipy.fftpack    : not found
+test_orb3.2.0    : ####################   0.26s (387.43fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : test_perf_vga_*.png: not found
+disk_write    1KB: ####################  18.50s (54.06 Mo/s)
+disk_read     1KB: ####################   4.80s (208.50 Mo/s)
+disk_write 1024KB: ####################  16.43s (60.86 Mo/s)
+disk_read  1024KB: ####################   4.30s (232.83 Mo/s)
+
+python version   : 3.6.9 (64bits) (8 core(s))
+test_cpu_int2    : ####################   0.58s
+test_cpu_float2  : ####################   0.13s
+scipy.fftpack    : not found
+test_orb3.2.0    : ####################   0.27s (365.51fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : test_perf_vga_*.png: not found
+disk_write    1KB: ####################  15.39s (65.00 Mo/s)
+disk_read     1KB: ####################   4.82s (207.60 Mo/s)
+disk_write 1024KB: ####################  14.99s (66.69 Mo/s)
+disk_read  1024KB: ####################   3.60s (277.75 Mo/s)
+am@amT7500:~/dev/git/electronoos$ nano scripts/test_perf.py 
+
+python version   : 3.6.9 (64bits) (8 core(s))
+test_cpu_int2    : ####################   0.57s
+test_cpu_float2  : ####################   0.13s
+scipy.fftpack    : not found
+test_orb3.2.0    : ####################   0.27s (369.71fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : test_perf_vga_*.png: not found
+multiprocess x4 :  0.82s /  0.23s /  0.01s /  0.67s / 0.22s /  0.25s =>    2.22s
+multiprocess x8 :  1.18s /  0.32s /  0.02s /  0.95s /  0.33s /  0.34s =>    5.35s
+multiprocess x32:  4.30s /  1.06s /  0.06s /  3.53s /  1.21s /  1.20s =>   16.71s
+disk_write    1KB: ####################  18.05s (55.41 Mo/s)
+disk_read     1KB: ####################   4.77s (209.54 Mo/s)
+disk_write 1024KB: ####################  13.26s (75.44 Mo/s)
+disk_read  1024KB: ####################   4.32s (231.54 Mo/s)
+
+
 *** Raspberry1-web ***
+(sd card de 32Go)
 
 pi@rasp2 ~/dev/git $ python ~/test_perf.py
 python version   : 2.7.3 (32bits) (1 core(s))
@@ -719,6 +764,37 @@ disk_read  1024KB: ####################  22.93s (43.61 Mo/s)
 therm_test (blob detection et threshold) sur images_thermal_from_sbre_accueil:
 INF: detectHuman total: 2274 file(s), duration:  4.85s, im/sec: 468.76
 INF: detectHuman total: 2274 file(s), duration:  4.46s, im/sec: 509.36 (output > tutu)
+
+*** Jetson AGX ***
+
+am@am-desktop:~/dev/git/electronoos$ sudo python scripts/test_perf.py
+python version   : 2.7.17 (64bits) (4 core(s))
+test_cpu_int2    : ####################   0.91s
+test_cpu_float2  : ####################   0.35s
+scipy.fftpack    : not found
+test_orb4.1.1    : ####################   0.60s (165.99fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : multiprocess x4 :  1.01s /  1.12s /  0.04s /  1.18s /  0.36s /  0.35s =>    4.05s
+multiprocess x8 :  1.83s /  0.80s /  0.08s /  2.10s /  0.71s /  0.70s =>   10.26s
+multiprocess x32:  7.35s /  3.23s /  0.24s /  8.60s /  3.14s /  2.65s =>   35.47s
+disk_write    1KB: ####################  14.69s (68.08 Mo/s)
+disk_read     1KB: ####################   4.14s (241.62 Mo/s)
+disk_write 1024KB: ####################  10.99s (90.98 Mo/s)
+disk_read  1024KB: ####################   3.47s (288.31 Mo/s)
+
+python version   : 3.6.9 (64bits) (4 core(s))
+test_cpu_int2    : ####################   0.88s
+test_cpu_float2  : ####################   0.37s
+test_scipy_xxt   : ####################   3.25s (122.89x)
+test_orb4.1.1    : ####################   0.65s (154.49fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : multiprocess x4 :  0.93s /  0.36s /  2.77s /  0.98s /  0.36s /  0.37s =>    5.79s
+multiprocess x8 :  2.10s /  0.68s /  4.92s /  2.03s /  0.78s /  0.76s =>   17.05s
+multiprocess x32:  7.29s /  2.69s / 19.25s /  8.57s /  3.03s /  3.06s =>   60.94s
+disk_write    1KB: ####################  16.14s (61.97 Mo/s)
+disk_read     1KB: ####################   7.33s (136.34 Mo/s)
+disk_write 1024KB: ####################  11.51s (86.87 Mo/s)
+disk_read  1024KB: ####################   3.46s (288.89 Mo/s)
 
 
 

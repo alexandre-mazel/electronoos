@@ -165,6 +165,10 @@ class Stater:
             "48:A9:D2:8C:75:F8": "PepperAlex9 Wifi",
             "00:08:22:66:0C:FC": "PepperAlex9 Tab",
             
+            "48:B0:2D:05:B6:9D": "Jetson AGX",
+            "DC:A6:32:48:A4:0C": "Rasp4Therm",
+            
+            
         }
 
         self.hostLabels = {

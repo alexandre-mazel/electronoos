@@ -309,3 +309,25 @@ def beep(frequency, duration):
     # duration in ms
     import winsound
     winsound.Beep(frequency, duration)
+
+global_dictLastBeep = dict() # for each id the last (h,m)    
+def isHalfHour(id=1):
+    """
+    return True half an hour
+    (NB: use a global, so it can be used only once in a program, or use a different id
+    """
+    global global_dictLastBeep
+    h,m,s = misctools.getTime()
+        
+    if m == 0 or m == 30:         
+        try:
+            lastVal = global_dictLastBeep[id]
+        except KeyError as err:
+            global_dictLastBeep[id] = (-1,-1)
+            lastVal = global_dictLastBeep[id]        
+        if (h,m) == lastVal:
+            return False
+        global_dictLastBeep[id] = (h,m)
+        return True
+        
+    return False

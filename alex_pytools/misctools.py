@@ -310,24 +310,46 @@ def beep(frequency, duration):
     import winsound
     winsound.Beep(frequency, duration)
 
-global_dictLastBeep = dict() # for each id the last (h,m)    
+global_dictLastHalfHour = dict() # for each id the last (h,m)    
 def isHalfHour(id=1):
     """
     return True half an hour
     (NB: use a global, so it can be used only once in a program, or use a different id
     """
-    global global_dictLastBeep
+    global global_dictLastHalfHour
     h,m,s = getTime()
         
     if m == 0 or m == 30:         
         try:
-            lastVal = global_dictLastBeep[id]
+            lastVal = global_dictLastHalfHour[id]
         except KeyError as err:
-            global_dictLastBeep[id] = (-1,-1)
-            lastVal = global_dictLastBeep[id]        
+            global_dictLastHalfHour[id] = (-1,-1)
+            lastVal = global_dictLastHalfHour[id]        
         if (h,m) == lastVal:
             return False
-        global_dictLastBeep[id] = (h,m)
+        global_dictLastHalfHour[id] = (h,m)
+        return True
+        
+    return False
+
+global_dictLast10min = dict() # for each id the last (h,m)    
+def isEvery10min(id=1):
+    """
+    return True half an hour
+    (NB: use a global, so it can be used only once in a program, or use a different id
+    """
+    global global_dictLast10min
+    h,m,s = getTime()
+        
+    if (m%10) == 0:         
+        try:
+            lastVal = global_dictLast10min[id]
+        except KeyError as err:
+            global_dictLast10min[id] = (-1,-1)
+            lastVal = global_dictLast10min[id]        
+        if (h,m) == lastVal:
+            return False
+        global_dictLast10min[id] = (h,m)
         return True
         
     return False

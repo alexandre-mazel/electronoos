@@ -317,7 +317,7 @@ def isHalfHour(id=1):
     (NB: use a global, so it can be used only once in a program, or use a different id
     """
     global global_dictLastBeep
-    h,m,s = misctools.getTime()
+    h,m,s = getTime()
         
     if m == 0 or m == 30:         
         try:

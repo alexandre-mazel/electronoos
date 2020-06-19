@@ -25,15 +25,8 @@ def bipInform():
     duration = 250  # Set Duration To 1000 ms == 1 second
     misctools.beep(frequency, duration)
 
-    
-global_lastBeep = (-1,-1)
 def beepEveryHalf():
-    global global_lastBeep
-    h,m,s = misctools.getTime()
-    if (h,m) == global_lastBeep:
-        return
-    if m == 0 or m == 30:
-        global_lastBeep = (h,m)
+    if misctools.isHalfHour():
         misctools.beep(440, 1000)
     
     

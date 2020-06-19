@@ -15,7 +15,6 @@ import sys
 
 
 strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
-if strLocalPath == "": strLocalPath = "./"
 logDebug("strLocalPath: " + strLocalPath)
 if strLocalPath == "": strLocalPath = './'
 sys.path.append(strLocalPath+"/../alex_pytools/")
@@ -139,9 +138,30 @@ class Stater:
     
     def __init__( self ):
         self.dStatPerDay = {} # for each day: for each mac: (ip, nUptime,bPresent, d1, d2) the elapsed time and a flag saying present or not
+        self.nCptRestartToday = 0
         self.nLastTime = 0
         self.strDate = ""
         self.loadLabels()
+        self.strSaveFileName = os.path.expanduser("~/") + "stater.sav"
+        self.load()
+        
+    def save(self):
+        f=open(self.strSaveFileName, "wt")
+        f.write(repr((self.dStatPerDay,self.nCptRestartToday)))
+        f.close()
+        
+    def load(self):
+        try:
+            f=open(self.strSaveFileName, "rt")
+            data = f.read()
+            reconstructed = eval(data) # harsh unsafe!
+            print("DBG: Stater.load: loading: '%s'" % str(reconstructed) )
+            self.dStatPerDay, self.nCptRestartToday  = reconstructed
+            self.nCptRestartToday += 1
+            f.close()  
+        except BaseException as err:
+            print("WRN: Stater.load: %s" % str(err) )
+            return
         
     def loadLabels( self ):
         """
@@ -164,6 +184,10 @@ class Stater:
             "00:13:95:1C:0E:C6": "PepperAlex9 Eth",
             "48:A9:D2:8C:75:F8": "PepperAlex9 Wifi",
             "00:08:22:66:0C:FC": "PepperAlex9 Tab",
+            
+            "48:B0:2D:05:B6:9D": "Jetson AGX",
+            "DC:A6:32:48:A4:0C": "Rasp4Therm",
+            
             
         }
 
@@ -200,11 +224,15 @@ class Stater:
                     self.strDate = "2020_05_09"
                 if self.nCpt == 2:
                     self.strDate = "2020_05_10"
+        if self.nLastTime == 0:
+            self.nLastTime = time.time() # was generating a bug when loading from save
 
         listUp = getHostUp()
         if not self.strDate in self.dStatPerDay.keys():
             bNewDay = True
             self.dStatPerDay[self.strDate]={}
+            self.nCptRestartToday = 0
+            self.save() # clean current day backup
         statToday = self.dStatPerDay[self.strDate]
         tempUpMacList = []
         for info in listUp:
@@ -226,6 +254,7 @@ class Stater:
         self.nLastTime = time.time()
         
         print(self.dStatPerDay)
+
         return bNewDay
     
     def generatePage( self, strDate, strOutputFileName ):
@@ -245,7 +274,7 @@ class Stater:
             strPage += "<td>%s</td>" % strUp
             strPage += "</tr>"
         strPage += "</table>"
-        strPage += "<font size=-10>last computed: %s</font>" % misctools.getTimeStamp()
+        strPage += "<font size=-10>restart today: %d<br>last computed: %s</font>" % (self.nCptRestartToday, misctools.getTimeStamp() )
         strPage += "</body></html>"
         f = open( strOutputFileName, "wt" )
         f.write(strPage)
@@ -266,7 +295,9 @@ def loopUpdate():
                     strDatePrev = sorted(stats.dStatPerDay.keys())[-2]
                     stats.generatePage(strDatePrev, "/var/www/html/stat_up_%s.html" % strDatePrev )
                 logDebug("loopUpdate: avant generatePage")
-                stats.generatePage(stats.strDate, "/var/www/html/stat_up.html")
+                stats.generatePage(stats.strDate, "/var/www/html/stat_up.html")                                
+                if misctools.isEvery10min() or 0:
+                    stats.save()
             except BaseException as err:
                 strErr = "ERR: loopUpdate: err: %s" % str(err)
                 print(strErr)

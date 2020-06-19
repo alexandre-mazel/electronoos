@@ -45,7 +45,7 @@ def drawAndInteract( strLessonFilename = "lesson.pdf" ):
         print( "contours: %s" % str(contours) )
         print( "hierarchy: %s" % str(hierarchy) )
     
-    drawer = draw_on_cv2.CV2_Drawable()
+    drawer = draw_on_cv2.CV2_Drawable(bOnlyRect=True)
     drawer.create(im)
     drawer.setDrawColor((180,40,43))
     while 1:
@@ -61,5 +61,6 @@ strLesson = "lesson.pdf"
 #~ strLesson = "C:/Users/amazel/Downloads/2020-04-20_-_article_de_Le_Monde_remis_en_page_-_demographie_Paris_confinement_PDF.pdf"
 strLesson = "C:/Users/amazel/Downloads/24_04.pdf"
 strLesson = "C:/Users/amazel/Downloads/05_14_3.pdf"
-#~ strLesson = "/tmp/1587730327.8424518.png"
+strLesson = "/tmp/1587730327.8424518.png"
+strLesson = "/tmp/example_01.png"
 drawAndInteract(strLesson)

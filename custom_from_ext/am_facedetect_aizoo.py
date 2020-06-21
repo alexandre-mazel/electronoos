@@ -6,6 +6,10 @@ import argparse
 import numpy as np
 from PIL import Image
 #from keras.models import model_from_json
+
+import sys
+import os
+sys.path.append( os.path.expanduser("~/dev/FaceMaskDetection/") )
 from utils.anchor_generator import generate_anchors
 from utils.anchor_decode import decode_bbox
 from utils.nms import single_class_non_max_suppression
@@ -16,10 +20,13 @@ class MaskDetector:
     def __init__( self ):
         pass
         
-    def loadModels( self, strMaskClassificationModel ):
+    def loadModels( self, strMaskClassificationModel = 'models/face_mask_detection.pb' ):
         print("INF: MaskDetector.loadModels: loading models..." )
         
-        self.sess, self.graph = load_tf_model( strMaskClassificationModel)
+        try:
+            self.sess, self.graph = load_tf_model( strMaskClassificationModel )
+        except:
+            self.sess, self.graph = load_tf_model( os.path.expanduser("~/dev/FaceMaskDetection/") + strMaskClassificationModel )
         # anchor configuration
         feature_map_sizes = [[33, 33], [17, 17], [9, 9], [5, 5], [3, 3]]
         anchor_sizes = [[0.04, 0.056], [0.08, 0.11], [0.16, 0.22], [0.32, 0.45], [0.64, 0.72]]
@@ -38,6 +45,9 @@ class MaskDetector:
         self.detectFromImage(np.zeros((128,128,3), np.uint8), bShowResults = False )
         
         print("INF: MaskDetector.loadModels: end..." )
+        
+    def classToStr(self, nNumClass):
+        return self.id2class[nNumClass]
 
     def detectFromImageFile( self, strFilename, bShowResults = True ):
         im = cv2.imread( strFilename )
@@ -45,7 +55,7 @@ class MaskDetector:
         
     def detectFromImage( self, img, bShowResults = True ):
         img = cv2.cvtColor( img, cv2.COLOR_BGR2RGB )
-        self._inference(img, show_result=bShowResults, target_shape=(260, 260))
+        return self._inference(img, show_result=bShowResults, target_shape=(260, 260))
 
     def _inference(self, image,
                   conf_thresh=0.5,
@@ -63,6 +73,7 @@ class MaskDetector:
         :param draw_result: whether to daw bounding box to the image.
         :param show_result: whether to display the image.
         :return:
+            [class_id, conf, xmin, ymin, xmax, ymax]
         '''
         # image = np.copy(image)
         output_info = []
@@ -150,12 +161,13 @@ def run_on_video(video_path, output_video_name, conf_thresh):
                                                                    write_frame_stamp - inference_stamp))
     # writer.release()
 
-totalScriptTimeBegin = time.time()
 if __name__ == "__main__":
+    totalScriptTimeBegin = time.time()
     parser = argparse.ArgumentParser(description="Face Mask Detection")
     parser.add_argument('--img-mode', type=int, default=1, help='set 1 to run on image, 0 to run on video.')
     parser.add_argument('--img-path', type=str, help='path to your image.')
     parser.add_argument('--video-path', type=str, default='0', help='path to your video, `0` means to use camera.')
+    parser.add_argument('--show', type=bool, default = False, help ='show results' )
     # parser.add_argument('--hdf5', type=str, help='keras hdf5 file')
     args = parser.parse_args()
     
@@ -164,7 +176,7 @@ if __name__ == "__main__":
     
     if args.img_mode:
         imgPath = args.img_path
-        md.detectFromImageFile(imgPath, bShowResults=False)
+        md.detectFromImageFile(imgPath, bShowResults=args.img_path)
         print( "INF: measuring time..." )
         timeBegin = time.time()
         md.detectFromImageFile(imgPath, bShowResults=False)
@@ -175,4 +187,4 @@ if __name__ == "__main__":
             video_path = 0
         run_on_video(video_path, '', conf_thresh=0.5)
 
-print("INF: total script time: %5.2fs" % (time.time()-totalScriptTimeBegin) )
+    print("INF: total script time: %5.2fs" % (time.time()-totalScriptTimeBegin) )

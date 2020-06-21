@@ -55,7 +55,19 @@ class MaskDetector:
         
     def detectFromImage( self, img, bShowResults = True ):
         img = cv2.cvtColor( img, cv2.COLOR_BGR2RGB )
-        return self._inference(img, show_result=bShowResults, target_shape=(260, 260))
+        detectedFaces = self._inference(img, show_result=bShowResults, target_shape=(260, 260))
+        retVal = []
+        rConfidenceItsAFace = 0.8 # we don't have this info currently
+        properties = ["mask", 0, 0.]
+        for detected in detectedFaces:
+            if detected[0] == 0:
+                properties[1] = 1
+            else:
+                properties[1] = 0
+            properties[2] = detected[1]
+            data = [detected[2:], rConfidenceItsAFace, properties]
+            retVal.append(data)
+        return retVal
 
     def _inference(self, image,
                   conf_thresh=0.5,

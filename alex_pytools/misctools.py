@@ -47,7 +47,7 @@ def getDayStamp():
     return (hour,min,second)
     """
     datetimeObject = datetime.datetime.now()
-    return datetimeObject.year + "_" + datetimeObject.month + "_" + datetimeObject.day
+    return "%04d_%02d_%02d" % ( datetimeObject.year, datetimeObject.month,  datetimeObject.day )
 
 def getTimeStamp():
     """

@@ -48,18 +48,55 @@ def sumDict( sd ):
 def getTextScaleToFit( strText, rectToFit, fontFace, nThickness = 1 ):
     """
     Compute the biggest scale to fit in some rectangle
+    - rectToFit: a pair (w,h)
     return [rScale, tl_to_center]
         - rScale: scale to render
         - tl_to_center: the bottom left point to render the font in the rectToFit for the font to be centered
     """
+    #~ print("DBG: getTextScaleToFit: txt: '%s', rectToFit: %s" % ( str(strText), str(rectToFit) ) )
     rScale = 2.
     while( rScale > 0. ):
         rcRendered, baseline = cv2.getTextSize( strText, fontFace, rScale, nThickness )
+        #~ print("rendered: %s" % str(rcRendered) )
         if( rcRendered[0] < rectToFit[0] and rcRendered[1] < rectToFit[1] ):
             break
         rScale -= 0.1
+        #~ print("rScale: %s" % rScale )
     
     return rScale, ( (rectToFit[0]-rcRendered[0]) // 2, rectToFit[1]-(rectToFit[1]-rcRendered[1]) // 2 )
+    
+def renderVerticalText( im, txt, p1, p2, color ):
+    """
+    render a text in a vertical rectangle, compute letter size based on space
+    """
+    nFont = cv2.FONT_HERSHEY_SIMPLEX
+    nFontThickness = 1
+    w = p2[0] - p1[0]
+    h = p2[1] - p1[1]
+    rScaleMin = 100
+    print(w,h)
+    for c in txt:
+        rScale, offsettext = getTextScaleToFit( c, (w,int(h/(len(txt)*1.1)) ), nFont, nFontThickness )
+        if rScaleMin>rScale: rScaleMin = rScale
+      
+    print(rScaleMin)
+
+    rcLetterMax = [0,0]
+    for c in txt:
+        rcLetter, baseline = cv2.getTextSize( c, nFont, rScaleMin, 1 )
+        if rcLetterMax[0]<rcLetter[0]: rcLetterMax[0]=rcLetter[0]
+        if rcLetterMax[1]<rcLetter[1]: rcLetterMax[1]=rcLetter[1]
+    
+    print("DBG: rcLetterMax: %s"%str(rcLetterMax) )    
+    
+    for i,c in enumerate(txt):
+        if 1:
+            # to have letter spread on all high
+            hPerLetter = h/len(txt) # (offsettext[1]*2)
+        else:
+            hPerLetter = (rcLetterMax[1]*1.5)
+        rcLetter, baseline = cv2.getTextSize( c, nFont, rScaleMin, 1 )
+        cv2.putText(im, c, (p1[0]+(w-rcLetter[0])//2,p1[1]+int((i+0.5)*hPerLetter)), nFont, rScaleMin, color, nFontThickness )
     
     
 def renderBarGraph( im, dValue, lt, rb, rMaxValue = 100. ):
@@ -81,16 +118,16 @@ def renderBarGraph( im, dValue, lt, rb, rMaxValue = 100. ):
             maxSubLen = len(d)
             
     wMargin = 4
+    hLegend = 20
     wPerVal = ( rb[0]-lt[0]-wMargin ) / len(dValue)
     wPerSubVal = (wPerVal / maxSubLen) - 1
     
-    hPerUnit = ( rb[1]-lt[1] ) / rMaxValue
+    hPerUnit = ( rb[1]-lt[1]-hLegend-wMargin ) / rMaxValue
     
     xGraph = lt[0]+wMargin
-    hLegend = 20
     bottomValue = rb[1] - hLegend
     
-    cv2.rectangle(im, lt, rb, grey, 1 )
+    cv2.rectangle(im, lt, rb, lgrey, 1 )
     nCptH = 0
     for kh, vh in sorted(dValue.items()):
         if not isinstance(vh,dict):
@@ -98,9 +135,10 @@ def renderBarGraph( im, dValue, lt, rb, rMaxValue = 100. ):
         else:
             nCpt = 0
             for d,v in sorted(vh.items()):
-                p1 = (int( xGraph+nCptH*wPerVal+wPerSubVal*nCpt), bottomValue  )
-                p2 = (int( xGraph+nCptH*wPerVal+wPerSubVal*nCpt+wPerSubVal-wMargin ), int(bottomValue-v*hPerUnit) )
+                p1 = (int( xGraph+nCptH*wPerVal+wPerSubVal*nCpt), int(bottomValue-v*hPerUnit) )
+                p2 = (int( xGraph+nCptH*wPerVal+wPerSubVal*nCpt+wPerSubVal-wMargin ), bottomValue )
                 cv2.rectangle( im,p1,p2, colors[nCpt], -1 )
+                renderVerticalText( im, d, p1, p2, black )
                 nCpt += 1
         p1 = (int( xGraph+nCptH*wPerVal), bottomValue )
         p2 = (int( xGraph+nCptH*wPerVal+wPerVal)-wMargin, rb[1] )

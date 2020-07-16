@@ -81,23 +81,24 @@ def renderVerticalText( im, txt, p1, p2, color ):
       
     print(rScaleMin)
 
-    rcLetterMax = [0,0]
-    for c in txt:
-        rcLetter, baseline = cv2.getTextSize( c, nFont, rScaleMin, 1 )
-        if rcLetterMax[0]<rcLetter[0]: rcLetterMax[0]=rcLetter[0]
-        if rcLetterMax[1]<rcLetter[1]: rcLetterMax[1]=rcLetter[1]
+    #~ rcLetterMax = [0,0]
+    #~ for c in txt:
+        #~ rcLetter, baseline = cv2.getTextSize( c, nFont, rScaleMin, nFontThickness )
+        #~ if rcLetterMax[0]<rcLetter[0]: rcLetterMax[0]=rcLetter[0]
+        #~ if rcLetterMax[1]<rcLetter[1]: rcLetterMax[1]=rcLetter[1]
     
-    print("DBG: rcLetterMax: %s"%str(rcLetterMax) )    
+    #~ print("DBG: rcLetterMax: %s"%str(rcLetterMax) )    
     
+    yLetter = p1[1] + 2
     for i,c in enumerate(txt):
-        if 1:
-            # to have letter spread on all high
-            hPerLetter = h/len(txt) # (offsettext[1]*2)
+        rcLetter, baseline = cv2.getTextSize( c, nFont, rScaleMin, nFontThickness )
+        cv2.putText(im, c, (int(p1[0]+(w-rcLetter[0])//2),yLetter+rcLetter[1]), nFont, rScaleMin, color, nFontThickness )
+        if 0:
+            # letters spread on all height
+            hPerLetter = h//len(txt) # (offsettext[1]*2)
+            yLetter += hPerLetter
         else:
-            hPerLetter = (rcLetterMax[1]*1.5)
-        rcLetter, baseline = cv2.getTextSize( c, nFont, rScaleMin, 1 )
-        cv2.putText(im, c, (p1[0]+(w-rcLetter[0])//2,p1[1]+int((i+0.5)*hPerLetter)), nFont, rScaleMin, color, nFontThickness )
-    
+            yLetter += rcLetter[1] + int(8*rScaleMin) # (rcLetterMax[1]*1.5)
     
 def renderBarGraph( im, dValue, lt, rb, rMaxValue = 100. ):
     """
@@ -108,6 +109,7 @@ def renderBarGraph( im, dValue, lt, rb, rMaxValue = 100. ):
     grey = (127,127,127)
     lgrey = (191,191,191)
     black = (0,0,0)
+    white = (255,255,255)
     colors = ( (255,0,0), (255,127,0), (255,0,127),(0,255,0), (127,255,0), (0,255,127) )
     nFont = cv2.FONT_HERSHEY_SIMPLEX
     nFontThickness = 1
@@ -137,8 +139,8 @@ def renderBarGraph( im, dValue, lt, rb, rMaxValue = 100. ):
             for d,v in sorted(vh.items()):
                 p1 = (int( xGraph+nCptH*wPerVal+wPerSubVal*nCpt), int(bottomValue-v*hPerUnit) )
                 p2 = (int( xGraph+nCptH*wPerVal+wPerSubVal*nCpt+wPerSubVal-wMargin ), bottomValue )
-                cv2.rectangle( im,p1,p2, colors[nCpt], -1 )
-                renderVerticalText( im, d, p1, p2, black )
+                cv2.rectangle( im,p1,p2, colors[nCpt%len(colors)], -1 )
+                renderVerticalText( im, d, p1, p2, white )
                 nCpt += 1
         p1 = (int( xGraph+nCptH*wPerVal), bottomValue )
         p2 = (int( xGraph+nCptH*wPerVal+wPerVal)-wMargin, rb[1] )
@@ -200,8 +202,8 @@ class Analytics:
         white = (255,255,255)
         black = (0,0,0)
         blue = (255,0,0)
-        w = 640
-        h = 480
+        w = int(640*1.9)
+        h = int(480*1.6)
         img = np.zeros((h,w,3), np.uint8)
         img[:] = white
         
@@ -216,7 +218,7 @@ class Analytics:
                     if sum > max:
                         max = sum
                     dPerDay[kd][kapp] = sum
-        renderBarGraph( img, dPerDay, (10, 10), (630, 470), max )
+        renderBarGraph( img, dPerDay, (10, 10), (w-10, h-10), max )
                 
         
         
@@ -232,9 +234,9 @@ def autoTest():
     strIP3 = "192.168.0.3"
     u1 = "Alex"
     u2 = "JP"
-    a1 = "boot"
-    a2 = "telepresence"
-    a3 = "detecthuman"
+    a1 = "BOOT"
+    a2 = "Telepresence"
+    a3 = "DetectHumanMec"
     a4 = "app4"
     a5 = "app5"
     a6 = "app6"
@@ -242,12 +244,13 @@ def autoTest():
     e2 = "stop"
     
     astrFakeDate = ["2020_07_01", "2020_07_02", "2020_07_03", "2020_07_04", "2020_07_05", "2020_07_06", "2020_08_01", "2020_09_02"]
-    for i in range(8):
+    for i in range(2):
         a.setDebugFakeDate(astrFakeDate[i] )
         a.update( strIP1, u1, a1, e1 )
         a.update( strIP1, u1, a1, e2 )
         a.update( strIP1, u1, a1, e1 )
         a.update( strIP1, u1, a1, e2 )
+        a.update( strIP1, u1, a3, e1 )
         if i & 2:
             a.update( strIP1, u1, a2, e1 )
             a.update( strIP1, u1, a2, e1 )

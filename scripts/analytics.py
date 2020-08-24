@@ -44,6 +44,19 @@ def sumDict( sd ):
         else:
             s += v
     return s
+
+def maxDict( sd ):
+    """
+    get max of all values in a super dictionnary.
+    eg: {'start': {'Alex': {'192.168.0.1': 30}, 'toto': 15 } will return 45
+    """
+    s = -1000
+    for k,v in sd.items():
+        if isinstance(v,dict):
+            s = max( s, maxDict(v) )
+        else:
+            s = max(s,v)
+    return s
     
 def getTextScaleToFit( strText, rectToFit, fontFace, nThickness = 1 ):
     """
@@ -74,12 +87,12 @@ def renderVerticalText( im, txt, p1, p2, color ):
     w = p2[0] - p1[0]
     h = p2[1] - p1[1]
     rScaleMin = 100
-    print(w,h)
+    #~ print(w,h)
     for c in txt:
         rScale, offsettext = getTextScaleToFit( c, (w,int(h/(len(txt)*1.1)) ), nFont, nFontThickness )
         if rScaleMin>rScale: rScaleMin = rScale
       
-    print(rScaleMin)
+    #~ print(rScaleMin)
 
     #~ rcLetterMax = [0,0]
     #~ for c in txt:
@@ -98,13 +111,18 @@ def renderVerticalText( im, txt, p1, p2, color ):
             hPerLetter = h//len(txt) # (offsettext[1]*2)
             yLetter += hPerLetter
         else:
-            yLetter += rcLetter[1] + int(8*rScaleMin) # (rcLetterMax[1]*1.5)
-    
-def renderBarGraph( im, dValue, lt, rb, rMaxValue = 100. ):
+            yLetter += rcLetter[1] + int(8*rScaleMin) # (rcLetterMax[1]*1.5
+            
+def renderCenteredText( im, txt, p1, p2, color, nFont, nFontThickness ):
+    rScale,offsettext = getTextScaleToFit(txt, (p2[0]-p1[0],p2[1]-p1[1]), nFont,nFontThickness)
+    cv2.putText(im, txt, (p1[0]+offsettext[0],p1[1]+offsettext[1]), nFont, rScale, color, nFontThickness )
+
+def renderBarGraph( im, dValue, lt, rb, rMaxValue = -1 ):
     """
     render in im a bargraph value for each value in dictValue, a value can be just a number or a dict of number (but not dict of dict)
     eg: {"day1": {"a1":12, "a2":25}, "day2": {"a2":30, "a3":12} } NB: rMaxValue is here 30
     - lt: left top position to start render the bargraph, rb: right bottom point
+    - rMaxValue: pass max value if known, else it will be recomputed
     """
     grey = (127,127,127)
     lgrey = (191,191,191)
@@ -114,26 +132,42 @@ def renderBarGraph( im, dValue, lt, rb, rMaxValue = 100. ):
     nFont = cv2.FONT_HERSHEY_SIMPLEX
     nFontThickness = 1
     
+    if rMaxValue == -1:
+        #compute max value!
+        rMaxValue = maxDict(dValue)
+    
     maxSubLen = 0
     for k,d in dValue.items():
-        if len(d) > maxSubLen:
-            maxSubLen = len(d)
+        if isinstance(d,dict):
+            nSub = len(d)
+        else:
+            nSub = 1        
+        if nSub > maxSubLen:
+            maxSubLen = nSub
             
     wMargin = 4
     hLegend = 20
+    hNumber = hLegend//2
     wPerVal = ( rb[0]-lt[0]-wMargin ) / len(dValue)
     wPerSubVal = (wPerVal / maxSubLen) - 1
     
-    hPerUnit = ( rb[1]-lt[1]-hLegend-wMargin ) / rMaxValue
+    hPerUnit = ( rb[1]-lt[1]-hLegend-wMargin-hNumber ) / rMaxValue
     
     xGraph = lt[0]+wMargin
     bottomValue = rb[1] - hLegend
     
-    cv2.rectangle(im, lt, rb, lgrey, 1 )
+    #~ cv2.rectangle(im, lt, rb, lgrey, 1 )
     nCptH = 0
     for kh, vh in sorted(dValue.items()):
         if not isinstance(vh,dict):
-            cv2.rectangle( im, (lt[0]+nCptH*wPerVal,rb[1]), (lt[0]+nCptH*wPerVal+wPerVal-1,rb[1]-vh*hPerUnit), colors[0], 0 )
+           # cv2.rectangle( im, (lt[0]+nCptH*wPerVal,rb[1]), (lt[0]+nCptH*wPerVal+wPerVal-1,rb[1]-vh*hPerUnit), colors[0], 0 )
+            nCpt = 0
+            v = vh
+            p1 = (int( xGraph+nCptH*wPerVal+wPerSubVal*nCpt), int(bottomValue-v*hPerUnit) )
+            p2 = (int( xGraph+nCptH*wPerVal+wPerSubVal*nCpt+wPerSubVal-wMargin ), bottomValue )
+            cv2.rectangle( im,p1,p2, colors[nCpt%len(colors)], -1 )
+            renderCenteredText( im, str(v), (p1[0],p1[1]-hNumber), (p2[0],p1[1]-1), black, nFont, nFontThickness )
+            
         else:
             nCpt = 0
             for d,v in sorted(vh.items()):
@@ -141,13 +175,14 @@ def renderBarGraph( im, dValue, lt, rb, rMaxValue = 100. ):
                 p2 = (int( xGraph+nCptH*wPerVal+wPerSubVal*nCpt+wPerSubVal-wMargin ), bottomValue )
                 cv2.rectangle( im,p1,p2, colors[nCpt%len(colors)], -1 )
                 renderVerticalText( im, d, p1, p2, white )
+                renderCenteredText( im, str(v), (p1[0],p1[1]-hNumber), (p2[0],p1[1]-1), black, nFont, nFontThickness )
+                
                 nCpt += 1
         p1 = (int( xGraph+nCptH*wPerVal), bottomValue )
         p2 = (int( xGraph+nCptH*wPerVal+wPerVal)-wMargin, rb[1] )
         
-        cv2.rectangle( im, p1, p2, lgrey, 1 )
-        rScale,offsettext = getTextScaleToFit(kh, (p2[0]-p1[0],p2[1]-p1[1]), nFont,nFontThickness)
-        cv2.putText(im, kh, (p1[0]+offsettext[0],p1[1]+offsettext[1]), nFont, rScale, black, nFontThickness )
+        #~ cv2.rectangle( im, p1, p2, lgrey, 1 )
+        renderCenteredText( im,kh,p1,p2, black, nFont,nFontThickness )
             
         nCptH += 1
         
@@ -204,23 +239,36 @@ class Analytics:
         blue = (255,0,0)
         w = int(640*1.9)
         h = int(480*1.6)
+        w2=w//2
+        h2=h//2
         img = np.zeros((h,w,3), np.uint8)
         img[:] = white
         
-        # global per day
+        # globalize per day and sum per apps
         dPerDay = dict()
-        max = 0
+        dPerApps = dict()
+        dPerEv = dict()
+        dPerUser = dict()
+        dPerIP = dict()
         for kd,d in sorted(self.dStatPerDay.items()):
             if kd >= strDateStart and kd <= strDateStop:
                 dPerDay[kd] = dict()
                 for kapp,d in sorted(d.items()):
                     sum = sumDict(d)
-                    if sum > max:
-                        max = sum
                     dPerDay[kd][kapp] = sum
-        renderBarGraph( img, dPerDay, (10, 10), (w-10, h-10), max )
-                
-        
+                    updateCounter( dPerApps,[kapp], sum)
+                    
+                    for kEv, d in sorted(d.items()):
+                        for kUser, d in sorted(d.items()):
+                            for kIP, d in sorted(d.items()):
+                                updateCounter( dPerEv,[kEv], d)
+                                updateCounter( dPerUser,[kUser], d)
+                                updateCounter( dPerIP,[kIP], d)
+                    
+        renderBarGraph( img, dPerDay,  (10, 10),              (w2-10, h2-10) )
+        renderBarGraph( img, dPerApps, (w2+10, 10),       (w-10, h2-10) )
+        renderBarGraph( img, dPerEv,    (10, h2+10),        (w2-10, h-10) )                
+        renderBarGraph( img, dPerUser, (w2+10, h2+10), (w-10, h-10) )
         
         return img
         
@@ -244,7 +292,7 @@ def autoTest():
     e2 = "stop"
     
     astrFakeDate = ["2020_07_01", "2020_07_02", "2020_07_03", "2020_07_04", "2020_07_05", "2020_07_06", "2020_08_01", "2020_09_02"]
-    for i in range(2):
+    for i in range(len(astrFakeDate)):
         a.setDebugFakeDate(astrFakeDate[i] )
         a.update( strIP1, u1, a1, e1 )
         a.update( strIP1, u1, a1, e2 )

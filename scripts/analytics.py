@@ -165,7 +165,7 @@ def renderBarGraph( im, dValue, lt, rb, rMaxValue = -1 ):
             v = vh
             p1 = (int( xGraph+nCptH*wPerVal+wPerSubVal*nCpt), int(bottomValue-v*hPerUnit) )
             p2 = (int( xGraph+nCptH*wPerVal+wPerSubVal*nCpt+wPerSubVal-wMargin ), bottomValue )
-            cv2.rectangle( im,p1,p2, colors[nCpt%len(colors)], -1 )
+            cv2.rectangle( im,p1,p2, colors[nCptH%len(colors)], -1 )
             renderCenteredText( im, str(v), (p1[0],p1[1]-hNumber), (p2[0],p1[1]-1), black, nFont, nFontThickness )
             
         else:
@@ -230,7 +230,7 @@ class Analytics:
         updateCounter(self.dStatPerDay, (strD, strAppName, strEvent, strUserID, strIP) )
         #~ print( "DBG: Analytics.update: data:\n" + str(self.dStatPerDay ) )
         
-    def render( self, strDateStart = "1874_01_01", strDateStop = "9999_01_01" ):
+    def render( self, strDateStart = "1874_01_01", strDateStop = "9999_01_01", strRestrictToApp = None ):
         """
         return an image with the rendered statistics
         """
@@ -254,6 +254,8 @@ class Analytics:
             if kd >= strDateStart and kd <= strDateStop:
                 dPerDay[kd] = dict()
                 for kapp,d in sorted(d.items()):
+                    if strRestrictToApp != None and strRestrictToApp not in kapp:
+                        continue
                     sum = sumDict(d)
                     dPerDay[kd][kapp] = sum
                     updateCounter( dPerApps,[kapp], sum)
@@ -265,8 +267,8 @@ class Analytics:
                                 updateCounter( dPerUser,[kUser], d)
                                 updateCounter( dPerIP,[kIP], d)
                     
-        renderBarGraph( img, dPerDay,  (10, 10),              (w2-10, h2-10) )
-        renderBarGraph( img, dPerApps, (w2+10, 10),       (w-10, h2-10) )
+        renderBarGraph( img, dPerApps,  (10, 10),              (w2-10, h2-10) )
+        renderBarGraph( img, dPerDay, (w2+10, 10),       (w-10, h2-10) )
         renderBarGraph( img, dPerEv,    (10, h2+10),        (w2-10, h-10) )                
         renderBarGraph( img, dPerUser, (w2+10, h2+10), (w-10, h-10) )
         
@@ -316,6 +318,14 @@ def autoTest():
             a.update( strIP3, u2, a4, e1 )
             
     img = a.render()
+    cv2.imshow("stat", img )
+    cv2.waitKey(0)
+    
+    img = a.render(strRestrictToApp="BOO")
+    cv2.imshow("stat", img )
+    cv2.waitKey(0)
+
+    img = a.render(strRestrictToApp="Te")
     cv2.imshow("stat", img )
     cv2.waitKey(0)
     

@@ -344,6 +344,28 @@ def isHalfHour(id=1):
         return True
         
     return False
+    
+global_dictLastQuarterHour = dict() # for each id the last (h,m)    
+def isQuarterHour(id=1):
+    """
+    return True half an hour
+    (NB: use a global, so it can be used only once in a program, or use a different id
+    """
+    global global_dictLastQuarterHour
+    h,m,s = getTime()
+        
+    if m == 0 or m == 15 or m == 30 or m == 45:         
+        try:
+            lastVal = global_dictLastQuarterHour[id]
+        except KeyError as err:
+            global_dictLastQuarterHour[id] = (-1,-1)
+            lastVal = global_dictLastQuarterHour[id]        
+        if (h,m) == lastVal:
+            return False
+        global_dictLastQuarterHour[id] = (h,m)
+        return True
+        
+    return False
 
 global_dictLast10min = dict() # for each id the last (h,m)    
 def isEvery10min(id=1):

@@ -83,7 +83,7 @@ class CaptureManager:
             self.screenPosition = None
             self.strSourceName = ""
             if strSourceName != None:
-                self.strSourceName = "_" + str(strSourceName)
+                self.strSourceName = "__" + str(strSourceName)
             self.nCptImage = 0
             self.timeBegin = time.time()
             

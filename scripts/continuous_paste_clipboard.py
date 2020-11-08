@@ -30,7 +30,7 @@ def beepEveryHalf():
         if misctools.isHalfHour():
             misctools.beep(440, 800)
         else:
-            misctools.beep(440, 400)
+            misctools.beep(440, 150) # try 200
     
     
 

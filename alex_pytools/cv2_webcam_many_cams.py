@@ -54,60 +54,65 @@ class VideoCaptureAsync:
         
 # VideoCaptureAsync - end
 
-cap = cv2.VideoCapture(1) #or 0 + cv2.CAP_DSHOW
-cap.set(cv2.CAP_PROP_FRAME_WIDTH,640)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
+aCap = []
+for i in range(10):
+    oneCap = cv2.VideoCapture(i) #or 0 + cv2.CAP_DSHOW
+    oneCap.set(cv2.CAP_PROP_FRAME_WIDTH,640)
+    oneCap.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
+    if oneCap.isOpened():
+        aCap.append(oneCap)
 
-# Check if the webcam is opened correctly
-if not cap.isOpened():
-    raise IOError("Cannot open webcam")
+print("nbr cam: %d" % len(aCap))
+if len(aCap) < 1:
+    exit(0)
 
 nCptFrame = 0
 timeBegin = time.time()
 bFirstTime = 1
 while(True):
-    # Capture frame-by-frame
-    ret, frame = cap.read()
-    #~ print("ret: %s" % ret)
-    if ret == False:
-        time.sleep(0.3)
-        continue
+    for i in range(len(aCap)):        
+        ret, frame = aCap[i].read()
+        #~ print("ret: %s" % ret)
+        if ret == False:
+            print("WRN: can't get image from camera %d" % i )
+            time.sleep(0.3)
+            continue
 
-    if bFirstTime:
-        bFirstTime = 0
-        print("image properties: %s" % str(frame.shape) )
+        if bFirstTime:
+            bFirstTime = 0
+            print("image properties: %s" % str(frame.shape) )
         
-    # Our operations on the frame come here
-    #~ gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    
-    frame = np.rot90(frame)
-    #~ frame = cv2.resize(frame, None, fx=1.5, fy=1.5 )
+        # Our operations on the frame come here
+        #~ gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        
+        #~ frame = np.rot90(frame)
+        #~ frame = cv2.resize(frame, None, fx=1.5, fy=1.5 )
 
-    if 1:
-        fn = misctools.getFilenameFromTime() + ".jpg"
-        fn = "c:/tmpi7/" + fn
-        retVal = cv2.imwrite(fn, frame )
-        assert(retVal)
-        print("INF: output to '%s'" % fn )
+        if 0:
+            fn = misctools.getFilenameFromTime() + "_" + str(i) + ".jpg"
+            fn = "d:/tmp/" + fn
+            retVal = cv2.imwrite(fn, frame )
+            assert(retVal)
+            print("INF: output to '%s'" % fn )
 
-    # Display the resulting frame
-    cv2.imshow('frame',frame)
-    #~ cv2.imshow('gray',gray)
+        # Display the resulting frame
+        cv2.imshow('frame_' + str(i),frame)
+        #~ cv2.imshow('gray',gray)
+        
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
         
     nCptFrame += 1
     if nCptFrame > 60:
         t = time.time() - timeBegin
-        print("fps: %5.2f" % (nCptFrame / t) )
+        print("fps: %5.2fs" % (nCptFrame / t) )
         nCptFrame = 0
         timeBegin = time.time()
+
+    #~ time.sleep(0.01)
         
         
     # D415: 60fps up to 1280x720 RGB
-    # Fish Eye: 15 fps at 640x480
-    time.sleep(0.3)
-    
 
 
         

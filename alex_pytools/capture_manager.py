@@ -75,7 +75,7 @@ class CaptureManager:
         handle image from one source
         """
         
-        def __init__( self,  strPathToSaveToDisk = None, strSourceName = None ):
+        def __init__( self,  strPathToSaveToDisk = None, strSourceName = None, bLosslessSave = True ):
             if strPathToSaveToDisk != None:
                 if strPathToSaveToDisk[-1] != os.sep:
                     strPathToSaveToDisk += os.sep
@@ -86,7 +86,11 @@ class CaptureManager:
                 self.strSourceName = "__" + str(strSourceName)
             self.nCptImage = 0
             self.timeBegin = time.time()
-            
+            self.bLosslessSave = bLosslessSave
+            if bLosslessSave:
+                self.strSaveExt = ".png"
+            else:
+                self.strSaveExt = ".jpg"
             
             
         def newImage( self, img, rThresholdDifferenceToSave = 0.01, strOptionalFileName = None  ):
@@ -102,35 +106,55 @@ class CaptureManager:
                 self.prevImage = np.zeros(img.shape,dtype=np.uint8)
                 self.prevImage[:] = 255
                 
+            bSaved = False
             if self.strPathToSaveToDisk != None:
                 rDiff = computeImageDifference( self.prevImage, img )
                 print("DBG: Source: %s, rDiff: %5.3f" % (self.strSourceName,rDiff) )
                 if rDiff > rThresholdDifferenceToSave:
-                    fn = self.strPathToSaveToDisk + getFilenameFromTime() + self.strSourceName + ".png"
+                    if strOptionalFileName != None:
+                        strSkullName = strOptionalFileName
+                    else:
+                        strSkullName = getFilenameFromTime()
+                    fn = self.strPathToSaveToDisk + strSkullName + self.strSourceName + self.strSaveExt
                     print("INF: Source: %s, saving to: '%s'" % (self.strSourceName, fn ) )
-                    cv2.imwrite(fn,img)
+                    retVal = cv2.imwrite(fn,img)
+                    assert(retVal)
+                    bSaved = True
                 self.prevImage = img.copy()
-            
+                
+            if bSaved: 
+                cv2.circle( img, (20,20), 10,(0,0,255), -1 )
+                
             cv2.imshow( self.strWindowName, img )
+                
+            
+            # fps counting
             self.nCptImage += 1
             if self.nCptImage > 60:
                 t = time.time() - self.timeBegin
                 print("INF: Source: %s, %5.2ffps" % ( self.strSourceName, (self.nCptImage / t) ) )
                 self.nCptImage = 0
                 self.timeBegin = time.time()
-            
+                
+        #newImage - end
                 
     
     # class SourceManager - end
 
 
     
-    def __init__( self, strPathToSaveToDisk = None ):
+    def __init__( self, strPathToSaveToDisk = None, rThresholdDifferenceToSave = 0.01, bLosslessSave = True ):
         """
         - strPathToSaveToDisk: c:/tmp/ or None to not save to disk
+        - rThresholdDifferenceToSave: put +inf to never save, -1 to always save
         """
+        if strPathToSaveToDisk != None:
+            try: os.makedirs(strPathToSaveToDisk)
+            except BaseException as err: pass ; print("DBG: makedirs: err:%s" % str(err))
         self.strPathToSaveToDisk = strPathToSaveToDisk
-        self.rThresholdDifferenceToSave = 0.01 # put +inf to never save, -1 to always save
+        self.bLosslessSave = bLosslessSave
+        
+        self.rThresholdDifferenceToSave = rThresholdDifferenceToSave
         self.dictSource = dict() # a sourcemanager for each sourcename
 
         
@@ -139,7 +163,7 @@ class CaptureManager:
         receive a new image
         """
         if strSourceName not in self.dictSource.keys():
-            self.dictSource[strSourceName] = CaptureManager.SourceManager(strPathToSaveToDisk=self.strPathToSaveToDisk, strSourceName=strSourceName)
+            self.dictSource[strSourceName] = CaptureManager.SourceManager(strPathToSaveToDisk=self.strPathToSaveToDisk, strSourceName=strSourceName, bLosslessSave=self.bLosslessSave )
         self.dictSource[strSourceName].newImage( img, rThresholdDifferenceToSave = self.rThresholdDifferenceToSave, strOptionalFileName = strOptionalFileName )
         
     def render( self ):
@@ -183,9 +207,37 @@ def showAndSaveAllCameras( strSavePath = None ):
             return
 #showAndSaveAllCameras - end
 
+def copyInterestingImage( strSrcPath, strDstPath, rThresholdDifferenceToSave = 0.01, bLosslessSave = True ):
+    """
+    take all images in a folder and output only interesting one in another path
+    (interesting == enough difference)
+    - rThresholdDifferenceToSave: 0.01 or 0.02 for fish eye in daylight
+    
+    NB: if not lossless, jpg will be reencoded thus image is changed a bit. 
+    (it's not an exact file copy)
+    
+    """
+    cm = CaptureManager( strDstPath, bLosslessSave=bLosslessSave, rThresholdDifferenceToSave=rThresholdDifferenceToSave )
+    for f in sorted(  os.listdir(strSrcPath) ):
+        if ".png" in f.lower() or ".jpg" in f.lower():
+            tf = strSrcPath + f
+            print("INF: loading '%s'" % tf )
+            im = cv2.imread(tf)
+            #f_wo_ext = '.'.join(f.split('.')[:-1])
+            f_wo_ext = os. path. splitext(f)[0]
+            cm.newImage(im, strOptionalFileName = f_wo_ext )
+            if not cm.render():
+                break
+            
+            
+# copyInterestingImage - end
+
 
 if __name__ == "__main__":
     #~ showAndSaveAllCameras() # not saving
-    showAndSaveAllCameras("c:\\tmpi8\\")
+    #~ showAndSaveAllCameras("c:\\tmpi8\\")
+    
+    copyInterestingImage( "c:/tmpi7/", "c:/tmpi7b/", rThresholdDifferenceToSave = 0.02, bLosslessSave=False )
+    
     
     

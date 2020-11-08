@@ -185,6 +185,7 @@ def showAndSaveAllCameras( strSavePath = None ):
 
 
 if __name__ == "__main__":
+    #~ showAndSaveAllCameras() # not saving
     showAndSaveAllCameras("c:\\tmpi8\\")
     
     

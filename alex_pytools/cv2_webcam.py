@@ -54,7 +54,7 @@ class VideoCaptureAsync:
         
 # VideoCaptureAsync - end
 
-cap = cv2.VideoCapture(1) #or 0 + cv2.CAP_DSHOW
+cap = cv2.VideoCapture(0) #or 0 + cv2.CAP_DSHOW
 cap.set(cv2.CAP_PROP_FRAME_WIDTH,640)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
 
@@ -80,10 +80,11 @@ while(True):
     # Our operations on the frame come here
     #~ gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     
-    frame = np.rot90(frame)
+    #~ frame = np.rot90(frame)
     #~ frame = cv2.resize(frame, None, fx=1.5, fy=1.5 )
+    #~ frame[:, :, 1] = 0
 
-    if 1:
+    if 0:
         fn = misctools.getFilenameFromTime() + ".jpg"
         fn = "c:/tmpi7/" + fn
         retVal = cv2.imwrite(fn, frame )

@@ -82,6 +82,8 @@ def pix2Temp( v ):
     8105: 27.7
     
     8237: 33.5 / 36.4
+    
+    ramping computed from google spreadsheet "lepton3 - temperature ramping"
     """
     # regression estimation
     a = 0.0346090322

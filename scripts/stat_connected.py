@@ -187,13 +187,15 @@ class Stater:
             
             "48:B0:2D:05:B6:9D": "Jetson AGX",
             "DC:A6:32:48:A4:0C": "Rasp4Therm",
+            "18:03:73:17:D3:6C": "BigA",
             
             
         }
 
         self.hostLabels = {
             "Speed Dragon": "Adapt Usb => Eth",
-            "Wistron Neweb": "NAO6 Wifi",
+            "Wistron Neweb": "Pepper/NAO6 Wifi",
+            "congatec": "Pepper Eth",
         }
             
     def getLabels(self, strMAC, strHostHint = "" ):

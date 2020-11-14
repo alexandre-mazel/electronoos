@@ -766,7 +766,7 @@ INF: detectHuman total: 2274 file(s), duration:  4.85s, im/sec: 468.76
 INF: detectHuman total: 2274 file(s), duration:  4.46s, im/sec: 509.36 (output > tutu)
 
 *** Jetson AGX ***
-
+power mode 2 (15W) 
 am@am-desktop:~/dev/git/electronoos$ sudo python scripts/test_perf.py
 python version   : 2.7.17 (64bits) (4 core(s))
 test_cpu_int2    : ####################   0.91s
@@ -774,7 +774,7 @@ test_cpu_float2  : ####################   0.35s
 scipy.fftpack    : not found
 test_orb4.1.1    : ####################   0.60s (165.99fps)
 test_orbcv imgs  : test_perf_vga_*.png: not found
-test_orbcv bis   : multiprocess x4 :  1.01s /  1.12s /  0.04s /  1.18s /  0.36s /  0.35s =>    4.05s
+multiprocess x4 :  1.01s /  1.12s /  0.04s /  1.18s /  0.36s /  0.35s =>    4.05s
 multiprocess x8 :  1.83s /  0.80s /  0.08s /  2.10s /  0.71s /  0.70s =>   10.26s
 multiprocess x32:  7.35s /  3.23s /  0.24s /  8.60s /  3.14s /  2.65s =>   35.47s
 disk_write    1KB: ####################  14.69s (68.08 Mo/s)
@@ -788,13 +788,45 @@ test_cpu_float2  : ####################   0.37s
 test_scipy_xxt   : ####################   3.25s (122.89x)
 test_orb4.1.1    : ####################   0.65s (154.49fps)
 test_orbcv imgs  : test_perf_vga_*.png: not found
-test_orbcv bis   : multiprocess x4 :  0.93s /  0.36s /  2.77s /  0.98s /  0.36s /  0.37s =>    5.79s
+multiprocess x4 :  0.93s /  0.36s /  2.77s /  0.98s /  0.36s /  0.37s =>    5.79s
 multiprocess x8 :  2.10s /  0.68s /  4.92s /  2.03s /  0.78s /  0.76s =>   17.05s
 multiprocess x32:  7.29s /  2.69s / 19.25s /  8.57s /  3.03s /  3.06s =>   60.94s
 disk_write    1KB: ####################  16.14s (61.97 Mo/s)
 disk_read     1KB: ####################   7.33s (136.34 Mo/s)
 disk_write 1024KB: ####################  11.51s (86.87 Mo/s)
 disk_read  1024KB: ####################   3.46s (288.89 Mo/s)
+
+power mode 0
+python version   : 2.7.17 (64bits) (8 core(s))
+test_cpu_int2    : ####################   0.44s
+test_cpu_float2  : ####################   0.17s
+scipy.fftpack    : not found
+test_orb4.1.1    : ####################   0.32s (310.59fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : test_perf_vga_*.png: not found
+multiprocess x4 :  0.45s /  0.18s /  0.02s /  0.50s /  0.17s /  0.17s =>    1.50s
+multiprocess x8 :  0.48s /  0.21s /  0.03s /  0.54s /  0.20s /  0.19s =>    3.14s
+multiprocess x32:  1.90s /  0.83s /  0.09s /  2.04s /  0.72s /  0.68s =>    9.39s
+disk_write    1KB: ####################  12.80s (78.11 Mo/s)
+disk_read     1KB: ####################   3.59s (278.74 Mo/s)
+disk_write 1024KB: ####################  10.40s (96.12 Mo/s)
+disk_read  1024KB: ####################   3.35s (298.24 Mo/s)
+
+python version   : 3.6.9 (64bits) (8 core(s))
+test_cpu_int2    : ####################   0.66s
+test_cpu_float2  : ####################   0.19s
+test_scipy_xxt   : ####################   1.27s (315.92x)
+test_orb4.1.1    : ####################   0.33s (300.27fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : test_perf_vga_*.png: not found
+multiprocess x4 :  0.47s /  0.18s /  1.16s /  0.55s /  0.23s /  0.22s =>    2.83s
+multiprocess x8 :  0.49s /  0.20s /  1.79s /  0.57s /  0.24s /  0.24s =>    6.37s
+multiprocess x32:  1.94s /  0.68s /  7.15s /  2.24s /  0.88s /  0.86s =>   20.12s
+disk_write    1KB: ####################  13.29s (75.26 Mo/s)
+disk_read     1KB: ####################   4.25s (235.43 Mo/s)
+disk_write 1024KB: ####################  10.66s (93.84 Mo/s)
+disk_read  1024KB: ####################   3.35s (298.94 Mo/s)
+
 
 
 

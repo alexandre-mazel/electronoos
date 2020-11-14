@@ -22,7 +22,7 @@ def generate(strPath):
         im = cv2.imread(filename)
         h,w,nplane=im.shape
         print("image size: %dx%d" % (w,h) )
-        imreduced = cv2.resize(im,(w/8,h/8))
+        imreduced = cv2.resize(im,(w//8,h//8))
         minFaceSize = 100
         faces = fd.detect_face( im, bCompleteSearch = True )
         print("faces: %s" % str(faces) )
@@ -36,9 +36,6 @@ def generate(strPath):
         ratioOrigRender = rOrigRatio/rRenderRatio
         rRatioToApply = rOrigRatio/ratioOrigRender
         print("ratio: orig: %5.3f, render: %5.3f, ratio: %5.3f, rRatioToApply:%5.3f" % (rOrigRatio,rRenderRatio,ratioOrigRender,rRatioToApply) )
-        
-        
-        
 
         
         nSpeedX = 0
@@ -104,7 +101,7 @@ def generate(strPath):
             cv2.moveWindow("result", 0,0)
             cv2.imshow("orig",imreduced)
             cv2.moveWindow("orig", wrender+10,0)
-            key = cv2.waitKey(4) # ~25fps
+            key = cv2.waitKey(1) # ~25fps
             if key == 27:
                 return
         nCpt += 1

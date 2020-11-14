@@ -26,8 +26,11 @@ def bipInform():
     misctools.beep(frequency, duration)
 
 def beepEveryHalf():
-    if misctools.isHalfHour():
-        misctools.beep(440, 1000)
+    if misctools.isQuarterHour():
+        if misctools.isHalfHour():
+            misctools.beep(440, 800)
+        else:
+            misctools.beep(440, 150) # try 200
     
     
 

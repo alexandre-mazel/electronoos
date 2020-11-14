@@ -23,6 +23,17 @@ def isMatch( s, ref ):
 def getPunctuationChars():
     return " .,;:?!"
     
+def trimPunctuation(s):
+    while len(s) > 0 and s[-1] in getPunctuationChars():
+        s = s[:-1]
+    print(s)
+    return s
+        
+#~ s = "ah!"
+#~ s=trimPunctuation(s)
+#~ print("s:%s"%s)
+#~ assert(s=="ah")
+    
 def getFirstWord( s, bAddStarAsSeparator = False ):
     """
     return the first  word in s
@@ -133,6 +144,7 @@ def isMatchFillVar( s, ref, defaultDict = {} ):
     """
     same as isMatchFill, but ref can mix some * and some $variable_name
     - variable_name is a string without spaces
+    - all variable will be trimmed of punctuation
     eg: "je m'appelle alexandre", "*appelle $name"
     
     """
@@ -163,7 +175,7 @@ def isMatchFillVar( s, ref, defaultDict = {} ):
     nNumStar = 1
     for k,v in sorted(retVal[1].items()):
         if k in dIdx:
-            dNew[dIdx[k]] = v
+            dNew[dIdx[k]] = trimPunctuation(v)
         else:
             dNew["$"+str(nNumStar)] = v
             nNumStar += 1
@@ -227,9 +239,12 @@ def autoTest():
     assert_check( isMatchFillVar( "m'appelle jean et je suis nul", "m'appelle $name_value*"),  (True, {'name_value': 'jean', '$1': ' et je suis nul'}) )
     assert_check( isMatchFillVar( "m'appelle john", "m'appelle $name_value*" ),  (True, {'name_value': 'john', '$1': ''}) )
     assert_check( isMatchFillVar( "m'appelle pierre.", "m'appelle $name_value*" ),  (True, {'name_value': 'pierre', '$1': '.'}) )
-    assert_check( isMatchFillVar( "m'appelle paul.", "m'appelle $name_value" ),  (True, {'name_value': 'paul.'}) )
+    assert_check( isMatchFillVar( "m'appelle paul.", "m'appelle $name_value" ),  (True, {'name_value': 'paul'}) )
     # assert_check( isMatchFillVar( "Je m'appelle patrick.", "* m'appelle $name_value *", {"attr":"name"} ),  (True, {'name_value': 'patrick', 'attr': 'name', '$1': 'Je'}) )
     assert_check( isMatchFillVar( "Je m'appelle patrick.", "* m'appelle $name_value *", {"attr":"name"} ),  (False, {}) ) # require the space to match !
+    assert_check( isMatchFillVar( "Il s'appelle Thomas!", "Il s'appelle $value*", {"attr":"name"} ),  (True, {'attr': 'name', 'value': 'Thomas', '$1': '!'} ) )
+    assert_check( isMatchFillVar( "Il s'appelle Fifi!", "Il s'appelle $value", {"attr":"name"} ),  (True, {'attr': 'name', 'value': 'Fifi'} ) )
+    
     
 if __name__ == "__main__":
     autoTest();

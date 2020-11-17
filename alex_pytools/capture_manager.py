@@ -40,6 +40,15 @@ def getFilenameFromTime():
     return strTimeStamp;
 # getFilenameFromTime - end
 
+def isPixelBlack(pixel):
+    """
+    return True if pixel is at zero.
+    pix can be an int, a float or a rgb component
+    """
+    if type(pixel) == np.ndarray:
+        return int(sum(pixel)) == 0
+    return int(pixel) == 0
+
 
 class CaptureManager:
     """
@@ -170,7 +179,8 @@ class CaptureManager:
         """
         return False if user want to quit
         """
-        if ( cv2.waitKey(1) & 0xFF ) == ord('q'):
+        key = ( cv2.waitKey(1) & 0xFF )
+        if key == ord('q') or key == 27:
             return False
         return True
     
@@ -186,14 +196,36 @@ def showAndSaveAllCameras( strSavePath = None ):
     aCap = []
     
     for i in range(10):
-        oneCap = cv2.VideoCapture(i) #or 0 + cv2.CAP_DSHOW
-        oneCap.set(cv2.CAP_PROP_FRAME_WIDTH,640)
-        oneCap.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
-        if oneCap.isOpened():
-            aCap.append(oneCap)
-            print("INF: found one camera...")
+        cap = cv2.VideoCapture(i) #or 0 + cv2.CAP_DSHOW
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH,640)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
+        if cap.isOpened():
+            print("GOOD: found one camera: '%s'" % cap.getBackendName() )
+            for prop in [cv2.CAP_PROP_FPS, cv2.CAP_PROP_FOURCC,cv2.CAP_PROP_GAIN,cv2.CAP_PROP_GUID,cv2.CAP_PROP_FRAME_WIDTH,cv2.CAP_PROP_FRAME_HEIGHT,
+                                cv2.CAP_PROP_MODE,cv2.CAP_PROP_RECTIFICATION,cv2.CAP_PROP_SAR_NUM,cv2.CAP_PROP_CODEC_PIXEL_FORMAT, cv2.CAP_PROP_BACKEND, 
+                                cv2.CAP_PROP_FORMAT,cv2.CAP_PROP_OPENNI_FOCAL_LENGTH,cv2.CAP_PROP_IMAGES_BASE ]:
+                retVal = cap.get(prop)
+                if prop == 9:
+                    print("") # saut de ligne
+                print("INF: prop %d: %s (0X%X)" % (prop,str(retVal),int(retVal)) )
+                
+            w = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+            fps = cap.get(cv2.CAP_PROP_FPS)
+            if w == 160:
+                # thermal camera
+                print("INF: Thermal camera detected: changing format")
+                cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('Y','1','6',' '))
+                cap.set(cv2.CAP_PROP_CONVERT_RGB, False)
+                fps = 9
+                
+            if fps < 1:
+                print("INF: this camera has no fps, skipping it...\n" )
+                continue
+                
+            print("")
+            aCap.append(cap)
 
-    print("INF: showAndSaveAllCamera: nbr cam found: %d" % len(aCap))
+    print("INF: showAndSaveAllCamera: nbr cam kept: %d\n" % len(aCap))
     if len(aCap) < 1:
         exit(0)
 
@@ -202,6 +234,17 @@ def showAndSaveAllCameras( strSavePath = None ):
         for i in range(len(aCap)):        
             ret, frame = aCap[i].read()
             if ret:
+                bAutoRotateFishEyePatchCrado = True
+                if bAutoRotateFishEyePatchCrado and frame.shape[1] > 160:
+                    # we use a properties my laptop camera are in 16/9 thus there's black border around images
+                    pix = frame[0,frame.shape[1]//2]
+                    #~ print("pix: %s" % pix )
+                    if not isPixelBlack(pix):
+                        frame = np.rot90(frame)
+                        
+                if frame.shape[1] == 122:
+                    frame = frame[:-2]
+                        
                 cm.newImage(frame, strSourceName = i )
         if not cm.render():
             return

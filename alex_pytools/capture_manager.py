@@ -127,6 +127,12 @@ class CaptureManager:
                     fn = self.strPathToSaveToDisk + strSkullName + self.strSourceName + self.strSaveExt
                     print("INF: Source: %s, saving to: '%s'" % (self.strSourceName, fn ) )
                     retVal = cv2.imwrite(fn,img)
+                    if img.dtype != np.uint8:
+                        fn = self.strPathToSaveToDisk + strSkullName + self.strSourceName + ".raw"
+                        print("INF: Source: %s, saving to RAW: '%s'" % (self.strSourceName, fn ) )
+                        f = open(fn,'wb')
+                        f.write(img)
+                        f.close()
                     assert(retVal)
                     bSaved = True
                 self.prevImage = img.copy()
@@ -194,8 +200,8 @@ def showAndSaveAllCameras( strSavePath = None ):
     
     cm = CaptureManager(strSavePath)
     aCap = []
-    
-    for i in range(10):
+    nFirst = 2
+    for i in range(nFirst,10):
         cap = cv2.VideoCapture(i) #or 0 + cv2.CAP_DSHOW
         cap.set(cv2.CAP_PROP_FRAME_WIDTH,640)
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
@@ -242,8 +248,9 @@ def showAndSaveAllCameras( strSavePath = None ):
                     if not isPixelBlack(pix):
                         frame = np.rot90(frame)
                         
-                if frame.shape[1] == 122:
+                if frame.shape[0] == 122:
                     frame = frame[:-2]
+                    #~ cv2.normalize(frame, frame, 0, 65535, cv2.NORM_MINMAX) # extend contrast
                         
                 cm.newImage(frame, strSourceName = i )
         if not cm.render():
@@ -277,11 +284,17 @@ def copyInterestingImage( strSrcPath, strDstPath, rThresholdDifferenceToSave = 0
 
 
 if __name__ == "__main__":
-    showAndSaveAllCameras() # not saving
-    #~ showAndSaveAllCameras("c:\\tmpi8\\") #saving
+    #~ showAndSaveAllCameras() # not saving
+    showAndSaveAllCameras("c:\\tmpi11\\") #saving
     
     # remove static image with same content from a folder
     #~ copyInterestingImage( "c:/tmpi7/", "c:/tmpi7b/", rThresholdDifferenceToSave = 0.02, bLosslessSave=False )
+    
+    if 0:
+        # test reouverture
+        for name in ["2020_11_17-11h43m13s571561ms__2", "2020_11_17-11h43m43s540418ms__2"]:
+            im = cv2.imread("c:\\tmpi11\\%s.png" % name)
+            print(im.dtype)
     
     
     

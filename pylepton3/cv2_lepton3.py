@@ -187,7 +187,8 @@ def acquire():
         frame_extra = frame[-2:].copy()
         print("frame_extra: %s" % frame_extra )
         
-        nCameraInternalTemp = frame_extra[0][24]
+        #~ nCameraInternalTemp = frame_extra[0][24]
+        nCameraInternalTemp = frame_extra[0][29]
         
         print("nCameraInternalTemp: %s" % nCameraInternalTemp )
         
@@ -243,22 +244,41 @@ def acquire():
 
 def analysePathFromRaw( strPath, w = 160, h=120 ):
     
+    aPrevExtras = None
 
-    for f in sorted( os.listdir(strPath) ):
+    for f in sorted( os.listdir(strPath) )[-4:]:
         if ".raw" in f.lower():
             tf = strPath + f
             im = np.fromfile(tf, dtype=np.uint16, count = w*(h+10)) # +10 for read extra parameters
             #~ im = im.byteswap() # little to big => no changes
             print("INF: loaded im shape: %s, type: %s" % (str(im.shape),im.dtype) )
+            
             nExtraDatas = im.shape[0]-(w*h)
             aExtras = im[-nExtraDatas:]
             im = im[:-nExtraDatas]
+            
+            if 1:
+                # render variations
+                for i in range(len(aExtras)): 
+                    if aExtras[i] > 0: 
+                        if aPrevExtras is None or aExtras[i] != aPrevExtras[i]:
+                            print("%d: %d 0x%x" % (i,aExtras[i],aExtras[i]) )
+                aPrevExtras = aExtras[:]
+
+            nCameraInternalTemp = aExtras[29]
+            print("nCameraInternalTemp: %d" % nCameraInternalTemp )
+            #~ nCameraInternalTemp = 30820 
+            # on my example it sould be 31150, nearest are [29], then [24]
+            # or 30820 then nearest are 29 82 or 24
+        
             #~ print("DBG: im0: %d 0x%X" %( im[0],im[0]) )
             im = np.reshape(im,(h,w))
             #~ print("INF: loaded im shape: %s, type: %s" % (str(im.shape),im.dtype) )
             #~ print("DBG: im0: %d 0x%X" % (im[0,0],im[0,0]) )
+            
+            
             render = visualiseData(im)
-            renderTemperatureOnImage(render,im,32500)
+            renderTemperatureOnImage(render,im,nCameraInternalTemp)
             cv2.imshow('render',render)
             key = ( cv2.waitKey(0) & 0xFF )
             if key == ord('q') or key == 27:
@@ -268,7 +288,7 @@ def analysePathFromRaw( strPath, w = 160, h=120 ):
 
 if __name__ == "__main__":
     #~ acquire()
-    analysePathFromRaw("c:/tmpi11/")
+    analysePathFromRaw("c:/tmpi11/") # 29.5 ou 35.3 # a la fin mes mains sont entre 34.2 et 35.0
 
 
 """

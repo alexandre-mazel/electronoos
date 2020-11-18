@@ -126,7 +126,17 @@ class CaptureManager:
                         strSkullName = getFilenameFromTime()
                     fn = self.strPathToSaveToDisk + strSkullName + self.strSourceName + self.strSaveExt
                     print("INF: Source: %s, saving to: '%s'" % (self.strSourceName, fn ) )
-                    retVal = cv2.imwrite(fn,img)
+                    if img.dtype == np.uint16:
+                        imgpseudo = img.copy()
+                        if imgpseudo.shape[0] == 122:
+                            imgpseudo = imgpseudo[:-2]
+                        cv2.normalize(imgpseudo, imgpseudo, 0, 65535, cv2.NORM_MINMAX) # extend contrast # don't do that if saving to raw is required!!!
+                        imgpseudo = (imgpseudo/256).astype('uint8')
+                        imgpseudo = cv2.applyColorMap(imgpseudo, cv2.COLORMAP_JET) # only for 8bits
+                        retVal = cv2.imwrite(fn,imgpseudo)
+                    else:
+                        retVal = cv2.imwrite(fn,img)
+                        
                     if img.dtype != np.uint8:
                         fn = self.strPathToSaveToDisk + strSkullName + self.strSourceName + ".raw"
                         print("INF: Source: %s, saving type %s to RAW: '%s', first byte is 0x%X" % (self.strSourceName, img.dtype, fn, img[0,0] ) )

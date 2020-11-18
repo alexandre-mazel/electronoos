@@ -136,12 +136,16 @@ class CaptureManager:
                     assert(retVal)
                     bSaved = True
                 self.prevImage = img.copy()
+
+
+            # tranformation for a better rendering
+            
+            if img.shape[0] == 122:
+                img = img[:-2]
                 
             if img.dtype == np.uint16:
                 cv2.normalize(img, img, 0, 65535, cv2.NORM_MINMAX) # extend contrast # don't do that if saving to raw is required!!!
-                
-            if img.shape[0] == 122:
-                img = img[:-2]
+
 
                 
             if bSaved: 

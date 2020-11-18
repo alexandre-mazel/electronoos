@@ -139,7 +139,8 @@ def renderTemperatureOnImage(render, frame,nCameraInternalTemp):
     t_max = int(a[y_max,x_max])
     x_center, y_center = w//2,h//2
     t_center = int(a[y_center,x_center])
-    txt = "%5.1fC" % pix2Temp(t_min)
+    
+    txt = "%s/%5.1fC/%5.1fC" % (t_min, pix2Temp(t_min), pix2TempAlt(t_min,nCameraInternalTemp) )
     putTextAndCross( render, (x_min*nZoom, y_min*nZoom), (255,0,0), txt )
     txt = "%s/%5.1fC/%5.1fC" % (t_max, pix2Temp(t_max), pix2TempAlt(t_max,nCameraInternalTemp) )
     putTextAndCross( render, (x_max*nZoom, y_max*nZoom), (0,0,255), txt )
@@ -242,12 +243,16 @@ def acquire():
 
 def analysePathFromRaw( strPath, w = 160, h=120 ):
     
+
     for f in sorted( os.listdir(strPath) ):
         if ".raw" in f.lower():
             tf = strPath + f
-            im = np.fromfile(tf, dtype=np.uint16, count = w*h)
+            im = np.fromfile(tf, dtype=np.uint16, count = w*(h+10)) # +10 for read extra parameters
             #~ im = im.byteswap() # little to big => no changes
             print("INF: loaded im shape: %s, type: %s" % (str(im.shape),im.dtype) )
+            nExtraDatas = im.shape[0]-(w*h)
+            aExtras = im[-nExtraDatas:]
+            im = im[:-nExtraDatas]
             #~ print("DBG: im0: %d 0x%X" %( im[0],im[0]) )
             im = np.reshape(im,(h,w))
             #~ print("INF: loaded im shape: %s, type: %s" % (str(im.shape),im.dtype) )

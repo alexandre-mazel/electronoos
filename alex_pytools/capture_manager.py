@@ -129,13 +129,20 @@ class CaptureManager:
                     retVal = cv2.imwrite(fn,img)
                     if img.dtype != np.uint8:
                         fn = self.strPathToSaveToDisk + strSkullName + self.strSourceName + ".raw"
-                        print("INF: Source: %s, saving to RAW: '%s'" % (self.strSourceName, fn ) )
+                        print("INF: Source: %s, saving type %s to RAW: '%s', first byte is 0x%X" % (self.strSourceName, img.dtype, fn, img[0,0] ) )
                         f = open(fn,'wb')
-                        f.write(img)
+                        img.tofile(f) # file.write(a.tobytes())
                         f.close()
                     assert(retVal)
                     bSaved = True
                 self.prevImage = img.copy()
+                
+            if img.dtype == np.uint16:
+                cv2.normalize(img, img, 0, 65535, cv2.NORM_MINMAX) # extend contrast # don't do that if saving to raw is required!!!
+                
+            if img.shape[0] == 122:
+                img = img[:-2]
+
                 
             if bSaved: 
                 cv2.circle( img, (20,20), 10,(0,0,255), -1 )
@@ -249,9 +256,10 @@ def showAndSaveAllCameras( strSavePath = None ):
                         frame = np.rot90(frame)
                         
                 if frame.shape[0] == 122 and 1:
-                    print("%s" % frame[-2:-1] )
-                    frame = frame[:-2]
-                    cv2.normalize(frame, frame, 0, 65535, cv2.NORM_MINMAX) # extend contrast
+                    #~ print("DBG extra lines: %s" % frame[-2:-1] )
+                    #~ frame = frame[:-2]
+                    #cv2.normalize(frame, frame, 0, 65535, cv2.NORM_MINMAX) # extend contrast # don't do that if saving to raw is required!!!
+                    pass
                         
                 cm.newImage(frame, strSourceName = i )
         if not cm.render():
@@ -285,8 +293,8 @@ def copyInterestingImage( strSrcPath, strDstPath, rThresholdDifferenceToSave = 0
 
 
 if __name__ == "__main__":
-    showAndSaveAllCameras() # not saving
-    #~ showAndSaveAllCameras("c:\\tmpi11\\") #saving
+    #~ showAndSaveAllCameras() # not saving
+    showAndSaveAllCameras("c:\\tmpi11\\") #saving
     
     # remove static image with same content from a folder
     #~ copyInterestingImage( "c:/tmpi7/", "c:/tmpi7b/", rThresholdDifferenceToSave = 0.02, bLosslessSave=False )

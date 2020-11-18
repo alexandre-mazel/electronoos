@@ -18,7 +18,7 @@ def putTextCentered( image, text, bottomCenteredPosition, fontFace, fontScale, c
     render it and return the location
     """
     tsx,tsy = cv2.getTextSize( text, fontFace, fontScale, thickness )[0]
-    print(tsx,tsy)
+    #~ print(tsx,tsy)q
     h,w = image.shape[:2]
     
     xd = bottomCenteredPosition[0]-(tsx//2)
@@ -167,6 +167,8 @@ def acquire():
         # Capture frame-by-frame
         ret, frame = cap.read()
         #~ print("ret: %s" % ret)
+        print("frame: %d 0x%X" %( frame[0,0],frame[0,0]) )
+        frame.tofile("/tmp/im.raw")
         if ret == False:
             time.sleep(0.3)
             continue
@@ -240,16 +242,16 @@ def acquire():
 
 def analysePathFromRaw( strPath, w = 160, h=120 ):
     
-    for f in sorted( os.listdir(strPath) )[197:]:
+    for f in sorted( os.listdir(strPath) ):
         if ".raw" in f.lower():
             tf = strPath + f
             im = np.fromfile(tf, dtype=np.uint16, count = w*h)
             #~ im = im.byteswap() # little to big => no changes
             print("INF: loaded im shape: %s, type: %s" % (str(im.shape),im.dtype) )
-            print("im0: %d 0x%X" %( im[0],im[0]) )
+            #~ print("DBG: im0: %d 0x%X" %( im[0],im[0]) )
             im = np.reshape(im,(h,w))
-            print("INF: loaded im shape: %s, type: %s" % (str(im.shape),im.dtype) )
-            print("im0: %d 0x%X" % (im[0,0],im[0,0]) )
+            #~ print("INF: loaded im shape: %s, type: %s" % (str(im.shape),im.dtype) )
+            #~ print("DBG: im0: %d 0x%X" % (im[0,0],im[0,0]) )
             render = visualiseData(im)
             renderTemperatureOnImage(render,im,32500)
             cv2.imshow('render',render)

@@ -240,14 +240,18 @@ def acquire():
 
 def analysePathFromRaw( strPath, w = 160, h=120 ):
     
-    for f in sorted(  os.listdir(strPath) ):
+    for f in sorted( os.listdir(strPath) )[197:]:
         if ".raw" in f.lower():
             tf = strPath + f
             im = np.fromfile(tf, dtype=np.uint16, count = w*h)
+            #~ im = im.byteswap() # little to big => no changes
+            print("INF: loaded im shape: %s, type: %s" % (str(im.shape),im.dtype) )
+            print("im0: %d 0x%X" %( im[0],im[0]) )
             im = np.reshape(im,(h,w))
-            print("INF: loaded im shape: %s" % str(im.shape) )
+            print("INF: loaded im shape: %s, type: %s" % (str(im.shape),im.dtype) )
+            print("im0: %d 0x%X" % (im[0,0],im[0,0]) )
             render = visualiseData(im)
-            renderTemperatureOnImage(render,im,nCameraInternalTemp,nCameraInternalTemp)
+            renderTemperatureOnImage(render,im,32500)
             cv2.imshow('render',render)
             key = ( cv2.waitKey(0) & 0xFF )
             if key == ord('q') or key == 27:

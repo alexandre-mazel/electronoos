@@ -248,9 +248,10 @@ def showAndSaveAllCameras( strSavePath = None ):
                     if not isPixelBlack(pix):
                         frame = np.rot90(frame)
                         
-                if frame.shape[0] == 122:
+                if frame.shape[0] == 122 and 1:
+                    print("%s" % frame[-2:-1] )
                     frame = frame[:-2]
-                    #~ cv2.normalize(frame, frame, 0, 65535, cv2.NORM_MINMAX) # extend contrast
+                    cv2.normalize(frame, frame, 0, 65535, cv2.NORM_MINMAX) # extend contrast
                         
                 cm.newImage(frame, strSourceName = i )
         if not cm.render():
@@ -284,8 +285,8 @@ def copyInterestingImage( strSrcPath, strDstPath, rThresholdDifferenceToSave = 0
 
 
 if __name__ == "__main__":
-    #~ showAndSaveAllCameras() # not saving
-    showAndSaveAllCameras("c:\\tmpi11\\") #saving
+    showAndSaveAllCameras() # not saving
+    #~ showAndSaveAllCameras("c:\\tmpi11\\") #saving
     
     # remove static image with same content from a folder
     #~ copyInterestingImage( "c:/tmpi7/", "c:/tmpi7b/", rThresholdDifferenceToSave = 0.02, bLosslessSave=False )

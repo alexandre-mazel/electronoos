@@ -41,8 +41,21 @@ def getTime():
     """
     datetimeObject = datetime.datetime.now()
     return datetimeObject.hour, datetimeObject.minute, datetimeObject.second 
+    
+def getDayStamp():
+    """
+    return (hour,min,second)
+    """
+    datetimeObject = datetime.datetime.now()
+    return "%04d_%02d_%02d" % ( datetimeObject.year, datetimeObject.month,  datetimeObject.day )
 
 def getTimeStamp():
+    """
+    
+    # REM: linux command:
+    # timedatectl list-timezones: list all timezones
+    # sudo timedatectl set-timezone Europe/Paris => set paris
+    """
     datetimeObject = datetime.datetime.now()
     strTimeStamp = datetimeObject.strftime( "%Y/%m/%d: %Hh%Mm%Ss" )
     return strTimeStamp
@@ -309,3 +322,69 @@ def beep(frequency, duration):
     # duration in ms
     import winsound
     winsound.Beep(frequency, duration)
+
+global_dictLastHalfHour = dict() # for each id the last (h,m)    
+def isHalfHour(id=1):
+    """
+    return True half an hour
+    (NB: use a global, so it can be used only once in a program, or use a different id
+    """
+    global global_dictLastHalfHour
+    h,m,s = getTime()
+        
+    if m == 0 or m == 30:         
+        try:
+            lastVal = global_dictLastHalfHour[id]
+        except KeyError as err:
+            global_dictLastHalfHour[id] = (-1,-1)
+            lastVal = global_dictLastHalfHour[id]        
+        if (h,m) == lastVal:
+            return False
+        global_dictLastHalfHour[id] = (h,m)
+        return True
+        
+    return False
+    
+global_dictLastQuarterHour = dict() # for each id the last (h,m)    
+def isQuarterHour(id=1):
+    """
+    return True half an hour
+    (NB: use a global, so it can be used only once in a program, or use a different id
+    """
+    global global_dictLastQuarterHour
+    h,m,s = getTime()
+        
+    if m == 0 or m == 15 or m == 30 or m == 45:         
+        try:
+            lastVal = global_dictLastQuarterHour[id]
+        except KeyError as err:
+            global_dictLastQuarterHour[id] = (-1,-1)
+            lastVal = global_dictLastQuarterHour[id]        
+        if (h,m) == lastVal:
+            return False
+        global_dictLastQuarterHour[id] = (h,m)
+        return True
+        
+    return False
+
+global_dictLast10min = dict() # for each id the last (h,m)    
+def isEvery10min(id=1):
+    """
+    return True half an hour
+    (NB: use a global, so it can be used only once in a program, or use a different id
+    """
+    global global_dictLast10min
+    h,m,s = getTime()
+        
+    if (m%10) == 0:         
+        try:
+            lastVal = global_dictLast10min[id]
+        except KeyError as err:
+            global_dictLast10min[id] = (-1,-1)
+            lastVal = global_dictLast10min[id]        
+        if (h,m) == lastVal:
+            return False
+        global_dictLast10min[id] = (h,m)
+        return True
+        
+    return False

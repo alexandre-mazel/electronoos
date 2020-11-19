@@ -27,7 +27,8 @@ class CV2_Drawable:
     def reset( self ):
         if self.strWindowName != None:
             cv2.destroyWindow(self.strWindowName)
-        self.listSegment = [] # list of all mouse drawed segment
+        #~ self.listSegment = [] # list of all mouse drawed segment
+        self.bRectangleMode = False
         self.bQuit = False
         self.bMouseDown = False
         self.imageOriginal = None
@@ -35,6 +36,9 @@ class CV2_Drawable:
         self.screen = None
         self.bInScrollMode = False
         self.colorDraw = (0,0,0)
+        
+    def setRectangleMode( self, bNewVal = True ):
+        self.bRectangleMode = bNewVal
         
         
     def create(self, image, strWindowName = "Draw on img"):
@@ -45,8 +49,11 @@ class CV2_Drawable:
         self.image = self.imageOriginal.copy()
         
         self.recordedMouseDraw = [] # record all position of drawing: a list of all position
-        self.nIndexLastRecord = -1 # point the last recorded (will point the end unless during undo navigation)  
+        self.nIndexMouseDrawLastRecord = -1 # point the last recorded (will point the end unless during undo navigation)  
 
+        self.listRectangle = [] # list of rectangles' two corners
+        self.nIndexRectangleLastRecord = -1
+        
         wScreen, hScreen = getScreenResolution() 
         #~ wScreen *= 2
         #~ hScreen *= 2
@@ -109,27 +116,42 @@ class CV2_Drawable:
             self.bInScrollMode = True
             return
             
-        while self.nIndexLastRecord != -1 and self.nIndexLastRecord < len(self.recordedMouseDraw):
-            # after an undo
-            del self.recordedMouseDraw[-1]
-        self.recordedMouseDraw.append([])
-        self.nIndexLastRecord = len(self.recordedMouseDraw)
-        print( "DBG: self.nIndexLastRecord: %s" % self.nIndexLastRecord )
-        self.writeStart(x,y+self.yOrig)
+        if not self.bRectangleMode:
+            while self.nIndexMouseDrawLastRecord != -1 and self.nIndexMouseDrawLastRecord < len(self.recordedMouseDraw):
+                # after an undo
+                del self.recordedMouseDraw[-1]
+            self.recordedMouseDraw.append([])
+            self.nIndexMouseDrawLastRecord = len(self.recordedMouseDraw)
+            print( "DBG: self.nIndexMouseDrawLastRecord: %s" % self.nIndexMouseDrawLastRecord )
+            self.writeStart(x,y+self.yOrig)
+        else:
+            while self.nIndexRectangleLastRecord != -1 and self.nIndexRectangleLastRecord < len(self.listRectangle):
+                # after an undo
+                del self.listRectangle[-1]
+            self.listRectangle.append( [(x,y),(x+1,y+1)] )
+            self.nIndexRectangleLastRecord = len(self.listRectangle)
         self.bMouseDown = True
         self._mouseMove(x,y)
         
     def _mouseUp( self, x, y ):
         if self.bMouseDown:
-            self._mouseMove(x, y)
-            self.writeEnd(x,y+self.yOrig)
+            if not self.bRectangleMode:
+                self._mouseMove(x, y)
+                self.writeEnd(x,y+self.yOrig)
+            else:
+                self._mouseMove(x, y)
             self.bMouseDown = False
         self.bInScrollMode = False
         
     def _mouseMove( self, x, y, bErase = False ):
         if self.bMouseDown:
-            self.recordedMouseDraw[-1].append((x,y+self.yOrig))
-            self.writeContinue(x,y+self.yOrig, bErase)
+            if not self.bRectangleMode:
+                self.recordedMouseDraw[-1].append((x,y+self.yOrig))
+                self.writeContinue(x,y+self.yOrig, bErase)
+            else:
+                self.listRectangle[-1][1] = (x,y)
+                #~ cv2.rectangle( self.screen, self.listRectangle[-1][0], self.listRectangle[-1][1], self.colorDraw, 2 )
+                self._redrawAllDrawing()
             cv2.imshow( self.strWindowName, self.screen )
         else:
             if self.bInScrollMode:
@@ -208,14 +230,22 @@ class CV2_Drawable:
             
     def undo( self ):
         print("undo")
-        self.nIndexLastRecord -= 1
+        if not self.bRectangleMode:
+            self.nIndexMouseDrawLastRecord -= 1
+        else:
+            self.nIndexRectangleLastRecord -= 1
         self._redrawAllDrawing()
             
     def redo( self ):
         print("redo")
-        if self.nIndexLastRecord < len(self.recordedMouseDraw):
-            self.nIndexLastRecord += 1
-            self._redrawAllDrawing()        
+        if not self.bRectangleMode:
+            if self.nIndexMouseDrawLastRecord < len(self.recordedMouseDraw):
+                self.nIndexMouseDrawLastRecord += 1
+                self._redrawAllDrawing()        
+        else:
+            if self.nIndexRectangleLastRecord < len(self.listRectangle):
+                self.nIndexRectangleLastRecord += 1
+                self._redrawAllDrawing()     
             
     def _redraw( self ):
         self.screen = self.image[self.yOrig:self.yOrig+self.hSeen,:]
@@ -228,11 +258,16 @@ class CV2_Drawable:
         self.image = self.imageOriginal.copy()
         self._redraw()
         print("recordedMouseDraw: %s" % self.recordedMouseDraw )
-        for draw in self.recordedMouseDraw[0:self.nIndexLastRecord]:
+        for draw in self.recordedMouseDraw[0:self.nIndexMouseDrawLastRecord]:
             self.writeStart(draw[0][0], draw[0][1])
             for pt in draw:
                 self.writeContinue(pt[0],pt[1])
             self.writeEnd(draw[-1][0],draw[-1][1])
+            
+        for rect in self.listRectangle[0:self.nIndexRectangleLastRecord]:
+            print("rect: %s" % str( rect ) )
+            cv2.rectangle( self.image, rect[0], rect[1], self.colorDraw, 2 )
+
         self._redraw()
         
     def isFinished( self ):
@@ -241,6 +276,20 @@ class CV2_Drawable:
         
     def setDrawColor( self, color = (0,0,0) ):
         self.colorDraw = color
+        
+        
+    def getListRectangle( self ):
+        return self.listRectangle
+        
+    def getListRectangleAsStr( self ):
+        strOut = ""
+        bFirst = True
+        for rect in self.listRectangle[0:self.nIndexRectangleLastRecord]:
+            if not bFirst:
+                strOut += "_"
+            bFirst = False
+            strOut += "rect_%d_%d_%d_%d"
+        return strOut
         
 # class CV2_Drawable - end
 
@@ -251,6 +300,8 @@ def autoTest():
     screen[:] = (255,255,255)
     drawable = CV2_Drawable()
     drawable.create(screen)
+    drawable.setRectangleMode( True )
+    drawable.setDrawColor((180,40,43))
     
     while 1:
         if drawable.isFinished(): # if you don't wait for that, it will crash at exit ?!? (seen 05/2020: windows10 mstablet)

@@ -18,7 +18,7 @@ def putTextCentered( image, text, bottomCenteredPosition, fontFace, fontScale, c
     render it and return the location
     """
     tsx,tsy = cv2.getTextSize( text, fontFace, fontScale, thickness )[0]
-    #~ print(tsx,tsy)q
+    #~ print(tsx,tsy)
     h,w = image.shape[:2]
     
     xd = bottomCenteredPosition[0]-(tsx//2)
@@ -42,17 +42,29 @@ def putTextCentered( image, text, bottomCenteredPosition, fontFace, fontScale, c
     
 def renderCross(im, pos, color, nSize = 2 ):
     x,y=pos
+    print("DBG: renderCross: x: %d, y: %d" % (x,y))
+    if 1:
+        # outliner
+        c = (0,0,0)
+        for i in range(nSize):
+            im[y+i+1,x+1] = c
+            im[y-i+1,x+1] = c
+            im[y+1,x+i+1] = c
+            im[y+1,x-i+1] = c
+        
     im[y,x] = color
     for i in range(nSize):
         im[y+i,x+0] = color
         im[y-i,x+0] = color
         im[y+0,x+i] = color
         im[y+0,x-i] = color
-        
+
 def putTextAndCross( im, pos, color, strText, nSize = 2 ):
-    renderCross(im, pos, color, nSize)
     putTextCentered( im, strText, (pos[0],pos[1]-7), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2 )
+    renderCross(im, pos, color, nSize)
     
+def tempFtoC(t):
+    return (t-32)/1.8
     
 def pix2Temp( v ):
     """
@@ -68,6 +80,14 @@ def pix2Temp( v ):
     #~ nCameraTemperatureScale100 = 30400+780 # + 390 pour le mode maison ou 
 
     #~ rT = ( 0.0217 * (v - 8192) ) + (nCameraTemperatureScale100/100.) - nOffsetK
+    
+    # from various website:
+    # fpa_temp_kelvin*65.00/63535.00
+    #  0.0465*SensorValue-349.44 
+    # git lepton3:
+    # ambientTemperature = 25.0;
+	# slope = 0.0217;
+	#T = slope*raw+ambientTemperature-177.77
     
     """
     mesure:
@@ -96,6 +116,13 @@ def pix2Temp( v ):
 def pix2TempAlt( v, nCameraTemperatureScale100 = 32500 ):
     nOffsetK = 273.15
     rVal = ( 0.0217 * (v - 8192) ) + (nCameraTemperatureScale100/100.) - nOffsetK
+    return rVal
+
+    
+def pix2TempAlt2( v, nCameraTemperatureScale1000 = 32500 ):
+    nCameraTemperatureScale1000 = 25000
+    rVal = ( 0.0217 * v ) + (nCameraTemperatureScale1000/1000.) -177.77
+    rVal = tempFtoC(rVal)
     return rVal
     
 def visualiseData( frame ):
@@ -140,11 +167,11 @@ def renderTemperatureOnImage(render, frame,nCameraInternalTemp):
     x_center, y_center = w//2,h//2
     t_center = int(a[y_center,x_center])
     
-    txt = "%s/%5.1fC/%5.1fC" % (t_min, pix2Temp(t_min), pix2TempAlt(t_min,nCameraInternalTemp) )
+    txt = "%s/%5.1fC/%5.1fC/%5.1fC" % (t_min, pix2Temp(t_min), pix2TempAlt(t_min,nCameraInternalTemp), pix2TempAlt2(t_min,nCameraInternalTemp) )
     putTextAndCross( render, (x_min*nZoom, y_min*nZoom), (255,0,0), txt )
-    txt = "%s/%5.1fC/%5.1fC" % (t_max, pix2Temp(t_max), pix2TempAlt(t_max,nCameraInternalTemp) )
+    txt = "%s/%5.1fC/%5.1fC/%5.1fC" % (t_max, pix2Temp(t_max), pix2TempAlt(t_max,nCameraInternalTemp), pix2TempAlt2(t_max,nCameraInternalTemp) )
     putTextAndCross( render, (x_max*nZoom, y_max*nZoom), (0,0,255), txt )
-    txt = "%s/%5.1fC/%5.1fC" % (t_center, pix2Temp(t_center), pix2TempAlt(t_center,nCameraInternalTemp) )
+    txt = "%s/%5.1fC/%5.1fC/%5.1fC" % (t_center, pix2Temp(t_center), pix2TempAlt(t_center,nCameraInternalTemp), pix2TempAlt2(t_center,nCameraInternalTemp) )
     putTextAndCross( render, (x_center*nZoom, y_center*nZoom), (200,200,200), txt, nSize=4 )
 
 def acquire():
@@ -246,8 +273,9 @@ def analysePathFromRaw( strPath, w = 160, h=120 ):
     
     aPrevExtras = None
 
-    for f in sorted( os.listdir(strPath) )[-4:]:
+    for f in sorted( os.listdir(strPath) )[-40:]:
         if ".raw" in f.lower():
+            print("INF: loading %s" % f )
             tf = strPath + f
             im = np.fromfile(tf, dtype=np.uint16, count = w*(h+10)) # +10 for read extra parameters
             #~ im = im.byteswap() # little to big => no changes
@@ -267,9 +295,14 @@ def analysePathFromRaw( strPath, w = 160, h=120 ):
 
             nCameraInternalTemp = aExtras[29]
             print("nCameraInternalTemp: %d" % nCameraInternalTemp )
-            #~ nCameraInternalTemp = 30820 
+            nCameraInternalTemp = 30760 # exactly [263]*10
             # on my example it sould be 31150, nearest are [29], then [24]
             # or 30820 then nearest are 29 82 or 24
+            # another moment, good number was 30520, nearest: 82: 30000 puis 29: 31280
+            # 30760: exactly [263]*10
+            # 24 pourrait etre la temperature de la camera.
+            # flat-field correction (FFC)
+            # 
         
             #~ print("DBG: im0: %d 0x%X" %( im[0],im[0]) )
             im = np.reshape(im,(h,w))
@@ -288,7 +321,10 @@ def analysePathFromRaw( strPath, w = 160, h=120 ):
 
 if __name__ == "__main__":
     #~ acquire()
-    analysePathFromRaw("c:/tmpi11/") # 29.5 ou 35.3 # a la fin mes mains sont entre 34.2 et 35.0
+    analysePathFromRaw("c:/tmpi11/")
+ 
+    # ma main: 36/36.5 #
+    # radiateur du salon cote jardin: 40
 
 
 """

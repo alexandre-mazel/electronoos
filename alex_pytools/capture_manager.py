@@ -155,6 +155,11 @@ class CaptureManager:
                 
             if img.dtype == np.uint16:
                 cv2.normalize(img, img, 0, 65535, cv2.NORM_MINMAX) # extend contrast # don't do that if saving to raw is required!!!
+                if img.shape[1] < 640:
+                    nZoom = 640 // img.shape[1]
+                    img = cv2.resize(img, None, fx=nZoom, fy=nZoom )
+                img = (img/256).astype('uint8')
+                img = cv2.applyColorMap(img, cv2.COLORMAP_JET) # only for 8bits
 
 
                 

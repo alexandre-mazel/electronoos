@@ -318,7 +318,7 @@ def simple_test(bToto):
 def test_multithreading():
     # It shows us that
     import platform
-    if platform.system() == 'Windows' or 1:
+    if platform.system() == 'Windows' or 0:
         return 0
 
     rTotalDuration = 0

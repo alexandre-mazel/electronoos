@@ -226,7 +226,8 @@ def showAndSaveAllCameras( strSavePath = None ):
     
     cm = CaptureManager(strSavePath)
     aCap = []
-    nFirst = 2
+    nFirst = 0
+    #~ nFirst = 2
     for i in range(nFirst,10):
         cap = cv2.VideoCapture(i) #or 0 + cv2.CAP_DSHOW
         cap.set(cv2.CAP_PROP_FRAME_WIDTH,640)
@@ -312,8 +313,8 @@ def copyInterestingImage( strSrcPath, strDstPath, rThresholdDifferenceToSave = 0
 
 
 if __name__ == "__main__":
-    #~ showAndSaveAllCameras() # not saving
-    showAndSaveAllCameras("c:\\tmpi11\\") #saving
+    showAndSaveAllCameras() # not saving
+    #~ showAndSaveAllCameras("c:\\tmpi13\\") #saving
     
     # remove static image with same content from a folder
     #~ copyInterestingImage( "c:/tmpi7/", "c:/tmpi7b/", rThresholdDifferenceToSave = 0.02, bLosslessSave=False )

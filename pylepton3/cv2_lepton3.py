@@ -42,7 +42,7 @@ def putTextCentered( image, text, bottomCenteredPosition, fontFace, fontScale, c
     
 def renderCross(im, pos, color, nSize = 2 ):
     x,y=pos
-    print("DBG: renderCross: x: %d, y: %d" % (x,y))
+    #~ print("DBG: renderCross: x: %d, y: %d" % (x,y))
     if 1:
         # outliner
         c = (0,0,0)
@@ -191,12 +191,69 @@ def acquire():
     timeBegin = time.time()
     bFirstTime = 1
     bBlinkIsLighten = False
+    aPrevExtras = None
+    
+    # signification extra datas (mainly the changing one)
+    dictExtraName = {
+                # 0: 0x50 puis oxA apres un ffc
+                 1: "time in millisec (low part)",
+                 2: "time in millisec (hi part)",
+                 # 3: 0X818 , ffc will occurs in 6 frames,  puis 2 puis 0X820
+                 # 3-7: lie au ffc
+               20: "frame number",                              # at 27 fps (hw return 1 one over 3)
+               #~ 22:  "",
+               #~ 23:  "",
+               24: "camera temperature",
+               #~ 25: "",
+               29: "camera temperature avg",
+             #~ 124: "",
+    }
+    
+    """
+    apres un ffc:
+0: : 80  (0x50)
+1: time in millisec (low part): 20480  (0x5000)
+2: time in millisec (hi part): 31874  (0x7c82)
+3: : 2  (0x2)
+4: : 5736  (0x1668)
+5: : 1755  (0x6db)
+6: : 28040  (0x6d88)
+7: : 193  (0xc1)
+20: frame number            : 2669  (0xa6d)
+23: : 7348  (0x1cb4)
+24: camera temperature      : 31295  (0x7a3f)
+25: : 8066  (0x1f82)
+nCameraInternalTemp: 31039
+
+puis
+
+0: : 10  (0xa)
+1: time in millisec (low part): 44298  (0xad0a)
+2: time in millisec (hi part): 4  (0x4)
+3: : 2080  (0x820)
+4: : 0  (0x0)
+5: : 0  (0x0)
+6: : 0  (0x0)
+7: : 0  (0x0)
+20: frame number            : 2685  (0xa7d)
+22: : 8179  (0x1ff3)
+23: : 7334  (0x1ca6)
+24: camera temperature      : 31305  (0x7a49)
+25: : 8067  (0x1f83)
+29: : 31301  (0x7a45)
+30: : 43386  (0xa97a)
+31: : 4  (0x4)
+124: : 15047  (0x3ac7)
+nCameraInternalTemp: 31301
+"""
+    
+    timeLastFFC = time.time()
     while(True):
         # Capture frame-by-frame
         ret, frame = cap.read()
         #~ print("ret: %s" % ret)
-        print("frame: %d 0x%X" %( frame[0,0],frame[0,0]) )
-        frame.tofile("/tmp/im.raw")
+        #~ print("frame: %d 0x%X" %( frame[0,0],frame[0,0]) )
+        #~ frame.tofile("/tmp/im.raw")
         if ret == False:
             time.sleep(0.3)
             continue
@@ -211,11 +268,30 @@ def acquire():
         #~ frame = np.rot90(frame)
         
         #analyse extra datas
-        frame_extra = frame[-2:].copy()
-        print("frame_extra: %s" % frame_extra )
+        aExtras = frame[-2:].copy()
+        aExtras = aExtras.reshape((320))
+        #~ print("aExtras: %s" % aExtras )
         
-        #~ nCameraInternalTemp = frame_extra[0][24]
-        nCameraInternalTemp = frame_extra[0][29]
+        if 1:
+            print("-"*40)
+            # render variations on extras
+            for i in range(len(aExtras)): 
+                if aExtras[i] > 0 or 1: 
+                    if aPrevExtras is None or aExtras[i] != aPrevExtras[i]:
+                        if i not in dictExtraName.keys():
+                            label = ""
+                        else:
+                            label = "%-24s" % dictExtraName[i]
+                        print("%3d: %s: %d  (0x%x)" % (i,label,aExtras[i],aExtras[i]) )
+            aPrevExtras = aExtras[:]
+        
+        #~ nCameraInternalTemp = aExtras[24]
+        nCameraInternalTemp = aExtras[29]
+        nFFCFlag = aExtras[3]
+        if nFFCFlag == 0X818:
+            print("***FFC***: duration:%5.2fs" % (time.time()-timeLastFFC) ) # 286sec # 300sec # 300
+            misctools.beep(600,100)
+            timeLastFFC = time.time()
         
         print("nCameraInternalTemp: %s" % nCameraInternalTemp )
         
@@ -244,8 +320,9 @@ def acquire():
         
         cv2.imshow('render',render)
         #~ cv2.imshow('gray',gray)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        key = ( cv2.waitKey(1) & 0xFF )
+        if key == ord('q') or key == 27:
+            return False
             
         nCptFrame += 1
         if nCptFrame > 10:
@@ -273,7 +350,7 @@ def analysePathFromRaw( strPath, w = 160, h=120 ):
     
     aPrevExtras = None
 
-    for f in sorted( os.listdir(strPath) )[-40:]:
+    for f in sorted( os.listdir(strPath) ):
         if ".raw" in f.lower():
             print("INF: loading %s" % f )
             tf = strPath + f
@@ -299,10 +376,10 @@ def analysePathFromRaw( strPath, w = 160, h=120 ):
             # on my example it sould be 31150, nearest are [29], then [24]
             # or 30820 then nearest are 29 82 or 24
             # another moment, good number was 30520, nearest: 82: 30000 puis 29: 31280
-            # 30760: exactly [263]*10
-            # 24 pourrait etre la temperature de la camera.
-            # flat-field correction (FFC)
+            #30760: exactly [263]*10
             # 
+            # flat-field correction (FFC): seems not currently hiding the lens !!!
+            #
         
             #~ print("DBG: im0: %d 0x%X" %( im[0],im[0]) )
             im = np.reshape(im,(h,w))
@@ -320,8 +397,8 @@ def analysePathFromRaw( strPath, w = 160, h=120 ):
 # analysePathFromRaw - end
 
 if __name__ == "__main__":
-    #~ acquire()
-    analysePathFromRaw("c:/tmpi11/")
+    acquire()
+    #~ analysePathFromRaw("c:/tmpi12/")
  
     # ma main: 36/36.5 #
     # radiateur du salon cote jardin: 40

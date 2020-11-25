@@ -226,7 +226,7 @@ class CaptureManager:
         """
         if self.bSlowRender:
             self.nSlowRenderCountSkip += 1
-            if self.nSlowRenderCountSkip < 6:
+            if self.nSlowRenderCountSkip < 7: # has to be a odd number 
                 return True
             self.nSlowRenderCountSkip = 0
                 
@@ -236,7 +236,7 @@ class CaptureManager:
         if duration > 0.1:
             self.bSlowRender = True
             print("DBG: Time render: %5.2fs" % duration )
-        elif:
+        else:
             self.bSlowRender = False
         
         

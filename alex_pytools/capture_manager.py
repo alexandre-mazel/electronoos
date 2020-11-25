@@ -5,6 +5,7 @@
 ##########################################
 
 import cv2
+print( "INF: cv2 version: %s" % cv2.__version__)
 import datetime
 import math
 import numpy as np
@@ -233,10 +234,16 @@ def showAndSaveAllCameras( strSavePath = None ):
         cap.set(cv2.CAP_PROP_FRAME_WIDTH,640)
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
         if cap.isOpened():
-            print("GOOD: found one camera: '%s'" % cap.getBackendName() )
-            for prop in [cv2.CAP_PROP_FPS, cv2.CAP_PROP_FOURCC,cv2.CAP_PROP_GAIN,cv2.CAP_PROP_GUID,cv2.CAP_PROP_FRAME_WIDTH,cv2.CAP_PROP_FRAME_HEIGHT,
-                                cv2.CAP_PROP_MODE,cv2.CAP_PROP_RECTIFICATION,cv2.CAP_PROP_SAR_NUM,cv2.CAP_PROP_CODEC_PIXEL_FORMAT, cv2.CAP_PROP_BACKEND, 
-                                cv2.CAP_PROP_FORMAT,cv2.CAP_PROP_OPENNI_FOCAL_LENGTH,cv2.CAP_PROP_IMAGES_BASE ]:
+            if os.name == "nt": print("GOOD: found one camera: '%s'" % cap.getBackendName() )
+            # removed cv2.CAP_PROP_SAR_NUM 
+            propList = [cv2.CAP_PROP_FPS, cv2.CAP_PROP_FOURCC,cv2.CAP_PROP_GAIN,cv2.CAP_PROP_GUID,cv2.CAP_PROP_FRAME_WIDTH,cv2.CAP_PROP_FRAME_HEIGHT,
+                                cv2.CAP_PROP_MODE,cv2.CAP_PROP_RECTIFICATION,
+                                cv2.CAP_PROP_FORMAT,cv2.CAP_PROP_OPENNI_FOCAL_LENGTH,cv2.CAP_PROP_IMAGES_BASE ]
+            if os.name == "nt":
+                # flag not on my Raspberry (or at list not in this cv2 version)
+                propList.extend( [cv2.CAP_PROP_SAR_NUM,cv2.CAP_PROP_CODEC_PIXEL_FORMAT,cv2.CAP_PROP_BACKEND] )
+                
+            for prop in propList:
                 retVal = cap.get(prop)
                 if prop == 9:
                     print("") # saut de ligne
@@ -247,8 +254,9 @@ def showAndSaveAllCameras( strSavePath = None ):
             if w == 160:
                 # thermal camera
                 print("INF: Thermal camera detected: changing format")
-                cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('Y','1','6',' '))
-                cap.set(cv2.CAP_PROP_CONVERT_RGB, False)
+                if os.name == "nt":
+                    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('Y','1','6',' '))
+                    cap.set(cv2.CAP_PROP_CONVERT_RGB, False)
                 fps = 9
                 
             if fps < 1:

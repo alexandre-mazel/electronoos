@@ -314,6 +314,8 @@ nCameraInternalTemp: 31301
 
 
         # Display the resulting frame
+        
+        # add a blincking dot
         if not bBlinkIsLighten:
             cv2.circle( render, (40,20), 10,(255,0,0), -1 )
         bBlinkIsLighten = not bBlinkIsLighten

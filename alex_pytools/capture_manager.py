@@ -12,6 +12,8 @@ import numpy as np
 import os
 import time
 
+import misctools
+
 def computeImageDifference( im1, im2 ):
     """
     return difference between two images expressed in a [0..1] coefficient
@@ -154,7 +156,12 @@ class CaptureManager:
             # tranformation for a better rendering
             
             if img.shape[0] == 122:
+                aExtras = img[-2:]
                 img = img[:-2]
+
+                nFFCFlag = aExtras[3]
+                if nFFCFlag == 0X818:
+                    misctools.beep(600,100)
                 
             if img.dtype == np.uint16:
                 cv2.normalize(img, img, 0, 65535, cv2.NORM_MINMAX) # extend contrast # don't do that if saving to raw is required!!!

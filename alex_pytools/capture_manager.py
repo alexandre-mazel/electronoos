@@ -169,12 +169,12 @@ class CaptureManager:
             img = img.copy() 
             
             if bSaved: 
-                cv2.circle( img, (20,20), 10,(0,0,255), -1 )
+                cv2.circle( img, (40,20), 10,(0,0,255), -1 )
                 
                 
             # add a blincking dot
             if not self.bBlinkIsLighten:
-                cv2.circle( img, (40,20), 10,(255,0,0), -1 )
+                cv2.circle( img, (20,20), 10,(255,0,0), -1 )
             self.bBlinkIsLighten = not self.bBlinkIsLighten
                 
             cv2.imshow( self.strWindowName, img )
@@ -184,7 +184,7 @@ class CaptureManager:
             self.nCptImage += 1
             if self.nCptImage > 60:
                 t = time.time() - self.timeBegin
-                print("INF: Source: %s, %5.2ffps" % ( self.strSourceName, (self.nCptImage / t) ) )
+                print("INF: Source: %s, %5.1ffps" % ( self.strSourceName, (self.nCptImage / t) ) )
                 self.nCptImage = 0
                 self.timeBegin = time.time()
                 
@@ -226,7 +226,7 @@ class CaptureManager:
         """
         if self.bSlowRender:
             self.nSlowRenderCountSkip += 1
-            if self.nSlowRenderCountSkip < 7: # has to be a odd number 
+            if self.nSlowRenderCountSkip < 9: # has to be a odd number to be able to see the blue blinking dot
                 return True
             self.nSlowRenderCountSkip = 0
                 
@@ -235,7 +235,7 @@ class CaptureManager:
         duration = time.time()-timeBegin
         if duration > 0.1:
             self.bSlowRender = True
-            print("DBG: Time render: %5.2fs" % duration )
+            print("DBG: Time render: %5.3fs" % duration )
         else:
             self.bSlowRender = False
         

@@ -101,6 +101,10 @@ class CaptureManager:
                 self.strSaveExt = ".png"
             else:
                 self.strSaveExt = ".jpg"
+                
+            self.bBlinkIsLighten = False
+            self.bSlowRender = False
+            self.nSlowRenderCountSkip = 0
             
             
         def newImage( self, img, rThresholdDifferenceToSave = 0.01, strOptionalFileName = None  ):
@@ -162,10 +166,18 @@ class CaptureManager:
                 img = (img/256).astype('uint8')
                 img = cv2.applyColorMap(img, cv2.COLORMAP_JET) # only for 8bits
 
-
-                
+            # The following line remove the RPI CV3.2.0 bug: "TypeError: Layout of the output array img is incompatible with cv::Mat"
+            # occuring when we want to draw in this image (circle, line...) type was good, dtype was good, shape was good but...
+            img = img.copy() 
+            
             if bSaved: 
                 cv2.circle( img, (20,20), 10,(0,0,255), -1 )
+                
+                
+            # add a blincking dot
+            if not self.bBlinkIsLighten:
+                cv2.circle( img, (40,20), 10,(255,0,0), -1 )
+            self.bBlinkIsLighten = not self.bBlinkIsLighten
                 
             cv2.imshow( self.strWindowName, img )
                 
@@ -212,7 +224,9 @@ class CaptureManager:
         """
         return False if user want to quit
         """
+        t = time.time()            
         key = ( cv2.waitKey(1) & 0xFF )
+        print("DBG: Time render: %5.2fs" % (time.time()-t) )
         if key == ord('q') or key == 27:
             return False
         return True

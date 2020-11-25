@@ -103,8 +103,6 @@ class CaptureManager:
                 self.strSaveExt = ".jpg"
                 
             self.bBlinkIsLighten = False
-            self.bSlowRender = False
-            self.nSlowRenderCountSkip = 0
             
             
         def newImage( self, img, rThresholdDifferenceToSave = 0.01, strOptionalFileName = None  ):
@@ -210,6 +208,8 @@ class CaptureManager:
         
         self.rThresholdDifferenceToSave = rThresholdDifferenceToSave
         self.dictSource = dict() # a sourcemanager for each sourcename
+        self.bSlowRender = False
+        self.nSlowRenderCountSkip = 0
 
         
     def newImage( self, img, strSourceName = None, strOptionalFileName = None  ):
@@ -224,9 +224,22 @@ class CaptureManager:
         """
         return False if user want to quit
         """
-        t = time.time()            
+        if self.bSlowRender:
+            self.nSlowRenderCountSkip += 1
+            if self.nSlowRenderCountSkip < 6:
+                return True
+            self.nSlowRenderCountSkip = 0
+                
+        timeBegin = time.time()            
         key = ( cv2.waitKey(1) & 0xFF )
-        print("DBG: Time render: %5.2fs" % (time.time()-t) )
+        duration = time.time()-timeBegin
+        if duration > 0.1:
+            self.bSlowRender = True
+            print("DBG: Time render: %5.2fs" % duration )
+        elif:
+            self.bSlowRender = False
+        
+        
         if key == ord('q') or key == 27:
             return False
         return True

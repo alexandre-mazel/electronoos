@@ -32,6 +32,19 @@ def mse(imageA, imageB, bDenoise = False):
     # return the MSE, the lower the error, the more "similar"
     # the two images are
     return abs(err)
+    
+global_bIsRaspberry = None
+def isRPI():
+    global global_bIsRaspberry
+    if global_bIsRaspberry != None:
+        return global_bIsRaspberry
+    f = open("/proc/cpuinfo", "rt")
+    buf=f.read()
+    print(buf)
+    global_bIsRaspberry = "Raspberry Pi" in buf
+    f.close()
+    print("INF: isRPI: %s" %  global_bIsRaspberry )
+    return global_bIsRaspberry
 
 
     
@@ -320,6 +333,10 @@ def makeDirsQuiet( strPath ):
     
 def beep(frequency, duration):
     # duration in ms
+    if isRPI():
+        print("WRN: beep replaced by aplay on RPI")
+        os.system("aplay /home/pi/saw_440_100ms.wav")
+        return
     import winsound
     winsound.Beep(frequency, duration)
 

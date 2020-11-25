@@ -111,6 +111,7 @@ class CaptureManager:
             """
             receive a new image
             """
+
             if self.screenPosition == None:
                 # first image
                 self.screenPosition = CaptureManager.findNewPosition(img)
@@ -154,13 +155,12 @@ class CaptureManager:
 
 
             # tranformation for a better rendering
-            
-            if img.shape[0] == 122:
+            if img.shape[0] == 122: # onlye on windows!!!
                 aExtras = img[-2:]
                 img = img[:-2]
 
                 nFFCFlag = aExtras[3]
-                if nFFCFlag == 0X818:
+                if nFFCFlag == 0X818 or 1:
                     misctools.beep(600,100)
                 
             if img.dtype == np.uint16:
@@ -308,6 +308,7 @@ def showAndSaveAllCameras( strSavePath = None ):
         #~ print("loop")
         for i in range(len(aCap)):        
             ret, frame = aCap[i].read()
+            print(str(frame.shape))
             if ret:
                 bAutoRotateFishEyePatchCrado = True
                 if bAutoRotateFishEyePatchCrado and frame.shape[1] > 160:

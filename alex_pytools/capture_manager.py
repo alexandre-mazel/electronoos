@@ -263,7 +263,7 @@ def showAndSaveAllCameras( strSavePath = None ):
     cm = CaptureManager(strSavePath) # rThresholdDifferenceToSave=0.04 for fish eye
     aCap = []
     nFirst = 0
-    nFirst = 2
+    if os.name == "nt": nFirst = 2
     for i in range(nFirst,8):
         cap = cv2.VideoCapture(i) #or 0 + cv2.CAP_DSHOW
         cap.set(cv2.CAP_PROP_FRAME_WIDTH,640)

@@ -28,14 +28,20 @@ class Skeleton:
     LANKLE  = 15
     RANKLE = 16
     
-    POSE_PAIRS=[ [1,0],[1,2],[1,5],[2,3],[3,4],[5,6],[6,7],[1,8],[8,9],[9,10],[1,11],[11,12],[12,13],[0,14],[0,15],[14,16],[15,17]]
+    #~ Nose - 0, Neck - 1, Right Shoulder - 2, Right Elbow - 3, Right Wrist - 4,
+#~ Left Shoulder - 5, Left Elbow - 6, Left Wrist - 7, Right Hip - 8,
+#~ Right Knee - 9, Right Ankle - 10, Left Hip - 11, Left Knee - 12,
+#~ LAnkle - 13, Right Eye - 14, Left Eye - 15, Right Ear - 16,
+#~ Left Ear - 17, Background - 18
+    
+    POSE_PAIRS=[ [1,0],[1,2],[1,5],[2,3],[3,4],[5,6],[6,7],[1,8],[8,9],[9,10],[1,11],[11,12],[12,13],[0,14],[0,15],[14,16],[15,17]] # COCO ORDERING
     
     def __init__( self ):
-        self.listPoint = []
+        self.listPoints = []
         
         
     def createFromCoco( self, cocoListPoints ):
-        pass
+        self.listPoints = cocoListPoints
         
     def save( self, filename, skel ):
         pass
@@ -47,13 +53,17 @@ class Skeleton:
         """
         """
         # Draw Skeleton
-        for pair in POSE_PAIRS:
+        print("render: pts: %s" % str(self.listPoints) )
+        print("render: len: %s" % len(self.listPoints) )
+        for pair in Skeleton.POSE_PAIRS:
             partA = pair[0]
             partB = pair[1]
+            #~ print(partA)
+            #~ print(partB)
 
-            if self.listPoint[partA] and self.listPoint[partB]:
-                cv2.line(im, self.listPoint[partA], self.listPoint[partB], (0, 255, 255), 2)
-                cv2.circle(im, self.listPoint[partA], 3, (0, 0, 255), thickness=-1, lineType=cv2.FILLED)
+            if self.listPoints[partA] and self.listPoints[partB]:
+                cv2.line(im, self.listPoints[partA], self.listPoints[partB], (0, 255, 255), 2)
+                cv2.circle(im, self.listPoints[partA], 3, (0, 0, 255), thickness=-1, lineType=cv2.FILLED)
 
 
 
@@ -69,6 +79,7 @@ class CVOpenPose:
     """
     
     def __init__( self, strOptionnalModelPath = "../models/", strMode = "COCO" ):
+        #~ strMode = "MPI"
         self.strModelPath = strOptionnalModelPath
         self.net = None
         self.strMode = strMode
@@ -79,27 +90,36 @@ class CVOpenPose:
             self.weightsFile = "pose/coco/pose_iter_440000.caffemodel"
             self.nPoints = 18
             self.PosePairs = [ [1,0],[1,2],[1,5],[2,3],[3,4],[5,6],[6,7],[1,8],[8,9],[9,10],[1,11],[11,12],[12,13],[0,14],[0,15],[14,16],[15,17]]
-        elif MODE == "MPI" :
+        elif strMode == "MPI" :
+            print("NDEV!")
             print("MPI")
             self.protoFile = "pose/mpi/pose_deploy_linevec_faster_4_stages.prototxt"
             self.weightsFile = "pose/mpi/pose_iter_160000.caffemodel"
             self.nPoints = 15
-            self.PosePairs = [[0,1], [1,2], [2,3], [3,4], [1,5], [5,6], [6,7], [1,14], [14,8], [8,9], [9,10], [14,11], [11,12], [12,13] ]        
+            self.PosePairs = [[0,1], [1,2], [2,3], [3,4], [1,5], [5,6], [6,7], [1,14], [14,8], [8,9], [9,10], [14,11], [11,12], [12,13] ]            
         
     def _loadModels( self ):
+        t = time.time()
         self.net = cv2.dnn.readNetFromCaffe(self.strModelPath + self.protoFile, self.strModelPath + self.weightsFile)
         if 0:
-            print("Using CPU device")
-            net.setPreferableBackend(cv2.dnn.DNN_TARGET_CPU)
-        elif 1:
-            print("Using GPU device")
+            print("INF: Using CPU device")
+            self.net.setPreferableBackend(cv2.dnn.DNN_TARGET_CPU)
+        else:
+            print("INF: Using GPU device")
             self.net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
             self.net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
+        print("INF: time taken by loading: {:.3f}".format(time.time() - t)) # biga-U18: 1.25
 
     def analyse( self, im ):
         if self.net == None:
             self._loadModels()
+            
         print("Start")
+        
+        frameWidth = im.shape[1]
+        frameHeight = im.shape[0]
+        threshold = 0.1
+
         t = time.time()
         # input image dimensions for the network
         inWidth = 368
@@ -109,16 +129,30 @@ class CVOpenPose:
         inpBlob = cv2.dnn.blobFromImage(im, 1.0 / 255, (inWidth, inHeight), (0, 0, 0), swapRB=False, crop=False)
         self.net.setInput(inpBlob)        
         output = self.net.forward()
-        print("time taken by network : {:.3f}".format(time.time() - t)) # 6.5s on my msTab4
+        print("INF: time taken by network: {:.3f}".format(time.time() - t)) # biga-U18: gpu: 0.40first, 0.11 next -- cpu: 5.5s ----MsTab4: 6.5s
+        print("output: %s" % str(output) )
+        print("output len: %s" % len(output) )
+        print("output shape: %s" % str(output.shape) )
         
         skel = Skeleton()
 
         H = output.shape[2]
         W = output.shape[3]
+        
+        nPoints = 18        
+        
+        if 1:
+            # render proba
+            i = 0
+            probMap = output[0, i, :, :]            
+            for i in range(1,nPoints):
+                probMap += output[0, i, :, :]
+            probMap = cv2.resize(probMap, (frameWidth, frameHeight))
+            cv2.imshow("prob_nose", probMap)
 
         # Empty list to store the detected keypoints
         points = []
-        nPoints = 18
+
         for i in range(nPoints):
             # confidence map of corresponding body's part.
             probMap = output[0, i, :, :]
@@ -130,16 +164,21 @@ class CVOpenPose:
             x = (frameWidth * point[0]) / W
             y = (frameHeight * point[1]) / H
 
-            if prob > threshold : 
-                cv2.circle(frameCopy, (int(x), int(y)), 3, (0, 255, 255), thickness=-1, lineType=cv2.FILLED)
-                cv2.putText(frameCopy, "{}".format(i), (int(x), int(y)), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, lineType=cv2.LINE_AA)
+            if prob > threshold: 
+                cv2.circle(im, (int(x), int(y)), 3, (0, 255, 255), thickness=-1, lineType=cv2.FILLED)
+                cv2.putText(im, "{}".format(i), (int(x), int(y)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, lineType=cv2.LINE_AA)
+                cv2.putText(im, "{}".format(i), (int(x), int(y)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, lineType=cv2.LINE_AA)
 
                 # Add the point to the list if the probability is greater than the threshold
                 points.append((int(x), int(y)))
             else :
                 points.append(None)
                 
-            return skel
+        skel.createFromCoco(points)
+            
+        return skel
+        
+    # analyse - end
 
 
 
@@ -150,13 +189,16 @@ class CVOpenPose:
 
 if __name__ == "__main__":
     image_file = "../data/alexandre.jpg"
+    image_file = "../data/multiple_humans.jpg"
+    
     im = cv2.imread(image_file)
     op = CVOpenPose()
+    skel = op.analyse(im)
     skel = op.analyse(im)
     skel.render(im)
     
     zoom=1
-    frame = cv2.resize(frame,None,fx=zoom,fy=zoom)
-    cv2.imshow('Output-Skeleton', frame)    
+    im = cv2.resize(im,None,fx=zoom,fy=zoom)
+    cv2.imshow('Output-Skeleton', im)    
     
     cv2.waitKey(0)

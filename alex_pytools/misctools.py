@@ -38,11 +38,15 @@ def isRPI():
     global global_bIsRaspberry
     if global_bIsRaspberry != None:
         return global_bIsRaspberry
-    f = open("/proc/cpuinfo", "rt")
-    buf=f.read()
+    try:
+        f = open("/proc/cpuinfo", "rt")
+        buf=f.read()
+        f.close()
+    except:
+        global_bIsRaspberry = False
+        return global_bIsRaspberry
     print(buf)
     global_bIsRaspberry = "Raspberry Pi" in buf
-    f.close()
     print("INF: isRPI: %s" %  global_bIsRaspberry )
     return global_bIsRaspberry
 

@@ -155,12 +155,13 @@ class CaptureManager:
 
 
             # tranformation for a better rendering
-            if img.shape[0] == 122: # onlye on windows!!!
-                aExtras = img[-2:]
+            if img.shape[0] == 122: # PB: we got the extra lines only on windows !!!
+                aExtras = img[-2:].copy()
                 img = img[:-2]
 
+                aExtras = aExtras.reshape((320))
                 nFFCFlag = aExtras[3]
-                if nFFCFlag == 0X818 or 1:
+                if nFFCFlag == 0X818:
                     misctools.beep(600,100)
                 
             if img.dtype == np.uint16:
@@ -259,11 +260,11 @@ def showAndSaveAllCameras( strSavePath = None ):
     a utility method as an example but very usefull...
     """
     
-    cm = CaptureManager(strSavePath)
+    cm = CaptureManager(strSavePath) # rThresholdDifferenceToSave=0.04 for fish eye
     aCap = []
     nFirst = 0
-    #~ nFirst = 2
-    for i in range(nFirst,10):
+    nFirst = 2
+    for i in range(nFirst,8):
         cap = cv2.VideoCapture(i) #or 0 + cv2.CAP_DSHOW
         cap.set(cv2.CAP_PROP_FRAME_WIDTH,640)
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
@@ -308,7 +309,7 @@ def showAndSaveAllCameras( strSavePath = None ):
         #~ print("loop")
         for i in range(len(aCap)):        
             ret, frame = aCap[i].read()
-            print(str(frame.shape))
+            #~ print(str(frame.shape))
             if ret:
                 bAutoRotateFishEyePatchCrado = True
                 if bAutoRotateFishEyePatchCrado and frame.shape[1] > 160:
@@ -318,7 +319,7 @@ def showAndSaveAllCameras( strSavePath = None ):
                     if not isPixelBlack(pix):
                         frame = np.rot90(frame)
                         
-                if frame.shape[0] == 122 and 1:
+                if frame.shape[0] == 122:
                     #~ print("DBG extra lines: %s" % frame[-2:-1] )
                     #~ frame = frame[:-2]
                     #cv2.normalize(frame, frame, 0, 65535, cv2.NORM_MINMAX) # extend contrast # don't do that if saving to raw is required!!!
@@ -356,8 +357,8 @@ def copyInterestingImage( strSrcPath, strDstPath, rThresholdDifferenceToSave = 0
 
 
 if __name__ == "__main__":
-    showAndSaveAllCameras() # not saving
-    #~ showAndSaveAllCameras("c:\\tmpi13\\") #saving
+    #~ showAndSaveAllCameras() # not saving
+    showAndSaveAllCameras("c:\\tmpi13\\") #saving or to /home/pi/tmpi13/
     
     # remove static image with same content from a folder
     #~ copyInterestingImage( "c:/tmpi7/", "c:/tmpi7b/", rThresholdDifferenceToSave = 0.02, bLosslessSave=False )

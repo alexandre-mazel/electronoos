@@ -68,7 +68,7 @@ class CVOpenPose:
     cf analyse for output description
     """
     
-    def __init__( self, strOptionnalModelPath = "./", strMode = "COCO" ):
+    def __init__( self, strOptionnalModelPath = "../models/", strMode = "COCO" ):
         self.strModelPath = strOptionnalModelPath
         self.net = None
         self.strMode = strMode
@@ -149,7 +149,7 @@ class CVOpenPose:
 
 
 if __name__ == "__main__":
-    image_file = "alexandre.jpg"
+    image_file = "../data/alexandre.jpg"
     im = cv2.imread(image_file)
     op = CVOpenPose()
     skel = op.analyse(im)

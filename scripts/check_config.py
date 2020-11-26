@@ -1,6 +1,9 @@
+import os
 def checkOpenCV():
     import cv2
     print("cv2: %s" % str(cv2.__version__) )
+    print("cv2: path: %s" % str(os.path.realpath(cv2.__file__)) )
+    
     try:
         dir(cv2.dnn)
         print("cv2: dnn found" )

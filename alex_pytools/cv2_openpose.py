@@ -1,8 +1,10 @@
 # Encapsulation in a nett class of the opencv openpose pose estimation
 # inspired from https://www.learnopencv.com/deep-learning-based-human-pose-estimation-using-opencv-cpp-python/
 #
+# on my biga: export PYTHONPATH=/usr/local/lib/python3.6/dist-packages/cv2/python-3.6:$PYTHONPATH
 
 import cv2
+import os
 import time
 import numpy as np
 
@@ -73,7 +75,8 @@ def getValidPairs(output,frameWidth, frameHeight,detected_keypoints):
         # Find the PAF values at a set of interpolated points between the joints
         # Use the above formula to compute a score to mark the connection valid
 
-        if( nA != 0 and nB != 0):
+        if( nA != 0 and nB != 0):, (820, 384, 0.9713697), (765, 384, 0.7346055), (847, 407, 0.4623131)]
+[(235, 360, 0.83213395), (236, 430, 0.8696778), (153, 430, 0.790813), (69, 406, 0.7214357), (69, 290, 0.7160149), (292, 431, 0.76776236), [0, 0, 0], [0, 0, 0], 
             valid_pair = np.zeros((0,3))
             for i in range(nA):
                 max_j=-1
@@ -192,7 +195,7 @@ class Skeleton:
     def createFromCoco( self, cocoListPoints ):
         self.listPoints = cocoListPoints
         
-    def save( self, filename, skel ):
+    def save( self, filename ):
         pass
         
     def load( self, filename ):   
@@ -207,14 +210,24 @@ class Skeleton:
         for pair in Skeleton.POSE_PAIRS:
             partA = pair[0]
             partB = pair[1]
-            #~ print(partA)
-            #~ print(partB)
+            print(partA)
+            print(partB)
+            #~ if partA >= 17 or partB>= 17:
+                #~ print("out")
+                #~ continue
+                
+            threshold = 0.2
+            if self.listPoints[partA][2] < threshold or self.listPoints[partB][2] < threshold:
+                continue
 
             if self.listPoints[partA] and self.listPoints[partB]:
-                cv2.line(im, self.listPoints[partA], self.listPoints[partB], (0, 255, 255), 2)
-                cv2.circle(im, self.listPoints[partA], 3, (0, 0, 255), thickness=-1, lineType=cv2.FILLED)
+                cv2.line(im, self.listPoints[partA][:2], self.listPoints[partB][:2], (0, 255, 255), 2)
+                cv2.circle(im, self.listPoints[partA][:2], 3, (0, 0, 255), thickness=-1, lineType=cv2.FILLED)
+                
+    def __str__( self ):
+        return str(self.listPoints) 
 
-
+# class Skeleton - end
 
 class CVOpenPose:
     """
@@ -260,6 +273,13 @@ class CVOpenPose:
         print("INF: time taken by loading: {:.3f}".format(time.time() - t)) # biga-U18: 1.25
 
     def analyse( self, im ):
+        """
+        return a list of skel
+        """
+        
+        bDebug = 1
+        bDebug = False
+        
         if self.net == None:
             self._loadModels()
             
@@ -304,6 +324,7 @@ class CVOpenPose:
                 keypoints = getKeypoints(probMap, threshold)
                 print("Keypoints - {} : {}".format(keypointsMapping[part], keypoints))
                 keypoints_with_id = []
+
                 for i in range(len(keypoints)):
                     keypoints_with_id.append(keypoints[i] + (keypoint_id,))
                     keypoints_list = np.vstack([keypoints_list, keypoints[i]])
@@ -312,28 +333,61 @@ class CVOpenPose:
                 detected_keypoints.append(keypoints_with_id)
 
 
-            frameClone = im.copy()
-            for i in range(nPoints):
-                for j in range(len(detected_keypoints[i])):
-                    cv2.circle(frameClone, detected_keypoints[i][j][0:2], 5, colors[i], -1, cv2.LINE_AA)
-            cv2.imshow("Keypoints",frameClone)
+            if bDebug:
+                frameClone = im.copy()
+                for i in range(nPoints):
+                    for j in range(len(detected_keypoints[i])):
+                        cv2.circle(frameClone, detected_keypoints[i][j][0:2], 5, colors[i], -1, cv2.LINE_AA)
+                        txt = "%3.2f" % detected_keypoints[i][j][2] # draw confidence
+                        txt = "%d" % detected_keypoints[i][j][3] # draw index
+                        cv2.putText(frameClone, txt, detected_keypoints[i][j][0:2], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, lineType=cv2.LINE_AA)
+                        cv2.putText(frameClone, txt, detected_keypoints[i][j][0:2], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, lineType=cv2.LINE_AA)
+                cv2.imshow("Keypoints",frameClone)
 
             valid_pairs, invalid_pairs = getValidPairs(output,frameWidth,frameHeight,detected_keypoints)
             personwiseKeypoints = getPersonwiseKeypoints(valid_pairs, invalid_pairs,keypoints_list)
 
-            print("INF: time taken by people appariemet: {:.3f}".format(time.time() - t)) # biga-U18: gpu: 1s for 4 people 0.1 for 1(alex)
+            print("INF: time taken by people appariement: {:.3f}".format(time.time() - t)) # biga-U18: gpu: 1s for 4 people 0.1 for 1(alex)
+            print("personwiseKeypoints: %s\n" % personwiseKeypoints )
+            print("detected_keypoints: %s\n" % detected_keypoints )
+            
+            detected_keypoints_flat = [item for sublist in detected_keypoints for item in sublist]
+            print("detected_keypoints_flat: %s\n" % detected_keypoints_flat )
+            
+            skel_list = []
+            for person in personwiseKeypoints:
+                # 19 float: 18 index + a confidence
+                skel = []
+                for i in range(18):
+                    index = int(person[i])
+                    #~ print("DBG: person pt index: %s" % index )                    
+                    if index == -1:                        
+                        pt = [0,0,0]
+                    else:
+                        pt = detected_keypoints_flat[index][:3]
+                    skel.append(pt)
+                s = Skeleton()
+                s.createFromCoco(skel)
+                skel_list.append(s)
+            print("skel_list:")
+            for sk in skel_list: print( str(sk) )
 
-            for i in range(17):
-                for n in range(len(personwiseKeypoints)):
-                    index = personwiseKeypoints[n][np.array(POSE_PAIRS[i])]
-                    if -1 in index:
-                        continue
-                    B = np.int32(keypoints_list[index.astype(int), 0])
-                    A = np.int32(keypoints_list[index.astype(int), 1])
-                    cv2.line(frameClone, (B[0], A[0]), (B[1], A[1]), colors[i], 3, cv2.LINE_AA)         
-            cv2.imshow("Detected Pose" , frameClone)
-            cv2.waitKey(0)
-            exit(1)
+            if bDebug:
+                frameClone = im.copy()
+                for i in range(17):
+                    for n in range(len(personwiseKeypoints)):
+                        index = personwiseKeypoints[n][np.array(POSE_PAIRS[i])]
+                        if -1 in index:
+                            continue
+                        B = np.int32(keypoints_list[index.astype(int), 0])
+                        A = np.int32(keypoints_list[index.astype(int), 1])
+                        cv2.line(frameClone, (B[0], A[0]), (B[1], A[1]), colors[i], 3, cv2.LINE_AA)
+                cv2.imshow("Detected Pose" , frameClone)
+                cv2.moveWindow("Detected Pose",640,0)
+                cv2.waitKey(0)
+            
+            
+            return skel_list
         
         
             
@@ -362,8 +416,9 @@ class CVOpenPose:
 
             if prob > threshold: 
                 cv2.circle(im, (int(x), int(y)), 3, (0, 255, 255), thickness=-1, lineType=cv2.FILLED)
-                cv2.putText(im, "{}".format(i), (int(x), int(y)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, lineType=cv2.LINE_AA)
-                cv2.putText(im, "{}".format(i), (int(x), int(y)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, lineType=cv2.LINE_AA)
+                txt = "%d (%3.1f)" % (i,prob)
+                cv2.putText(im, txt, (int(x), int(y)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, lineType=cv2.LINE_AA)
+                cv2.putText(im, txt, (int(x), int(y)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, lineType=cv2.LINE_AA)
 
                 # Add the point to the list if the probability is greater than the threshold
                 points.append((int(x), int(y)))
@@ -380,21 +435,43 @@ class CVOpenPose:
 
 # class CVOpenPose - end
 
-
-
-
-if __name__ == "__main__":
-    image_file = "../data/alexandre.jpg"
-    image_file = "../data/multiple_humans.jpg"
-    
+def analyseOneFile( strFilename ):
     im = cv2.imread(image_file)
     op = CVOpenPose()
-    skel = op.analyse(im)
-    skel = op.analyse(im)
-    skel.render(im)
+    skels= op.analyse(im)
+    #~ skel = op.analyse(im)
+    for sk in skels:
+        sk.render(im)
     
     zoom=1
     im = cv2.resize(im,None,fx=zoom,fy=zoom)
     cv2.imshow('Output-Skeleton', im)    
-    
-    cv2.waitKey(0)
+    cv2.waitKey(0)    
+
+def extractFromPath( strPath ):
+    print("INF: extractFromPath: analysing folder: %s" % strPath )
+    op = CVOpenPose()
+    for f in sorted(  os.listdir(strPath) ):
+        tf = strPath + f
+        if os.path.isdir(tf):
+            extractFromPath(tf + os.sep)
+            continue
+        filename, file_extension = os.path.splitext(f)
+        if ".png" in file_extension.lower() or ".jpg" in file_extension.lower():            
+            print("INF: analysing '%s'" % tf )
+            im = cv2.imread(tf)
+            skel = op.analyse(im)
+            outname = strPath + filename + ".skl"
+            skel.save(outname)
+            return # debugging
+
+
+
+if __name__ == "__main__":
+    if 1:
+        image_file = "../data/alexandre.jpg"
+        image_file = "../data/multiple_humans.jpg"    
+        analyseOneFile(image_file)
+    else:
+        strPath = "/home/am/images_salon_debout_couche/"
+        extractFromPath(strPath)

@@ -252,6 +252,8 @@ class Skeleton:
 # class Skeleton - end
 
 class Skeletons:
+    NBR_POINTS = 18
+    
     def __init__(self):
         self.aSkels = []
         
@@ -285,13 +287,42 @@ class Skeletons:
             ln.tofile(f)
         # else we write an empty file, and that's great
         f.close()
+        
+        if 1:
+            # check saving (autotest)
+            skels2 = Skeletons()                
+            skels2.load(filename)
+            print("skels2: %s" % skels2)
+            assert(len(self.aSkels)==len(skels2.aSkels))
+            print("self  : %s" % self )
+            print("skels2: %s" % skels2 )
+            assert(self==skels2)        
 
         
     def load( self, filename ):   
-        pass        
+        f = open(filename,"rb")
+        ln = np.fromfile(f,dtype=np.float32)
+        nbrskel = len(ln)//Skeletons.NBR_POINTS//3
+        ln = np.reshape(ln,(nbrskel,Skeletons.NBR_POINTS,3))
+        f.close()
+        print("DBG: type: %s" % str(type(ln)) )
+        print("DBG: len: %s" % str(len(ln)) )
+        print("DBG: shape: %s" % str(ln.shape) )
+        print("DBG: dtype: %s" % str(ln.dtype) )
+        print("DBG: ln: %s" % str(ln) )
+
+        self.aSkels = []        
+        for k in range(ln.shape[0]):
+            sk = Skeleton()            
+            for j in range(ln.shape[1]):
+                sk.listPoints.append( (int(ln[k,j,0]),int(ln[k,j,1]),ln[k,j,2]) )
+            self.aSkels.append(sk)
+            
+        print("INF: Skeletons, %s loaded skeleton(s) from '%s'" % (len(self.aSkels),filename) )
+        
         
     def __str__(self):
-        txt = ""
+        txt = "%d skeleton(s):\n" % len(self.aSkels)
         for sk in self.aSkels:
             txt += str(sk) + "\n"
         return txt
@@ -436,7 +467,7 @@ class CVOpenPose:
                     index = int(person[i])
                     #~ print("DBG: person pt index: %s" % index )                    
                     if index == -1:                        
-                        pt = [0,0,0]
+                        pt = (0,0,0.)
                     else:
                         pt = detected_keypoints_flat[index][:3]
                     skel.append(pt)
@@ -519,6 +550,9 @@ def analyseOneFile( strFilename ):
     im = cv2.resize(im,None,fx=zoom,fy=zoom)
     cv2.imshow('Output-Skeleton', im)
     cv2.waitKey(0)    
+    
+    skels.save("/tmp/test.skl") # test saving
+    
 
 def extractFromPath( strPath ):
     print("INF: extractFromPath: analysing folder: %s" % strPath )
@@ -544,10 +578,11 @@ def extractFromPath( strPath ):
             skels.filter(0.2)
             outname = strPath + filename + ".skl"
             skels.save(outname)
-            #~ exit(1) # debugging
+                
             if key == ord('q') or key == 27:
                 print("INTERRUPTED")
                 exit(-1)
+            #~ exit(1) # debugging
             
 
 

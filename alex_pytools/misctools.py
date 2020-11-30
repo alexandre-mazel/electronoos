@@ -96,7 +96,7 @@ def getFilenameFromTime(timestamp=None):
   else:
       datetimeObject = datetime.datetime.fromtimestamp(timestamp)
   strTimeStamp = datetimeObject.strftime( "%Y_%m_%d-%Hh%Mm%Ss%fms" );
-  strTimeStamp = strTimeStamp.replace( "000ms", "ms" ); # because there's no flags for milliseconds
+  if os.name != "nt": strTimeStamp = strTimeStamp.replace( "000ms", "ms" ); # because there's no datas for microseconds on some platforms
   return strTimeStamp;
 # getFilenameFromTime - end
 

@@ -288,8 +288,8 @@ class Skeletons:
         # else we write an empty file, and that's great
         f.close()
         
-        if 1:
-            # check saving (autotest)
+        if 0:
+            # check saving (for debug or test purpose)
             skels2 = Skeletons()                
             skels2.load(filename)
             print("skels2: %s" % skels2)
@@ -305,11 +305,12 @@ class Skeletons:
         nbrskel = len(ln)//Skeletons.NBR_POINTS//3
         ln = np.reshape(ln,(nbrskel,Skeletons.NBR_POINTS,3))
         f.close()
-        print("DBG: type: %s" % str(type(ln)) )
-        print("DBG: len: %s" % str(len(ln)) )
-        print("DBG: shape: %s" % str(ln.shape) )
-        print("DBG: dtype: %s" % str(ln.dtype) )
-        print("DBG: ln: %s" % str(ln) )
+        if 0:
+            print("DBG: type: %s" % str(type(ln)) )
+            print("DBG: len: %s" % str(len(ln)) )
+            print("DBG: shape: %s" % str(ln.shape) )
+            print("DBG: dtype: %s" % str(ln.dtype) )
+            print("DBG: ln: %s" % str(ln) )
 
         self.aSkels = []        
         for k in range(ln.shape[0]):
@@ -351,6 +352,16 @@ class Skeletons:
         aColors = [(0,255,255),(255,0,255),(255,255,0),(127,255,255),(255,127,255),(255,255,127)]
         for i, sk in enumerate(self.aSkels):
             sk.render(im,aColors[i%len(aColors)])
+            
+            
+    def getAsLists(self):
+        """
+        return the all points in each skeleton as a list of trouple
+        """
+        listSkel = []
+        for sk in self.aSkels:
+                listSkel.append(sk.listPoints)
+        return listSkel
         
 # class Skeletons - end
 
@@ -604,14 +615,34 @@ def extractFromPath( strPath ):
                 exit(-1)
             #~ exit(1) # debugging
             
+            
+def loadSkeletonsFromOneFolder(strPath):
+    listSkels = []
+    for f in sorted(  os.listdir(strPath) ):
+        tf = strPath + f
+        filename, file_extension = os.path.splitext(f)
+        if ".skl" in file_extension.lower():
+            print("INF: analysing '%s'" % f )
+            skels = Skeletons()
+            skels.load(tf)
+            listSkels.extend(skels.getAsLists())
+            #~ print(listSkels)
+            
+    return listSkels
+            
+            
+            
 
 
+strPathDeboutCouche = "/home/am/images_salon_debout_couche/"
+if os.name == "nt": strPathDeboutCouche = "c:/images_salon_debout_couche/"
 
 if __name__ == "__main__":
     if 0:
         image_file = "../data/alexandre.jpg"
         image_file = "../data/multiple_humans.jpg"    
         analyseOneFile(image_file)
+    elif 0:
+        extractFromPath(strPathDeboutCouche)
     else:
-        strPath = "/home/am/images_salon_debout_couche/"
-        extractFromPath(strPath)
+        loadSkeletonsFromOneFolder(strPathDeboutCouche+"fish/couche/")

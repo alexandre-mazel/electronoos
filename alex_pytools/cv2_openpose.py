@@ -197,14 +197,36 @@ class Skeleton:
     def render( self, im, color = (0,255,255) ):
         """
         """
+        # compute average
+        
+        # avgX = sum([pt[2] for pt in self.listPoints])                
+        avgX = avgY = avgC = 0
+        nbrPoints = 0
+        for pt in self.listPoints:
+            if pt[2] > 0.1:
+                avgX += pt[0]
+                avgY += pt[1]
+                nbrPoints += 1
+            avgC += pt[2]
+        
+        avgX = avgX/nbrPoints
+        avgY = avgY/nbrPoints
+        avgC = avgC/len(self.listPoints)
+        
+        nThick = 1
+        if avgC > 0.3:
+            nThick = 2
+        if avgC > 0.5:
+            nThick = 4
+        
         # Draw Skeleton
-        print("render: pts: %s" % str(self.listPoints) )
-        print("render: len: %s" % len(self.listPoints) )
+        #~ print("render: pts: %s" % str(self.listPoints) )
+        #~ print("render: len: %s" % len(self.listPoints) )
         for pair in Skeleton.POSE_PAIRS:
             partA = pair[0]
             partB = pair[1]
-            print(partA)
-            print(partB)
+            #~ print(partA)
+            #~ print(partB)
             #~ if partA >= 17 or partB>= 17:
                 #~ print("out")
                 #~ continue
@@ -214,8 +236,15 @@ class Skeleton:
                 continue
 
             if self.listPoints[partA] and self.listPoints[partB]:
-                cv2.line(im, self.listPoints[partA][:2], self.listPoints[partB][:2], color, 2)
+                cv2.line(im, self.listPoints[partA][:2], self.listPoints[partB][:2], color, nThick)
                 cv2.circle(im, self.listPoints[partA][:2], 3, (0, 0, 255), thickness=-1, lineType=cv2.FILLED)
+        
+
+        
+        txt = "%3.2f" % avgC
+        cv2.putText(im, txt, (int(avgX),int(avgY)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, lineType=cv2.LINE_AA)
+        cv2.putText(im, txt, (int(avgX),int(avgY)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, lineType=cv2.LINE_AA)
+            
                 
     def __str__( self ):
         return str(self.listPoints) 
@@ -251,8 +280,8 @@ class Skeletons:
         f = open(filename,"wb")
         if len(self.aSkels) > 0:
             #~ ln = np.ndarray(len(self.aSkels,len(self.aSkels[0])),np.float32)
-            ln = numpy.array([numpy.array(x) for x in self.aSkels])
-            type(ln)
+            ln = np.array([np.array(x.listPoints) for x in self.aSkels],dtype=np.float32)
+            print("DBG: %s, dtype: %s" % (type(ln),ln.dtype) )
             ln.tofile(f)
         # else we write an empty file, and that's great
         f.close()
@@ -511,11 +540,15 @@ def extractFromPath( strPath ):
             skels.render(im)
             print("skels: %s" % skels )
             cv2.imshow('skels', im)
-            cv2.waitKey(1)
+            key = cv2.waitKey(1)
             skels.filter(0.2)
             outname = strPath + filename + ".skl"
             skels.save(outname)
-            exit(1) # debugging
+            #~ exit(1) # debugging
+            if key == ord('q') or key == 27:
+                print("INTERRUPTED")
+                exit(-1)
+            
 
 
 

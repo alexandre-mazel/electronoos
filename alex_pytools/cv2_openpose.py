@@ -75,8 +75,7 @@ def getValidPairs(output,frameWidth, frameHeight,detected_keypoints):
         # Find the PAF values at a set of interpolated points between the joints
         # Use the above formula to compute a score to mark the connection valid
 
-        if( nA != 0 and nB != 0):, (820, 384, 0.9713697), (765, 384, 0.7346055), (847, 407, 0.4623131)]
-[(235, 360, 0.83213395), (236, 430, 0.8696778), (153, 430, 0.790813), (69, 406, 0.7214357), (69, 290, 0.7160149), (292, 431, 0.76776236), [0, 0, 0], [0, 0, 0], 
+        if( nA != 0 and nB != 0):
             valid_pair = np.zeros((0,3))
             for i in range(nA):
                 max_j=-1

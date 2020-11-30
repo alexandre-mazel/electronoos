@@ -200,7 +200,7 @@ class Skeleton:
     def load( self, filename ):   
         pass
 
-    def render( self, im ):
+    def render( self, im, color = (0,255,255) ):
         """
         """
         # Draw Skeleton
@@ -220,13 +220,33 @@ class Skeleton:
                 continue
 
             if self.listPoints[partA] and self.listPoints[partB]:
-                cv2.line(im, self.listPoints[partA][:2], self.listPoints[partB][:2], (0, 255, 255), 2)
+                cv2.line(im, self.listPoints[partA][:2], self.listPoints[partB][:2], color, 2)
                 cv2.circle(im, self.listPoints[partA][:2], 3, (0, 0, 255), thickness=-1, lineType=cv2.FILLED)
                 
     def __str__( self ):
         return str(self.listPoints) 
 
 # class Skeleton - end
+
+class Skeletons:
+    def __init__(self):
+        self.aSkels = []
+        
+    def append( self, skel ):
+        self.aSkels.append(skel)
+        
+    def __str__(self):
+        txt = ""
+        for sk in self.aSkels:  
+            txt += str(sk) + "\n"
+        return txt
+        
+    def render( self, im ):
+        aColors = [(0,255,255),(255,0,255),(255,255,0),(127,255,255),(255,127,255),(255,255,127)]
+        for i, sk in enumerate(self.aSkels):
+            sk.render(im,aColors[i%len(aColors)])
+        
+# class Skeletons - end
 
 class CVOpenPose:
     """
@@ -273,7 +293,7 @@ class CVOpenPose:
 
     def analyse( self, im ):
         """
-        return a list of skel
+        return a list of skel as an object Skeletons
         """
         
         bDebug = 1
@@ -353,7 +373,7 @@ class CVOpenPose:
             detected_keypoints_flat = [item for sublist in detected_keypoints for item in sublist]
             print("detected_keypoints_flat: %s\n" % detected_keypoints_flat )
             
-            skel_list = []
+            skels = Skeletons()
             for person in personwiseKeypoints:
                 # 19 float: 18 index + a confidence
                 skel = []
@@ -367,9 +387,8 @@ class CVOpenPose:
                     skel.append(pt)
                 s = Skeleton()
                 s.createFromCoco(skel)
-                skel_list.append(s)
-            print("skel_list:")
-            for sk in skel_list: print( str(sk) )
+                skels.append(s)
+            print("skel_list: %s" % skels)
 
             if bDebug:
                 frameClone = im.copy()
@@ -386,7 +405,7 @@ class CVOpenPose:
                 cv2.waitKey(0)
             
             
-            return skel_list
+            return skels
         
         
             
@@ -439,8 +458,7 @@ def analyseOneFile( strFilename ):
     op = CVOpenPose()
     skels= op.analyse(im)
     #~ skel = op.analyse(im)
-    for sk in skels:
-        sk.render(im)
+    skels.render(im)
     
     zoom=1
     im = cv2.resize(im,None,fx=zoom,fy=zoom)
@@ -459,7 +477,7 @@ def extractFromPath( strPath ):
         if ".png" in file_extension.lower() or ".jpg" in file_extension.lower():            
             print("INF: analysing '%s'" % tf )
             im = cv2.imread(tf)
-            skel = op.analyse(im)
+            skels = op.analyse(im)
             outname = strPath + filename + ".skl"
             skel.save(outname)
             return # debugging

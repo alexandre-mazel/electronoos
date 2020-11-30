@@ -1,3 +1,6 @@
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
 import os
 def checkOpenCV():
     import cv2
@@ -19,6 +22,7 @@ def checkTensorFlow():
         tf.__version__ = tf.version.VERSION
     except: pass
     print("tf: %s" % str( tf.__version__ ) )
+    print("tf.keras: %s" % str( tf.keras.__version__ ) )
     
     
 checkOpenCV()    

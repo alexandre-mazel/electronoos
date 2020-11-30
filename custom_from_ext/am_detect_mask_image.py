@@ -2,7 +2,18 @@
 # python detect_mask_image.py --image examples/example_01.png
 import cv2 # for jetson: import cv2 before tensorflow
 # import the necessary packages
-from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
+
+
+from tensorflow.keras.applications.mobilenet_v2 import preprocess_input 
+# ModuleNotFoundError: No module named 'tensorflow.keras' => ?
+# try: (but not working)
+#~ import tensorflow
+#~ import keras
+#~ import tensorflow.keras
+#~ import tensorflow.keras.applications.ResNet50
+#~ from keras.applications.resnet50 import ResNet50
+
+
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.models import load_model
 import numpy as np

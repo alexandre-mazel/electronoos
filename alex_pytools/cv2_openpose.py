@@ -193,12 +193,6 @@ class Skeleton:
         
     def createFromCoco( self, cocoListPoints ):
         self.listPoints = cocoListPoints
-        
-    def save( self, filename ):
-        pass
-        
-    def load( self, filename ):   
-        pass
 
     def render( self, im, color = (0,255,255) ):
         """
@@ -235,9 +229,41 @@ class Skeletons:
     def append( self, skel ):
         self.aSkels.append(skel)
         
+    def filter( self, rThreshold = 0.2):
+        """
+        remove all uninteresting skeletons
+        """
+        i = 0
+        while i<len(self.aSkels):
+            sk = self.aSkels[i]
+            for pt in sk.listPoints:
+                if pt[2] >=rThreshold:
+                    break
+            else:
+                # no pt found greater than threshold
+                del self.aSkels[i]
+                continue
+            i += 1
+        
+        
+    def save( self, filename ):
+        print("INF: Skeletons, saving %s skeleton(s) to '%s'" % (len(self.aSkels),filename) )
+        f = open(filename,"wb")
+        if len(self.aSkels) > 0:
+            #~ ln = np.ndarray(len(self.aSkels,len(self.aSkels[0])),np.float32)
+            ln = numpy.array([numpy.array(x) for x in self.aSkels])
+            type(ln)
+            ln.tofile(f)
+        # else we write an empty file, and that's great
+        f.close()
+
+        
+    def load( self, filename ):   
+        pass        
+        
     def __str__(self):
         txt = ""
-        for sk in self.aSkels:  
+        for sk in self.aSkels:
             txt += str(sk) + "\n"
         return txt
         
@@ -462,7 +488,7 @@ def analyseOneFile( strFilename ):
     
     zoom=1
     im = cv2.resize(im,None,fx=zoom,fy=zoom)
-    cv2.imshow('Output-Skeleton', im)    
+    cv2.imshow('Output-Skeleton', im)
     cv2.waitKey(0)    
 
 def extractFromPath( strPath ):
@@ -477,15 +503,24 @@ def extractFromPath( strPath ):
         if ".png" in file_extension.lower() or ".jpg" in file_extension.lower():            
             print("INF: analysing '%s'" % tf )
             im = cv2.imread(tf)
+            if im.shape[0]<130:
+                # thermal image!
+                print("INF: too low resolution => skip")
+                continue
             skels = op.analyse(im)
+            skels.render(im)
+            print("skels: %s" % skels )
+            cv2.imshow('skels', im)
+            cv2.waitKey(1)
+            skels.filter(0.2)
             outname = strPath + filename + ".skl"
-            skel.save(outname)
-            return # debugging
+            skels.save(outname)
+            exit(1) # debugging
 
 
 
 if __name__ == "__main__":
-    if 1:
+    if 0:
         image_file = "../data/alexandre.jpg"
         image_file = "../data/multiple_humans.jpg"    
         analyseOneFile(image_file)

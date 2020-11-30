@@ -161,32 +161,89 @@ class Skeleton:
     
     # internal ordering
     # "nose", "left_eye", "right_eye", "left_ear", "right_ear", "left_shoulder", "right_shoulder", "left_elbow", "right_elbow", "left_wrist", "right_wrist", "left_hip", "right_hip", "left_knee", "right_knee", "left_ankle", "right_ankle"
-    NOSE = 0
-    LEYE = 1
-    REYE = 2
-    LEAR = 3
-    REAR = 4
-    LSHOULDER= 5
-    RSHOULDER= 6
-    LELBOW = 7
-    RELBOW = 8
-    LWRIST = 9
-    RWRIST = 10
-    LHIP  = 11
-    RHIP = 12
-    LKNEE = 13
-    RKNEE = 14
-    LANKLE  = 15
-    RANKLE = 16
+    #~ NOSE = 0
+    #~ LEYE = 1
+    #~ REYE = 2
+    #~ LEAR = 3
+    #~ REAR = 4
+    #~ LSHOULDER= 5
+    #~ RSHOULDER= 6
+    #~ LELBOW = 7
+    #~ RELBOW = 8
+    #~ LWRIST = 9
+    #~ RWRIST = 10
+    #~ LHIP  = 11
+    #~ RHIP = 12
+    #~ LKNEE = 13
+    #~ RKNEE = 14
+    #~ LANKLE  = 15
+    #~ RANKLE = 16
     
     #~ Nose - 0, Neck - 1, Right Shoulder - 2, Right Elbow - 3, Right Wrist - 4,
 #~ Left Shoulder - 5, Left Elbow - 6, Left Wrist - 7, Right Hip - 8,
 #~ Right Knee - 9, Right Ankle - 10, Left Hip - 11, Left Knee - 12,
 #~ LAnkle - 13, Right Eye - 14, Left Eye - 15, Right Ear - 16,
 #~ Left Ear - 17, Background - 18
+
+    NOSE = 0
+    NECK = 1
+    RSHOULDER=2
+    RELBOW=3
+    RWRIST=4
+    LSHOULDER=5
+    LELBOW=6
+    LWRIST=7
+    RHIP=8
+    RKNEE=9
+    RANKLE=10
+    LHIP=11
+    LKNEE=12
+    LANKLE=13
+    REYE=14
+    LEYE=15
+    REAR=16
+    LEAR=17
     
+Neck - 1, Right Shoulder - 2, Right Elbow - 3, Right Wrist - 4,
+#~ Left Shoulder - 5, Left Elbow - 6, Left Wrist - 7, Right Hip - 8,
+#~ Right Knee - 9, Right Ankle - 10, Left Hip - 11, Left Knee - 12,
+#~ LAnkle - 13, Right Eye - 14, Left Eye - 15, Right Ear - 16,
+#~ Left Ear - 17, Background - 18
+
+
+        
     POSE_PAIRS=[ [1,0],[1,2],[1,5],[2,3],[3,4],[5,6],[6,7],[1,8],[8,9],[9,10],[1,11],[11,12],[12,13],[0,14],[0,15],[14,16],[15,17]] # COCO ORDERING
     
+    # all indexes are returned right then left
+    
+    def getLegsIndex():
+        return [
+                        [8,9,10],
+                        [11,12,13],
+                    ]
+
+    def getArmsIndex():
+        return [
+                        [2,3,4],
+                        [5,6,7],
+                    ]
+                    
+    def getWristsIndex():
+        return [4,7]    
+
+    def getAnklesIndex():
+        return [10,13]
+        
+    def getNeckIndex():
+        return [1]
+        
+    def getStomach(self):
+        """
+        return approximation of stomach point
+        """
+        neck = self.listPoints[getNeckIndex()]
+        return [neck[0], y=avg des 2 hanches, conf = avg des 3 points]
+        
     def __init__( self ):
         self.listPoints = []
         
@@ -260,23 +317,25 @@ class Skeletons:
     def append( self, skel ):
         self.aSkels.append(skel)
         
-    def filter( self, rThreshold = 0.2):
+    def filter( self, rThresholdConfidence = 0.2, nThresholdNbrPoints = 0 ):
         """
         remove all uninteresting skeletons
         """
         i = 0
+        nCptInterestingPoint = 0
         while i<len(self.aSkels):
             sk = self.aSkels[i]
             for pt in sk.listPoints:
-                if pt[2] >=rThreshold:
-                    break
+                if pt[2] >=rThresholdConfidence:
+                    nCptInterestingPoint += 1
+                    if nCptInterestingPoint > nThresholdNbrPoints:
+                        break
             else:
                 # no pt found greater than threshold
                 del self.aSkels[i]
                 continue
             i += 1
-        
-        
+            
     def save( self, filename ):
         print("INF: Skeletons, saving %s skeleton(s) to '%s'" % (len(self.aSkels),filename) )
         f = open(filename,"wb")
@@ -299,7 +358,7 @@ class Skeletons:
             assert(self==skels2)        
 
         
-    def load( self, filename ):   
+    def load( self, filename, bVerbose = True ):   
         f = open(filename,"rb")
         ln = np.fromfile(f,dtype=np.float32)
         nbrskel = len(ln)//Skeletons.NBR_POINTS//3
@@ -319,7 +378,7 @@ class Skeletons:
                 sk.listPoints.append( (int(ln[k,j,0]),int(ln[k,j,1]),ln[k,j,2]) )
             self.aSkels.append(sk)
             
-        print("INF: Skeletons, %s loaded skeleton(s) from '%s'" % (len(self.aSkels),filename) )
+        if bVerbose: print("INF: Skeletons, %s loaded skeleton(s) from '%s'" % (len(self.aSkels),filename) )
         
         
     def __str__(self):
@@ -616,15 +675,19 @@ def extractFromPath( strPath ):
             #~ exit(1) # debugging
             
             
-def loadSkeletonsFromOneFolder(strPath):
+def loadSkeletonsFromOneFolder(strPath, nFilterNbrPoint = 6):
+    """
+    nFilterNbrPoint: remove all skeletons with less than x detected point
+    """
     listSkels = []
     for f in sorted(  os.listdir(strPath) ):
         tf = strPath + f
         filename, file_extension = os.path.splitext(f)
         if ".skl" in file_extension.lower():
-            print("INF: analysing '%s'" % f )
+            #~ print("INF: analysing '%s'" % f )
             skels = Skeletons()
-            skels.load(tf)
+            skels.load(tf,bVerbose=False)
+            skels.filter(nThresholdNbrPoints=nFilterNbrPoint)
             listSkels.extend(skels.getAsLists())
             #~ print(listSkels)
             
@@ -638,7 +701,7 @@ strPathDeboutCouche = "/home/am/images_salon_debout_couche/"
 if os.name == "nt": strPathDeboutCouche = "c:/images_salon_debout_couche/"
 
 if __name__ == "__main__":
-    if 0:
+    if 1:
         image_file = "../data/alexandre.jpg"
         image_file = "../data/multiple_humans.jpg"    
         analyseOneFile(image_file)

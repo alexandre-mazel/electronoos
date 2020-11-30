@@ -327,6 +327,26 @@ class Skeletons:
             txt += str(sk) + "\n"
         return txt
         
+    def __eq__(self, other): 
+        if not isinstance(other, Skeletons):
+            # don't attempt to compare against unrelated types
+            return NotImplemented
+            
+        if len(self.aSkels) != len(other.aSkels):
+            return False
+            
+        for j in range(len(self.aSkels)):
+            if len(self.aSkels[j].listPoints) != len(other.aSkels[j].listPoints):
+                return False            
+            for i in range(len(self.aSkels[j].listPoints)):
+                if self.aSkels[j].listPoints[i][0] != other.aSkels[j].listPoints[i][0] or self.aSkels[j].listPoints[i][1] != other.aSkels[j].listPoints[i][1]:
+                    return False
+                diff = self.aSkels[j].listPoints[i][2]-other.aSkels[j].listPoints[i][2]
+                if diff > 0.01:
+                    return False
+                    
+        return True
+        
     def render( self, im ):
         aColors = [(0,255,255),(255,0,255),(255,255,0),(127,255,255),(255,127,255),(255,255,127)]
         for i, sk in enumerate(self.aSkels):

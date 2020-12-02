@@ -99,6 +99,14 @@ class Skeleton:
                         [self.listPoints[legs[0][0]],self.listPoints[legs[0][1]],self.listPoints[legs[0][2]] ],
                         [self.listPoints[legs[1][0]],self.listPoints[legs[1][1]],self.listPoints[legs[1][2]] ],
                     ]
+
+    def getArms(self):
+        arms = Skeleton.getArmsIndex()
+        
+        return [
+                        [self.listPoints[arms[0][0]],self.listPoints[arms[0][1]],self.listPoints[arms[0][2]] ],
+                        [self.listPoints[arms[1][0]],self.listPoints[arms[1][1]],self.listPoints[arms[1][2]] ],
+                    ]
                     
     def getBB(self,rThreshold = 0.2):
         """

@@ -104,8 +104,8 @@ class Skeleton:
         """
         get BB of all points in the skeleton
         """
-        xmin,ymin = 9999999
-        xmax,ymax= -1
+        xmin = ymin = 9999999
+        xmax = ymax= -1
         for pt in self.listPoints:
             if pt[2] > rThreshold:
                 if pt[0] < xmin:

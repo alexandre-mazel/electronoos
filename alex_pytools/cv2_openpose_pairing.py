@@ -4,6 +4,10 @@
 # used by cv2_openpose.py
 #
 ###
+
+import cv2
+import numpy as np
+
 keypointsMapping = ['Nose', 'Neck', 'R-Sho', 'R-Elb', 'R-Wr', 'L-Sho', 'L-Elb', 'L-Wr', 'R-Hip', 'R-Knee', 'R-Ank', 'L-Hip', 'L-Knee', 'L-Ank', 'R-Eye', 'L-Eye', 'R-Ear', 'L-Ear']
 
 POSE_PAIRS = [[1,2], [1,5], [2,3], [3,4], [5,6], [6,7],

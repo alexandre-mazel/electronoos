@@ -8,6 +8,8 @@ import os
 import time
 import numpy as np
 
+import cv2_openpose_pairing
+
 
 class Skeleton:
     
@@ -87,14 +89,18 @@ class Skeleton:
         return [10,13]
         
     def getNeckIndex():
-        return [1]
+        return 1
         
     def getStomach(self):
         """
         return approximation of stomach point
         """
         neck = self.listPoints[getNeckIndex()]
-        return [neck[0], y=avg des 2 hanches, conf = avg des 3 points]
+        hips = getLegsIndex()
+        rhip = self.listPoints[hips[0][0]]
+        lhip = self.listPoints[hips[1][0]]
+        yhip = (rhip[1] + lhip[1])//2
+        return [neck[0], yhip, min(neck[2],rhip[2],lhip[2]) ] # conf should be the average or the min
         
     def __init__( self ):
         self.listPoints = []
@@ -368,8 +374,8 @@ class CVOpenPose:
             for part in range(nPoints):
                 probMap = output[0,part,:,:]
                 probMap = cv2.resize(probMap, (im.shape[1], im.shape[0]))
-                keypoints = getKeypoints(probMap, threshold)
-                print("Keypoints - {} : {}".format(keypointsMapping[part], keypoints))
+                keypoints = cv2_openpose_pairing.getKeypoints(probMap, threshold)
+                print("Keypoints - {} : {}".format(cv2_openpose_pairing.keypointsMapping[part], keypoints))
                 keypoints_with_id = []
 
                 for i in range(len(keypoints)):
@@ -391,8 +397,8 @@ class CVOpenPose:
                         cv2.putText(frameClone, txt, detected_keypoints[i][j][0:2], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, lineType=cv2.LINE_AA)
                 cv2.imshow("Keypoints",frameClone)
 
-            valid_pairs, invalid_pairs = getValidPairs(output,frameWidth,frameHeight,detected_keypoints)
-            personwiseKeypoints = getPersonwiseKeypoints(valid_pairs, invalid_pairs,keypoints_list)
+            valid_pairs, invalid_pairs = cv2_openpose_pairing.getValidPairs(output,frameWidth,frameHeight,detected_keypoints)
+            personwiseKeypoints = cv2_openpose_pairing.getPersonwiseKeypoints(valid_pairs, invalid_pairs,keypoints_list)
 
             print("INF: time taken by people appariement: {:.3f}".format(time.time() - t)) # biga-U18: gpu: 1s for 4 people 0.1 for 1(alex)
             print("personwiseKeypoints: %s\n" % personwiseKeypoints )

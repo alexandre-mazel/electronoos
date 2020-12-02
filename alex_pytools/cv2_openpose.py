@@ -367,7 +367,7 @@ class CVOpenPose:
         """
         
         bDebug = 1
-        #~ bDebug = False
+        bDebug = False
         
         if self.net == None:
             self._loadModels()

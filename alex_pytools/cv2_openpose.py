@@ -388,7 +388,7 @@ class CVOpenPose:
         self.net.setInput(inpBlob)        
         output = self.net.forward()
         print("INF: time taken by network: {:.3f}".format(time.time() - t)) # biga-U18: gpu: 0.40 first, 0.11 next -- cpu: 5.5s ----MsTab4: 6.5s        
-        print("output: %s" % str(output) )
+        #~ print("output: %s" % str(output) )
         print("output len: %s" % len(output) )
         print("output shape: %s" % str(output.shape) )
         
@@ -411,7 +411,7 @@ class CVOpenPose:
                 probMap = output[0,part,:,:]
                 probMap = cv2.resize(probMap, (im.shape[1], im.shape[0]))
                 keypoints = cv2_openpose_pairing.getKeypoints(probMap, threshold)
-                print("Keypoints - {} : {}".format(cv2_openpose_pairing.keypointsMapping[part], keypoints))
+                #~ print("Keypoints - {} : {}".format(cv2_openpose_pairing.keypointsMapping[part], keypoints))
                 keypoints_with_id = []
 
                 for i in range(len(keypoints)):
@@ -539,7 +539,8 @@ def analyseOneFile( strFilename ):
     
 
 def extractFromPath( strPath ):
-    print("INF: extractFromPath: analysing folder: %s" % strPath )
+    bOverwrite = False
+    print("INF: extractFromPath: analysing folder: %s (overwrite:%s)" % (strPath,bOverwrite) )
     op = CVOpenPose()
     for f in sorted(  os.listdir(strPath) ):
         tf = strPath + f
@@ -554,13 +555,16 @@ def extractFromPath( strPath ):
                 # thermal image!
                 print("INF: too low resolution => skip")
                 continue
+            outname = strPath + filename + ".skl"
+            if not bOverwrite and os.path.exists(outname):
+                print("INF: already done => skip")
+                continue
             skels = op.analyse(im)
             skels.render(im)
             print("skels: %s" % skels )
             cv2.imshow('skels', im)
             key = cv2.waitKey(1)
             skels.filter(0.2)
-            outname = strPath + filename + ".skl"
             skels.save(outname)
                 
             if key == ord('q') or key == 27:

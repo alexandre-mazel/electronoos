@@ -14,10 +14,13 @@ import time
 
 import misctools
 
-def getDiffBetweenTwoList(a1,a2):
+def getDiffBetweenTwoLists(a1,a2):
     print( "INF: getDiffBetweenTwoList:")
     if len(a1)!=len(a2):
         print("Len differs: %d/%d" % (len(a1),len(a2) ) )
+    for i in range(min(len(a1),len(a2))):
+        if a1[i] != a2[i]:
+            print("%d: %s!=%s" % (i,str(a1[i]),str(a2[i]) ) )
 
 def computeImageDifference( im1, im2 ):
     """
@@ -307,9 +310,36 @@ def showAndSaveAllCameras( strSavePath = None ):
             print("")
             aCap.append(cap)
 
-    print("INF: showAndSaveAllCamera: nbr cam kept: %d\n" % len(aCap))
+    print( "INF: showAndSaveAllCamera: nbr cam kept: %d\n" % len(aCap) )
     if len(aCap) < 1:
         exit(0)
+    
+    if 1:
+        # exploration properties et comparaison entre chaque camera
+        listProps = []
+        for n in range(len(aCap)):
+            listProps.append([])
+            for i in range(32000):
+                val = aCap[n].get(i)
+                listProps[n].append(val)
+            if n != 0:
+                print("\nCompare properties of camera 0 and camera %d" % n )
+                getDiffBetweenTwoLists(listProps[0],listProps[n])
+                
+        # list all cap:
+        for attr in dir(cv2):
+            print("attr: %s, value: %s" % (attr, str(getattr(cv2,attr)) ) )
+            
+#~ 11: 0.0!=32.0 #CAP_PROP_CONTRAST
+#~ 12: 0.0!=64.0 # CAP_PROP_SATURATION
+#~ 14: -1.0!=0.0 # CAP_PROP_GAIN
+#~ 15: -5.0!=-6.0 # CAP_PROP_EXPOSURE
+#~ 20: 0.0!=3.0 # CAP_PROP_SHARPNESS
+#~ 22: -1.0!=100.0 # CAP_PROP_GAMMA
+#~ 23: 6500.0!=4600.0 # CAP_PROP_TEMPERATURE
+#~ 27: 1.0!=-1.0 # CAP_PROP_ZOOM
+#~ 32: 0.0!=1.0 # CAP_PROP_BACKLIGHT
+
 
     while 1:
         #~ print("loop")

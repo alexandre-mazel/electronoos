@@ -93,7 +93,7 @@ class Skeleton:
         return 1
         
     def getLegs(self):
-        legs = getLegsIndex()
+        legs = Skeleton.getLegsIndex()
         
         return [
                         [self.listPoints[legs[0][0]],self.listPoints[legs[0][1]],self.listPoints[legs[0][2]] ],
@@ -192,11 +192,12 @@ class Skeleton:
     def __str__( self ):
         return str(self.listPoints)
     
-    def getVector(p1,p2):
+    def getVector(p1,p2,bb=[1,1]):
         """
-        return a vector not normalised between two points
+        return a vector normalised or not between two points.
+        if bb is given it will be an approximation of the skeleton size
         """
-        return [ p2[0]-p1[0], p2[1]-p1[1], min(p1[2],p2[2]) ]
+        return [ (p2[0]-p1[0])/bb[0], (p2[1]-p1[1])/bb[1], min(p1[2],p2[2]) ]
     
 
 # class Skeleton - end
@@ -366,7 +367,7 @@ class CVOpenPose:
         """
         
         bDebug = 1
-        bDebug = False
+        #~ bDebug = False
         
         if self.net == None:
             self._loadModels()
@@ -425,7 +426,7 @@ class CVOpenPose:
                 frameClone = im.copy()
                 for i in range(nPoints):
                     for j in range(len(detected_keypoints[i])):
-                        cv2.circle(frameClone, detected_keypoints[i][j][0:2], 5, colors[i], -1, cv2.LINE_AA)
+                        cv2.circle(frameClone, detected_keypoints[i][j][0:2], 5, cv2_openpose_pairing.colors[i], -1, cv2.LINE_AA)
                         txt = "%3.2f" % detected_keypoints[i][j][2] # draw confidence
                         txt = "%d" % detected_keypoints[i][j][3] # draw index
                         cv2.putText(frameClone, txt, detected_keypoints[i][j][0:2], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, lineType=cv2.LINE_AA)
@@ -463,12 +464,12 @@ class CVOpenPose:
                 frameClone = im.copy()
                 for i in range(17):
                     for n in range(len(personwiseKeypoints)):
-                        index = personwiseKeypoints[n][np.array(POSE_PAIRS[i])]
+                        index = personwiseKeypoints[n][np.array(cv2_openpose_pairing.POSE_PAIRS[i])]
                         if -1 in index:
                             continue
                         B = np.int32(keypoints_list[index.astype(int), 0])
                         A = np.int32(keypoints_list[index.astype(int), 1])
-                        cv2.line(frameClone, (B[0], A[0]), (B[1], A[1]), colors[i], 3, cv2.LINE_AA)
+                        cv2.line(frameClone, (B[0], A[0]), (B[1], A[1]), cv2_openpose_pairing.colors[i], 3, cv2.LINE_AA)
                 cv2.imshow("Detected Pose" , frameClone)
                 cv2.moveWindow("Detected Pose",640,0)
                 cv2.waitKey(0)
@@ -581,7 +582,11 @@ def loadSkeletonsFromOneFolder(strPath, nFilterNbrPoint = 6):
             skels = Skeletons()
             skels.load(tf,bVerbose=False)
             skels.filter(nThresholdNbrPoints=nFilterNbrPoint)
-            listSkels.extend(skels.getAsLists())
+            
+            # return Skeletons or list of Points ?
+            listSkels.extend(skels.aSkels)
+            #~ listSkels.extend(skels.getAsLists())
+            
             #~ print(listSkels)
             
     return listSkels

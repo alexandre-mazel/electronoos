@@ -17,6 +17,22 @@ from sklearn import  svm
 
 
 
+def skelToFeatures(sk):
+    lil = sk.getLegs()
+    bb = sk.getBB()
+    sto = sk.getStomach()
+    rh,rk,ra = lil[0]
+    lh,lk,la = lil[1]
+    
+    return [
+                                    Skeleton.getVector(sto,rh,bb),
+                                    Skeleton.getVector(sto,lh,bb),
+                                    Skeleton.getVector(rh,rk,bb),
+                                    Skeleton.getVector(rk,ra,bb),
+                                    Skeleton.getVector(lh,lk,bb),
+                                    Skeleton.getVector(lk,la,bb),
+                                ]
+    
 def learn():
     nFilterNbrPoint = 7
     listCouche = cv2_openpose.loadSkeletonsFromOneFolder(cv2_openpose.strPathDeboutCouche+"fish/couche/",nFilterNbrPoint=nFilterNbrPoint)
@@ -33,19 +49,12 @@ def learn():
 
     for i in range(len(listCouche)):
         sk = listCouche[i]
-        lil = sk.getLegs()
-        sto = sk.getStomach()
-        rh,rk,ra = lil[0]
-        lh,lk,la = lil[1]
-        listCouche[i] = [
-                                    Skeleton.getVector(sto,rh),
-                                    Skeleton.getVector(sto,lh),
-                                    Skeleton.getVector(rh,rk),
-                                    Skeleton.getVector(rk,ra),
-                                    Skeleton.getVector(lh,lk),
-                                    Skeleton.getVector(lk,la),
-                                ]
-    
+        listCouche[i] = skelToFeatures(sk)
+        
+    for i in range(len(listDebout)):
+        sk = listDebout[i]
+        listDebout[i] = skelToFeatures(sk)
+        
     features = listCouche + listDebout
     
     print("INF: features: %s" % len(features) )

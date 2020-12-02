@@ -75,6 +75,7 @@ class Skeleton:
                         [8,9,10],
                         [11,12,13],
                     ]
+                    
 
     def getArmsIndex():
         return [
@@ -90,6 +91,33 @@ class Skeleton:
         
     def getNeckIndex():
         return 1
+        
+    def getLegs(self):
+        legs = getLegsIndex()
+        
+        return [
+                        [self.listPoints[legs[0][0]],self.listPoints[legs[0][1]],self.listPoints[legs[0][2]] ],
+                        [self.listPoints[legs[1][0]],self.listPoints[legs[1][1]],self.listPoints[legs[1][2]] ],
+                    ]
+                    
+    def getBB(self,rThreshold = 0.2):
+        """
+        get BB of all points in the skeleton
+        """
+        xmin,ymin = 9999999
+        xmax,ymax= -1
+        for pt in self.listPoints:
+            if pt[2] > rThreshold:
+                if pt[0] < xmin:
+                    xmin = pt[0]
+                if pt[0] > xmax:
+                    xmax = pt[0]  
+                if pt[1] < ymin:
+                    ymin = pt[1]
+                if pt[1] > ymax:
+                    ymax = pt[1]
+
+        return[ max(xmax-xmin,1), max(ymax-ymin,1) ] # BB will be always > 0
         
     def getStomach(self):
         """
@@ -162,7 +190,14 @@ class Skeleton:
             
                 
     def __str__( self ):
-        return str(self.listPoints) 
+        return str(self.listPoints)
+    
+    def getVector(p1,p2):
+        """
+        return a vector not normalised between two points
+        """
+        return [ p2[0]-p1[0], p2[1]-p1[1], min(p1[2],p2[2]) ]
+    
 
 # class Skeleton - end
 

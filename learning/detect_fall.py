@@ -10,9 +10,11 @@
 import sys
 sys.path.append("../alex_pytools/" )
 import cv2_openpose
+from cv2_openpose import Skeleton
 
 #~ import sklearn 
 from sklearn import  svm
+
 
 
 def learn():
@@ -27,12 +29,32 @@ def learn():
     listDebout = listDebout[:len(listCouche)]
     print("INF: debout reduced %d skels" % len(listDebout) )
     
+    # transform to skeleton to features based on vector joint orientations
+
+    for i in range(len(listCouche)):
+        sk = listCouche[i]
+        lil = sk.getLegs()
+        sto = sk.getStomach()
+        rh,rk,ra = lil[0]
+        lh,lk,la = lil[1]
+        listCouche[i] = [
+                                    Skeleton.getVector(sto,rh),
+                                    Skeleton.getVector(sto,lh),
+                                    Skeleton.getVector(rh,rk),
+                                    Skeleton.getVector(rk,ra),
+                                    Skeleton.getVector(lh,lk),
+                                    Skeleton.getVector(lk,la),
+                                ]
+    
     features = listCouche + listDebout
     
     print("INF: features: %s" % len(features) )
     print(features)
+    
+    
 
     
+    # create classes
     classes = [0]*len(listCouche) + [1]*len(listDebout) 
     
     print("INF: classes: %d" % len(classes) )

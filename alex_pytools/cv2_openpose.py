@@ -123,8 +123,8 @@ class Skeleton:
         """
         return approximation of stomach point
         """
-        neck = self.listPoints[getNeckIndex()]
-        hips = getLegsIndex()
+        neck = self.listPoints[Skeleton.getNeckIndex()]
+        hips = Skeleton.getLegsIndex()
         rhip = self.listPoints[hips[0][0]]
         lhip = self.listPoints[hips[1][0]]
         yhip = (rhip[1] + lhip[1])//2
@@ -587,7 +587,7 @@ def loadSkeletonsFromOneFolder(strPath, nFilterNbrPoint = 6):
             listSkels.extend(skels.aSkels)
             #~ listSkels.extend(skels.getAsLists())
             
-            #~ print(listSkels)
+    #~ print(listSkels)
             
     return listSkels
             

@@ -14,6 +14,11 @@ import time
 
 import misctools
 
+def getDiffBetweenTwoList(a1,a2):
+    print( "INF: getDiffBetweenTwoList:")
+    if len(a1)!=len(a2):
+        print("Len differs: %d/%d" % (len(a1),len(a2) ) )
+
 def computeImageDifference( im1, im2 ):
     """
     return difference between two images expressed in a [0..1] coefficient
@@ -210,7 +215,7 @@ class CaptureManager:
         """
         if strPathToSaveToDisk != None:
             try: os.makedirs(strPathToSaveToDisk)
-            except BaseException as err: pass ; print("DBG: makedirs: err:%s" % str(err))
+            except BaseException as err: pass ; # print("DBG: makedirs: err:%s" % str(err))
         self.strPathToSaveToDisk = strPathToSaveToDisk
         self.bLosslessSave = bLosslessSave
         
@@ -263,7 +268,7 @@ def showAndSaveAllCameras( strSavePath = None ):
     cm = CaptureManager(strSavePath) # rThresholdDifferenceToSave=0.04 for fish eye
     aCap = []
     nFirst = 0
-    if os.name == "nt": nFirst = 2
+    #~ if os.name == "nt": nFirst = 2
     for i in range(nFirst,8):
         cap = cv2.VideoCapture(i) #or 0 + cv2.CAP_DSHOW
         cap.set(cv2.CAP_PROP_FRAME_WIDTH,640)
@@ -277,6 +282,7 @@ def showAndSaveAllCameras( strSavePath = None ):
             if os.name == "nt":
                 # flag not on my Raspberry (or at list not in this cv2 version)
                 propList.extend( [cv2.CAP_PROP_SAR_NUM,cv2.CAP_PROP_CODEC_PIXEL_FORMAT,cv2.CAP_PROP_BACKEND] )
+                propList.extend( [cv2.CAP_PROP_PVAPI_DECIMATIONHORIZONTAL,cv2.CAP_PROP_PVAPI_PIXELFORMAT,cv2.CAP_PROP_IMAGES_BASE,cv2.CAP_PROP_IMAGES_LAST ] ) 
                 
             for prop in propList:
                 retVal = cap.get(prop)
@@ -357,8 +363,8 @@ def copyInterestingImage( strSrcPath, strDstPath, rThresholdDifferenceToSave = 0
 
 
 if __name__ == "__main__":
-    #~ showAndSaveAllCameras() # not saving
-    showAndSaveAllCameras("c:\\tmpi13\\") #saving or to /home/pi/tmpi13/
+    showAndSaveAllCameras() # not saving
+    #~ showAndSaveAllCameras("c:\\tmpi13\\") #saving or to /home/pi/tmpi13/
     
     # remove static image with same content from a folder
     #~ copyInterestingImage( "c:/tmpi7/", "c:/tmpi7b/", rThresholdDifferenceToSave = 0.02, bLosslessSave=False )

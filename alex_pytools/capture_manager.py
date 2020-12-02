@@ -263,16 +263,19 @@ class CaptureManager:
 # class CaptureManager - end
 
 
-def showAndSaveAllCameras( strSavePath = None ):
+def showAndSaveAllCameras( strSavePath = None,rThresholdDifferenceToSave =0.01):
     """
     a utility method as an example but very usefull...
     """
     
-    cm = CaptureManager(strSavePath) # rThresholdDifferenceToSave=0.04 for fish eye
+    cm = CaptureManager(strSavePath,rThresholdDifferenceToSave=rThresholdDifferenceToSave) # rThresholdDifferenceToSave=0.04 for fish eye
     aCap = []
     nFirst = 0
-    #~ if os.name == "nt": nFirst = 2
-    for i in range(nFirst,8):
+    nLast = 8
+    if os.name == "nt": nFirst = 1
+    if os.name == "nt": nLast = 2
+    
+    for i in range(nFirst,nLast):
         cap = cv2.VideoCapture(i) #or 0 + cv2.CAP_DSHOW
         cap.set(cv2.CAP_PROP_FRAME_WIDTH,640)
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
@@ -280,7 +283,7 @@ def showAndSaveAllCameras( strSavePath = None ):
             if os.name == "nt": print("GOOD: found one camera: '%s'" % cap.getBackendName() )
             # removed cv2.CAP_PROP_SAR_NUM 
             propList = [cv2.CAP_PROP_FPS, cv2.CAP_PROP_FOURCC,cv2.CAP_PROP_GAIN,cv2.CAP_PROP_GUID,cv2.CAP_PROP_FRAME_WIDTH,cv2.CAP_PROP_FRAME_HEIGHT,
-                                cv2.CAP_PROP_MODE,cv2.CAP_PROP_RECTIFICATION,
+                                cv2.CAP_PROP_MODE,cv2.CAP_PROP_RECTIFICATION,cv2.CAP_PROP_BACKLIGHT,
                                 cv2.CAP_PROP_FORMAT,cv2.CAP_PROP_OPENNI_FOCAL_LENGTH,cv2.CAP_PROP_IMAGES_BASE ]
             if os.name == "nt":
                 # flag not on my Raspberry (or at list not in this cv2 version)
@@ -326,9 +329,10 @@ def showAndSaveAllCameras( strSavePath = None ):
                 print("\nCompare properties of camera 0 and camera %d" % n )
                 getDiffBetweenTwoLists(listProps[0],listProps[n])
                 
-        # list all cap:
-        for attr in dir(cv2):
-            print("attr: %s, value: %s" % (attr, str(getattr(cv2,attr)) ) )
+        # list all cv2 cap:
+        if 0:
+            for attr in dir(cv2):
+                print("attr: %s, value: %s" % (attr, str(getattr(cv2,attr)) ) )
             
 #~ 11: 0.0!=32.0 #CAP_PROP_CONTRAST
 #~ 12: 0.0!=64.0 # CAP_PROP_SATURATION
@@ -393,8 +397,8 @@ def copyInterestingImage( strSrcPath, strDstPath, rThresholdDifferenceToSave = 0
 
 
 if __name__ == "__main__":
-    showAndSaveAllCameras() # not saving
-    #~ showAndSaveAllCameras("c:\\tmpi13\\") #saving or to /home/pi/tmpi13/
+    #~ showAndSaveAllCameras() # not saving
+    showAndSaveAllCameras("c:\\tmpi13\\",rThresholdDifferenceToSave = 0.02) #saving or to /home/pi/tmpi13/
     
     # remove static image with same content from a folder
     #~ copyInterestingImage( "c:/tmpi7/", "c:/tmpi7b/", rThresholdDifferenceToSave = 0.02, bLosslessSave=False )

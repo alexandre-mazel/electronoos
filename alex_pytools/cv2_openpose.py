@@ -599,11 +599,11 @@ strPathDeboutCouche = "/home/am/images_salon_debout_couche/"
 if os.name == "nt": strPathDeboutCouche = "c:/images_salon_debout_couche/"
 
 if __name__ == "__main__":
-    if 1:
+    if 0:
         image_file = "../data/alexandre.jpg"
         image_file = "../data/multiple_humans.jpg"    
         analyseOneFile(image_file)
-    elif 0:
-        extractFromPath(strPathDeboutCouche)
+    elif 1:
+        extractFromPath(strPathDeboutCouche+"/fish/test/")
     else:
         loadSkeletonsFromOneFolder(strPathDeboutCouche+"fish/couche/")

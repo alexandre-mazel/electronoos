@@ -526,16 +526,38 @@ class CVOpenPose:
         return skel
         
     # analyse - end
+    
+    def analyseFromFile( self, strImageFile ):
+        """
+        Analyse a file, and cache results in a file with same name.skl
+        """
+        filename, file_extension = os.path.splitext(strImageFile)
+        strSkelFilename = filename + ".skl"
+        if os.path.exists(strSkelFilename):
+            skels = Skeletons()
+            skels.load(strSkelFilename)
+            return skels
+        im = cv2.imread(strImageFile)
+        skels= self.analyse(im)
+        skels.save(strSkelFilename)
+        return skels
+    # analyseFromFile - end
 
 
 
 # class CVOpenPose - end
 
 def analyseOneFile( strFilename ):
-    im = cv2.imread(image_file)
+    
     op = CVOpenPose()
-    skels= op.analyse(im)
-    #~ skel = op.analyse(im)
+    if 0:
+        # previous method
+        im = cv2.imread(strFilename)
+        skels= op.analyse(im)
+        #~ skel = op.analyse(im) # to test time taken
+    else:
+        skels = op.analyseFromFile(strFilename)
+        im = cv2.imread(strFilename)
     skels.render(im)
     
     zoom=1
@@ -543,7 +565,7 @@ def analyseOneFile( strFilename ):
     cv2.imshow('Output-Skeleton', im)
     cv2.waitKey(0)    
     
-    skels.save("/tmp/test.skl") # test saving
+    #~ skels.save("/tmp/test.skl") # test saving
     
 
 def extractFromPath( strPath ):
@@ -611,7 +633,7 @@ strPathDeboutCouche = "/home/am/images_salon_debout_couche/"
 if os.name == "nt": strPathDeboutCouche = "c:/images_salon_debout_couche/"
 
 if __name__ == "__main__":
-    if 0:
+    if 1:
         image_file = "../data/alexandre.jpg"
         image_file = "../data/multiple_humans.jpg"    
         analyseOneFile(image_file)

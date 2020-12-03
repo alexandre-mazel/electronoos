@@ -12,7 +12,7 @@ sys.path.append("../alex_pytools/" )
 import cv2_openpose
 from cv2_openpose import Skeleton
 
-#~ import sklearn 
+import sklearn 
 from sklearn import  svm
 
 def div2(pt):
@@ -103,7 +103,7 @@ def learn():
     classifier = svm.SVC()
     classifier.fit(features, classes)
     
-    if 1:
+    if 0:
         # test
         pred = classifier.predict(features)
         print("predicted: %s" % pred)
@@ -141,6 +141,15 @@ def learn():
         print("predicted: %s" % pred)
         print("diff on test folder: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) #0/46
         
-        
+        sklearn.externals.joblib.dump(classifier, 'detect_fall_classifier.pkl')
+
+# learn - end
+
+def analyseFilename( strImageFilename ):
+    op = cv2_openpose.CVOpenPose()
+    skel = op.analyseFromFile(strImageFilename)
+    clf = sklearn.externals.joblib.load('detect_fall_classifier.pkl')
+    
 if __name__ == "__main__":
     learn()
+    

@@ -125,6 +125,13 @@ class Skeleton:
                 if pt[1] > ymax:
                     ymax = pt[1]
 
+        return[xmin, ymin, xmax, ymax]
+        
+    def getBB_Size(self,rThreshold = 0.2):
+        """
+        get BB of all points in the skeleton
+        """
+        xmin, ymin, xmax, ymax = self.getBB(rThreshold=rThreshold)
         return[ max(xmax-xmin,1), max(ymax-ymin,1) ] # BB will be always > 0
         
     def getStomach(self):
@@ -323,6 +330,18 @@ class Skeletons:
         for sk in self.aSkels:
                 listSkel.append(sk.listPoints)
         return listSkel
+        
+    
+    # iterator for handy access to aSkels
+    def __iter__(self):
+        self.iter_idx = -1 #will store previously returned
+        return self
+        
+    def __next__(self): # Python 2: def next(self)
+        self.iter_idx += 1
+        if self.iter_idx >= len(self.aSkels):
+            raise StopIteration
+        return self.aSkels[self.iter_idx]
         
 # class Skeletons - end
 

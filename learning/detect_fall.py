@@ -9,11 +9,16 @@
 
 import sys
 sys.path.append("../alex_pytools/" )
+
+import cv2
+
 import cv2_openpose
 from cv2_openpose import Skeleton
 
 import sklearn 
 from sklearn import  svm
+import joblib
+import os
 
 def div2(pt):
     for i in range(len(pt)):
@@ -32,7 +37,7 @@ def isFullConf(triols, rThreshold = 0.2):
 
 def skelToFeatures(sk):
     lil = sk.getLegs()
-    bb = sk.getBB()
+    bb = sk.getBB_Size()
     sto = sk.getStomach()
     rh,rk,ra = lil[0] # hip, knee, ankle
     lh,lk,la = lil[1]
@@ -140,16 +145,47 @@ def learn():
         pred = classifier.predict(features)
         print("predicted: %s" % pred)
         print("diff on test folder: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) #0/46
-        
-        sklearn.externals.joblib.dump(classifier, 'detect_fall_classifier.pkl')
+    
+    #~ from sklearn.externals import joblib        
+    joblib.dump(classifier, 'detect_fall_classifier.pkl')
 
 # learn - end
 
-def analyseFilename( strImageFilename ):
+def analyseFilenameInPath( strPath ):
     op = cv2_openpose.CVOpenPose()
-    skel = op.analyseFromFile(strImageFilename)
-    clf = sklearn.externals.joblib.load('detect_fall_classifier.pkl')
-    
+    clf = joblib.load('detect_fall_classifier.pkl')
+    #~ skel = op.analyseFromFile(strImageFilename)
+    for f in sorted(  os.listdir(strPath) ):
+        tf = strPath + f
+        if os.path.isdir(tf):
+            analyseFilenameInPath(tf + os.sep)
+            continue
+        filename, file_extension = os.path.splitext(f)
+        if ".png" in file_extension.lower() or ".jpg" in file_extension.lower(): 
+            skels = op.analyseFromFile(tf)
+            im = cv2.imread(tf)
+            for skel in skels:
+                feat = skelToFeatures(skel)
+                if isFullConf(feat):
+                    pred = clf.predict([feat])[0]
+                    if pred==0:
+                        txt = "Fall"
+                    else:
+                        txt = "Stand"
+                else:
+                    txt = "?"
+                
+                bb = skel.getBB()
+                cv2.putText(im, txt, ( (bb[0]+bb[2]) // 2,bb[3]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2 )
+                cv2.putText(im, txt, ( (bb[0]+bb[2]) // 2,bb[3]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1 )
+            skels.render(im)
+            cv2.imshow("detected",im)
+            key = cv2.waitKey(0)
+            if key == ord('q') or key == 27:
+                break
+#analyseFilenameInPath  - end
+
 if __name__ == "__main__":
-    learn()
+    #~ learn()
+    analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test/debout/")
     

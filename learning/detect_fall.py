@@ -107,7 +107,7 @@ def learn():
         # test
         pred = classifier.predict(features)
         print("predicted: %s" % pred)
-        print("diff on learn: %d/%d" % (sum(pred-classes),len(pred) ) ) #1/80
+        print("diff on learn: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) #1/80
         # test
         pred = classifier.predict(listDeboutFTotal[len(listCoucheF):] )
         print("predicted: %s" % pred)
@@ -139,7 +139,7 @@ def learn():
         classes = [0]*len(listCoucheF) + [1]*len(listDeboutF) 
         pred = classifier.predict(features)
         print("predicted: %s" % pred)
-        print("diff on test folder: %d/%d" % (sum(pred-classes),len(pred) ) ) #0/46
+        print("diff on test folder: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) #0/46
         
         
 if __name__ == "__main__":

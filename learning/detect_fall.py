@@ -73,9 +73,14 @@ def isDeboutHandCoded( sk ):
     """
     use a hand coded rules
     """
+    bVerbose = 0
     lil = sk.getLegs()
+    if bVerbose: print("legs: %s" % str(lil))
+    
     bb = sk.getBB_Size()
     sto = sk.getStomach()
+    
+
     
     rh,rk,ra = lil[0] # hip, knee, ankle
     lh,lk,la = lil[1]
@@ -84,6 +89,7 @@ def isDeboutHandCoded( sk ):
     div2(avgFeets)
     
     lal = sk.getArms()
+    if bVerbose: print("arms: %s" % str(lal))
     rs,re,rw = lal[0] #shoulder, elbow, wrist
     ls,le,lw = lal[1]
     
@@ -147,14 +153,16 @@ def isDeboutHandCoded( sk ):
     else:
         lo = avg2(rLo,lLo)
         
-    print("rLo:%s,lLo:%s" % (rLo,lLo) )
+    if bVerbose: print("rLo:%s,lLo:%s" % (rLo,lLo) )
         
-    print("hi:%s,lo:%s" % (hi,lo) )
+    if bVerbose: print("hi:%s,lo:%s" % (hi,lo) )
     
     #~ return hi[1]<lo[1] # add a margin ?
     
     bb = sk.getBB_Size()
     rMargin = bb[1]/4
+    
+    if bVerbose: print("rMargin:%5.2f"%rMargin)
     
     if hi[1]+rMargin<lo[1]: # WRN:  pixel Y are inverted (high pixel are smaller than lower)
         return 1
@@ -229,6 +237,26 @@ def learn():
         print("predicted: %s" % pred)
         print("diff on extra debout: %d/%d" % (len(pred)-sum(pred),len(pred)) ) # count zeroes # 2/114
         
+        if 1:
+            # hand coded test
+            pred = predictHandCoded(listCouche+listDebout)
+            classes = [0]*len(listCouche) + [1]*len(listDebout) 
+            print("predicted: %s" % pred)
+            
+            # remove None case
+            pred = pred.tolist()
+            i = 0
+            while i < len(pred):
+                if pred[i] == None:
+                    del pred[i]
+                    del classes[i]
+                else:
+                    i += 1
+            pred = np.array(pred)
+            
+            print("diff on learn folder hand coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 37/372 # 54/402 sans margin, 45/402
+        
+        
         # test on test folder
         listCouche = cv2_openpose.loadSkeletonsFromOneFolder(cv2_openpose.strPathDeboutCouche+"fish/test/couche/",nFilterNbrPoint=nFilterNbrPoint)
         print("INF: couche %d skels" % len(listCouche) )
@@ -257,6 +285,7 @@ def learn():
         print("predicted: %s" % pred)
         print("diff on test folder: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) #17/274
         
+        # hand coded test
         pred = predictHandCoded(listCouche+listDebout)
         classes = [0]*len(listCouche) + [1]*len(listDebout) 
         print("predicted: %s" % pred)
@@ -272,7 +301,7 @@ def learn():
                 i += 1
         pred = np.array(pred)
         
-        print("diff on test folder hand coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 37/372 # 54/402
+        print("diff on test folder hand coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 37/372 # 54/402 sans margin, 45/402
         
     #~ from sklearn.externals import joblib        
     joblib.dump(classifier, 'detect_fall_classifier.pkl')
@@ -327,13 +356,17 @@ def analyseFilenameInPath( strPath ):
             if key == ord('q') or key == 27:
                 break
             if key == ord('p'):
-                i -= 3 # skip also prev skel crappy!
+                i -= 5 # skip also some prev not images like skel... - crappy!
+                if i < 0:
+                    i = -1
                 
         i += 1
+    # while - end
         
 #analyseFilenameInPath  - end
 
 if __name__ == "__main__":
     learn()
-    analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test/debout/")
+    #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test/debout/")
+    analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test/couche/")
     

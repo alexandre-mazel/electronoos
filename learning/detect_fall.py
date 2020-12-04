@@ -74,6 +74,9 @@ def isDeboutHandCoded( sk ):
     use a hand coded rules
     """
     bVerbose = 0
+    
+    neck = sk.listPoints[Skeleton.getNeckIndex()]
+        
     lil = sk.getLegs()
     if bVerbose: print("legs: %s" % str(lil))
     
@@ -96,6 +99,7 @@ def isDeboutHandCoded( sk ):
     rThreshold = 0.2
     
     #~ # si les pieds sont plus bas que les hanches
+    #a essayer: orientation cou/estomac ou moyenne des hanches: vertical => debout; sinon couche
     
     # si les mains ou a defaut les coudes sont plus hautes que les pieds ou a defaut les hanches
     if rw[2] > rThreshold:
@@ -111,7 +115,6 @@ def isDeboutHandCoded( sk ):
         lHi = le[:2]
     else:
         # check le neck
-        neck = sk.listPoints[Skeleton.getNeckIndex()]
         if neck[2] > rThreshold:
             lHi = neck[:2]
         else:
@@ -164,7 +167,30 @@ def isDeboutHandCoded( sk ):
     
     if bVerbose: print("rMargin:%5.2f"%rMargin)
     
-    if hi[1]+rMargin<lo[1]: # WRN:  pixel Y are inverted (high pixel are smaller than lower)
+    bDeboutFromArmsLegsHeight = hi[1]+rMargin<lo[1] # WRN:  pixel Y are inverted (high pixel are smaller than lower)
+        
+
+
+    bDeboutFromTorsoAngle = None
+    if rh[2] > rThreshold and lh[2] > rThreshold and neck[2] > rThreshold:
+        avg_hip = avg2(rh,lh)
+        dx = avg_hip[0]-neck[0]
+        dy = avg_hip[1]-neck[1]
+        if dx < 0.1:
+            coef = dy*10
+        else:
+            coef = dy/dx
+        bDeboutFromTorsoAngle = abs(coef) > 0.5
+        if bVerbose: print("coef: %5.1f, bDeboutFromTorsoAngle: %s" % (coef,bDeboutFromTorsoAngle) )
+    #~ else:
+        #~ return None
+        
+    # on veut etre sur => si hesitation, ne se prononces pas
+    if bDeboutFromArmsLegsHeight != bDeboutFromTorsoAngle:
+        return None
+        
+    #~ if bDeboutFromArmsLegsHeight:
+    if bDeboutFromTorsoAngle:
         return 1
     return 0
         
@@ -231,11 +257,11 @@ def learn():
         # test
         pred = classifier.predict(features)
         print("predicted: %s" % pred)
-        print("diff on learn: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) #1/80
+        print("diff on learn: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) #1/80  sans avg hand/feet 3/158
         # test
         pred = classifier.predict(listDeboutFTotal[len(listCoucheF):] )
         print("predicted: %s" % pred)
-        print("diff on extra debout: %d/%d" % (len(pred)-sum(pred),len(pred)) ) # count zeroes # 2/114
+        print("diff on extra debout: %d/%d" % (len(pred)-sum(pred),len(pred)) ) # count zeroes # 2/114  9/111
         
         if 1:
             # hand coded test
@@ -254,7 +280,7 @@ def learn():
                     i += 1
             pred = np.array(pred)
             
-            print("diff on learn folder hand coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 37/372 # 54/402 sans margin, 45/402
+            print("diff on learn folder hand coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 96/345 mix hauteur bras et jambe et angle torse: 79/299
         
         
         # test on test folder
@@ -283,7 +309,7 @@ def learn():
         classes = [0]*len(listCoucheF) + [1]*len(listDeboutF) 
         pred = classifier.predict(features)
         print("predicted: %s" % pred)
-        print("diff on test folder: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) #17/274
+        print("diff on test folder: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) #17/274  16/315
         
         # hand coded test
         pred = predictHandCoded(listCouche+listDebout)
@@ -301,7 +327,7 @@ def learn():
                 i += 1
         pred = np.array(pred)
         
-        print("diff on test folder hand coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 37/372 # 54/402 sans margin, 45/402
+        print("diff on test folder hand coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 37/372 # 54/402 sans margin, 45/402 mix hauteur bras et jambe et angle torse:  18/361
         
     #~ from sklearn.externals import joblib        
     joblib.dump(classifier, 'detect_fall_classifier.pkl')

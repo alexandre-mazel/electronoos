@@ -747,6 +747,7 @@ disk_write    1KB: ####################  83.26s (12.01 Mo/s)
 disk_read     1KB: ####################  24.85s (40.24 Mo/s)
 disk_write 1024KB: ####################  78.17s (12.79 Mo/s)
 disk_read  1024KB: ####################  22.93s (43.62 Mo/s)
+# sur la sandisk 64Go:
 
 pi@raspberrypi:~/dev/git/electronoos/scripts $ LD_PRELOAD=/usr/lib/gcc/arm-linux-gnueabihf/8/libatomic.so python3 test_perf.py
 python version   : 3.7.3 (32bits) (4 core(s))
@@ -760,10 +761,18 @@ disk_write    1KB: ####################  79.69s (12.55 Mo/s)
 disk_read     1KB: ####################  24.57s (40.71 Mo/s)
 disk_write 1024KB: ####################  78.36s (12.76 Mo/s)
 disk_read  1024KB: ####################  22.93s (43.61 Mo/s)
+# sur la sandisk 64Go:
+disk_write    1KB: ####################  36.18s (27.64 Mo/s)
+disk_read     1KB: ####################  24.33s (41.10 Mo/s)
+disk_write 1024KB: ####################  36.37s (27.49 Mo/s)
+disk_read  1024KB: ####################  22.96s (43.55 Mo/s)
 
 therm_test (blob detection et threshold) sur images_thermal_from_sbre_accueil:
 INF: detectHuman total: 2274 file(s), duration:  4.85s, im/sec: 468.76
 INF: detectHuman total: 2274 file(s), duration:  4.46s, im/sec: 509.36 (output > tutu)
+
+
+
 
 *** Jetson AGX ***
 power mode 2 (15W) 

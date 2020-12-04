@@ -20,11 +20,19 @@ from sklearn import  svm
 import joblib
 import os
 
+import numpy as np
+
 def div2(pt):
     for i in range(len(pt)):
         pt[i] /= 2
 
-
+def avg2(pt1,pt2):
+    assert( len(pt1) == len(pt2) )
+    a = []
+    for i in range(len(pt1)):
+        a.append( (pt1[i]+pt2[i])/2 )
+    return a
+        
 def isFullConf(triols, rThreshold = 0.2):
     """
     return True if all third values are > threshold
@@ -58,7 +66,101 @@ def skelToFeatures(sk):
                 + Skeleton.getVector(rk,ra,bb) \
                 + Skeleton.getVector(lh,lk,bb) \
                 + Skeleton.getVector(lk,la,bb) \
-                + Skeleton.getVector(avgHands,avgFeets,bb) \
+                #~ + Skeleton.getVector(avgHands,avgFeets,bb) \
+                
+               
+def isDeboutHandCoded( sk ):                
+    """
+    use a hand coded rules
+    """
+    lil = sk.getLegs()
+    bb = sk.getBB_Size()
+    sto = sk.getStomach()
+    
+    rh,rk,ra = lil[0] # hip, knee, ankle
+    lh,lk,la = lil[1]
+    
+    avgFeets = [ ra[0]+la[0],ra[1]+la[1],ra[2]+la[2] ]
+    div2(avgFeets)
+    
+    lal = sk.getArms()
+    rs,re,rw = lal[0] #shoulder, elbow, wrist
+    ls,le,lw = lal[1]
+    
+    rThreshold = 0.2
+    
+    #~ # si les pieds sont plus bas que les hanches
+    
+    # si les mains ou a defaut les coudes sont plus hautes que les pieds ou a defaut les hanches
+    if rw[2] > rThreshold:
+        rHi = rw[:2]
+    elif re[2] > rThreshold:
+        rHi = re[:2]
+    else:
+        rHi = None
+
+    if lw[2] > rThreshold:
+        lHi = lw[:2]
+    elif le[2] > rThreshold:
+        lHi = le[:2]
+    else:
+        lHi = None
+        
+    if lHi == None and rHi == None:
+        return None
+        
+    if lHi == None:
+        hi = rHi
+    elif rHi == None:
+        hi = lHi
+    else:
+        hi = avg2(rHi,lHi)
+        
+        
+        
+    if ra[2] > rThreshold:
+        rLo = ra[:2]
+    elif rk[2] > rThreshold:
+        rLo = rk[:2]
+    else:
+        rLo = None
+
+    if la[2] > rThreshold:
+        lLo = la[:2]
+    elif lk[2] > rThreshold:
+        lLo = lk[:2]
+    else:
+        lLo = None
+        
+    if lLo == None and rLo == None:
+        return None
+        
+    if lLo == None:
+        lo = rLo
+    elif rLo == None:
+        lo = lLo
+    else:
+        lo = avg2(rLo,lLo)
+        
+    print("rLo:%s,lLo:%s" % (rLo,lLo) )
+        
+    print("hi:%s,lo:%s" % (hi,lo) )
+    
+    #~ return hi[1]>lo[1] # add a margin ?
+    if hi[1]<lo[1]: # pixel Y are inverted
+        return 1
+    return 0
+        
+        
+    
+        
+        
+    
+def predictHandCoded( listSkel ):
+    ret = []
+    for sk in listSkel:
+        ret.append(isDeboutHandCoded(sk))
+    return np.array(ret)
                                 
 
 def learn():
@@ -108,7 +210,7 @@ def learn():
     classifier = svm.SVC()
     classifier.fit(features, classes)
     
-    if 0:
+    if 1:
         # test
         pred = classifier.predict(features)
         print("predicted: %s" % pred)
@@ -144,8 +246,25 @@ def learn():
         classes = [0]*len(listCoucheF) + [1]*len(listDeboutF) 
         pred = classifier.predict(features)
         print("predicted: %s" % pred)
-        print("diff on test folder: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) #0/46
-    
+        print("diff on test folder: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) #17/274
+        
+        pred = predictHandCoded(listCouche+listDebout)
+        classes = [0]*len(listCouche) + [1]*len(listDebout) 
+        print("predicted: %s" % pred)
+        
+        # remove None case
+        pred = pred.tolist()
+        i = 0
+        while i < len(pred):
+            if pred[i] == None:
+                del pred[i]
+                del classes[i]
+            else:
+                i += 1
+        pred = np.array(pred)
+        
+        print("diff on test folder hand coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) #17/274
+        
     #~ from sklearn.externals import joblib        
     joblib.dump(classifier, 'detect_fall_classifier.pkl')
 
@@ -186,6 +305,6 @@ def analyseFilenameInPath( strPath ):
 #analyseFilenameInPath  - end
 
 if __name__ == "__main__":
-    #~ learn()
+    learn()
     analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test/debout/")
     

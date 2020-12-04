@@ -322,7 +322,7 @@ def test_multithreading():
         return 0
 
     rTotalDuration = 0
-    for nNbrProcessInParalell in [4,8,32]:
+    for nNbrProcessInParalell in [1,4,8,32]:
         sys.stdout.write( "multiprocess x%-2d:" % nNbrProcessInParalell  )    
         bFirstInLine = True
         all_process = []

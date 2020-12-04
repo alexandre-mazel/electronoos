@@ -104,7 +104,12 @@ def isDeboutHandCoded( sk ):
     elif le[2] > rThreshold:
         lHi = le[:2]
     else:
-        lHi = None
+        # check le neck
+        neck = sk.listPoints[Skeleton.getNeckIndex()]
+        if neck[2] > rThreshold:
+            lHi = neck[:2]
+        else:
+            lHi = None
         
     if lHi == None and rHi == None:
         return None
@@ -146,8 +151,12 @@ def isDeboutHandCoded( sk ):
         
     print("hi:%s,lo:%s" % (hi,lo) )
     
-    #~ return hi[1]>lo[1] # add a margin ?
-    if hi[1]<lo[1]: # pixel Y are inverted
+    #~ return hi[1]<lo[1] # add a margin ?
+    
+    bb = sk.getBB_Size()
+    rMargin = bb[1]/4
+    
+    if hi[1]+rMargin<lo[1]: # WRN:  pixel Y are inverted (high pixel are smaller than lower)
         return 1
     return 0
         
@@ -263,7 +272,7 @@ def learn():
                 i += 1
         pred = np.array(pred)
         
-        print("diff on test folder hand coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) #17/274
+        print("diff on test folder hand coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 37/372 # 54/402
         
     #~ from sklearn.externals import joblib        
     joblib.dump(classifier, 'detect_fall_classifier.pkl')
@@ -274,7 +283,10 @@ def analyseFilenameInPath( strPath ):
     op = cv2_openpose.CVOpenPose()
     clf = joblib.load('detect_fall_classifier.pkl')
     #~ skel = op.analyseFromFile(strImageFilename)
-    for f in sorted(  os.listdir(strPath) ):
+    listFile = sorted(  os.listdir(strPath) )
+    i = 0
+    while i < len(listFile):
+        f = listFile[i]
         tf = strPath + f
         if os.path.isdir(tf):
             analyseFilenameInPath(tf + os.sep)
@@ -293,15 +305,32 @@ def analyseFilenameInPath( strPath ):
                         txt = "Stand"
                 else:
                     txt = "?"
+                    
+                if 1:
+                    txt += " / "
+                ret = isDeboutHandCoded(skel)
+                if ret == 0:
+                    txt += "Fall"
+                elif ret == 1:
+                    txt += "Stand"
+                else:
+                    txt += "?"
                 
+                print(txt)
                 bb = skel.getBB()
-                cv2.putText(im, txt, ( (bb[0]+bb[2]) // 2,bb[3]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2 )
-                cv2.putText(im, txt, ( (bb[0]+bb[2]) // 2,bb[3]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1 )
+                cv2.putText(im, txt, ( (bb[0]+bb[2]-20) // 2,bb[3]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2 )
+                cv2.putText(im, txt, ( (bb[0]+bb[2]-20) // 2,bb[3]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1 )
             skels.render(im)
             cv2.imshow("detected",im)
             key = cv2.waitKey(0)
+            print(key)
             if key == ord('q') or key == 27:
                 break
+            if key == ord('p'):
+                i -= 3 # skip also prev skel crappy!
+                
+        i += 1
+        
 #analyseFilenameInPath  - end
 
 if __name__ == "__main__":

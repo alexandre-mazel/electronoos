@@ -743,11 +743,20 @@ test_scipy_xxt   : ####################   6.99s (57.19x)
 test_orb3.2.0    : ####################   1.34s (74.62fps)
 test_orbcv imgs  : test_perf_vga_*.png: not found
 test_orbcv bis   : test_perf_vga_*.png: not found
+multiprocess x1 :  1.73s /  0.29s /  0.01s /  0.01s /  0.01s /  0.01s =>    2.06s
+multiprocess x4 :  1.76s /  0.36s /  0.02s /  0.02s /  0.02s /  0.02s =>    4.26s
+multiprocess x8 :  3.51s /  0.75s /  0.03s /  0.03s /  0.03s /  0.03s =>    8.64s
+multiprocess x32: 14.27s /  2.99s /  0.11s /  0.11s /  0.11s /  0.11s =>   26.33s
 disk_write    1KB: ####################  83.26s (12.01 Mo/s)
 disk_read     1KB: ####################  24.85s (40.24 Mo/s)
 disk_write 1024KB: ####################  78.17s (12.79 Mo/s)
 disk_read  1024KB: ####################  22.93s (43.62 Mo/s)
 # sur la sandisk 64Go:
+disk_write    1KB: ####################  34.41s (29.06 Mo/s)
+disk_read     1KB: ####################  24.42s (40.95 Mo/s)
+disk_write 1024KB: ####################  35.02s (28.56 Mo/s)
+disk_read  1024KB: ####################  22.90s (43.68 Mo/s)
+
 
 pi@raspberrypi:~/dev/git/electronoos/scripts $ LD_PRELOAD=/usr/lib/gcc/arm-linux-gnueabihf/8/libatomic.so python3 test_perf.py
 python version   : 3.7.3 (32bits) (4 core(s))
@@ -757,6 +766,10 @@ test_scipy_xxt   : ####################   8.82s (45.35x)
 test_orb4.1.1    : ####################   1.12s (88.94fps)
 test_orbcv imgs  : test_perf_vga_*.png: not found
 test_orbcv bis   : test_perf_vga_*.png: not found
+multiprocess x1 :  1.76s /  0.26s /  0.01s /  0.01s /  0.01s /  0.01s =>    2.06s
+multiprocess x4 :  1.75s /  0.28s /  0.02s /  0.02s /  0.02s /  0.02s =>    4.19s
+multiprocess x8 :  3.51s /  0.57s /  0.04s /  0.05s /  0.04s /  0.05s =>    8.44s
+multiprocess x32: 14.23s /  2.24s /  0.15s /  0.14s /  0.14s /  0.15s =>   25.49s
 disk_write    1KB: ####################  79.69s (12.55 Mo/s)
 disk_read     1KB: ####################  24.57s (40.71 Mo/s)
 disk_write 1024KB: ####################  78.36s (12.76 Mo/s)

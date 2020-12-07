@@ -22,6 +22,11 @@ import os
 
 import numpy as np
 
+def renderCenteredText( im, strText, pt, nFontFace, rScale, color, nFontThickness ):
+    rcRendered, baseline = cv2.getTextSize( strText, nFontFace, rScale, nFontThickness )
+    cv2.putText(im, strText, (pt[0]-rcRendered[0]//2,pt[1]), nFontFace, rScale, color, nFontThickness )
+
+
 def div2(pt):
     for i in range(len(pt)):
         pt[i] /= 2
@@ -352,6 +357,7 @@ def analyseFilenameInPath( strPath ):
             im = cv2.imread(tf)
             for skel in skels:
                 feat = skelToFeatures(skel)
+                colorText = (255,255,255)
                 if isFullConf(feat):
                     pred = clf.predict([feat])[0]
                     if pred==0:
@@ -372,19 +378,23 @@ def analyseFilenameInPath( strPath ):
                         txt += "?"
                 if 1:
                     txt += " / "
+                    txt = "" #erase all other algorithms
                     ret = isDeboutHandCoded(skel,bVerbose=1,bOnlyTorso=True)
                     if ret == 0:
                         txt += "Fall"
+                        colorText = (80,80,255)
                     elif ret == 1:
                         txt += "Stand"
+                        colorText = (255,80,80)
                     else:
                         txt += "?"
+
                         
                 print(txt)
                 bb = skel.getBB()
-                cv2.putText(im, txt, ( (bb[0]+bb[2]-20) // 2,bb[3]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2 )
-                cv2.putText(im, txt, ( (bb[0]+bb[2]-20) // 2,bb[3]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1 )
-            skels.render(im)
+                renderCenteredText(im, txt, ( (bb[0]+bb[2]) // 2,bb[3]+14), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2 )
+                renderCenteredText(im, txt, ( (bb[0]+bb[2]) // 2,bb[3]+14), cv2.FONT_HERSHEY_SIMPLEX, 0.6, colorText, 1 )
+            skels.render(im, bRenderConfidenceValue=False)
             cv2.imshow("detected",im)
             key = cv2.waitKey(0)
             print(key)
@@ -401,7 +411,7 @@ def analyseFilenameInPath( strPath ):
 #analyseFilenameInPath  - end
 
 if __name__ == "__main__":
-    learn()
+    #~ learn()
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test/debout/")
     analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test/couche/")
     

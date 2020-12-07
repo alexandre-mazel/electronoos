@@ -152,7 +152,7 @@ class Skeleton:
     def createFromCoco( self, cocoListPoints ):
         self.listPoints = cocoListPoints
 
-    def render( self, im, color = (0,255,255) ):
+    def render( self, im, color = (0,255,255), bRenderConfidenceValue = True ):
         """
         """
         # compute average
@@ -192,17 +192,31 @@ class Skeleton:
             threshold = 0.2
             if self.listPoints[partA][2] < threshold or self.listPoints[partB][2] < threshold:
                 continue
+                
+            if 1:
+                confJoint = (self.listPoints[partA][2] + self.listPoints[partB][2] ) /2
+                nThickPerJoint = 1
+                if confJoint > 0.3:
+                    nThickPerJoint = 2
+                if confJoint > 0.5:
+                    nThickPerJoint = 4
+                nThick = nThickPerJoint
 
             if self.listPoints[partA] and self.listPoints[partB]:
                 cv2.line(im, self.listPoints[partA][:2], self.listPoints[partB][:2], color, nThick)
-                cv2.circle(im, self.listPoints[partA][:2], 3, (0, 0, 255), thickness=-1, lineType=cv2.FILLED)
+                if partA == Skeleton.NOSE:
+                    pointColor = (255, 255, 255)
+                else:
+                    pointColor = (180, 180, 180)
+                cv2.circle(im, self.listPoints[partA][:2], 3, pointColor, thickness=-1, lineType=cv2.FILLED)
         
 
         
-        txt = "%3.2f" % avgC
-        cv2.putText(im, txt, (int(avgX),int(avgY)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, lineType=cv2.LINE_AA)
-        cv2.putText(im, txt, (int(avgX),int(avgY)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, lineType=cv2.LINE_AA)
-            
+        if bRenderConfidenceValue:
+            txt = "%3.2f" % avgC
+            cv2.putText(im, txt, (int(avgX),int(avgY)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2, lineType=cv2.LINE_AA)
+            cv2.putText(im, txt, (int(avgX),int(avgY)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, lineType=cv2.LINE_AA)
+                
                 
     def __str__( self ):
         return str(self.listPoints)
@@ -316,10 +330,10 @@ class Skeletons:
                     
         return True
         
-    def render( self, im ):
+    def render( self, im, bRenderConfidenceValue = True ):
         aColors = [(0,255,255),(255,0,255),(255,255,0),(127,255,255),(255,127,255),(255,255,127)]
         for i, sk in enumerate(self.aSkels):
-            sk.render(im,aColors[i%len(aColors)])
+            sk.render(im,aColors[i%len(aColors)],bRenderConfidenceValue=bRenderConfidenceValue)
             
             
     def getAsLists(self):
@@ -546,13 +560,13 @@ class CVOpenPose:
         
     # analyse - end
     
-    def analyseFromFile( self, strImageFile ):
+    def analyseFromFile( self, strImageFile, bForceRecompute=False ):
         """
         Analyse a file, and cache results in a file with same name.skl
         """
         filename, file_extension = os.path.splitext(strImageFile)
         strSkelFilename = filename + ".skl"
-        if os.path.exists(strSkelFilename):
+        if os.path.exists(strSkelFilename) and not bForceRecompute:
             skels = Skeletons()
             skels.load(strSkelFilename)
             return skels
@@ -566,7 +580,7 @@ class CVOpenPose:
 
 # class CVOpenPose - end
 
-def analyseOneFile( strFilename ):
+def analyseOneFile( strFilename, bForceRecompute=False ):
     
     op = CVOpenPose()
     if 0:

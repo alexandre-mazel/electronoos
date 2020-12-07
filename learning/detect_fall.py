@@ -185,8 +185,8 @@ def isDeboutHandCoded( sk, bVerbose = False ):
         #~ return None
         
     # on veut etre sur => si hesitation, ne se prononces pas
-    #~ if bDeboutFromArmsLegsHeight != bDeboutFromTorsoAngle:
-        #~ return None
+    if bDeboutFromArmsLegsHeight != bDeboutFromTorsoAngle:
+        return None
         
     #~ if bDeboutFromArmsLegsHeight:
     if bDeboutFromTorsoAngle:
@@ -279,7 +279,7 @@ def learn():
                     i += 1
             pred = np.array(pred)
             
-            print("diff on LEARN folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 96/345 mix hauteur bras et jambe et angle torse: 74/313 (change seul torso: 68/345)
+            print("diff on LEARN folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 96/345 mix hauteur bras et jambe et angle torse: 59/297 (change seul torso: 68/345)
         
         
         # test on test folder
@@ -326,7 +326,7 @@ def learn():
                 i += 1
         pred = np.array(pred)
         
-        print("diff on TEST folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 37/372 # 54/402 sans margin, 45/402 mix hauteur bras et jambe et angle torse:  15/364 (change seul torso: 16/402)
+        print("diff on TEST folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 37/372 # 54/402 sans margin, 45/402 mix hauteur bras et jambe et angle torse:  11/361 (change seul torso: 16/402)
         
     #~ from sklearn.externals import joblib        
     joblib.dump(classifier, 'detect_fall_classifier.pkl')

@@ -69,7 +69,7 @@ def skelToFeatures(sk):
                 #~ + Skeleton.getVector(avgHands,avgFeets,bb) \
                 
                
-def isDeboutHandCoded( sk, bVerbose = False ):                
+def isDeboutHandCoded( sk, bOnlyTorso = False, bVerbose = False ):                
     """
     use a hand coded rules
     """
@@ -185,8 +185,9 @@ def isDeboutHandCoded( sk, bVerbose = False ):
         #~ return None
         
     # on veut etre sur => si hesitation, ne se prononces pas
-    if bDeboutFromArmsLegsHeight != bDeboutFromTorsoAngle:
-        return None
+    if not bOnlyTorso:
+        if bDeboutFromArmsLegsHeight != bDeboutFromTorsoAngle:
+            return None
         
     #~ if bDeboutFromArmsLegsHeight:
     if bDeboutFromTorsoAngle:
@@ -279,7 +280,7 @@ def learn():
                     i += 1
             pred = np.array(pred)
             
-            print("diff on LEARN folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 96/345 mix hauteur bras et jambe et angle torse: 59/297 (change seul torso: 68/345)
+            print("diff on LEARN folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 96/345 mix hauteur bras et jambe et angle torse: 59/297=0.272 (change seul torso: 68/345=0.197)
         
         
         # test on test folder
@@ -326,7 +327,7 @@ def learn():
                 i += 1
         pred = np.array(pred)
         
-        print("diff on TEST folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 37/372 # 54/402 sans margin, 45/402 mix hauteur bras et jambe et angle torse:  11/361 (change seul torso: 16/402)
+        print("diff on TEST folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 37/372 # 54/402 sans margin, 45/402 mix hauteur bras et jambe et angle torse:  11/361=0.030 (change seul torso: 16/402=0.039)
         
     #~ from sklearn.externals import joblib        
     joblib.dump(classifier, 'detect_fall_classifier.pkl')
@@ -362,14 +363,23 @@ def analyseFilenameInPath( strPath ):
                     
                 if 1:
                     txt += " / "
-                ret = isDeboutHandCoded(skel,bVerbose=1)
-                if ret == 0:
-                    txt += "Fall"
-                elif ret == 1:
-                    txt += "Stand"
-                else:
-                    txt += "?"
-                
+                    ret = isDeboutHandCoded(skel,bVerbose=1)
+                    if ret == 0:
+                        txt += "Fall"
+                    elif ret == 1:
+                        txt += "Stand"
+                    else:
+                        txt += "?"
+                if 1:
+                    txt += " / "
+                    ret = isDeboutHandCoded(skel,bVerbose=1,bOnlyTorso=True)
+                    if ret == 0:
+                        txt += "Fall"
+                    elif ret == 1:
+                        txt += "Stand"
+                    else:
+                        txt += "?"
+                        
                 print(txt)
                 bb = skel.getBB()
                 cv2.putText(im, txt, ( (bb[0]+bb[2]-20) // 2,bb[3]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2 )

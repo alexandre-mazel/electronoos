@@ -69,11 +69,10 @@ def skelToFeatures(sk):
                 #~ + Skeleton.getVector(avgHands,avgFeets,bb) \
                 
                
-def isDeboutHandCoded( sk ):                
+def isDeboutHandCoded( sk, bVerbose = False ):                
     """
     use a hand coded rules
     """
-    bVerbose = 0
     
     neck = sk.listPoints[Skeleton.getNeckIndex()]
         
@@ -176,18 +175,18 @@ def isDeboutHandCoded( sk ):
         avg_hip = avg2(rh,lh)
         dx = avg_hip[0]-neck[0]
         dy = avg_hip[1]-neck[1]
-        if dx < 0.1:
+        if abs(dx) < 0.1:
             coef = dy*10
         else:
             coef = dy/dx
-        bDeboutFromTorsoAngle = abs(coef) > 0.5
-        if bVerbose: print("coef: %5.1f, bDeboutFromTorsoAngle: %s" % (coef,bDeboutFromTorsoAngle) )
+        bDeboutFromTorsoAngle = abs(coef) > 0.5 # 1: diagonal
+        if bVerbose: print("coef: %5.1f (dy:%3.1f,dx:%3.1f), bDeboutFromTorsoAngle: %s" % (coef,dy, dx, bDeboutFromTorsoAngle) )
     #~ else:
         #~ return None
         
     # on veut etre sur => si hesitation, ne se prononces pas
-    if bDeboutFromArmsLegsHeight != bDeboutFromTorsoAngle:
-        return None
+    #~ if bDeboutFromArmsLegsHeight != bDeboutFromTorsoAngle:
+        #~ return None
         
     #~ if bDeboutFromArmsLegsHeight:
     if bDeboutFromTorsoAngle:
@@ -280,7 +279,7 @@ def learn():
                     i += 1
             pred = np.array(pred)
             
-            print("diff on learn folder hand coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 96/345 mix hauteur bras et jambe et angle torse: 79/299
+            print("diff on LEARN folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 96/345 mix hauteur bras et jambe et angle torse: 74/313 (change seul torso: 82/345)
         
         
         # test on test folder
@@ -327,7 +326,7 @@ def learn():
                 i += 1
         pred = np.array(pred)
         
-        print("diff on test folder hand coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 37/372 # 54/402 sans margin, 45/402 mix hauteur bras et jambe et angle torse:  18/361
+        print("diff on TEST folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 37/372 # 54/402 sans margin, 45/402 mix hauteur bras et jambe et angle torse:  15/364 (change seul torso: 21/402)
         
     #~ from sklearn.externals import joblib        
     joblib.dump(classifier, 'detect_fall_classifier.pkl')
@@ -363,7 +362,7 @@ def analyseFilenameInPath( strPath ):
                     
                 if 1:
                     txt += " / "
-                ret = isDeboutHandCoded(skel)
+                ret = isDeboutHandCoded(skel,bVerbose=1)
                 if ret == 0:
                     txt += "Fall"
                 elif ret == 1:

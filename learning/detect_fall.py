@@ -217,7 +217,7 @@ def isDeboutHandCoded( sk, bOnlyTorso = False, bVerbose = False ):
             lenLimbs = sk.getLenLimbs()
             if bVerbose: print("lenLimbs: %s" % str(lenLimbs) )
             rLenLegs = (lenLimbs[0][0] +lenLimbs[1][0]) / 2
-            bNotBumOnGround = (avg_hip[1] + (rLenLegs*0.70)) < rLowest
+            bNotBumOnGround = (avg_hip[1] + (rLenLegs*0.75)) < rLowest
             if bVerbose: print("avg hip: %5.1f, lowest: %5.1f, rLenLegs: %5.1f, bNotBum: %s" % (avg_hip[1],rLowest,rLenLegs, bNotBumOnGround) )
     #~ return bNotBumOnGround
         
@@ -317,7 +317,7 @@ def learn():
                     i += 1
             pred = np.array(pred)
             
-            print("diff on LEARN folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 96/345 mix hauteur bras et jambe et angle torse: 59/297=0.272 (seul torso: 68/345=0.197) avec bum: 23/297
+            print("diff on LEARN folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 96/345 mix hauteur bras et jambe et angle torse: 59/297=0.272 (seul torso: 68/345=0.197) avec bum: 16/297
         
         
         # test on test folder
@@ -448,7 +448,8 @@ def analyseFilenameInPath( strPath ):
 #analyseFilenameInPath  - end
 
 if __name__ == "__main__":
-    learn()
-    analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/learn/couche/")
+    #~ learn()
+    #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/learn/couche/")
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/demo/")
+    analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test2/")
     

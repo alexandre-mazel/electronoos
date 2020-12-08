@@ -171,12 +171,12 @@ def isDeboutHandCoded( sk, bOnlyTorso = False, bVerbose = False ):
     
     bb = sk.getBB_Size()
     rMargin = bb[1]/4
-    
-    if bVerbose: print("rMargin:%5.2f"%rMargin)
+
     
     bDeboutFromArmsLegsHeight = hi[1]+rMargin<lo[1] # WRN:  pixel Y are inverted (high pixel are smaller than lower)
         
-
+    
+    if bVerbose: print("rMargin:%5.2f, bDeboutFromArmsLegsHeight: %s"% (rMargin,bDeboutFromArmsLegsHeight) )
 
     bDeboutFromTorsoAngle = None
     if rh[2] > rThreshold and lh[2] > rThreshold and neck[2] > rThreshold:
@@ -191,6 +191,32 @@ def isDeboutHandCoded( sk, bOnlyTorso = False, bVerbose = False ):
         if bVerbose: print("coef: %5.1f (dy:%3.1f,dx:%3.1f), bDeboutFromTorsoAngle: %s" % (coef,dy, dx, bDeboutFromTorsoAngle) )
     #~ else:
         #~ return None
+        
+    # fesses sur le sol
+    bNotBumOnGround = None
+    if rh[2] > rThreshold and lh[2] > rThreshold:
+        avg_hip = avg2(rh,lh)
+    elif rh[2] > rThreshold:
+        avg_hip = rh
+    elif lh[2] > rThreshold:
+        avg_hip = lh
+    else:
+        avg_hip = None
+    if avg_hip != None:
+        # look for lower point in legs, but not hip:
+        rLowest = -10000
+        #~ for i in range(cv2_openpose.Skeleton.NBR_POINTS):
+        for i in [cv2_openpose.Skeleton.RKNEE,cv2_openpose.Skeleton.LKNEE,cv2_openpose.Skeleton.RANKLE,cv2_openpose.Skeleton.LANKLE]:
+            if i == cv2_openpose.Skeleton.RHIP or i == cv2_openpose.Skeleton.LHIP:
+                continue
+            if sk.listPoints[i][2] < rThreshold:
+                continue
+            if sk.listPoints[i][1] > rLowest:
+                rLowest = sk.listPoints[i][1]
+        if rLowest >= 0:
+            bNotBumOnGround = avg_hip[1] < rLowest
+            print("avg hip: %5.1f, lowest: %5.1f, bNotBum: %s" % (avg_hip[1],rLowest,bNotBumOnGround) )
+    #~ return bNotBumOnGround
         
     # on veut etre sur => si hesitation, ne se prononces pas
     if not bOnlyTorso:
@@ -394,7 +420,7 @@ def analyseFilenameInPath( strPath ):
                         txt += "?"
 
                 #render skel with color
-                skel.render(im, colorText)
+                skel.render(im, colorText,bRenderConfidenceValue=False)
 
                 print(txt)
                 bb = skel.getBB()
@@ -420,6 +446,6 @@ def analyseFilenameInPath( strPath ):
 
 if __name__ == "__main__":
     #~ learn()
-    #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test/debout/")
-    analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/demo/")
+    analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test/debout/")
+    #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/demo/")
     

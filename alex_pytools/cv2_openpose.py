@@ -57,6 +57,7 @@ class Skeleton:
     LEYE=15
     REAR=16
     LEAR=17
+    NBR_POINTS=18
     
 #~ Neck - 1, Right Shoulder - 2, Right Elbow - 3, Right Wrist - 4,
 #~ Left Shoulder - 5, Left Elbow - 6, Left Wrist - 7, Right Hip - 8,
@@ -668,16 +669,17 @@ if os.name == "nt": strPathDeboutCouche = "c:/images_salon_debout_couche/"
 if __name__ == "__main__":
     strFilename = "../data/alexandre.jpg"
     strFilename = "../data/multiple_humans.jpg"
-    if 0:
+    if 1:
         analyseOneFile(strFilename)
     elif 1:
         # recherche multi angle
+        op = CVOpenPose()
         im = cv2.imread(strFilename)
         skels= op.analyse(im)
         skels.render(im)
         print("skels: %s" % skels )
         cv2.imshow('skels', im)
-        key = cv2.waitKey(1)
+        key = cv2.waitKey(0)
     elif 1:
         extractFromPath(strPathDeboutCouche+"/fish/test/")
     else:

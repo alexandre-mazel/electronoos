@@ -214,8 +214,11 @@ def isDeboutHandCoded( sk, bOnlyTorso = False, bVerbose = False ):
             if sk.listPoints[i][1] > rLowest:
                 rLowest = sk.listPoints[i][1]
         if rLowest >= 0:
-            bNotBumOnGround = avg_hip[1] < rLowest
-            print("avg hip: %5.1f, lowest: %5.1f, bNotBum: %s" % (avg_hip[1],rLowest,bNotBumOnGround) )
+            lenLimbs = sk.getLenLimbs()
+            if bVerbose: print("lenLimbs: %s" % str(lenLimbs) )
+            rLenLegs = (lenLimbs[0][0] +lenLimbs[1][0]) / 2
+            bNotBumOnGround = (avg_hip[1] + (rLenLegs*0.70)) < rLowest
+            if bVerbose: print("avg hip: %5.1f, lowest: %5.1f, rLenLegs: %5.1f, bNotBum: %s" % (avg_hip[1],rLowest,rLenLegs, bNotBumOnGround) )
     #~ return bNotBumOnGround
         
     # on veut etre sur => si hesitation, ne se prononces pas
@@ -224,7 +227,7 @@ def isDeboutHandCoded( sk, bOnlyTorso = False, bVerbose = False ):
             return None
         
     #~ if bDeboutFromArmsLegsHeight:
-    if bDeboutFromTorsoAngle:
+    if bDeboutFromTorsoAngle and bNotBumOnGround:
         return 1
     return 0
         
@@ -314,7 +317,7 @@ def learn():
                     i += 1
             pred = np.array(pred)
             
-            print("diff on LEARN folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 96/345 mix hauteur bras et jambe et angle torse: 59/297=0.272 (change seul torso: 68/345=0.197)
+            print("diff on LEARN folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 96/345 mix hauteur bras et jambe et angle torse: 59/297=0.272 (seul torso: 68/345=0.197) avec bum: 23/297
         
         
         # test on test folder
@@ -361,7 +364,7 @@ def learn():
                 i += 1
         pred = np.array(pred)
         
-        print("diff on TEST folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 37/372 # 54/402 sans margin, 45/402 mix hauteur bras et jambe et angle torse:  11/361=0.030 (change seul torso: 16/402=0.039)
+        print("diff on TEST folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 37/372 # 54/402 sans margin, 45/402 mix hauteur bras et jambe et angle torse:  11/361=0.030 (change seul torso: 16/402=0.039) avec bum: 19/361
         
     #~ from sklearn.externals import joblib        
     joblib.dump(classifier, 'detect_fall_classifier.pkl')
@@ -430,7 +433,7 @@ def analyseFilenameInPath( strPath ):
             #skels.render(im, bRenderConfidenceValue=False)
             
             cv2.imshow("detected",im)
-            key = cv2.waitKey(10)
+            key = cv2.waitKey(0)
             print(key)
             if key == ord('q') or key == 27:
                 break
@@ -445,7 +448,7 @@ def analyseFilenameInPath( strPath ):
 #analyseFilenameInPath  - end
 
 if __name__ == "__main__":
-    #~ learn()
-    analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test/debout/")
+    learn()
+    analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/learn/couche/")
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/demo/")
     

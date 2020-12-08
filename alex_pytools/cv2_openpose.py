@@ -4,11 +4,15 @@
 # on my biga: export PYTHONPATH=/usr/local/lib/python3.6/dist-packages/cv2/python-3.6:$PYTHONPATH
 
 import cv2
+import math
 import os
 import time
 import numpy as np
 
 import cv2_openpose_pairing
+
+def lenPts(pt1,pt2):
+    return math.sqrt( (pt1[0]-pt2[0])*(pt1[0]-pt2[0]) + (pt1[1]-pt2[1])*(pt1[1]-pt2[1]) )
 
 
 class Skeleton:
@@ -134,6 +138,20 @@ class Skeleton:
         """
         xmin, ymin, xmax, ymax = self.getBB(rThreshold=rThreshold)
         return[ max(xmax-xmin,1), max(ymax-ymin,1) ] # BB will be always > 0
+        
+    def getLenLimbs(self):
+        """
+        return len and min confidence of each limbs, arms then legs
+        """
+        legs = self.getLegs()
+        arms = self.getLegs()
+        rleg =  lenPts(legs[0][0],legs[0][1])+lenPts(legs[0][1],legs[0][2]), (legs[0][0][2] + legs[0][1][2] + legs[0][2][2]) /3
+        lleg =  lenPts(legs[1][0],legs[1][1])+lenPts(legs[1][1],legs[1][2]), (legs[1][0][2] + legs[1][1][2] + legs[1][2][2]) /3
+
+        rarm =  lenPts(arms[0][0],arms[0][1])+lenPts(arms[0][1],arms[0][2]), (arms[0][0][2] + arms[0][1][2] + arms[0][2][2]) /3
+        larm =  lenPts(arms[1][0],arms[1][1])+lenPts(arms[1][1],arms[1][2]), (arms[1][0][2] + arms[1][1][2] + arms[1][2][2]) /3
+        
+        return rleg, lleg, rarm, larm
         
     def getStomach(self):
         """

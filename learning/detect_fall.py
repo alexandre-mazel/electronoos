@@ -103,7 +103,10 @@ def isDeboutHandCoded( sk, bOnlyTorso = False, bVerbose = False ):
     rThreshold = 0.2
     
     #~ # si les pieds sont plus bas que les hanches
-    #a essayer: orientation cou/estomac ou moyenne des hanches: vertical => debout; sinon couche
+    # a essayer: orientation cou/(estomac ou moyenne des hanches): vertical => debout; sinon couche
+    # a essayer: quand les fesses sont sur le sol
+    
+    # NB: on n'arrivera jamais a voir que quelqu'un qui est assis ou couche' oriente' vers la camera est tombe'
     
     # si les mains ou a defaut les coudes sont plus hautes que les pieds ou a defaut les hanches
     if rw[2] > rThreshold:
@@ -346,6 +349,7 @@ def analyseFilenameInPath( strPath ):
     listFile = sorted(  os.listdir(strPath) )
     i = 0
     while i < len(listFile):
+        print("Analyse: %d/%d" % (i,len(listFile) ) )
         f = listFile[i]
         tf = strPath + f
         if os.path.isdir(tf):
@@ -389,19 +393,23 @@ def analyseFilenameInPath( strPath ):
                     else:
                         txt += "?"
 
-                        
+                #render skel with color
+                skel.render(im, colorText)
+
                 print(txt)
                 bb = skel.getBB()
-                renderCenteredText(im, txt, ( (bb[0]+bb[2]) // 2,bb[3]+14), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2 )
-                renderCenteredText(im, txt, ( (bb[0]+bb[2]) // 2,bb[3]+14), cv2.FONT_HERSHEY_SIMPLEX, 0.6, colorText, 1 )
-            skels.render(im, bRenderConfidenceValue=False)
+                renderCenteredText(im, txt, ( (bb[0]+bb[2]) // 2,bb[3]+18), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 3 )
+                renderCenteredText(im, txt, ( (bb[0]+bb[2]) // 2,bb[3]+18), cv2.FONT_HERSHEY_SIMPLEX, 0.6, colorText, 1 )
+            
+            #skels.render(im, bRenderConfidenceValue=False)
+            
             cv2.imshow("detected",im)
-            key = cv2.waitKey(0)
+            key = cv2.waitKey(10)
             print(key)
             if key == ord('q') or key == 27:
                 break
             if key == ord('p'):
-                i -= 5 # skip also some prev not images like skel... - crappy!
+                i -= 5 # skip also some previous file not images, like skel... - crappy!
                 if i < 0:
                     i = -1
                 
@@ -413,5 +421,5 @@ def analyseFilenameInPath( strPath ):
 if __name__ == "__main__":
     #~ learn()
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test/debout/")
-    analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test/couche/")
+    analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/demo/")
     

@@ -398,7 +398,7 @@ def copyInterestingImage( strSrcPath, strDstPath, rThresholdDifferenceToSave = 0
 
 if __name__ == "__main__":
     #~ showAndSaveAllCameras() # not saving
-    showAndSaveAllCameras("c:\\tmpi13\\",rThresholdDifferenceToSave = 0.02) #saving or to /home/pi/tmpi13/
+    showAndSaveAllCameras("c:\\tmpi14\\",rThresholdDifferenceToSave = 0.01) #saving or to /home/pi/tmpi13/
     
     # remove static image with same content from a folder
     #~ copyInterestingImage( "c:/tmpi7/", "c:/tmpi7b/", rThresholdDifferenceToSave = 0.02, bLosslessSave=False )

@@ -433,7 +433,7 @@ def analyseFilenameInPath( strPath ):
             #skels.render(im, bRenderConfidenceValue=False)
             
             cv2.imshow("detected",im)
-            key = cv2.waitKey(0)
+            key = cv2.waitKey(100)
             print(key)
             if key == ord('q') or key == 27:
                 break
@@ -451,5 +451,6 @@ if __name__ == "__main__":
     #~ learn()
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/learn/couche/")
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/demo/")
+    #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test_frontal/")
     analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test2/")
     

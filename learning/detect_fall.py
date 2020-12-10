@@ -227,6 +227,8 @@ def isDeboutHandCoded( sk, bOnlyTorso = False, bVerbose = False ):
             return None
         
     #~ if bDeboutFromArmsLegsHeight:
+    if bDeboutFromTorsoAngle == None and bNotBumOnGround:
+        return 1
     if bDeboutFromTorsoAngle and bNotBumOnGround:
         return 1
     return 0
@@ -239,7 +241,7 @@ def isDeboutHandCoded( sk, bOnlyTorso = False, bVerbose = False ):
 def predictHandCoded( listSkel ):
     ret = []
     for sk in listSkel:
-        ret.append(isDeboutHandCoded(sk))
+        ret.append(isDeboutHandCoded(sk,bOnlyTorso=0))
     return np.array(ret)
                                 
 
@@ -317,7 +319,7 @@ def learn():
                     i += 1
             pred = np.array(pred)
             
-            print("diff on LEARN folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 96/345 mix hauteur bras et jambe et angle torse: 59/297=0.272 (seul torso: 68/345=0.197) avec bum: 16/297
+            print("diff on LEARN folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 96/345 mix hauteur bras et jambe et angle torse: 59/297=0.272 (seul torso: 68/345=0.197) avec bum: 19/297 (only torso et bum: 28/345=0.081)
         
         
         # test on test folder
@@ -364,7 +366,7 @@ def learn():
                 i += 1
         pred = np.array(pred)
         
-        print("diff on TEST folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 37/372 # 54/402 sans margin, 45/402 mix hauteur bras et jambe et angle torse:  11/361=0.030 (change seul torso: 16/402=0.039) avec bum: 19/361
+        print("diff on TEST folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 37/372 # 54/402 sans margin, 45/402 mix hauteur bras et jambe et angle torse:  11/361=0.030 (change seul torso: 16/402=0.039) avec bum: 19/361 (only torso et bum: 22/402=0.055)
         
     #~ from sklearn.externals import joblib        
     joblib.dump(classifier, 'detect_fall_classifier.pkl')
@@ -411,7 +413,7 @@ def analyseFilenameInPath( strPath ):
                         txt += "?"
                 if 1:
                     txt += " / "
-                    txt = "" #erase all other algorithms
+                    #~ txt = "" #erase all other algorithms
                     ret = isDeboutHandCoded(skel,bVerbose=1,bOnlyTorso=True)
                     if ret == 0:
                         txt += "Fall"
@@ -433,7 +435,7 @@ def analyseFilenameInPath( strPath ):
             #skels.render(im, bRenderConfidenceValue=False)
             
             cv2.imshow("detected",im)
-            key = cv2.waitKey(100)
+            key = cv2.waitKey(0)
             print(key)
             if key == ord('q') or key == 27:
                 break
@@ -448,9 +450,9 @@ def analyseFilenameInPath( strPath ):
 #analyseFilenameInPath  - end
 
 if __name__ == "__main__":
-    #~ learn()
+    learn()
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/learn/couche/")
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/demo/")
-    #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test_frontal/")
-    analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test2/")
+    analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test_frontal/")
+    #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test2/")
     

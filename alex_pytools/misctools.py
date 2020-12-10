@@ -455,41 +455,76 @@ def smoothererstep( x, edge0 = 0, edge1 = 1 ):
     # -20x7 + 70 x6 - 84 x5 + 35 x4
     return x * x * x * x * (  x * ( x * ( (x*-20) +70)-84) + 35 )
     
+def initPyGamePlayer():
+    import pygame as pg
+    FREQ = 18000   # play with this for best sound
+    BITSIZE = -16  # here unsigned 16 bit
+    CHANNELS = 2   # 1 is mono, 2 is stereo
+    BUFFER = 1024  # audio buffer size, number of samples
+
+    pg.mixer.init(FREQ, BITSIZE, CHANNELS, BUFFER)
+    
+def playWavPyGame( strFilename, bWaitEnd = True ):
+    """
+    will load the whole sound into memory before playback
+    """
+    import pygame as pg
+    initPyGamePlayer()
+    sound = pg.mixer.Sound(strFilename)
+    clock = pg.time.Clock()
+    sound.play()
+    # how often to check active playback
+    frame_rate = 30
+    if bWaitEnd:
+        while pg.mixer.get_busy():
+            clock.tick(frame_rate)
+    return True
+    
+def playWav( strFilename, bWaitEnd = True ):
+    """
+    play a wav, return False on error
+    """
+    if playWavPyGame(strFilename, bWaitEnd=bWaitEnd):
+        return True
+        
+    import winsound
+    flags = winsound.SND_FILENAME
+    if not bWaitEnd:
+        flags |= winsound.SND_ASYNC | winsound.SND_NOSTOP
+    
+    try:
+        import winsound
+        winsound.PlaySound( strFilename, flags )
+        return True
+    except BaseException as err:
+        print("DBG: misctools.playWav: err: %s" % str(err) )
+    return False
 
 def ting():
     """
     play a bell or a simulated one if no bell available
     """
-    try:
-        import winsound
-        winsound.PlaySound( "../data/ting.wav", winsound.SND_FILENAME )
-    except BaseException as err:
-        print("DBG: misctools.bell: err: %s" % str(err) )
-        beep(1200, 100)
-        time.sleep(200)
+    if playWav("../data/ting.wav"):
+        return
+    beep(1200, 100)
+    time.sleep(200)
         
 def bell():
     """
     play a bell or a simulated one if no bell available
     """
-    try:
-        import winsound
-        winsound.PlaySound( "../data/bell.wav", winsound.SND_FILENAME )
-    except BaseException as err:
-        print("DBG: misctools.bell: err: %s" % str(err) )
-        beep(440, 100)
-        time.sleep(200)
+    if playWav("../data/bell.wav"):
+        return
+    beep(440, 100)
+    time.sleep(200)
         
 def deepbell():
     """
-    play a bell or a simulated one if no bell available (async !!! )
+    play a bell or a simulated one if no bell available ( as deep bell is long, it's an async method !!! 
     """
-    try:
-        import winsound
-        winsound.PlaySound( "../data/deep_bell.wav", winsound.SND_FILENAME | winsound.SND_ASYNC | winsound.SND_NOSTOP )
-    except BaseException as err:
-        print("DBG: misctools.bell: err: %s" % str(err) )
-        beep(330, 100)
+    if playWav("../data/deep_bell.wav", bWaitEnd = False):
+        return
+    beep(330, 200)
    
 def ringTheBell(nHour):
     """
@@ -497,7 +532,7 @@ def ringTheBell(nHour):
     """
     for i in range( nHour ):
         deepbell()
-        time.sleep(0.4)
+        time.sleep(0.5)
     
 def viewSmoothstep():
     # demo de subplot:

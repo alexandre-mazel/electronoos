@@ -18,6 +18,17 @@ cd python-v4l2capture/
 sudo ./setup.py install
 """
 
+def getPathData():
+    """
+    return the absolute path of electronooos/data
+    """
+    strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
+    if strLocalPath == "": strLocalPath = './'
+    ret = os.path.abspath(strLocalPath + "/../data/") + "/"
+    #~ print(ret)
+    return ret
+    
+
 def check(v1,v2):
     if v1==v2:
         print( "GOOD: %s == %s" % (str(v1),str(v2) ) )
@@ -468,17 +479,21 @@ def playWavPyGame( strFilename, bWaitEnd = True ):
     """
     will load the whole sound into memory before playback
     """
-    import pygame as pg
-    initPyGamePlayer()
-    sound = pg.mixer.Sound(strFilename)
-    clock = pg.time.Clock()
-    sound.play()
-    # how often to check active playback
-    frame_rate = 30
-    if bWaitEnd:
-        while pg.mixer.get_busy():
-            clock.tick(frame_rate)
-    return True
+    try:
+        import pygame as pg
+        initPyGamePlayer()
+        sound = pg.mixer.Sound(strFilename)
+        clock = pg.time.Clock()
+        sound.play()
+        # how often to check active playback
+        frame_rate = 30
+        if bWaitEnd:
+            while pg.mixer.get_busy():
+                clock.tick(frame_rate)
+        return True
+    except BaseException as err:
+        print("DBG: misctools.playWavPyGame: err: %s" % str(err) )
+    return False
     
 def playWav( strFilename, bWaitEnd = True ):
     """
@@ -504,7 +519,7 @@ def ting():
     """
     play a bell or a simulated one if no bell available
     """
-    if playWav("../data/ting.wav"):
+    if playWav(getPathData()+"ting.wav"):
         return
     beep(1200, 100)
     time.sleep(200)
@@ -513,7 +528,7 @@ def bell():
     """
     play a bell or a simulated one if no bell available
     """
-    if playWav("../data/bell.wav"):
+    if playWav(getPathData()+"bell.wav"):
         return
     beep(440, 100)
     time.sleep(200)
@@ -522,7 +537,7 @@ def deepbell():
     """
     play a bell or a simulated one if no bell available ( as deep bell is long, it's an async method !!! 
     """
-    if playWav("../data/deep_bell.wav", bWaitEnd = False):
+    if playWav(getPathData()+"deep_bell.wav", bWaitEnd = False):
         return
     beep(330, 200)
    

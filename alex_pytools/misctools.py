@@ -1,5 +1,5 @@
 """
-some classic handy class
+some classic handy classes
 """        
 import datetime
 import cv2 # made with cv 3.2.0-dev
@@ -578,6 +578,24 @@ def viewSmoothstep():
     #~ fig.savefig("test.png")
     plt.show()
     
+def testSound():
+    if 0:
+        ting()
+        bell()
+        deepbell()
+        time.sleep(1)
+        
+        ringTheBell(3)
+        time.sleep(2)
+        ringTheBell(7)
+        
+    for i in range(3):
+        t = time.time()
+        deepbell()
+        print("duration: %5.3fs" % (time.time()-t) )
+        
+    time.sleep(1) # time to finish some sounds
+     
     
 def autoTest():
     check(smoothstep(0),0)
@@ -591,12 +609,4 @@ def autoTest():
 if __name__ == "__main__":
     autoTest()
     #~ viewSmoothstep()
-    if 1:
-        ting()
-        bell()
-        deepbell()
-        time.sleep(1)
-        
-        ringTheBell(3)
-        time.sleep(2)
-        ringTheBell(7)
+    testSound()

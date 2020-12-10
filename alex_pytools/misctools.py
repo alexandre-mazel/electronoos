@@ -18,6 +18,15 @@ cd python-v4l2capture/
 sudo ./setup.py install
 """
 
+def check(v1,v2):
+    if v1==v2:
+        print( "GOOD: %s == %s" % (str(v1),str(v2) ) )
+        return
+    print( "BAD: %s != %s" % (str(v1),str(v2) ) )
+    assert(v1==v2)
+    return
+        
+
 def mse(imageA, imageB, bDenoise = False):
     # the 'Mean Squared Error' between the two images is the
     # sum of the squared difference between the two images;
@@ -345,23 +354,26 @@ def beep(frequency, duration):
     winsound.Beep(frequency, duration)
 
 global_dictLastHalfHour = dict() # for each id the last (h,m)    
-def isHalfHour(id=1):
+def isHalfHour(id=1,nOffsetMin = 0):
     """
     return True half an hour
     (NB: use a global, so it can be used only once in a program, or use a different id
     """
     global global_dictLastHalfHour
     h,m,s = getTime()
+    
+    mToCheck = m + nOffsetMin
         
-    if m == 0 or m == 30:         
+    if mToCheck == 0 or mToCheck == 30:
+        key = "%s_%s"%(id,nOffsetMin)
         try:
-            lastVal = global_dictLastHalfHour[id]
+            lastVal = global_dictLastHalfHour[key]
         except KeyError as err:
-            global_dictLastHalfHour[id] = (-1,-1)
-            lastVal = global_dictLastHalfHour[id]        
+            global_dictLastHalfHour[key] = (-1,-1)
+            lastVal = global_dictLastHalfHour[key]    
         if (h,m) == lastVal:
             return False
-        global_dictLastHalfHour[id] = (h,m)
+        global_dictLastHalfHour[key] = (h,m)
         return True
         
     return False
@@ -409,3 +421,78 @@ def isEvery10min(id=1):
         return True
         
     return False
+    
+def clamp( x, lowerlimit = 0, upperlimit = 1 ):
+    if x < lowerlimit: return lowerlimit
+    if x > upperlimit: return upperlimit
+    return x
+    
+def smoothstep( x, edge0 = 0, edge1 = 1 ):
+    """
+    return a smooth (sigmoide/beziers/acceleration-deceleration like) value of x, resting in the edge0/edge1 boundaries
+    """
+    #Scale, bias and saturate x to 0..1 range
+    x = clamp( (x - edge0) / (edge1 - edge0), 0.0, 1.0)
+    # -3x3 + 3x2
+    return x * x * (3 - 2 * x)
+    
+
+def smootherstep( x, edge0 = 0, edge1 = 1 ):
+    """
+    cf smoothstep but with more accentuate curve
+    """
+    #Scale, bias and saturate x to 0..1 range
+    x = clamp( (x - edge0) / (edge1 - edge0), 0.0, 1.0)
+    # 6x5 - 15 x4 + 10 x3
+    return x * x * x * (x * (x * 6 - 15) + 10)
+  
+def smoothererstep( x, edge0 = 0, edge1 = 1 ):
+    """
+    cf smoothstep but with more accentuate curve
+    """
+    #Scale, bias and saturate x to 0..1 range
+    x = clamp( (x - edge0) / (edge1 - edge0), 0.0, 1.0)
+    # -20x7 + 70 x6 - 84 x5 + 35 x4
+    return x * x * x * x * (  x * ( x * ( (x*-20) +70)-84) + 35 )
+    
+    
+def viewSmoothstep():
+    # demo de subplot:
+    # https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.subplots.html#matplotlib.pyplot.subplots
+    import matplotlib
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    # Data for plotting
+    xlist = np.arange(-0.5, 1.5, 0.01)
+    s1 = []
+    s2 = []
+    s3 = []
+    for x in xlist:
+        s1.append( smoothstep(x) )
+        s2.append( smootherstep(x) )
+        s3.append( smoothererstep(x) )
+
+    fig, ax = plt.subplots()
+    ax.plot(xlist, s1,label="smoothstep")
+    ax.plot(xlist, s2,label="smootherstep")
+    ax.plot(xlist, s3,label="smoothererstep")
+    
+    ax.set(xlabel='x', ylabel='y', title='smoothstep function')
+    ax.grid()
+    ax.legend()
+
+    #~ fig.savefig("test.png")
+    plt.show()
+    
+def autoTest():
+    check(smoothstep(0),0)
+    check(smoothstep(-1),0)
+    check(smoothstep(0.5),0.5)
+    check(smoothstep(0.1),0.1 * 0.1 * (3 - 2 * 0.1))
+    check(smoothstep(1),1)
+    check(smoothstep(2),1)
+    
+if __name__ == "__main__":
+    autoTest()
+    viewSmoothstep()

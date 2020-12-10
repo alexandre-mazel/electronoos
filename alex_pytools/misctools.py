@@ -455,6 +455,49 @@ def smoothererstep( x, edge0 = 0, edge1 = 1 ):
     # -20x7 + 70 x6 - 84 x5 + 35 x4
     return x * x * x * x * (  x * ( x * ( (x*-20) +70)-84) + 35 )
     
+
+def ting():
+    """
+    play a bell or a simulated one if no bell available
+    """
+    try:
+        import winsound
+        winsound.PlaySound( "../data/ting.wav", winsound.SND_FILENAME )
+    except BaseException as err:
+        print("DBG: misctools.bell: err: %s" % str(err) )
+        beep(1200, 100)
+        time.sleep(200)
+        
+def bell():
+    """
+    play a bell or a simulated one if no bell available
+    """
+    try:
+        import winsound
+        winsound.PlaySound( "../data/bell.wav", winsound.SND_FILENAME )
+    except BaseException as err:
+        print("DBG: misctools.bell: err: %s" % str(err) )
+        beep(440, 100)
+        time.sleep(200)
+        
+def deepbell():
+    """
+    play a bell or a simulated one if no bell available (async !!! )
+    """
+    try:
+        import winsound
+        winsound.PlaySound( "../data/deep_bell.wav", winsound.SND_FILENAME | winsound.SND_ASYNC | winsound.SND_NOSTOP )
+    except BaseException as err:
+        print("DBG: misctools.bell: err: %s" % str(err) )
+        beep(330, 100)
+   
+def ringTheBell(nHour):
+    """
+    Sonne la cloche d'une certaine heure
+    """
+    for i in range( nHour ):
+        deepbell()
+        time.sleep(0.4)
     
 def viewSmoothstep():
     # demo de subplot:
@@ -485,6 +528,7 @@ def viewSmoothstep():
     #~ fig.savefig("test.png")
     plt.show()
     
+    
 def autoTest():
     check(smoothstep(0),0)
     check(smoothstep(-1),0)
@@ -493,6 +537,16 @@ def autoTest():
     check(smoothstep(1),1)
     check(smoothstep(2),1)
     
+    
 if __name__ == "__main__":
     autoTest()
-    viewSmoothstep()
+    #~ viewSmoothstep()
+    if 1:
+        ting()
+        bell()
+        deepbell()
+        time.sleep(1)
+        
+        ringTheBell(3)
+        time.sleep(2)
+        ringTheBell(7)

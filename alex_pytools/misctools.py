@@ -11,6 +11,10 @@ import sys
 try: import v4l2capture  # can be found here : https://github.com/gebart/python-v4l2capture
 except: pass # can be skipped if no use of v4l2 function
 
+
+try: import pygame_tools
+except: pass
+
 """
 sudo apt-get install libv4l-dev
 git clone https://github.com/gebart/python-v4l2capture.gitlibv4l-dev
@@ -466,30 +470,13 @@ def smoothererstep( x, edge0 = 0, edge1 = 1 ):
     # -20x7 + 70 x6 - 84 x5 + 35 x4
     return x * x * x * x * (  x * ( x * ( (x*-20) +70)-84) + 35 )
     
-def initPyGamePlayer():
-    import pygame as pg
-    FREQ = 18000   # play with this for best sound
-    BITSIZE = -16  # here unsigned 16 bit
-    CHANNELS = 2   # 1 is mono, 2 is stereo
-    BUFFER = 1024  # audio buffer size, number of samples
-
-    pg.mixer.init(FREQ, BITSIZE, CHANNELS, BUFFER)
-    
 def playWavPyGame( strFilename, bWaitEnd = True ):
     """
     will load the whole sound into memory before playback
     """
+    import pygame_tools
     try:
-        import pygame as pg
-        initPyGamePlayer()
-        sound = pg.mixer.Sound(strFilename)
-        clock = pg.time.Clock()
-        sound.play()
-        # how often to check active playback
-        frame_rate = 30
-        if bWaitEnd:
-            while pg.mixer.get_busy():
-                clock.tick(frame_rate)
+        pygame_tools.soundPlayer.playFile(strFilename, bWaitEnd=bWaitEnd)
         return True
     except BaseException as err:
         print("DBG: misctools.playWavPyGame: err: %s" % str(err) )

@@ -575,6 +575,7 @@ def testSound():
         ringTheBell(3)
         time.sleep(2)
         ringTheBell(7)
+        time.sleep(10)
     else:
         for i in range(3):
             t = time.time()

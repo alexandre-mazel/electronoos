@@ -534,7 +534,7 @@ def ringTheBell( nTimes ):
     """
     for i in range( nTimes ):
         deepbell()
-        time.sleep(1.2)
+        time.sleep(1.3)
     
 def viewSmoothstep():
     # demo de subplot:

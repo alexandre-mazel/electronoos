@@ -105,10 +105,11 @@ def generateImagePerlin(w,h,rZoom=1,sizegrid=256,offsetx=0,offsety=0):
 def generateLandscape(w,h,rZoom=1,offsetx=0,offsety=0):
     
     # use of 4 simplex at different scale
-    im1 = generateImageSimplex(w,h,rZoom=rZoom*64,offsetx=0,offsety=0)
-    im2 = generateImageSimplex(w,h,rZoom=rZoom*16,offsetx=0,offsety=0)
-    im3 = generateImageSimplex(w,h,rZoom=rZoom*4,offsetx=0,offsety=0)
-    im4 = generateImageSimplex(w,h,rZoom=rZoom*1,offsetx=0,offsety=0)
+    # nice zoom are around 1 for noisy to 64 for nice detail
+    im1 = generateImageSimplex(w,h,rZoom=rZoom*1,offsetx=0,offsety=0)
+    im2 = generateImageSimplex(w,h,rZoom=rZoom*4,offsetx=0,offsety=0)
+    im3 = generateImageSimplex(w,h,rZoom=rZoom*16,offsetx=0,offsety=0)
+    im4 = generateImageSimplex(w,h,rZoom=rZoom*64,offsetx=0,offsety=0)
     
     im = im1*0.0625 + im2*0.125 + im3*0.25 + im4 * 0.5
 
@@ -122,7 +123,7 @@ def animateLandscape():
     zoom = 1
     while zoom < 1000:
         im = generateLandscape(160,120,zoom,offsetx=int(math.sin(inc)*10),offsety=int(math.sin(inc)*10))
-        im = cv2.resize(im,None,fx=1,fy=1)
+        im = cv2.resize(im,None,fx=2,fy=2)
         cv2.imshow("OpenSimplex grey", im)
         key = cv2.waitKey(1)
         if key == ord('q') or key == 27:

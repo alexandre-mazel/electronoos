@@ -103,15 +103,39 @@ def generateImagePerlin(w,h,rZoom=1,sizegrid=256,offsetx=0,offsety=0):
     
     
 def generateLandscape(w,h,rZoom=1,offsetx=0,offsety=0):
-    
     # use of 4 simplex at different scale
     # nice zoom are around 1 for noisy to 64 for nice detail
-    im1 = generateImageSimplex(w,h,rZoom=rZoom*1,offsetx=0,offsety=0)
-    im2 = generateImageSimplex(w,h,rZoom=rZoom*4,offsetx=0,offsety=0)
-    im3 = generateImageSimplex(w,h,rZoom=rZoom*16,offsetx=0,offsety=0)
-    im4 = generateImageSimplex(w,h,rZoom=rZoom*64,offsetx=0,offsety=0)
+    # but need to generate for each zoom the good detail unlimitedly
+    # 
+    rZoom = 1.
+    im1 = generateImageSimplex(w,h,rZoom=rZoom*64,offsetx=0,offsety=0)
+    im2 = generateImageSimplex(w,h,rZoom=rZoom*16,offsetx=0,offsety=0)
+    im3 = generateImageSimplex(w,h,rZoom=rZoom*4,offsetx=0,offsety=0)
+    im4 = generateImageSimplex(w,h,rZoom=rZoom*1,offsetx=0,offsety=0)
     
-    im = im1*0.0625 + im2*0.125 + im3*0.25 + im4 * 0.5
+    #~ im = im1*0.5 + im2*0.25 + im3*0.125 + im4 * 0.0625  # 1 + 2 + 4 + 8 = 15
+    
+    if 0:
+        c1 = 0.5
+        c2 = 0.25
+        c3 = 0.125
+        c4 = 0.09
+    else:
+        c1 = 0.4
+        c2 = 0.3
+        c3 = 0.2
+        c4 = 0.1
+    
+    if 0:
+        im = im1*c1
+        im += im2*c2
+        im += im3*c3
+        im += im4*c4
+    else:
+        im = im1*c4
+        im += im2*c3
+        im += im3*c2
+        im += im4*c1        
 
     im = im.astype(np.uint8)
     #~ print(im)
@@ -122,12 +146,13 @@ def animateLandscape():
     inc = 1
     zoom = 1
     while zoom < 1000:
-        im = generateLandscape(160,120,zoom,offsetx=int(math.sin(inc)*10),offsety=int(math.sin(inc)*10))
+        im = generateLandscape(480,300,zoom,offsetx=int(math.sin(inc)*10),offsety=int(math.sin(inc)*10))
         im = cv2.resize(im,None,fx=2,fy=2)
         cv2.imshow("OpenSimplex grey", im)
-        key = cv2.waitKey(1)
+        key = cv2.waitKey(0)
         if key == ord('q') or key == 27:
             break
+        break
         zoom *= 1.1
     
     
@@ -185,3 +210,4 @@ def exploreMethod():
 if __name__ == "__main__":
     #~ exploreMethod()
     animateLandscape()
+    # for animation, juste generate in 1D with a transition of movement from the value of the pixel

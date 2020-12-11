@@ -32,15 +32,21 @@ def beepEveryHalf():
             if m == 30:
                 # demi
                 #~ misctools.beep(440, 100)
+                print("bim 30")
                 misctools.deepbell()
             else:
                 # count the hour
-                for i in range(h):
+                #~ for i in range(h):
                     #~ misctools.beep(440, 100)
                     #~ time.sleep(0.1)
-                    misctools.ringTheBell(h)
+                print("ring the bell")
+                times = h
+                if times > 12:
+                    times = times-12
+                misctools.ringTheBell(times) # h de 0 a 24 => de de 0 a 12 puis de 1 a 11
         else:
             #~ misctools.beep(880, 100)
+            print("bim 15")
             misctools.ting()
     if misctools.isHalfHour(nOffsetMin=5):
         # fin du pomodoro

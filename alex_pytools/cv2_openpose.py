@@ -139,7 +139,15 @@ class Skeleton:
         xmin, ymin, xmax, ymax = self.getBB(rThreshold=rThreshold)
         return[ max(xmax-xmin,1), max(ymax-ymin,1) ] # BB will be always > 0
         
-    def getLenLimbs(self):
+    def getAvgLenLeg( self,rThreshold = 0.2 ):
+        """
+        return the average length of a complete leg
+        """
+        todo si pas de chevilles prends la cuisse x 2 ou l'inverse, ou l'autre jambe...
+        se debrouille quoi !
+        a tester sur 86/1212
+        
+    def getLenLimbs(self,rThreshold = 0.2):
         """
         return len and min confidence of each limbs, arms then legs
         """
@@ -682,7 +690,7 @@ def loadSkeletonsFromOneFolder(strPath, nFilterNbrPoint = 6):
 
 
 strPathDeboutCouche = "/home/am/images_salon_debout_couche/"
-if os.name == "nt": strPathDeboutCouche = "c:/images_salon_debout_couche/"
+if os.name == "nt": strPathDeboutCouche = "D:/images_salon_debout_couche/"
 
 if __name__ == "__main__":
     strFilename = "../data/alexandre.jpg"

@@ -528,13 +528,13 @@ def deepbell():
         return
     beep(330, 200)
    
-def ringTheBell(nHour):
+def ringTheBell( nTimes ):
     """
     Sonne la cloche d'une certaine heure
     """
-    for i in range( nHour ):
+    for i in range( nTimes ):
         deepbell()
-        time.sleep(0.5)
+        time.sleep(1.2)
     
 def viewSmoothstep():
     # demo de subplot:
@@ -566,20 +566,20 @@ def viewSmoothstep():
     plt.show()
     
 def testSound():
-    if 0:
+    if 1:
         ting()
         bell()
-        deepbell()
+        #~ deepbell()
         time.sleep(1)
         
         ringTheBell(3)
         time.sleep(2)
         ringTheBell(7)
-        
-    for i in range(3):
-        t = time.time()
-        deepbell()
-        print("duration: %5.3fs" % (time.time()-t) )
+    else:
+        for i in range(3):
+            t = time.time()
+            deepbell()
+            print("duration: %5.3fs" % (time.time()-t) )
         
     time.sleep(1) # time to finish some sounds
      

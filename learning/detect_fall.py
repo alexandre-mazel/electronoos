@@ -214,9 +214,10 @@ def isDeboutHandCoded( sk, bOnlyTorso = False, bVerbose = False ):
             if sk.listPoints[i][1] > rLowest:
                 rLowest = sk.listPoints[i][1]
         if rLowest >= 0:
-            lenLimbs = sk.getLenLimbs()
-            if bVerbose: print("lenLimbs: %s" % str(lenLimbs) )
-            rLenLegs = (lenLimbs[0][0] +lenLimbs[1][0]) / 2
+            #~ lenLimbs = sk.getLenLimbs()
+            #~ if bVerbose: print("lenLimbs: %s" % str(lenLimbs) )
+            #~ rLenLegs = (lenLimbs[0][0] +lenLimbs[1][0]) / 2
+            rLenLegs = sk.getAvgLenLeg()
             bNotBumOnGround = (avg_hip[1] + (rLenLegs*0.75)) < rLowest
             if bVerbose: print("avg hip: %5.1f, lowest: %5.1f, rLenLegs: %5.1f, bNotBum: %s" % (avg_hip[1],rLowest,rLenLegs, bNotBumOnGround) )
     #~ return bNotBumOnGround

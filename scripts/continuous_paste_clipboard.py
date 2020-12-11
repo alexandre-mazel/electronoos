@@ -50,6 +50,7 @@ def beepEveryHalf():
             misctools.ting()
     if misctools.isHalfHour(nOffsetMin=5):
         # fin du pomodoro
+        print("bim pomodoro")
         for i in range(3):
             misctools.ting()
             time.sleep(0.1)

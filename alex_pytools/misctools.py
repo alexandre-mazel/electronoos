@@ -1,5 +1,6 @@
 """
 some classic handy classes
+(c) 2010-2022 A. Mazel
 """        
 import datetime
 import cv2 # made with cv 3.2.0-dev
@@ -377,7 +378,7 @@ def isHalfHour(id=1,nOffsetMin = 0):
     global global_dictLastHalfHour
     h,m,s = getTime()
     
-    mToCheck = m + nOffsetMin
+    mToCheck = (m + nOffsetMin) % 60
         
     if mToCheck == 0 or mToCheck == 30:
         key = "%s_%s"%(id,nOffsetMin)

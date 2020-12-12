@@ -3,10 +3,24 @@ import os
 import time
 import opensimplex
 
+def clamp( x, lowerlimit = 0, upperlimit = 1 ):
+    if x < lowerlimit: return lowerlimit
+    if x > upperlimit: return upperlimit
+    return x
+    
+def clamp_list(a,lowerlimit = 0, upperlimit = 1 ):
+    ret = list(a)
+    for i in range(len(ret)):
+        ret[i] = clamp(ret[i],lowerlimit = lowerlimit, upperlimit=upperlimit)
+    if isinstance(a, tuple):
+        ret = tuple(ret)
+    return ret
+    
+
 pygame.init()
 
 # Define some colors
-BLACK = ( 0, 0, 0)
+BLACK = ( 0, 0, 0,100)
 WHITE = ( 255, 255, 255)
 GREEN = ( 0, 255, 0)
 RED = ( 255, 0, 0)
@@ -51,7 +65,7 @@ while bContinue:
     #logic
     dx = osx.noise2d(t,0)*1
     dy = osx.noise2d(t,1)*1
-    print("t: %5.2f, dx: %f, dy: %f" % (t,dx, dy) )
+    #~ print("t: %5.2f, dx: %f, dy: %f" % (t,dx, dy) )
     x += dx
     y += dy
 
@@ -62,7 +76,15 @@ while bContinue:
     #~ pygame.draw.line(screen, GREEN, [0, 0], [100, 100], 5)
     #~ pygame.draw.ellipse(screen, BLACK, [20,20,250,100], 2)
     
-    pygame.draw.circle(screen, BLACK, [int(x),int(y)], 3)
+    xr = int(x)
+    yr = int(y)
+    new_color = screen.get_at((xr-0,yr-0))
+    inc = -10
+    new_color = (new_color[0]+inc,new_color[1]+inc,new_color[2]+inc)
+    new_color = clamp_list(new_color,0,255)
+    print(new_color)
+    
+    pygame.draw.circle(screen, new_color, [xr,yr], 1)
 
  
 

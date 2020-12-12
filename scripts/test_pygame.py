@@ -1,4 +1,5 @@
 import pygame
+import cv2
 import os
 import time
 import opensimplex
@@ -42,6 +43,16 @@ if 1:
     screenw = 2736//2
     screenh = 1824//2
     os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (0,0)
+    
+
+bUseModel = 1 # force the trace to draw something
+if bUseModel:
+    #~ model = cv2.imread(misctools.getPathData() + "landscape-bw.jpg", cv2.IMREAD_GRAYSCALE)
+    model = cv2.imread(misctools.getPathData() + "logo_nike.jpg", cv2.IMREAD_GRAYSCALE)
+    model = cv2.imread(misctools.getPathData() + "face_bw1.jpg", cv2.IMREAD_GRAYSCALE)
+    if model.shape[1] > 1300:
+        model = cv2.resize(model,None,fx=0.5,fy=0.5)
+    screenh,screenw = model.shape[:2]
 
 
 size = (screenw, screenh)
@@ -56,6 +67,7 @@ bContinue = True
 nCptImageFps = 0
 nCptImageTotal = 0
 timeBegin = time.time()
+
 
 t = 0
 dt = 1/60.
@@ -80,9 +92,29 @@ while bContinue:
     dx = osx.noise2d(t,0)*0.2
     dy = osx.noise2d(t,1)*0.2
     #~ print("t: %5.2f, dx: %f, dy: %f" % (t,dx, dy) )
+    
+    if bUseModel:
+        grey = model[int(clamp(y,0,screenh-1)),int(clamp(x,0,screenw-1))]
+        
+        dx *= 20
+        dy *= 20
+        # slowdown if dark
+        dx /= (256-grey)*0.1
+        dy /= (256-grey)*0.1
     x += dx
     y += dy
-
+    
+    if bUseModel:
+        # warp
+        if x < 0:
+            x += screenw
+        if x >= screenw:
+            x -= screenw
+        if y < 0:
+            y += screenh
+        if y >= screenh:
+            y -= screenh
+            
     #rendering
     #~ screen.fill(WHITE)
     
@@ -120,10 +152,22 @@ while bContinue:
     if (nCptImageTotal % 200) == 0:
         pygame.display.flip()
         
-    if (nCptImageTotal % (500*1000)) == 0:
-            name = "/tmp_scr/" + misctools.getFilenameFromTime() + ".png"
-            print("saving image")
+    if 1:
+        if (nCptImageTotal % (500*1000)) == 0:
+            name = "/images_generated/" + misctools.getFilenameFromTime() + ".png"
+            print("t:%7.2fs, saving image..." % t)
             pygame.image.save(screen, name)
+                
+        if 1:
+            if (nCptImageTotal % (50*1000)) == 0:
+                #estompe tout l'ecran
+                for j in range(screenh):
+                    for i in range(screenw):
+                        col = screen.get_at([i,j])
+                        for k in range(3):
+                            if col[k] < 255:
+                                col[k] = col[k]+1
+                        screen.set_at([i,j],col)
         
 
     # --- Limit to 60 frames per second

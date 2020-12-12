@@ -210,4 +210,4 @@ def exploreMethod():
 if __name__ == "__main__":
     #~ exploreMethod()
     animateLandscape()
-    # for animation, juste generate in 1D with a transition of movement from the value of the pixel
+    # for robot animation, juste generate in 1D with a transition of movement from the value of the pixel

@@ -10,6 +10,12 @@ if strLocalPath == "": strLocalPath = './'
 sys.path.append(strLocalPath+"/../alex_pytools/")
 import misctools
 
+def bgr2rgb(col):
+    b = col[0]
+    col[0] = col[2]
+    col[2] = b
+    return col
+
 def clamp( x, lowerlimit = 0, upperlimit = 1 ):
     if x < lowerlimit: return lowerlimit
     if x > upperlimit: return upperlimit
@@ -22,6 +28,13 @@ def clamp_list(a,lowerlimit = 0, upperlimit = 1 ):
     if isinstance(a, tuple):
         ret = tuple(ret)
     return ret
+    
+def warp(x,screensize):
+    if x < 0:
+        x += screensize
+    if x >= screensize:
+        x -= screensize
+    return x
     
 
 pygame.init()
@@ -53,6 +66,13 @@ if bUseModel:
     if model.shape[1] > 1300:
         model = cv2.resize(model,None,fx=0.5,fy=0.5)
     screenh,screenw = model.shape[:2]
+    
+bUseModelRGB = 0    
+if bUseModelRGB:
+    #~ model = cv2.imread(misctools.getPathData() + "landscape-bw.jpg", cv2.IMREAD_GRAYSCALE)
+    model = cv2.imread(misctools.getPathData() + "landscape.jpg")
+    screenh,screenw = model.shape[:2]
+
 
 
 size = (screenw, screenh)
@@ -73,6 +93,12 @@ t = 0
 dt = 1/60.
 x = screenw // 2
 y = screenh // 2
+
+x2 = screenw // 2 + 100
+y2 = screenh // 2
+
+x3 = screenw // 2 - 100
+y3 = screenh // 2
 
 osx = opensimplex.OpenSimplex()
 screen.fill(WHITE)
@@ -101,10 +127,23 @@ while bContinue:
         # slowdown if dark
         dx /= (256-grey)*0.1
         dy /= (256-grey)*0.1
+        
+        
     x += dx
     y += dy
     
-    if bUseModel:
+    if bUseModelRGB:
+        dx2 = osx.noise2d(t,10)*0.2
+        dy2 = osx.noise2d(t,20)*0.2        
+        dx3 = osx.noise2d(t,30)*0.2
+        dy3 = osx.noise2d(t,40)*0.2
+        
+        x2 += dx2
+        y2 += dy2
+        x3 += dx3
+        y3 += dy3
+        
+    if bUseModel or bUseModelRGB:
         # warp
         if x < 0:
             x += screenw
@@ -114,6 +153,13 @@ while bContinue:
             y += screenh
         if y >= screenh:
             y -= screenh
+            
+        if bUseModelRGB:
+            x2 = warp(x2,screenw)
+            y2 = warp(y2,screenh)
+            x3 = warp(x3,screenw)
+            y3 = warp(y3,screenh)
+            
             
     #rendering
     #~ screen.fill(WHITE)
@@ -144,7 +190,40 @@ while bContinue:
     new_color = clamp_list(new_color,0,255)
     #~ print(new_color)
     
-    pygame.draw.circle(screen, new_color, [xr,yr], 1)
+    if bUseModelRGB:
+        new_color = model[yr,xr]
+        new_color = bgr2rgb(new_color)
+        if 1:
+            # 3 pixels per composantes
+            xr2 = int(x2)
+            yr2 = int(y2)
+            xr3 = int(x3)
+            yr3 = int(y3)
+
+            col = screen.get_at((xr,yr))
+            col_model = model[yr,xr]
+            #~ print(col)
+            col = (col_model[2],col[1],col[2])
+            screen.set_at( (xr,yr), col )
+            
+            col = screen.get_at((xr2,yr2))
+            col_model = model[yr2,xr2]
+            #~ print(col)
+            col = (col[0],col_model[1],col[2])
+            screen.set_at( (xr2,yr2), col )
+
+            col = screen.get_at((xr3,yr3))
+            col_model = model[yr3,xr3]
+            #~ print(col)
+            col = (col[0],col[1],col_model[0])
+            screen.set_at( (xr3,yr3), col )
+            
+            
+    else:
+        if bUseModel:
+            screen.set_at( (xr,yr), new_color )
+        else:
+            pygame.draw.circle(screen, new_color, [xr,yr], 1)
 
  
 
@@ -158,7 +237,7 @@ while bContinue:
             print("t:%7.2fs, saving image..." % t)
             pygame.image.save(screen, name)
                 
-        if 1:
+        if 0:
             if (nCptImageTotal % (50*1000)) == 0:
                 #estompe tout l'ecran
                 for j in range(screenh):

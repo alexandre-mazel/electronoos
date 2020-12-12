@@ -31,6 +31,13 @@ os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (4,40)
 screenw = 1200
 screenh = 800
 
+if 1:
+    # full screen on my ms tab4
+    screenw = 2736//2
+    screenh = 1824//2
+    os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (0,0)
+
+
 size = (screenw, screenh)
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption("My First Game")
@@ -78,11 +85,25 @@ while bContinue:
     
     xr = int(x)
     yr = int(y)
+    while xr < 0 or xr >= screenw:
+        #~ print("begin: %s" % xr)
+        if xr < 0:
+            xr = abs(xr)
+        if xr >= screenw:
+            xr = 2*(screenw-1) - xr
+        #~ print(xr)
+        
+    while yr < 0 or yr >= screenh:
+        if yr < 0:
+            yr = abs(yr)
+        if yr >= screenh:
+            yr = 2*(screenh-1) - yr
+        
     new_color = screen.get_at((xr-0,yr-0))
     inc = -10
     new_color = (new_color[0]+inc,new_color[1]+inc,new_color[2]+inc)
     new_color = clamp_list(new_color,0,255)
-    print(new_color)
+    #~ print(new_color)
     
     pygame.draw.circle(screen, new_color, [xr,yr], 1)
 
@@ -92,12 +113,12 @@ while bContinue:
     pygame.display.flip()
 
     # --- Limit to 60 frames per second
-    clock.tick(60)
+    clock.tick(6000)
     t += dt
     
     # fps counting
     nCptImage += 1
-    if nCptImage > 60:
+    if nCptImage > 10000 or time.time() - timeBegin > 5:
         duration = time.time() - timeBegin
         print("INF: %5.1ffps" % ( nCptImage / duration) )
         nCptImage = 0

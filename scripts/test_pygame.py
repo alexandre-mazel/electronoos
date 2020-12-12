@@ -2,6 +2,12 @@ import pygame
 import os
 import time
 import opensimplex
+import sys
+
+strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
+if strLocalPath == "": strLocalPath = './'
+sys.path.append(strLocalPath+"/../alex_pytools/")
+import misctools
 
 def clamp( x, lowerlimit = 0, upperlimit = 1 ):
     if x < lowerlimit: return lowerlimit
@@ -47,7 +53,8 @@ clock = pygame.time.Clock()
  
 bContinue = True
 
-nCptImage = 0
+nCptImageFps = 0
+nCptImageTotal = 0
 timeBegin = time.time()
 
 t = 0
@@ -70,8 +77,8 @@ while bContinue:
             
             
     #logic
-    dx = osx.noise2d(t,0)*1
-    dy = osx.noise2d(t,1)*1
+    dx = osx.noise2d(t,0)*0.2
+    dy = osx.noise2d(t,1)*0.2
     #~ print("t: %5.2f, dx: %f, dy: %f" % (t,dx, dy) )
     x += dx
     y += dy
@@ -100,7 +107,7 @@ while bContinue:
             yr = 2*(screenh-1) - yr
         
     new_color = screen.get_at((xr-0,yr-0))
-    inc = -10
+    inc = -1
     new_color = (new_color[0]+inc,new_color[1]+inc,new_color[2]+inc)
     new_color = clamp_list(new_color,0,255)
     #~ print(new_color)
@@ -110,18 +117,27 @@ while bContinue:
  
 
     # --- Go ahead and update the screen with what we've drawn.
-    pygame.display.flip()
+    if (nCptImageTotal % 200) == 0:
+        pygame.display.flip()
+        
+    if (nCptImageTotal % (500*1000)) == 0:
+            name = "/tmp_scr/" + misctools.getFilenameFromTime() + ".png"
+            print("saving image")
+            pygame.image.save(screen, name)
+        
 
     # --- Limit to 60 frames per second
     clock.tick(6000)
     t += dt
     
+    nCptImageTotal += 1
+    
     # fps counting
-    nCptImage += 1
-    if nCptImage > 10000 or time.time() - timeBegin > 5:
+    nCptImageFps += 1
+    if nCptImageFps > 10000 or time.time() - timeBegin > 5:
         duration = time.time() - timeBegin
-        print("INF: %5.1ffps" % ( nCptImage / duration) )
-        nCptImage = 0
+        print("INF: %5.1ffps" % ( nCptImageFps / duration) )
+        nCptImageFps = 0
         timeBegin = time.time()
 
 #Once we have exited the main program loop we can stop the game engine:

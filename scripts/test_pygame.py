@@ -34,6 +34,9 @@ dt = 1/60.
 x = screenw // 2
 y = screenh // 2
 
+osx = opensimplex.OpenSimplex()
+screen.fill(WHITE)
+
 while bContinue:
     # --- Main event loop
     for event in pygame.event.get(): # User did something
@@ -44,17 +47,23 @@ while bContinue:
             if event.key == pygame.K_ESCAPE:
                 bContinue = False
             
- 
+            
+    #logic
+    dx = osx.noise2d(t,0)*1
+    dy = osx.noise2d(t,1)*1
+    print("t: %5.2f, dx: %f, dy: %f" % (t,dx, dy) )
+    x += dx
+    y += dy
 
     #rendering
-    screen.fill(WHITE)
+    #~ screen.fill(WHITE)
     
     #~ pygame.draw.rect(screen, RED, [55, 200, 100, 70],0)
     #~ pygame.draw.line(screen, GREEN, [0, 0], [100, 100], 5)
     #~ pygame.draw.ellipse(screen, BLACK, [20,20,250,100], 2)
     
-    pygame.draw.circle(screen, BLACK, [x,y], 3)
-    x += 
+    pygame.draw.circle(screen, BLACK, [int(x),int(y)], 3)
+
  
 
     # --- Go ahead and update the screen with what we've drawn.
@@ -67,8 +76,8 @@ while bContinue:
     # fps counting
     nCptImage += 1
     if nCptImage > 60:
-        t = time.time() - timeBegin
-        print("INF: %5.1ffps" % ( nCptImage / t) )
+        duration = time.time() - timeBegin
+        print("INF: %5.1ffps" % ( nCptImage / duration) )
         nCptImage = 0
         timeBegin = time.time()
 

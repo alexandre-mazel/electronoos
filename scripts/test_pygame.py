@@ -58,13 +58,15 @@ if 1:
     os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (0,0)
     
 
-bUseModel = 1 # force the trace to draw something
+bUseModel = 1  # force the trace to draw something
 if bUseModel:
     #~ model = cv2.imread(misctools.getPathData() + "landscape-bw.jpg", cv2.IMREAD_GRAYSCALE)
     model = cv2.imread(misctools.getPathData() + "logo_nike.jpg", cv2.IMREAD_GRAYSCALE)
-    model = cv2.imread(misctools.getPathData() + "face_bw1.jpg", cv2.IMREAD_GRAYSCALE)
+    model = cv2.imread(misctools.getPathData() + "lion1.jpg", cv2.IMREAD_GRAYSCALE)
     if model.shape[1] > 1300:
         model = cv2.resize(model,None,fx=0.5,fy=0.5)
+    while model.shape[1] < 500:
+        model = cv2.resize(model,None,fx=2,fy=2)
     screenh,screenw = model.shape[:2]
     
 bUseModelRGB = 0    

@@ -17,7 +17,7 @@ class SoundPlayer:
         self.changePlayFreq()
         
     def changePlayFreq( self, newFreq = 44100 ):
-        FREQ = 48000   # changing that can change the playing of some wav
+        FREQ = newFreq   # changing that can change the playing of some wav
         BITSIZE = -16  # here unsigned 16 bit
         CHANNELS = 2   # 1 is mono, 2 is stereo
         BUFFER = 1024  # audio buffer size, number of samples

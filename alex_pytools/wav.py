@@ -1,3 +1,7 @@
+"""
+Handle wav format.
+python3 translation
+"""
 import logging
 import numpy as np
 import struct
@@ -93,8 +97,8 @@ class Wav:
         """
         logging.debug( "Updating header to match new data size: %s" % nNewDataSize )
         self.nDataSize = int( nNewDataSize )
-        self.nNbrSample = int( self.nDataSize * 8 / self.nNbrChannel / self.nNbrBitsPerSample )
-        self.rDuration = self.nDataSize / float( self.nAvgBytesPerSec )        
+        self.nNbrSample = int( self.nDataSize * 8 // self.nNbrChannel // self.nNbrBitsPerSample )
+        self.rDuration = self.nDataSize // float( self.nAvgBytesPerSec )        
         logging.debug( "Updating header to match new data size: new duration: %f" % self.rDuration )
     
     def updateHeaderSizeFromDataLength( self ):
@@ -102,15 +106,15 @@ class Wav:
         Update header information relative to the data in current self.data
         NB: updateHeaderComputedValues() needs to be called before that if you've changed your header properties
         """
-        self.updateHeaderSize( int( len( self.data ) * self.nNbrBitsPerSample / 8 ) )
+        self.updateHeaderSize( int( len( self.data ) * self.nNbrBitsPerSample // 8 ) )
     # updateHeaderSizeFromDataLength - end
     
     def updateHeaderComputedValues( self ):
         """
         Update variable that are computed from properties
         """
-        self.nAvgBytesPerSec = int( self.nNbrChannel*self.nSamplingRate*self.nNbrBitsPerSample/8 )
-        self.nSizeBlockAlign = int( self.nNbrChannel*self.nNbrBitsPerSample/8 )
+        self.nAvgBytesPerSec = int( self.nNbrChannel*self.nSamplingRate*self.nNbrBitsPerSample//8 )
+        self.nSizeBlockAlign = int( self.nNbrChannel*self.nNbrBitsPerSample//8 )
         self.dataType = Wav.getDataType( self.nNbrBitsPerSample )
     # updateHeaderComputedValue - end
     
@@ -217,9 +221,9 @@ class Wav:
             logging.error( "Can't load '%s', err: %s" % (strFilename, err) )
             return False
         # look for the header part
-        file.seek( 8L, 0 )
+        file.seek( 8, 0 )
         self.strFormatTag = file.read( 8 )
-        if( self.strFormatTag != "WAVEfmt " ):
+        if( self.strFormatTag.decode() != "WAVEfmt " ):
             file.close()
             logging.error( "Unknown format: '%s'" % self.strFormatTag )
             return False
@@ -239,18 +243,18 @@ class Wav:
         self.nNbrBitsPerSample  = struct.unpack_from( "h", file.read( 2 ) )[0] # Digits of quantization (usually 32, 24, 16, 8). I wonder if this is, for example, 5 ..?
         
         strDataTag = file.read( 4 )
-        if( strDataTag != "data" ):
+        if( strDataTag.decode() != "data" ):
             if( strDataTag == "LIST" ):
                 self.readListData( file, bQuiet = bQuiet )
                 strDataTag = file.read( 4 )
 
-        if( strDataTag != "data" ):
+        if( strDataTag.decode() != "data" ):
             if( ord(strDataTag[0]) == 0x16 and ord(strDataTag[1]) == 0x0 and ord(strDataTag[2]) == 0x10 and ord(strDataTag[3]) == 0x0 ):
                 logging.warning( "Exotic header found, trying to patch it..." )
                 # parecord generate another flavoured head, weird...
                 file.seek( 20, 1 )
                 strDataTag = file.read( 4 )
-        if( strDataTag != "data" ):
+        if( strDataTag.decode() != "data" ):
             nCurrentPos = file.tell()
             logging.error( "Unknown data chunk name: '%s' (0x%x 0x%x 0x%x 0x%x) (at: %d) - opening failed" % (strDataTag, ord(strDataTag[0]), ord(strDataTag[1]), ord(strDataTag[2]), ord(strDataTag[3]), nCurrentPos - 4 ) )
             if( 1 ):
@@ -274,17 +278,17 @@ class Wav:
                 file.close()
                 return False
             
-            nNbrBytesPerSample = int( self.nNbrBitsPerSample / 8 )
+            nNbrBytesPerSample = int( self.nNbrBitsPerSample // 8 )
             nRealDataSize = len( self.data ) * nNbrBytesPerSample
             
             if( nRealDataSize != self.nDataSize ):
                 # try to decode info field at the end of the file
                 if( nRealDataSize > self.nDataSize ):
-                    nLenExtraData = int( (nRealDataSize-self.nDataSize) / nNbrBytesPerSample )
+                    nLenExtraData = int( (nRealDataSize-self.nDataSize) // nNbrBytesPerSample )
                     for i in range(nLenExtraData):
-                        logging.debug( "After data %d: %d 0x%x (%c%c)" % (i, self.data[self.nDataSize/nNbrBytesPerSample+i], self.data[self.nDataSize/nNbrBytesPerSample+i],self.data[self.nDataSize/nNbrBytesPerSample+i]&0xFF,(self.data[self.nDataSize/nNbrBytesPerSample+i]>>8)&0xFF) )                    
+                        logging.debug( "After data %d: %d 0x%x (%c%c)" % (i, self.data[self.nDataSize//nNbrBytesPerSample+i], self.data[self.nDataSize//nNbrBytesPerSample+i],self.data[self.nDataSize//nNbrBytesPerSample+i]&0xFF,(self.data[self.nDataSize//nNbrBytesPerSample+i]>>8)&0xFF) )                    
 
-                    if( self.data[self.nDataSize/nNbrBytesPerSample] == 0x494c and self.data[self.nDataSize/nNbrBytesPerSample+1] == 0x5453  ):
+                    if( self.data[self.nDataSize//nNbrBytesPerSample] == 0x494c and self.data[self.nDataSize//nNbrBytesPerSample+1] == 0x5453  ):
                         # "LIST"
                         nOffsetFromEnd = nLenExtraData*nNbrBytesPerSample - 4
                         if not bQuiet: logging.warning( "Raw info field is present (at offset from end: %d (0x%x))" % (nOffsetFromEnd,nOffsetFromEnd) )
@@ -292,7 +296,7 @@ class Wav:
                         nReadSize = self.readListData(file)
                         nReadSize += 8
                         nRealDataSize -= nReadSize
-                        self.data = self.data[:-int((nReadSize)/nNbrBytesPerSample)]
+                        self.data = self.data[:-int((nReadSize)//nNbrBytesPerSample)]
             
             if( nRealDataSize != self.nDataSize ):
                 if not bQuiet: logging.warning( "In '%s', effective data is different than information from header... changing header... (real: %d, header: %d)" % (strFilename,nRealDataSize,self.nDataSize) )
@@ -327,7 +331,7 @@ class Wav:
         
         self.data = np.fromfile( file, dtype=self.dataType )
         
-        self.nDataSize = int( len(self.data) * nNbrBitsPerSample/8 )
+        self.nDataSize = int( len(self.data) * nNbrBitsPerSample//8 )
         
         self.updateHeaderSize( self.nDataSize )
         
@@ -398,7 +402,7 @@ class Wav:
             data = np.array( data, dtype = self.dataType )
         if( bAddBeginOfDataChunk ):
             file.write( "data" )
-            file.write( struct.pack( "I", len(data)*self.nNbrBitsPerSample/8 ) )
+            file.write( struct.pack( "I", len(data)*self.nNbrBitsPerSample//8 ) )
         data.tofile( file )
     # writeSpecificData - end
     
@@ -445,11 +449,11 @@ class Wav:
         newWav.copyHeader( self )
         newWav.nNbrChannel = 1
         newWav.updateHeaderComputedValues()        
-        newWav.updateHeaderSize( self.nDataSize * newWav.nNbrChannel / self.nNbrChannel )
+        newWav.updateHeaderSize( self.nDataSize * newWav.nNbrChannel // self.nNbrChannel )
         
         newData = []
         idx = nNumChannel # positionnate on good channel
-        nIncIdx = int( (self.nNbrChannel) / newWav.nNbrChannel )
+        nIncIdx = int( (self.nNbrChannel) // newWav.nNbrChannel )
         
         newData = self.data[nNumChannel::nIncIdx]
 
@@ -468,7 +472,7 @@ class Wav:
         return False on error
         """
         nNbrData = len(anValue) 
-        nNbrSample = nNbrData/self.nNbrChannel
+        nNbrSample = nNbrData//self.nNbrChannel
         if( self.nNbrChannel*nNbrSample != nNbrData ):
             logging.error( "You should provide a number of data multiple of you channel number ! (data:%d, nbrChannel: %d)" % ( nNbrData, self.nNbrChannel ) )
             return False
@@ -492,13 +496,13 @@ class Wav:
         return False on error
         """
         nNbrDataSize = len(anValue) 
-        nNbrSample = nNbrDataSize/self.nNbrChannel
+        nNbrSample = nNbrDataSize//self.nNbrChannel
         if( self.nNbrChannel*nNbrSample != nNbrDataSize ):
             logging.error( "You should provide a number of data multiple of your channel number ! (data size:%d, nbrChannel: %d)" % ( nNbrDataSize, self.nNbrChannel ) )
             return False
         # update header:
-        self.rDuration += float(nNbrSample)/self.nSamplingRate        
-        self.nDataSize += int( nNbrDataSize*self.nNbrBitsPerSample/8 )
+        self.rDuration += float(nNbrSample)//self.nSamplingRate        
+        self.nDataSize += int( nNbrDataSize*self.nNbrBitsPerSample//8 )
         self.nNbrSample += nNbrSample
         # update data:
         #~ self.dataUnpacked.append( anValue )
@@ -510,7 +514,7 @@ class Wav:
         for i in range( nNbrDataSize ):
             newData += struct.pack( strFormat, anValue[i] )
         
-        nInsertPoint = nOffset*self.nNbrChannel*self.nNbrBitsPerSample/8
+        nInsertPoint = nOffset*self.nNbrChannel*self.nNbrBitsPerSample//8
         self.data = self.data[:nInsertPoint] + newData + self.data[nInsertPoint:]
 
         return True
@@ -525,7 +529,7 @@ class Wav:
         return False on error
         """
         nNbrElementNew = len(anValue) 
-        nNbrSampleNew = int(nNbrElementNew/self.nNbrChannel)
+        nNbrSampleNew = int(nNbrElementNew//self.nNbrChannel)
         
         logging.info( "Replacing %d samples (nbr element:%d)" % (nNbrSampleNew,nNbrElementNew) )
         if( self.nNbrChannel*nNbrSampleNew != nNbrElementNew ):
@@ -555,10 +559,10 @@ class Wav:
         """
         nNbrDataSize = nNbrSample * self.nNbrChannel
         # update header:
-        self.nDataSize -= int( nNbrDataSize*self.nNbrBitsPerSample/8 )
-        self.rDuration -= float(nNbrSample)/self.nSamplingRate        
+        self.nDataSize -= int( nNbrDataSize*self.nNbrBitsPerSample//8 )
+        self.rDuration -= float(nNbrSample)//self.nSamplingRate        
         self.nNbrSample -= nNbrSample
-        self.data = self.data[:nOffset*self.nNbrChannel*self.nNbrBitsPerSample/8] + self.data[((nOffset+nNbrSample)*self.nNbrChannel*self.nNbrBitsPerSample/8):]
+        self.data = self.data[:nOffset*self.nNbrChannel*self.nNbrBitsPerSample//8] + self.data[((nOffset+nNbrSample)*self.nNbrChannel*self.nNbrBitsPerSample//8):]
         return True
     # delData - end
     
@@ -590,7 +594,7 @@ class Wav:
         if( nFirstNonSilenceIndex == -1 ):
             logging.warning( "This sound seems to have only silence!!!" )
             nFirstNonSilenceIndex = len(self.data) - 1
-        nNumFirstSample = (nFirstNonSilenceIndex/self.nNbrChannel)*self.nNbrChannel
+        nNumFirstSample = (nFirstNonSilenceIndex//self.nNbrChannel)*self.nNbrChannel
         nNbrWantedSilenceSample = rTimeAtBegin * self.nSamplingRate
         if( nNbrWantedSilenceSample > nNumFirstSample ):
             # add silence:
@@ -833,7 +837,7 @@ class Wav:
                 # all remaining sound are silence!
                 break
             nFirstNonSilenceIndex += nCurrentPos
-            nNumFirstSample = nFirstNonSilenceIndex/self.nNbrChannel
+            nNumFirstSample = nFirstNonSilenceIndex//self.nNbrChannel
             print( "INF: sound.Wav.split: found a sound at sample %d" % nNumFirstSample )
             nCurrentPos = nFirstNonSilenceIndex # so at the end, we're stopping
             
@@ -863,14 +867,14 @@ class Wav:
             # each time we're out, we've got a silence or we're at the end => new split
             if( nFirstSilenceIndex == -1 ):
                 break
-            nNumLastSample = nFirstSilenceIndex/self.nNbrChannel
+            nNumLastSample = nFirstSilenceIndex//self.nNbrChannel
             print( "INF: sound.Wav.split: found the end of that sound at sample %d" % nNumLastSample )
             if( nNumLastSample - nNumFirstSample > 4000 ):
                 w = Wav()
                 w.copyHeader( self )
                 w.data = np.copy(self.data[nNumFirstSample*self.nNbrChannel:nNumLastSample*self.nNbrChannel])
                 nPeakMax = max( max( w.data ), -min( w.data ) )
-                if( nPeakMax > self.getSampleMaxValue() / 8 ): # remove glitch sound
+                if( nPeakMax > self.getSampleMaxValue() // 8 ): # remove glitch sound
                     w.updateHeaderSizeFromDataLength()
                     print( "INF: sound.Wav.split: new split of %5.2fs" % w.rDuration )
                     aSplitted.append( w )

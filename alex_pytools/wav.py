@@ -4,6 +4,7 @@ python3 translation
 """
 import logging
 import numpy as np
+import os
 import struct
 import time
 
@@ -160,7 +161,12 @@ class Wav:
         logging.debug( "nSizeOfSectionChunck: %d"  % nSizeOfSectionChunck )
         data = file.read( 4 )
         #print debug.dumpHexa( data )
-        if( data[0] == 'I' and data[3] == 'O' ):
+        if not bQuiet: print( "DBG: readListData: data: %s" % str(data) )
+        if not bQuiet: print( "DBG: readListData: data: 0x%x" % (data[0] ) )
+        if( (data[0] == 'I' and data[3] == 'O')
+            or (data[0] == ord('I') and data[1] == ord('D') and data[2] == ord('3') ) # audacity tag is ID3
+        ):
+            if not bQuiet: print( "DBG: reading info file, size chunk: %s" % nSizeOfSectionChunck )
             self.readInfoData( file, nSizeOfSectionChunck - 4, bQuiet = bQuiet )
             return nSizeOfSectionChunck
         return 0
@@ -179,28 +185,31 @@ class Wav:
             "ICMT": "Comments",
             "ICRD": "Date",
             "ISFT": "Software",
+            "ISFT": "Software",
         }
         
         nCpt = 0
+        bQuiet = False
         
         while( nCpt < nChunckSize ):
+            if not bQuiet: print( "DBG: readInfoData: nCpt: %d, nChunckSize: %d" % (nCpt,nChunckSize) )
             strFieldName = file.read( 4 ) 
             nCpt += 4
             if( not bQuiet ):
-                logging.debug( "strFieldName: '%s'" % strFieldName )
+                print( "strFieldName: '%s'" % strFieldName )
             nFieldDataSize = struct.unpack_from( "i", file.read( 4 ) )[0] 
             nCpt += 4
             if( ( nFieldDataSize % 2 ) == 1 ):
                 nFieldDataSize += 1 # some software doesn't output the padded size => padding
             if( not bQuiet ):
-                logging.debug( "nFieldDataSize: %s" % nFieldDataSize )
+                print( "nFieldDataSize: %s" % nFieldDataSize )
             strFieldContents = file.read( nFieldDataSize ) 
             nCpt += nFieldDataSize
             
             while( strFieldContents[len(strFieldContents)-1] == '\0' ):
                 strFieldContents = strFieldContents[:-1]
             if( not bQuiet ):
-                logging.debug( "strFieldContents: '%s'" % strFieldContents )
+                print( "strFieldContents: '%s'" % strFieldContents )
             self.info[aDictConvNameField[strFieldName]] = strFieldContents
             
     # readInfoData - end
@@ -221,7 +230,7 @@ class Wav:
             logging.error( "Can't load '%s', err: %s" % (strFilename, err) )
             return False
         # look for the header part
-        file.seek( 8, 0 )
+        file.seek( 8, os.SEEK_SET )
         self.strFormatTag = file.read( 8 )
         if( self.strFormatTag.decode() != "WAVEfmt " ):
             file.close()
@@ -243,6 +252,7 @@ class Wav:
         self.nNbrBitsPerSample  = struct.unpack_from( "h", file.read( 2 ) )[0] # Digits of quantization (usually 32, 24, 16, 8). I wonder if this is, for example, 5 ..?
         
         strDataTag = file.read( 4 )
+        
         if( strDataTag.decode() != "data" ):
             if( strDataTag == "LIST" ):
                 self.readListData( file, bQuiet = bQuiet )
@@ -283,20 +293,28 @@ class Wav:
             
             if( nRealDataSize != self.nDataSize ):
                 # try to decode info field at the end of the file
+                if not bQuiet: print("INF: info field found at the end of the file...")
                 if( nRealDataSize > self.nDataSize ):
                     nLenExtraData = int( (nRealDataSize-self.nDataSize) // nNbrBytesPerSample )
+                    if not bQuiet: print("INF: info field: nLenExtraData: %s" % nLenExtraData)
                     for i in range(nLenExtraData):
-                        logging.debug( "After data %d: %d 0x%x (%c%c)" % (i, self.data[self.nDataSize//nNbrBytesPerSample+i], self.data[self.nDataSize//nNbrBytesPerSample+i],self.data[self.nDataSize//nNbrBytesPerSample+i]&0xFF,(self.data[self.nDataSize//nNbrBytesPerSample+i]>>8)&0xFF) )                    
+                        if not bQuiet:  print( "After data %d: %d 0x%x (%c%c)" % (i, self.data[self.nDataSize//nNbrBytesPerSample+i], self.data[self.nDataSize//nNbrBytesPerSample+i],self.data[self.nDataSize//nNbrBytesPerSample+i]&0xFF,(self.data[self.nDataSize//nNbrBytesPerSample+i]>>8)&0xFF) )                    
 
-                    if( self.data[self.nDataSize//nNbrBytesPerSample] == 0x494c and self.data[self.nDataSize//nNbrBytesPerSample+1] == 0x5453  ):
+                    if( (self.data[self.nDataSize//nNbrBytesPerSample] == 0x494c and self.data[self.nDataSize//nNbrBytesPerSample+1] == 0x5453)
+                        or (self.data[self.nDataSize//nNbrBytesPerSample] == 0x6469) # python3 or from audacity ?
+                        ):
                         # "LIST"
                         nOffsetFromEnd = nLenExtraData*nNbrBytesPerSample - 4
                         if not bQuiet: logging.warning( "Raw info field is present (at offset from end: %d (0x%x))" % (nOffsetFromEnd,nOffsetFromEnd) )
                         file.seek( -nOffsetFromEnd, os.SEEK_END )
-                        nReadSize = self.readListData(file)
-                        nReadSize += 8
-                        nRealDataSize -= nReadSize
-                        self.data = self.data[:-int((nReadSize)//nNbrBytesPerSample)]
+                        if 0:
+                            nReadSize = self.readListData(file, bQuiet=bQuiet)
+                            nReadSize += 8
+                            nRealDataSize -= nReadSize
+                            self.data = self.data[:-int((nReadSize)//nNbrBytesPerSample)]
+                        else:
+                            print("WRN: bug due to python3 with extra data => loading infos might fail. destroying them and removing from wav")
+                            nRealDataSize = self.nDataSize
             
             if( nRealDataSize != self.nDataSize ):
                 if not bQuiet: logging.warning( "In '%s', effective data is different than information from header... changing header... (real: %d, header: %d)" % (strFilename,nRealDataSize,self.nDataSize) )
@@ -367,13 +385,13 @@ class Wav:
             - bAddBeginOfDataChunk: should be write data chunk in this method ?
             - nDataSize: specific data to write in headers (instead of object current one)
         """
-        file.write( "RIFF" )
+        file.write( b"RIFF" )
         if( nDataSize == -1 ):
             nDataSize = self.nDataSize # default use data size from object
         file.write( struct.pack( "I", 4 + nDataSize + 44 + 4 - 16 ) )
         
-        file.write( "WAVE" )
-        file.write( "fmt " )
+        file.write( b"WAVE" )
+        file.write( b"fmt " )
         file.write( struct.pack( "I", 16 ) )
         file.write( struct.pack( "h", 1) ) # self.nWaveTypeFormat
         file.write( struct.pack( "h", self.nNbrChannel) )
@@ -383,7 +401,7 @@ class Wav:
         file.write( struct.pack( "h", self.nNbrBitsPerSample) )        
         
         if( bAddBeginOfDataChunk ):
-            file.write( "data" )
+            file.write( b"data" )
             file.write( struct.pack( "I", nDataSize ) )
     # writeHeader - end
     

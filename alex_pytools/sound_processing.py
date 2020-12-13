@@ -4,7 +4,9 @@ process big wav file, cut them...
 import wav
 
 def autocut(wavfile):
-    w = wav.Wav(wavfile)
+    w = wav.Wav(wavfile,bQuiet=False)
+    print(w)
+    w.write("/tmp/t.wav")
     
     
 if __name__ == "__main__":

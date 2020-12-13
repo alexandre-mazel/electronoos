@@ -14,14 +14,17 @@ class SoundPlayer:
     """
     
     def __init__( self ):
-        FREQ = 18000   # play with this for best sound
+        self.changePlayFreq()
+        
+    def changePlayFreq( self, newFreq = 44100 ):
+        FREQ = 48000   # changing that can change the playing of some wav
         BITSIZE = -16  # here unsigned 16 bit
         CHANNELS = 2   # 1 is mono, 2 is stereo
         BUFFER = 1024  # audio buffer size, number of samples
 
         pg.mixer.init(FREQ, BITSIZE, CHANNELS, BUFFER)
         
-        self.listPreloadedSound = {}
+        self.listPreloadedSound = {}        
         
     def loadFile( self, strFilename ):
         """

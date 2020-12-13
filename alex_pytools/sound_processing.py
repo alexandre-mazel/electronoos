@@ -6,7 +6,13 @@ import wav
 def autocut(wavfile):
     w = wav.Wav(wavfile,bQuiet=False)
     print(w)
-    w.write("/tmp/t.wav")
+    #~ w.write("/tmp/t.wav")
+    seq = w.split(rSilenceTresholdPercent=0.6)
+    for i,s in enumerate(seq):
+        s.normalise()
+        s.write("/tmp/s%03d.wav" % i)
+            
+    
     
     
 if __name__ == "__main__":

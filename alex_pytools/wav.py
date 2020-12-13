@@ -8,6 +8,60 @@ import os
 import struct
 import time
 
+def findFirstValueHigher( data, limit ):
+    """
+    find the first value higher than a limit (in absolute value). 
+    return -1 if no value higher in the array
+    """
+    # NB: argmax could return 0 if all remaining sample are equal to zero (the index of equal value are the one of the first element)
+    # min( np.argmax( self.data>nLimit ), np.argmax( self.data<-nLimit ) ); => pb if no neg or no positive value => 0 => min => 0 and so we think there's no value, even if other sign has some # eg: [15,15,-1,-1] and limit = 2    
+    # for long sound with a lot of silence and noise, it's faster to recode it having a return well placed.
+    idx = np.argmax( np.abs(data)>limit );
+    if( abs(data[idx])<= limit ):
+        return -1;
+    return idx;    
+# findFirstValueHigher - end
+
+def findFirstTrueValue( data ):
+    """
+    find the first value true.
+    return -1 if no value true in the array
+    """
+    #~ idx = np.argmax( data );
+    #~ if( not data[idx] ):
+        #~ return -1;
+    #~ return idx;
+    
+    # for long sound with a lot of silence and noise, it's faster to recode it having a return well placed. (8sec => 0.052sec)
+    n = len(data);
+    i = 0;    
+    while( i < n ):
+        if( data[i] ):
+            return i;
+        i += 1;
+    return -1;    
+# findFirstTrueValue - end
+
+def findFirstFalseValue( data ):
+    """
+    find the first value true.
+    return -1 if no value true in the array
+    """
+    #~ idx = np.argmin( data ); 
+    #~ if( data[idx] ):
+        #~ return -1;
+    #~ return idx;
+    
+    # argmin seems far less efficient than argmax...   (and seems to compute all the list)
+    n = len(data);
+    i = 0;    
+    while( i < n ):
+        if( not data[i] ):
+            return i;
+        i += 1;
+    return -1;
+# findFirstFalseValue - end 
+
 class Wav:
     # load and extract properties from a wav
     """
@@ -313,8 +367,9 @@ class Wav:
                             nRealDataSize -= nReadSize
                             self.data = self.data[:-int((nReadSize)//nNbrBytesPerSample)]
                         else:
-                            print("WRN: bug due to python3 with extra data => loading infos might fail. destroying them and removing from wav")
+                            print("WRN: bug due to python3 with extra data => loading infos might fail. destroying them and removing from wav (real data size: %d, self.nDataSize: %d, data.size: %d" % (nRealDataSize,self.nDataSize,len(self.data)) )
                             nRealDataSize = self.nDataSize
+                            self.data = self.data[:self.nDataSize//nNbrBytesPerSample]
             
             if( nRealDataSize != self.nDataSize ):
                 if not bQuiet: logging.warning( "In '%s', effective data is different than information from header... changing header... (real: %d, header: %d)" % (strFilename,nRealDataSize,self.nDataSize) )
@@ -419,7 +474,7 @@ class Wav:
         if( not isinstance( data, np.ndarray ) ):
             data = np.array( data, dtype = self.dataType )
         if( bAddBeginOfDataChunk ):
-            file.write( "data" )
+            file.write( b"data" )
             file.write( struct.pack( "I", len(data)*self.nNbrBitsPerSample//8 ) )
         data.tofile( file )
     # writeSpecificData - end
@@ -776,7 +831,9 @@ class Wav:
         logging.info( "nCurrentMax: %s" % nCurrentMax )
         logging.info( "nWantedMax: %s" % nWantedMax )            
         logging.info( "applying a %f ratio to the whole sound" % rRatio )
-        self.data *= rRatio  # another option is to make a np.round(self.data*rRatio), but it's perhaps less linear (on a linear elevation for example)
+        #self.data *= rRatio  # another option is to make a np.round(self.data*rRatio), but it's perhaps less linear (on a linear elevation for example)
+        self.data = self.data*rRatio
+        self.data = self.data.astype(Wav.getDataType(self.nNbrBitsPerSample))
         return True
     # normalise - end
     
@@ -856,7 +913,7 @@ class Wav:
                 break
             nFirstNonSilenceIndex += nCurrentPos
             nNumFirstSample = nFirstNonSilenceIndex//self.nNbrChannel
-            print( "INF: sound.Wav.split: found a sound at sample %d" % nNumFirstSample )
+            print( "INF: sound.Wav.split: found a sound at sample %d (t:%5.3fs) (value:%d)" % (nNumFirstSample,nNumFirstSample/self.nSamplingRate,self.data[nFirstNonSilenceIndex]) )
             nCurrentPos = nFirstNonSilenceIndex # so at the end, we're stopping
             
             # then find end

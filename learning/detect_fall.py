@@ -218,8 +218,9 @@ def isDeboutHandCoded( sk, bOnlyTorso = False, bVerbose = False ):
             #~ if bVerbose: print("lenLimbs: %s" % str(lenLimbs) )
             #~ rLenLegs = (lenLimbs[0][0] +lenLimbs[1][0]) / 2
             rLenLegs = sk.getAvgLenLeg()
-            bNotBumOnGround = (avg_hip[1] + (rLenLegs*0.75)) < rLowest
-            if bVerbose: print("avg hip: %5.1f, lowest: %5.1f, rLenLegs: %5.1f, bNotBum: %s" % (avg_hip[1],rLowest,rLenLegs, bNotBumOnGround) )
+            if rLenLegs != None:
+                bNotBumOnGround = (avg_hip[1] + (rLenLegs*0.75)) < rLowest
+                if bVerbose: print("avg hip: %5.1f, lowest: %5.1f, rLenLegs: %5.1f, bNotBum: %s" % (avg_hip[1],rLowest,rLenLegs, bNotBumOnGround) )
     #~ return bNotBumOnGround
         
     # on veut etre sur => si hesitation, ne se prononces pas
@@ -232,6 +233,9 @@ def isDeboutHandCoded( sk, bOnlyTorso = False, bVerbose = False ):
         return 1
     if bDeboutFromTorsoAngle and bNotBumOnGround:
         return 1
+        
+    if bDeboutFromTorsoAngle == None and bNotBumOnGround == None and bDeboutFromArmsLegsHeight != None:
+        return bDeboutFromArmsLegsHeight
     return 0
         
         
@@ -320,7 +324,7 @@ def learn():
                     i += 1
             pred = np.array(pred)
             
-            print("diff on LEARN folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 96/345 mix hauteur bras et jambe et angle torse: 59/297=0.272 (seul torso: 68/345=0.197) avec bum: 19/297 (only torso et bum: 28/345=0.081)
+            print("diff on LEARN folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 96/345 mix hauteur bras et jambe et angle torse: 59/297=0.272 (seul torso: 68/345=0.197) avec bum: 19/297 (only torso et bum: 28/345=0.081) avec new avg len on bum: 16/297
         
         
         # test on test folder
@@ -367,7 +371,7 @@ def learn():
                 i += 1
         pred = np.array(pred)
         
-        print("diff on TEST folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 37/372 # 54/402 sans margin, 45/402 mix hauteur bras et jambe et angle torse:  11/361=0.030 (change seul torso: 16/402=0.039) avec bum: 19/361 (only torso et bum: 22/402=0.055)
+        print("diff on TEST folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 37/372 # 54/402 sans margin, 45/402 mix hauteur bras et jambe et angle torse:  11/361=0.030 (change seul torso: 16/402=0.039) avec bum: 19/361 (only torso et bum: 22/402=0.055) avec new avg len on bum: 14/361
         
     #~ from sklearn.externals import joblib        
     joblib.dump(classifier, 'detect_fall_classifier.pkl')
@@ -375,17 +379,24 @@ def learn():
 # learn - end
 
 def analyseFilenameInPath( strPath ):
+    """
+    Return False if user want to quit
+    """
+    print("INF: analyseFilenameInPath: strPath: %s" % strPath )
     op = cv2_openpose.CVOpenPose()
     clf = joblib.load('detect_fall_classifier.pkl')
     #~ skel = op.analyseFromFile(strImageFilename)
     listFile = sorted(  os.listdir(strPath) )
     i = 0
-    while i < len(listFile):
+    bContinue = True
+    while i < len(listFile) and bContinue:
         print("Analyse: %d/%d" % (i,len(listFile) ) )
         f = listFile[i]
         tf = strPath + f
         if os.path.isdir(tf):
-            analyseFilenameInPath(tf + os.sep)
+            bRet = analyseFilenameInPath(tf + os.sep)
+            if not bRet: return bRet
+            i += 1
             continue
         filename, file_extension = os.path.splitext(f)
         if ".png" in file_extension.lower() or ".jpg" in file_extension.lower(): 
@@ -414,7 +425,7 @@ def analyseFilenameInPath( strPath ):
                         txt += "?"
                 if 1:
                     txt += " / "
-                    #~ txt = "" #erase all other algorithms
+                    txt = "" #erase all other algorithms
                     ret = isDeboutHandCoded(skel,bVerbose=1,bOnlyTorso=True)
                     if ret == 0:
                         txt += "Fall"
@@ -436,9 +447,11 @@ def analyseFilenameInPath( strPath ):
             #skels.render(im, bRenderConfidenceValue=False)
             
             cv2.imshow("detected",im)
-            key = cv2.waitKey(0)
+            cv2.imwrite("/tmp/generated/" + 
+            key = cv2.waitKey(1)
             print(key)
             if key == ord('q') or key == 27:
+                bContinue = False
                 break
             if key == ord('p'):
                 i -= 5 # skip also some previous file not images, like skel... - crappy!
@@ -447,13 +460,15 @@ def analyseFilenameInPath( strPath ):
                 
         i += 1
     # while - end
+    
+    return bContinue
         
 #analyseFilenameInPath  - end
 
 if __name__ == "__main__":
-    learn()
+    #~ learn()
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/learn/couche/")
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/demo/")
-    analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test_frontal/")
-    #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test2/")
+    #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test_frontal2/")
+    analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/demo/")
     

@@ -143,9 +143,31 @@ class Skeleton:
         """
         return the average length of a complete leg
         """
-        todo si pas de chevilles prends la cuisse x 2 ou l'inverse, ou l'autre jambe...
-        se debrouille quoi !
-        a tester sur 86/1212
+        #~ todo si pas de chevilles prends la cuisse x 2 ou l'inverse, ou l'autre jambe...
+        #~ se debrouille quoi !
+        #~ a tester sur 86/1212
+        
+        legs = self.getLegs()
+        lenlegs = []
+        
+        for i in range(2):
+            if legs[i][0][2] > rThreshold and legs[i][1][2] > rThreshold and legs[i][2][2] > rThreshold:
+                l = lenPts(legs[i][0],legs[i][1])+lenPts(legs[i][1],legs[i][2])
+            elif legs[i][0][2] > rThreshold and legs[i][1][2] > rThreshold:
+                l = lenPts(legs[i][0],legs[i][1]) * 2
+            elif legs[i][1][2] > rThreshold and legs[i][2][2] > rThreshold:
+                l = lenPts(legs[i][1],legs[i][2]) * 2
+            else:
+                l = None
+            if l != None:
+                lenlegs.append(l)
+        if len(lenlegs) == 0:
+            return None
+        if len(lenlegs) == 1:
+            return lenlegs[0]
+        return (lenlegs[0]+lenlegs[1]) / 2
+                
+                
         
     def getLenLimbs(self,rThreshold = 0.2):
         """

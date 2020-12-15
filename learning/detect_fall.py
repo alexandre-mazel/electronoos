@@ -389,6 +389,7 @@ def analyseFilenameInPath( strPath ):
     listFile = sorted(  os.listdir(strPath) )
     i = 0
     bContinue = True
+    nCptGenerated = 0
     while i < len(listFile) and bContinue:
         print("Analyse: %d/%d" % (i,len(listFile) ) )
         f = listFile[i]
@@ -447,7 +448,12 @@ def analyseFilenameInPath( strPath ):
             #skels.render(im, bRenderConfidenceValue=False)
             
             cv2.imshow("detected",im)
-            cv2.imwrite("/tmp/generated/" + 
+            if 1:
+                # ffmpeg -r 10 -i %06d.png -vcodec libx264 -b:v 4M -b:a 1k test.mp4
+                cv2.imwrite("/generated/%06d.png" % nCptGenerated, im)  # NB: won't wok with sub folder (overwriting dest)
+                # pour un petit gif animé de l'image de 823 a 992
+                # ffmpeg -r 10 -i %06d.png -start_number 823 -vframes 169 -vf "fps=10,scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 output.gif
+                nCptGenerated += 1
             key = cv2.waitKey(1)
             print(key)
             if key == ord('q') or key == 27:

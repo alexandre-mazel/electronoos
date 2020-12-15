@@ -40,6 +40,7 @@ class SoundPlayer:
         
     def playFile( self, strFilename, bWaitEnd = True ):
         sound = self.loadFile( strFilename )
+        sound.set_volume(0.15) #temp: lower sound
         sound.play()
         # how often to check active playback
         frame_rate = 30

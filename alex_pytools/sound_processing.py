@@ -9,6 +9,44 @@ import time
 
 import speech_recognition #pip install speechrecognition
 
+def cleanStringAnsi128( txt, bChangeSpaceAndQuote = True ):
+    cleaned = ""
+    for c in txt:
+        newc=c
+        if ord(c)>=128:
+            oc = ord(c)
+            if oc == 0xe0 or oc == 0xe2:
+                newc = 'a'
+            elif oc == 0xe7:
+                newc = 'c'
+            elif oc == 0xe8 or oc == 0xe9 or oc == 0xea:
+                newc = 'e'
+            elif oc == 0xee:
+                newc = 'i'
+            elif oc == 0xf4:
+                newc = 'o'
+            else:
+                print("c: %s, 0x%x" % (c,ord(c)) )
+                newc = "_"
+        if bChangeSpaceAndQuote:
+            if c in [ ' ',"'",'"', '-']:
+                newc = '_'
+        cleaned += newc
+    return cleaned
+
+def cleanNameInFolder(strPath):
+    """
+    remove all not ascii 128 character in filename
+    """
+    listFile = sorted(  os.listdir(strPath) )
+    for f in listFile:
+        tf = strPath + f
+        cleaned = cleanStringAnsi128(f)
+        if cleaned != f:
+            print("INF: %s => %s" % (f,cleaned) )
+            os.rename(tf, strPath+cleaned)
+    
+
 def cleanText(rawResume):
     """ encode with bs4 for handle special character """
     soup = BeautifulSoup(rawResume)
@@ -101,36 +139,46 @@ def getSpeechInWav( strSoundFilename ):
     return retVal[0][0]
 
 def autocut(wavfile, rSilenceMinDuration = 0.3 ):
+    bPlaySound = 1
+    bAutoRename = 1
     w = wav.Wav(wavfile,bQuiet=False)
     print(w)
     #~ w.write("/tmp/t.wav")
     seq = w.split(rSilenceTresholdPercent=0.6,rSilenceMinDuration=rSilenceMinDuration)
     for i,s in enumerate(seq):
         s.normalise()
-        name = "/tmp/s%03d.wav" % i 
+        name = "/generated/s%03d.wav" % i 
         s.write(name)
-        if 0:
+        if bPlaySound:
             print("playing: %s" % name )
             pygame_tools.soundPlayer.playFile(name)
             time.sleep(0.5)
             
-        if 1:
+        if bAutoRename:
             txt = getSpeechInWav(name)
             newname = name.replace(".wav", "__" + txt[:100]+".wav")
+            newname = cleanStringAnsi128(newname)
             os.rename(name, newname)
             
-    
+# autocut - end
     
     
 if __name__ == "__main__":
+    strPathRavir = "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut/"
     if 1:
         #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/rec2.wav")
-        autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/rec1_fx.wav")
+        #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/rec1_fx.wav")
         #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/rec2_fx.wav",rSilenceMinDuration=0.5)
+        autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/robot1.wav")
     if 0:
-        strFile = "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut/rec2/s032.wav"
+        strFile = strPathRavir + "/rec2/s032.wav"
         strFile = "/tmp/s032.wav"
         print(getSpeechInWav(strFile))
         pygame_tools.soundPlayer.playFile(strFile)
+        
+    if 0:
+        cleanNameInFolder(strPathRavir + "/rec1/")
+        cleanNameInFolder(strPathRavir + "/rec2/")
+        
     
     

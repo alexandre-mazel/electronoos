@@ -464,7 +464,7 @@ class CVOpenPose:
     def _loadModels( self ):
         t = time.time()
         self.net = cv2.dnn.readNetFromCaffe(self.strModelPath + self.protoFile, self.strModelPath + self.weightsFile)
-        if 0:
+        if 1:
             print("INF: Using CPU device")
             self.net.setPreferableBackend(cv2.dnn.DNN_TARGET_CPU)
         else:
@@ -753,7 +753,7 @@ if __name__ == "__main__":
     strFilename = "../data/multiple_humans.jpg"
     strFilename = "../data/human_upsidedown.png"
     if 1:
-        analyseOneFile(strFilename,bForceRecompute=False)
+        analyseOneFile(strFilename,bForceRecompute=True)
     elif 0:
         # recherche multi angle
         op = CVOpenPose()

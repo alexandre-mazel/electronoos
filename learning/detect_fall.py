@@ -450,7 +450,7 @@ def analyseFilenameInPath( strPath, bForceRecompute = False ):
             
             #skels.render(im, bRenderConfidenceValue=False)
             
-            cv2.imshow("detected",im)
+            #~ cv2.imshow("detected",im)
             if 0:
                 # ffmpeg -r 10 -i %06d.png -vcodec libx264 -b:v 4M -b:a 1k test.mp4
                 cv2.imwrite("/generated/%06d.png" % nCptGenerated, im)  # NB: won't wok with sub folder (overwriting dest)
@@ -459,16 +459,17 @@ def analyseFilenameInPath( strPath, bForceRecompute = False ):
                 # pour un petit gif anime de l'image de 823 a 992 # les de debut et fin ne fonctionnent pas => isoler dans un dossier
                 # ffmpeg -r 10 -i %06d.png -start_number 823 -vframes 169 -vf "fps=10,scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 output.gif
                 # => use of the "a (%d).png" techniques
-                
-            key = cv2.waitKey(1)
-            print(key)
-            if key == ord('q') or key == 27:
-                bContinue = False
-                break
-            if key == ord('p'):
-                i -= 5 # skip also some previous file not images, like skel... - crappy!
-                if i < 0:
-                    i = -1
+            
+            if 0:
+                key = cv2.waitKey(1)
+                print(key)
+                if key == ord('q') or key == 27:
+                    bContinue = False
+                    break
+                if key == ord('p'):
+                    i -= 5 # skip also some previous file not images, like skel... - crappy!
+                    if i < 0:
+                        i = -1
                 
         i += 1
     # while - end
@@ -483,5 +484,5 @@ if __name__ == "__main__":
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/demo/")
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test_frontal2/")
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/demo/")
-    analyseFilenameInPath("d:/exported/")
+    analyseFilenameInPath("/home/am/exported/")
     

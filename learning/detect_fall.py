@@ -384,7 +384,8 @@ def analyseFilenameInPath( strPath, bForceRecompute = False ):
     """
     print("INF: analyseFilenameInPath: strPath: %s" % strPath )
     op = cv2_openpose.CVOpenPose()
-    clf = joblib.load('detect_fall_classifier.pkl')
+    if 0:
+        clf = joblib.load('detect_fall_classifier.pkl')
     #~ skel = op.analyseFromFile(strImageFilename)
     listFile = sorted(  os.listdir(strPath) )
     i = 0
@@ -406,24 +407,26 @@ def analyseFilenameInPath( strPath, bForceRecompute = False ):
             for skel in skels:
                 feat = skelToFeatures(skel)
                 colorText = (255,255,255)
-                if isFullConf(feat):
-                    pred = clf.predict([feat])[0]
-                    if pred==0:
-                        txt = "Fall"
+                txt = ""
+                if 0:
+                    if isFullConf(feat):
+                        pred = clf.predict([feat])[0]
+                        if pred==0:
+                            txt = "Fall"
+                        else:
+                            txt = "Stand"
                     else:
-                        txt = "Stand"
-                else:
-                    txt = "?"
-                    
-                if 1:
-                    txt += " / "
-                    ret = isDeboutHandCoded(skel,bVerbose=1)
-                    if ret == 0:
-                        txt += "Fall"
-                    elif ret == 1:
-                        txt += "Stand"
-                    else:
-                        txt += "?"
+                        txt = "?"
+                        
+                    if 1:
+                        txt += " / "
+                        ret = isDeboutHandCoded(skel,bVerbose=1)
+                        if ret == 0:
+                            txt += "Fall"
+                        elif ret == 1:
+                            txt += "Stand"
+                        else:
+                            txt += "?"
                 if 1:
                     txt += " / "
                     txt = "" #erase all other algorithms

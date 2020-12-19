@@ -743,7 +743,7 @@ def loadSkeletonsFromOneFolder(strPath, nFilterNbrPoint = 6):
             
             
             
-
+#~ C:\Users\amazel\dev\git\electronoos>scp -r model* am@192.168.0.40:/home/am/dev/git/electronoos/
 
 strPathDeboutCouche = "/home/am/images_salon_debout_couche/"
 if os.name == "nt": strPathDeboutCouche = "D:/images_salon_debout_couche/"

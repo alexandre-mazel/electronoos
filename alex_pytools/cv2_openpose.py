@@ -200,6 +200,17 @@ class Skeleton:
         
     def createFromCoco( self, cocoListPoints ):
         self.listPoints = cocoListPoints
+        
+    def computeAverageConfidence( self ):
+        """
+        compute average and not just average on detected point
+        """
+        
+        rSum = 0.
+        for pt in self.listPoints:
+            rSum += pt[2]
+        avgC = rSum / len(self.listPoints)
+        return avgC
 
     def render( self, im, color = (0,255,255), bRenderConfidenceValue = True ):
         """
@@ -307,6 +318,17 @@ class Skeletons:
                 del self.aSkels[i]
                 continue
             i += 1
+            
+    def computeMaxAverageConfidence( self ):
+        """
+        return confidence of the skeleton with maximum confidence
+        """
+        rMax = 0.
+        for sk in self.aSkels:
+            rVal = sk.computeAverageConfidence()
+            if rVal > rMax:
+                rMax = rVal
+        return rMax
             
     def save( self, filename ):
         print("INF: Skeletons, saving %s skeleton(s) to '%s'" % (len(self.aSkels),filename) )
@@ -620,7 +642,19 @@ class CVOpenPose:
             skels.load(strSkelFilename)
             return skels
         im = cv2.imread(strImageFile)
-        skels= self.analyse(im)
+        skels = self.analyse(im)
+        if len(skels.aSkels) == 0 or skels.computeMaxAverageConfidence() < 0.3:
+            # try inverted (no need to test each angles)
+            print("INF: analyseFromFile: trying reverted for '%s' ..." % strImageFile )
+            im = np.flipud(im)
+            skels2 = self.analyse(im)
+            for sk in skels2:
+                if sk.computeAverageConfidence() > 0.3:
+                    # invert all points upsidedown
+                    for i in range(len(sk.listPoints)):
+                        sk.listPoints[i] = sk.listPoints[i][0], im.shape[0] - sk.listPoints[i][1], sk.listPoints[i][2]
+                    skels.aSkels.append(sk)
+                    
         skels.save(strSkelFilename)
         return skels
     # analyseFromFile - end
@@ -638,7 +672,7 @@ def analyseOneFile( strFilename, bForceRecompute=False ):
         skels= op.analyse(im)
         #~ skel = op.analyse(im) # to test time taken
     else:
-        skels = op.analyseFromFile(strFilename)
+        skels = op.analyseFromFile(strFilename,bForceRecompute=bForceRecompute)
         im = cv2.imread(strFilename)
     skels.render(im)
     
@@ -717,9 +751,10 @@ if os.name == "nt": strPathDeboutCouche = "D:/images_salon_debout_couche/"
 if __name__ == "__main__":
     strFilename = "../data/alexandre.jpg"
     strFilename = "../data/multiple_humans.jpg"
+    strFilename = "../data/human_upsidedown.png"
     if 1:
-        analyseOneFile(strFilename)
-    elif 1:
+        analyseOneFile(strFilename,bForceRecompute=False)
+    elif 0:
         # recherche multi angle
         op = CVOpenPose()
         im = cv2.imread(strFilename)

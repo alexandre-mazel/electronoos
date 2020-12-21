@@ -19,6 +19,7 @@ import sklearn
 from sklearn import  svm
 import joblib
 import os
+import math
 
 import numpy as np
 
@@ -31,12 +32,29 @@ def div2(pt):
     for i in range(len(pt)):
         pt[i] /= 2
 
+def div2tuple(pt):
+    ptret = list(pt)
+    for i in range(len(pt)):
+        ptret[i] /= 2
+    return tuple(ptret)
+
+def mul2tuple(pt):
+    ptret = list(pt)
+    for i in range(len(pt)):
+        ptret[i] *= 2
+    return tuple(ptret)
+    
 def avg2(pt1,pt2):
     assert( len(pt1) == len(pt2) )
     a = []
     for i in range(len(pt1)):
         a.append( (pt1[i]+pt2[i])/2 )
     return a
+    
+def dist(p1,p2):
+    dx = p1[0] - p2[0]
+    dy = p1[1] - p2[1]
+    return math.sqrt(dx*dx+dy*dy)
         
 def isFullConf(triols, rThreshold = 0.2):
     """
@@ -46,6 +64,60 @@ def isFullConf(triols, rThreshold = 0.2):
         if triols[i] < rThreshold:
             return False
     return True
+    
+    
+class WorldMemory:
+    def __init__( self ):
+        self.facts = [] # list of fact, a fact is a pos, a ttl and a fact (here, just True or False)
+        
+    def update( self ):
+        """
+        get everything older
+        """
+        i = 0
+        while i < len(self.facts):
+            self.facts[i][1] -= 1
+            if self.facts[i][1] < 0:
+                print("ING: WorldMemory.update: erasing %d: %s" % (i,str(self.facts[i]) ) )
+                del self.facts[i]
+                continue
+            i += 1
+            
+                
+    def get( self, pos, rRadius = 5 ):
+        i = 0
+        while i < len(self.facts):
+            rDist = dist(self.facts[i][0],pos)
+            if rDist < rRadius:
+                self.facts[i][1] -= 1
+                if self.facts[i][1] < 0:
+                    print("ING: WorldMemory.get: erasing %d: %s" % (i,str(self.facts[i]) ) )
+                    del self.facts[i]
+                    continue
+                print("ING: WorldMemory.get: returning %d: %s (dist:%5.1f)" % (i,str(self.facts[i]), rDist ) )
+                return self.facts[i][2]
+            i += 1
+        return None
+    
+    
+    def set( self, pos, fact, rRadius = 5, nTTL = 5 ):
+        """
+        - rRadius: radius to identify if a new plot is a new one
+        """
+        i = 0
+        while i < len(self.facts):
+            rDist = dist(self.facts[i][0],pos)
+            if rDist < rRadius:
+                self.facts[i][0] = pos
+                self.facts[i][1] = nTTL
+                self.facts[i][2] = fact
+                print("ING: WorldMemory.set: updating %d to %s (dist:%5.1f)" % (i,str(self.facts[i]), rDist ) )
+                return
+            i += 1
+        self.facts.append([pos,nTTL, fact])
+        print("ING: WorldMemory.set: adding %d %s" % (len(self.facts)-1,str(self.facts[-1]) ) )
+        return
+# WorldMemory - end
 
 
 def skelToFeatures(sk):
@@ -80,17 +152,17 @@ def isDeboutHandCoded( sk, bOnlyTorso = False, bVerbose = False ):
     """
     
     neck = sk.listPoints[Skeleton.getNeckIndex()]
-        
-    lil = sk.getLegs()
-    if bVerbose: print("legs: %s" % str(lil))
+    
+    legsInfo = sk.getLegs()
+    if bVerbose: print("legs: %s" % str(legsInfo))
     
     bb = sk.getBB_Size()
     sto = sk.getStomach()
     
 
     
-    rh,rk,ra = lil[0] # hip, knee, ankle
-    lh,lk,la = lil[1]
+    rh,rk,ra = legsInfo[0] # hip, knee, ankle
+    lh,lk,la = legsInfo[1]
     
     avgFeets = [ ra[0]+la[0],ra[1]+la[1],ra[2]+la[2] ]
     div2(avgFeets)
@@ -221,6 +293,10 @@ def isDeboutHandCoded( sk, bOnlyTorso = False, bVerbose = False ):
             if rLenLegs != None:
                 bNotBumOnGround = (avg_hip[1] + (rLenLegs*0.75)) < rLowest
                 if bVerbose: print("avg hip: %5.1f, lowest: %5.1f, rLenLegs: %5.1f, bNotBum: %s" % (avg_hip[1],rLowest,rLenLegs, bNotBumOnGround) )
+                if legsInfo[0][2][2] < rThreshold and legsInfo[1][2][2] < rThreshold:
+                    if bVerbose: print("INF: no foot seen, reseting bNotBumOnGround" )
+                    # on ne voit aucun pied, soit ils ne sont pas a l'ecran soit il sont derriere, dans le doute, on prefere dire None
+                    bNotBumOnGround = None
     #~ return bNotBumOnGround
         
     # on veut etre sur => si hesitation, ne se prononces pas
@@ -236,6 +312,10 @@ def isDeboutHandCoded( sk, bOnlyTorso = False, bVerbose = False ):
         
     if bDeboutFromTorsoAngle == None and bNotBumOnGround == None and bDeboutFromArmsLegsHeight != None:
         return bDeboutFromArmsLegsHeight
+        
+    if bDeboutFromTorsoAngle != None and bNotBumOnGround == None:
+        return bDeboutFromTorsoAngle
+        
     return 0
         
         
@@ -324,7 +404,7 @@ def learn():
                     i += 1
             pred = np.array(pred)
             
-            print("diff on LEARN folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 96/345 mix hauteur bras et jambe et angle torse: 59/297=0.272 (seul torso: 68/345=0.197) avec bum: 19/297 (only torso et bum: 28/345=0.081) avec new avg len on bum: 16/297
+            print("diff on LEARN folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 96/345 mix hauteur bras et jambe et angle torse: 59/297=0.272 (seul torso: 68/345=0.197) avec bum: 19/297 (only torso et bum: 28/345=0.081) avec new avg len on bum: 16/297 # avec nouvel regle utilisation angle si pas bum: 19/297
         
         
         # test on test folder
@@ -371,40 +451,51 @@ def learn():
                 i += 1
         pred = np.array(pred)
         
-        print("diff on TEST folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 37/372 # 54/402 sans margin, 45/402 mix hauteur bras et jambe et angle torse:  11/361=0.030 (change seul torso: 16/402=0.039) avec bum: 19/361 (only torso et bum: 22/402=0.055) avec new avg len on bum: 14/361
+        print("diff on TEST folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 37/372 # 54/402 sans margin, 45/402 mix hauteur bras et jambe et angle torse:  11/361=0.030 (change seul torso: 16/402=0.039) avec bum: 19/361 (only torso et bum: 22/402=0.055) avec new avg len on bum: 14/364 # avec nouvel regle utilisation angle si pas bum: 9/364
         
     #~ from sklearn.externals import joblib        
     joblib.dump(classifier, 'detect_fall_classifier.pkl')
 
 # learn - end
 
-def analyseFilenameInPath( strPath, bForceRecompute = False ):
+def analyseFilenameInPath( strPath, bForceRecompute = False, bRender=True ):
     """
     Return False if user want to quit
     """
     print("INF: analyseFilenameInPath: strPath: %s" % strPath )
     op = cv2_openpose.CVOpenPose()
-    if 0:
+    if 1:
         clf = joblib.load('detect_fall_classifier.pkl')
     #~ skel = op.analyseFromFile(strImageFilename)
     listFile = sorted(  os.listdir(strPath) )
     i = 0
     bContinue = True
     nCptGenerated = 0
+    rThresholdAvg = 0.1
+    wm = WorldMemory()
     while i < len(listFile) and bContinue:
         print("Analyse: %d/%d" % (i,len(listFile) ) )
+        if i < 1500:
+            i += 1
+            continue
         f = listFile[i]
         tf = strPath + f
         if os.path.isdir(tf):
-            bRet = analyseFilenameInPath(tf + os.sep,bForceRecompute=bForceRecompute)
+            bRet = analyseFilenameInPath(tf + os.sep,bForceRecompute=bForceRecompute,bRender=bRender)
             if not bRet: return bRet
             i += 1
             continue
+        
         filename, file_extension = os.path.splitext(f)
         if ".png" in file_extension.lower() or ".jpg" in file_extension.lower(): 
             skels = op.analyseFromFile(tf,bForceRecompute=bForceRecompute)
             im = cv2.imread(tf)
             for skel in skels:
+                if 0:
+                    rAvg = skel.computeAverageConfidence()
+                    if rAvg < rThresholdAvg:
+                        continue
+                    
                 feat = skelToFeatures(skel)
                 colorText = (255,255,255)
                 txt = ""
@@ -431,6 +522,12 @@ def analyseFilenameInPath( strPath, bForceRecompute = False ):
                     txt += " / "
                     txt = "" #erase all other algorithms
                     ret = isDeboutHandCoded(skel,bVerbose=1,bOnlyTorso=True)
+                    bFromCache = 0
+                    if ret == None:
+                        ret = wm.get(skel.getNeckPos(),rRadius=20)
+                        if ret != None: bFromCache = 1
+                    else:
+                        wm.set(skel.getNeckPos(),ret,rRadius=20) # default is 5 ttl (1 in update and 1 in get)
                     if ret == 0:
                         txt += "Fall"
                         colorText = (80,80,255)
@@ -439,6 +536,10 @@ def analyseFilenameInPath( strPath, bForceRecompute = False ):
                         colorText = (255,80,80)
                     else:
                         txt += "?"
+                        
+                    if bFromCache: 
+                        colorText = mul2tuple(colorText)
+                        #~ txt = txt[0].lower() + txt[1:]
 
                 #render skel with color
                 skel.render(im, colorText,bRenderConfidenceValue=False)
@@ -448,9 +549,11 @@ def analyseFilenameInPath( strPath, bForceRecompute = False ):
                 renderCenteredText(im, txt, ( (bb[0]+bb[2]) // 2,bb[3]+18), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 3 )
                 renderCenteredText(im, txt, ( (bb[0]+bb[2]) // 2,bb[3]+18), cv2.FONT_HERSHEY_SIMPLEX, 0.6, colorText, 1 )
             
-            #skels.render(im, bRenderConfidenceValue=False)
+            # skels.render(im, bRenderConfidenceValue=False)
             
-            #~ cv2.imshow("detected",im)
+            wm.update()
+            if bRender: cv2.imshow("detected",im)
+            
             if 0:
                 # ffmpeg -r 10 -i %06d.png -vcodec libx264 -b:v 4M -b:a 1k test.mp4
                 cv2.imwrite("/generated/%06d.png" % nCptGenerated, im)  # NB: won't wok with sub folder (overwriting dest)
@@ -460,8 +563,8 @@ def analyseFilenameInPath( strPath, bForceRecompute = False ):
                 # ffmpeg -r 10 -i %06d.png -start_number 823 -vframes 169 -vf "fps=10,scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 output.gif
                 # => use of the "a (%d).png" techniques
             
-            if 0:
-                key = cv2.waitKey(1)
+            if bRender:
+                key = cv2.waitKey(0)
                 print(key)
                 if key == ord('q') or key == 27:
                     bContinue = False
@@ -479,10 +582,14 @@ def analyseFilenameInPath( strPath, bForceRecompute = False ):
 #analyseFilenameInPath  - end
 
 if __name__ == "__main__":
+    pathData = "/home/am/"
+    if os.name == "nt":  pathData = "d:/"
+    
     #~ learn()
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test/couche/", bForceRecompute=True)
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/demo/")
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test_frontal2/")
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/demo/")
-    analyseFilenameInPath("/home/am/exported/")
+    analyseFilenameInPath(pathData+"/exported/")
+    #~ analyseFilenameInPath(pathData+"/tmp2/")
     

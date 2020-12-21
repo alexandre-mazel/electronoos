@@ -96,6 +96,9 @@ class Skeleton:
         
     def getNeckIndex():
         return 1
+
+    def getNeckPos(self):
+        return [self.listPoints[1][0],self.listPoints[1][1]]
         
     def getLegs(self):
         legs = Skeleton.getLegsIndex()

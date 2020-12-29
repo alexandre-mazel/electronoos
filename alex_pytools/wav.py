@@ -668,11 +668,17 @@ class Wav:
             logging.warning( "This sound seems to have only silence!!!" )
             nFirstNonSilenceIndex = len(self.data) - 1
         nNumFirstSample = (nFirstNonSilenceIndex//self.nNbrChannel)*self.nNbrChannel
-        nNbrWantedSilenceSample = rTimeAtBegin * self.nSamplingRate
+        nNbrWantedSilenceSample = int(rTimeAtBegin * self.nSamplingRate)
         if( nNbrWantedSilenceSample > nNumFirstSample ):
             # add silence:
-            logging.info( "Adding %d sample at beginning (or end)" % nMissingSample )
             nMissingSample = nNbrWantedSilenceSample-nNumFirstSample
+            #~ logging.info( "Adding %d sample at beginning (or end)" % nMissingSample )
+            #~ print("DBG: ensureSilenceAtBegin: nNbrWantedSilenceSample: %s" % nNbrWantedSilenceSample )
+            #~ print("DBG: ensureSilenceAtBegin: nNumFirstSample: %s" % nNumFirstSample )
+            #~ print("DBG: ensureSilenceAtBegin: self.dataType: %s" % self.dataType )
+            #~ print("DBG: ensureSilenceAtBegin: self.data type: %s" % type(self.data) )
+            #~ print("DBG: ensureSilenceAtBegin: self.data nMissingSample: %s" % str(nMissingSample) )
+            #~ print("DBG: ensureSilenceAtBegin: self.data self.nNbrChannel: %s" % str(self.nNbrChannel) )
             self.data = np.concatenate( (np.zeros( nMissingSample*self.nNbrChannel, dtype=self.dataType ), self.data ) )
         elif( bRemoveIfTooMuch and nNbrWantedSilenceSample < nNumFirstSample ):
             # remove some

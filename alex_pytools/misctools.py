@@ -23,6 +23,12 @@ cd python-v4l2capture/
 sudo ./setup.py install
 """
 
+def assert_greater(x,y):
+    print( "%s >= %s ?" % (str(x),str(y)) )
+    if x<y:
+        assert(0)
+        
+
 def getPathData():
     """
     return the absolute path of electronooos/data
@@ -597,6 +603,66 @@ def testSound():
             print("duration: %5.3fs" % (time.time()-t) )
         
     time.sleep(1) # time to finish some sounds
+    
+    
+def levenshtein( a,b ):
+    """
+    Calculates the Levenshtein distance between a and b.
+    from http://hetland.org/coding/python/levenshtein.py
+    """
+
+    n, m = len(a), len(b)
+    if n > m:
+        # Make sure n <= m, to use O(min(n,m)) space
+        a,b = b,a
+        n,m = m,n
+
+    current = range(n+1)
+    for i in range(1,m+1):
+        previous, current = current, [i]+[0]*n
+        for j in range(1,n+1):
+            add, delete = previous[j]+1, current[j-1]+1
+            change = previous[j-1]
+            if a[j-1] != b[i-1]:
+                change = change + 1
+            current[j] = min(add, delete, change)
+
+    return current[n]
+# levenshtein - end
+
+def getPhoneticComparison( s1, s2 ):
+    """
+    return the phonetic equality between of two string: [0., .. 1.] : 0 completely different, from 0 to 1: the more ressembling, 1: equal]
+    """
+    import metaphone
+    #~ print metaphone.dm( unicode(s1) )
+    #~ print metaphone.dm( unicode(s2) )
+    try:
+        meta1 = metaphone.dm( s1 )[0]
+        meta2 = metaphone.dm( s2 )[0]
+    except BaseException as err:
+        print( "ERR: can't metaphone '%s' or '%s': err: %s" % (s1, s2, err ) )
+        meta1 = s1
+        meta2 = s2
+    if meta1 == meta2:
+        return 1.
+
+    rMidLen = ( len(meta1) + len( meta2 ) ) / 2;
+    if( rMidLen < 1 ):
+        return 0.
+    rDist = 0.9 - levenshtein( meta1, meta2 )/float(rMidLen)
+    if( rDist < 0. ):
+        rDist = 0.
+    return rDist
+# getPhoneticComparison - end
+
+def testPhoneticComparison():
+    assert_greater( getPhoneticComparison("Julien", "juliain"), 1. )
+    assert_greater( getPhoneticComparison("Dakar", "Daka"), 0.3 )
+    assert_greater( getPhoneticComparison("du pain", "Dupain"), 1. )
+    assert_greater( getPhoneticComparison("du pain", "Dublin"), 0.5 )
+    assert_greater( getPhoneticComparison("checkin please", "chicken please"), 0.99 ) # should be less than 1. !!!
+
      
     
 def autoTest():
@@ -607,8 +673,13 @@ def autoTest():
     check(smoothstep(1),1)
     check(smoothstep(2),1)
     
+    check(levenshtein("Alexandre", "Alexandre"),0)
+    check(levenshtein("Alexandre", "Alxendr"),3)
+    
+    testPhoneticComparison()
+    
     
 if __name__ == "__main__":
     autoTest()
     #~ viewSmoothstep()
-    testSound()
+    #~ testSound()

@@ -11,6 +11,37 @@ import os
 import time
 
 
+#~ print( levenshtein( "bateau", "batau" ) );
+#~ print( levenshtein( "bateau", "bataux" ) );
+#~ print( levenshtein( "KSTLPRSTNTTSTTSNS", "KSTPRKPM" ) );
+
+def isPhoneticEqual( s1, s2 ):
+    """
+    return the phonetic equality between of two string: [0., .. 1.] : 0 completely different, from 0 to 1: the more ressembling, 1: equal]
+    """
+    import metaphone
+    #~ print metaphone.dm( unicode(s1) )
+    #~ print metaphone.dm( unicode(s2) )
+    try:
+        meta1 = metaphone.dm( unicode(s1) )[0]
+        meta2 = metaphone.dm( unicode(s2) )[0]
+    except BaseException, err:
+        print( "ERR: can't metaphone '%s' or '%s': err: %s" % (s1, s2, err ) )
+        meta1 = s1
+        meta2 = s2
+    if meta1 == meta2:
+        return 1.
+
+    rMidLen = ( len(meta1) + len( meta2 ) ) / 2;
+    if( rMidLen < 1 ):
+        return 0.
+    rDist = 0.9 - levenshtein( meta1, meta2 )/float(rMidLen)
+    if( rDist < 0. ):
+        rDist = 0.
+    return rDist
+# isPhoneticEqual - end
+
+
 
 class Tts:
     

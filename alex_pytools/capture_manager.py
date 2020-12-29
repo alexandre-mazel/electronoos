@@ -272,8 +272,8 @@ def showAndSaveAllCameras( strSavePath = None,rThresholdDifferenceToSave =0.01):
     aCap = []
     nFirst = 0
     nLast = 8
-    if os.name == "nt": nFirst = 2
-    if os.name == "nt": nLast = 3
+    if os.name == "nt": nFirst = 1
+    if os.name == "nt": nLast = 2
     
     for i in range(nFirst,nLast):
         cap = cv2.VideoCapture(i) #or 0 + cv2.CAP_DSHOW

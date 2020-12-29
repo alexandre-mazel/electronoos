@@ -153,6 +153,8 @@ def isDeboutHandCoded( sk, bOnlyTorso = False, bVerbose = False ):
     
     neck = sk.listPoints[Skeleton.getNeckIndex()]
     
+    if bVerbose: print("neck: %s" % str(neck))
+    
     legsInfo = sk.getLegs()
     if bVerbose: print("legs: %s" % str(legsInfo))
     
@@ -181,6 +183,8 @@ def isDeboutHandCoded( sk, bOnlyTorso = False, bVerbose = False ):
     # NB: on n'arrivera jamais a voir que quelqu'un qui est assis ou couche' oriente' vers la camera est tombe'
     
     # si les mains ou a defaut les coudes sont plus hautes que les pieds ou a defaut les hanches
+    bDeboutFromArmsLegsHeight = None
+    
     if rw[2] > rThreshold:
         rHi = rw[:2]
     elif re[2] > rThreshold:
@@ -199,60 +203,62 @@ def isDeboutHandCoded( sk, bOnlyTorso = False, bVerbose = False ):
         else:
             lHi = None
         
-    if lHi == None and rHi == None:
-        return None
-        
-    if lHi == None:
-        hi = rHi
-    elif rHi == None:
-        hi = lHi
-    else:
-        hi = avg2(rHi,lHi)
-        
-        
-        
-    if ra[2] > rThreshold:
-        rLo = ra[:2]
-    elif rk[2] > rThreshold:
-        rLo = rk[:2]
-    else:
-        rLo = None
+        if lHi != None or rHi != None:
+            
+            if lHi == None:
+                hi = rHi
+            elif rHi == None:
+                hi = lHi
+            else:
+                hi = avg2(rHi,lHi)
+                
+                
+                
+            if ra[2] > rThreshold:
+                rLo = ra[:2]
+            elif rk[2] > rThreshold:
+                rLo = rk[:2]
+            else:
+                rLo = None
 
-    if la[2] > rThreshold:
-        lLo = la[:2]
-    elif lk[2] > rThreshold:
-        lLo = lk[:2]
-    else:
-        lLo = None
-        
-    if lLo == None and rLo == None:
-        return None
-        
-    if lLo == None:
-        lo = rLo
-    elif rLo == None:
-        lo = lLo
-    else:
-        lo = avg2(rLo,lLo)
-        
-    if bVerbose: print("rLo:%s,lLo:%s" % (rLo,lLo) )
-        
-    if bVerbose: print("hi:%s,lo:%s" % (hi,lo) )
-    
-    #~ return hi[1]<lo[1] # add a margin ?
-    
-    bb = sk.getBB_Size()
-    rMargin = bb[1]/4
+            if la[2] > rThreshold:
+                lLo = la[:2]
+            elif lk[2] > rThreshold:
+                lLo = lk[:2]
+            else:
+                lLo = None
+                
+            if lLo != None or rLo != None:
 
-    
-    bDeboutFromArmsLegsHeight = hi[1]+rMargin<lo[1] # WRN:  pixel Y are inverted (high pixel are smaller than lower)
+                if lLo == None:
+                    lo = rLo
+                elif rLo == None:
+                    lo = lLo
+                else:
+                    lo = avg2(rLo,lLo)
+                    
+                if bVerbose: print("rLo:%s,lLo:%s" % (rLo,lLo) )
+                    
+                if bVerbose: print("hi:%s,lo:%s" % (hi,lo) )
+                
+                #~ return hi[1]<lo[1] # add a margin ?
+                
+                bb = sk.getBB_Size()
+                rMargin = bb[1]/4
+
+                
+                bDeboutFromArmsLegsHeight = hi[1]+rMargin<lo[1] # WRN:  pixel Y are inverted (high pixel are smaller than lower)
         
-    
-    if bVerbose: print("rMargin:%5.2f, bDeboutFromArmsLegsHeight: %s"% (rMargin,bDeboutFromArmsLegsHeight) )
+                if bVerbose: print("rMargin:%5.2f, bDeboutFromArmsLegsHeight: %s"% (rMargin,bDeboutFromArmsLegsHeight) )
 
     bDeboutFromTorsoAngle = None
-    if rh[2] > rThreshold and lh[2] > rThreshold and neck[2] > rThreshold:
-        avg_hip = avg2(rh,lh)
+    if (rh[2] > rThreshold or lh[2] > rThreshold) and neck[2] > rThreshold:
+        if (rh[2] > rThreshold and lh[2] > rThreshold):
+            avg_hip = avg2(rh,lh)
+        elif rh[2] > rThreshold:
+            avg_hip = rh
+        else:
+            avg_hip = lh
         dx = avg_hip[0]-neck[0]
         dy = avg_hip[1]-neck[1]
         if abs(dx) < 0.1:
@@ -300,25 +306,39 @@ def isDeboutHandCoded( sk, bOnlyTorso = False, bVerbose = False ):
     #~ return bNotBumOnGround
         
     # on veut etre sur => si hesitation, ne se prononces pas
-    if not bOnlyTorso:
-        if bDeboutFromArmsLegsHeight != bDeboutFromTorsoAngle:
-            return None
+    if 0:
+        if not bOnlyTorso:
+            if bDeboutFromArmsLegsHeight != bDeboutFromTorsoAngle:
+                return None
+
+            
+        #~ if bDeboutFromArmsLegsHeight:
+        if bDeboutFromTorsoAngle == None and bNotBumOnGround:
+            return 1
+            
+        if bDeboutFromTorsoAngle and bNotBumOnGround:
+            return 1
+
+            
+        if bDeboutFromTorsoAngle == None and bNotBumOnGround == None and bDeboutFromArmsLegsHeight != None:
+            return bDeboutFromArmsLegsHeight
+            
+        if bDeboutFromTorsoAngle != None and bNotBumOnGround == None:
+            return bDeboutFromTorsoAngle
+            
+        return 0
         
-    #~ if bDeboutFromArmsLegsHeight:
-    if bDeboutFromTorsoAngle == None and bNotBumOnGround:
-        return 1
-    if bDeboutFromTorsoAngle and bNotBumOnGround:
-        return 1
         
-    if bDeboutFromTorsoAngle == None and bNotBumOnGround == None and bDeboutFromArmsLegsHeight != None:
-        return bDeboutFromArmsLegsHeight
-        
-    if bDeboutFromTorsoAngle != None and bNotBumOnGround == None:
-        return bDeboutFromTorsoAngle
-        
-    return 0
-        
-        
+    else:
+        if bDeboutFromTorsoAngle == bNotBumOnGround and bDeboutFromTorsoAngle == bDeboutFromArmsLegsHeight:
+            return bDeboutFromTorsoAngle
+        if bNotBumOnGround != None:
+            return bNotBumOnGround
+        if bDeboutFromTorsoAngle != None:
+            return bDeboutFromTorsoAngle        
+        if bDeboutFromArmsLegsHeight != None:
+            return bDeboutFromArmsLegsHeight
+        return None
     
         
         
@@ -380,18 +400,18 @@ def learn():
     if 1:
         # test
         pred = classifier.predict(features)
-        print("predicted: %s" % pred)
+        #~ print("predicted: %s" % pred)
         print("diff on learn: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) #1/80  sans avg hand/feet 3/158
         # test
         pred = classifier.predict(listDeboutFTotal[len(listCoucheF):] )
-        print("predicted: %s" % pred)
+        #~ print("predicted: %s" % pred)
         print("diff on extra debout: %d/%d" % (len(pred)-sum(pred),len(pred)) ) # count zeroes # 2/114  9/111
         
         if 1:
             # hand coded test
             pred = predictHandCoded(listCouche+listDebout)
             classes = [0]*len(listCouche) + [1]*len(listDebout) 
-            print("predicted: %s" % pred)
+            #~ print("predicted: %s" % pred)
             
             # remove None case
             pred = pred.tolist()
@@ -405,7 +425,7 @@ def learn():
             pred = np.array(pred)
             
             print("diff on LEARN folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 96/345 mix hauteur bras et jambe et angle torse: 59/297=0.272 (seul torso: 68/345=0.197) avec bum: 19/297 (only torso et bum: 28/345=0.081) avec new avg len on bum: 16/297 # avec nouvel regle utilisation angle si pas bum: 19/297
-        
+            # apres refactor: 37/366
         
         # test on test folder
         listCouche = cv2_openpose.loadSkeletonsFromOneFolder(cv2_openpose.strPathDeboutCouche+"fish/test/couche/",nFilterNbrPoint=nFilterNbrPoint)
@@ -432,13 +452,13 @@ def learn():
         # create classes
         classes = [0]*len(listCoucheF) + [1]*len(listDeboutF) 
         pred = classifier.predict(features)
-        print("predicted: %s" % pred)
+        #~ print("predicted: %s" % pred)
         print("diff on test folder: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) #17/274  16/315
         
         # hand coded test
         pred = predictHandCoded(listCouche+listDebout)
         classes = [0]*len(listCouche) + [1]*len(listDebout) 
-        print("predicted: %s" % pred)
+        #~ print("predicted: %s" % pred)
         
         # remove None case
         pred = pred.tolist()
@@ -452,6 +472,8 @@ def learn():
         pred = np.array(pred)
         
         print("diff on TEST folder Hand Coded: %d/%d" % (sum(abs(pred-classes)),len(pred) ) ) # 37/372 # 54/402 sans margin, 45/402 mix hauteur bras et jambe et angle torse:  11/361=0.030 (change seul torso: 16/402=0.039) avec bum: 19/361 (only torso et bum: 22/402=0.055) avec new avg len on bum: 14/364 # avec nouvel regle utilisation angle si pas bum: 9/364
+        # apres refactor des conditions: 108/598
+        # total: 145/964 (0.15)
         
     #~ from sklearn.externals import joblib        
     joblib.dump(classifier, 'detect_fall_classifier.pkl')
@@ -475,9 +497,9 @@ def analyseFilenameInPath( strPath, bForceRecompute = False, bRender=True ):
     wm = WorldMemory()
     while i < len(listFile) and bContinue:
         print("Analyse: %d/%d" % (i,len(listFile) ) )
-        if i < 1500:
-            i += 1
-            continue
+        #~ if i < 2000:
+            #~ i += 1
+            #~ continue
         f = listFile[i]
         tf = strPath + f
         if os.path.isdir(tf):
@@ -491,7 +513,7 @@ def analyseFilenameInPath( strPath, bForceRecompute = False, bRender=True ):
             skels = op.analyseFromFile(tf,bForceRecompute=bForceRecompute)
             im = cv2.imread(tf)
             for skel in skels:
-                if 0:
+                if 1:
                     rAvg = skel.computeAverageConfidence()
                     if rAvg < rThresholdAvg:
                         continue
@@ -556,7 +578,7 @@ def analyseFilenameInPath( strPath, bForceRecompute = False, bRender=True ):
             
             if 0:
                 # ffmpeg -r 10 -i %06d.png -vcodec libx264 -b:v 4M -b:a 1k test.mp4
-                cv2.imwrite("/generated/%06d.png" % nCptGenerated, im)  # NB: won't wok with sub folder (overwriting dest)
+                cv2.imwrite("d:/generated/%06d.png" % nCptGenerated, im)  # NB: won't work with sub folder (overwriting dest)
                 nCptGenerated += 1
                 
                 # pour un petit gif anime de l'image de 823 a 992 # les de debut et fin ne fonctionnent pas => isoler dans un dossier
@@ -564,7 +586,7 @@ def analyseFilenameInPath( strPath, bForceRecompute = False, bRender=True ):
                 # => use of the "a (%d).png" techniques
             
             if bRender:
-                key = cv2.waitKey(0)
+                key = cv2.waitKey(10)
                 print(key)
                 if key == ord('q') or key == 27:
                     bContinue = False
@@ -585,7 +607,7 @@ if __name__ == "__main__":
     pathData = "/home/am/"
     if os.name == "nt":  pathData = "d:/"
     
-    #~ learn()
+    learn()
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test/couche/", bForceRecompute=True)
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/demo/")
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test_frontal2/")

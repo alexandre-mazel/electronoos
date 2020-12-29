@@ -537,7 +537,7 @@ def autoTest():
     assert_check( fromMetaphoneAtEnd( "PLS", "Do you like apples?" ), "apples" )
     assert_check( fromMetaphoneAtEnd( "PL", "Do you like apple?" ), "apple" )
     assert_check( fromMetaphoneAtEnd( "KKMPRS", "Do you like cucumbers?" ), "cucumbers" )
-    assert_check( fromMetaphoneAtEnd( "TOTO", "Do you like nothing?" ), "" )
+    assert_check( fromMetaphoneAtEnd( "TOTO", "Do you like nothing?" ), "" ) # WRN: can't find the string from metaphone 'TOTO' in 'Do you like nothing?', it's a normal error!
     
     
     

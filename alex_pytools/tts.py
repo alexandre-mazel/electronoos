@@ -34,7 +34,7 @@ class Tts:
         generate a wavfile and save it.
         return the filename
         """
-        txt = txt.strip()
+        txt = txt.strip(" !?,;")
         strOutputFilename = misctools.getTempFilename() + ".wav"
         listSound = []
         idxend = len(txt)
@@ -70,7 +70,9 @@ tts = Tts()
 def autoTest():
     tts = Tts()
     tts.load("c:/tts_alexandre/")
-    tts.say("je aimer toi")
+    #~ tts.say("je aimer toi")
+    tts.say("je etre content") # manque etre et avoir !!!
+    tts.say("toi faim?")
     
     
 if __name__ == "__main__":

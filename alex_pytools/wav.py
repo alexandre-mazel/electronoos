@@ -1004,12 +1004,16 @@ def concatenateWav(astrFileList, strDestFilename,rInsertSilenceBetween=0.):
     nNbrSilenceSample = 0
     if rInsertSilenceBetween > 0.:
         nNbrSilenceSample = int(rInsertSilenceBetween * dst.nSamplingRate)
-        dst.data = np.concatenate( (dst.data,np.zeros( nNbrSilenceSample*dst.nNbrChannel, dtype=dst.dataType ) ) )
-    for f in astrFileList[1:]:
-        w = Wav(f)
-        dst.data = np.concatenate( (dst.data,w.data) )
-        if nNbrSilenceSample > 0:
+        if len(astrFileList)>1:
             dst.data = np.concatenate( (dst.data,np.zeros( nNbrSilenceSample*dst.nNbrChannel, dtype=dst.dataType ) ) )
+            
+    idx = 1
+    while idx < len(astrFileList):
+        w = Wav(astrFileList[idx])
+        dst.data = np.concatenate( (dst.data,w.data) )
+        if nNbrSilenceSample > 0 and idx + 1 < len(astrFileList):
+            dst.data = np.concatenate( (dst.data,np.zeros( nNbrSilenceSample*dst.nNbrChannel, dtype=dst.dataType ) ) )
+        idx += 1
     dst.updateHeaderSizeFromDataLength()
     dst.write(strDestFilename)
 # concatenateWav - end

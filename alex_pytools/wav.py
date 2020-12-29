@@ -992,3 +992,25 @@ class Wav:
                 #~ strOut += "- dataUnpacked[%d]: 0x%x (%d)\n" % ( i, self.dataUnpacked[i], self.dataUnpacked[i] )
         return strOut
 # class Wav - end
+
+def concatenateWav(astrFileList, strDestFilename,rInsertSilenceBetween=0.):
+    """
+    concatenate all filename in one filename
+    NB: all sound must have same properties, or the result will be unknown !!!
+    - rInsertSilenceBetween: in seconds
+    """
+    assert(len(astrFileList)>0)
+    dst = Wav(astrFileList[0])
+    nNbrSilenceSample = 0
+    if rInsertSilenceBetween > 0.:
+        nNbrSilenceSample = int(rInsertSilenceBetween * dst.nSamplingRate)
+        dst.data = np.concatenate( (dst.data,np.zeros( nNbrSilenceSample*dst.nNbrChannel, dtype=dst.dataType ) ) )
+    for f in astrFileList[1:]:
+        w = Wav(f)
+        dst.data = np.concatenate( (dst.data,w.data) )
+        if nNbrSilenceSample > 0:
+            dst.data = np.concatenate( (dst.data,np.zeros( nNbrSilenceSample*dst.nNbrChannel, dtype=dst.dataType ) ) )
+    dst.updateHeaderSizeFromDataLength()
+    dst.write(strDestFilename)
+# concatenateWav - end
+    

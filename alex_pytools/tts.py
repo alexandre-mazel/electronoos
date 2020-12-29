@@ -21,12 +21,15 @@ class Tts:
     def load( self, strPath ):
         self.strPath = strPath
         for f in sorted(  os.listdir(strPath) ):
-            strWord = f.split(".")[0].split("__")[-1]
-            if strWord != "":
+            words = f.split(".")[0].split("__")
+            if len(words)>1:
+                strWord = words[-1]
                 if strWord not in self.dWord.keys():
                     self.dWord[strWord] = []
                 self.dWord[strWord].append(f)
                 #~ print("INF: '%s' => '%s'" % (strWord, self.dWord[strWord] ) )
+            else:
+                print("WRN: '%s' no keyword found" % f )
         
         
         
@@ -81,13 +84,13 @@ class Tts:
                         words = words[1:]
                         continue
                     tomatch = "_".join(words[:idxend]).lower()
-                    print("tomatch: %s" % tomatch)
+                    #~ print("tomatch: %s" % tomatch)
                     for k,f in self.dWord.items():
                         if k == tomatch:
                             listSound.append(self.strPath+f[0])
                             words = words[idxend:]
-                            print("words found: %s" % k )
-                            print("words remaining: %s" % words )
+                            #~ print("words found: %s" % k )
+                            #~ print("words remaining: %s" % words )
                             idxend = len(words)
                             break # for
                     else:

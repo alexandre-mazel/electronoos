@@ -482,6 +482,7 @@ def fromMetaphoneAtEnd( meta, hint ):
     """
     find the string related to a metaphone describing the end of the hint text.
     eg: LSFLJLT, tu aimes les flageolet? => les flageolet?
+    return "" if not found
     """    
     
     if 0:
@@ -503,7 +504,7 @@ def fromMetaphoneAtEnd( meta, hint ):
                     return stripUnicode(hint[i:], getTextSeparators())
     
     print( "WRN: can't find the string from metaphone '%s' in '%s'" % (meta, hint) )
-    return "" # impossible!
+    return "" # not found
 # fromMetaphoneAtEnd - end
 
 def assert_check( v1, reference ):

@@ -2,7 +2,9 @@
 process big wav file, cut them...
 """
 import wav
+import misctools
 import pygame_tools
+
 
 import os
 import time
@@ -29,7 +31,7 @@ def cleanStringAnsi128( txt, bChangeSpaceAndQuote = True ):
                 print("c: %s, 0x%x" % (c,ord(c)) )
                 newc = "_"
         if bChangeSpaceAndQuote:
-            if c in [ ' ',"'",'"', '-']:
+            if c in [ ' ',"'",'"', '-','?','/','\\']:
                 newc = '_'
         cleaned += newc
     return cleaned
@@ -96,6 +98,15 @@ def getSpeechInWav( strSoundFilename ):
     strAnsiLang = 'fr-FR'
     retVal = None
     
+    if 1:
+        # add silence before and after
+        newname = misctools.getTempFilename() + ".wav"
+        w = wav.Wav(strSoundFilename)
+        w.ensureSilenceAtBegin(0.1)
+        w.addSilence(0.1)
+        w.write(newname)
+        strSoundFilename = newname
+    
     timeBegin = time.time()
     
     r = speech_recognition.Recognizer()
@@ -106,6 +117,7 @@ def getSpeechInWav( strSoundFilename ):
     try:
         # for testing purposes, we're just using the default API key
         retFromReco =r.recognize_google(audio, language = strAnsiLang, show_all = True )
+        #~ retFromReco =r.recognize_google_cloud(audio, language = strAnsiLang, show_all = True )
         print( "DBG: getSpeechInWav: retFromReco: %s" % retFromReco )
         if retFromReco != []:
             
@@ -122,10 +134,9 @@ def getSpeechInWav( strSoundFilename ):
             strTxt = cleanText2( strTxt )
             print( "INF: getSpeechInWav: Google Speech Recognition thinks you said: '%s' (conf:%5.2f)\n" % (strTxt, rConf) )
             retVal = [ [strTxt,rConf] ]
-
-    except speech_recognition.UnknownValueError:
-        pass
-        
+            
+    except speech_recognition.UnknownValueError as e:
+        print( "ERR: getSpeechInWav: Unknown Value Error; {0}".format(e))
     except speech_recognition.RequestError as e:
         print( "ERR: getSpeechInWav: Could not request results from Google Speech Recognition service; {0}".format(e))
 
@@ -141,24 +152,31 @@ def getSpeechInWav( strSoundFilename ):
 def autocut(wavfile, rSilenceMinDuration = 0.3 ):
     bPlaySound = 1
     bAutoRename = 1
+    bAlternativeManualInputted = 1
     w = wav.Wav(wavfile,bQuiet=False)
     print(w)
     #~ w.write("/tmp/t.wav")
     seq = w.split(rSilenceTresholdPercent=0.6,rSilenceMinDuration=rSilenceMinDuration)
     for i,s in enumerate(seq):
         s.normalise()
-        name = "/generated/s%03d.wav" % i 
-        s.write(name)
+        strPath = "c:/generated/"
+        name = "s%04d.wav" % i 
+        s.write(strPath+name)
         if bPlaySound:
             print("playing: %s" % name )
-            pygame_tools.soundPlayer.playFile(name)
-            time.sleep(0.5)
+            pygame_tools.soundPlayer.playFile(strPath+name)
+            time.sleep(0.1)
             
         if bAutoRename:
-            txt = getSpeechInWav(name)
-            newname = name.replace(".wav", "__" + txt[:100]+".wav")
-            newname = cleanStringAnsi128(newname)
-            os.rename(name, newname)
+            txt = getSpeechInWav(strPath+name)
+            if bAlternativeManualInputted:
+                if txt == "":
+                    txt = input("Type what you just heard:\n")
+            if txt != "":
+                newname = name.replace(".wav", "__" + txt[:100]+".wav")
+                newname = cleanStringAnsi128(newname)
+                print("INF: Renammed to '%s'\n" % newname )
+                os.rename(strPath+name, strPath+newname)
             
 # autocut - end
     
@@ -169,10 +187,13 @@ if __name__ == "__main__":
         #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/rec2.wav")
         #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/rec1_fx.wav")
         #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/rec2_fx.wav",rSilenceMinDuration=0.5)
-        autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/robot1.wav")
+        autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/robot3.wav")
     if 0:
         strFile = strPathRavir + "/rec2/s032.wav"
         strFile = "/tmp/s032.wav"
+        strFile = "/generated/s0000__je.wav"
+        #~ strFile = "/generated/s017__completement.wav"
+        #~ strFile = "/generated/s0047__petit_pere.wav"
         print(getSpeechInWav(strFile))
         pygame_tools.soundPlayer.playFile(strFile)
         

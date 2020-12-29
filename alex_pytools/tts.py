@@ -34,25 +34,54 @@ class Tts:
         generate a wavfile and save it.
         return the filename
         """
-        txt = txt.strip(" !?,;")
         strOutputFilename = misctools.getTempFilename() + ".wav"
         listSound = []
-        idxend = len(txt)
-        while len(txt) > 0:
-            for k,f in self.dWord.items():
-                if k == txt[:idxend]:
-                    listSound.append(self.strPath+f[0])
-                    txt = txt[idxend:].strip()
-                    print("txt found: %s" % k )
-                    print("txt remaining: %s" % txt )
-                    idxend = len(txt)
-                    break
-            else:
-                print("INF: sayToFile: cannot match: %s" % txt[:idxend] )
-                idxend -= 1
-                if idxend == -1:
-                    break
         
+        if 0:
+            # dumb letter par letter
+            txt = txt.strip(" !?,;")
+            idxend = len(txt)
+            while len(txt) > 0:
+                for k,f in self.dWord.items():
+                    if k == txt[:idxend]:
+                        listSound.append(self.strPath+f[0])
+                        txt = txt[idxend:].strip()
+                        print("txt found: %s" % k )
+                        print("txt remaining: %s" % txt )
+                        idxend = len(txt)
+                        break
+                else:
+                    print("INF: sayToFile: cannot match: %s" % txt[:idxend] )
+                    idxend -= 1
+                    if idxend == -1:
+                        break
+        else:
+            import nltk
+            #~ words = txt.split(",.;?!") # split works only with one separator
+            #~ print("words: %s" % words)
+            listSentences = nltk.tokenize.sent_tokenize(txt)
+            print("listSentences: %s" % listSentences)
+            for sentence in listSentences:
+                words = nltk.tokenize.word_tokenize(sentence)
+                print("words: %s" % words)
+                idxend = len(words)
+                while len(words) > 0:
+                    for k,f in self.dWord.items():
+                        if k == "_".words[:idxend]: check ici et finir
+                            listSound.append(self.strPath+f[0])
+                            txt = txt[idxend:].strip()
+                            print("txt found: %s" % k )
+                            print("txt remaining: %s" % txt )
+                            idxend = len(txt)
+                            break
+                    else:
+                        print("INF: sayToFile: cannot match: %s" % txt[:idxend] )
+                        idxend -= 1
+                        if idxend == -1:
+                            break
+                
+            
+            
         wav.concatenateWav(listSound, strOutputFilename, 0.1)
         return strOutputFilename
         
@@ -71,8 +100,8 @@ def autoTest():
     tts = Tts()
     tts.load("c:/tts_alexandre/")
     #~ tts.say("je aimer toi")
-    tts.say("je etre content") # manque etre et avoir !!!
-    tts.say("toi faim?")
+    tts.say("je etre gentil, et toi? Moi ca va!") # manque etre et avoir !!!
+    #~ tts.say("toi faim?")
     
     
 if __name__ == "__main__":

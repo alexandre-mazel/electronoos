@@ -38,9 +38,9 @@ class SoundPlayer:
         return sound
         
         
-    def playFile( self, strFilename, bWaitEnd = True ):
+    def playFile( self, strFilename, bWaitEnd = True, rSoundVolume = 1. ):
         sound = self.loadFile( strFilename )
-        sound.set_volume(0.15) #temp: lower sound
+        sound.set_volume(rSoundVolume)
         sound.play()
         # how often to check active playback
         frame_rate = 30

@@ -33,6 +33,19 @@ def getPathData():
     #~ print(ret)
     return ret
     
+def getPathTemp():
+    """
+    return a temporary folder
+    """
+    if os.name == "nt":
+        ret = "c:/tmp/"
+    else:
+        ret = "/tmp/"
+    return ret
+    
+def getTempFilename():
+    return getPathTemp() + getFilenameFromTime()
+    
 
 def check(v1,v2):
     if v1==v2:
@@ -471,23 +484,23 @@ def smoothererstep( x, edge0 = 0, edge1 = 1 ):
     # -20x7 + 70 x6 - 84 x5 + 35 x4
     return x * x * x * x * (  x * ( x * ( (x*-20) +70)-84) + 35 )
     
-def playWavPyGame( strFilename, bWaitEnd = True ):
+def playWavPyGame( strFilename, bWaitEnd = True, rSoundVolume=1. ):
     """
     will load the whole sound into memory before playback
     """
     import pygame_tools
     try:
-        pygame_tools.soundPlayer.playFile(strFilename, bWaitEnd=bWaitEnd)
+        pygame_tools.soundPlayer.playFile(strFilename, bWaitEnd=bWaitEnd,rSoundVolume=rSoundVolume)
         return True
     except BaseException as err:
         print("DBG: misctools.playWavPyGame: err: %s" % str(err) )
     return False
     
-def playWav( strFilename, bWaitEnd = True ):
+def playWav( strFilename, bWaitEnd = True, rSoundVolume = 1. ):
     """
     play a wav, return False on error
     """
-    if playWavPyGame(strFilename, bWaitEnd=bWaitEnd):
+    if playWavPyGame(strFilename, bWaitEnd=bWaitEnd,rSoundVolume=rSoundVolume):
         return True
         
     import winsound
@@ -507,7 +520,7 @@ def ting():
     """
     play a bell or a simulated one if no bell available
     """
-    if playWav(getPathData()+"ting.wav"):
+    if playWav(getPathData()+"ting.wav",rSoundVolume=0.15):
         return
     beep(1200, 100)
     time.sleep(200)
@@ -516,7 +529,7 @@ def bell():
     """
     play a bell or a simulated one if no bell available
     """
-    if playWav(getPathData()+"bell.wav"):
+    if playWav(getPathData()+"bell.wav",rSoundVolume=0.15):
         return
     beep(440, 100)
     time.sleep(200)
@@ -525,7 +538,7 @@ def deepbell():
     """
     play a bell or a simulated one if no bell available ( as deep bell is long, it's an async method !!! 
     """
-    if playWav(getPathData()+"deep_bell.wav", bWaitEnd = False):
+    if playWav(getPathData()+"deep_bell.wav", bWaitEnd = False,rSoundVolume=0.15):
         return
     beep(330, 200)
    

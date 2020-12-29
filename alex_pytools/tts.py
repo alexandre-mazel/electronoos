@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 tts du pauvre v2
 """
@@ -66,19 +67,37 @@ class Tts:
                 print("words: %s" % words)
                 idxend = len(words)
                 while len(words) > 0:
+                    if words[0] in [ "," , ";", "!", "?", ".", ":" ]:
+                        if words[0] in [ "," , ";", ":"]:
+                            # insert silence 
+                            for i in range(1):
+                                listSound.append(self.strPath+"silence_100ms.wav")
+                                
+                        if words[0] in [ ".", "!", "?"]:
+                            # insert silence 
+                            for i in range(2):
+                                listSound.append(self.strPath+"silence_100ms.wav")
+                                
+                        words = words[1:]
+                        continue
+                    tomatch = "_".join(words[:idxend]).lower()
+                    print("tomatch: %s" % tomatch)
                     for k,f in self.dWord.items():
-                        if k == "_".words[:idxend]: check ici et finir
+                        if k == tomatch:
                             listSound.append(self.strPath+f[0])
-                            txt = txt[idxend:].strip()
-                            print("txt found: %s" % k )
-                            print("txt remaining: %s" % txt )
-                            idxend = len(txt)
-                            break
+                            words = words[idxend:]
+                            print("words found: %s" % k )
+                            print("words remaining: %s" % words )
+                            idxend = len(words)
+                            break # for
                     else:
-                        print("INF: sayToFile: cannot match: %s" % txt[:idxend] )
-                        idxend -= 1
-                        if idxend == -1:
-                            break
+                        if idxend == 1:
+                            # word not found
+                            print("INF: sayToFile: word not found: %s" % words[:idxend] )
+                            words = words[1:]
+                            idxend = len(words)
+                        else:
+                            idxend -= 1
                 
             
             
@@ -100,7 +119,10 @@ def autoTest():
     tts = Tts()
     tts.load("c:/tts_alexandre/")
     #~ tts.say("je aimer toi")
-    tts.say("je etre gentil, et toi? Moi ca va!") # manque etre et avoir !!!
+    #~ tts.say("je aimer toi, toi aimer moi.")
+    tts.say("Je aimer toi, toi aimer moi. Moi gentil.")
+    #~ tts.say("c'est la phrase dites initialement par Tarzan.")
+    #~ tts.say("je etre gentil, et toi? Moi ca va !") # manque etre et avoir !!!
     #~ tts.say("toi faim?")
     
     

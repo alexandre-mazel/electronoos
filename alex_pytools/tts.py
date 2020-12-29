@@ -11,38 +11,6 @@ import os
 import time
 
 
-#~ print( levenshtein( "bateau", "batau" ) );
-#~ print( levenshtein( "bateau", "bataux" ) );
-#~ print( levenshtein( "KSTLPRSTNTTSTTSNS", "KSTPRKPM" ) );
-
-def isPhoneticEqual( s1, s2 ):
-    """
-    return the phonetic equality between of two string: [0., .. 1.] : 0 completely different, from 0 to 1: the more ressembling, 1: equal]
-    """
-    import metaphone
-    #~ print metaphone.dm( unicode(s1) )
-    #~ print metaphone.dm( unicode(s2) )
-    try:
-        meta1 = metaphone.dm( unicode(s1) )[0]
-        meta2 = metaphone.dm( unicode(s2) )[0]
-    except BaseException, err:
-        print( "ERR: can't metaphone '%s' or '%s': err: %s" % (s1, s2, err ) )
-        meta1 = s1
-        meta2 = s2
-    if meta1 == meta2:
-        return 1.
-
-    rMidLen = ( len(meta1) + len( meta2 ) ) / 2;
-    if( rMidLen < 1 ):
-        return 0.
-    rDist = 0.9 - levenshtein( meta1, meta2 )/float(rMidLen)
-    if( rDist < 0. ):
-        rDist = 0.
-    return rDist
-# isPhoneticEqual - end
-
-
-
 class Tts:
     
     def __init__( self ):
@@ -96,12 +64,13 @@ class Tts:
             #~ print("words: %s" % words)
             listSentences = nltk.tokenize.sent_tokenize(txt)
             print("listSentences: %s" % listSentences)
+            separators = [ "," , ";", "!", "?", ".", ":" ]
             for sentence in listSentences:
                 words = nltk.tokenize.word_tokenize(sentence)
                 print("words: %s" % words)
                 idxend = len(words)
                 while len(words) > 0:
-                    if words[0] in [ "," , ";", "!", "?", ".", ":" ]:
+                    if words[0] in separators :
                         if words[0] in [ "," , ";", ":"]:
                             # insert silence 
                             for i in range(1):
@@ -114,9 +83,16 @@ class Tts:
                                 
                         words = words[1:]
                         continue
-                    tomatch = "_".join(words[:idxend]).lower()
+                    if idxend > 1:
+                        if words[idxend-1] in separators:
+                            tomatch = "_".join(words[:idxend-1]).lower()
+                        else:
+                            tomatch = "_".join(words[:idxend]).lower()
+                    else:
+                        tomatch = words[0].lower()
                     #~ print("tomatch: %s" % tomatch)
                     for k,f in self.dWord.items():
+                        #~ if k == tomatch:
                         if k == tomatch:
                             listSound.append(self.strPath+f[0])
                             words = words[idxend:]
@@ -125,13 +101,24 @@ class Tts:
                             idxend = len(words)
                             break # for
                     else:
-                        if idxend == 1:
-                            # word not found
-                            print("INF: sayToFile: word not found: %s" % words[:idxend] )
-                            words = words[1:]
-                            idxend = len(words)
+                        for k,f in self.dWord.items():
+                            rSame = misctools.getPhoneticComparison( k, tomatch)
+                            if  rSame > 0.8:
+                                print("WRN: using %s instead of %s (rSame=%4.2f)" % (k,tomatch,rSame) )
+                                listSound.append(self.strPath+f[0])
+                                words = words[idxend:]
+                                #~ print("words found: %s" % k )
+                                #~ print("words remaining: %s" % words )
+                                idxend = len(words)
+                                break # for
                         else:
-                            idxend -= 1
+                            if idxend == 1:
+                                # word not found
+                                print("INF: sayToFile: word not found: %s" % words[:idxend] )
+                                words = words[1:]
+                                idxend = len(words)
+                            else:
+                                idxend -= 1
                 
             
             
@@ -143,6 +130,12 @@ class Tts:
         misctools.playWav(wavfile)
         
         
+    def manque( self ):
+        """
+        etre, avoir, manger, dormir, lire, jouer, écouter, faire la sieste, creer, cuisiner, tricoter,
+        
+        """
+        pass
         
         
 # class Tts - end
@@ -154,7 +147,8 @@ def autoTest():
     tts.load("c:/tts_alexandre/")
     #~ tts.say("je aimer toi")
     #~ tts.say("je aimer toi, toi aimer moi.")
-    tts.say("Je aimer toi, toi aimer moi. Moi gentil.")
+    #~ tts.say("Je aimer toi, toi aimer moi. Moi gentil.")
+    tts.say("toi vouloir manger chocolat puis medicament?")
     #~ tts.say("c'est la phrase dites initialement par Tarzan.")
     #~ tts.say("je etre gentil, et toi? Moi ca va !") # manque etre et avoir !!!
     #~ tts.say("toi faim?")

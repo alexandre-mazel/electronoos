@@ -508,7 +508,7 @@ def fromMetaphoneAtEnd( meta, hint ):
 # fromMetaphoneAtEnd - end
 
 def assert_check( v1, reference ):
-    print( "assert_check: %s" % str(v1) )
+    print( "assert_check: %s / %s" % (str(v1),str(reference)) )
     if( v1 != reference ):
         print( "assert_check: '%s' != '%s'" % (v1, reference) )
         assert(0)    
@@ -530,6 +530,8 @@ def autoTest():
     assert_check( dm( "Do you like apples?" ), ('TLKPLS', '') )
     assert_check( dm( "Did you like cucumbers?" ), ('TTLKKKMPRS', '') )
     assert_check( dm( "apples" ), ('APLS', '') )
+    assert_check( dm( "les_enfants" ),dm( "les enfants" ) )
+    
     assert_check( fromMetaphoneAtEnd( "LSFLJLT", "tu aimes les flageolet?" ), "les flageolet" )
     assert_check( fromMetaphoneAtEnd( "LSFLJLTS", "tu aimes les flageolets?" ), "les flageolets" )
     assert_check( fromMetaphoneAtEnd( "LSPMS", "tu aimes les pommes" ), "les pommes" )

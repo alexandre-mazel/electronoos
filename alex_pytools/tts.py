@@ -132,8 +132,32 @@ class Tts:
         
     def manque( self ):
         """
-        etre, avoir, manger, dormir, lire, jouer, écouter, faire la sieste, creer, cuisiner, tricoter,
-        
+        etre, avoir, vouloir, manger, dormir, lire, jouer, ecouter, faire la sieste, creer, cuisiner, tricoter,
+        faire dodo, dormir, calin, caliner, copier, recopier, pleurer, heureux, triste, sauter,
+        danser, gouter, dejeuner, diner, souper, petit dejeuner, grand, grosse, fin, maigre,
+        luxueux, luxe, grand, petit, rond, carre, triangulaire, rectangle, rectangulaire,
+        plein, vide, grenier, cave, salon, salle a manger, chambre, toilette, salle de bains,
+        entree, jardin, rue, boulevard, chemin, villa, avenue, champs, elisee, elisa, alexandre,
+        patricia, elsa, corto, gaia, nicole, le, la, les, roux, brun, blond, brune, blonde, rousse,
+        rousseurs, grains, 
+        jeopardy, monopoly, monopole, oie, echec, dame, poker, jeu, belotte, solitaire,
+        extraverti, introverti, monotone, anime, calme, silence, poubelle, bruit, oreiller,
+        drap, couverture, couette, barette, cheveux, torve, epaule, jambe, pied, orteil,
+        doigts, main, hanche, coude, tete, cou, articulation, 
+        gras, lipide, glucide, proteine, vitamine, sel, poivre, mineraux, vegetaux, sucre
+        loi,
+        tres, menteur, menteuse, copine, plus, arreter, m'embeter, arrete,
+        stop, super, beau, c'est, genial, boom, trop, nul, chez, viens, top,
+        on va faire ca, on va jouer, viens on va regarder, elle est trop belle,
+        j'aime, j'aime bien, sa robe, robe, ballon, trop fort, 
+        puree, fichtre, flute, superfloute, mille sabord, sacripan, millier,
+        milliard, million, une, un, l'infini, a, jamais, toujours, parfois,
+        des fois, quelques, fois, quelques fois, bonne nuit, bonjour, salut, hello,
+        bonne journee, journee, soiree, matinee, 
+        chat, chocolat, la mer, mer, maitresse, maitre, j'aime pas les epinards.
+        casser, reparer, quitter, marrier, se, divorcer, perir, mourir, 
+        initialement, medicament, puis, source, eau, vin, 
+        + imagier
         """
         pass
         

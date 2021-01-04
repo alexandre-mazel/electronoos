@@ -107,10 +107,10 @@ class Wav:
     WARNING: 
     
     """
-    def __init__( self, strLoadFromFile = None, bQuiet = True ):
+    def __init__( self, strLoadFromFile = None, bQuiet = True, bLoadData = True ):
         self.reset()
         if( strLoadFromFile != None ):
-            self.load( strLoadFromFile, bQuiet = bQuiet )
+            self.load( strLoadFromFile, bLoadData = bLoadData, bQuiet = bQuiet )
     # __init__ - end
         
     def reset( self ):
@@ -204,6 +204,9 @@ class Wav:
         
     #~ def nbrSampleToDuration( self, nNbrSample ):
         #~ return int( nNbrSample / self.nSamplingRate )
+        
+    def getDuration( self ):
+        return self.rDuration
     
     def readListData( self, file, bQuiet = True ):
         """
@@ -891,7 +894,7 @@ class Wav:
         return True
     # hasSameProperties - end
     
-    def split( self, rSilenceTresholdPercent = 0.1, rSilenceMinDuration = 0.3, nExtractJustFirsts = -1 ):
+    def split( self, rSilenceTresholdPercent = 0.1, rSilenceMinDuration = 0.3, nExtractJustFirsts = -1, nPeakRatioToKeep = 16 ):
         """
         split a wav into a bunch of wav
         - rSilenceTresholdPercent: how to qualify silence ?
@@ -957,7 +960,7 @@ class Wav:
                 w.data = np.copy(self.data[nNumFirstSample*self.nNbrChannel:nNumLastSample*self.nNbrChannel])
                 nPeakMax = max( max( w.data ), -min( w.data ) )
                 # test if enough sound to be interesting
-                if( nPeakMax > self.getSampleMaxValue() // 16 ): # remove glitch sound # $$$Alma: //16, change was // 8
+                if( nPeakMax > self.getSampleMaxValue() // nPeakRatioToKeep ): # remove glitch sound # $$$Alma: //16, change was // 8
                     w.updateHeaderSizeFromDataLength()
                     print( "INF: sound.Wav.split: GOOD: new split of %5.3fs" % w.rDuration )
                     aSplitted.append( w )

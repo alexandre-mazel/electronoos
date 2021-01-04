@@ -8,6 +8,7 @@ strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
 if strLocalPath == "": strLocalPath = './'
 sys.path.append(strLocalPath+"/../alex_pytools/")
 import misctools
+import noise
 import pygame_tools
 import wav
 
@@ -32,7 +33,8 @@ class Breather:
         self.nState = Breather.kStateIdle
         self.timeLastUpdate = time.time()
         
-        self.rExcitationRate = 1. # entre 0 et 1, va modifier la quantité d'air circulant par secondes
+        self.rExcitationRate = 1 # va modifier la quantite d'air circulant par seconde, 1: normal, 0.5: tres cool, 2: excite, 3: tres excite 
+        self.bReceiveExcitationFromExternal = False
         
     def loadBreathIn( self, strBreathSamplesPath ):
         """
@@ -75,7 +77,10 @@ class Breather:
             i += 1
         f = listSoundAndDuration[nIdxBest][0]
         print("Play %s" % f.split('/')[-1] )
-        misctools.playWav(f, bWaitEnd=False, rSoundVolume=0.2)
+        rSoundVolume = 0.2 * self.rExcitationRate
+        if rSoundVolume < 0.12: rSoundVolume = 0.12
+        if rSoundVolume > 0.7: rSoundVolume = 0.7
+        misctools.playWav(f, bWaitEnd=False, rSoundVolume=rSoundVolume)
         
         
     def update( self ):
@@ -84,15 +89,15 @@ class Breather:
         
         # update fullness
         if self.nState == Breather.kStateIn:
-            self.rFull += self.rNormalInPerSec*rTimeSinceLastUpdate
+            self.rFull += self.rNormalInPerSec*self.rExcitationRate*rTimeSinceLastUpdate
             
         if self.nState == Breather.kStateOut:
-            self.rFull -= self.rNormalOutPerSec*rTimeSinceLastUpdate
+            self.rFull -= self.rNormalOutPerSec*self.rExcitationRate*rTimeSinceLastUpdate
         
             
         nPrevState = self.nState
         
-        if self.nState != Breather.kStateIn and (self.rFull <= 0.1 or (self.rFull <= 0.5 and random.random()>0.95) ):
+        if self.nState != Breather.kStateIn and (self.rFull <= 0.1 or (self.rFull <= 0.3 and random.random()>0.95) ):
             self.nState = Breather.kStateIn
             
         if self.nState != Breather.kStateOut and self.rFull >= 0.95:
@@ -101,18 +106,31 @@ class Breather:
         if self.nState != nPrevState:
             # play a sound
             if self.nState == Breather.kStateIn:
-                rTimeEstim = (1. - self.rFull) / self.rNormalInPerSec
+                rTimeEstim = (1. - self.rFull) / (self.rNormalInPerSec*self.rExcitationRate)
                 self.playBreath( self.aBreathIn, rTimeEstim )
                 
             if self.nState == Breather.kStateOut:
-                rTimeEstim = (self.rFull-0.1) / self.rNormalOutPerSec
+                rTimeEstim = (self.rFull-0.1) / (self.rNormalOutPerSec*self.rExcitationRate)
                 self.playBreath( self.aBreathOut, rTimeEstim )  
                 
-            print("%5.2fs: INF: Breather.update: rFull: %4.2f, state: %s" % (time.time(),self.rFull,self.nState) )
+            
+            self.rExcitationRate += noise.getSimplexNoise(time.time())/10. # random.random()*3 (change trop violemment)
+            if self.rExcitationRate < 0.1: self.rExcitationRate = 0.1
+            print("%5.2fs: INF: Breather.update: rFull: %4.2f, state: %s, rExcitation: %5.1f" % (time.time(),self.rFull,self.nState,self.rExcitationRate) )
         
-        
+            if self.bReceiveExcitationFromExternal:
+                if self.rExcitationRate > 1.:
+                    self.rExcitationRate -= 0.1 # will mess  the nice simplex noise average tends to 0
+                else:
+                    self.bReceiveExcitationFromExternal = False
+                
     def say( self, txt ):
         pass
+        
+    def increaseExcitation( self, rInc ):
+        print("INF: adding external excitation: %5.1f" % rInc)
+        self.rExcitationRate += rInc
+        self.bReceiveExcitationFromExternal = True
         
 # class Breather - end
 
@@ -125,6 +143,8 @@ def demo():
     while 1:
         breather.update()
         time.sleep(0.05)
+        if misctools.getKeystrokeNotBlocking() != 0:
+            breather.increaseExcitation(0.1)
         
     
     

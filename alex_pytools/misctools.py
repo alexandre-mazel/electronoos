@@ -663,6 +663,18 @@ def testPhoneticComparison():
     assert_greater( getPhoneticComparison("du pain", "Dublin"), 0.5 )
     assert_greater( getPhoneticComparison("checkin please", "chicken please"), 0.99 ) # should be less than 1. !!!
 
+def getKeystrokeNotBlocking():
+    """
+    return 0 if not keyboard keys are waiting in the buffer, else return the key
+    """
+    if os.name == "nt":
+        # seems to work only from cli
+        import msvcrt
+        if not msvcrt.kbhit():
+            return 0
+        return msvcrt.getch()
+    print("getKeystrokeNotBlocking: NDEV linux, use select module...")
+        
      
     
 def autoTest():

@@ -119,7 +119,7 @@ class Breather:
             print("%5.2fs: INF: Breather.update: rFull: %4.2f, state: %s, rExcitation: %5.1f" % (time.time(),self.rFull,self.nState,self.rExcitationRate) )
         
             if self.bReceiveExcitationFromExternal:
-                if self.rExcitationRate > 1.:
+                if self.rExcitationRate >= 0.8:
                     self.rExcitationRate -= 0.1 # will mess  the nice simplex noise average tends to 0
                 else:
                     self.bReceiveExcitationFromExternal = False

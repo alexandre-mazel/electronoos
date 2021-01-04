@@ -76,10 +76,13 @@ class Breather:
                 nIdxBest = i
             i += 1
         f = listSoundAndDuration[nIdxBest][0]
-        print("Play %s" % f.split('/')[-1] )
+        
         rSoundVolume = 0.2 * self.rExcitationRate
         if rSoundVolume < 0.12: rSoundVolume = 0.12
-        if rSoundVolume > 0.7: rSoundVolume = 0.7
+        if rSoundVolume > 0.5: rSoundVolume = 0.5
+        
+        print("INF: Play %s, vol: %5.1f" % (f.split('/')[-1],rSoundVolume) )
+        
         misctools.playWav(f, bWaitEnd=False, rSoundVolume=rSoundVolume)
         
         

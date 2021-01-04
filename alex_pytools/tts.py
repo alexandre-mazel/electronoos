@@ -29,6 +29,7 @@ class Tts:
                 #~ print("INF: '%s' => '%s'" % (strWord, self.dWord[strWord] ) )
             else:
                 print("WRN: '%s' no keyword found" % f )
+        print("IN F: load inished")
         
         
         
@@ -157,7 +158,7 @@ class Tts:
         chat, chocolat, la mer, mer, maitresse, maitre, j'aime pas les epinards.
         casser, reparer, quitter, marrier, se, divorcer, perir, mourir, 
         initialement, medicament, puis, source, eau, vin, 
-        + imagier
+        + imagier LCDL super imagier
         """
         pass
         

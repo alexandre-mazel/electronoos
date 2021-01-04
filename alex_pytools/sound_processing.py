@@ -151,12 +151,13 @@ def getSpeechInWav( strSoundFilename ):
 
 def autocut(wavfile, rSilenceMinDuration = 0.3 ):
     bPlaySound = 1
-    bAutoRename = 1
+    bAutoRename = 0
     bAlternativeManualInputted = 1
     w = wav.Wav(wavfile,bQuiet=False)
     print(w)
     #~ w.write("/tmp/t.wav")
     seq = w.split(rSilenceTresholdPercent=0.6,rSilenceMinDuration=rSilenceMinDuration)
+    print("INF: nbr part: %s" % len(seq) )
     for i,s in enumerate(seq):
         s.normalise()
         strPath = "c:/generated/"
@@ -187,7 +188,8 @@ if __name__ == "__main__":
         #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/rec2.wav")
         #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/rec1_fx.wav")
         #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/rec2_fx.wav",rSilenceMinDuration=0.5)
-        autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/robot3.wav")
+        #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/robot3.wav")
+        autocut("D:/sounds/recordings/robot4.wav")
     if 0:
         strFile = strPathRavir + "/rec2/s032.wav"
         strFile = "/tmp/s032.wav"

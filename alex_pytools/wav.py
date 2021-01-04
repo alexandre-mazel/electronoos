@@ -949,15 +949,17 @@ class Wav:
             if( nFirstSilenceIndex == -1 ):
                 break
             nNumLastSample = nFirstSilenceIndex//self.nNbrChannel
-            print( "INF: sound.Wav.split: found the end of that sound at sample %d" % nNumLastSample )
-            if( nNumLastSample - nNumFirstSample > 4000 ):
+            print( "INF: sound.Wav.split: found the end of that sound at sample %d (t:%5.3fs)" % (nNumLastSample,nNumLastSample/self.nSamplingRate) )
+            if( (nNumLastSample - nNumFirstSample)/self.nSamplingRate > 0.08 ): # change: expressed in seconds from 4000 (90ms at 44100) to 80ms
+                print( "INF: GOT an interesting one !")
                 w = Wav()
                 w.copyHeader( self )
                 w.data = np.copy(self.data[nNumFirstSample*self.nNbrChannel:nNumLastSample*self.nNbrChannel])
                 nPeakMax = max( max( w.data ), -min( w.data ) )
-                if( nPeakMax > self.getSampleMaxValue() // 8 ): # remove glitch sound
+                # test if enough sound to be interesting
+                if( nPeakMax > self.getSampleMaxValue() // 16 ): # remove glitch sound # $$$Alma: //16, change was // 8
                     w.updateHeaderSizeFromDataLength()
-                    print( "INF: sound.Wav.split: new split of %5.2fs" % w.rDuration )
+                    print( "INF: sound.Wav.split: GOOD: new split of %5.2fs" % w.rDuration )
                     aSplitted.append( w )
             #~ print( "nCurLocalVs: %s" % nCurLocalVs )
             if( nExtractJustFirsts != -1 and nExtractJustFirsts == len(aSplitted) ):

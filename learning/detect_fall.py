@@ -482,7 +482,10 @@ def learn():
 
 def analyseFilenameInPath( strPath, bForceRecompute = False, bRender=True ):
     """
-    Return False if user want to quit
+    Return False if user want to quit.
+    
+    Rappel: convert one video to png:
+    ffmpeg -i in.mp4 -vsync 0 out%05d.png
     """
     print("INF: analyseFilenameInPath: strPath: %s" % strPath )
     op = cv2_openpose.CVOpenPose()

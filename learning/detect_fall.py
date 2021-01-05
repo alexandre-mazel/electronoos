@@ -507,7 +507,7 @@ def analyseFilenameInPath( strPath, bForceRecompute = False, bRender=True ):
         f = listFile[i]
         tf = strPath + f
         if os.path.isdir(tf):
-            bRet = analyseFilenameInPath(tf + os.sep,bForceRecompute=bForceRecompute,bRender=bRender)
+            bRet = analyseFilenameInPath(tf + os.sep,bForceRecompute=bForceRecompute,bRender=bRender,bForceAlternateAngles=bJustPrecompute)
             if not bRet: return bRet
             i += 1
             continue

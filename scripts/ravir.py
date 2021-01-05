@@ -9,9 +9,11 @@ if strLocalPath == "": strLocalPath = './'
 sys.path.append(strLocalPath+"/../alex_pytools/")
 import misctools
 import noise
-import pygame_tools
+try: import pygame_tools
+except: pass
 import wav
 
+import math
 import random
 import time
 
@@ -33,8 +35,25 @@ class Breather:
         self.nState = Breather.kStateIdle
         self.timeLastUpdate = time.time()
         
-        self.rExcitationRate = 1 # va modifier la quantite d'air circulant par seconde, 1: normal, 0.5: tres cool, 2: excite, 3: tres excite 
+        self.rExcitationRate = 0.5 # va modifier la quantite d'air circulant par seconde, 1: normal, 0.5: tres cool, 2: excite, 3: tres excite 
         self.bReceiveExcitationFromExternal = False
+        
+        self.rTimeIdle = 0.
+        
+        self.motion = None
+        
+        if os.name != "nt":
+            import naoqi
+            self.ap = naoqi.ALProxy("ALAudioPlayer", "localhost", 9559)
+            self.motion = naoqi.ALProxy("ALMotion", "localhost", 9559)
+            self.astrChain = ["HipPitch","LShoulderPitch","RShoulderPitch"]
+            
+            self.rAmp = 0.2
+            self.rCoefArmAmp = 0.5
+
+            self.rHeadDelay = 0.6
+            self.rHeadPos = self.rAmp*self.rCoefArmAmp*0.1*1.5
+            self.rOffsetHip = -0.0
         
     def loadBreathIn( self, strBreathSamplesPath ):
         """
@@ -65,7 +84,11 @@ class Breather:
         """
         Find a sample equal or slightly shorter than rApproxDuration and play it
         """
-        pygame_tools.soundPlayer.stopAll()
+        try:
+            pygame_tools.soundPlayer.stopAll()
+        except:
+            self.ap.stopAll()
+            pass
         nIdxBest = -1
         rBestApprox = -1
         i = 0
@@ -83,12 +106,18 @@ class Breather:
         
         print("INF: Play %s, vol: %5.1f" % (f.split('/')[-1],rSoundVolume) )
         
-        misctools.playWav(f, bWaitEnd=False, rSoundVolume=rSoundVolume)
+        if os.name == "nt":
+            misctools.playWav(f, bWaitEnd=False, rSoundVolume=rSoundVolume)
+        else:
+            self.ap.post.playFile(f,rSoundVolume,0.)
+            
         
         
     def update( self ):
         rTimeSinceLastUpdate = time.time() - self.timeLastUpdate
         self.timeLastUpdate = time.time()
+        
+        nPrevState = self.nState
         
         # update fullness
         if self.nState == Breather.kStateIn:
@@ -96,12 +125,16 @@ class Breather:
             
         if self.nState == Breather.kStateOut:
             self.rFull -= self.rNormalOutPerSec*self.rExcitationRate*rTimeSinceLastUpdate
-        
             
-        nPrevState = self.nState
+        if self.nState == Breather.kStateIdle:
+            self.rTimeIdle -= self.timeLastUpdate
+            if self.rTimeIdle < 0:
+                self.nState = Breather.kStateIn
+            
+
         
-        if self.nState != Breather.kStateIn and (self.rFull <= 0.1 or (self.rFull <= 0.3 and random.random()>0.95) ):
-            self.nState = Breather.kStateIn
+        if self.nState != Breather.kStateIn and (self.rFull <= 0.1 or (self.rFull <= 0.3 and random.random()>0.9) ):
+            self.nState = Breather.kStateIdle
             
         if self.nState != Breather.kStateOut and self.rFull >= 0.95:
             self.nState = Breather.kStateOut
@@ -110,14 +143,24 @@ class Breather:
             # play a sound
             if self.nState == Breather.kStateIn:
                 rTimeEstim = (1. - self.rFull) / (self.rNormalInPerSec*self.rExcitationRate)
+                if self.motion != None:
+                    self.motion.stopMove()
+                    self.motion.post.angleInterpolation( self.astrChain, [self.rAmp*0.1+self.rOffsetHip,(math.pi/2)+self.rAmp*self.rCoefArmAmp*0.1,(math.pi/2)+self.rAmp*self.rCoefArmAmp*0.1], rTimeEstim-0.15, True )
                 self.playBreath( self.aBreathIn, rTimeEstim )
+
                 
             if self.nState == Breather.kStateOut:
                 rTimeEstim = (self.rFull-0.1) / (self.rNormalOutPerSec*self.rExcitationRate)
+                if self.motion != None:
+                    self.motion.stopMove()
+                    self.motion.post.angleInterpolation( self.astrChain, [-self.rAmp*0.1+self.rOffsetHip,(math.pi/2)-self.rAmp*self.rCoefArmAmp*0.1,(math.pi/2)-self.rAmp*self.rCoefArmAmp*0.1], rTimeEstim-0.15, True )
                 self.playBreath( self.aBreathOut, rTimeEstim )  
                 
+            if self.nState == Breather.kStateIdle:
+                self.rTimeIdle = random.random() # jusqu'a 1sec d'idle
+                
             
-            self.rExcitationRate += noise.getSimplexNoise(time.time())/10. # random.random()*3 (change trop violemment)
+            self.rExcitationRate += noise.getSimplexNoise(time.time())/100. # random.random()*3 (change trop violemment)
             if self.rExcitationRate < 0.1: self.rExcitationRate = 0.1
             print("%5.2fs: INF: Breather.update: rFull: %4.2f, state: %s, rExcitation: %5.1f" % (time.time(),self.rFull,self.nState,self.rExcitationRate) )
         
@@ -141,14 +184,40 @@ class Breather:
 breather = Breather()
 
 def demo():
-    breather.loadBreathIn( "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/breath/selected_intake/")
-    breather.loadBreathOut( "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/breath/selected_outtake/")
+    
+    if os.name == "nt":
+        breather.loadBreathIn( "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/breath/selected_intake/")
+        breather.loadBreathOut( "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/breath/selected_outtake/")
+    else:
+        breather.loadBreathIn( "/home/nao/breath/selected_intake/")
+        breather.loadBreathOut( "/home/nao/breath/selected_outtake/")    
+        import naoqi
+        mem = naoqi.ALProxy("ALMemory", "localhost", 9559)        
     while 1:
         breather.update()
         time.sleep(0.05)
-        if misctools.getKeystrokeNotBlocking() != 0:
-            breather.increaseExcitation(0.1)
         
+        if os.name == "nt":
+            bTouch = misctools.getKeystrokeNotBlocking() != 0
+            rInc = 0.05
+        else:
+            bTouch = mem.getData("Device/SubDeviceList/Head/Touch/Front/Sensor/Value") != 0
+            rInc = 0.05
+        if bTouch:
+            breather.increaseExcitation(rInc)
+
+"""
+pb: trop en arriere: -2 sur KneePitch, -4 sur ravir
+son sur ravir moteur: robot a 60 pour excitation a 1, 65 pour 0.5, = 90 sur mon ordi
+
+# des fois, faire un soupir, pour vider les poumons:
+Dans les bronches une gaine de muscle lisse. A un moment donné ca se bloque avec de l'atp, ca devient rigide.
+Une facon de remettre a l'etat souple c'est de tirer un grand coup dessus => soupir: 2/3 fois le soupir courant. 
+Pas forcément plus longtemps. dans ce soupir qui sera plus fort, ca devrait pas etre plus fort que l'etat actuel 
+(tout est moins fort donc).
+
+# avant de parler: inspi plus vite plus fort et entendable
+"""
     
     
         

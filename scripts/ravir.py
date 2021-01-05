@@ -208,13 +208,15 @@ def demo():
 
 """
 pb: trop en arriere: -2 sur KneePitch, -4 sur ravir
-son sur ravir moteur: robot a 60 pour excitation a 1, 70 pour 0.5, = 90 sur mon ordi
+son sur ravir moteur: robot a 60 pour excitation a 1, 65 pour 0.5, = 90 sur mon ordi
 
 # des fois, faire un soupir, pour vider les poumons:
 Dans les bronches une gaine de muscle lisse. A un moment donné ca se bloque avec de l'atp, ca devient rigide.
 Une facon de remettre a l'etat souple c'est de tirer un grand coup dessus => soupir: 2/3 fois le soupir courant. 
 Pas forcément plus longtemps. dans ce soupir qui sera plus fort, ca devrait pas etre plus fort que l'etat actuel 
-(tout est moins fort donc)
+(tout est moins fort donc).
+
+# avant de parler: inspi plus vite plus fort et entendable
 """
     
     

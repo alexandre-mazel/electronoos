@@ -467,11 +467,11 @@ class CVOpenPose:
     def _loadModels( self ):
         t = time.time()
         self.net = cv2.dnn.readNetFromCaffe(self.strModelPath + self.protoFile, self.strModelPath + self.weightsFile)
-        if 1:
+        if 0:
             print("INF: Using CPU device")
             self.net.setPreferableBackend(cv2.dnn.DNN_TARGET_CPU)
         else:
-            print("INF: Using GPU device")
+            print("INF: Using GPU device") # biga-U18 export PYTHONPATH=/usr/local/lib/python3.6/dist-packages/cv2/python-3.6:$PYTHONPATH
             self.net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
             self.net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
         print("INF: time taken by loading: {:.3f}".format(time.time() - t)) # biga-U18: 1.25

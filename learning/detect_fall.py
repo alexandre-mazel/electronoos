@@ -480,7 +480,7 @@ def learn():
 
 # learn - end
 
-def analyseFilenameInPath( strPath, bForceRecompute = False, bRender=True ):
+def analyseFilenameInPath( strPath, bForceRecompute = False, bRender=True, bForceAlternateAngles = False ):
     """
     Return False if user want to quit.
     
@@ -507,14 +507,14 @@ def analyseFilenameInPath( strPath, bForceRecompute = False, bRender=True ):
         f = listFile[i]
         tf = strPath + f
         if os.path.isdir(tf):
-            bRet = analyseFilenameInPath(tf + os.sep,bForceRecompute=bForceRecompute,bRender=bRender,bForceAlternateAngles=bJustPrecompute)
+            bRet = analyseFilenameInPath(tf + os.sep,bForceRecompute=bForceRecompute,bRender=bRender,bForceAlternateAngles=bForceAlternateAngles)
             if not bRet: return bRet
             i += 1
             continue
         
         filename, file_extension = os.path.splitext(f)
         if ".png" in file_extension.lower() or ".jpg" in file_extension.lower(): 
-            skels = op.analyseFromFile(tf,bForceRecompute=bForceRecompute)
+            skels = op.analyseFromFile(tf,bForceRecompute=bForceRecompute,bForceAlternateAngles=bForceAlternateAngles)
             if bJustPrecompute:
                 i += 1
                 continue
@@ -619,6 +619,6 @@ if __name__ == "__main__":
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/demo/")
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test_frontal2/")
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/demo/")
-    analyseFilenameInPath(pathData+"/exported/")
+    analyseFilenameInPath(pathData+"/exported/", bForceRecompute = 1, bForceAlternateAngles = 1)
     #~ analyseFilenameInPath(pathData+"/tmp2/")
     

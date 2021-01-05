@@ -487,6 +487,7 @@ def analyseFilenameInPath( strPath, bForceRecompute = False, bRender=True ):
     Rappel: convert one video to png:
     ffmpeg -i in.mp4 -vsync 0 out%05d.png
     """
+    bJustPrecompute = 0
     print("INF: analyseFilenameInPath: strPath: %s" % strPath )
     op = cv2_openpose.CVOpenPose()
     if 1:
@@ -514,6 +515,9 @@ def analyseFilenameInPath( strPath, bForceRecompute = False, bRender=True ):
         filename, file_extension = os.path.splitext(f)
         if ".png" in file_extension.lower() or ".jpg" in file_extension.lower(): 
             skels = op.analyseFromFile(tf,bForceRecompute=bForceRecompute)
+            if bJustPrecompute:
+                i += 1
+                continue
             im = cv2.imread(tf)
             for skel in skels:
                 if 1:
@@ -589,7 +593,7 @@ def analyseFilenameInPath( strPath, bForceRecompute = False, bRender=True ):
                 # => use of the "a (%d).png" techniques
             
             if bRender:
-                key = cv2.waitKey(10)
+                key = cv2.waitKey(1)
                 print(key)
                 if key == ord('q') or key == 27:
                     bContinue = False
@@ -610,7 +614,7 @@ if __name__ == "__main__":
     pathData = "/home/am/"
     if os.name == "nt":  pathData = "d:/"
     
-    learn()
+    #~ learn()
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test/couche/", bForceRecompute=True)
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/demo/")
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test_frontal2/")

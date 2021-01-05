@@ -431,6 +431,15 @@ class Skeletons:
             raise StopIteration
         return self.aSkels[self.iter_idx]
         
+    
+    # some other nice sugars for indexing
+    def __len__(self):
+        return len(self.aSkels)
+    def __getitem__(self,key):
+        return self.aSkels[key]
+    def __delitem__(self,key):
+        del self.aSkels[key]
+        
 # class Skeletons - end
 
 class CVOpenPose:
@@ -634,7 +643,7 @@ class CVOpenPose:
         
     # analyse - end
     
-    def analyseFromFile( self, strImageFile, bForceRecompute=False ):
+    def analyseFromFile( self, strImageFile, bForceRecompute=False, bForceAlternateAngles = False ):
         """
         Analyse a file, and cache results in a file with same name.skl
         """
@@ -646,18 +655,62 @@ class CVOpenPose:
             return skels
         im = cv2.imread(strImageFile)
         skels = self.analyse(im)
-        if len(skels.aSkels) == 0 or skels.computeMaxAverageConfidence() < 0.3:
+        if len(skels.aSkels) == 0 or skels.computeMaxAverageConfidence() < 0.3 or bForceAlternateAngles:
             # try inverted (no need to test each angles)
             print("INF: analyseFromFile: trying reverted for '%s' ..." % strImageFile )
-            im = np.flipud(im)
-            skels2 = self.analyse(im)
+            im2 = np.flipud(im)
+            skels2 = self.analyse(im2)
             for sk in skels2:
                 if sk.computeAverageConfidence() > 0.3:
                     # invert all points upsidedown
                     for i in range(len(sk.listPoints)):
                         sk.listPoints[i] = sk.listPoints[i][0], im.shape[0] - sk.listPoints[i][1], sk.listPoints[i][2]
                     skels.aSkels.append(sk)
-                    
+            if bForceAlternateAngles:
+                # add the two 90 rotations
+                im2 = np.rot90(im)
+                skels2 = self.analyse(im2)
+                for sk in skels2:
+                    if sk.computeAverageConfidence() > 0.3:
+                        # invert all points upsidedown
+                        for i in range(len(sk.listPoints)):
+                            sk.listPoints[i] = (im.shape[1]-sk.listPoints[i][1]), sk.listPoints[i][0], sk.listPoints[i][2]
+                        skels.aSkels.append(sk)
+                im2 = np.rot90(im,3) # ccw
+                skels2 = self.analyse(im2)
+                for sk in skels2:
+                    if sk.computeAverageConfidence() > 0.3:
+                        # invert all points upsidedown
+                        for i in range(len(sk.listPoints)):
+                            sk.listPoints[i] = sk.listPoints[i][1], im.shape[0] - sk.listPoints[i][0], sk.listPoints[i][2]
+                        skels.aSkels.append(sk)
+                
+                # filter redundant skels
+                i = 0
+                while i < len(skels):
+                    n1 = skels[i].getNeckPos()
+                    j = i + 1
+                    while j < len(skels):
+                        n2 = skels[j].getNeckPos()
+                        if lenPts(n1,n2) < 10:
+                            c1 = skels[i].computeAverageConfidence()
+                            c2 = skels[j].computeAverageConfidence()
+                            bb1=skels[i].getBB()
+                            bb2=skels[j].getBB()
+                            bQuiteSameBB = lenPts(bb1,bb2)<20 and lenPts(bb1[2:],bb2[2:])<20 
+                            if c1 < 0.4 and c2 > 0.7 or (c1 > 0.7 and c2 > 0.7 and bQuiteSameBB and c1 < c2):
+                                del skels[i]
+                                break
+                            if c1 > c2:
+                                del skels[j]
+                                continue # continue on next j, without changing j
+                        j += 1
+                    else:
+                        # not out from the break in the while
+                        i += 1
+                        
+            
+                        
         skels.save(strSkelFilename)
         return skels
     # analyseFromFile - end
@@ -666,7 +719,7 @@ class CVOpenPose:
 
 # class CVOpenPose - end
 
-def analyseOneFile( strFilename, bForceRecompute=False ):
+def analyseOneFile( strFilename, bForceRecompute=False, bForceAlternateAngles = False ):
     
     op = CVOpenPose()
     if 0:
@@ -675,7 +728,7 @@ def analyseOneFile( strFilename, bForceRecompute=False ):
         skels= op.analyse(im)
         #~ skel = op.analyse(im) # to test time taken
     else:
-        skels = op.analyseFromFile(strFilename,bForceRecompute=bForceRecompute)
+        skels = op.analyseFromFile(strFilename,bForceRecompute=bForceRecompute,bForceAlternateAngles=bForceAlternateAngles)
         im = cv2.imread(strFilename)
     skels.render(im)
     
@@ -755,8 +808,11 @@ if __name__ == "__main__":
     strFilename = "../data/alexandre.jpg"
     strFilename = "../data/multiple_humans.jpg"
     strFilename = "../data/human_upsidedown.png"
+    strFilename = "../data/alexandre_rot1.jpg"
+    #~ strFilename = "../data/alexandre_rot2.jpg"
+    #~ strFilename = "../data/alexandre_rot3.jpg"
     if 1:
-        analyseOneFile(strFilename,bForceRecompute=True)
+        analyseOneFile(strFilename,bForceRecompute=True,bForceAlternateAngles=True)
     elif 0:
         # recherche multi angle
         op = CVOpenPose()

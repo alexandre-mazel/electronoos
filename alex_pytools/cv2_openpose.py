@@ -668,6 +668,7 @@ class CVOpenPose:
                     skels.aSkels.append(sk)
             if bForceAlternateAngles:
                 # add the two 90 rotations
+                print("INF: analyseFromFile: trying rotated for '%s' ..." % strImageFile )
                 im2 = np.rot90(im)
                 skels2 = self.analyse(im2)
                 for sk in skels2:

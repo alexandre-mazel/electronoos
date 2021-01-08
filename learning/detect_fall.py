@@ -593,7 +593,7 @@ def analyseFilenameInPath( strPath, bForceRecompute = False, bRender=True, bForc
                 # => use of the "a (%d).png" techniques
             
             if bRender:
-                key = cv2.waitKey(1)
+                key = cv2.waitKey(10)
                 print(key)
                 if key == ord('q') or key == 27:
                     bContinue = False
@@ -619,6 +619,6 @@ if __name__ == "__main__":
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/demo/")
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test_frontal2/")
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/demo/")
-    analyseFilenameInPath(pathData+"/exported/", bForceRecompute = 0, bForceAlternateAngles = 1)
+    analyseFilenameInPath(pathData+"/exported_gloucester/", bForceRecompute = 0, bForceAlternateAngles = 0)
     #~ analyseFilenameInPath(pathData+"/tmp2/")
     

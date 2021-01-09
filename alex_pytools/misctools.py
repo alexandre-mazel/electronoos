@@ -694,4 +694,4 @@ def autoTest():
 if __name__ == "__main__":
     autoTest()
     #~ viewSmoothstep()
-    #~ testSound()
+    testSound()

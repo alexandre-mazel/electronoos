@@ -43,7 +43,10 @@ def beepEveryHalf():
                 times = h
                 if times > 12:
                     times = times-12
-                misctools.ringTheBell(times) # h de 0 a 24 => de de 0 a 12 puis de 1 a 11
+                if times == 0:
+                    # NB: midnight => 12 coups
+                    times = 12
+                misctools.ringTheBell(times) # h de 0 a 24 => de 0 a 12 puis de 1 a 11
         else:
             #~ misctools.beep(880, 100)
             print("bim 15")

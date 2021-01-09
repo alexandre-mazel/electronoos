@@ -5,6 +5,7 @@
 #- fx ?
 ##########################################
 
+import os
 
 class SoundPlayer:
     """
@@ -16,51 +17,51 @@ class SoundPlayer:
     
     def __init__( self ):
         
+        self.pyGameSoudPlayer = None
+        
         if os.name == "nt":
-            self.bUsePyGame = True
+            try:
+                import pygame_tools
+                self.pyGameSoudPlayer = pygame_tools.soundPlayer
+            except BaseException as err:
+                print("WRN: SoundPlayer: pygames not found, using standard windows call, functionnalities reduced...\nerr: %s" % str(err) )
+            
         self.changePlayFreq()
         
     def changePlayFreq( self, newFreq = 44100 ):
-        FREQ = newFreq   # changing that can change the playing of some wav
-        BITSIZE = -16  # here unsigned 16 bit
-        CHANNELS = 2   # 1 is mono, 2 is stereo
-        BUFFER = 1024  # audio buffer size, number of samples
-
-        pg.mixer.init(FREQ, BITSIZE, CHANNELS, BUFFER)
+        if os.name == "nt":
+            if self.pyGameSoudPlayer:
+                self.pyGameSoudPlayer.changePlayFreq(newFreq)
         
-        self.listPreloadedSound = {}        
+        self.listPreloadedSound = {} 
         
     def loadFile( self, strFilename ):
         """
         preload file before playing them
         """
-        try:
-            return self.listPreloadedSound[strFilename]
-        except:
-            sound = pg.mixer.Sound(strFilename)
-            self.listPreloadedSound[strFilename] = sound
+        if os.name == "nt":
+            if self.pyGameSoudPlayer:
+                sound = self.pyGameSoudPlayer.loadFile(strFilename)
+
         return sound
         
         
     def playFile( self, strFilename, bWaitEnd = True, rSoundVolume = 1. ):
-        sound = self.loadFile( strFilename )
-        sound.set_volume(rSoundVolume)
-        sound.play()
-        # how often to check active playback
-        frame_rate = 30
-        if bWaitEnd:
-            clock = pg.time.Clock()
-            while pg.mixer.get_busy():
-                clock.tick(frame_rate)
+        if os.name == "nt":
+            if self.pyGameSoudPlayer:
+                return self.pyGameSoudPlayer.playFile(strFilename, bWaitEnd = bWaitEnd, rSoundVolume=rSoundVolume)
+
         
     def stopAll( self ):
-        pg.mixer.stop()
+        if os.name == "nt":
+            if self.pyGameSoudPlayer:
+                return self.pyGameSoudPlayer.stopAll()
         
 # class SoundPlayer - end
         
 soundPlayer = SoundPlayer()
 
-def testPlay()
+def testPlay():
     soundPlayer.playFile( "../data/ting.wav")
     soundPlayer.playFile( "../data/ting.wav", False)
     

@@ -83,7 +83,7 @@ class SoundPlayer:
 
         
     def stopAll( self ):
-        if self.play: return self.play.stopAll()
+        if self.player: return self.player.stopAll()
                 
         
 # class SoundPlayer - end
@@ -94,7 +94,9 @@ def testPlay():
     import time
     soundPlayer.playFile( "../data/ting.wav")
     soundPlayer.playFile( "../data/ting.wav", False)
-    time.sleep(0.6)
+    time.sleep(0.2)
+    soundPlayer.stopAll() #the second sound must be heard cut
+    time.sleep(1.) #ensure the stopAll has cut everything, and not because we're leaving the script
     
 if __name__ == "__main__":
     testPlay()

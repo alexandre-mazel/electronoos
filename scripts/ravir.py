@@ -9,8 +9,7 @@ if strLocalPath == "": strLocalPath = './'
 sys.path.append(strLocalPath+"/../alex_pytools/")
 import misctools
 import noise
-try: import pygame_tools
-except: pass
+import sound_player
 import wav
 
 import math
@@ -43,8 +42,6 @@ class Breather:
         self.motion = None
         
         if os.name != "nt":
-            import naoqi
-            self.ap = naoqi.ALProxy("ALAudioPlayer", "localhost", 9559)
             self.motion = naoqi.ALProxy("ALMotion", "localhost", 9559)
             self.astrChain = ["HipPitch","LShoulderPitch","RShoulderPitch"]
             
@@ -84,11 +81,8 @@ class Breather:
         """
         Find a sample equal or slightly shorter than rApproxDuration and play it
         """
-        try:
-            pygame_tools.soundPlayer.stopAll()
-        except:
-            self.ap.stopAll()
-            pass
+        sound_player.soundPlayer.stopAll()
+
         nIdxBest = -1
         rBestApprox = -1
         i = 0
@@ -106,10 +100,8 @@ class Breather:
         
         print("INF: Play %s, vol: %5.1f" % (f.split('/')[-1],rSoundVolume) )
         
-        if os.name == "nt":
-            misctools.playWav(f, bWaitEnd=False, rSoundVolume=rSoundVolume)
-        else:
-            self.ap.post.playFile(f,rSoundVolume,0.)
+        sound_player.soundPlayer.playFile(f, bWaitEnd=False, rSoundVolume=rSoundVolume)
+
             
         
         
@@ -211,9 +203,9 @@ pb: trop en arriere: -2 sur KneePitch, -4 sur ravir
 son sur ravir moteur: robot a 60 pour excitation a 1, 65 pour 0.5, = 90 sur mon ordi
 
 # des fois, faire un soupir, pour vider les poumons:
-Dans les bronches une gaine de muscle lisse. A un moment donné ca se bloque avec de l'atp, ca devient rigide.
+Dans les bronches une gaine de muscle lisse. A un moment donne ca se bloque avec de l'atp, ca devient rigide.
 Une facon de remettre a l'etat souple c'est de tirer un grand coup dessus => soupir: 2/3 fois le soupir courant. 
-Pas forcément plus longtemps. dans ce soupir qui sera plus fort, ca devrait pas etre plus fort que l'etat actuel 
+Pas forcement plus longtemps. dans ce soupir qui sera plus fort, ca devrait pas etre plus fort que l'etat actuel 
 (tout est moins fort donc).
 
 # avant de parler: inspi plus vite plus fort et entendable

@@ -490,37 +490,13 @@ def smoothererstep( x, edge0 = 0, edge1 = 1 ):
     # -20x7 + 70 x6 - 84 x5 + 35 x4
     return x * x * x * x * (  x * ( x * ( (x*-20) +70)-84) + 35 )
     
-def playWavPyGame( strFilename, bWaitEnd = True, rSoundVolume=1. ):
-    """
-    will load the whole sound into memory before playback
-    """
-    import pygame_tools
-    try:
-        pygame_tools.soundPlayer.playFile(strFilename, bWaitEnd=bWaitEnd,rSoundVolume=rSoundVolume)
-        return True
-    except BaseException as err:
-        print("DBG: misctools.playWavPyGame: err: %s" % str(err) )
-    return False
     
 def playWav( strFilename, bWaitEnd = True, rSoundVolume = 1. ):
     """
     play a wav, return False on error
     """
-    if playWavPyGame(strFilename, bWaitEnd=bWaitEnd,rSoundVolume=rSoundVolume):
-        return True
-        
-    import winsound
-    flags = winsound.SND_FILENAME
-    if not bWaitEnd:
-        flags |= winsound.SND_ASYNC | winsound.SND_NOSTOP
-    
-    try:
-        import winsound
-        winsound.PlaySound( strFilename, flags )
-        return True
-    except BaseException as err:
-        print("DBG: misctools.playWav: err: %s" % str(err) )
-    return False
+    import sound_player
+    return sound_player.soundPlayer.playFile(strFilename, bWaitEnd = bWaitEnd, rSoundVolume=rSoundVolume)
 
 def ting():
     """

@@ -48,6 +48,7 @@ class SoundPlayer:
             clock = pg.time.Clock()
             while pg.mixer.get_busy():
                 clock.tick(frame_rate)
+        return True
         
     def stopAll( self ):
         pg.mixer.stop()

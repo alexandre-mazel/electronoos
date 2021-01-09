@@ -23,6 +23,7 @@ class SoundPlayer:
             try:
                 import pygame_tools
                 self.pyGameSoudPlayer = pygame_tools.soundPlayer
+                
             except BaseException as err:
                 print("WRN: SoundPlayer: pygames not found, using standard windows call, functionnalities reduced...\nerr: %s" % str(err) )
             
@@ -50,6 +51,19 @@ class SoundPlayer:
         if os.name == "nt":
             if self.pyGameSoudPlayer:
                 return self.pyGameSoudPlayer.playFile(strFilename, bWaitEnd = bWaitEnd, rSoundVolume=rSoundVolume)
+            #windows standard
+            print("DBG: SoundPlayer.playFile: using standard windows api")
+            import winsound
+            flags = winsound.SND_FILENAME
+            if not bWaitEnd:
+                flags |= winsound.SND_ASYNC | winsound.SND_NOSTOP
+            
+            try:
+                import winsound
+                winsound.PlaySound( strFilename, flags )
+                return True
+            except BaseException as err:
+                print("ERR: SoundPlayer.playFile: err: %s" % str(err) )
 
         
     def stopAll( self ):

@@ -7,6 +7,18 @@
 
 import os
 
+
+# we don't want to import misctools here (cyclic import)
+def isNaoqi():
+    try:
+        f = open("/proc/cpuinfo", "rt")
+        buf=f.read()
+        f.close()
+    except:
+        return False
+    bIsNaoqi = "Geode" in buf  or "Intel(R) Atom(TM)" in buf
+    return bIsNaoqi
+
 class SoundPlayer:
     """
     handles playing of wav sound with preloading, caching...
@@ -17,40 +29,44 @@ class SoundPlayer:
     
     def __init__( self ):
         
-        self.pyGameSoudPlayer = None
+        self.player = None
         
-        if os.name == "nt":
+        bTryPygame = False
+        bIsNaoqi = isNaoqi()
+        
+        if os.name == "nt" or not bIsNaoqi:
+            bTryPygame = True
+            
+        if bTryPygame:
             try:
                 import pygame_tools
-                self.pyGameSoudPlayer = pygame_tools.soundPlayer
+                self.player = pygame_tools.soundPlayer
+                print("INF: SoundPlayer: using pygame") 
                 
             except BaseException as err:
-                print("WRN: SoundPlayer: pygames not found, using standard windows call, functionnalities reduced...\nerr: %s" % str(err) )
+                print("WRN: SoundPlayer: pygames not found, using standard call, functionnalities might be reduced...\nerr: %s" % str(err) )
+    
+        if bIsNaoqi:
+            import naoqi_tools
+            self.player = naoqi_tools.soundPlayer
+            print("INF: SoundPlayer: using naoqi")
             
         self.changePlayFreq()
         
     def changePlayFreq( self, newFreq = 44100 ):
-        if os.name == "nt":
-            if self.pyGameSoudPlayer:
-                self.pyGameSoudPlayer.changePlayFreq(newFreq)
-        
-        self.listPreloadedSound = {} 
+        self.player.changePlayFreq(newFreq)
         
     def loadFile( self, strFilename ):
         """
         preload file before playing them
         """
-        if os.name == "nt":
-            if self.pyGameSoudPlayer:
-                sound = self.pyGameSoudPlayer.loadFile(strFilename)
-
+        sound = self.player.loadFile(strFilename)
         return sound
         
         
     def playFile( self, strFilename, bWaitEnd = True, rSoundVolume = 1. ):
+        if self.player: return self.player.playFile(strFilename, bWaitEnd = bWaitEnd, rSoundVolume=rSoundVolume)
         if os.name == "nt":
-            if self.pyGameSoudPlayer:
-                return self.pyGameSoudPlayer.playFile(strFilename, bWaitEnd = bWaitEnd, rSoundVolume=rSoundVolume)
             #windows standard
             print("DBG: SoundPlayer.playFile: using standard windows api")
             import winsound
@@ -67,17 +83,18 @@ class SoundPlayer:
 
         
     def stopAll( self ):
-        if os.name == "nt":
-            if self.pyGameSoudPlayer:
-                return self.pyGameSoudPlayer.stopAll()
+        if self.play: return self.play.stopAll()
+                
         
 # class SoundPlayer - end
         
 soundPlayer = SoundPlayer()
 
 def testPlay():
+    import time
     soundPlayer.playFile( "../data/ting.wav")
     soundPlayer.playFile( "../data/ting.wav", False)
+    time.sleep(0.6)
     
 if __name__ == "__main__":
     testPlay()

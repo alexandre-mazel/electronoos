@@ -91,10 +91,26 @@ def isRPI():
         return global_bIsRaspberry
     print(buf)
     global_bIsRaspberry = "Raspberry Pi" in buf
-    print("INF: isRPI: %s" %  global_bIsRaspberry )
+    print("DBG: isRPI: %s" %  global_bIsRaspberry )
     return global_bIsRaspberry
 
-
+global_bIsNaoqi = None
+def isNaoqi():
+    global global_bIsNaoqi
+    if global_bIsNaoqi != None:
+        return global_bIsNaoqi
+    try:
+        f = open("/proc/cpuinfo", "rt")
+        buf=f.read()
+        f.close()
+    except:
+        global_bIsNaoqi = False
+        return global_bIsNaoqi
+    print(buf)
+    global_bIsNaoqi = "Geode" in buf  or "Intel(R) Atom(TM)" in buf
+    print("DBG: isNaoqi: %s" %  global_bIsNaoqi )
+    return global_bIsNaoqi
+    
     
 def getTime():
     """
@@ -664,10 +680,13 @@ def autoTest():
     check(levenshtein("Alexandre", "Alexandre"),0)
     check(levenshtein("Alexandre", "Alxendr"),3)
     
+    print("isRPI: %s" % isRPI())
+    print("isNaoqi: %s" % isNaoqi())
+    
     testPhoneticComparison()
     
     
 if __name__ == "__main__":
     autoTest()
     #~ viewSmoothstep()
-    testSound()
+    #~ testSound()

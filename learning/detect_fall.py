@@ -619,6 +619,7 @@ if __name__ == "__main__":
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/demo/")
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/test_frontal2/")
     #~ analyseFilenameInPath(cv2_openpose.strPathDeboutCouche+"fish/demo/")
-    analyseFilenameInPath(pathData+"/exported_gloucester/", bForceRecompute = 0, bForceAlternateAngles = 0)
+    #~ analyseFilenameInPath(pathData+"/exported_gloucester/", bForceRecompute = 0, bForceAlternateAngles = 0)
     #~ analyseFilenameInPath(pathData+"/tmp2/")
+    analyseFilenameInPath(pathData+"/export_processed/", bForceRecompute = 0, bForceAlternateAngles = 0)
     

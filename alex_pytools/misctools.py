@@ -709,6 +709,21 @@ def getKeystrokeNotBlocking():
             return 0
         return msvcrt.getch()
     print("getKeystrokeNotBlocking: NDEV linux, use select module...")
+    
+def isPauseRequired():
+    """
+    if you want to pause you're program, juste write a file in path temp nammed pause
+    """
+    f = getPathTemp() + "pause"
+    try:
+        file = open(f,"rt")
+        file.close()
+        os.unlink(f)
+        return True
+    except BaseException as err:
+        #~ print( "DBG: isPauseRequired: err: %s" % str(err) )
+        pass
+    return False
         
      
     
@@ -728,6 +743,7 @@ def autoTest():
     print("isNaoqi: %s" % isNaoqi())
     
     testPhoneticComparison()
+    print("isPauseRequired: %s" %isPauseRequired() )
     
     
 if __name__ == "__main__":

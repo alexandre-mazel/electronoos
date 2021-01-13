@@ -596,6 +596,7 @@ def analyseFilenameInPath( strPath, bForceRecompute = False, bRender=True, bForc
                 # ffmpeg -r 10 -i %06d.png -start_number 823 -vframes 169 -vf "fps=10,scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 output.gif
                 # => use of the "a (%d).png" techniques
             
+            bIsPauseRequired = misctools.isPauseRequired()
             if bRender:
                 key = cv2.waitKey(10)
                 print(key)
@@ -607,8 +608,10 @@ def analyseFilenameInPath( strPath, bForceRecompute = False, bRender=True, bForc
                     if i < 0:
                         i = -1
                 if key == ord('h'):
-                    print("%s: In pause for 5min" % misctools.getTimeStamp())
-                    time.sleep(5*60)           
+                    bIsPauseRequired = True
+            if bIsPauseRequired:
+                print("%s: In pause for 5min" % misctools.getTimeStamp())
+                time.sleep(5*60)
         i += 1
     # while - end
     

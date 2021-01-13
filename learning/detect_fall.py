@@ -9,11 +9,13 @@
 
 import sys
 sys.path.append("../alex_pytools/" )
+import misctools
 
 import cv2
 
 import cv2_openpose
 from cv2_openpose import Skeleton
+
 
 import sklearn 
 from sklearn import  svm
@@ -22,6 +24,8 @@ import os
 import math
 
 import numpy as np
+import time
+
 
 def renderCenteredText( im, strText, pt, nFontFace, rScale, color, nFontThickness ):
     rcRendered, baseline = cv2.getTextSize( strText, nFontFace, rScale, nFontThickness )
@@ -602,7 +606,9 @@ def analyseFilenameInPath( strPath, bForceRecompute = False, bRender=True, bForc
                     i -= 5 # skip also some previous file not images, like skel... - crappy!
                     if i < 0:
                         i = -1
-                
+                if key == ord('h'):
+                    print("%s: In pause for 5min" % misctools.getTimeStamp())
+                    time.sleep(5*60)           
         i += 1
     # while - end
     

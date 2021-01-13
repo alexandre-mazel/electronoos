@@ -6,6 +6,7 @@ import datetime
 import cv2 # made with cv 3.2.0-dev
 import numpy as np
 import os
+import platform
 import select
 import time
 import sys
@@ -160,6 +161,47 @@ def getFilenameFromTime(timestamp=None):
   return strTimeStamp;
 # getFilenameFromTime - end
 
+def cleanText( txt, bEatAll = True):
+    """
+    remove non character from a text badly encoded
+    - bEatAll: when True: remove all char not in the good range
+    """
+    out = ""
+    for c in txt:
+        if ord(c) < 254 and ord(c)>0: #255 and 254 (and 0) are specific encoding marks
+            out += c
+    return out
+
+def getSystemCallReturn( strCommand ):
+    f = getTempFilename()+".txt"
+    #~ print("DBG: getSystemCallReturn: running '%s' into '%s'" % (strCommand,f) )
+    os.system("%s>%s" % (strCommand,f) )
+    #file = open(f,"rt", encoding="utf-8", errors="surrogateescape") #cp1252 on windows, latin-1 on linux system
+    file = open(f,"rt")
+    data = file.read()
+    #~ print("DBG: getSystemCallReturn: data (1): %s" % str(data) )
+    if len(data) > 0 and ord(data[0]) == 255:
+        # command is of the type wmic and so is rotten in a wild burk encoding
+        #~ data = data.encode("cp1252", "strict").decode("cp1252", "strict") 
+        # can't find working solution for wmic => handling by hand
+        data = cleanText(data)
+        
+        
+    #~ print("DBG: getSystemCallReturn: data (2): %s" % str(data) )
+    #~ data = data.decode()
+    file.close()
+    #~ os.unlink(f)
+    return str(data)
+
+def getCpuModel(bShort=False):
+    if platform.system() == "Windows":
+        name1 = platform.processor()
+        name2 = getSystemCallReturn( "wmic cpu get name" ).split("\n")[-3]
+    else:
+        name1, name2 =  "TODO:getCpuModel", "todo"
+    if bShort: return name2
+    return name1, name2
+
 def is_available_resolution(cam,x,y):
     cam.set(cv2.CAP_PROP_FRAME_WIDTH, int(x))
     cam.set(cv2.CAP_PROP_FRAME_HEIGHT, int(y))
@@ -227,6 +269,7 @@ def get_video_devices():
     device_path = "/dev"
     file_names = [os.path.join(device_path, x) for x in os.listdir(device_path) if x.startswith("video")]
     return file_names
+    
 
 
 class WebCam():
@@ -670,6 +713,7 @@ def getKeystrokeNotBlocking():
      
     
 def autoTest():
+    print("cpu: %s" % str(getCpuModel()) )
     check(smoothstep(0),0)
     check(smoothstep(-1),0)
     check(smoothstep(0.5),0.5)

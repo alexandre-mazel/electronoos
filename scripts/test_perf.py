@@ -12,6 +12,10 @@ import struct
 import time
 import multiprocessing
 
+import sys
+sys.path.append("../alex_pytools/" )
+import misctools # just for cpumodel
+
 def getFreeDiskSpace():
     """
     return current disk space in bytes
@@ -23,6 +27,7 @@ def getFreeDiskSpace():
     import psutil # pip install psutil
     usa = psutil.disk_usage('/')
     return usa.free
+
 
 class FlushableFile:
     """
@@ -96,6 +101,9 @@ def clear_caches():
 
 def print_version():
     print( "python version   : %d.%d.%d (%dbits) (%d core(s))" % (sys.version_info.major,sys.version_info.minor,sys.version_info.micro,8 * struct.calcsize("P"),multiprocessing.cpu_count()) )
+    
+def print_cpu():
+    print( "cpu              : %s" % str(misctools.getCpuModel(bShort=True)) )
     
 def test_cpu_int( bPrint = True ):
     if bPrint: sys.stdout.write( "test_cpu_int2    : " )
@@ -347,6 +355,7 @@ def test_multithreading():
 
 def test_perf(nDiskTestSizeMB=200):
     print_version()
+    print_cpu()
     rTotalTime = 0;
     rTotalTime += test_cpu_int();
     rTotalTime += test_cpu_float();

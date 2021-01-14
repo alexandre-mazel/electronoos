@@ -16,7 +16,7 @@ def getNbrHourWind( strFile, rThresholdMeterSecond ):
     nCount = 0
     nCountTotal = 0
     for l in lines:
-        #~ print("nCptLine: %d/%d" % (nCptLine,len(lines)) )
+        print("nCptLine: %d/%d" % (nCptLine,len(lines)) )
         l = str(l)
         #~ print(l) 
         data = l.split(';')
@@ -40,8 +40,19 @@ def getNbrHourWind( strFile, rThresholdMeterSecond ):
     
 # getNbrHourWind - end
 rThresholdMeterSecond = 12
-print("rThresholdMeterSecond: %d m/s" % rThresholdMeterSecond )
+rWH = 7000 # watt heure at this ratio 
+print("rThresholdMeterSecond: %3.1f m/s - estimated production at this speed: %8.3fkWH" % (rThresholdMeterSecond,rWH/1000 ) )
+rRatioSum = 0
+rRatioCnt = 0
+rPowerSum = 0
 for m in range(1,13):
     strName = "C:/Users/amazel/perso/docs/creativeV/meteodata/synop.2020%02d.csv.gz" % m
     rRatio = getNbrHourWind(strName, rThresholdMeterSecond = rThresholdMeterSecond)
-    print("Month %2s: %5.1f min/day" % (m, rRatio*24*60) )
+    rPower = rRatio*rWH*24
+    rRatioSum += rRatio
+    rRatioCnt += 1
+    rPowerSum += rPower
+    print("Month %2s: %5.1f min/day - %d%% - production: %8.1fkWH" % (m, rRatio*24*60,int(rRatio*100),rPower/1000) )
+    
+rRatioSum /= rRatioCnt
+print("Year avg: %5.1f min/day - %d%% - production: %8.1fkWH" % (rRatioSum*24*60,int(rRatioSum*100),rPowerSum/1000) )

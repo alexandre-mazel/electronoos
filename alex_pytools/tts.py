@@ -40,6 +40,9 @@ class Tts:
         generate a wavfile and save it.
         return filename,rSpeechDuration
         """
+        
+        f,r = misctools.cache.get("tts_saytofile_" + txt ):
+            return f,r
         strOutputFilename = misctools.getTempFilename() + ".wav"
         listSound = []
         
@@ -131,6 +134,8 @@ class Tts:
             print("WRN:tts.sayToFile: nothing to say for '%s'" % txt )
             strOutputFilename = self.strPath+"silence_100ms.wav"
             rDuration = 0.1
+            
+        misctools.cache.store("tts_saytofile_" + txt, (strOutputFilename, rDuration) )
         return strOutputFilename, rDuration
         
     def say( self, txt ):

@@ -27,14 +27,19 @@ class Breather:
         
         # physical specification
         self.rSpeakDurationWhenFull = 5. # in sec
-        self.rNormalInPerSec = 1/1.2
-        self.rNormalOutPerSec = 1/1.8
+        rCoefAnatomic = 0.5 # 1 => enfant de 8 ans
+        self.rNormalInPerSec = 1/1.2*rCoefAnatomic
+        self.rNormalOutPerSec = 1/1.8*rCoefAnatomic
+        
+        # we naturally  doesn't use our full capacity
+        self.rNormalFull = 0.7
+        self.rNormalEmpty = 0.2
         
         self.rFull = 0. # fullness of limb from 0 to 1
         self.nState = Breather.kStateIdle
         self.timeLastUpdate = time.time()
         
-        self.rExcitationRate = 0.5 # va modifier la quantite d'air circulant par seconde, 1: normal, 0.5: tres cool, 2: excite, 3: tres excite 
+        self.rExcitationRate = 1. # va modifier la quantite d'air circulant par seconde, 1: normal, 0.5: tres cool, 2: excite, 3: tres excite 
         self.bReceiveExcitationFromExternal = False
         
         self.rTimeIdle = 0.
@@ -96,7 +101,7 @@ class Breather:
         
         rSoundVolume = 0.2 * self.rExcitationRate
         if rSoundVolume < 0.12: rSoundVolume = 0.12
-        if rSoundVolume > 0.5: rSoundVolume = 0.5
+        if rSoundVolume > 0.4: rSoundVolume = 0.4
         
         print("INF: Play %s, vol: %5.1f" % (f.split('/')[-1],rSoundVolume) )
         
@@ -125,10 +130,10 @@ class Breather:
             
 
         
-        if self.nState != Breather.kStateIn and (self.rFull <= 0.1 or (self.rFull <= 0.3 and random.random()>0.9) ):
+        if self.nState != Breather.kStateIn and (self.rFull <= self.rNormalEmpty or (self.rFull <= 0.4 and random.random()>0.9) ):
             self.nState = Breather.kStateIdle
             
-        if self.nState != Breather.kStateOut and self.rFull >= 0.95:
+        if self.nState != Breather.kStateOut and self.rFull >= self.rNormalFull:
             self.nState = Breather.kStateOut
             
         if self.nState != nPrevState:
@@ -142,7 +147,7 @@ class Breather:
 
                 
             if self.nState == Breather.kStateOut:
-                rTimeEstim = (self.rFull-0.1) / (self.rNormalOutPerSec*self.rExcitationRate)
+                rTimeEstim = (self.rFull-self.rNormalEmpty) / (self.rNormalOutPerSec*self.rExcitationRate)
                 if self.motion != None:
                     self.motion.stopMove()
                     self.motion.post.angleInterpolation( self.astrChain, [-self.rAmp*0.1+self.rOffsetHip,(math.pi/2)-self.rAmp*self.rCoefArmAmp*0.1,(math.pi/2)-self.rAmp*self.rCoefArmAmp*0.1], rTimeEstim-0.15, True )
@@ -157,7 +162,7 @@ class Breather:
             print("%5.2fs: INF: Breather.update: rFull: %4.2f, state: %s, rExcitation: %5.1f" % (time.time(),self.rFull,self.nState,self.rExcitationRate) )
         
             if self.bReceiveExcitationFromExternal:
-                if self.rExcitationRate >= 0.8:
+                if self.rExcitationRate >= 0.9:
                     self.rExcitationRate -= 0.02 # will mess  the nice simplex noise "average tends to 0"
                 else:
                     self.bReceiveExcitationFromExternal = False

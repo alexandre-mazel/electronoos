@@ -22,13 +22,13 @@ class Breather:
     kStateIdle = 0
     kStateIn = 1 # inspiration
     kStateOut = 2 # expiration
-    kStateSpeak = 3
-    kStateInBeforeSpeak = 4
+    kStateInBeforeSpeak = 3
+    kStateSpeak = 4
     
     def __init__( self ):
         
         # physical specification
-        self.rSpeakDurationWhenFull = 5. # in sec
+        self.rSpeakDurationWhenFull = 4. # in sec
 
         # we naturally  doesn't use our full capacity
         self.rNormalMax = 0.7
@@ -42,6 +42,8 @@ class Breather:
         rNormalAmplitude = self.rNormalMax-self.rNormalMin
         self.rNormalInPerSec = rNormalAmplitude / ( (2*rPeriod)/5 )
         self.rNormalOutPerSec = rNormalAmplitude / ( (3*rPeriod)/5 )
+        
+        self.rPreSpeakInRatio = 2.5
         
         print("rPeriod: %s" % rPeriod)
         print("self.rNormalInPerSec: %s" % self.rNormalInPerSec)
@@ -120,8 +122,14 @@ class Breather:
         f = listSoundAndDuration[nIdxBest][0]
         
         rSoundVolume = 0.2 * self.rExcitationRate
+        
+        if self.nState == Breather.kStateInBeforeSpeak:
+            rSoundVolume *= self.rPreSpeakInRatio
+            
         if rSoundVolume < 0.12: rSoundVolume = 0.12
         if rSoundVolume > 0.4: rSoundVolume = 0.4
+        
+
         
         print("INF: Play %s, vol: %5.1f" % (f.split('/')[-1],rSoundVolume) )
         
@@ -142,6 +150,9 @@ class Breather:
         # update fullness
         if self.nState == Breather.kStateIn:
             self.rFullness += self.rNormalInPerSec*self.rExcitationRate*rTimeSinceLastUpdate
+
+        if self.nState == Breather.kStateInBeforeSpeak:
+            self.rFullness += self.rNormalInPerSec*self.rExcitationRate*rTimeSinceLastUpdate*self.rPreSpeakInRatio
             
         if self.nState == Breather.kStateOut:
             self.rFullness -= self.rNormalOutPerSec*self.rExcitationRate*rTimeSinceLastUpdate
@@ -153,6 +164,7 @@ class Breather:
 
         if self.nState == Breather.kStateSpeak:
             self.rTimeSpeak -= rTimeSinceLastUpdate
+            self.rFullness -= self.rExcitationRate*rTimeSinceLastUpdate / self.rSpeakDurationWhenFull
             if self.rTimeSpeak < 0:
                 self.nState = Breather.kStateIdle
                 
@@ -161,10 +173,10 @@ class Breather:
             if self.rFullnessToSay < self.rFullness:
                 self.nState = Breather.kStateSpeak
             else:
-                self.nState = Breather.kStateIn
+                self.nState = Breather.kStateInBeforeSpeak
 
         
-        if self.nState != self.kStateSpeak:
+        if self.nState != Breather.kStateSpeak and self.nState != Breather.kStateInBeforeSpeak:
             # automatic change of in/out
             if self.nState != Breather.kStateIn and (self.rFullness <= self.rNormalMin or (self.rFullness <= self.rNormalMin+0.2 and random.random()>0.93) ):
                 self.nState = Breather.kStateIdle
@@ -175,12 +187,17 @@ class Breather:
         if self.nState != nPrevState:
             # play a sound
             
-            if self.nState == Breather.kStateIn:
+            if self.nState == Breather.kStateIn or self.nState == Breather.kStateInBeforeSpeak:
                 self.rTargetIn = self.rNormalMax
-                if  random.random()>0.95:
-                    print( "INF: full respi" )
-                    self.rTargetIn = 1.
+                if self.strFilenameToSay != "":
+                    self.rTargetIn = self.rFullnessToSay
+                else:
+                    if  random.random()>0.95:
+                        print( "INF: full respi" )
+                        self.rTargetIn = 1. 
                 rTimeEstim = ( self.rTargetIn - self.rFullness) / (self.rNormalInPerSec*self.rExcitationRate)
+                if self.nState == Breather.kStateInBeforeSpeak:
+                    rTimeEstim /= self.rPreSpeakInRatio
                 if self.motion != None:
                     self.motion.stopMove()
                     self.motion.post.angleInterpolation( self.astrChain, [self.rAmp*0.1+self.rOffsetHip,(math.pi/2)+self.rAmp*self.rCoefArmAmp*0.1,(math.pi/2)+self.rAmp*self.rCoefArmAmp*0.1], rTimeEstim-0.15, True )
@@ -253,7 +270,7 @@ def demo():
         
         if int(rT)%10 == 0 and time.time()-rTimeLastSpeak>2.:
             #~ msgs = ["oui", "d'accord", "Ah oui, je suis tout a fait d'accord!"]
-            msgs = ["moi aimer toi!"]
+            msgs = ["moi aimer toi pas du tout tres beaucoup!"]
             breather.say(msgs[random.randint(0,len(msgs)-1)])
             rTimeLastSpeak = time.time()
         

@@ -17,7 +17,9 @@ class Tts:
         self.dWord = dict() # for each word, a list of wavfile
         
         
-    def load( self, strPath ):
+    def load( self, strPath = None ):
+        if strPath == None:
+            strPath = misctools.getUserHome() + "tts_alexandre/"
         self.strPath = strPath
         for f in sorted(  os.listdir(strPath) ):
             words = f.split(".")[0].split("__")
@@ -29,14 +31,14 @@ class Tts:
                 #~ print("INF: '%s' => '%s'" % (strWord, self.dWord[strWord] ) )
             else:
                 print("WRN: '%s' no keyword found" % f )
-        print("IN F: load inished")
+        print("INF: load finished")
         
         
         
     def sayToFile( self, txt ):
         """
         generate a wavfile and save it.
-        return the filename
+        return filename,rSpeechDuration
         """
         strOutputFilename = misctools.getTempFilename() + ".wav"
         listSound = []
@@ -123,11 +125,16 @@ class Tts:
                 
             
             
-        wav.concatenateWav(listSound, strOutputFilename, 0.1)
-        return strOutputFilename
+        if len(listSound) > 1:
+            rDuration = wav.concatenateWav(listSound, strOutputFilename, 0.1)
+        else:
+            print("WRN:tts.sayToFile: nothing to say for '%s'" % txt )
+            strOutputFilename = self.strPath+"silence_100ms.wav"
+            rDuration = 0.1
+        return strOutputFilename, rDuration
         
     def say( self, txt ):
-        wavfile = self.sayToFile(txt)
+        wavfile,rDuration = self.sayToFile(txt)
         misctools.playWav(wavfile)
         
         
@@ -169,7 +176,7 @@ tts = Tts()
 
 def autoTest():
     tts = Tts()
-    tts.load("c:/tts_alexandre/")
+    tts.load()
     #~ tts.say("je aimer toi")
     #~ tts.say("je aimer toi, toi aimer moi.")
     #~ tts.say("Je aimer toi, toi aimer moi. Moi gentil.")
@@ -177,6 +184,8 @@ def autoTest():
     #~ tts.say("c'est la phrase dites initialement par Tarzan.")
     #~ tts.say("je etre gentil, et toi? Moi ca va !") # manque etre et avoir !!!
     #~ tts.say("toi faim?")
+    
+    tts.say("ok")
     
     
 if __name__ == "__main__":

@@ -29,6 +29,16 @@ def assert_greater(x,y):
     if x<y:
         assert(0)
         
+        
+def getUserHome():
+    """
+    return a temporary folder
+    """
+    if os.name == "nt":
+        ret = "c:/"
+    else:
+        ret = "~/"
+    return ret
 
 def getPathData():
     """

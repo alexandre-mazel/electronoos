@@ -15,6 +15,7 @@ import wav
 import math
 import random
 import time
+import tts
 
 
 class Breather:
@@ -22,6 +23,7 @@ class Breather:
     kStateIn = 1 # inspiration
     kStateOut = 2 # expiration
     kStateSpeak = 3
+    kStateInBeforeSpeak = 4
     
     def __init__( self ):
         
@@ -46,7 +48,7 @@ class Breather:
         print("self.rNormalOutPerSec: %s" % self.rNormalOutPerSec)
 
         
-        self.rFull = 0. # current fullness of limb from 0 to 1
+        self.rFullness = 0. # current fullness of limb from 0 to 1
         self.rTargetIn = self.rNormalMax
         self.nState = Breather.kStateIdle
         self.timeLastUpdate = time.time()
@@ -56,6 +58,8 @@ class Breather:
         
         self.rTimeIdle = 0.
         self.rTimeSpeak = 0.
+        
+        self.strFilenameToSay = "" # if set => want to speak
         
         self.motion = None
         
@@ -69,6 +73,9 @@ class Breather:
             self.rHeadDelay = 0.6
             self.rHeadPos = self.rAmp*self.rCoefArmAmp*0.1*1.5
             self.rOffsetHip = -0.0
+            
+            
+        tts.tts.load()
         
     def loadBreathIn( self, strBreathSamplesPath ):
         """
@@ -127,31 +134,43 @@ class Breather:
         rTimeSinceLastUpdate = time.time() - self.timeLastUpdate
         self.timeLastUpdate = time.time()
         
+        print("\n%5.2fs: DBG: Breather.update: state: %s, rFullness: %4.2f, rExcitation: %5.1f, self.rTimeIdle: %5.2f, self.rTimeSpeak: %5.2f, rTimeSinceLastUpdate: %5.2f" % (time.time(),self.nState,self.rFullness,self.rExcitationRate, self.rTimeIdle,self.rTimeSpeak,rTimeSinceLastUpdate) )
+
+        
         nPrevState = self.nState
         
         # update fullness
         if self.nState == Breather.kStateIn:
-            self.rFull += self.rNormalInPerSec*self.rExcitationRate*rTimeSinceLastUpdate
+            self.rFullness += self.rNormalInPerSec*self.rExcitationRate*rTimeSinceLastUpdate
             
         if self.nState == Breather.kStateOut:
-            self.rFull -= self.rNormalOutPerSec*self.rExcitationRate*rTimeSinceLastUpdate
+            self.rFullness -= self.rNormalOutPerSec*self.rExcitationRate*rTimeSinceLastUpdate
             
         if self.nState == Breather.kStateIdle:
-            self.rTimeIdle -= self.timeLastUpdate
+            self.rTimeIdle -= rTimeSinceLastUpdate
             if self.rTimeIdle < 0:
                 self.nState = Breather.kStateIn
 
         if self.nState == Breather.kStateSpeak:
-            self.kStateSpeak -= self.timeLastUpdate
-            if self.kStateSpeak < 0:
+            self.rTimeSpeak -= rTimeSinceLastUpdate
+            if self.rTimeSpeak < 0:
                 self.nState = Breather.kStateIdle
+                
+                
+        if self.strFilenameToSay != "" and self.nState != self.kStateSpeak:
+            if self.rFullnessToSay < self.rFullness:
+                self.nState = Breather.kStateSpeak
+            else:
+                self.nState = Breather.kStateIn
 
         
-        if self.nState != Breather.kStateIn and (self.rFull <= self.rNormalMin or (self.rFull <= self.rNormalMin+0.2 and random.random()>0.93) ):
-            self.nState = Breather.kStateIdle
-            
-        if self.nState != Breather.kStateOut and self.rFull >= self.rTargetIn:
-            self.nState = Breather.kStateOut
+        if self.nState != self.kStateSpeak:
+            # automatic change of in/out
+            if self.nState != Breather.kStateIn and (self.rFullness <= self.rNormalMin or (self.rFullness <= self.rNormalMin+0.2 and random.random()>0.93) ):
+                self.nState = Breather.kStateIdle
+                
+            if self.nState != Breather.kStateOut  and self.rFullness >= self.rTargetIn:
+                self.nState = Breather.kStateOut
             
         if self.nState != nPrevState:
             # play a sound
@@ -161,7 +180,7 @@ class Breather:
                 if  random.random()>0.95:
                     print( "INF: full respi" )
                     self.rTargetIn = 1.
-                rTimeEstim = ( self.rTargetIn - self.rFull) / (self.rNormalInPerSec*self.rExcitationRate)
+                rTimeEstim = ( self.rTargetIn - self.rFullness) / (self.rNormalInPerSec*self.rExcitationRate)
                 if self.motion != None:
                     self.motion.stopMove()
                     self.motion.post.angleInterpolation( self.astrChain, [self.rAmp*0.1+self.rOffsetHip,(math.pi/2)+self.rAmp*self.rCoefArmAmp*0.1,(math.pi/2)+self.rAmp*self.rCoefArmAmp*0.1], rTimeEstim-0.15, True )
@@ -169,7 +188,7 @@ class Breather:
 
                 
             if self.nState == Breather.kStateOut:
-                rTimeEstim = (self.rFull-self.rNormalMin) / (self.rNormalOutPerSec*self.rExcitationRate)
+                rTimeEstim = (self.rFullness-self.rNormalMin) / (self.rNormalOutPerSec*self.rExcitationRate)
                 if self.motion != None:
                     self.motion.stopMove()
                     self.motion.post.angleInterpolation( self.astrChain, [-self.rAmp*0.1+self.rOffsetHip,(math.pi/2)-self.rAmp*self.rCoefArmAmp*0.1,(math.pi/2)-self.rAmp*self.rCoefArmAmp*0.1], rTimeEstim-0.15, True )
@@ -177,11 +196,16 @@ class Breather:
                 
             if self.nState == Breather.kStateIdle:
                 self.rTimeIdle = random.random() # jusqu'a 1sec d'idle
-                
+
+            if self.nState == Breather.kStateSpeak:
+                sound_player.soundPlayer.stopAll()
+                sound_player.soundPlayer.playFile(self.strFilenameToSay, bWaitEnd=False)
+                self.strFilenameToSay = ""
             
             self.rExcitationRate += noise.getSimplexNoise(time.time())/100. # random.random()*3 (change trop violemment)
             if self.rExcitationRate < 0.1: self.rExcitationRate = 0.1
-            print("%5.2fs: INF: Breather.update: rFull: %4.2f, state: %s, rExcitation: %5.1f" % (time.time(),self.rFull,self.nState,self.rExcitationRate) )
+            
+            print("%5.2fs: INF: Breather.update: new state: %s, rFullness: %4.2f, rExcitation: %5.1f" % (time.time(),self.nState,self.rFullness,self.rExcitationRate) )
         
             if self.bReceiveExcitationFromExternal:
                 if self.rExcitationRate >= 0.9:
@@ -189,8 +213,11 @@ class Breather:
                 else:
                     self.bReceiveExcitationFromExternal = False
                 
-    def say( self, txt ):
-        pass
+    def say( self, strText ):
+        #~ self.strMessageToSay = txt
+        self.strFilenameToSay, self.rTimeSpeak = tts.tts.sayToFile( strText )
+        self.rFullnessToSay = self.rTimeSpeak / self.rSpeakDurationWhenFull
+        print("INF: Breather.say: rTimeSpeak: %5.2fs, rFullnessToSay: %5.2f" % (self.rTimeSpeak,self.rFullnessToSay) )
         
     def increaseExcitation( self, rInc ):
         print("INF: adding external excitation: %5.1f" % rInc)
@@ -212,8 +239,10 @@ def demo():
         breather.loadBreathOut( "/home/nao/breath/selected_outtake/")    
         import naoqi
         mem = naoqi.ALProxy("ALMemory", "localhost", 9559)
+        
     rT = 0
     rBeginT = time.time()
+    rTimeLastSpeak = time.time()-10
     while 1:
         rT = time.time() - rBeginT
         
@@ -222,8 +251,11 @@ def demo():
         time.sleep(0.05)
         
         
-        if int(rT)%15 == 0:
-            breather.say("oui", "ok", "Ah oui, je suis tout a fait d'accord!")
+        if int(rT)%10 == 0 and time.time()-rTimeLastSpeak>2.:
+            #~ msgs = ["oui", "d'accord", "Ah oui, je suis tout a fait d'accord!"]
+            msgs = ["moi aimer toi!"]
+            breather.say(msgs[random.randint(0,len(msgs)-1)])
+            rTimeLastSpeak = time.time()
         
         
         # interaction with the world

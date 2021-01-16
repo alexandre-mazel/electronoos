@@ -230,12 +230,20 @@ class Breather:
                 else:
                     self.bReceiveExcitationFromExternal = False
                 
-    def say( self, strText ):
+    def sayTts( self, strText ):
         #~ self.strMessageToSay = txt
         self.strFilenameToSay, self.rTimeSpeak = tts.tts.sayToFile( strText )
         self.rFullnessToSay = self.rTimeSpeak / self.rSpeakDurationWhenFull
-        print("INF: Breather.say: rTimeSpeak: %5.2fs, rFullnessToSay: %5.2f" % (self.rTimeSpeak,self.rFullnessToSay) )
+        print("INF: Breather.sayTts %s: rTimeSpeak: %5.2fs, rFullnessToSay: %5.2f" % (strText,self.rTimeSpeak,self.rFullnessToSay) )
         
+    def sayFile( self, filename ):
+        #~ self.strMessageToSay = txt
+        self.strFilenameToSay = filename
+        w = wav.Wav(filename,bLoadData=False)
+        self.rTimeSpeak = w.getDuration()
+        self.rFullnessToSay = self.rTimeSpeak / self.rSpeakDurationWhenFull
+        print("INF: Breather.sayFile %s: rTimeSpeak: %5.2fs, rFullnessToSay: %5.2f" % (filename,self.rTimeSpeak,self.rFullnessToSay) )
+                
     def increaseExcitation( self, rInc ):
         print("INF: adding external excitation: %5.1f" % rInc)
         self.rExcitationRate += rInc
@@ -251,9 +259,11 @@ def demo():
     if os.name == "nt":
         breather.loadBreathIn( "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/breath/selected_intake/")
         breather.loadBreathOut( "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/breath/selected_outtake/")
+        strTalkPath = "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut/rec2/"
     else:
         breather.loadBreathIn( "/home/nao/breath/selected_intake/")
-        breather.loadBreathOut( "/home/nao/breath/selected_outtake/")    
+        breather.loadBreathOut( "/home/nao/breath/selected_outtake/")
+        strTalkPath = "/home/nao/cut/rec1/"
         import naoqi
         mem = naoqi.ALProxy("ALMemory", "localhost", 9559)
         
@@ -269,9 +279,21 @@ def demo():
         
         
         if int(rT)%10 == 0 and time.time()-rTimeLastSpeak>2.:
-            #~ msgs = ["oui", "d'accord", "Ah oui, je suis tout a fait d'accord!"]
-            msgs = ["moi aimer toi pas du tout tres beaucoup!","moi","pas toi"]
-            breather.say(msgs[random.randint(0,len(msgs)-1)])
+            if 0:
+                #~ msgs = ["oui", "d'accord", "Ah oui, je suis tout a fait d'accord!"]
+                msgs = ["moi aimer toi pas du tout tres beaucoup!","moi","pas toi"]
+                breather.sayTts(msgs[random.randint(0,len(msgs)-1)])
+            else:
+                #msgs = ["s053__ah_merci_je_comprends_mieux_maintenant_je_suis_content_d_avoir_appris_seul_p1","s053__ah_merci_je_comprends_mieux_maintenant_je_suis_content_d_avoir_appris_seul_p2"]
+                msgs = []
+                msgs.append("s005__j_ai_remarque_qu_il_y_a_moins_de_monde_la_nuit_dans_les_rues_par_rapport_a_l_age")
+                msgs.append("s006__ca_me_gene_je_mens")
+                msgs.append("s007__j_ai_l_impression_de_ne_pas_savoir_quoi_faire_je_me_sens_en_minutes")
+                msgs.append("s008__je_ne_comprends_pas_pourquoi_il_y_a_une_difference_entre_le_jour_et_la_nuit_c_est_les")
+                msgs.append("s009__est_ce_que_tu_peux_m_expliquer_la_difference_qu_il_y_a_entre_toi_et")
+                msgs.append("s010__est_ce_que_tu_t_ennuies_toi")
+                msgs.append("s011__tu_fais_des_trucs_particuliers")
+                breather.sayFile(strTalkPath + msgs[random.randint(0,len(msgs)-1)] + ".wav")
             rTimeLastSpeak = time.time()
         
         

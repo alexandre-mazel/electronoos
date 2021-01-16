@@ -270,7 +270,7 @@ def demo():
         
         if int(rT)%10 == 0 and time.time()-rTimeLastSpeak>2.:
             #~ msgs = ["oui", "d'accord", "Ah oui, je suis tout a fait d'accord!"]
-            msgs = ["moi aimer toi pas du tout tres beaucoup!"]
+            msgs = ["moi aimer toi pas du tout tres beaucoup!","moi","pas toi"]
             breather.say(msgs[random.randint(0,len(msgs)-1)])
             rTimeLastSpeak = time.time()
         

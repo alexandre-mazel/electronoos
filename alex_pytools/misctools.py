@@ -767,6 +767,23 @@ def getActionRequired():
         #~ print( "DBG: getActionRequired: err: %s" % str(err) )
         pass
     return False
+    
+    
+class Cache:
+    
+    def __init__( self ):
+        self.stored = dict()
+        
+    def get( self, key ):
+        try:
+            return self.stored[key]
+        except: pass
+        return False
+        
+    def store( self, key, data ):
+        self.stored[key] = data
+# class Cache - end
+cache = Cache()
         
      
     

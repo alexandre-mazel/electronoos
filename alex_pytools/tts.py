@@ -40,8 +40,11 @@ class Tts:
         generate a wavfile and save it.
         return filename,rSpeechDuration
         """
-        
-        f,r = misctools.cache.get("tts_saytofile_" + txt ):
+        bDebug = 0
+        if bDebug: print("\n\nDBG: sayToFile('%s') - begin" % txt )
+        data = misctools.cache.get("tts_saytofile_" + txt )
+        if data != False:
+            f,r = data
             return f,r
         strOutputFilename = misctools.getTempFilename() + ".wav"
         listSound = []
@@ -55,8 +58,8 @@ class Tts:
                     if k == txt[:idxend]:
                         listSound.append(self.strPath+f[0])
                         txt = txt[idxend:].strip()
-                        print("txt found: %s" % k )
-                        print("txt remaining: %s" % txt )
+                        if bDebug: print("txt found: %s" % k )
+                        if bDebug: print("txt remaining: %s" % txt )
                         idxend = len(txt)
                         break
                 else:
@@ -69,11 +72,11 @@ class Tts:
             #~ words = txt.split(",.;?!") # split works only with one separator
             #~ print("words: %s" % words)
             listSentences = nltk.tokenize.sent_tokenize(txt)
-            print("listSentences: %s" % listSentences)
+            if bDebug: print("listSentences: %s" % listSentences)
             separators = [ "," , ";", "!", "?", ".", ":" ]
             for sentence in listSentences:
                 words = nltk.tokenize.word_tokenize(sentence)
-                print("words: %s" % words)
+                if bDebug: print("words: %s" % words)
                 idxend = len(words)
                 while len(words) > 0:
                     if words[0] in separators :
@@ -98,6 +101,7 @@ class Tts:
                         tomatch = words[0].lower()
                     #~ print("tomatch: %s" % tomatch)
                     for k,f in self.dWord.items():
+                        if bDebug: print("comp: '%s' and '%s'" % (k,tomatch))
                         #~ if k == tomatch:
                         if k == tomatch:
                             listSound.append(self.strPath+f[0])
@@ -128,7 +132,7 @@ class Tts:
                 
             
             
-        if len(listSound) > 1:
+        if len(listSound) > 0:
             rDuration = wav.concatenateWav(listSound, strOutputFilename, 0.1)
         else:
             print("WRN:tts.sayToFile: nothing to say for '%s'" % txt )
@@ -190,6 +194,8 @@ def autoTest():
     #~ tts.say("je etre gentil, et toi? Moi ca va !") # manque etre et avoir !!!
     #~ tts.say("toi faim?")
     
+    tts.say("moi")
+    tts.say("ok")
     tts.say("ok")
     
     

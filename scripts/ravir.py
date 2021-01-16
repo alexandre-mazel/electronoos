@@ -27,15 +27,27 @@ class Breather:
         
         # physical specification
         self.rSpeakDurationWhenFull = 5. # in sec
-        rCoefAnatomic = 0.5 # 1 => enfant de 8 ans
-        self.rNormalInPerSec = 1/1.2*rCoefAnatomic
-        self.rNormalOutPerSec = 1/1.8*rCoefAnatomic
-        
+
         # we naturally  doesn't use our full capacity
-        self.rNormalFull = 0.7
-        self.rNormalEmpty = 0.2
+        self.rNormalMax = 0.7
+        self.rNormalMin = 0.2
         
-        self.rFull = 0. # fullness of limb from 0 to 1
+        # La frequence respiratoire normale d'un adulte se situe entre 12 et 20. ici on va se mettre a 18: petit adulte
+        # enfant de 8 ans => 1 cycle en 3 sec
+        
+        #~ rCoefAnatomic = 1. # on va se baser sur un adulte moyen
+        rPeriod = 60/16
+        rNormalAmplitude = self.rNormalMax-self.rNormalMin
+        self.rNormalInPerSec = rNormalAmplitude / ( (2*rPeriod)/5 )
+        self.rNormalOutPerSec = rNormalAmplitude / ( (3*rPeriod)/5 )
+        
+        print("rPeriod: %s" % rPeriod)
+        print("self.rNormalInPerSec: %s" % self.rNormalInPerSec)
+        print("self.rNormalOutPerSec: %s" % self.rNormalOutPerSec)
+
+        
+        self.rFull = 0. # current fullness of limb from 0 to 1
+        self.rTargetIn = self.rNormalMax
         self.nState = Breather.kStateIdle
         self.timeLastUpdate = time.time()
         
@@ -43,6 +55,7 @@ class Breather:
         self.bReceiveExcitationFromExternal = False
         
         self.rTimeIdle = 0.
+        self.rTimeSpeak = 0.
         
         self.motion = None
         
@@ -127,19 +140,28 @@ class Breather:
             self.rTimeIdle -= self.timeLastUpdate
             if self.rTimeIdle < 0:
                 self.nState = Breather.kStateIn
-            
+
+        if self.nState == Breather.kStateSpeak:
+            self.kStateSpeak -= self.timeLastUpdate
+            if self.kStateSpeak < 0:
+                self.nState = Breather.kStateIdle
 
         
-        if self.nState != Breather.kStateIn and (self.rFull <= self.rNormalEmpty or (self.rFull <= 0.4 and random.random()>0.9) ):
+        if self.nState != Breather.kStateIn and (self.rFull <= self.rNormalMin or (self.rFull <= self.rNormalMin+0.2 and random.random()>0.93) ):
             self.nState = Breather.kStateIdle
             
-        if self.nState != Breather.kStateOut and self.rFull >= self.rNormalFull:
+        if self.nState != Breather.kStateOut and self.rFull >= self.rTargetIn:
             self.nState = Breather.kStateOut
             
         if self.nState != nPrevState:
             # play a sound
+            
             if self.nState == Breather.kStateIn:
-                rTimeEstim = (1. - self.rFull) / (self.rNormalInPerSec*self.rExcitationRate)
+                self.rTargetIn = self.rNormalMax
+                if  random.random()>0.95:
+                    print( "INF: full respi" )
+                    self.rTargetIn = 1.
+                rTimeEstim = ( self.rTargetIn - self.rFull) / (self.rNormalInPerSec*self.rExcitationRate)
                 if self.motion != None:
                     self.motion.stopMove()
                     self.motion.post.angleInterpolation( self.astrChain, [self.rAmp*0.1+self.rOffsetHip,(math.pi/2)+self.rAmp*self.rCoefArmAmp*0.1,(math.pi/2)+self.rAmp*self.rCoefArmAmp*0.1], rTimeEstim-0.15, True )
@@ -147,7 +169,7 @@ class Breather:
 
                 
             if self.nState == Breather.kStateOut:
-                rTimeEstim = (self.rFull-self.rNormalEmpty) / (self.rNormalOutPerSec*self.rExcitationRate)
+                rTimeEstim = (self.rFull-self.rNormalMin) / (self.rNormalOutPerSec*self.rExcitationRate)
                 if self.motion != None:
                     self.motion.stopMove()
                     self.motion.post.angleInterpolation( self.astrChain, [-self.rAmp*0.1+self.rOffsetHip,(math.pi/2)-self.rAmp*self.rCoefArmAmp*0.1,(math.pi/2)-self.rAmp*self.rCoefArmAmp*0.1], rTimeEstim-0.15, True )
@@ -200,7 +222,11 @@ def demo():
         time.sleep(0.05)
         
         
-        # outing
+        if int(rT)%15 == 0:
+            breather.say("oui", "ok", "Ah oui, je suis tout a fait d'accord!")
+        
+        
+        # interaction with the world
         if os.name == "nt":
             bTouch = misctools.getKeystrokeNotBlocking() != 0
             rInc = 0.05

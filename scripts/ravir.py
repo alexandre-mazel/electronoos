@@ -230,6 +230,9 @@ class Breather:
                 else:
                     self.bReceiveExcitationFromExternal = False
                 
+    def isSpeaking( self ):
+        return self.strFilenameToSay != "" or self.nState == Breather.kStateSpeak
+        
     def sayTts( self, strText ):
         #~ self.strMessageToSay = txt
         self.strFilenameToSay, self.rTimeSpeak = tts.tts.sayToFile( strText )
@@ -278,7 +281,8 @@ def demo():
         time.sleep(0.05)
         
         
-        if int(rT)%10 == 0 and time.time()-rTimeLastSpeak>2.:
+        #if int(rT)%15 == 0 and time.time()-rTimeLastSpeak>2.:
+        if random.random()>0.98 and not breather.isSpeaking():
             if 0:
                 #~ msgs = ["oui", "d'accord", "Ah oui, je suis tout a fait d'accord!"]
                 msgs = ["moi aimer toi pas du tout tres beaucoup!","moi","pas toi"]
@@ -293,6 +297,8 @@ def demo():
                 msgs.append("s009__est_ce_que_tu_peux_m_expliquer_la_difference_qu_il_y_a_entre_toi_et")
                 msgs.append("s010__est_ce_que_tu_t_ennuies_toi")
                 msgs.append("s011__tu_fais_des_trucs_particuliers")
+                msgs.append("s021__j_ai_remarque_depuis_quelques_temps_que_vous_les_humains_vous_mettez_les_trucs_bleus_sur_votre_fille")
+                msgs.append("s022__je_m_appelle_comment")
                 breather.sayFile(strTalkPath + msgs[random.randint(0,len(msgs)-1)] + ".wav")
             rTimeLastSpeak = time.time()
         

@@ -712,7 +712,7 @@ def getKeystrokeNotBlocking():
     
 def isPauseRequired():
     """
-    if you want to pause you're program, juste write a file in path temp nammed pause
+    if you want to pause you're program, juste write a file in path temp nammed "pause"
     """
     f = getPathTemp() + "pause"
     try:
@@ -722,6 +722,39 @@ def isPauseRequired():
         return True
     except BaseException as err:
         #~ print( "DBG: isPauseRequired: err: %s" % str(err) )
+        pass
+    return False
+    
+def isExitRequired():
+    """
+    if you want to exit you're program, juste write a file in path temp nammed "exit"
+    """
+    f = getPathTemp() + "exit"
+    try:
+        file = open(f,"rt")
+        file.close()
+        os.unlink(f)
+        return True
+    except BaseException as err:
+        #~ print( "DBG: isExitRequired: err: %s" % str(err) )
+        pass
+    return False
+    
+def getActionRequired():
+    """
+    if you want to bang you're program, juste write a file in path temp nammed "interact".
+    return False if no action required or a string. NB: the string can be empty, then it's just a bang.
+    
+    """
+    f = getPathTemp() + "interact"
+    try:
+        file = open(f,"rt")
+        data = file.read()
+        file.close()
+        os.unlink(f)
+        return data
+    except BaseException as err:
+        #~ print( "DBG: getActionRequired: err: %s" % str(err) )
         pass
     return False
         
@@ -743,7 +776,11 @@ def autoTest():
     print("isNaoqi: %s" % isNaoqi())
     
     testPhoneticComparison()
-    print("isPauseRequired: %s" %isPauseRequired() )
+    actionRequired = getActionRequired()
+    print("getActionRequired: '%s'" % actionRequired )
+    print("getActionRequired: != False: %s" % (actionRequired != False) )
+    print("isPauseRequired: %s" % isPauseRequired() )
+    print("isExitRequired: %s" % isExitRequired() )
     
     
 if __name__ == "__main__":

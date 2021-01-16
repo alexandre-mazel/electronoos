@@ -158,7 +158,7 @@ class Breather:
         
             if self.bReceiveExcitationFromExternal:
                 if self.rExcitationRate >= 0.8:
-                    self.rExcitationRate -= 0.1 # will mess  the nice simplex noise average tends to 0
+                    self.rExcitationRate -= 0.02 # will mess  the nice simplex noise "average tends to 0"
                 else:
                     self.bReceiveExcitationFromExternal = False
                 
@@ -184,33 +184,56 @@ def demo():
         breather.loadBreathIn( "/home/nao/breath/selected_intake/")
         breather.loadBreathOut( "/home/nao/breath/selected_outtake/")    
         import naoqi
-        mem = naoqi.ALProxy("ALMemory", "localhost", 9559)        
+        mem = naoqi.ALProxy("ALMemory", "localhost", 9559)
+    rT = 0
+    rBeginT = time.time()
     while 1:
+        rT = time.time() - rBeginT
+        
         breather.update()
+        
         time.sleep(0.05)
         
+        
+        # outing
         if os.name == "nt":
             bTouch = misctools.getKeystrokeNotBlocking() != 0
             rInc = 0.05
         else:
             bTouch = mem.getData("Device/SubDeviceList/Head/Touch/Front/Sensor/Value") != 0
             rInc = 0.05
+            
+        bTouch |= misctools.getActionRequired() != False
+        
         if bTouch:
             breather.increaseExcitation(rInc)
+            
+        bExit = misctools.isExitRequired()
+        
+        if bExit:
+            print( "Exiting..." )
+            break
+    # while - end
+# demo - end
+
+
+#~ pb: trop en arriere: -2 sur KneePitch, -4 sur ravir
+#~ son sur ravir moteur: robot a 60 pour excitation a 1, 65 pour 0.5, = 90 sur mon ordi
 
 """
-pb: trop en arriere: -2 sur KneePitch, -4 sur ravir
-son sur ravir moteur: robot a 60 pour excitation a 1, 65 pour 0.5, = 90 sur mon ordi
-
 # des fois, faire un soupir, pour vider les poumons:
+
 Dans les bronches une gaine de muscle lisse. A un moment donne ca se bloque avec de l'atp, ca devient rigide.
-Une facon de remettre a l'etat souple c'est de tirer un grand coup dessus => soupir: 2/3 fois le soupir courant. 
+
+Une facon de remettre a l'etat souple c'est de tirer un grand coup dessus => soupir: 2 a 3 fois le soupir courant. 
+
 Pas forcement plus longtemps. dans ce soupir qui sera plus fort, ca devrait pas etre plus fort que l'etat actuel 
+
 (tout est moins fort donc).
+
 
 # avant de parler: inspi plus vite plus fort et entendable
 """
-    
     
         
 if __name__ == "__main__":

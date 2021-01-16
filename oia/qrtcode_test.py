@@ -5,7 +5,7 @@ import qrcode
 filename_qr_code = "qrcode.png"
 #~ filename_qr_code = "photo_with_qrcode.jpg"
 
-if 1:
+if 0:
     #generate an image containing a QR code
     # example data
     data = "Room: L206"
@@ -56,13 +56,15 @@ while(True):
     data, bbox, straight_qrcode = detector.detectAndDecode(frame)
     # print("data: '%s', bbox:%s straight_qrcode:%s" % (data, bbox, straight_qrcode) )
     if data != "":
+        print("data: '%s', bbox:%s straight_qrcode:%s" % (data, bbox, straight_qrcode) )
         strPre = "Room: "
         if strPre in data:
             data = data[len(strPre):]
             print("Vous etes en %s" % data)
     cv2.imshow("qrcode",frame)
     #~ cv2.imshow('gray',gray)
-    if cv2.waitKey(100) & 0xFF == ord('q'):
+    key = cv2.waitKey(100) & 0xFF
+    if key == ord('q') or key == 27:
         break  
 
 

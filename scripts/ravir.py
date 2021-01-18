@@ -76,9 +76,10 @@ class Breather:
             self.rHeadDelay = 0.6
             self.rHeadPos = self.rAmp*self.rCoefArmAmp*0.1*1.5
             self.rOffsetHip = -0.0
+        else:
+            self.leds = False
             
             
-        #~ tts.tts.load()
         
     def loadBreathIn( self, strBreathSamplesPath ):
         """
@@ -215,13 +216,13 @@ class Breather:
                 
             if self.nState == Breather.kStateIdle:
                 self.rTimeIdle = random.random() # jusqu'a 1sec d'idle
-                self.leds.post.fadeRGB("FaceLeds", 0x202020, 0.5)
+                if self.leds: self.leds.post.fadeRGB("FaceLeds", 0x202020, 0.5)
                 if nPrevState == Breather.kStateSpeak:
                     self.rTimeIdle += 0.5
 
             if self.nState == Breather.kStateSpeak:
                 sound_player.soundPlayer.stopAll()
-                self.leds.fadeRGB("FaceLeds", 0x0000FF, 0.00)
+                if self.leds: self.leds.fadeRGB("FaceLeds", 0x0000FF, 0.00)
                 sound_player.soundPlayer.playFile(self.strFilenameToSay, bWaitEnd=False)
                 if self.motion != None:
                     rTimeEstim = self.rTimeSpeak
@@ -246,6 +247,7 @@ class Breather:
         
     def sayTts( self, strText ):
         import tts
+        if tts.tts.isLoaded(): tts.tts.load()
         #~ self.strMessageToSay = txt
         self.strFilenameToSay, self.rTimeSpeak = tts.tts.sayToFile( strText )
         self.rFullnessToSay = self.rTimeSpeak / self.rSpeakDurationWhenFull

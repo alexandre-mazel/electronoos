@@ -15,6 +15,10 @@ class Tts:
     
     def __init__( self ):
         self.dWord = dict() # for each word, a list of wavfile
+        self.bLoaded = False
+        
+    def isLoaded( self ):
+        return self.bLoaded
         
         
     def load( self, strPath = None ):
@@ -31,6 +35,7 @@ class Tts:
                 #~ print("INF: '%s' => '%s'" % (strWord, self.dWord[strWord] ) )
             else:
                 print("WRN: '%s' no keyword found" % f )
+        self.bLoaded = True
         print("INF: load finished")
         
         

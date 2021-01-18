@@ -37,7 +37,7 @@ class SoundPlayer:
         
         
     def playFile( self, strFilename, bWaitEnd = True, rSoundVolume = 1. ):
-        soundID = loadFile(strFilename)
+        soundID = self.loadFile(strFilename)
         if bWaitEnd:
             self.ap.play( soundID, rSoundVolume, 0.)
         else:
@@ -46,7 +46,7 @@ class SoundPlayer:
         return True
         
     def stopAll( self ):
-        self.ap.stop()
+        self.ap.stopAll()
         
 # class SoundPlayer - end
         

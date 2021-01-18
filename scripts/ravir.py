@@ -15,7 +15,6 @@ import wav
 import math
 import random
 import time
-import tts
 
 
 class Breather:
@@ -66,6 +65,7 @@ class Breather:
         self.motion = None
         
         if os.name != "nt":
+            import naoqi
             self.motion = naoqi.ALProxy("ALMotion", "localhost", 9559)
             self.astrChain = ["HipPitch","LShoulderPitch","RShoulderPitch"]
             
@@ -77,7 +77,7 @@ class Breather:
             self.rOffsetHip = -0.0
             
             
-        tts.tts.load()
+        #~ tts.tts.load()
         
     def loadBreathIn( self, strBreathSamplesPath ):
         """
@@ -121,12 +121,12 @@ class Breather:
             i += 1
         f = listSoundAndDuration[nIdxBest][0]
         
-        rSoundVolume = 0.2 * self.rExcitationRate
+        rSoundVolume = 0.18 * self.rExcitationRate
         
         if self.nState == Breather.kStateInBeforeSpeak:
             rSoundVolume *= self.rPreSpeakInRatio
             
-        if rSoundVolume < 0.12: rSoundVolume = 0.12
+        if rSoundVolume < 0.1: rSoundVolume = 0.1
         if rSoundVolume > 0.4: rSoundVolume = 0.4
         
 
@@ -142,7 +142,7 @@ class Breather:
         rTimeSinceLastUpdate = time.time() - self.timeLastUpdate
         self.timeLastUpdate = time.time()
         
-        print("\n%5.2fs: DBG: Breather.update: state: %s, rFullness: %4.2f, rExcitation: %5.1f, self.rTimeIdle: %5.2f, self.rTimeSpeak: %5.2f, rTimeSinceLastUpdate: %5.2f" % (time.time(),self.nState,self.rFullness,self.rExcitationRate, self.rTimeIdle,self.rTimeSpeak,rTimeSinceLastUpdate) )
+        #~ print("\n%5.2fs: DBG: Breather.update: state: %s, rFullness: %4.2f, rExcitation: %5.1f, self.rTimeIdle: %5.2f, self.rTimeSpeak: %5.2f, rTimeSinceLastUpdate: %5.2f" % (time.time(),self.nState,self.rFullness,self.rExcitationRate, self.rTimeIdle,self.rTimeSpeak,rTimeSinceLastUpdate) )
 
         
         nPrevState = self.nState
@@ -190,7 +190,8 @@ class Breather:
             if self.nState == Breather.kStateIn or self.nState == Breather.kStateInBeforeSpeak:
                 self.rTargetIn = self.rNormalMax
                 if self.strFilenameToSay != "":
-                    self.rTargetIn = self.rFullnessToSay
+                    self.rTargetIn = self.rFullnessToSay +0.3 # add margin to prevent having to full respi at the end
+                    if self.rTargetIn > 1.: self.rTargetIn = 1.
                 else:
                     if  random.random()>0.95:
                         print( "INF: full respi" )
@@ -213,10 +214,17 @@ class Breather:
                 
             if self.nState == Breather.kStateIdle:
                 self.rTimeIdle = random.random() # jusqu'a 1sec d'idle
+                if nPrevState == Breather.kStateSpeak:
+                    self.rTimeIdle += 0.5
 
             if self.nState == Breather.kStateSpeak:
                 sound_player.soundPlayer.stopAll()
                 sound_player.soundPlayer.playFile(self.strFilenameToSay, bWaitEnd=False)
+                if self.motion != None:
+                    rTimeEstim = self.rTimeSpeak
+                    self.motion.stopMove()
+                    self.motion.post.angleInterpolation( self.astrChain, [-self.rAmp*0.1+self.rOffsetHip,(math.pi/2)-self.rAmp*self.rCoefArmAmp*0.1,(math.pi/2)-self.rAmp*self.rCoefArmAmp*0.1], rTimeEstim-0.15, True )
+
                 self.strFilenameToSay = ""
             
             self.rExcitationRate += noise.getSimplexNoise(time.time())/100. # random.random()*3 (change trop violemment)
@@ -234,6 +242,7 @@ class Breather:
         return self.strFilenameToSay != "" or self.nState == Breather.kStateSpeak
         
     def sayTts( self, strText ):
+        import tts
         #~ self.strMessageToSay = txt
         self.strFilenameToSay, self.rTimeSpeak = tts.tts.sayToFile( strText )
         self.rFullnessToSay = self.rTimeSpeak / self.rSpeakDurationWhenFull
@@ -266,13 +275,14 @@ def demo():
     else:
         breather.loadBreathIn( "/home/nao/breath/selected_intake/")
         breather.loadBreathOut( "/home/nao/breath/selected_outtake/")
-        strTalkPath = "/home/nao/cut/rec1/"
+        strTalkPath = "/home/nao/cut/rec2/"
         import naoqi
         mem = naoqi.ALProxy("ALMemory", "localhost", 9559)
         
     rT = 0
     rBeginT = time.time()
     rTimeLastSpeak = time.time()-10
+    bForceSpeak = False
     while 1:
         rT = time.time() - rBeginT
         
@@ -281,27 +291,29 @@ def demo():
         time.sleep(0.05)
         
         
-        #if int(rT)%15 == 0 and time.time()-rTimeLastSpeak>2.:
-        if random.random()>0.98 and not breather.isSpeaking():
-            if 0:
-                #~ msgs = ["oui", "d'accord", "Ah oui, je suis tout a fait d'accord!"]
-                msgs = ["moi aimer toi pas du tout tres beaucoup!","moi","pas toi"]
-                breather.sayTts(msgs[random.randint(0,len(msgs)-1)])
-            else:
-                #msgs = ["s053__ah_merci_je_comprends_mieux_maintenant_je_suis_content_d_avoir_appris_seul_p1","s053__ah_merci_je_comprends_mieux_maintenant_je_suis_content_d_avoir_appris_seul_p2"]
-                msgs = []
-                msgs.append("s005__j_ai_remarque_qu_il_y_a_moins_de_monde_la_nuit_dans_les_rues_par_rapport_a_l_age")
-                msgs.append("s006__ca_me_gene_je_mens")
-                msgs.append("s007__j_ai_l_impression_de_ne_pas_savoir_quoi_faire_je_me_sens_en_minutes")
-                msgs.append("s008__je_ne_comprends_pas_pourquoi_il_y_a_une_difference_entre_le_jour_et_la_nuit_c_est_les")
-                msgs.append("s009__est_ce_que_tu_peux_m_expliquer_la_difference_qu_il_y_a_entre_toi_et")
-                msgs.append("s010__est_ce_que_tu_t_ennuies_toi")
-                msgs.append("s011__tu_fais_des_trucs_particuliers")
-                msgs.append("s021__j_ai_remarque_depuis_quelques_temps_que_vous_les_humains_vous_mettez_les_trucs_bleus_sur_votre_fille")
-                msgs.append("s022__je_m_appelle_comment")
-                breather.sayFile(strTalkPath + msgs[random.randint(0,len(msgs)-1)] + ".wav")
-            rTimeLastSpeak = time.time()
-        
+        if 1:
+            #if int(rT)%15 == 0 and time.time()-rTimeLastSpeak>2.:
+            if ( random.random()>0.999 or bForceSpeak ) and not breather.isSpeaking():
+                bForceSpeak = False
+                if 0:
+                    #~ msgs = ["oui", "d'accord", "Ah oui, je suis tout a fait d'accord!"]
+                    msgs = ["moi aimer toi pas du tout tres beaucoup!","moi","pas toi"]
+                    breather.sayTts(msgs[random.randint(0,len(msgs)-1)])
+                else:
+                    #msgs = ["s053__ah_merci_je_comprends_mieux_maintenant_je_suis_content_d_avoir_appris_seul_p1","s053__ah_merci_je_comprends_mieux_maintenant_je_suis_content_d_avoir_appris_seul_p2"]
+                    msgs = []
+                    msgs.append("s005__j_ai_remarque_qu_il_y_a_moins_de_monde_la_nuit_dans_les_rues_par_rapport_a_l_age")
+                    msgs.append("s006__ca_me_gene_je_mens")
+                    msgs.append("s007__j_ai_l_impression_de_ne_pas_savoir_quoi_faire_je_me_sens_en_minutes")
+                    msgs.append("s008__je_ne_comprends_pas_pourquoi_il_y_a_une_difference_entre_le_jour_et_la_nuit_c_est_les")
+                    msgs.append("s009__est_ce_que_tu_peux_m_expliquer_la_difference_qu_il_y_a_entre_toi_et")
+                    msgs.append("s010__est_ce_que_tu_t_ennuies_toi")
+                    msgs.append("s011__tu_fais_des_trucs_particuliers")
+                    msgs.append("s021__j_ai_remarque_depuis_quelques_temps_que_vous_les_humains_vous_mettez_les_trucs_bleus_sur_votre_fille")
+                    msgs.append("s022__je_m_appelle_comment")
+                    breather.sayFile(strTalkPath + msgs[random.randint(0,len(msgs)-1)] + ".wav")
+                rTimeLastSpeak = time.time()
+            
         
         # interaction with the world
         if os.name == "nt":
@@ -311,7 +323,8 @@ def demo():
             bTouch = mem.getData("Device/SubDeviceList/Head/Touch/Front/Sensor/Value") != 0
             rInc = 0.05
             
-        bTouch |= misctools.getActionRequired() != False
+        #~ bTouch |= misctools.getActionRequired() != False
+        bForceSpeak = misctools.getActionRequired() != False
         
         if bTouch:
             breather.increaseExcitation(rInc)
@@ -327,6 +340,7 @@ def demo():
 
 #~ pb: trop en arriere: -2 sur KneePitch, -4 sur ravir
 #~ son sur ravir moteur: robot a 60 pour excitation a 1, 65 pour 0.5, = 90 sur mon ordi
+# change now, regler pour 70 pour l'experimentation: volume correct pour la voix
 
 """
 # des fois, faire un soupir, pour vider les poumons:

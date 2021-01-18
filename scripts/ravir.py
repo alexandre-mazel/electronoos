@@ -67,6 +67,7 @@ class Breather:
         if os.name != "nt":
             import naoqi
             self.motion = naoqi.ALProxy("ALMotion", "localhost", 9559)
+            self.leds = naoqi.ALProxy("ALLeds", "localhost", 9559)
             self.astrChain = ["HipPitch","LShoulderPitch","RShoulderPitch"]
             
             self.rAmp = 0.2
@@ -214,11 +215,13 @@ class Breather:
                 
             if self.nState == Breather.kStateIdle:
                 self.rTimeIdle = random.random() # jusqu'a 1sec d'idle
+                self.leds.post.fadeRGB("FaceLeds", 0x202020, 0.5)
                 if nPrevState == Breather.kStateSpeak:
                     self.rTimeIdle += 0.5
 
             if self.nState == Breather.kStateSpeak:
                 sound_player.soundPlayer.stopAll()
+                self.leds.fadeRGB("FaceLeds", 0x0000FF, 0.00)
                 sound_player.soundPlayer.playFile(self.strFilenameToSay, bWaitEnd=False)
                 if self.motion != None:
                     rTimeEstim = self.rTimeSpeak
@@ -293,7 +296,7 @@ def demo():
         
         if 1:
             #if int(rT)%15 == 0 and time.time()-rTimeLastSpeak>2.:
-            if ( random.random()>0.999 or bForceSpeak ) and not breather.isSpeaking():
+            if ( random.random()>0.997 or bForceSpeak ) and not breather.isSpeaking():
                 bForceSpeak = False
                 if 0:
                     #~ msgs = ["oui", "d'accord", "Ah oui, je suis tout a fait d'accord!"]

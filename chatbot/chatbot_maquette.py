@@ -131,7 +131,7 @@ class Agent(object):
         #~ textsurface = myfont.render('Faiska', False, (0, 0, 0))
         #~ myfont = pygame.freetype.SysFont('Verdana', 18)
 
-        textsurface,rect = myfont.render('Faiska', (0, 0, 0))
+        textsurface,rect = myfont.render('TestPepper', (0, 0, 0))
         self.screen.blit(textsurface,(w//2-(rect[2]-rect[0])//2,ycur))
         ycur = 50
         

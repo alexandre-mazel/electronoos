@@ -14,6 +14,31 @@ import os
 import pygame as pg
 import pygame.freetype  # Import the freetype module.
 
+def renderTxtMultiline(surface, text, pos, font, color=pygame.Color('black'), nWidthMax = -1):
+    """
+    nWidthMax: limit width to a specific size
+    """
+    #~ print("DBG: renderTxtMultiline: text: %s, pos: %s, font: %s, color: %s" % (str(text),str(pos),str(font),str(color)) )
+    words = [word.split(' ') for word in text.splitlines()]  # 2D array where each row is a list of words.
+    #space = font.size(' ')[0]  # The width of a space.
+    textsurface,rect = font.render(" ")
+    space = rect[2]
+    max_width, max_height = surface.get_size()
+    if nWidthMax != -1: max_width = nWidthMax
+
+    x, y = pos
+    for line in words:
+        for word in line:
+            word_surface, rect = font.render(word, color)
+            word_width, word_height = rect[2],rect[3]
+            if x + word_width >= max_width:
+                x = pos[0]  # Reset the x.
+                y += word_height  # Start on new row.
+            surface.blit(word_surface, (x, y))
+            x += word_width + space
+        x = pos[0]  # Reset the x.
+        y += word_height  # Start on new row
+
 
 class Agent(object):
     def __init__(self,screen_size):
@@ -133,7 +158,7 @@ class Agent(object):
         wmouth = 40
         hmouth = 30
         
-        if self.isSpeaking():
+        if self.isSpeaking() and pg.time.get_ticks()/1000-self.timeStartSpeak < self.rDurationSpeak:
             # change mouth
             pg.draw.rect(self.screen,colBotsSkin,(xmouth-wmouth//2,ymouth-hmouth//2,wmouth,hmouth) )
         
@@ -143,11 +168,12 @@ class Agent(object):
             #nMouthSize = (int(rTime)*3)%hmouth
             nMouthSize = abs(noise.getSimplexNoise(rTime*3))*hmouth
             pg.draw.ellipse(self.screen,colDark1,(xmouth-nMouthSize,ymouth-nMouthSize//2,nMouthSize*2,nMouthSize) )
-            
+        
+        if self.isSpeaking():
+            # render question
             nEnd = int((pg.time.get_ticks()/1000-self.timeStartSpeak)*10)
             txt = self.strTxtSpeak[:nEnd]
-            textsurface,rect = myfont.render(txt, (0, 0, 0))
-            self.screen.blit(textsurface,(xmargin*2,ycur+ymargin))
+            renderTxtMultiline( self.screen, txt, (xmargin*2,ycur+ymargin),myfont, colDark1,nWidthMax=300)
         
         
         # microphone over mouth

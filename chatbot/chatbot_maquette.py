@@ -1,3 +1,4 @@
+# coding: cp1252
 """
 Chatbot sample
 """
@@ -7,6 +8,7 @@ import misctools
 sys.path.append("../../rounded-rects-pygame/" ) # for roundrects
 from roundrects import round_rect
 from roundrects import aa_round_rect as round_rect
+import noise
 
 import os
 import pygame as pg
@@ -38,7 +40,10 @@ class Agent(object):
         wdst = s[0]//2
         self.imBot = pg.transform.scale(self.imBot, (wdst, int(wdst*s[1]/s[0])))
         
-        pg.font.init() # you have to call this at the start, 
+        self.strTxtSpeak = ""
+        
+        pg.font.init()
+
 
     def event_loop(self):
         for event in pg.event.get():
@@ -50,6 +55,15 @@ class Agent(object):
 
     def update(self):
         pass
+        
+        
+    def speak(self,txt):
+        self.timeStartSpeak = pg.time.get_ticks()/1000
+        self.rDurationSpeak = len(txt)/10
+        self.strTxtSpeak = txt
+        
+    def isSpeaking(self):
+        return self.strTxtSpeak != ""
 
     def draw(self):
         #~ self.screen.blit(self.background, (0,0))
@@ -60,6 +74,7 @@ class Agent(object):
         colDark1 = (22,22,22)
         colBlue1 = (164,194,244)
         colBotsSkin = (243,243,243)
+        colBotsMicro = (153,153,153)
         
         myfont = pygame.freetype.Font("../fonts/SF-UI-Display-Regular.otf", 20)
         #~ myfontsmall = pygame.freetype.Font("../fonts/SF-UI-Display-Regular.otf", 16)
@@ -106,37 +121,50 @@ class Agent(object):
         warea = w-xmargin*2
         harea = 400
         
-        xbot = xmargin+warea-self.imBot.get_rect().size[0]+xmargin//2
+        xbot = xmargin+warea-self.imBot.get_rect().size[0]+xmargin//2 + 6
         ybot = ycur+harea-self.imBot.get_rect().size[1]#+ymargin//2
         
         round_rect(self.screen, (xmargin,ycur,warea,harea), colBlue1, 10, 0)
         self.screen.blit(self.imBot, (xbot, ybot))
         
-        # change mouth
-        xmouth = xbot+101
-        ymouth = ybot+100
-        wmouth = 30
-        hmouth = 20
-        pg.draw.rect(self.screen,colBotsSkin,(xmouth-wmouth//2,ymouth-hmouth//2,wmouth,hmouth) )
-        
-        rTime = pg.time.get_ticks()/1000 #rTime in sec
-        
-        nMouthSize = (int(rTime)*3)%hmouth
-        pg.draw.ellipse(self.screen,colDark1,(xmouth-nMouthSize,ymouth-nMouthSize//2,nMouthSize*2,nMouthSize) )
 
-        #~ round_rect(self.screen, (50,20,400,200), pg.Color("darkslateblue"),
-                        #~ 30, 50, pg.Color("lightslateblue"))
-        #~ round_rect(self.screen, (20,235,100,200), pg.Color("red"), 10, 5)
-        #~ round_rect(self.screen, (140,250,175,100), pg.Color("black"), 30,
-                        #~ 2, pg.Color("green"))
-        #~ round_rect(self.screen, (335,250,145,200), pg.Color("purple"), 30, 20, pg.Color("yellow"))
+        xmouth = xbot+101
+        ymouth = ybot+96
+        wmouth = 40
+        hmouth = 30
         
-                        
+        if self.isSpeaking():
+            # change mouth
+            pg.draw.rect(self.screen,colBotsSkin,(xmouth-wmouth//2,ymouth-hmouth//2,wmouth,hmouth) )
+        
+            
+            rTime = pg.time.get_ticks()/1000 #rTime in sec
+            
+            #nMouthSize = (int(rTime)*3)%hmouth
+            nMouthSize = abs(noise.getSimplexNoise(rTime*3))*hmouth
+            pg.draw.ellipse(self.screen,colDark1,(xmouth-nMouthSize,ymouth-nMouthSize//2,nMouthSize*2,nMouthSize) )
+            
+            nEnd = int((pg.time.get_ticks()/1000-self.timeStartSpeak)*10)
+            txt = self.strTxtSpeak[:nEnd]
+            textsurface,rect = myfont.render(txt, (0, 0, 0))
+            self.screen.blit(textsurface,(xmargin*2,ycur+ymargin))
+        
+        
+        # microphone over mouth
+        wmicro = 26
+        hmicro = 16
+        pg.draw.ellipse(self.screen,colBotsMicro,(xmouth-wmicro//2-26,ymouth-hmicro//2+2,wmicro,hmicro) )
+        
+    # draw - end
 
 
     def main_loop(self):
         while not self.done:
             self.event_loop()
+            rTime = pg.time.get_ticks()/1000
+            nTime = int(rTime)
+            if nTime == 2 and not self.isSpeaking():
+                self.speak("Comparé à votre mission précédente, le cadre de celle ci vous a t'il paru plus agréable ?")
             self.update()
             self.draw()
             pg.display.update()

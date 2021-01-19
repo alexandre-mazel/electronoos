@@ -21,6 +21,7 @@ def renderTxtMultiline(surface, text, pos, font, color=pygame.Color('black'), nW
     #~ print("DBG: renderTxtMultiline: text: %s, pos: %s, font: %s, color: %s" % (str(text),str(pos),str(font),str(color)) )
     words = [word.split(' ') for word in text.splitlines()]  # 2D array where each row is a list of words.
     #space = font.size(' ')[0]  # The width of a space.
+    TODO: compute M and q and text with é
     textsurface,rect = font.render(" ")
     space = rect[2]
     max_width, max_height = surface.get_size()

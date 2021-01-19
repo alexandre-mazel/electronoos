@@ -10,6 +10,7 @@ from roundrects import aa_round_rect as round_rect
 
 import os
 import pygame as pg
+import pygame.freetype  # Import the freetype module.
 
 
 class Agent(object):
@@ -30,6 +31,8 @@ class Agent(object):
         #resize to screen (no bicubic)
         #~ s = self.imTopBanner.get_rect().size
         #~ self.imTopBanner = pg.transform.scale(self.imTopBanner, (self.w, int(self.w*s[1]/s[0])))
+        
+        pg.font.init() # you have to call this at the start, 
 
     def event_loop(self):
         for event in pg.event.get():
@@ -47,6 +50,12 @@ class Agent(object):
         self.screen.fill( pg.Color("lightslategrey") )
         
         self.screen.blit(self.imTopBanner, (0, 0)) 
+    
+        #~ myfont = pg.font.SysFont('Comic Sans MS', 30)
+        #~ textsurface = myfont.render('Faiska', False, (0, 0, 0))
+        myfont = pygame.freetype.SysFont('Verdana', 18)
+        textsurface,rect = myfont.render('Faiska', (0, 0, 0))
+        self.screen.blit(textsurface,(self.w//2-(rect[2]-rect[0])//2,6))
 
         #~ round_rect(self.screen, (50,20,400,200), pg.Color("darkslateblue"),
                         #~ 30, 50, pg.Color("lightslateblue"))

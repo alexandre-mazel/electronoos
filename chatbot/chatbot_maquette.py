@@ -26,10 +26,10 @@ class Agent(object):
         self.h = screen_size[1]
         
 
-        self.imTopBanner = pg.image.load("top_banner.png") 
-        #resize to screen
-        s = self.imTopBanner.get_rect().size
-        self.imTopBanner = pg.transform.scale(self.imTopBanner, (self.w, int(self.w*s[1]/s[0])))
+        self.imTopBanner = pg.image.load("top_banner_small.png") 
+        #resize to screen (no bicubic)
+        #~ s = self.imTopBanner.get_rect().size
+        #~ self.imTopBanner = pg.transform.scale(self.imTopBanner, (self.w, int(self.w*s[1]/s[0])))
 
     def event_loop(self):
         for event in pg.event.get():

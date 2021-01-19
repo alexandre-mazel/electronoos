@@ -484,6 +484,91 @@ def learn():
 
 # learn - end
 
+def detectStand( strFile, op, bRenderImage = True, bForceRecompute = False, bForceAlternateAngles = False, bUseCache = False ):
+    """
+    detect Fall in one file.
+    Return skels, listState, image
+    - skels: skeleton structure
+    - listState: a list for each skel [None/0: fall / 1: stand]
+    - image: rendered image or None if no rendering
+    """
+    
+    rThresholdAvg = 0.1
+    
+    skels = op.analyseFromFile(strFile,bForceRecompute=bForceRecompute,bForceAlternateAngles=bForceAlternateAngles)
+
+    if bRenderImage: im = cv2.imread(strFile)
+    else: im = None
+    
+    listState = []
+    for skel in skels:
+        listState.append(None)
+        if 1:
+            rAvg = skel.computeAverageConfidence()
+            if rAvg < rThresholdAvg:
+                continue
+            
+        feat = skelToFeatures(skel)
+        colorText = (255,255,255)
+        txt = ""
+        if 0:
+            if isFullConf(feat):
+                pred = clf.predict([feat])[0]
+                if pred==0:
+                    txt = "Fall"
+                else:
+                    txt = "Stand"
+            else:
+                txt = "?"
+                
+            if 1:
+                txt += " / "
+                ret = isDeboutHandCoded(skel,bVerbose=1)
+                if ret == 0:
+                    txt += "Fall"
+                elif ret == 1:
+                    txt += "Stand"
+                else:
+                    txt += "?"
+        if 1:
+            txt += " / "
+            txt = "" #erase all other algorithms
+            ret = isDeboutHandCoded(skel,bVerbose=1,bOnlyTorso=True)
+            bFromCache = 0
+            if 0:
+                # use caching
+                if ret == None:
+                    ret = wm.get(skel.getNeckPos(),rRadius=20)
+                    if ret != None: bFromCache = 1
+                else:
+                    wm.set(skel.getNeckPos(),ret,rRadius=20) # default is 5 ttl (1 in update and 1 in get)
+            if ret == 0:
+                txt += "Fall"
+                colorText = (80,80,255)
+            elif ret == 1:
+                txt += "Stand"
+                colorText = (255,80,80)
+            else:
+                txt += "?"
+                
+            listState[-1] = ret
+                
+            if bFromCache: 
+                colorText = mul2tuple(colorText)
+                #~ txt = txt[0].lower() + txt[1:]
+
+        if bRenderImage:
+            #render skel with color
+            skel.render(im, colorText,bRenderConfidenceValue=False)
+
+            print(txt)
+            bb = skel.getBB()
+            renderCenteredText(im, txt, ( (bb[0]+bb[2]) // 2,bb[3]+18), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 3 )
+            renderCenteredText(im, txt, ( (bb[0]+bb[2]) // 2,bb[3]+18), cv2.FONT_HERSHEY_SIMPLEX, 0.6, colorText, 1 )
+            
+    return skels,listState,im
+
+
 def analyseFilenameInPath( strPath, bForceRecompute = False, bRender=True, bForceAlternateAngles = False ):
     """
     Return False if user want to quit.
@@ -491,112 +576,126 @@ def analyseFilenameInPath( strPath, bForceRecompute = False, bRender=True, bForc
     Rappel: convert one video to png:
     ffmpeg -i in.mp4 -vsync 0 out%05d.png
     """
-    str 
-    bJustPrecompute = 0
+    strAlternatePath = "" # for comparison
+    strAlternatePath = "d:/export_processed/"
+
     print("INF: analyseFilenameInPath: strPath: %s" % strPath )
     op = cv2_openpose.CVOpenPose()
     if 1:
         clf = joblib.load('detect_fall_classifier.pkl')
     #~ skel = op.analyseFromFile(strImageFilename)
     listFile = sorted(  os.listdir(strPath) )
-    i = 0
+    nNumImage = 0
     bContinue = True
     nCptGenerated = 0
-    rThresholdAvg = 0.1
+
     wm = WorldMemory()
-    while i < len(listFile) and bContinue:
-        print("Analyse: %d/%d" % (i,len(listFile) ) )
+    aNbrSkel = [0,0]
+    aNbrStand = [0,0]
+    aNbrFall = [0,0]
+    while nNumImage < len(listFile) and bContinue:
+        print("Analyse: %d/%d" % (nNumImage,len(listFile) ) )
         #~ if i < 2000:
             #~ i += 1
             #~ continue
-        f = listFile[i]
+        f = listFile[nNumImage]
         tf = strPath + f
         if os.path.isdir(tf):
             bRet = analyseFilenameInPath(tf + os.sep,bForceRecompute=bForceRecompute,bRender=bRender,bForceAlternateAngles=bForceAlternateAngles)
             if not bRet: return bRet
-            i += 1
+            nNumImage += 1
             continue
         
         filename, file_extension = os.path.splitext(f)
-        if ".png" in file_extension.lower() or ".jpg" in file_extension.lower(): 
-            skels = op.analyseFromFile(tf,bForceRecompute=bForceRecompute,bForceAlternateAngles=bForceAlternateAngles)
-            if bJustPrecompute:
-                i += 1
-                continue
-            im = cv2.imread(tf)
-            for skel in skels:
-                if 1:
-                    rAvg = skel.computeAverageConfidence()
-                    if rAvg < rThresholdAvg:
-                        continue
-                    
-                feat = skelToFeatures(skel)
-                colorText = (255,255,255)
-                txt = ""
-                if 0:
-                    if isFullConf(feat):
-                        pred = clf.predict([feat])[0]
-                        if pred==0:
-                            txt = "Fall"
-                        else:
-                            txt = "Stand"
-                    else:
-                        txt = "?"
-                        
-                    if 1:
-                        txt += " / "
-                        ret = isDeboutHandCoded(skel,bVerbose=1)
-                        if ret == 0:
-                            txt += "Fall"
-                        elif ret == 1:
-                            txt += "Stand"
-                        else:
-                            txt += "?"
-                if 1:
-                    txt += " / "
-                    txt = "" #erase all other algorithms
-                    ret = isDeboutHandCoded(skel,bVerbose=1,bOnlyTorso=True)
-                    bFromCache = 0
-                    if ret == None:
-                        ret = wm.get(skel.getNeckPos(),rRadius=20)
-                        if ret != None: bFromCache = 1
-                    else:
-                        wm.set(skel.getNeckPos(),ret,rRadius=20) # default is 5 ttl (1 in update and 1 in get)
-                    if ret == 0:
-                        txt += "Fall"
-                        colorText = (80,80,255)
-                    elif ret == 1:
-                        txt += "Stand"
-                        colorText = (255,80,80)
-                    else:
-                        txt += "?"
-                        
-                    if bFromCache: 
-                        colorText = mul2tuple(colorText)
-                        #~ txt = txt[0].lower() + txt[1:]
-
-                #render skel with color
-                skel.render(im, colorText,bRenderConfidenceValue=False)
-
-                print(txt)
-                bb = skel.getBB()
-                renderCenteredText(im, txt, ( (bb[0]+bb[2]) // 2,bb[3]+18), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 3 )
-                renderCenteredText(im, txt, ( (bb[0]+bb[2]) // 2,bb[3]+18), cv2.FONT_HERSHEY_SIMPLEX, 0.6, colorText, 1 )
-            
-            # skels.render(im, bRenderConfidenceValue=False)
+        if ".png" in file_extension.lower() or ".jpg" in file_extension.lower():
+            twoFiles = [tf,strAlternatePath+f]
+            nNumPlace = 0
+            ims = [None,None]
+            for tf in twoFiles:
+                skels,listState,ims[nNumPlace] = detectStand(tf,op,bForceRecompute=bForceRecompute,bForceAlternateAngles=bForceAlternateAngles)
+                if bRender: cv2.imshow("detected" + str(nNumPlace),ims[nNumPlace])
+                
+                for i in range(len(skels)):
+                    rAvg = skels[i].computeAverageConfidence()
+                    if rAvg > 0.2:
+                        aNbrSkel[nNumPlace] += 1
+                for i in range(len(listState)):
+                    if listState[i] == 0:
+                        aNbrFall[nNumPlace] += 1
+                    elif listState[i] == 1:
+                        aNbrStand[nNumPlace] += 1
+                
+                nNumPlace += 1
             
             wm.update()
-            if bRender: cv2.imshow("detected",im)
             
             if 0:
-                # ffmpeg -r 10 -i %06d.png -vcodec libx264 -b:v 4M -b:a 1k test.mp4
+                # ffmpeg -r 10 -i %06d.png -vcodec libx264 -b:v 4M -an test.mp4 # -an: no audio
                 cv2.imwrite("d:/generated/%06d.png" % nCptGenerated, im)  # NB: won't work with sub folder (overwriting dest)
                 nCptGenerated += 1
                 
                 # pour un petit gif anime de l'image de 823 a 992 # les de debut et fin ne fonctionnent pas => isoler dans un dossier
                 # ffmpeg -r 10 -i %06d.png -start_number 823 -vframes 169 -vf "fps=10,scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 output.gif
                 # => use of the "a (%d).png" techniques
-            
+                
+            if 1:
+                # collage
+                wc = 1920
+                hc = 1080
+                
+                imc = np.zeros((hc,wc,3),np.uint8)
+                imc[:] = 127,127,127
+                
+                #~ ims[0] = cv2.resize(ims[0],None,fx=2,fy=2)
+                ims[1] = cv2.resize(ims[1],None,fx=2,fy=2)
+                
+                
+                xs1 = 300
+                ys1 = int(hc/2 - ims[0].shape[0]/2) - 50
+                imc[ys1:ys1+ims[0].shape[0],xs1:xs1+ims[0].shape[1]] = ims[0]
+                
+                xs2 = wc - xs1 - ims[1].shape[1]
+                ys2 = int(hc/2 - ims[1].shape[0]/2) - 50
+                imc[ys2:ys2+ims[1].shape[0],xs2:xs2+ims[1].shape[1]] = ims[1]
+                
+                
+                xst = [0,0]
+                yst = [0,0]
+                nMargin = xs1
+                xst[0] = xs1 + ims[0].shape[1] + nMargin
+                xst[0] = xs1+20
+                yst[0] = ys1 + nMargin
+                yst[0] = ys1 + ims[0].shape[0]
+                                
+                xst[1] = xs2 - nMargin 
+                xst[1] = xs2+20
+                yst[1] = ys1 + nMargin
+                yst[1] = ys2 + ims[1].shape[0]
+                
+                colorText = (200,200,200)
+                
+                nHText = 60
+                for i in range(2):
+                    txt = "Skeleton: %d" % aNbrSkel[i]
+
+                    cv2.putText(imc, txt, (xst[i],yst[i]+nHText*1), cv2.FONT_HERSHEY_SIMPLEX, 2, colorText, 4 )
+                    
+                    txt = "Fall: %d" % aNbrFall[i]
+                    cv2.putText(imc, txt, (xst[i],yst[i]+nHText*2), cv2.FONT_HERSHEY_SIMPLEX, 2, colorText, 4 )
+                    
+                    txt = "Stand: %d" % aNbrStand[i]
+                    cv2.putText(imc, txt, (xst[i],yst[i]+nHText*3), cv2.FONT_HERSHEY_SIMPLEX, 2, colorText, 4 )
+                
+
+                
+                if 1:
+                    # ffmpeg -r 10 -i %06d.png -vcodec libx264 -b:v 4M -b:a 1k test.mp4
+                    cv2.imwrite("d:/generated/%06d.png" % nCptGenerated, imc)  # NB: won't work with sub folder (overwriting dest)
+                    nCptGenerated += 1
+                
+                imc = cv2.resize(imc,None,fx=0.5,fy=0.5)
+                cv2.imshow("collage",imc)
+                
             bIsPauseRequired = misctools.isPauseRequired()
             if bRender:
                 key = cv2.waitKey(10)
@@ -613,7 +712,7 @@ def analyseFilenameInPath( strPath, bForceRecompute = False, bRender=True, bForc
             if bIsPauseRequired:
                 print("%s: In pause for 5min" % misctools.getTimeStamp())
                 time.sleep(5*60)
-        i += 1
+        nNumImage += 1
     # while - end
     
     return bContinue

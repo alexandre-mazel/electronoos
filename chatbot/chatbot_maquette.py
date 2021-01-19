@@ -47,15 +47,47 @@ class Agent(object):
 
     def draw(self):
         #~ self.screen.blit(self.background, (0,0))
-        self.screen.fill( pg.Color("lightslategrey") )
+        #~ self.screen.fill( pg.Color("lightslategrey") )
         
+        colBackground = (247,247,247)
+        colLight1 = (220,220,220)
+        colDark1 = (22,22,22)
+        
+        myfont = pygame.freetype.Font("../fonts/SF-UI-Display-Regular.otf", 20)
+        myfontsmall = pygame.freetype.Font("../fonts/SF-UI-Display-Regular.otf", 16)
+        myfontsmall = pygame.freetype.Font("../fonts/SF-Compact-Text-Semibold.otf", 16)
+        
+        
+        w = self.w
+        h = self.h
+        
+        self.screen.fill( colBackground )
+
+        
+        # system
         self.screen.blit(self.imTopBanner, (0, 0)) 
+        ycur = 8
+        textsurface,rect = myfontsmall.render('11:28', (0, 0, 0))
+        self.screen.blit(textsurface,(10+20 ,ycur))
+        
+        # title
+        ycur = 28
+        
+        for i in range(3):
+            y = ycur+i*6
+            pg.draw.line(self.screen, colDark1,(10,y),(30,y),2 )
+
     
         #~ myfont = pg.font.SysFont('Comic Sans MS', 30)
         #~ textsurface = myfont.render('Faiska', False, (0, 0, 0))
-        myfont = pygame.freetype.SysFont('Verdana', 18)
+        #~ myfont = pygame.freetype.SysFont('Verdana', 18)
+
         textsurface,rect = myfont.render('Faiska', (0, 0, 0))
-        self.screen.blit(textsurface,(self.w//2-(rect[2]-rect[0])//2,6))
+        self.screen.blit(textsurface,(w//2-(rect[2]-rect[0])//2,ycur))
+        ycur = 50
+        
+        pg.draw.line(self.screen, colLight1,(0,ycur),(w,ycur) )
+        ycur += 1
 
         #~ round_rect(self.screen, (50,20,400,200), pg.Color("darkslateblue"),
                         #~ 30, 50, pg.Color("lightslateblue"))

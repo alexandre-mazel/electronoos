@@ -491,6 +491,7 @@ def analyseFilenameInPath( strPath, bForceRecompute = False, bRender=True, bForc
     Rappel: convert one video to png:
     ffmpeg -i in.mp4 -vsync 0 out%05d.png
     """
+    str 
     bJustPrecompute = 0
     print("INF: analyseFilenameInPath: strPath: %s" % strPath )
     op = cv2_openpose.CVOpenPose()

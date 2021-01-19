@@ -27,10 +27,16 @@ class Agent(object):
         self.h = screen_size[1]
         
 
-        self.imTopBanner = pg.image.load("top_banner_small.png") 
+        self.imTopBanner = pg.image.load("top_banner_small.png")
         #resize to screen (no bicubic)
         #~ s = self.imTopBanner.get_rect().size
         #~ self.imTopBanner = pg.transform.scale(self.imTopBanner, (self.w, int(self.w*s[1]/s[0])))
+        
+        
+        self.imBot = pg.image.load("robot_idle.png")
+        s = self.imBot.get_rect().size
+        wdst = s[0]//2
+        self.imBot = pg.transform.scale(self.imBot, (wdst, int(wdst*s[1]/s[0])))
         
         pg.font.init() # you have to call this at the start, 
 
@@ -52,9 +58,11 @@ class Agent(object):
         colBackground = (247,247,247)
         colLight1 = (220,220,220)
         colDark1 = (22,22,22)
+        colBlue1 = (164,194,244)
+        colBotsSkin = (243,243,243)
         
         myfont = pygame.freetype.Font("../fonts/SF-UI-Display-Regular.otf", 20)
-        myfontsmall = pygame.freetype.Font("../fonts/SF-UI-Display-Regular.otf", 16)
+        #~ myfontsmall = pygame.freetype.Font("../fonts/SF-UI-Display-Regular.otf", 16)
         myfontsmall = pygame.freetype.Font("../fonts/SF-Compact-Text-Semibold.otf", 16)
         
         
@@ -88,6 +96,33 @@ class Agent(object):
         
         pg.draw.line(self.screen, colLight1,(0,ycur),(w,ycur) )
         ycur += 1
+        
+        
+        # screen
+        # roundrect(mat,(x,y,w,h),col1,round_size,border_size)
+        ycur += 20
+        xmargin=20
+        ymargin=20
+        warea = w-xmargin*2
+        harea = 400
+        
+        xbot = xmargin+warea-self.imBot.get_rect().size[0]+xmargin//2
+        ybot = ycur+harea-self.imBot.get_rect().size[1]#+ymargin//2
+        
+        round_rect(self.screen, (xmargin,ycur,warea,harea), colBlue1, 10, 0)
+        self.screen.blit(self.imBot, (xbot, ybot))
+        
+        # change mouth
+        xmouth = xbot+101
+        ymouth = ybot+100
+        wmouth = 30
+        hmouth = 20
+        pg.draw.rect(self.screen,colBotsSkin,(xmouth-wmouth//2,ymouth-hmouth//2,wmouth,hmouth) )
+        
+        rTime = pg.time.get_ticks()/1000 #rTime in sec
+        
+        nMouthSize = (int(rTime)*3)%hmouth
+        pg.draw.ellipse(self.screen,colDark1,(xmouth-nMouthSize,ymouth-nMouthSize//2,nMouthSize*2,nMouthSize) )
 
         #~ round_rect(self.screen, (50,20,400,200), pg.Color("darkslateblue"),
                         #~ 30, 50, pg.Color("lightslateblue"))

@@ -19,7 +19,7 @@ def renderTxtMultiline(surface, text, pos, font, color=pygame.Color('black'), nW
     nWidthMax: limit width to a specific size
     return the rect
     """
-    #~ print("DBG: renderTxtMultiline: text: %s, pos: %s, font: %s, color: %s" % (str(text),str(pos),str(font),str(color)) )
+    print("DBG: renderTxtMultiline: text: %s, pos: %s, font: %s, color: %s, nWidthMax=%s" % (str(text),str(pos),str(font),str(color),nWidthMax) )
     words = [word.split(' ') for word in text.splitlines()]  # 2D array where each row is a list of words.
     #space = font.size(' ')[0]  # The width of a space.
     
@@ -51,7 +51,7 @@ def renderTxtMultiline(surface, text, pos, font, color=pygame.Color('black'), nW
                     rectTotal[3]+=word_height
                 surface.blit(word_surface, (x, y))
                 x += word_width + space
-                rectTotal[2] = max(rectTotal[2],x-space)
+                rectTotal[2] = max(rectTotal[2],(x-space)-pos[0])
             x = pos[0]  # Reset the x.
             y += word_height  # Start on new row
             rectTotal[3]+=word_height
@@ -72,7 +72,7 @@ def renderTxtMultiline(surface, text, pos, font, color=pygame.Color('black'), nW
                     lines[-1] += " " + word
                 x += word_width + space
             x = pos[0]  # Reset the x.
-
+            
         x,y = pos
         for line in lines:
             print(font.pad)
@@ -81,6 +81,7 @@ def renderTxtMultiline(surface, text, pos, font, color=pygame.Color('black'), nW
             surface.blit(line_surface, (x, y+hLetter-rect[3]))
             y += int(rect[3]*1.4)
             
+    print("DBG: renderTxtMultiline: rectTotal: " + str(rectTotal) )
     return rectTotal
 # renderTxtMultiline - end
 
@@ -113,7 +114,7 @@ def renderTxtMultilineCentered(surface, text, pos, font, color=pygame.Color('bla
     x, y = pos
     for line in words:
         lines.append("")
-        for word in line:
+        for nNumWord,word in enumerate(line):
             word_surface, rect = font.render(word, color)
             word_width, word_height = rect[2],rect[3]
             if x + word_width >= max_width:
@@ -123,15 +124,17 @@ def renderTxtMultilineCentered(surface, text, pos, font, color=pygame.Color('bla
                 lines.append("")
             x += word_width + space
             rectTotal[2] = max(rectTotal[2],(x-space)-pos[0])
-            lines[-1] += word + " "
+            lines[-1] += word
+            if nNumWord < len(line)-1:
+                lines[-1] += " "
         x = pos[0]  # Reset the x.
         y += word_height  # Start on new row
         rectTotal[3]+=word_height
         
     x, y = pos
-    print(lines)
-    print(rectTotal)
-    if nWidthTotal  == -1: nWidthTotal=rectTotal[3]
+    print("DBG: renderTxtMultilineCentered: lines: %s" % lines)
+    print("rectTotal: " + str(rectTotal) )
+    if nWidthTotal  == -1: nWidthTotal=rectTotal[2]
     if nHeightTotal  == -1: nHeightTotal=rectTotal[3]
     for line in lines:
         line_surface, rect = font.render(line, color)
@@ -142,7 +145,8 @@ def renderTxtMultilineCentered(surface, text, pos, font, color=pygame.Color('bla
         surface.blit(line_surface, (xl, yl+hLetter-rect[3]))
         y += rect[3]
         
-    #~ pg.draw.rect(surface, (255,0,255),(pos[0],pos[1],rectTotal[2],nHeightTotal) )
+    #~ pg.draw.rect(surface, (200,0,200),(pos[0],pos[1],rectTotal[2],rectTotal[3]) )
+    #~ pg.draw.rect(surface, (255,0,255),(pos[0],pos[1],nWidthTotal,nHeightTotal) )
         
     
     return rectTotal
@@ -153,6 +157,7 @@ class Button(object):
         """
         - margin: spaces between button and text
         """
+        print("DBG: Button(%s,pos:%s,size:%s,margin:%s" % (txt,str(pos),str(size),str(margin)) )
         self.txt = txt
         self.pos = pos
         self.size = size
@@ -215,9 +220,8 @@ class ButtonManager(object):
         computedSize = []
         for nNumButton,txt in enumerate(astrButton):
             #~ txt_surface, rect = self.font.render(txt)
-            rect = renderTxtMultiline(surface,txt,(0,0),font)
-            renderTxtMultiline
-            #~ print(rect)
+            rect = renderTxtMultiline(surface,txt,pos,font,nWidthMax=surface.get_size()[0]-pos[0])
+            print("DBG: ButtonManager.createButtons: rect:%s" % str(rect) )
             if len(txt)<0 and 0:
                 nRealMarginX = 20
             else:
@@ -472,7 +476,7 @@ class Agent(object):
         #~ self.listQ.append(["C?", ["Oui", "bof", "Non", "car","or"]])
         self.listQ.append(["Comparé à votre mission précédente, celle ci vous a t'elle paru plus agréable?", ["Oui", "Bof", "Non"]])
         self.listQ.append(["Quel aspect vous a fait répondre ainsi?", ["Le\ncadre", "Les\ncollégues", "Le\nmanager", "un\npeu\ntout"]])
-        self.listQ.append(["Merci à bientot!",["De rien, au revoir!", "Bye!"]] )
+        self.listQ.append(["Merci à bientot!",["De rien, au revoir! Grave de la grosse balle atomiaque de gros malade!", "Bye!"]] )
         self.nNumQ = 0
         #~ self.nNumQ = 1;self.listQ[self.nNumQ][0]="C"
         #~ print(listQ)

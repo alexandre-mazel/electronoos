@@ -77,6 +77,23 @@ def renderTxtMultiline(surface, text, pos, font, color=pygame.Color('black'), nW
             y += int(rect[3]*1.4)
 # renderTxtMultiline - end
 
+class Button(object):
+    def __init__(self,txt,pos,size):
+        self.txt = txt
+        self.pos = pos
+        self.size = size
+        
+    def render( self, surface ):
+        
+    def isOver(self,pos):
+        if          pos[0]>=self.pos[0] and pos[0]<self.pos[0]+self.size[0]
+            and  pos[1]>=self.pos[1] and pos[1]<self.pos[1]+self.size[1]
+        :
+            return True
+        return False
+# class Button - end
+            
+
 class Agent(object):
     def __init__(self,screen_size):
         pg.init()
@@ -131,7 +148,7 @@ class Agent(object):
     def renderUserButton( self, astrButton, surface, pos ):
         colTxt = (243,243,243)
         colButton = (164//2,194//2,244//2)
-        font = pygame.freetype.Font("../fonts/SF-Compact-Text-Semibold.otf", 14)
+        font = pygame.freetype.Font("../fonts/SF-Compact-Text-Semibold.otf", 15)
         font.pad = True
         x, y = pos
         nMarginX = 18
@@ -282,18 +299,19 @@ class Agent(object):
         
         # progression
         round_rect(self.screen, (xmargin,ycur,warea,20), colLight1, 2, 0)
-        rProgress = 0.6 
-        round_rect(self.screen, (xmargin,ycur,int(warea*rProgress),20), colBlue1, 2, 0)
+        rProgress = (self.nNumQ+1) / len(self.listQ)
+        if rProgress > 0.1:
+            round_rect(self.screen, (xmargin,ycur,int(warea*rProgress),20), colBlue1, 2, 0)
         
     # draw - end
 
 
     def main_loop(self):
-        listQ = []
-        listQ.append(["Comparé à votre mission précédente, celle ci vous a t'il paru plus agréable?", ["Oui", "Bof", "Non"]])
-        listQ.append(["Sur quel aspect pensez vous cela?", ["Le cadre", "Les collégues", "Le manager", "un peu tout"]])
-        nNumQ = 0
-        print(listQ)
+        self.listQ = []
+        self.listQ.append(["Comparé à votre mission précédente, celle ci vous a t'il paru plus agréable?", ["Oui", "Bof", "Non"]])
+        self.listQ.append(["Sur quel aspect pensez vous cela?", ["Le cadre", "Les collégues", "Le manager", "un peu tout"]])
+        self.nNumQ = -1
+        #~ print(listQ)
         
         while not self.done:
             self.event_loop()
@@ -301,7 +319,8 @@ class Agent(object):
             nTime = int(rTime)
             if nTime == 2 and not self.isSpeaking():
                 #~ self.speak()
-                self.speak( listQ[nNumQ][0],listQ[nNumQ][1])
+                self.nNumQ += 1
+                self.speak( self.listQ[self.nNumQ][0],self.listQ[self.nNumQ][1])
                 #~ self.speak("C?", ["Oui", "bof", "Non", "car","or"])
             self.update()
             self.draw()

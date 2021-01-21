@@ -78,20 +78,101 @@ def renderTxtMultiline(surface, text, pos, font, color=pygame.Color('black'), nW
 # renderTxtMultiline - end
 
 class Button(object):
-    def __init__(self,txt,pos,size):
+    def __init__( self, txt, pos, size, margin, id=-1 ):
+        """
+        - margin: spaces between button and text
+        """
         self.txt = txt
         self.pos = pos
         self.size = size
+        self.margin = margin
         
-    def render( self, surface ):
+    def render( self, surface, font ):
+        """
+        return painted rect position
+        """
+        colTxt = (243,243,243)
+        colButton = (164//2,194//2,244//2)
+        
+        txt_surface, rect = font.render(self.txt, colTxt)
+        round_rect(surface,self.pos+self.size,colButton,11,0)
+        surface.blit(txt_surface,(self.pos[0]+self.margin[0],self.pos[1]+self.margin[1]))
         
     def isOver(self,pos):
-        if          pos[0]>=self.pos[0] and pos[0]<self.pos[0]+self.size[0]
-            and  pos[1]>=self.pos[1] and pos[1]<self.pos[1]+self.size[1]
-        :
+        if          pos[0] >= self.pos[0] and pos[0] < self.pos[0]+self.size[0] \
+            and  pos[1] >= self.pos[1] and pos[1] < self.pos[1]+self.size[1] \
+            :
             return True
         return False
 # class Button - end
+
+class ButtonManager(object):
+    def __init__(self):
+        self.aButtons = []
+        self.font = None
+        
+    def hasButtons( self ):
+        return len(self.aButtons) > 0
+        
+    def createButtons( self, astrButton, surface, pos ):
+        """
+        surface is used just to know the available size
+        """
+        if self.font == None:
+            self.font = pygame.freetype.Font("../fonts/SF-Compact-Text-Semibold.otf", 15)
+            self.font.pad = True
+            
+        x, y = pos
+        nMarginX = 18
+        nMarginY = 2
+        
+        bAlignCenter = 1
+        computedSize = []
+        for nNumButton,txt in enumerate(astrButton):
+            txt_surface, rect = self.font.render(txt)
+            #~ print(rect)
+            if len(txt)<0 and 0:
+                nRealMarginX = 20
+            else:
+                nRealMarginX = nMarginX
+            wButton = rect[2] + nRealMarginX*2
+            hButton = rect[3] + nMarginY*2
+            if not bAlignCenter:
+                #~ round_rect(surface,(x,y,wButton,hButton),colButton,11,0)
+                #~ surface.blit(txt_surface,(x+nRealMarginX,y+nMarginY))
+                self.aButtons.append( Button(txt,(x,y),(wButton,hButton),(nRealMarginX,nMarginY)) )
+            else:
+                computedSize.append((x,y,wButton,hButton,nRealMarginX,nMarginY))
+            x += wButton + nMarginX
+            
+        if bAlignCenter:
+            # render after all computation
+            # center them
+            max_width, max_height = surface.get_size()
+            hspace = max_width-nMarginX*2
+            for data in computedSize:
+                hspace-=data[2]
+            hspace //= len(astrButton)-1
+            #~ print("hspace: %s" % hspace )
+                
+            for nNumButton,txt in enumerate(astrButton):
+                x,y,wButton,hButton,nRealMarginX,nMarginY = computedSize[nNumButton]
+                #~ txt_surface, rect = self.font.render(txt, colTxt)
+                x -= nMarginX*(nNumButton)
+                if nNumButton > 0:
+                    x += hspace*(nNumButton)
+                #~ round_rect(surface,(x,y,wButton,hButton),colButton,11,0)
+                #~ surface.blit(txt_surface,(x+nRealMarginX,y+nMarginY))
+                self.aButtons.append( Button(txt,(x,y),(wButton,hButton),(nRealMarginX,nMarginY)) )
+                
+     # createButtons - end
+     
+    def render(self, surface):
+        for button in self.aButtons:
+            button.render(surface,self.font)
+
+# class ButtonManager - end
+    
             
 
 class Agent(object):
@@ -121,6 +202,8 @@ class Agent(object):
         
         self.strTxtSpeak = ""
         
+        self.buttonManager = ButtonManager()
+        
         pg.font.init()
 
 
@@ -144,54 +227,12 @@ class Agent(object):
         
     def isSpeaking(self):
         return self.strTxtSpeak != ""
-        
-    def renderUserButton( self, astrButton, surface, pos ):
-        colTxt = (243,243,243)
-        colButton = (164//2,194//2,244//2)
-        font = pygame.freetype.Font("../fonts/SF-Compact-Text-Semibold.otf", 15)
-        font.pad = True
-        x, y = pos
-        nMarginX = 18
-        nMarginY = 2
-        
-        bAlignCenter = 1
-        computedSize = []
-        for txt in astrButton:
-            txt_surface, rect = font.render(txt, colTxt)
-            #~ print(rect)
-            if len(txt)<0 and 0:
-                nRealMarginX = 20
-            else:
-                nRealMarginX = nMarginX
-            wButton = rect[2] + nRealMarginX*2
-            hButton = rect[3] + nMarginY*2
-            if not bAlignCenter:
-                round_rect(surface,(x,y,wButton,hButton),colButton,11,0)
-                surface.blit(txt_surface,(x+nRealMarginX,y+nMarginY))
-            else:
-                computedSize.append((x,y,wButton,hButton,nRealMarginX,nMarginY))
-            x += wButton + nMarginX
-            
-        if bAlignCenter:
-            # render after all computation
-            # center them
-            max_width, max_height = surface.get_size()
-            hspace = max_width-nMarginX*2
-            for data in computedSize:
-                hspace-=data[2]
-            hspace //= len(astrButton)-1
-            #~ print("hspace: %s" % hspace )
-                
-            for i,txt in enumerate(astrButton):
-                x,y,wButton,hButton,nRealMarginX,nMarginY = computedSize[i]
-                txt_surface, rect = font.render(txt, colTxt)
-                x -= nMarginX*(i)
-                if i > 0:
-                    x += hspace*(i)
-                round_rect(surface,(x,y,wButton,hButton),colButton,11,0)
-                surface.blit(txt_surface,(x+nRealMarginX,y+nMarginY))
-                
-     # renderUserButton - end
+    
+    def renderUserButton( self, surface, pos ):
+        if not self.buttonManager.hasButtons():
+            self.buttonManager.createButtons(self.astrAnswers,surface,pos)
+        self.buttonManager.render(surface)
+
         
 
     def draw(self):
@@ -292,7 +333,7 @@ class Agent(object):
             pg.draw.ellipse(self.screen,colBotsMicro,(xmouth-wmicro//2-26,ymouth-hmicro//2+2,wmicro,hmicro) )
 
             if nEnd >= len(self.strTxtSpeak):
-                self.renderUserButton( self.astrAnswers, self.screen, (xmargin,ycur) )
+                self.renderUserButton( self.screen,(xmargin,ycur) )
 
         
         ycur=650
@@ -308,6 +349,7 @@ class Agent(object):
 
     def main_loop(self):
         self.listQ = []
+        self.listQ.append(["C?", ["Oui", "bof", "Non", "car","or"]])
         self.listQ.append(["Comparé à votre mission précédente, celle ci vous a t'il paru plus agréable?", ["Oui", "Bof", "Non"]])
         self.listQ.append(["Sur quel aspect pensez vous cela?", ["Le cadre", "Les collégues", "Le manager", "un peu tout"]])
         self.nNumQ = -1

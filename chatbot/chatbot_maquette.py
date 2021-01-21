@@ -21,25 +21,61 @@ def renderTxtMultiline(surface, text, pos, font, color=pygame.Color('black'), nW
     #~ print("DBG: renderTxtMultiline: text: %s, pos: %s, font: %s, color: %s" % (str(text),str(pos),str(font),str(color)) )
     words = [word.split(' ') for word in text.splitlines()]  # 2D array where each row is a list of words.
     #space = font.size(' ')[0]  # The width of a space.
-    TODO: compute M and q and text with é
+    
+    #~ TODO: compute M and q and text with é
     textsurface,rect = font.render(" ")
     space = rect[2]
+    wLetter = rect[2]
+    hLetter = rect[3]
+
+    #~ textsurface,rect = font.render("MqéQ")
+    #~ wLetter = max(rect[2],wLetter)
+    #~ hLetter = max(rect[3],hLetter)
+    
     max_width, max_height = surface.get_size()
     if nWidthMax != -1: max_width = nWidthMax
 
-    x, y = pos
-    for line in words:
-        for word in line:
-            word_surface, rect = font.render(word, color)
-            word_width, word_height = rect[2],rect[3]
-            if x + word_width >= max_width:
-                x = pos[0]  # Reset the x.
-                y += word_height  # Start on new row.
-            surface.blit(word_surface, (x, y))
-            x += word_width + space
-        x = pos[0]  # Reset the x.
-        y += word_height  # Start on new row
+    font.pad = True # render letter in a empty rect of the size of the bigger letter (even if no bigger letter to be rendered yet)
 
+    if 1:
+        x, y = pos
+        for line in words:
+            for word in line:
+                word_surface, rect = font.render(word, color)
+                word_width, word_height = rect[2],rect[3]
+                if x + word_width >= max_width:
+                    x = pos[0]  # Reset the x.
+                    y += word_height  # Start on new row.
+                surface.blit(word_surface, (x, y))
+                x += word_width + space
+            x = pos[0]  # Reset the x.
+            y += word_height  # Start on new row
+    else:
+        # redo same with precompute without rendering, then render
+        # not usefull when using font.pad !!!
+        lines = [""]
+        x, y = pos
+        for line in words:
+            for word in line:
+                word_surface, rect = font.render(word, color)
+                word_width, word_height = rect[2],rect[3]
+                if x + word_width >= max_width:
+                    x = pos[0]  # Reset the x.
+                    y += word_height  # Start on new row.
+                    lines.append(word + " ")
+                else:
+                    lines[-1] += " " + word
+                x += word_width + space
+            x = pos[0]  # Reset the x.
+
+        x,y = pos
+        for line in lines:
+            print(font.pad)
+            font.pad = True
+            line_surface, rect = font.render(line, color)
+            surface.blit(line_surface, (x, y+hLetter-rect[3]))
+            y += int(rect[3]*1.4)
+# renderTxtMultiline - end
 
 class Agent(object):
     def __init__(self,screen_size):
@@ -102,9 +138,9 @@ class Agent(object):
         colBotsSkin = (243,243,243)
         colBotsMicro = (153,153,153)
         
-        myfont = pygame.freetype.Font("../fonts/SF-UI-Display-Regular.otf", 20)
-        #~ myfontsmall = pygame.freetype.Font("../fonts/SF-UI-Display-Regular.otf", 16)
-        myfontsmall = pygame.freetype.Font("../fonts/SF-Compact-Text-Semibold.otf", 16)
+        fontSys = pygame.freetype.Font("../fonts/SF-UI-Display-Regular.otf", 20)
+        #~ fontSysSmall = pygame.freetype.Font("../fonts/SF-UI-Display-Regular.otf", 16)
+        fontSysSmall = pygame.freetype.Font("../fonts/SF-Compact-Text-Semibold.otf", 16)
         
         
         w = self.w
@@ -116,7 +152,7 @@ class Agent(object):
         # system
         self.screen.blit(self.imTopBanner, (0, 0)) 
         ycur = 8
-        textsurface,rect = myfontsmall.render('11:28', (0, 0, 0))
+        textsurface,rect = fontSysSmall.render('11:28', (0, 0, 0))
         self.screen.blit(textsurface,(10+20 ,ycur))
         
         # title
@@ -127,11 +163,12 @@ class Agent(object):
             pg.draw.line(self.screen, colDark1,(10,y),(30,y),2 )
 
     
-        #~ myfont = pg.font.SysFont('Comic Sans MS', 30)
-        #~ textsurface = myfont.render('Faiska', False, (0, 0, 0))
-        #~ myfont = pygame.freetype.SysFont('Verdana', 18)
+        #~ fontSys = pg.font.SysFont('Comic Sans MS', 30)
+        #~ textsurface = fontSys.render('Faiska', False, (0, 0, 0))
+        #~ fontSys = pygame.freetype.SysFont('Verdana', 18)
 
-        textsurface,rect = myfont.render('TestPepper', (0, 0, 0))
+        #~ fontSys.underline = True
+        textsurface,rect = fontSys.render('TestPepper', (0, 0, 0))
         self.screen.blit(textsurface,(w//2-(rect[2]-rect[0])//2,ycur))
         ycur = 50
         
@@ -174,8 +211,14 @@ class Agent(object):
             # render question
             nEnd = int((pg.time.get_ticks()/1000-self.timeStartSpeak)*10)
             txt = self.strTxtSpeak[:nEnd]
-            renderTxtMultiline( self.screen, txt, (xmargin*2,ycur+ymargin),myfont, colDark1,nWidthMax=300)
-        
+            for i in range(nEnd,len(self.strTxtSpeak)):
+                if self.strTxtSpeak[i] != ' ':
+                    txt += "_"
+                else:
+                    txt += " "
+            renderTxtMultiline( self.screen, txt, (xmargin*2,ycur+ymargin-5),fontSys, colDark1,nWidthMax=300)
+            if nEnd >= len(self.strTxtSpeak):
+                renderUserButton( self.astrAnswer )
         
         # microphone over mouth
         wmicro = 26
@@ -191,7 +234,7 @@ class Agent(object):
             rTime = pg.time.get_ticks()/1000
             nTime = int(rTime)
             if nTime == 2 and not self.isSpeaking():
-                self.speak("Comparé à votre mission précédente, le cadre de celle ci vous a t'il paru plus agréable ?")
+                self.speak("Comparé à votre mission précédente, le cadre de celle ci vous a t'il paru plus agréable ?", ["Oui", "Bof", "Non"])
             self.update()
             self.draw()
             pg.display.update()

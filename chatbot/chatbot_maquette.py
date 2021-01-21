@@ -289,13 +289,19 @@ class Agent(object):
 
 
     def main_loop(self):
+        listQ = []
+        listQ.append(["Comparé à votre mission précédente, celle ci vous a t'il paru plus agréable?", ["Oui", "Bof", "Non"]])
+        listQ.append(["Sur quel aspect pensez vous cela?", ["Le cadre", "Les collégues", "Le manager", "un peu tout"]])
+        nNumQ = 0
+        print(listQ)
+        
         while not self.done:
             self.event_loop()
             rTime = pg.time.get_ticks()/1000
             nTime = int(rTime)
             if nTime == 2 and not self.isSpeaking():
-                #~ self.speak("Comparé à votre mission précédente, le cadre de celle ci vous a t'il paru plus agréable ?", ["Oui", "Bof", "Non"])
-                self.speak("C?", ["Oui", "Je ne sais pas trop!", "Non"])
+                #~ self.speak()
+                self.speak( listQ[nNumQ][0],listQ[nNumQ][1])
                 #~ self.speak("C?", ["Oui", "bof", "Non", "car","or"])
             self.update()
             self.draw()

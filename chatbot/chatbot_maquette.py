@@ -121,7 +121,7 @@ class Agent(object):
         
     def speak(self,txt,astrAnswers):
         self.timeStartSpeak = pg.time.get_ticks()/1000
-        self.rDurationSpeak = len(txt)/30
+        self.rDurationSpeak = len(txt)/20
         self.strTxtSpeak = txt
         self.astrAnswers = astrAnswers
         
@@ -232,7 +232,7 @@ class Agent(object):
         
         if self.isSpeaking():
             # render question
-            nEnd = int((pg.time.get_ticks()/1000-self.timeStartSpeak)*30)
+            nEnd = int((pg.time.get_ticks()/1000-self.timeStartSpeak)*20)
             txt = self.strTxtSpeak[:nEnd]
             for i in range(nEnd,len(self.strTxtSpeak)):
                 if self.strTxtSpeak[i] != ' ':

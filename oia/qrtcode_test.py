@@ -85,3 +85,8 @@ def loopOnWebcam():
 # loopOnWebcam - end
 
 
+data = "Room: L206"
+data = "Room: Cantine"
+#~ generateQRCode(data)
+#~ findQRCodeInImage("photo_with_qrcode.jpg")
+loopOnWebcam()

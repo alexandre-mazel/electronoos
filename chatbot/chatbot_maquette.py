@@ -217,6 +217,9 @@ class ButtonManager(object):
         nMarginY = 2
         
         bAlignCenter = 1
+        
+        if 0:
+            self.bVerticalRender=True # TODO
         computedSize = []
         for nNumButton,txt in enumerate(astrButton):
             #~ txt_surface, rect = self.font.render(txt)

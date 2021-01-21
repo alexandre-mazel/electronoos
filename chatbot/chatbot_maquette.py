@@ -17,6 +17,7 @@ import pygame.freetype  # Import the freetype module.
 def renderTxtMultiline(surface, text, pos, font, color=pygame.Color('black'), nWidthMax = -1):
     """
     nWidthMax: limit width to a specific size
+    return the rect
     """
     #~ print("DBG: renderTxtMultiline: text: %s, pos: %s, font: %s, color: %s" % (str(text),str(pos),str(font),str(color)) )
     words = [word.split(' ') for word in text.splitlines()]  # 2D array where each row is a list of words.
@@ -36,7 +37,8 @@ def renderTxtMultiline(surface, text, pos, font, color=pygame.Color('black'), nW
     if nWidthMax != -1: max_width = nWidthMax
 
     font.pad = True # render letter in a empty rect of the size of the bigger letter (even if no bigger letter to be rendered yet)
-
+    
+    rectTotal = [pos[0],pos[1],0,0]
     if 1:
         x, y = pos
         for line in words:
@@ -46,10 +48,13 @@ def renderTxtMultiline(surface, text, pos, font, color=pygame.Color('black'), nW
                 if x + word_width >= max_width:
                     x = pos[0]  # Reset the x.
                     y += word_height  # Start on new row.
+                    rectTotal[3]+=word_height
                 surface.blit(word_surface, (x, y))
                 x += word_width + space
+                rectTotal[2] = max(rectTotal[2],x-space)
             x = pos[0]  # Reset the x.
             y += word_height  # Start on new row
+            rectTotal[3]+=word_height
     else:
         # redo same with precompute without rendering, then render
         # not usefull when using font.pad !!!
@@ -75,6 +80,8 @@ def renderTxtMultiline(surface, text, pos, font, color=pygame.Color('black'), nW
             line_surface, rect = font.render(line, color)
             surface.blit(line_surface, (x, y+hLetter-rect[3]))
             y += int(rect[3]*1.4)
+            
+    return rectTotal
 # renderTxtMultiline - end
 
 class Button(object):
@@ -87,16 +94,21 @@ class Button(object):
         self.size = size
         self.margin = margin
         
-    def render( self, surface, font ):
+    def render( self, surface, font, bSelected=False ):
         """
         return painted rect position
         """
         colTxt = (243,243,243)
         colButton = (164//2,194//2,244//2)
+        colButtonSelected = (250//2,250//2,244//2)
         
-        txt_surface, rect = font.render(self.txt, colTxt)
+        if bSelected:
+            colButton = colButtonSelected
+        
+        #~ txt_surface, rect = font.render(self.txt, colTxt)
         round_rect(surface,self.pos+self.size,colButton,11,0)
-        surface.blit(txt_surface,(self.pos[0]+self.margin[0],self.pos[1]+self.margin[1]))
+        #~ surface.blit(txt_surface,(self.pos[0]+self.margin[0],self.pos[1]+self.margin[1]))
+        renderTxtMultiline(surface,self.txt,(self.pos[0]+self.margin[0],self.pos[1]+self.margin[1]),font, colTxt)
         
     def isOver(self,pos):
         if          pos[0] >= self.pos[0] and pos[0] < self.pos[0]+self.size[0] \
@@ -110,6 +122,8 @@ class ButtonManager(object):
     def __init__(self):
         self.aButtons = []
         self.font = None
+        self.fontSmall = None
+        self.nNumSelected = -1 # num of selected button; -1 => none
         
     def hasButtons( self ):
         return len(self.aButtons) > 0
@@ -121,6 +135,13 @@ class ButtonManager(object):
         if self.font == None:
             self.font = pygame.freetype.Font("../fonts/SF-Compact-Text-Semibold.otf", 15)
             self.font.pad = True
+        if self.fontSmall == None:
+            self.fontSmall = pygame.freetype.Font("../fonts/SF-Compact-Text-Semibold.otf", 12)
+            self.fontSmall.pad = True
+            
+        font = self.font
+        if len(astrButton)>3:
+            font = self.fontSmall
             
         x, y = pos
         nMarginX = 18
@@ -129,7 +150,9 @@ class ButtonManager(object):
         bAlignCenter = 1
         computedSize = []
         for nNumButton,txt in enumerate(astrButton):
-            txt_surface, rect = self.font.render(txt)
+            #~ txt_surface, rect = self.font.render(txt)
+            rect = renderTxtMultiline(surface,txt,(0,0),font)
+            renderTxtMultiline
             #~ print(rect)
             if len(txt)<0 and 0:
                 nRealMarginX = 20
@@ -150,8 +173,10 @@ class ButtonManager(object):
             # center them
             max_width, max_height = surface.get_size()
             hspace = max_width-nMarginX*2
+            hMax = 0
             for data in computedSize:
-                hspace-=data[2]
+                hspace -= data[2]
+                hMax = max(hMax,data[3])
             hspace //= len(astrButton)-1
             #~ print("hspace: %s" % hspace )
                 
@@ -163,13 +188,29 @@ class ButtonManager(object):
                     x += hspace*(nNumButton)
                 #~ round_rect(surface,(x,y,wButton,hButton),colButton,11,0)
                 #~ surface.blit(txt_surface,(x+nRealMarginX,y+nMarginY))
-                self.aButtons.append( Button(txt,(x,y),(wButton,hButton),(nRealMarginX,nMarginY)) )
+                self.aButtons.append( Button(txt,(x,y),(wButton,hMax),(nRealMarginX,nMarginY)) )
                 
      # createButtons - end
      
     def render(self, surface):
-        for button in self.aButtons:
-            button.render(surface,self.font)
+        font = self.font
+        if len(self.aButtons)>3:
+            font = self.fontSmall
+        for nNum,button in enumerate(self.aButtons):
+            button.render(surface,font,self.nNumSelected == nNum)
+            
+    def isOver(self,pos):
+        for nNum,button in enumerate(self.aButtons):
+            if button.isOver(pos):
+                return nNum
+        return None
+            
+    def select(self,nNum,bState=True):
+        self.nNumSelected = nNum
+        
+    def clearButtons( self ):
+        self.aButtons = []
+        self.nNumSelected = -1
 
 # class ButtonManager - end
     
@@ -214,6 +255,16 @@ class Agent(object):
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
                     self.done = True
+                    
+            if event.type == pg.MOUSEBUTTONDOWN or event.type == pg.MOUSEBUTTONUP:
+                pos = pg.mouse.get_pos()
+                num = self.buttonManager.isOver(pos)
+                if num != None:
+                    if event.type == pg.MOUSEBUTTONDOWN:
+                        self.buttonManager.select(num)
+                    else:
+                        self.receiveAnswer(num)
+                
 
     def update(self):
         pass
@@ -232,7 +283,11 @@ class Agent(object):
         if not self.buttonManager.hasButtons():
             self.buttonManager.createButtons(self.astrAnswers,surface,pos)
         self.buttonManager.render(surface)
-
+        
+    def receiveAnswer(self,num):
+        self.nNumQ += 1
+        self.buttonManager.clearButtons()
+        self.strTxtSpeak = ""
         
 
     def draw(self):
@@ -340,7 +395,8 @@ class Agent(object):
         
         # progression
         round_rect(self.screen, (xmargin,ycur,warea,20), colLight1, 2, 0)
-        rProgress = (self.nNumQ+1) / len(self.listQ)
+        rProgress = (self.nNumQ) / len(self.listQ)
+        if rProgress > 1.: rProgress = 1.
         if rProgress > 0.1:
             round_rect(self.screen, (xmargin,ycur,int(warea*rProgress),20), colBlue1, 2, 0)
         
@@ -350,20 +406,22 @@ class Agent(object):
     def main_loop(self):
         self.listQ = []
         self.listQ.append(["C?", ["Oui", "bof", "Non", "car","or"]])
-        self.listQ.append(["Comparé à votre mission précédente, celle ci vous a t'il paru plus agréable?", ["Oui", "Bof", "Non"]])
-        self.listQ.append(["Sur quel aspect pensez vous cela?", ["Le cadre", "Les collégues", "Le manager", "un peu tout"]])
-        self.nNumQ = -1
+        self.listQ.append(["Comparé à votre mission précédente, celle ci vous a t'elle paru plus agréable?", ["Oui", "Bof", "Non"]])
+        self.listQ.append(["Sur quel aspect pensez vous cela?", ["Le\ncadre", "Les\ncollégues", "Le\nmanager", "un\npeu\ntout"]])
+        self.nNumQ = 0
+        #~ self.nNumQ = 2;self.listQ[-1][0]="C"
         #~ print(listQ)
         
         while not self.done:
             self.event_loop()
             rTime = pg.time.get_ticks()/1000
             nTime = int(rTime)
-            if nTime == 2 and not self.isSpeaking():
+            if nTime >= 2 and not self.isSpeaking():
                 #~ self.speak()
-                self.nNumQ += 1
-                self.speak( self.listQ[self.nNumQ][0],self.listQ[self.nNumQ][1])
-                #~ self.speak("C?", ["Oui", "bof", "Non", "car","or"])
+                #~ self.nNumQ += 1
+                if self.nNumQ < len(self.listQ):
+                    self.speak( self.listQ[self.nNumQ][0],self.listQ[self.nNumQ][1])
+                    #~ self.speak("C?", ["Oui", "bof", "Non", "car","or"])
             self.update()
             self.draw()
             pg.display.update()

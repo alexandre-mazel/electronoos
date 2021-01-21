@@ -19,7 +19,8 @@ def renderTxtMultiline(surface, text, pos, font, color=pygame.Color('black'), nW
     nWidthMax: limit width to a specific size
     return the rect
     """
-    print("DBG: renderTxtMultiline: text: %s, pos: %s, font: %s, color: %s, nWidthMax=%s" % (str(text),str(pos),str(font),str(color),nWidthMax) )
+    bVerbose = False
+    if bVerbose: print("DBG: renderTxtMultiline: text: %s, pos: %s, font: %s, color: %s, nWidthMax=%s" % (str(text),str(pos),str(font),str(color),nWidthMax) )
     words = [word.split(' ') for word in text.splitlines()]  # 2D array where each row is a list of words.
     #space = font.size(' ')[0]  # The width of a space.
     
@@ -90,6 +91,7 @@ def renderTxtMultilineCentered(surface, text, pos, font, color=pygame.Color('bla
     nWidthMax: limit width to a specific size
     return the rect
     """
+    bVerbose = False
     print("DBG: renderTxtMultilineCentered: text: %s, pos: %s, font: %s, color: %s, nWidthMax: %s, nWidthTotal: %s, nHeightTotal: %s" % (str(text),str(pos),str(font),str(color),nWidthMax,nWidthTotal, nHeightTotal) )
      
     words = [word.split(' ') for word in text.splitlines()]  # 2D array where each row is a list of words.
@@ -132,13 +134,13 @@ def renderTxtMultilineCentered(surface, text, pos, font, color=pygame.Color('bla
         rectTotal[3]+=word_height
         
     x, y = pos
-    print("DBG: renderTxtMultilineCentered: lines: %s" % lines)
-    print("rectTotal: " + str(rectTotal) )
+    if bVerbose: print("DBG: renderTxtMultilineCentered: lines: %s" % lines)
+    if bVerbose: print("rectTotal: " + str(rectTotal) )
     if nWidthTotal  == -1: nWidthTotal=rectTotal[2]
     if nHeightTotal  == -1: nHeightTotal=rectTotal[3]
     for line in lines:
         line_surface, rect = font.render(line, color)
-        print("rect: %s, hLetter:%s" % (str(rect),hLetter) )
+        if bVerbose: print("rect: %s, hLetter:%s" % (str(rect),hLetter) )
         # we assume each line has the same rect (thanks to pad option)
         xl = x + ( nWidthTotal//2 - rect[2]//2 )
         yl = y + ( nHeightTotal//2 - rectTotal[3]//2 )
@@ -218,8 +220,10 @@ class ButtonManager(object):
         
         bAlignCenter = 1
         
-        if 0:
-            self.bVerticalRender=True # TODO
+        self.bVerticalRender = False
+        if 0: # if there's one big text
+            self.bVerticalRender=True # TODO: finish to debug that: currently bug in yVertical computation
+            
         computedSize = []
         for nNumButton,txt in enumerate(astrButton):
             #~ txt_surface, rect = self.font.render(txt)
@@ -251,6 +255,7 @@ class ButtonManager(object):
             hspace //= len(astrButton)-1
             #~ print("hspace: %s" % hspace )
                 
+            yVertical = 0
             for nNumButton,txt in enumerate(astrButton):
                 x,y,wButton,hButton,nRealMarginX,nMarginY = computedSize[nNumButton]
                 #~ txt_surface, rect = self.font.render(txt, colTxt)
@@ -259,6 +264,10 @@ class ButtonManager(object):
                     x += hspace*(nNumButton)
                 #~ round_rect(surface,(x,y,wButton,hButton),colButton,11,0)
                 #~ surface.blit(txt_surface,(x+nRealMarginX,y+nMarginY))
+                if self.bVerticalRender:
+                    y += yVertical
+                    yVertical += hButton+nMarginY*1
+                    x = nRealMarginX
                 self.aButtons.append( Button(txt,(x,y),(wButton,hMax),(nRealMarginX,nMarginY)) )
                 
      # createButtons - end
@@ -451,7 +460,7 @@ class Agent(object):
                 else:
                     txt += " "
             renderTxtMultiline( self.screen, txt, (xmargin*2,ycur+ymargin-5),fontSys, colDark1,nWidthMax=300)
-            ycur += harea+20
+            ycur += harea+10
         
             # microphone over mouth
             wmicro = 26
@@ -462,7 +471,7 @@ class Agent(object):
                 self.renderUserButton( self.screen,(xmargin,ycur) )
 
         
-        ycur=650
+        ycur=670
         
         # progression
         round_rect(self.screen, (xmargin,ycur,warea,20), colLight1, 2, 0)
@@ -479,6 +488,7 @@ class Agent(object):
         #~ self.listQ.append(["C?", ["Oui", "bof", "Non", "car","or"]])
         self.listQ.append(["Comparé à votre mission précédente, celle ci vous a t'elle paru plus agréable?", ["Oui", "Bof", "Non"]])
         self.listQ.append(["Quel aspect vous a fait répondre ainsi?", ["Le\ncadre", "Les\ncollégues", "Le\nmanager", "un\npeu\ntout"]])
+        self.listQ.append(["Merci à bientot!",["De rien, au revoir!", "Bye!"]] )
         self.listQ.append(["Merci à bientot!",["De rien, au revoir! Grave de la grosse balle atomiaque de gros malade!", "Bye!"]] )
         self.nNumQ = 0
         #~ self.nNumQ = 1;self.listQ[self.nNumQ][0]="C"

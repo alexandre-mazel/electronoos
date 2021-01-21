@@ -136,6 +136,9 @@ class Agent(object):
         x, y = pos
         nMarginX = 18
         nMarginY = 2
+        
+        bAlignCenter = 1
+        computedSize = []
         for txt in astrButton:
             txt_surface, rect = font.render(txt, colTxt)
             #~ print(rect)
@@ -145,9 +148,33 @@ class Agent(object):
                 nRealMarginX = nMarginX
             wButton = rect[2] + nRealMarginX*2
             hButton = rect[3] + nMarginY*2
-            round_rect(surface,(x,y,wButton,hButton),colButton,11,0)
-            surface.blit(txt_surface,(x+nRealMarginX,y+nMarginY))
+            if not bAlignCenter:
+                round_rect(surface,(x,y,wButton,hButton),colButton,11,0)
+                surface.blit(txt_surface,(x+nRealMarginX,y+nMarginY))
+            else:
+                computedSize.append((x,y,wButton,hButton,nRealMarginX,nMarginY))
             x += wButton + nMarginX
+            
+        if bAlignCenter:
+            # render after all computation
+            # center them
+            max_width, max_height = surface.get_size()
+            hspace = max_width-nMarginX*2
+            for data in computedSize:
+                hspace-=data[2]
+            hspace //= len(astrButton)-1
+            #~ print("hspace: %s" % hspace )
+                
+            for i,txt in enumerate(astrButton):
+                x,y,wButton,hButton,nRealMarginX,nMarginY = computedSize[i]
+                txt_surface, rect = font.render(txt, colTxt)
+                x -= nMarginX*(i)
+                if i > 0:
+                    x += hspace*(i)
+                round_rect(surface,(x,y,wButton,hButton),colButton,11,0)
+                surface.blit(txt_surface,(x+nRealMarginX,y+nMarginY))
+                
+     # renderUserButton - end
         
 
     def draw(self):
@@ -258,8 +285,9 @@ class Agent(object):
             rTime = pg.time.get_ticks()/1000
             nTime = int(rTime)
             if nTime == 2 and not self.isSpeaking():
-                self.speak("Comparé à votre mission précédente, le cadre de celle ci vous a t'il paru plus agréable ?", ["Oui", "Bof", "Non"])
-                #~ self.speak("C?", ["Oui", "Bof", "Non"])
+                #~ self.speak("Comparé à votre mission précédente, le cadre de celle ci vous a t'il paru plus agréable ?", ["Oui", "Bof", "Non"])
+                self.speak("C?", ["Oui", "Je ne sais pas trop!", "Non"])
+                #~ self.speak("C?", ["Oui", "bof", "Non", "car","or"])
             self.update()
             self.draw()
             pg.display.update()

@@ -119,13 +119,36 @@ class Agent(object):
         pass
         
         
-    def speak(self,txt):
+    def speak(self,txt,astrAnswers):
         self.timeStartSpeak = pg.time.get_ticks()/1000
-        self.rDurationSpeak = len(txt)/10
+        self.rDurationSpeak = len(txt)/30
         self.strTxtSpeak = txt
+        self.astrAnswers = astrAnswers
         
     def isSpeaking(self):
         return self.strTxtSpeak != ""
+        
+    def renderUserButton( self, astrButton, surface, pos ):
+        colTxt = (243,243,243)
+        colButton = (164//2,194//2,244//2)
+        font = pygame.freetype.Font("../fonts/SF-Compact-Text-Semibold.otf", 14)
+        font.pad = True
+        x, y = pos
+        nMarginX = 18
+        nMarginY = 2
+        for txt in astrButton:
+            txt_surface, rect = font.render(txt, colTxt)
+            #~ print(rect)
+            if len(txt)<0 and 0:
+                nRealMarginX = 20
+            else:
+                nRealMarginX = nMarginX
+            wButton = rect[2] + nRealMarginX*2
+            hButton = rect[3] + nMarginY*2
+            round_rect(surface,(x,y,wButton,hButton),colButton,11,0)
+            surface.blit(txt_surface,(x+nRealMarginX,y+nMarginY))
+            x += wButton + nMarginX
+        
 
     def draw(self):
         #~ self.screen.blit(self.background, (0,0))
@@ -177,12 +200,12 @@ class Agent(object):
         
         
         # screen
-        # roundrect(mat,(x,y,w,h),col1,round_size,border_size)
+        # round_rect(mat,(x,y,w,h),col1,round_size,border_size)
         ycur += 20
         xmargin=20
         ymargin=20
         warea = w-xmargin*2
-        harea = 400
+        harea = 500
         
         xbot = xmargin+warea-self.imBot.get_rect().size[0]+xmargin//2 + 6
         ybot = ycur+harea-self.imBot.get_rect().size[1]#+ymargin//2
@@ -204,12 +227,12 @@ class Agent(object):
             rTime = pg.time.get_ticks()/1000 #rTime in sec
             
             #nMouthSize = (int(rTime)*3)%hmouth
-            nMouthSize = abs(noise.getSimplexNoise(rTime*3))*hmouth
+            nMouthSize = int(abs(noise.getSimplexNoise(rTime*3))*hmouth)
             pg.draw.ellipse(self.screen,colDark1,(xmouth-nMouthSize,ymouth-nMouthSize//2,nMouthSize*2,nMouthSize) )
         
         if self.isSpeaking():
             # render question
-            nEnd = int((pg.time.get_ticks()/1000-self.timeStartSpeak)*10)
+            nEnd = int((pg.time.get_ticks()/1000-self.timeStartSpeak)*30)
             txt = self.strTxtSpeak[:nEnd]
             for i in range(nEnd,len(self.strTxtSpeak)):
                 if self.strTxtSpeak[i] != ' ':
@@ -217,8 +240,9 @@ class Agent(object):
                 else:
                     txt += " "
             renderTxtMultiline( self.screen, txt, (xmargin*2,ycur+ymargin-5),fontSys, colDark1,nWidthMax=300)
+            ycur += harea+20
             if nEnd >= len(self.strTxtSpeak):
-                renderUserButton( self.astrAnswer )
+                self.renderUserButton( self.astrAnswers, self.screen, (xmargin,ycur) )
         
         # microphone over mouth
         wmicro = 26
@@ -235,6 +259,7 @@ class Agent(object):
             nTime = int(rTime)
             if nTime == 2 and not self.isSpeaking():
                 self.speak("Comparé à votre mission précédente, le cadre de celle ci vous a t'il paru plus agréable ?", ["Oui", "Bof", "Non"])
+                #~ self.speak("C?", ["Oui", "Bof", "Non"])
             self.update()
             self.draw()
             pg.display.update()

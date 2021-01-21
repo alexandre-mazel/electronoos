@@ -84,6 +84,70 @@ def renderTxtMultiline(surface, text, pos, font, color=pygame.Color('black'), nW
     return rectTotal
 # renderTxtMultiline - end
 
+def renderTxtMultilineCentered(surface, text, pos, font, color=pygame.Color('black'), nWidthMax = -1, nWidthTotal = -1, nHeightTotal = -1):
+    """
+    nWidthMax: limit width to a specific size
+    return the rect
+    """
+    print("DBG: renderTxtMultilineCentered: text: %s, pos: %s, font: %s, color: %s, nWidthMax: %s, nWidthTotal: %s, nHeightTotal: %s" % (str(text),str(pos),str(font),str(color),nWidthMax,nWidthTotal, nHeightTotal) )
+     
+    words = [word.split(' ') for word in text.splitlines()]  # 2D array where each row is a list of words.
+    
+    #~ TODO: compute M and q and text with é
+    textsurface,rect = font.render(" ")
+    space = rect[2]
+    wLetter = rect[2]
+    hLetter = rect[3]
+
+    #~ textsurface,rect = font.render("MqéQ")
+    #~ wLetter = max(rect[2],wLetter)
+    #~ hLetter = max(rect[3],hLetter)
+    
+    max_width, max_height = surface.get_size()
+    if nWidthMax != -1: max_width = nWidthMax
+
+    font.pad = True # render letter in a empty rect of the size of the bigger letter (even if no bigger letter to be rendered yet)
+    
+    lines = []
+    rectTotal = [pos[0],pos[1],0,0]
+    x, y = pos
+    for line in words:
+        lines.append("")
+        for word in line:
+            word_surface, rect = font.render(word, color)
+            word_width, word_height = rect[2],rect[3]
+            if x + word_width >= max_width:
+                x = pos[0]  # Reset the x.
+                y += word_height  # Start on new row.
+                rectTotal[3]+=word_height
+                lines.append("")
+            x += word_width + space
+            rectTotal[2] = max(rectTotal[2],(x-space)-pos[0])
+            lines[-1] += word + " "
+        x = pos[0]  # Reset the x.
+        y += word_height  # Start on new row
+        rectTotal[3]+=word_height
+        
+    x, y = pos
+    print(lines)
+    print(rectTotal)
+    if nWidthTotal  == -1: nWidthTotal=rectTotal[3]
+    if nHeightTotal  == -1: nHeightTotal=rectTotal[3]
+    for line in lines:
+        line_surface, rect = font.render(line, color)
+        print("rect: %s, hLetter:%s" % (str(rect),hLetter) )
+        # we assume each line has the same rect (thanks to pad option)
+        xl = x + ( nWidthTotal//2 - rect[2]//2 )
+        yl = y + ( nHeightTotal//2 - rectTotal[3]//2 )
+        surface.blit(line_surface, (xl, yl+hLetter-rect[3]))
+        y += rect[3]
+        
+    #~ pg.draw.rect(surface, (255,0,255),(pos[0],pos[1],rectTotal[2],nHeightTotal) )
+        
+    
+    return rectTotal
+# renderTxtMultilineCentered - end
+
 class Button(object):
     def __init__( self, txt, pos, size, margin, id=-1 ):
         """
@@ -108,7 +172,7 @@ class Button(object):
         #~ txt_surface, rect = font.render(self.txt, colTxt)
         round_rect(surface,self.pos+self.size,colButton,11,0)
         #~ surface.blit(txt_surface,(self.pos[0]+self.margin[0],self.pos[1]+self.margin[1]))
-        renderTxtMultiline(surface,self.txt,(self.pos[0]+self.margin[0],self.pos[1]+self.margin[1]),font, colTxt)
+        renderTxtMultilineCentered(surface,self.txt,(self.pos[0],self.pos[1]),font, colTxt,nWidthTotal = self.size[0], nHeightTotal=self.size[1])
         
     def isOver(self,pos):
         if          pos[0] >= self.pos[0] and pos[0] < self.pos[0]+self.size[0] \
@@ -405,11 +469,12 @@ class Agent(object):
 
     def main_loop(self):
         self.listQ = []
-        self.listQ.append(["C?", ["Oui", "bof", "Non", "car","or"]])
+        #~ self.listQ.append(["C?", ["Oui", "bof", "Non", "car","or"]])
         self.listQ.append(["Comparé à votre mission précédente, celle ci vous a t'elle paru plus agréable?", ["Oui", "Bof", "Non"]])
-        self.listQ.append(["Sur quel aspect pensez vous cela?", ["Le\ncadre", "Les\ncollégues", "Le\nmanager", "un\npeu\ntout"]])
+        self.listQ.append(["Quel aspect vous a fait répondre ainsi?", ["Le\ncadre", "Les\ncollégues", "Le\nmanager", "un\npeu\ntout"]])
+        self.listQ.append(["Merci à bientot!",["De rien, au revoir!", "Bye!"]] )
         self.nNumQ = 0
-        #~ self.nNumQ = 2;self.listQ[-1][0]="C"
+        #~ self.nNumQ = 1;self.listQ[self.nNumQ][0]="C"
         #~ print(listQ)
         
         while not self.done:

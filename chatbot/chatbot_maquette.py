@@ -268,13 +268,22 @@ class Agent(object):
                     txt += " "
             renderTxtMultiline( self.screen, txt, (xmargin*2,ycur+ymargin-5),fontSys, colDark1,nWidthMax=300)
             ycur += harea+20
+        
+            # microphone over mouth
+            wmicro = 26
+            hmicro = 16
+            pg.draw.ellipse(self.screen,colBotsMicro,(xmouth-wmicro//2-26,ymouth-hmicro//2+2,wmicro,hmicro) )
+
             if nEnd >= len(self.strTxtSpeak):
                 self.renderUserButton( self.astrAnswers, self.screen, (xmargin,ycur) )
+
         
-        # microphone over mouth
-        wmicro = 26
-        hmicro = 16
-        pg.draw.ellipse(self.screen,colBotsMicro,(xmouth-wmicro//2-26,ymouth-hmicro//2+2,wmicro,hmicro) )
+        ycur=650
+        
+        # progression
+        round_rect(self.screen, (xmargin,ycur,warea,20), colLight1, 2, 0)
+        rProgress = 0.6 
+        round_rect(self.screen, (xmargin,ycur,int(warea*rProgress),20), colBlue1, 2, 0)
         
     # draw - end
 

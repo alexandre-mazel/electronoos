@@ -399,7 +399,11 @@ class Agent(object):
         # system
         self.screen.blit(self.imTopBanner, (0, 0)) 
         ycur = 8
-        textsurface,rect = fontSysSmall.render('11:28', (0, 0, 0))
+        
+        hour,min,sec =misctools.getTime()
+        #~ hour,min = 11,28
+        strTime = "%2d:%2d" % (hour,min)
+        textsurface,rect = fontSysSmall.render( strTime, (0, 0, 0) )
         self.screen.blit(textsurface,(10+20 ,ycur))
         
         # title
@@ -415,7 +419,7 @@ class Agent(object):
         #~ fontSys = pygame.freetype.SysFont('Verdana', 18)
 
         #~ fontSys.underline = True
-        textsurface,rect = fontSys.render('TestPepper', (0, 0, 0))
+        textsurface,rect = fontSys.render('Faiska', (0, 0, 0))
         self.screen.blit(textsurface,(w//2-(rect[2]-rect[0])//2,ycur))
         ycur = 50
         
@@ -519,18 +523,20 @@ class Agent(object):
 
 
     def main_loop(self):
+        random.seed(1000) # tune to have a blink during the first question
         self.listQ = []
         #~ self.listQ.append(["C?", ["Oui", "bof", "Non", "car","or"]])
-        self.listQ.append(["Comparé à votre mission précédente, celle ci vous a t'elle paru plus agréable?", ["Oui", "Bof", "Non"]])
-        self.listQ.append(["Quel aspect vous a fait répondre ainsi?", ["Le\ncadre", "Les\ncollégues", "Le\nmanager", "un\npeu\ntout"]])
+        self.listQ.append(["Comparé à votre mission précédente chez Sephora, celle ci vous a t'elle paru plus agréable?", ["Oui", "Bof", "Non"]])
+        self.listQ.append(["Quel aspect vous a le plus plu?", ["Le\ncadre", "Les\ncollégues", "Le\nmanager", "un\npeu\ntout"]])
         self.listQ.append(["Merci à bientot!",["De rien, au revoir!", "Bye!"]] )
-        self.listQ.append(["Merci à bientot!",["De rien, au revoir! Grave de la grosse balle atomiaque de gros malade!", "Bye!"]] )
+        #~ self.listQ.append(["Merci à bientot!",["De rien, au revoir! Grave de la grosse balle atomiaque de gros malade!", "Bye!"]] )
         self.nNumQ = 0
         #~ self.nNumQ = 1;self.listQ[self.nNumQ][0]="C"
         #~ print(listQ)
         
         nCpt = 0
         timeFps = time.time()
+        nCptImageTotal = 0
         while not self.done:
             self.event_loop()
             rTime = pg.time.get_ticks()/1000
@@ -551,6 +557,15 @@ class Agent(object):
                 print("INF: fps: %5.1f" % (nCpt/duration) )
                 nCpt = 0
                 timeFps = time.time()
+                
+                    
+            nCptImageTotal += 1
+            if 0: # if (nCptImageTotal % (500*1000)) == 0 or 1:
+                #ffmpeg -r 10 -i %d.png -vcodec libx264 -b:v 4M -an test.mp4 # -an: no audio
+                #ffmpeg -r 60 -i "%d.png" -vf "fps=10,scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 123 output.gif
+                filename = "d:/images_generated/" + str(nCptImageTotal) + ".png"
+                pygame.image.save(self.screen, filename)
+                
                 
 
 #class Agent - end

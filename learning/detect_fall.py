@@ -689,7 +689,6 @@ def analyseFilenameInPath( strPath, bForceRecompute = False, bRender=True, bForc
 
                 
                 if 1:
-                    # ffmpeg -r 10 -i %06d.png -vcodec libx264 -b:v 4M -b:a 1k test.mp4
                     cv2.imwrite("d:/generated/%06d.png" % nCptGenerated, imc)  # NB: won't work with sub folder (overwriting dest)
                     nCptGenerated += 1
                 

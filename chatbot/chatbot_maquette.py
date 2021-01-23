@@ -9,6 +9,8 @@ sys.path.append("../../rounded-rects-pygame/" ) # for roundrects
 from roundrects import round_rect
 from roundrects import aa_round_rect as round_rect
 import noise
+import random
+import time
 
 import os
 import pygame as pg
@@ -82,7 +84,7 @@ def renderTxtMultiline(surface, text, pos, font, color=pygame.Color('black'), nW
             surface.blit(line_surface, (x, y+hLetter-rect[3]))
             y += int(rect[3]*1.4)
             
-    print("DBG: renderTxtMultiline: rectTotal: " + str(rectTotal) )
+    if bVerbose: print("DBG: renderTxtMultiline: rectTotal: " + str(rectTotal) )
     return rectTotal
 # renderTxtMultiline - end
 
@@ -92,7 +94,7 @@ def renderTxtMultilineCentered(surface, text, pos, font, color=pygame.Color('bla
     return the rect
     """
     bVerbose = False
-    print("DBG: renderTxtMultilineCentered: text: %s, pos: %s, font: %s, color: %s, nWidthMax: %s, nWidthTotal: %s, nHeightTotal: %s" % (str(text),str(pos),str(font),str(color),nWidthMax,nWidthTotal, nHeightTotal) )
+    if bVerbose: print("DBG: renderTxtMultilineCentered: text: %s, pos: %s, font: %s, color: %s, nWidthMax: %s, nWidthTotal: %s, nHeightTotal: %s" % (str(text),str(pos),str(font),str(color),nWidthMax,nWidthTotal, nHeightTotal) )
      
     words = [word.split(' ') for word in text.splitlines()]  # 2D array where each row is a list of words.
     
@@ -320,6 +322,7 @@ class Agent(object):
         s = self.imBot.get_rect().size
         wdst = s[0]//2
         self.imBot = pg.transform.scale(self.imBot, (wdst, int(wdst*s[1]/s[0])))
+        self.bInBlink = False
         
         self.strTxtSpeak = ""
         
@@ -376,6 +379,7 @@ class Agent(object):
         
         colBackground = (247,247,247)
         colLight1 = (220,220,220)
+        colBlack = (0,0,0)
         colDark1 = (22,22,22)
         colBlue1 = (164,194,244)
         colBotsSkin = (243,243,243)
@@ -433,18 +437,49 @@ class Agent(object):
         round_rect(self.screen, (xmargin,ycur,warea,harea), colBlue1, 10, 0)
         self.screen.blit(self.imBot, (xbot, ybot))
         
+        rTime = pg.time.get_ticks()/1000 #rTime in sec
+        
 
         xmouth = xbot+101
         ymouth = ybot+96
         wmouth = 40
         hmouth = 30
         
+        # animate bots
+        
+        xEye1=xbot+77
+        xEye2=xbot+122
+        yEye = ybot+54
+        wEyeMax = 30
+        hEyeMax = wEyeMax
+        pg.draw.rect(self.screen,colBotsSkin,(xEye1-wEyeMax//2,yEye-hEyeMax//2,wEyeMax,hEyeMax) )
+        pg.draw.rect(self.screen,colBotsSkin,(xEye2-wEyeMax//2,yEye-hEyeMax//2,wEyeMax,hEyeMax) )
+        
+        wEye = int( (wEyeMax+3)*(0.8+0.2*abs(noise.getSimplexNoise((rTime+10)/2))) )
+        hEye = wEye
+        
+        if self.bInBlink:
+            rTimeBlink = 0.1
+            rInBlink = (rTime - self.timeStartBlink)/rTimeBlink
+            if rInBlink >= 1.:
+                self.bInBlink = False
+            else:
+                if rInBlink < 0.5:
+                    hEye=int( (wEyeMax+3)*(0.5-rInBlink) )
+                else:
+                    hEye=int( (wEyeMax+3)*(rInBlink-0.5) )
+        else:
+            if random.random()>0.99:
+                self.bInBlink = True
+                self.timeStartBlink = rTime
+
+        pg.draw.ellipse(self.screen,colBlack,(xEye1-wEye//2,yEye-hEye//2,wEye,hEye) )
+        pg.draw.ellipse(self.screen,colBlack,(xEye2-wEye//2,yEye-hEye//2,wEye,hEye) )
+            
+        
         if self.isSpeaking() and pg.time.get_ticks()/1000-self.timeStartSpeak < self.rDurationSpeak:
             # change mouth
             pg.draw.rect(self.screen,colBotsSkin,(xmouth-wmouth//2,ymouth-hmouth//2,wmouth,hmouth) )
-        
-            
-            rTime = pg.time.get_ticks()/1000 #rTime in sec
             
             #nMouthSize = (int(rTime)*3)%hmouth
             nMouthSize = int(abs(noise.getSimplexNoise(rTime*3))*hmouth)
@@ -494,6 +529,8 @@ class Agent(object):
         #~ self.nNumQ = 1;self.listQ[self.nNumQ][0]="C"
         #~ print(listQ)
         
+        nCpt = 0
+        timeFps = time.time()
         while not self.done:
             self.event_loop()
             rTime = pg.time.get_ticks()/1000
@@ -508,6 +545,13 @@ class Agent(object):
             self.draw()
             pg.display.update()
             self.clock.tick(self.fps)
+            nCpt += 1
+            if nCpt > 300:
+                duration = time.time() - timeFps
+                print("INF: fps: %5.1f" % (nCpt/duration) )
+                nCpt = 0
+                timeFps = time.time()
+                
 
 #class Agent - end
 

@@ -323,6 +323,7 @@ class Agent(object):
         wdst = s[0]//2
         self.imBot = pg.transform.scale(self.imBot, (wdst, int(wdst*s[1]/s[0])))
         self.bInBlink = False
+        self.timeBotsStartExit = 0
         
         self.strTxtSpeak = ""
         
@@ -426,6 +427,7 @@ class Agent(object):
         pg.draw.line(self.screen, colLight1,(0,ycur),(w,ycur) )
         ycur += 1
         
+        rTime = pg.time.get_ticks()/1000 #rTime in sec # the time of the game
         
         # screen
         # round_rect(mat,(x,y,w,h),col1,round_size,border_size)
@@ -438,10 +440,15 @@ class Agent(object):
         xbot = xmargin+warea-self.imBot.get_rect().size[0]+xmargin//2 + 6
         ybot = ycur+harea-self.imBot.get_rect().size[1]#+ymargin//2
         
+        rTimeBotsInOut = 2.
+        if rTime < rTimeBotsInOut:
+            # arrival
+            xbot += 300*(rTimeBotsInOut-rTime)
+        elif self.timeBotsStartExit > 0:
+            xbot += 300*(rTime-self.timeBotsStartExit)/rTimeBotsInOut
+        
         round_rect(self.screen, (xmargin,ycur,warea,harea), colBlue1, 10, 0)
         self.screen.blit(self.imBot, (xbot, ybot))
-        
-        rTime = pg.time.get_ticks()/1000 #rTime in sec
         
 
         xmouth = xbot+101
@@ -518,6 +525,10 @@ class Agent(object):
         if rProgress > 1.: rProgress = 1.
         if rProgress > 0.1:
             round_rect(self.screen, (xmargin,ycur,int(warea*rProgress),20), colBlue1, 2, 0)
+            
+        if rProgress == 1.:
+            if self.timeBotsStartExit == 0:
+                self.timeBotsStartExit = rTime
         
     # draw - end
 
@@ -541,7 +552,7 @@ class Agent(object):
             self.event_loop()
             rTime = pg.time.get_ticks()/1000
             nTime = int(rTime)
-            if nTime >= 2 and not self.isSpeaking():
+            if rTime >= 3. and not self.isSpeaking():
                 #~ self.speak()
                 #~ self.nNumQ += 1
                 if self.nNumQ < len(self.listQ):

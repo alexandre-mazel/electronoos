@@ -406,21 +406,21 @@ class Agent(object):
 
         
         # system
-        self.screen.blit(self.imTopBanner, (0+260-1, 0+10-1)) 
+        self.screen.blit(self.imTopBanner, (0+260+2, 0+10)) 
         ycur = 10
         
         hour,min,sec =misctools.getTime()
         #~ hour,min = 11,28
         strTime = "%2d:%2d" % (hour,min)
         textsurface,rect = fontSysSmall.render( strTime, (0, 0, 0) )
-        self.screen.blit(textsurface,(10+20+3 ,ycur+4))
+        self.screen.blit(textsurface,(10+20+4 ,ycur+4))
         
         # title
         ycur = 28+10
         
         for i in range(3):
             y = ycur+i*6
-            pg.draw.line(self.screen, colDark1,(10+6,y),(30+6,y),2 )
+            pg.draw.line(self.screen, colDark1,(10+6+3,y),(30+6,y),2 )
 
     
         #~ fontSys = pg.font.SysFont('Comic Sans MS', 30)
@@ -471,8 +471,8 @@ class Agent(object):
         yEye = ybot+54
         wEyeMax = 30
         hEyeMax = wEyeMax
-        pg.draw.rect(self.screen,colBotsSkin,(xEye1-wEyeMax//2,yEye-hEyeMax//2,wEyeMax,hEyeMax) )
-        pg.draw.rect(self.screen,colBotsSkin,(xEye2-wEyeMax//2,yEye-hEyeMax//2,wEyeMax,hEyeMax) )
+        pg.draw.rect(self.screen,colBotsSkin,(int(xEye1-wEyeMax//2),int(yEye-hEyeMax//2),wEyeMax,hEyeMax) )
+        pg.draw.rect(self.screen,colBotsSkin,(int(xEye2-wEyeMax//2),int(yEye-hEyeMax//2),wEyeMax,hEyeMax) )
         
         wEye = int( (wEyeMax+3)*(0.8+0.2*abs(noise.getSimplexNoise((rTime+10)/2))) )
         hEye = wEye
@@ -583,7 +583,7 @@ class Agent(object):
                 
                     
             nCptImageTotal += 1
-            if 1: # if (nCptImageTotal % (500*1000)) == 0 or 1:
+            if 0: # if (nCptImageTotal % (500*1000)) == 0 or 1:
                 #ffmpeg -r 10 -i %d.png -vcodec libx264 -b:v 4M -an test.mp4 # -an: no audio
                 #ffmpeg -r 60 -i "%d.png" -vf "fps=10,scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 123 output.gif
                 filename = "d:/images_generated/" + str(nCptImageTotal) + ".png"

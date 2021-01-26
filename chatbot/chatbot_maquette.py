@@ -296,6 +296,10 @@ class ButtonManager(object):
 
 # class ButtonManager - end
     
+    
+    
+    
+######################################################################    
             
 
 class Agent(object):
@@ -307,6 +311,7 @@ class Agent(object):
         self.clock = pg.time.Clock()
         self.fps = 60.0
         self.done = False
+        self.bQuick = False # when user click it render the question directly
         
         self.w = screen_size[0]
         self.h = screen_size[1]
@@ -348,6 +353,8 @@ class Agent(object):
                         self.buttonManager.select(num)
                     else:
                         self.receiveAnswer(num)
+                elif event.type == pg.MOUSEBUTTONUP:
+                    self.bQuick = True
                 
 
     def update(self):
@@ -388,7 +395,8 @@ class Agent(object):
         
         fontSys = pygame.freetype.Font("../fonts/SF-UI-Display-Regular.otf", 20)
         #~ fontSysSmall = pygame.freetype.Font("../fonts/SF-UI-Display-Regular.otf", 16)
-        fontSysSmall = pygame.freetype.Font("../fonts/SF-Compact-Text-Semibold.otf", 16)
+        fontSysSmall = pygame.freetype.Font("../fonts/SF-Compact-Text-Semibold.otf", 15)
+        fontTxt = pygame.freetype.Font("../fonts/SF-UI-Display-Regular.otf", 20)
         
         
         w = self.w
@@ -398,21 +406,21 @@ class Agent(object):
 
         
         # system
-        self.screen.blit(self.imTopBanner, (0, 0)) 
-        ycur = 8
+        self.screen.blit(self.imTopBanner, (0+260-1, 0+10-1)) 
+        ycur = 10
         
         hour,min,sec =misctools.getTime()
         #~ hour,min = 11,28
         strTime = "%2d:%2d" % (hour,min)
         textsurface,rect = fontSysSmall.render( strTime, (0, 0, 0) )
-        self.screen.blit(textsurface,(10+20 ,ycur))
+        self.screen.blit(textsurface,(10+20+3 ,ycur+4))
         
         # title
-        ycur = 28
+        ycur = 28+10
         
         for i in range(3):
             y = ycur+i*6
-            pg.draw.line(self.screen, colDark1,(10,y),(30,y),2 )
+            pg.draw.line(self.screen, colDark1,(10+6,y),(30+6,y),2 )
 
     
         #~ fontSys = pg.font.SysFont('Comic Sans MS', 30)
@@ -422,7 +430,7 @@ class Agent(object):
         #~ fontSys.underline = True
         textsurface,rect = fontSys.render('Faiska', (0, 0, 0))
         self.screen.blit(textsurface,(w//2-(rect[2]-rect[0])//2,ycur))
-        ycur = 50
+        ycur += 24
         
         pg.draw.line(self.screen, colLight1,(0,ycur),(w,ycur) )
         ycur += 1
@@ -498,6 +506,9 @@ class Agent(object):
         
         if self.isSpeaking():
             # render question
+            if self.bQuick:
+                self.bQuick = False
+                self.timeStartSpeak -= 5
             nEnd = int((pg.time.get_ticks()/1000-self.timeStartSpeak)*20)
             txt = self.strTxtSpeak[:nEnd]
             for i in range(nEnd,len(self.strTxtSpeak)):
@@ -505,7 +516,7 @@ class Agent(object):
                     txt += "_"
                 else:
                     txt += " "
-            renderTxtMultiline( self.screen, txt, (xmargin*2,ycur+ymargin-5),fontSys, colDark1,nWidthMax=300)
+            renderTxtMultiline( self.screen, txt, (xmargin*2,ycur+ymargin-5),fontTxt, colDark1,nWidthMax=300)
             ycur += harea+10
         
             # microphone over mouth
@@ -537,9 +548,10 @@ class Agent(object):
         random.seed(1000) # tune to have a blink during the first question
         self.listQ = []
         #~ self.listQ.append(["C?", ["Oui", "bof", "Non", "car","or"]])
-        self.listQ.append(["Comparé à votre mission précédente chez Sephora, celle ci vous a t'elle paru plus agréable?", ["Oui", "Bof", "Non"]])
-        self.listQ.append(["Quel aspect vous a le plus plu?", ["Le\ncadre", "Les\ncollégues", "Le\nmanager", "un\npeu\ntout"]])
-        self.listQ.append(["Merci à bientot!",["De rien, au revoir!", "Bye!"]] )
+        self.listQ.append(["Comparé à votre précédente mission chez Sephora, celle ci vous a t'elle paru plus agréable?", ["Oui", "Bof", "Non"]])
+        self.listQ.append(["Super, et quel aspect vous a le plus plu?", ["Le\ncadre", "Les\ncollégues", "Le\nmanager", "un\npeu\ntout"]])
+        self.listQ.append(["J'ai adoré discuter avec vous!",["Moi\naussi!", "C'étais\npas mal.", "Moi\npas trop..."]] )
+        self.listQ.append(["Merci et à bientot!",["De rien, au revoir!", "Bye!"]] )
         #~ self.listQ.append(["Merci à bientot!",["De rien, au revoir! Grave de la grosse balle atomiaque de gros malade!", "Bye!"]] )
         self.nNumQ = 0
         #~ self.nNumQ = 1;self.listQ[self.nNumQ][0]="C"
@@ -563,7 +575,7 @@ class Agent(object):
             pg.display.update()
             self.clock.tick(self.fps)
             nCpt += 1
-            if nCpt > 300:
+            if nCpt > 200:
                 duration = time.time() - timeFps
                 print("INF: fps: %5.1f" % (nCpt/duration) )
                 nCpt = 0
@@ -571,7 +583,7 @@ class Agent(object):
                 
                     
             nCptImageTotal += 1
-            if 0: # if (nCptImageTotal % (500*1000)) == 0 or 1:
+            if 1: # if (nCptImageTotal % (500*1000)) == 0 or 1:
                 #ffmpeg -r 10 -i %d.png -vcodec libx264 -b:v 4M -an test.mp4 # -an: no audio
                 #ffmpeg -r 60 -i "%d.png" -vf "fps=10,scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 123 output.gif
                 filename = "d:/images_generated/" + str(nCptImageTotal) + ".png"
@@ -582,7 +594,7 @@ class Agent(object):
 #class Agent - end
 
 def runAgent():
-    a = Agent((700//2,700)) #700 is the size of my banner
+    a = Agent((700//2,720))
     a.main_loop()
     pg.quit()
     

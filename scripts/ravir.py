@@ -1,5 +1,10 @@
 """
 Breath engine for RAVIR project
+# copy manually all breathing to Pepper:
+scp -r C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/breath* nao@192.168.0.:/home/nao/
+scp -r C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut/rec* nao@192.168.0.:/home/nao/
+scp d:\Python38-32\Lib\site-packages\opensimplex\*.py 
+
 """
 
 import os

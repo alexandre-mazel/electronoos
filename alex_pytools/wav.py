@@ -1003,7 +1003,7 @@ def concatenateWav(astrFileList, strDestFilename,rInsertSilenceBetween=0.):
     concatenate all filename in one filename
     NB: all sound must have same properties, or the result will be unknown !!!
     - rInsertSilenceBetween: in seconds
-    return the duration of the output
+    return the duration of the destination
     """
     assert(len(astrFileList)>0)
     dst = Wav(astrFileList[0])
@@ -1024,4 +1024,15 @@ def concatenateWav(astrFileList, strDestFilename,rInsertSilenceBetween=0.):
     dst.write(strDestFilename)
     return dst.getDuration()
 # concatenateWav - end
-    
+
+def insertSilenceAtBeginning(filename, rSilenceTimeInSec = 1. ):
+    """
+    return the duration of result
+    """
+    w = Wav(filename)
+    nNbrSilenceSample = int(rSilenceTimeInSec * w.nSamplingRate)
+    #~ print("DBG: insertSilenceAtBeginning: nNbrSilenceSample: %s" % nNbrSilenceSample )
+    w.data = np.concatenate( (np.zeros( nNbrSilenceSample*w.nNbrChannel, dtype=w.dataType ), w.data ) )
+    w.updateHeaderSizeFromDataLength()
+    w.write(filename)  
+    return w.getDuration()

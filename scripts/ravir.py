@@ -2,8 +2,8 @@
 Breath engine for RAVIR project
 # copy manually all breathing to Pepper:
 scp -r C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/breath* nao@192.168.0.:/home/nao/
-scp -r C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut/rec* nao@192.168.0.:/home/nao/
-scp d:\Python38-32\Lib\site-packages\opensimplex\*.py 
+scp -r C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut* nao@192.168.0.:/home/nao/
+scp d:\Python38-32\Lib\site-packages\opensimplex\*.py nao@192.168.0.:/home/nao/.local/lib/python2.7/site-packages/
 
 """
 
@@ -142,8 +142,15 @@ class Breather:
         
         sound_player.soundPlayer.playFile(f, bWaitEnd=False, rSoundVolume=rSoundVolume)
 
-            
-        
+    
+    def updateBodyPosture(self):
+        if self.motion != None:
+            #self.motion.setAngles("HeadYaw",self.rFullness,0.5)
+            #~ ( self.astrChain, [self.rAmp*0.1+self.rOffsetHip,(math.pi/2)+self.rAmp*self.rCoefArmAmp*0.1,(math.pi/2)+self.rAmp*self.rCoefArmAmp*0.1], rTimeEstim-0.15, True )
+            rMin = -self.rAmp*0.2
+            rMax = self.rAmp*0.2
+            rPos = rMin+self.rFullness*(rMax-rMin)
+            self.motion.setAngles(self.astrChain,[rPos+self.rOffsetHip,(math.pi/2)+rPos*self.rCoefArmAmp,(math.pi/2)+rPos*self.rCoefArmAmp],0.6)
         
     def update( self ):
         rTimeSinceLastUpdate = time.time() - self.timeLastUpdate
@@ -163,6 +170,8 @@ class Breather:
             
         if self.nState == Breather.kStateOut:
             self.rFullness -= self.rNormalOutPerSec*self.rExcitationRate*rTimeSinceLastUpdate
+            
+        self.updateBodyPosture()
             
         if self.nState == Breather.kStateIdle:
             self.rTimeIdle -= rTimeSinceLastUpdate
@@ -206,17 +215,17 @@ class Breather:
                 rTimeEstim = ( self.rTargetIn - self.rFullness) / (self.rNormalInPerSec*self.rExcitationRate)
                 if self.nState == Breather.kStateInBeforeSpeak:
                     rTimeEstim /= self.rPreSpeakInRatio
-                if self.motion != None:
-                    self.motion.stopMove()
-                    self.motion.post.angleInterpolation( self.astrChain, [self.rAmp*0.1+self.rOffsetHip,(math.pi/2)+self.rAmp*self.rCoefArmAmp*0.1,(math.pi/2)+self.rAmp*self.rCoefArmAmp*0.1], rTimeEstim-0.15, True )
+                #~ if self.motion != None:
+                    #~ self.motion.stopMove()
+                    #~ self.motion.post.angleInterpolation( self.astrChain, [self.rAmp*0.1+self.rOffsetHip,(math.pi/2)+self.rAmp*self.rCoefArmAmp*0.1,(math.pi/2)+self.rAmp*self.rCoefArmAmp*0.1], rTimeEstim-0.15, True )
                 self.playBreath( self.aBreathIn, rTimeEstim )
 
                 
             if self.nState == Breather.kStateOut:
                 rTimeEstim = (self.rFullness-self.rNormalMin) / (self.rNormalOutPerSec*self.rExcitationRate)
-                if self.motion != None:
-                    self.motion.stopMove()
-                    self.motion.post.angleInterpolation( self.astrChain, [-self.rAmp*0.1+self.rOffsetHip,(math.pi/2)-self.rAmp*self.rCoefArmAmp*0.1,(math.pi/2)-self.rAmp*self.rCoefArmAmp*0.1], rTimeEstim-0.15, True )
+                #~ if self.motion != None:
+                    #~ self.motion.stopMove()
+                    #~ self.motion.post.angleInterpolation( self.astrChain, [-self.rAmp*0.1+self.rOffsetHip,(math.pi/2)-self.rAmp*self.rCoefArmAmp*0.1,(math.pi/2)-self.rAmp*self.rCoefArmAmp*0.1], rTimeEstim-0.15, True )
                 self.playBreath( self.aBreathOut, rTimeEstim )  
                 
             if self.nState == Breather.kStateIdle:
@@ -229,10 +238,10 @@ class Breather:
                 sound_player.soundPlayer.stopAll()
                 if self.leds: self.leds.fadeRGB("FaceLeds", 0x0000FF, 0.00)
                 sound_player.soundPlayer.playFile(self.strFilenameToSay, bWaitEnd=False)
-                if self.motion != None:
-                    rTimeEstim = self.rTimeSpeak
-                    self.motion.stopMove()
-                    self.motion.post.angleInterpolation( self.astrChain, [-self.rAmp*0.1+self.rOffsetHip,(math.pi/2)-self.rAmp*self.rCoefArmAmp*0.1,(math.pi/2)-self.rAmp*self.rCoefArmAmp*0.1], rTimeEstim-0.15, True )
+                #~ if self.motion != None:
+                    #~ rTimeEstim = self.rTimeSpeak
+                    #~ self.motion.stopMove()
+                    #~ self.motion.post.angleInterpolation( self.astrChain, [-self.rAmp*0.1+self.rOffsetHip,(math.pi/2)-self.rAmp*self.rCoefArmAmp*0.1,(math.pi/2)-self.rAmp*self.rCoefArmAmp*0.1], rTimeEstim-0.15, True )
 
                 self.strFilenameToSay = ""
             
@@ -293,6 +302,7 @@ def demo():
     rBeginT = time.time()
     rTimeLastSpeak = time.time()-10
     bForceSpeak = False
+    nIdxTxt = 0
     while 1:
         rT = time.time() - rBeginT
         
@@ -321,7 +331,20 @@ def demo():
                     msgs.append("s011__tu_fais_des_trucs_particuliers")
                     msgs.append("s021__j_ai_remarque_depuis_quelques_temps_que_vous_les_humains_vous_mettez_les_trucs_bleus_sur_votre_fille")
                     msgs.append("s022__je_m_appelle_comment")
-                    breather.sayFile(strTalkPath + msgs[random.randint(0,len(msgs)-1)] + ".wav")
+                    msgs.append("s023__a_partir_de_certains_de_mes_propos")
+                    msgs.append("s024__est_ce_que_ca_vous_gene_pas_aussi_pour_vous_comprends")
+                    msgs.append("s025__il_y_a_marque_quelque_chose_bleu_vous_n_aviez_plus_la_meme_facon_de_respirer")
+                    msgs.append("s026__ca_ne_vous_pose_pas_un_probleme")
+                    msgs.append("s028__que_debut_quand_il_y_avait_l_autre_humain_vous_en_aviez_tous_les_deux_et_la_tu_l_as_en")
+                    msgs.append("s029__ca_me_concerne_pas_alors_le_truc")
+                    msgs.append("s030__et_toi_tu_trouve_ca_agreable_a_porter")
+                    #~ msgs.append("s031__")
+                    msgs.append("s032__ca_ne_te_gene_pas_quand_tu_racontes_des_nouvelles_personnes_pour_mieux_les_cones")
+                    #~ nIdxTxt = random.randint(0,len(msgs)-1)
+                    breather.sayFile(strTalkPath + msgs[nIdxTxt] + ".wav")
+                    nIdxTxt += 1
+                    if nIdxTxt >= len(msgs):
+                        nIdxTxt = 0 
                 rTimeLastSpeak = time.time()
             
         

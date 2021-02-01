@@ -3,7 +3,8 @@ process big wav file, cut them...
 """
 import wav
 import misctools
-import pygame_tools
+try: import pygame_tools
+except: pass
 
 
 import os
@@ -47,6 +48,18 @@ def cleanNameInFolder(strPath):
         if cleaned != f:
             print("INF: %s => %s" % (f,cleaned) )
             os.rename(tf, strPath+cleaned)
+            
+            
+
+def insertSilenceInFolder(strPath, rSilenceDuration):
+    """
+    add a silence to all wav in a folder
+    """
+    listFile = sorted(  os.listdir(strPath) )
+    for f in listFile:
+        tf = strPath + f
+        rNewDuration = wav.insertSilenceAtBeginning(tf,rSilenceDuration)
+        print("INF: %s: added %5.3fs resulting in a sound of %5.3fs" % (f,rSilenceDuration,rNewDuration) )
     
 
 def cleanText(rawResume):
@@ -186,7 +199,7 @@ def autocut(wavfile, rSilenceMinDuration = 0.3 ):
     
 if __name__ == "__main__":
     strPathRavir = "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut/"
-    if 1:
+    if 0:
         #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/rec2.wav")
         #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/rec1_fx.wav")
         #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/rec2_fx.wav",rSilenceMinDuration=0.5)
@@ -205,6 +218,13 @@ if __name__ == "__main__":
     if 0:
         cleanNameInFolder(strPathRavir + "/rec1/")
         cleanNameInFolder(strPathRavir + "/rec2/")
+        
+    if 1:
+        rTimeAdded = 0.1
+        strPath = "/tmp2/brea/selected_intake/"
+        strPath = "/home/nao/breath/selected_intake/"
+        insertSilenceInFolder(strPath, rTimeAdded)
+        insertSilenceInFolder("/home/nao/breath/selected_outtake/", rTimeAdded)
         
     
     

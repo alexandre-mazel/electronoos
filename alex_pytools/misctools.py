@@ -3,7 +3,8 @@ some classic handy classes
 (c) 2010-2022 A. Mazel
 """        
 import datetime
-import cv2 # made with cv 3.2.0-dev
+try: import cv2 # made with cv 3.2.0-dev
+except: pass
 import numpy as np
 import os
 import platform

@@ -859,6 +859,45 @@ disk_write 1024KB: ####################  10.66s (93.84 Mo/s)
 disk_read  1024KB: ####################   3.35s (298.94 Mo/s)
 
 
+xenia@xenia-test-server:~/alex/git/electronoos/scripts$ python3 test_perf.py 50000
+INF: Changing disk test size to 50000 MB
+python version   : 3.8.5 (64bits) (8 core(s))
+cpu              : todo
+test_cpu_int2    : ####################   0.23s
+test_cpu_float2  : ####################   0.05s
+scipy.fftpack    : not found
+test_orb4.5.1    : ####################   0.09s (1172.23fps)
+opencv (orb)    : not found
+opencv (orb)    : not found
+multiprocess x1 :  0.23s /  0.05s /  0.00s /  0.00s /  0.00s /  0.00s =>    0.29s
+multiprocess x4 :  0.24s /  0.05s /  0.00s /  0.00s /  0.00s /  0.00s =>    0.59s
+multiprocess x8 :  0.25s /  0.06s /  0.00s /  0.00s /  0.00s /  0.00s =>    0.91s
+multiprocess x32:  1.00s /  0.22s /  0.01s /  0.01s /  0.01s /  0.01s =>    2.19s
+disk_write    1KB: ####################  36.40s (1373.69 Mo/s)
+disk_read     1KB: ####################  38.64s (1294.00 Mo/s)
+disk_write 1024KB: ####################  45.93s (1088.53 Mo/s)
+disk_read  1024KB: ####################  45.87s (1090.02 Mo/s)
+xenia@xenia-test-server:~/alex/git/electronoos/scripts$
+
+xenia@xenia-test-server:~/alex/git/electronoos/scripts$ python3 test_perf.py
+python version   : 3.8.5 (64bits) (8 core(s))
+cpu              : todo
+test_cpu_int2    : ####################   0.23s
+test_cpu_float2  : ####################   0.05s
+scipy.fftpack    : not found
+test_orb4.5.1    : ####################   0.09s (1172.23fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : test_perf_vga_*.png: not found
+multiprocess x1 :  0.28s /  0.05s /  0.00s /  0.15s /  0.06s /  0.06s =>    0.60s
+multiprocess x4 :  0.24s /  0.05s /  0.00s /  0.16s /  0.06s /  0.06s =>    1.18s
+multiprocess x8 :  0.25s /  0.06s /  0.00s /  0.18s /  0.06s /  0.06s =>    1.80s
+multiprocess x32:  1.00s /  0.22s /  0.02s /  0.77s /  0.24s /  0.24s =>    4.30s
+disk_write    1KB: ####################   2.58s (387.25 Mo/s)
+disk_read     1KB: ####################   1.67s (600.11 Mo/s)
+disk_write 1024KB: ####################   2.29s (436.47 Mo/s)
+disk_read  1024KB: ####################   1.41s (708.34 Mo/s)
+
+
 
 
 

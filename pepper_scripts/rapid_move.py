@@ -15,7 +15,8 @@ while 1:
     rAngleCommand = -rAngleCommand
     print( "%s: start - moveto %s\n" % (time.time(),rAngleCommand) )
     timeBegin = time.time()
-    mot.setAngles(strJointName, rAngleCommand, 0.4)
+    #~ mot.setAngles(strJointName, rAngleCommand, 0.4)
+    mot.angleInterpolationWithSpeed(strJointName, rAngleCommand, 0.4)
     
     if 0:
         # draw all values

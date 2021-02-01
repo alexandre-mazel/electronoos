@@ -5,6 +5,15 @@ scp -r C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/breath* nao@192.168.0.:/hom
 scp -r C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut* nao@192.168.0.:/home/nao/
 scp d:\Python38-32\Lib\site-packages\opensimplex\*.py nao@192.168.0.:/home/nao/.local/lib/python2.7/site-packages/
 
+Currently I'm inserting a silence at the beginning of each breath:
+sound_processing:
+        rTimeAdded = 0.1
+        strPath = "/tmp2/brea/selected_intake/"
+        strPath = "/home/nao/breath/selected_intake/"
+        insertSilenceInFolder(strPath, rTimeAdded)
+        insertSilenceInFolder("/home/nao/breath/selected_outtake/", rTimeAdded)
+
+So we wait a bit for the body motion reaction
 """
 
 import os

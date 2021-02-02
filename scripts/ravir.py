@@ -410,6 +410,19 @@ Pas forcement plus longtemps. dans ce soupir qui sera plus fort, ca devrait pas 
 - ajout du hipyawrandom (boite choregraphe) en parallele.
 - ajout tete sur parole (mot) et main et coude. (comme porteuse de sac a main) 
    avec une main predominante.
++ anim de soulagement.
+   
+Catherine: thesarde sur mesure de la qualité d'interaction (synchro...)
+
+Questionnaire sur la présence fait bcp sur la RV mais pas trop avec les robots.
+Comment pourrait on mesurer la présence. Vous vous sentez moins seul ?
+
+Idée Thomas avec NAO: il pense que ca n'a pas de sens d'avoir un robot debout, c'est trop impacter.
+alors qu'avec NAO qui serait assis on comprendrait qu'il est juste a coté
+=> designer une chaise haute et le laisser dans la piece pour faire une présence
+et il fait juste le bébé (pas besoin de parler).
+
+Catherine croyait que c'etait une voix de synthese
 """
     
         

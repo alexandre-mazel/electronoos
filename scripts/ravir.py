@@ -51,7 +51,7 @@ class Breather:
         # enfant de 8 ans => 1 cycle en 3 sec
         
         #~ rCoefAnatomic = 1. # on va se baser sur un adulte moyen
-        rPeriod = 60/16
+        rPeriod = 60/12
         rNormalAmplitude = self.rNormalMax-self.rNormalMin
         self.rNormalInPerSec = rNormalAmplitude / ( (2*rPeriod)/5 )
         self.rNormalOutPerSec = rNormalAmplitude / ( (3*rPeriod)/5 )
@@ -160,7 +160,12 @@ class Breather:
             rMax = self.rAmp*0.2
             rPos = rMin+self.rFullness*(rMax-rMin)
             self.motion.setAngles(self.astrChain,[rPos+self.rOffsetHip,(math.pi/2)+rPos*self.rCoefArmAmp,(math.pi/2)+rPos*self.rCoefArmAmp],0.6)
-        
+
+    def updateHeadTalk(self):
+        if self.motion != None:
+            rInc = 0.02+random.random()*0.2
+            self.motion.setAngles("HeadPitch", rInc, random.random()/15. )
+            
     def update( self ):
         rTimeSinceLastUpdate = time.time() - self.timeLastUpdate
         self.timeLastUpdate = time.time()
@@ -180,8 +185,6 @@ class Breather:
         if self.nState == Breather.kStateOut:
             self.rFullness -= self.rNormalOutPerSec*self.rExcitationRate*rTimeSinceLastUpdate
             
-        self.updateBodyPosture()
-            
         if self.nState == Breather.kStateIdle:
             self.rTimeIdle -= rTimeSinceLastUpdate
             if self.rTimeIdle < 0:
@@ -192,6 +195,11 @@ class Breather:
             self.rFullness -= self.rExcitationRate*rTimeSinceLastUpdate / self.rSpeakDurationWhenFull
             if self.rTimeSpeak < 0:
                 self.nState = Breather.kStateIdle
+                
+        self.updateBodyPosture()
+        
+        if self.nState == Breather.kStateSpeak:
+            self.updateHeadTalk()
                 
                 
         if self.strFilenameToSay != "" and self.nState != self.kStateSpeak:
@@ -322,7 +330,7 @@ def demo():
         
         if 1:
             #if int(rT)%15 == 0 and time.time()-rTimeLastSpeak>2.:
-            if ( random.random()>0.997 or bForceSpeak ) and not breather.isSpeaking():
+            if ( random.random()>1.997 or bForceSpeak ) and not breather.isSpeaking():
                 bForceSpeak = False
                 if 0:
                     #~ msgs = ["oui", "d'accord", "Ah oui, je suis tout a fait d'accord!"]
@@ -382,7 +390,7 @@ def demo():
 
 #~ pb: trop en arriere: -2 sur KneePitch, -4 sur ravir
 #~ son sur ravir moteur: robot a 60 pour excitation a 1, 65 pour 0.5, = 90 sur mon ordi
-# change now, regler pour 70 pour l'experimentation: volume correct pour la voix
+# change now, regler pour 72 pour l'experimentation: volume correct pour la voix
 
 """
 # des fois, faire un soupir, pour vider les poumons:
@@ -397,6 +405,11 @@ Pas forcement plus longtemps. dans ce soupir qui sera plus fort, ca devrait pas 
 
 
 # avant de parler: inspi plus vite plus fort et entendable
+
+# retour du 2 fevrier:
+- ajout du hipyawrandom (boite choregraphe) en parallele.
+- ajout tete sur parole (mot) et main et coude. (comme porteuse de sac a main) 
+   avec une main predominante.
 """
     
         

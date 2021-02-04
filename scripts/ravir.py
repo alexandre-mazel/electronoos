@@ -422,7 +422,7 @@ alors qu'avec NAO qui serait assis on comprendrait qu'il est juste a coté
 => designer une chaise haute et le laisser dans la piece pour faire une présence
 et il fait juste le bébé (pas besoin de parler).
 
-Catherine croyait que c'etait une voix de synthese
+Catherine croyait que c'etait une voix de synthese.
 """
     
         

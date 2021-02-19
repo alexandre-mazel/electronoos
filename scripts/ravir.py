@@ -5,6 +5,8 @@ scp -r C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/breath* nao@192.168.0.:/hom
 scp -r C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut* nao@192.168.0.:/home/nao/
 scp d:\Python38-32\Lib\site-packages\opensimplex\*.py nao@192.168.0.:/home/nao/.local/lib/python2.7/site-packages/
 
+scp -pw nao C:\Users\amazel\dev\git\electronoos\scripts\rav*.py nao@192.168.1.211:/home/nao/dev/git/electronoos/scripts/
+
 Currently I'm inserting a silence at the beginning of each breath:
 sound_processing:
         rTimeAdded = 0.1
@@ -166,12 +168,31 @@ class Breather:
             rInc = 0.02+random.random()*0.2
             self.motion.setAngles("HeadPitch", rInc, random.random()/15. )
             
+           
+    def setHeadIdleLook( self, listHeadOrientation, ratioTimeFirst ):
+        self.listHeadOrientation = listHeadOrientation
+        self.ratioTimeFirst = ratioTimeFirst
+        self.lastHeadMove = time.time()
+        
+    def updateHeadLook(self):
+        if time.time() - self.lastHeadMove > 3:
+            if random.random()<0.7 and time.time() - self.lastHeadMove < 8: # proba de pas bouger
+                return
+            self.lastHeadMove = time.time()
+            if random.random()<self.ratioTimeFirst:
+                idx = 0
+            else:
+                idx = random.randint(0,len(self.listHeadOrientation)-2)
+                idx = idx + 1
+            headPos = self.listHeadOrientation[idx]
+            self.motion.angleInterpolationWithSpeed("Head",headPos,0.1)
+                
+            
     def update( self ):
         rTimeSinceLastUpdate = time.time() - self.timeLastUpdate
         self.timeLastUpdate = time.time()
         
         #~ print("\n%5.2fs: DBG: Breather.update: state: %s, rFullness: %4.2f, rExcitation: %5.1f, self.rTimeIdle: %5.2f, self.rTimeSpeak: %5.2f, rTimeSinceLastUpdate: %5.2f" % (time.time(),self.nState,self.rFullness,self.rExcitationRate, self.rTimeIdle,self.rTimeSpeak,rTimeSinceLastUpdate) )
-
         
         nPrevState = self.nState
         
@@ -200,6 +221,8 @@ class Breather:
         
         if self.nState == Breather.kStateSpeak:
             self.updateHeadTalk()
+        else:
+            self.updateHeadLook()
                 
                 
         if self.strFilenameToSay != "" and self.nState != self.kStateSpeak:
@@ -302,12 +325,15 @@ class Breather:
 
 breather = Breather()
 
-def demo():
-    
+def init():
+    """
+    load, return talkpath,mem
+    """
     if os.name == "nt":
         breather.loadBreathIn( "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/breath/selected_intake/")
         breather.loadBreathOut( "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/breath/selected_outtake/")
         strTalkPath = "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut/rec2/"
+        mem = None
     else:
         breather.loadBreathIn( "/home/nao/breath/selected_intake/")
         breather.loadBreathOut( "/home/nao/breath/selected_outtake/")
@@ -315,18 +341,48 @@ def demo():
         import naoqi
         mem = naoqi.ALProxy("ALMemory", "localhost", 9559)
         
+    return strTalkPath,mem
+    
+def loadDialogs():
+    #msgs = ["s053__ah_merci_je_comprends_mieux_maintenant_je_suis_content_d_avoir_appris_seul_p1","s053__ah_merci_je_comprends_mieux_maintenant_je_suis_content_d_avoir_appris_seul_p2"]
+
+    msgs = []
+    msgs.append("s005__j_ai_remarque_qu_il_y_a_moins_de_monde_la_nuit_dans_les_rues_par_rapport_a_l_age")
+    msgs.append("s006__ca_me_gene_je_mens")
+    msgs.append("s007__j_ai_l_impression_de_ne_pas_savoir_quoi_faire_je_me_sens_en_minutes")
+    msgs.append("s008__je_ne_comprends_pas_pourquoi_il_y_a_une_difference_entre_le_jour_et_la_nuit_c_est_les")
+    msgs.append("s009__est_ce_que_tu_peux_m_expliquer_la_difference_qu_il_y_a_entre_toi_et")
+    msgs.append("s010__est_ce_que_tu_t_ennuies_toi")
+    msgs.append("s011__tu_fais_des_trucs_particuliers")
+    msgs.append("s021__j_ai_remarque_depuis_quelques_temps_que_vous_les_humains_vous_mettez_les_trucs_bleus_sur_votre_fille")
+    msgs.append("s022__je_m_appelle_comment")
+    msgs.append("s023__a_partir_de_certains_de_mes_propos")
+    msgs.append("s024__est_ce_que_ca_vous_gene_pas_aussi_pour_vous_comprends")
+    msgs.append("s025__il_y_a_marque_quelque_chose_bleu_vous_n_aviez_plus_la_meme_facon_de_respirer")
+    msgs.append("s026__ca_ne_vous_pose_pas_un_probleme")
+    msgs.append("s028__que_debut_quand_il_y_avait_l_autre_humain_vous_en_aviez_tous_les_deux_et_la_tu_l_as_en")
+    msgs.append("s029__ca_me_concerne_pas_alors_le_truc")
+    msgs.append("s030__et_toi_tu_trouve_ca_agreable_a_porter")
+    #~ msgs.append("s031__")
+    msgs.append("s032__ca_ne_te_gene_pas_quand_tu_racontes_des_nouvelles_personnes_pour_mieux_les_cones")
+    return msgs
+
+def demo():
+    strTalkPath,mem = init()
+        
     rT = 0
     rBeginT = time.time()
     rTimeLastSpeak = time.time()-10
     bForceSpeak = False
     nIdxTxt = 0
+    
+    msgs = loadDialogs()
     while 1:
         rT = time.time() - rBeginT
         
         breather.update()
         
         time.sleep(0.05)
-        
         
         if 1:
             #if int(rT)%15 == 0 and time.time()-rTimeLastSpeak>2.:
@@ -337,26 +393,6 @@ def demo():
                     msgs = ["moi aimer toi pas du tout tres beaucoup!","moi","pas toi"]
                     breather.sayTts(msgs[random.randint(0,len(msgs)-1)])
                 else:
-                    #msgs = ["s053__ah_merci_je_comprends_mieux_maintenant_je_suis_content_d_avoir_appris_seul_p1","s053__ah_merci_je_comprends_mieux_maintenant_je_suis_content_d_avoir_appris_seul_p2"]
-                    msgs = []
-                    msgs.append("s005__j_ai_remarque_qu_il_y_a_moins_de_monde_la_nuit_dans_les_rues_par_rapport_a_l_age")
-                    msgs.append("s006__ca_me_gene_je_mens")
-                    msgs.append("s007__j_ai_l_impression_de_ne_pas_savoir_quoi_faire_je_me_sens_en_minutes")
-                    msgs.append("s008__je_ne_comprends_pas_pourquoi_il_y_a_une_difference_entre_le_jour_et_la_nuit_c_est_les")
-                    msgs.append("s009__est_ce_que_tu_peux_m_expliquer_la_difference_qu_il_y_a_entre_toi_et")
-                    msgs.append("s010__est_ce_que_tu_t_ennuies_toi")
-                    msgs.append("s011__tu_fais_des_trucs_particuliers")
-                    msgs.append("s021__j_ai_remarque_depuis_quelques_temps_que_vous_les_humains_vous_mettez_les_trucs_bleus_sur_votre_fille")
-                    msgs.append("s022__je_m_appelle_comment")
-                    msgs.append("s023__a_partir_de_certains_de_mes_propos")
-                    msgs.append("s024__est_ce_que_ca_vous_gene_pas_aussi_pour_vous_comprends")
-                    msgs.append("s025__il_y_a_marque_quelque_chose_bleu_vous_n_aviez_plus_la_meme_facon_de_respirer")
-                    msgs.append("s026__ca_ne_vous_pose_pas_un_probleme")
-                    msgs.append("s028__que_debut_quand_il_y_avait_l_autre_humain_vous_en_aviez_tous_les_deux_et_la_tu_l_as_en")
-                    msgs.append("s029__ca_me_concerne_pas_alors_le_truc")
-                    msgs.append("s030__et_toi_tu_trouve_ca_agreable_a_porter")
-                    #~ msgs.append("s031__")
-                    msgs.append("s032__ca_ne_te_gene_pas_quand_tu_racontes_des_nouvelles_personnes_pour_mieux_les_cones")
                     #~ nIdxTxt = random.randint(0,len(msgs)-1)
                     breather.sayFile(strTalkPath + msgs[nIdxTxt] + ".wav")
                     nIdxTxt += 1
@@ -392,6 +428,72 @@ def demo():
 #~ son sur ravir moteur: robot a 60 pour excitation a 1, 65 pour 0.5, = 90 sur mon ordi
 # change now, regler pour 72 pour l'experimentation: volume correct pour la voix
 
+def expe():
+    print("INF: mode experimentation ravir  - start!!!\n")
+    strTalkPath,mem = init()
+        
+    rT = 0
+    rBeginT = time.time()
+    rTimeLastSpeak = time.time()-10
+    bForceSpeak = False
+    nIdxTxt = 0
+    
+    msgs = loadDialogs()
+    
+    listHeadOrientation = [
+        [0,-0.087], # face
+        [0.45,0.36], # chaussure
+        [0.92,-0.02] # deuxieme fenetre
+    ]
+    ratioTimeFirst = 0.7 # first orientation is predominant, other orientation randomly
+    breather.setHeadIdleLook(listHeadOrientation,ratioTimeFirst)
+    
+    while 1:
+        rT = time.time() - rBeginT
+        
+        breather.update()
+        
+        time.sleep(0.05)
+        
+        if 1:
+            #if int(rT)%15 == 0 and time.time()-rTimeLastSpeak>2.:
+            if ( random.random()>1.997 or bForceSpeak ) and not breather.isSpeaking():
+                bForceSpeak = False
+                if 0:
+                    #~ msgs = ["oui", "d'accord", "Ah oui, je suis tout a fait d'accord!"]
+                    msgs = ["moi aimer toi pas du tout tres beaucoup!","moi","pas toi"]
+                    breather.sayTts(msgs[random.randint(0,len(msgs)-1)])
+                else:
+                    #~ nIdxTxt = random.randint(0,len(msgs)-1)
+                    breather.sayFile(strTalkPath + msgs[nIdxTxt] + ".wav")
+                    nIdxTxt += 1
+                    if nIdxTxt >= len(msgs):
+                        nIdxTxt = 0 
+                rTimeLastSpeak = time.time()
+            
+        
+        # interaction with the world
+        if os.name == "nt":
+            bTouch = misctools.getKeystrokeNotBlocking() != 0
+            rInc = 0.05
+        else:
+            bTouch = mem.getData("Device/SubDeviceList/Head/Touch/Front/Sensor/Value") != 0
+            rInc = 0.05
+            
+        #~ bTouch |= misctools.getActionRequired() != False
+        bForceSpeak = misctools.getActionRequired() != False
+        
+        if bTouch:
+            breather.increaseExcitation(rInc)
+            
+        bExit = misctools.isExitRequired()
+        
+        if bExit:
+            print( "Exiting..." )
+            break
+    # while - end
+# expe - end
+
 """
 # des fois, faire un soupir, pour vider les poumons:
 
@@ -408,23 +510,31 @@ Pas forcement plus longtemps. dans ce soupir qui sera plus fort, ca devrait pas 
 
 # retour du 2 fevrier:
 - ajout du hipyawrandom (boite choregraphe) en parallele.
-- ajout tete sur parole (mot) et main et coude. (comme porteuse de sac a main) 
+- ajouter tete sur parole (mot) et main et coude. (comme porteuse de sac a main) 
    avec une main predominante.
 + anim de soulagement.
    
-Catherine: thesarde sur mesure de la qualité d'interaction (synchro...)
+Catherine: thesarde sur mesure de la qualite d'interaction (synchro...)
 
-Questionnaire sur la présence fait bcp sur la RV mais pas trop avec les robots.
-Comment pourrait on mesurer la présence. Vous vous sentez moins seul ?
+Questionnaire sur la presence fait bcp sur la RV mais pas trop avec les robots.
+Comment pourrait on mesurer la presence. Vous vous sentez moins seul ?
 
-Idée Thomas avec NAO: il pense que ca n'a pas de sens d'avoir un robot debout, c'est trop impacter.
-alors qu'avec NAO qui serait assis on comprendrait qu'il est juste a coté
-=> designer une chaise haute et le laisser dans la piece pour faire une présence
-et il fait juste le bébé (pas besoin de parler).
+Idee Thomas avec NAO: il pense que ca n'a pas de sens d'avoir un robot debout, c'est trop impacter.
+alors qu'avec NAO qui serait assis on comprendrait qu'il est juste a cote
+=> designer une chaise haute et le laisser dans la piece pour faire une presence
+et il fait juste le bebe (pas besoin de parler).
 
 Catherine croyait que c'etait une voix de synthese.
 """
-    
-        
+
+"""
+# experiementation
+- debut: immobile
+- on enleve le paravent et on appuie sur sa tete, il se met en idle (respi ou pas)
+- tete alterne entre tete sujet et autres points 
+
+"""
+
 if __name__ == "__main__":
-    demo()
+     #~ demo()
+     expe()

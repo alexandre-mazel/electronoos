@@ -162,6 +162,9 @@ class Breather:
             #~ ( self.astrChain, [self.rAmp*0.1+self.rOffsetHip,(math.pi/2)+self.rAmp*self.rCoefArmAmp*0.1,(math.pi/2)+self.rAmp*self.rCoefArmAmp*0.1], rTimeEstim-0.15, True )
             rMin = -self.rAmp*0.2
             rMax = self.rAmp*0.2
+            rFullness = self.rFullness
+            if rFullness > 1.6:
+                self.rFullness = 1.6 # we could have lock it to 1, but more is fine also (let's track some bugs) # seen once at 3.53 and the robot hadn't fall!
             rPos = rMin+self.rFullness*(rMax-rMin)
             self.motion.setAngles(self.astrChain,[rPos+self.rOffsetHip,(math.pi/2)+rPos*self.rCoefArmAmp,(math.pi/2)+rPos*self.rCoefArmAmp],0.6)
 
@@ -176,18 +179,27 @@ class Breather:
         self.ratioTimeFirst = ratioTimeFirst
         self.lastHeadMove = time.time()
         
-    def updateHeadLook(self):
-        if time.time() - self.lastHeadMove > 3:
-            if random.random()<0.7 and time.time() - self.lastHeadMove < 8: # proba de pas bouger
+    def updateHeadLook( self, nForcedAngle = -1):
+        """
+        nForcedAngle: force to look at this direction NOW
+        """
+        # TODO: stocker id task et killer avant d'envoyer
+        if time.time() - self.lastHeadMove > 3 or nForcedAngle != -1:
+            if random.random()<0.7 and time.time() - self.lastHeadMove < 8 and nForcedAngle == -1: # proba de pas bouger
                 return
             self.lastHeadMove = time.time()
-            if random.random()<self.ratioTimeFirst:
-                idx = 0
+            if nForcedAngle == -1:
+                if random.random()<self.ratioTimeFirst:
+                    idx = 0
+                else:
+                    idx = random.randint(0,len(self.listHeadOrientation)-2)
+                    idx = idx + 1
+                rSpeed = 0.01+random.random()*0.2
             else:
-                idx = random.randint(0,len(self.listHeadOrientation)-2)
-                idx = idx + 1
+                idx = nForcedAngle
+                rSpeed = 0.2
             headPos = self.listHeadOrientation[idx]
-            self.motion.angleInterpolationWithSpeed("Head",headPos,0.01+random.random()*0.2)
+            self.motion.post.angleInterpolationWithSpeed("Head",headPos,rSpeed)
                 
             
     def update( self ):
@@ -223,11 +235,12 @@ class Breather:
         
         if self.nState == Breather.kStateSpeak:
             self.updateHeadTalk()
-        else:
+        elif self.nState != Breather.kStateInBeforeSpeak:
             self.updateHeadLook()
                 
                 
         if self.strFilenameToSay != "" and self.nState != self.kStateSpeak:
+            self.updateHeadLook(0)
             if self.rFullnessToSay < self.rFullness:
                 self.nState = Breather.kStateSpeak
             else:
@@ -447,7 +460,7 @@ def expe():
         [0.45,0.36], # chaussure
         [0.92,-0.02], # deuxieme fenetre
         [-0.67,0.50], # placard a droite
-        [1.46,0.004], # porte
+        [1.26,0.004], # porte
     ]
     ratioTimeFirst = 0.7 # first orientation is predominant, other orientation randomly
     breather.setHeadIdleLook(listHeadOrientation,ratioTimeFirst)
@@ -463,16 +476,11 @@ def expe():
             #if int(rT)%15 == 0 and time.time()-rTimeLastSpeak>2.:
             if ( random.random()>1.997 or bForceSpeak ) and not breather.isSpeaking():
                 bForceSpeak = False
-                if 0:
-                    #~ msgs = ["oui", "d'accord", "Ah oui, je suis tout a fait d'accord!"]
-                    msgs = ["moi aimer toi pas du tout tres beaucoup!","moi","pas toi"]
-                    breather.sayTts(msgs[random.randint(0,len(msgs)-1)])
-                else:
-                    #~ nIdxTxt = random.randint(0,len(msgs)-1)
-                    breather.sayFile(strTalkPath + msgs[nIdxTxt] + ".wav")
-                    nIdxTxt += 1
-                    if nIdxTxt >= len(msgs):
-                        nIdxTxt = 0 
+                #~ nIdxTxt = random.randint(0,len(msgs)-1)
+                breather.sayFile(strTalkPath + msgs[nIdxTxt] + ".wav")
+                nIdxTxt += 1
+                if nIdxTxt >= len(msgs):
+                    nIdxTxt = 0 
                 rTimeLastSpeak = time.time()
             
         

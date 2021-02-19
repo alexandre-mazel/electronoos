@@ -92,6 +92,8 @@ class Breather:
             self.rHeadDelay = 0.6
             self.rHeadPos = self.rAmp*self.rCoefArmAmp*0.1*1.5
             self.rOffsetHip = -0.0
+            
+            self.motion.angleInterpolationWithSpeed("KneePitch",-0.0659611225, 0.05)
         else:
             self.leds = False
             
@@ -185,7 +187,7 @@ class Breather:
                 idx = random.randint(0,len(self.listHeadOrientation)-2)
                 idx = idx + 1
             headPos = self.listHeadOrientation[idx]
-            self.motion.angleInterpolationWithSpeed("Head",headPos,0.1)
+            self.motion.angleInterpolationWithSpeed("Head",headPos,0.01+random.random()*0.2)
                 
             
     def update( self ):
@@ -443,7 +445,9 @@ def expe():
     listHeadOrientation = [
         [0,-0.087], # face
         [0.45,0.36], # chaussure
-        [0.92,-0.02] # deuxieme fenetre
+        [0.92,-0.02], # deuxieme fenetre
+        [-0.67,0.50], # placard a droite
+        [1.46,0.004], # porte
     ]
     ratioTimeFirst = 0.7 # first orientation is predominant, other orientation randomly
     breather.setHeadIdleLook(listHeadOrientation,ratioTimeFirst)

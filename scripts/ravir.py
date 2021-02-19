@@ -543,7 +543,16 @@ Catherine croyait que c'etait une voix de synthese.
 # experiementation
 - debut: immobile
 - on enleve le paravent et on appuie sur sa tete, il se met en idle (respi ou pas)
-- tete alterne entre tete sujet et autres points 
+- tete alterne entre tete sujet et autres points
+- lancer le dialogue, qui automatiquement déroule les phrases et enchaine (bloquer la tete pendant le dialogue) TODO
+- TODO: rallonger le dialogue => actuellement 25 et on aimerait 45. ca devrait etre avant la fin des questions quand la lumiere, le soir, les sons se font plus rare, et alors j'ai remarqu" qu'il y avait plus personne et apres 22h, ... on enchaine la suite./ tourner autour du pot au début.
+- ecoute active pendant x minutes, le gars parle.
+- le gars arrete de parler
+- press pour repasser en idle.
+- press head pour passer en rest
+- le deplace
+- press head pour repasser en wake et mode idle
+- dialog 2
 
 """
 

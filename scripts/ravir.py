@@ -552,7 +552,12 @@ Catherine croyait que c'etait une voix de synthese.
 - press head pour passer en rest
 - le deplace
 - press head pour repasser en wake et mode idle
-- dialog 2
+- dialog 2, longueur ok, mais changer: le chercheur qui rentre et qui sort, l'a tout le temps et toi des fois tu le met et des fois tu l'enleve.
+- ecoute active pendant x minutes, le gars parle.
+- le gars arrete de parler
+- press pour repasser en idle.
+- tape tete pour rest
+- remise du paravent
 
 """
 

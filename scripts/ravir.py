@@ -1,11 +1,13 @@
+# coding: cp1252
+
 """
 Breath engine for RAVIR project
 # copy manually all breathing to Pepper:
 scp -r C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/breath* nao@192.168.0.:/home/nao/
 scp -r C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut* nao@192.168.0.:/home/nao/
-scp d:\Python38-32\Lib\site-packages\opensimplex\*.py nao@192.168.0.:/home/nao/.local/lib/python2.7/site-packages/
+scp d:/Python38-32/Lib/site-packages/opensimplex/*.py nao@192.168.0.:/home/nao/.local/lib/python2.7/site-packages/
 
-scp -pw nao C:\Users\amazel\dev\git\electronoos\scripts\rav*.py nao@192.168.1.211:/home/nao/dev/git/electronoos/scripts/
+scp -pw nao C:/Users/amazel/dev/git/electronoos/scripts/rav*.py nao@192.168.1.211:/home/nao/dev/git/electronoos/scripts/
 
 Currently I'm inserting a silence at the beginning of each breath:
 sound_processing:
@@ -39,6 +41,7 @@ class Breather:
     kStateOut = 2 # expiration
     kStateInBeforeSpeak = 3
     kStateSpeak = 4
+    kStatePause = 5 # do nothing, just stand
     
     def __init__( self ):
         
@@ -80,6 +83,8 @@ class Breather:
         
         self.motion = None
         
+        self.idMoveHead = -1
+        
         if os.name != "nt":
             import naoqi
             self.motion = naoqi.ALProxy("ALMotion", "localhost", 9559)
@@ -93,7 +98,7 @@ class Breather:
             self.rHeadPos = self.rAmp*self.rCoefArmAmp*0.1*1.5
             self.rOffsetHip = -0.0
             
-            self.motion.angleInterpolationWithSpeed("KneePitch",-0.0659611225, 0.05)
+            self.wake()
         else:
             self.leds = False
             
@@ -156,13 +161,19 @@ class Breather:
         sound_player.soundPlayer.playFile(f, bWaitEnd=False, rSoundVolume=rSoundVolume)
 
     
-    def updateBodyPosture(self):
+    def wake(self):
+        self.motion.wakeUp()
+        self.motion.angleInterpolationWithSpeed("KneePitch",-0.0659611225, 0.05)
+        
+    def updateBodyPosture(self, rFullness = -1):
+        
+        if rFullness == -1: rFullness = self.rFullness
+        
         if self.motion != None:
             #self.motion.setAngles("HeadYaw",self.rFullness,0.5)
             #~ ( self.astrChain, [self.rAmp*0.1+self.rOffsetHip,(math.pi/2)+self.rAmp*self.rCoefArmAmp*0.1,(math.pi/2)+self.rAmp*self.rCoefArmAmp*0.1], rTimeEstim-0.15, True )
             rMin = -self.rAmp*0.2
             rMax = self.rAmp*0.2
-            rFullness = self.rFullness
             if rFullness > 1.6:
                 self.rFullness = 1.6 # we could have lock it to 1, but more is fine also (let's track some bugs) # seen once at 3.53 and the robot hadn't fall!
             rPos = rMin+self.rFullness*(rMax-rMin)
@@ -183,7 +194,7 @@ class Breather:
         """
         nForcedAngle: force to look at this direction NOW
         """
-        # TODO: stocker id task et killer avant d'envoyer
+        if not self.motion: return
         if time.time() - self.lastHeadMove > 3 or nForcedAngle != -1:
             if random.random()<0.7 and time.time() - self.lastHeadMove < 8 and nForcedAngle == -1: # proba de pas bouger
                 return
@@ -199,10 +210,14 @@ class Breather:
                 idx = nForcedAngle
                 rSpeed = 0.2
             headPos = self.listHeadOrientation[idx]
-            self.motion.post.angleInterpolationWithSpeed("Head",headPos,rSpeed)
+            try:
+                self.motion.killTask(self.idMoveHead)
+            except BaseException as err:
+                print("WRN: stopping task %d failed: %s" % (self.idMoveHead,err) )
+            self.idMoveHead=self.motion.post.angleInterpolationWithSpeed("Head",headPos,rSpeed)
                 
             
-    def update( self ):
+    def update( self, nForceNewState = None ):
         rTimeSinceLastUpdate = time.time() - self.timeLastUpdate
         self.timeLastUpdate = time.time()
         
@@ -210,53 +225,63 @@ class Breather:
         
         nPrevState = self.nState
         
-        # update fullness
-        if self.nState == Breather.kStateIn:
-            self.rFullness += self.rNormalInPerSec*self.rExcitationRate*rTimeSinceLastUpdate
-
-        if self.nState == Breather.kStateInBeforeSpeak:
-            self.rFullness += self.rNormalInPerSec*self.rExcitationRate*rTimeSinceLastUpdate*self.rPreSpeakInRatio
+        if nForceNewState != None:
+            self.nState = nForceNewState
             
-        if self.nState == Breather.kStateOut:
-            self.rFullness -= self.rNormalOutPerSec*self.rExcitationRate*rTimeSinceLastUpdate
+        if self.nState != Breather.kStatePause:        
+            # update fullness
+            if self.nState == Breather.kStateIn:
+                self.rFullness += self.rNormalInPerSec*self.rExcitationRate*rTimeSinceLastUpdate
+
+            if self.nState == Breather.kStateInBeforeSpeak:
+                self.rFullness += self.rNormalInPerSec*self.rExcitationRate*rTimeSinceLastUpdate*self.rPreSpeakInRatio
+                
+            if self.nState == Breather.kStateOut:
+                self.rFullness -= self.rNormalOutPerSec*self.rExcitationRate*rTimeSinceLastUpdate
+                
+            if self.nState == Breather.kStateIdle:
+                self.rTimeIdle -= rTimeSinceLastUpdate
+                if self.rTimeIdle < 0:
+                    self.nState = Breather.kStateIn
+
+            if self.nState == Breather.kStateSpeak:
+                self.rTimeSpeak -= rTimeSinceLastUpdate
+                self.rFullness -= self.rExcitationRate*rTimeSinceLastUpdate / self.rSpeakDurationWhenFull
+                if self.rTimeSpeak < 0:
+                    self.nState = Breather.kStateIdle
+                    
+            self.updateBodyPosture()
             
-        if self.nState == Breather.kStateIdle:
-            self.rTimeIdle -= rTimeSinceLastUpdate
-            if self.rTimeIdle < 0:
-                self.nState = Breather.kStateIn
+            if self.nState == Breather.kStateSpeak:
+                self.updateHeadTalk()
+            elif self.nState != Breather.kStateInBeforeSpeak:
+                self.updateHeadLook()
+                    
+                    
+            if self.strFilenameToSay != "" and self.nState != self.kStateSpeak:
+                self.updateHeadLook(0)
+                if self.rFullnessToSay < self.rFullness:
+                    self.nState = Breather.kStateSpeak
+                else:
+                    self.nState = Breather.kStateInBeforeSpeak
 
-        if self.nState == Breather.kStateSpeak:
-            self.rTimeSpeak -= rTimeSinceLastUpdate
-            self.rFullness -= self.rExcitationRate*rTimeSinceLastUpdate / self.rSpeakDurationWhenFull
-            if self.rTimeSpeak < 0:
-                self.nState = Breather.kStateIdle
-                
-        self.updateBodyPosture()
-        
-        if self.nState == Breather.kStateSpeak:
-            self.updateHeadTalk()
-        elif self.nState != Breather.kStateInBeforeSpeak:
-            self.updateHeadLook()
-                
-                
-        if self.strFilenameToSay != "" and self.nState != self.kStateSpeak:
-            self.updateHeadLook(0)
-            if self.rFullnessToSay < self.rFullness:
-                self.nState = Breather.kStateSpeak
-            else:
-                self.nState = Breather.kStateInBeforeSpeak
-
-        
-        if self.nState != Breather.kStateSpeak and self.nState != Breather.kStateInBeforeSpeak:
-            # automatic change of in/out
-            if self.nState != Breather.kStateIn and (self.rFullness <= self.rNormalMin or (self.rFullness <= self.rNormalMin+0.2 and random.random()>0.93) ):
-                self.nState = Breather.kStateIdle
-                
-            if self.nState != Breather.kStateOut  and self.rFullness >= self.rTargetIn:
-                self.nState = Breather.kStateOut
+            
+            if self.nState != Breather.kStateSpeak and self.nState != Breather.kStateInBeforeSpeak:
+                # automatic change of in/out
+                if self.nState != Breather.kStateIn and (self.rFullness <= self.rNormalMin or (self.rFullness <= self.rNormalMin+0.2 and random.random()>0.93) ):
+                    self.nState = Breather.kStateIdle
+                    
+                if self.nState != Breather.kStateOut  and self.rFullness >= self.rTargetIn:
+                    self.nState = Breather.kStateOut
             
         if self.nState != nPrevState:
-            # play a sound
+            
+            ######################################
+            # change of state
+            ######################################
+            
+            if nPrevState == Breather.kStatePause:
+                self.wake()
             
             if self.nState == Breather.kStateIn or self.nState == Breather.kStateInBeforeSpeak:
                 self.rTargetIn = self.rNormalMax
@@ -299,6 +324,13 @@ class Breather:
                     #~ self.motion.post.angleInterpolation( self.astrChain, [-self.rAmp*0.1+self.rOffsetHip,(math.pi/2)-self.rAmp*self.rCoefArmAmp*0.1,(math.pi/2)-self.rAmp*self.rCoefArmAmp*0.1], rTimeEstim-0.15, True )
 
                 self.strFilenameToSay = ""
+                
+            if self.nState == Breather.kStatePause:
+                # reset state
+                sound_player.soundPlayer.stopAll()
+                self.updateHeadLook(0)
+                self.updateBodyPosture(1.) # ou rest ?
+                #~ self.motion.rest()
             
             self.rExcitationRate += noise.getSimplexNoise(time.time())/100. # random.random()*3 (change trop violemment)
             if self.rExcitationRate < 0.1: self.rExcitationRate = 0.1
@@ -445,6 +477,7 @@ def demo():
 
 def expe():
     print("INF: mode experimentation ravir  - start!!!\n")
+    
     strTalkPath,mem = init()
         
     rT = 0
@@ -464,6 +497,8 @@ def expe():
     ]
     ratioTimeFirst = 0.7 # first orientation is predominant, other orientation randomly
     breather.setHeadIdleLook(listHeadOrientation,ratioTimeFirst)
+    
+    breather.update(breather.kStatePause)
     
     while 1:
         rT = time.time() - rBeginT
@@ -541,23 +576,25 @@ Catherine croyait que c'etait une voix de synthese.
 
 """
 # experiementation
-- debut: immobile
-- on enleve le paravent et on appuie sur sa tete, il se met en idle (respi ou pas)
-- tete alterne entre tete sujet et autres points
-- lancer le dialogue, qui automatiquement déroule les phrases et enchaine (bloquer la tete pendant le dialogue) TODO
-- TODO: rallonger le dialogue => actuellement 25 et on aimerait 45. ca devrait etre avant la fin des questions quand la lumiere, le soir, les sons se font plus rare, et alors j'ai remarqu" qu'il y avait plus personne et apres 22h, ... on enchaine la suite./ tourner autour du pot au début.
-- ecoute active pendant x minutes, le gars parle.
-- le gars arrete de parler
-- press pour repasser en idle.
-- press head pour passer en rest
-- le deplace
-- press head pour repasser en wake et mode idle
-- dialog 2, longueur ok, mais changer: le chercheur qui rentre et qui sort, l'a tout le temps et toi des fois tu le met et des fois tu l'enleve.
-- ecoute active pendant x minutes, le gars parle.
-- le gars arrete de parler
-- press pour repasser en idle.
-- tape tete pour rest
-- remise du paravent
+ 10 - debut: immobile (pause)
+ 20 - on enleve le paravent et on appuie sur sa tete, il se met en idle (respi ou pas)
+ 30 - tete alterne entre tete sujet et autres points
+ 40 - lancer le dialogue, qui automatiquement déroule les phrases et enchaine (bloquer la tete pendant le dialogue) TODO
+ 50 - TODO: rallonger le dialogue => actuellement 25 et on aimerait 45. ca devrait etre avant la fin des questions quand la lumiere, le soir, les sons se font plus rare, et alors j'ai remarqué qu'il y avait plus personne et apres 22h, ... on enchaine la suite./ tourner autour du pot au début.
+ 60 - ecoute active pendant x minutes, le gars parle.
+ 70 - le gars arrete de parler
+ 80 - press pour repasser en idle.
+ 90 - press head pour passer en rest
+100 - le deplace
+110 - press head pour repasser en wake et mode idle
+120 - dialog 2, longueur ok, mais changer: le chercheur qui rentre et qui sort, l'a tout le temps et toi des fois tu le met et des fois tu l'enleve.
+130 - ecoute active pendant x minutes, le gars parle.
+140 - le gars arrete de parler
+150 - press pour repasser en idle.
+160 - tape tete pour rest
+170 - remise du paravent
+
+bandana bleu et vert + ramener une tablette pour joli et test
 
 """
 

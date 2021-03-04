@@ -586,10 +586,10 @@ def expe():
 110: "head pour repasser en wake et mode idle",
 120: "dialog 2, longueur ok, mais changer: le chercheur qui rentre et qui sort, l'a tout le temps et toi des fois tu le met et des fois tu l'enleve.",
 130: "ecoute active pendant x minutes, le gars parle.",
-140: "le gars arrete de parler",
-150: "press pour repasser en idle.",
+140: "le gars arrete de parler, repasse en idle",
+150: "",
 160: "tape tete pour rest",
-170: "remise du paravent",
+170: "remise du paravent - pret a recommencer",
                                 }
                     
                 # Next Action
@@ -613,14 +613,27 @@ def expe():
             
                 if nStep == 90:
                     breather.setPaused(not breather.isPaused())
-                    nStep += 10        
-
+                    nStep += 10
+                    
                 if nStep == 110:
                     breather.setPaused(not breather.isPaused())
                     
                 if nStep == 120:
                     nDialog = 2
                     nIdxTxt = 7
+
+                if nStep == 130:
+                    breather.setListening(True)
+
+                if nStep == 140:
+                    breather.setListening(False)
+                    nStep += 10
+                    
+                if nStep == 160:
+                    breather.setPaused(not breather.isPaused())
+                    
+                if nStep == 170:
+                    nStep = 10
                     
         bExit = misctools.isExitRequired()
         

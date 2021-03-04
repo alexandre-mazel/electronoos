@@ -41,7 +41,8 @@ class Breather:
     kStateOut = 2 # expiration
     kStateInBeforeSpeak = 3
     kStateSpeak = 4
-    kStatePause = 5 # do nothing, just stand
+    #~ kStateListen = 5 #not a real state, just a boolean added to the machine
+    kStatePause = 10 # do nothing, just stand
     
     def __init__( self ):
         
@@ -84,6 +85,8 @@ class Breather:
         self.motion = None
         
         self.idMoveHead = -1
+        
+        self.bListening = False
         
         if os.name != "nt":
             import naoqi
@@ -184,7 +187,11 @@ class Breather:
         if self.motion != None:
             rInc = 0.02+random.random()*0.2
             self.motion.setAngles("HeadPitch", rInc, random.random()/15. )
-            
+
+    def updateHeadListen(self):
+        if self.motion != None:
+            rInc = 0.02+random.random()*0.1
+            self.motion.setAngles("HeadPitch", rInc, random.random()/45. )            
            
     def setHeadIdleLook( self, listHeadOrientation, ratioTimeFirst ):
         self.listHeadOrientation = listHeadOrientation
@@ -255,8 +262,11 @@ class Breather:
             
             if self.nState == Breather.kStateSpeak:
                 self.updateHeadTalk()
-            elif self.nState != Breather.kStateInBeforeSpeak:
+            elif self.nState != Breather.kStateInBeforeSpeak and not self.bListening:
                 self.updateHeadLook()
+                
+            if self.bListening:
+                self.updateHeadListen()
                     
                     
             if self.strFilenameToSay != "" and self.nState != self.kStateSpeak:
@@ -373,10 +383,18 @@ class Breather:
         return self.nState == Breather.kStatePause
         
     def setPaused(self, bNewState):
+        print("INF: Breather.setPaused: %d" % (bNewState) )
         if bNewState:
-            breather.update(breather.kStatePause)
+            self.update(Breather.kStatePause)
         else:
-            breather.update(breather.kStateIdle)
+            self.update(Breather.kStateIdle)
+            
+            
+    def setListening(self, bNewState):
+        print("INF: Breather.setListening: %d => %d" % (breather.bListening,bNewState) )
+        if bNewState:
+            self.updateHeadLook(0)
+        breather.bListening = bNewState
         
 # class Breather - end
 
@@ -513,6 +531,8 @@ def expe():
     
     nStep = 10
     
+    nDialog = 0 # diff de 0 if in a dialog, 
+    
     while 1:
         rT = time.time() - rBeginT
         
@@ -520,15 +540,14 @@ def expe():
         
         time.sleep(0.05)
         
-        if 1:
-            #if int(rT)%15 == 0 and time.time()-rTimeLastSpeak>2.:
-            if ( random.random()>1.997 or bForceSpeak ) and not breather.isSpeaking():
-                bForceSpeak = False
-                #~ nIdxTxt = random.randint(0,len(msgs)-1)
+        if nDialog != 0:
+            if not breather.isSpeaking():
                 breather.sayFile(strTalkPath + msgs[nIdxTxt] + ".wav")
                 nIdxTxt += 1
-                if nIdxTxt >= len(msgs):
-                    nIdxTxt = 0 
+                if nDialog == 1 and nIdxTxt == 7:
+                    nDialog = 0
+                if nDialog == 2 and nIdxTxt >= len(msgs):
+                    nDialog = 0
                 rTimeLastSpeak = time.time()
             
         
@@ -542,25 +561,29 @@ def expe():
             
         #~ bForceSpeak = misctools.getActionRequired() != False
         strActionRequired = misctools.getActionRequired()
+        #~ print(strActionRequired)
         if strActionRequired != False:
-            bIsActionTouchSimulated = "10" in strActionRequired 
+            bIsActionTouchSimulated = "touch" in strActionRequired.lower() 
             if bIsActionTouchSimulated:
                 bTouch = True
                 strActionRequired = False # we erase it as in real robot, we won't received it in that case
                 
-        if bTouch or strActionRequired != False:
+        if bTouch and nStep in [10,90]:
+            strActionRequired = True
+            
+        if strActionRequired != False:
                 descState = {
  10: "debut: immobile (pause)",
- 20: "on enleve le paravent et on appuie sur sa tete, il se met en idle (respi ou perlin)",
- 30: "tete alterne entre tete sujet et autres points",
+ 20: "on enleve le paravent et on a appuyer sur sa tete, il se met en idle (respi ou perlin)",
+ 30: "    inclus tete alterne entre tete sujet et autres points",
  40: "lancer le dialogue, qui automatiquement déroule les phrases et enchaine (bloquer la tete pendant le dialogue) TODO",
- 50: "TODO: rallonger le dialogue => actuellement 25 et on aimerait 45. ca devrait etre avant la fin des questions quand la lumiere, le soir, les sons se font plus rare, et alors j'ai remarqué qu'il y avait plus personne et apres 22h, ... on enchaine la suite./ tourner autour du pot au début.",
+ 50: "    TODO: rallonger le dialogue => actuellement 25 et on aimerait 45. ca devrait etre avant la fin des questions quand la lumiere, le soir, les sons se font plus rare, et alors j'ai remarqué qu'il y avait plus personne et apres 22h, ... on enchaine la suite./ tourner autour du pot au début.",
  60: "ecoute active pendant x minutes, le gars parle.",
- 70: "le gars a arreter de parler",
- 80: "press pour repasser en idle.",
- 90: "press head pour passer en rest",
-100: "le deplace",
-110: "press head pour repasser en wake et mode idle",
+ 70: "le gars a arreter de parler; repasse en idle.",
+ 80: "",
+ 90: "head pour passer en rest",
+100: "    le deplace",
+110: "head pour repasser en wake et mode idle",
 120: "dialog 2, longueur ok, mais changer: le chercheur qui rentre et qui sort, l'a tout le temps et toi des fois tu le met et des fois tu l'enleve.",
 130: "ecoute active pendant x minutes, le gars parle.",
 140: "le gars arrete de parler",
@@ -568,19 +591,37 @@ def expe():
 160: "tape tete pour rest",
 170: "remise du paravent",
                                 }
-                # Next Action
-                if bTouch and nStep in [10,90]:
-                    breather.setPaused(not breather.isPaused())
                     
                 # Next Action
                 nStep += 10
-                print("new step: %s" % descState[nStep])
+                print("\nINF: new step: %d: %s\n" % (nStep,descState[nStep]) )
+                if nStep == 20:
+                    breather.setPaused(not breather.isPaused())
+                    nStep += 10
                     
-                
-        
+                if nStep == 40:
+                    nDialog = 1
+                    nIdxTxt = 0
+                    nStep += 10
+                    
+                if nStep == 60:
+                    breather.setListening(True)
+
+                if nStep == 70:
+                    breather.setListening(False)    
+                    nStep += 10                    
             
-        
-            
+                if nStep == 90:
+                    breather.setPaused(not breather.isPaused())
+                    nStep += 10        
+
+                if nStep == 110:
+                    breather.setPaused(not breather.isPaused())
+                    
+                if nStep == 120:
+                    nDialog = 2
+                    nIdxTxt = 7
+                    
         bExit = misctools.isExitRequired()
         
         if bExit:

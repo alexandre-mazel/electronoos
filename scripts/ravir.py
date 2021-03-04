@@ -162,8 +162,9 @@ class Breather:
 
     
     def wake(self):
-        self.motion.wakeUp()
-        self.motion.angleInterpolationWithSpeed("KneePitch",-0.0659611225, 0.05)
+        if self.motion:
+            self.motion.wakeUp()
+            self.motion.angleInterpolationWithSpeed("KneePitch",-0.0659611225, 0.05)
         
     def updateBodyPosture(self, rFullness = -1):
         
@@ -367,6 +368,16 @@ class Breather:
         self.rExcitationRate += rInc
         self.bReceiveExcitationFromExternal = True
         
+        
+    def isPaused(self):
+        return self.nState == Breather.kStatePause
+        
+    def setPaused(self, bNewState):
+        if bNewState:
+            breather.update(breather.kStatePause)
+        else:
+            breather.update(breather.kStateIdle)
+        
 # class Breather - end
 
 
@@ -498,7 +509,9 @@ def expe():
     ratioTimeFirst = 0.7 # first orientation is predominant, other orientation randomly
     breather.setHeadIdleLook(listHeadOrientation,ratioTimeFirst)
     
-    breather.update(breather.kStatePause)
+    breather.setPaused(True)
+    
+    nStep = 10
     
     while 1:
         rT = time.time() - rBeginT
@@ -527,11 +540,46 @@ def expe():
             bTouch = mem.getData("Device/SubDeviceList/Head/Touch/Front/Sensor/Value") != 0
             rInc = 0.05
             
-        #~ bTouch |= misctools.getActionRequired() != False
-        bForceSpeak = misctools.getActionRequired() != False
+        #~ bForceSpeak = misctools.getActionRequired() != False
+        strActionRequired = misctools.getActionRequired()
+        if strActionRequired != False:
+            bIsActionTouchSimulated = "10" in strActionRequired 
+            if bIsActionTouchSimulated:
+                bTouch = True
+                strActionRequired = False # we erase it as in real robot, we won't received it in that case
+                
+        if bTouch or strActionRequired != False:
+                descState = {
+ 10: "debut: immobile (pause)",
+ 20: "on enleve le paravent et on appuie sur sa tete, il se met en idle (respi ou perlin)",
+ 30: "tete alterne entre tete sujet et autres points",
+ 40: "lancer le dialogue, qui automatiquement déroule les phrases et enchaine (bloquer la tete pendant le dialogue) TODO",
+ 50: "TODO: rallonger le dialogue => actuellement 25 et on aimerait 45. ca devrait etre avant la fin des questions quand la lumiere, le soir, les sons se font plus rare, et alors j'ai remarqué qu'il y avait plus personne et apres 22h, ... on enchaine la suite./ tourner autour du pot au début.",
+ 60: "ecoute active pendant x minutes, le gars parle.",
+ 70: "le gars a arreter de parler",
+ 80: "press pour repasser en idle.",
+ 90: "press head pour passer en rest",
+100: "le deplace",
+110: "press head pour repasser en wake et mode idle",
+120: "dialog 2, longueur ok, mais changer: le chercheur qui rentre et qui sort, l'a tout le temps et toi des fois tu le met et des fois tu l'enleve.",
+130: "ecoute active pendant x minutes, le gars parle.",
+140: "le gars arrete de parler",
+150: "press pour repasser en idle.",
+160: "tape tete pour rest",
+170: "remise du paravent",
+                                }
+                # Next Action
+                if bTouch and nStep in [10,90]:
+                    breather.setPaused(not breather.isPaused())
+                    
+                # Next Action
+                nStep += 10
+                print("new step: %s" % descState[nStep])
+                    
+                
         
-        if bTouch:
-            breather.increaseExcitation(rInc)
+            
+        
             
         bExit = misctools.isExitRequired()
         
@@ -575,24 +623,7 @@ Catherine croyait que c'etait une voix de synthese.
 """
 
 """
-# experiementation
- 10 - debut: immobile (pause)
- 20 - on enleve le paravent et on appuie sur sa tete, il se met en idle (respi ou pas)
- 30 - tete alterne entre tete sujet et autres points
- 40 - lancer le dialogue, qui automatiquement déroule les phrases et enchaine (bloquer la tete pendant le dialogue) TODO
- 50 - TODO: rallonger le dialogue => actuellement 25 et on aimerait 45. ca devrait etre avant la fin des questions quand la lumiere, le soir, les sons se font plus rare, et alors j'ai remarqué qu'il y avait plus personne et apres 22h, ... on enchaine la suite./ tourner autour du pot au début.
- 60 - ecoute active pendant x minutes, le gars parle.
- 70 - le gars arrete de parler
- 80 - press pour repasser en idle.
- 90 - press head pour passer en rest
-100 - le deplace
-110 - press head pour repasser en wake et mode idle
-120 - dialog 2, longueur ok, mais changer: le chercheur qui rentre et qui sort, l'a tout le temps et toi des fois tu le met et des fois tu l'enleve.
-130 - ecoute active pendant x minutes, le gars parle.
-140 - le gars arrete de parler
-150 - press pour repasser en idle.
-160 - tape tete pour rest
-170 - remise du paravent
+
 
 bandana bleu et vert + ramener une tablette pour joli et test
 

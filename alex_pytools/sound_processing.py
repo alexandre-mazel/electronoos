@@ -50,6 +50,17 @@ def cleanNameInFolder(strPath):
             os.rename(tf, strPath+cleaned)
             
             
+def changeVolumeInFolder(strPath,rRatio=2):
+    """
+    remove all not ascii 128 character in filename
+    """
+    listFile = sorted(  os.listdir(strPath) )
+    for f in listFile:
+        tf = strPath + f
+        print("INF: %s => %s * %5.1f" % ( f,f,rRatio ) )
+        rNewDuration = wav.changeVolume( tf, rRatio )
+            
+            
 
 def insertSilenceInFolder(strPath, rSilenceDuration):
     """
@@ -163,11 +174,16 @@ def getSpeechInWav( strSoundFilename ):
     return retVal[0][0]
 
 def autocut(wavfile, rSilenceMinDuration = 0.3 ):
-    bPlaySound = 0
-    bAutoRename = 0
+    bPlaySound = 1
+    bAutoRename = 1
     bAlternativeManualInputted = 1
     bNormalise = 0
-    nPeakRatioToKeep = 128 #si respi, 16 sinon
+    strDstPath = "c:/generated/"
+    try: os.makedirs(strDstPath)
+    except: pass
+    
+    nPeakRatioToKeep = 128 # 128 si respi a enlever, 16 sinon
+    
     w = wav.Wav(wavfile,bQuiet=False)
     print(w)
     #~ w.write("/tmp/t.wav")
@@ -175,16 +191,16 @@ def autocut(wavfile, rSilenceMinDuration = 0.3 ):
     print("INF: nbr part: %s" % len(seq) )
     for i,s in enumerate(seq):
         if bNormalise: s.normalise()
-        strPath = "c:/generated/"
+        
         name = "s_%04d.wav" % i 
-        s.write(strPath+name)
+        s.write(strDstPath+name)
         if bPlaySound:
             print("playing: %s" % name )
-            pygame_tools.soundPlayer.playFile(strPath+name)
+            pygame_tools.soundPlayer.playFile(strDstPath+name)
             time.sleep(0.1)
             
         if bAutoRename:
-            txt = getSpeechInWav(strPath+name)
+            txt = getSpeechInWav(strDstPath+name)
             if bAlternativeManualInputted:
                 if txt == "":
                     txt = input("Type what you just heard:\n")
@@ -192,20 +208,28 @@ def autocut(wavfile, rSilenceMinDuration = 0.3 ):
                 newname = name.replace(".wav", "__" + txt[:100]+".wav")
                 newname = cleanStringAnsi128(newname)
                 print("INF: Renammed to '%s'\n" % newname )
-                os.rename(strPath+name, strPath+newname)
+                os.rename(strDstPath+name, strDstPath+newname)
             
 # autocut - end
     
     
 if __name__ == "__main__":
     strPathRavir = "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut/"
+    #~ strPathRavir = "d:/sounds/recordings/ravir"
+    
+    if 1:
+        #~ changeVolumeInFolder(strPathRavir+"rec3/dial2/",2)
+        changeVolumeInFolder(strPathRavir+"rec3/relance/",2)
+    
     if 0:
         #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/rec2.wav")
         #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/rec1_fx.wav")
         #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/rec2_fx.wav",rSilenceMinDuration=0.5)
         #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/robot3.wav")
         #~ autocut("D:/sounds/recordings/robot4.wav")
-        autocut("D:/sounds/recordings/respi1.wav") # should cut in 14 or 15 seq
+        #~ autocut("D:/sounds/recordings/respi1.wav") # should cut in 14 or 15 seq
+        autocut("D:/sounds/recordings/ravir/r4.wav")
+        
     if 0:
         strFile = strPathRavir + "/rec2/s032.wav"
         strFile = "/tmp/s032.wav"
@@ -219,7 +243,8 @@ if __name__ == "__main__":
         cleanNameInFolder(strPathRavir + "/rec1/")
         cleanNameInFolder(strPathRavir + "/rec2/")
         
-    if 1:
+    if 0:
+        # add silence at beginning of each sound
         rTimeAdded = 0.1
         strPath = "/tmp2/brea/selected_intake/"
         strPath = "/home/nao/breath/selected_intake/"

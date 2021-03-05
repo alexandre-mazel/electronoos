@@ -1036,3 +1036,15 @@ def insertSilenceAtBeginning(filename, rSilenceTimeInSec = 1. ):
     w.updateHeaderSizeFromDataLength()
     w.write(filename)  
     return w.getDuration()
+
+
+def changeVolume(filename, rRatio = 2. ):
+    """
+    return the duration of result
+    """
+    w = Wav(filename)
+
+    w.data = w.data*rRatio
+    w.updateHeaderSizeFromDataLength()
+    w.write(filename)  
+    return True

@@ -402,6 +402,7 @@ class Breather:
         print("INF: Breather.setPaused: %d" % (bNewState) )
         if bNewState:
             self.update(Breather.kStatePause)
+            time.sleep(1.) # time for touch to finish
         else:
             self.update(Breather.kStateIdle)
             
@@ -410,7 +411,10 @@ class Breather:
         print("INF: Breather.setListening: %d => %d" % (breather.bListening,bNewState) )
         if bNewState:
             self.updateHeadLook(0)
+            if self.leds: self.leds.post.fadeRGB("EarLeds", 0xFFFFFF, 0.2)
             time.sleep(0.3) # time for headlook a 0 to finish
+        else:
+            if self.leds: self.leds.post.fadeRGB("EarLeds", 0x000000, 0.2)
         breather.bListening = bNewState
         
 # class Breather - end
@@ -483,22 +487,22 @@ def loadDialogsExpe():
     msgs1 = []
     msgs1.append("dial1/s_0002__je_vais_te_raconter_un_probleme_personnel")
     msgs1.append("dial1/s_0003__j_aimerais_savoir_ce_que_tu_en_penses")
-    #~ msgs1.append("dial1/s_0010__j_ai_remarque_que_quand_la_lumiere_baisse_en_fin_de_journee")
-    #~ msgs1.append("dial1/s_0011__et_encore_plus_le_soir")
-    #~ msgs1.append("dial1/s_0012__les_sons_se_font_plus_rares")
-    #~ msgs1.append("dial1/s_0013__et_alors_j_ai_l_impression_qu_il_n_y_a_plus_personne_avec_moi_dans_les_bureaux")
-    #~ msgs1.append("dial1/s_0014__et_aussi_d_apres_les_sons_que_j_entends_venant_des_rues_autour")
-    #~ msgs1.append("dial1/s_0015__on_dirait_qu_elles_sont_vides_en_comparaison_de_l_agitation_et_du_brouhaha_de_la_journee")
-    #~ msgs1.append("dial1/s_0016__ca_me_gene")
-    #~ msgs1.append("dial1/s_0017__je_m_ennuie")
-    #~ msgs1.append("dial1/s_0018__je_ne_sais_pas_quoi_faire")
-    #~ msgs1.append("dial1/s_0019__et_je_me_sens_inutile")
-    #~ msgs1.append("dial1/s_0021__je_ne_comprends_pas_pourquoi_il_y_a_une_difference_entre_le_jour_et_la_nuit_chez_les_humains")
-    #~ msgs1.append("dial1/s_0022__est_ce_que_tu_peux_m_expliquer_la_difference_qu_il_y_a")
-    #~ msgs1.append("dial1/s_0023__entre_toi_et_moi")
-    #~ msgs1.append("dial1/s_0025__est_ce_que_tu_t_ennuies_toi_la_nuit")
+    msgs1.append("dial1/s_0010__j_ai_remarque_que_quand_la_lumiere_baisse_en_fin_de_journee")
+    msgs1.append("dial1/s_0011__et_encore_plus_le_soir")
+    msgs1.append("dial1/s_0012__les_sons_se_font_plus_rares")
+    msgs1.append("dial1/s_0013__et_alors_j_ai_l_impression_qu_il_n_y_a_plus_personne_avec_moi_dans_les_bureaux")
+    msgs1.append("dial1/s_0014__et_aussi_d_apres_les_sons_que_j_entends_venant_des_rues_autour")
+    msgs1.append("dial1/s_0015__on_dirait_qu_elles_sont_vides_en_comparaison_de_l_agitation_et_du_brouhaha_de_la_journee")
+    msgs1.append("dial1/s_0016__ca_me_gene")
+    msgs1.append("dial1/s_0017__je_m_ennuie")
+    msgs1.append("dial1/s_0018__je_ne_sais_pas_quoi_faire")
+    msgs1.append("dial1/s_0019__et_je_me_sens_inutile")
+    msgs1.append("dial1/s_0021__je_ne_comprends_pas_pourquoi_il_y_a_une_difference_entre_le_jour_et_la_nuit_chez_les_humains")
+    msgs1.append("dial1/s_0022__est_ce_que_tu_peux_m_expliquer_la_difference_qu_il_y_a")
+    msgs1.append("dial1/s_0023__entre_toi_et_moi")
+    msgs1.append("dial1/s_0025__est_ce_que_tu_t_ennuies_toi_la_nuit")
     msgs1.append("dial1/s_0026__il_t_arrive_de_faire_des_choses")
-    #~ msgs1.append("dial1/s_0027__et_tu_fais_des_trucs_particuliers_la_nuit")
+    #msgs1.append("dial1/s_0027__et_tu_fais_des_trucs_particuliers_la_nuit")
     
     msgs2 = []
     msgs2.append("dial1/s_0002__je_vais_te_raconter_un_probleme_personnel")
@@ -513,11 +517,11 @@ def loadDialogsExpe():
     msgs2.append("dial2/s_0011__vous_n_aviez_plus_la_meme_facon_de_respirer")
     msgs2.append("dial2/s_0012__est_ce_que_ca_vous_pose_un_probleme")
     msgs2.append("dial2/s_0014__et_puis_vous_enlever_le_truc_bleu_pour_manger_ca_veut_dire_que_c_est_moins_important_que_manger_pour")
-    msgs2.append("dial2/s_0015__et_puis_au_debut_quand_il_y_avait_l_autre_humain")
-    msgs2.append("dial2/s_0016__vous_en_avez_bien_tous_les_deux")
-    msgs2.append("dial2/s_0017__et_la_tu_l_as_enleve")
+    #msgs2.append("dial2/s_0015__et_puis_au_debut_quand_il_y_avait_l_autre_humain")
+    #msgs2.append("dial2/s_0016__vous_en_avez_bien_tous_les_deux")
+    #msgs2.append("dial2/s_0017__et_la_tu_l_as_enleve")
     msgs2.append("dial2/s_0018__et_puis_le_chercheur_qui_rentre_et_qui_sort_le_porte_tout_le_temps_et_toi_des_fois_tu_le_mets_et_des")
-    msgs2.append("dial2/s_0019__ca_ne_me_concerne_pas_alors_le_truc")
+    #msgs2.append("dial2/s_0019__ca_ne_me_concerne_pas_alors_le_truc")
     msgs2.append("dial2/s_0021__ca_me_concerne_pas_alors")
     msgs2.append("dial2/s_0022__ce_truc")
     msgs2.append("dial2/s_0023__et_toi_tu_trouve_ca_agreable_de_porter_ce_truc_bleu")
@@ -577,10 +581,10 @@ def loadDialogsExpe():
 
     msgs_reponse = []    
     msgs_reponse.append("relance/s_0032__ah_ouais")
-    msgs_reponse.append("relance/s_0036__je_comprends_mieux_maintenant")
     msgs_reponse.append("relance/s_0037__je_suis_content_d_avoir_appris_seul")
-    msgs_reponse.append("relance/s_0038__je_suis_content_")
-    msgs_reponse.append("relance/s_0032__ah_ouais")
+    #msgs_reponse.append("relance/s_0036__je_comprends_mieux_maintenant")
+    #msgs_reponse.append("relance/s_0038__je_suis_content_")
+    #msgs_reponse.append("relance/s_0032__ah_ouais")
     
 
     return msgs1,msgs2,msgs_ecoute,msgs_relance,msgs_reponse
@@ -709,7 +713,7 @@ def expe():
                 bTouch = True
                 strActionRequired = False # we erase it as in real robot, we won't received it in that case
                 
-        if bTouch and nStep in [10,80,100]:
+        if bTouch and nStep in [10,80,100,140]:
             strActionRequired = "next"
             
         if strActionRequired != False:
@@ -727,10 +731,10 @@ def expe():
 110: "head presser pour repasser en wake et mode idle",
 120: "dialog 2, longueur ok, mais changer: le chercheur qui rentre et qui sort, l'a tout le temps et toi des fois tu le met et des fois tu l'enleve.",
 130: "ecoute active pendant x minutes, le gars parle.",
-140: "le gars arrete de parler, repasse en idle",
+140: "le gars arrete de parler, repasse en idle avec reponse content",
 150: "",
-160: "tape tete pour rest",
-170: "remise du paravent - pret a recommencer",
+160: "tete taper pour rest et remise du paravent",
+170: "paravent remis - pret a recommencer",
                                 }
                     
                 if "next" in strActionRequired:
@@ -749,8 +753,9 @@ def expe():
                         breather.setListening(True)
 
                     if nStep == 70:
-                        breather.setListening(False)    
-                        breather.sayFile(strTalkPath + msgDials[4][1] + ".wav")
+                        breather.setListening(False)   
+                        #~ breather.sayFile(strTalkPath + msgDials[4][1] + ".wav")                        
+                        nDialog = 5
                         nStep += 10                    
                 
                     if nStep == 90:
@@ -768,6 +773,7 @@ def expe():
 
                     if nStep == 140:
                         breather.setListening(False)
+                        nDialog = 5     
                         nStep += 10
                         
                     if nStep == 160:
@@ -775,15 +781,28 @@ def expe():
                         
                     if nStep == 170:
                         nStep = 10
-                else:
+                elif "interact" in strActionRequired:
+                    ####
+                    # interaction dans l'éecoute
+                    
                     strNumber = strActionRequired.replace("interact","")
                     try:
                         nNumber=int(strNumber)
                     except:
                         nNumber=0
-                    if nStep == 60:
+                    if nStep == 60 or nStep == 130:
                         breather.sayFile(strTalkPath + msgDials[3][nNumber%len(msgDials[3])] + ".wav")
-                        
+                elif "hun" in strActionRequired:
+                    ####
+                    # interaction dans l'éecoute
+                    
+                    strNumber = strActionRequired.replace("hun","")
+                    try:
+                        nNumber=int(strNumber)
+                    except:
+                        nNumber=0
+                    breather.sayFile(strTalkPath + msgDials[2][nNumber%len(msgDials[2])] + ".wav")
+                                                
                     
                     
         bExit = misctools.isExitRequired()
@@ -829,9 +848,18 @@ Catherine croyait que c'etait une voix de synthese.
 
 """
 
+Notes du 5 mars:
+1)enregistrer un grand soupir de soulagement avec respiration et un sans respiration pour après l'explication.
+ grosse respi soulagé "ah ouaaaaais je suis content d'avoir appris cela" tres soulagé puis merci.
+ et meme sans respi
+1b) + "je ne peux pas te répondre, ca ne fait pas partie de l'experience, je te demande simplement ton avis.". tout le temps actif.
+2) virer tout mouvement aléatoire pendant qu'il parle, meme entre 2 phrases d'un dialog
+3) ajouter au démarrage le settings des conditions 1/2/3/4 et gestion afférente.
+4) simplifier interaction
+next step1: paufiner
+et coup d'apres reglage des caméras et reglage complet
 
-bandana bleu et vert + ramener une tablette pour joli et test
-
+Ce qu'il manque, c'est une belle écoute active avec detection de voix et hunhun a la fin des phrases.
 """
 
 if __name__ == "__main__":

@@ -855,9 +855,11 @@ Notes du 5 mars:
 1b) + "je ne peux pas te répondre, ca ne fait pas partie de l'experience, je te demande simplement ton avis.". tout le temps actif.
 2) virer tout mouvement aléatoire pendant qu'il parle, meme entre 2 phrases d'un dialog
 3) ajouter au démarrage le settings des conditions 1/2/3/4 et gestion afférente.
-4) simplifier interaction
-next step1: paufiner
-et coup d'apres reglage des caméras et reglage complet
+4) refaire schema du setup a jour
+5) simplifier interaction du passeur de test? (gfx?choregraphe)
+
+prochaine journée: paufineage
+coup d'apres: reglage des caméras et reglage complet
 
 Ce qu'il manque, c'est une belle écoute active avec detection de voix et hunhun a la fin des phrases.
 """

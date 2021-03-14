@@ -32,14 +32,21 @@ class SoundPlayer:
         """
         try:
             return self.listPreloadedSound[strFilename]
-        except:
-            sound = pg.mixer.Sound(strFilename)
+        except KeyError as err:
+            try:
+                sound = pg.mixer.Sound(strFilename)
+            except:
+                sound = None
+            if not sound: print("WRN: pygame_tools.loadFile: loading error: '%s'" % strFilename)
             self.listPreloadedSound[strFilename] = sound
         return sound
         
         
     def playFile( self, strFilename, bWaitEnd = True, rSoundVolume = 1. ):
         sound = self.loadFile( strFilename )
+        if sound == None:
+            print("WRN: pygame_tools.playFile: can't play this sound, as it hasn't been loaded: '%s'" % strFilename )
+            return False
         sound.set_volume(rSoundVolume)
         sound.play()
         # how often to check active playback

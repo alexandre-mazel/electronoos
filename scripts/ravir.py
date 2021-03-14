@@ -46,6 +46,10 @@ import math
 import random
 import time
 
+def updateHipRoll(motion):
+    rPosInc = noise.getSimplexNoise(time.time()*0.3)*0.1
+    rTime = random.random()*3+0.6
+    motion.angleInterpolation( "HipRoll", rPosInc, rTime, True )
 
 class Breather:
     kStateIdle = 0
@@ -275,6 +279,7 @@ class Breather:
                     self.nState = Breather.kStateIdle
                     
             self.updateBodyPosture()
+            if self.motion: updateHipRoll(self.motion)
             
             if self.nState == Breather.kStateSpeak:
                 self.updateHeadTalk()
@@ -432,6 +437,38 @@ class Perliner:
     #~ kStateListen = 5 #not a real state, just a boolean added to the machine
     kStatePause = 10 # do nothing, just stand
     
+    """
+    # choregraphe behavior:
+
+    def _incTime(self):
+        self.t += 0.1
+
+    def animateChest(self, motion,rTime,bWaitEnd=True):
+        self._incTime()
+        if self.bUseSound:
+            if self.osx.noise2d(self.t,10) > 0.:
+                self.ap.post.playFile("/home/nao/tic.wav")
+            if self.osx.noise2d(self.t,20) > 0.2:
+                self.ap.post.playFile("/home/nao/tictic.wav")
+
+        rPosInc = self.osx.noise2d(self.t,0)*0.2
+        if bWaitEnd:
+            motion.angleInterpolation( self.astrChain, [rPosInc,(math.pi/2)-rPosInc*self.rCoefArmAmp,(math.pi/2)-rPosInc*self.rCoefArmAmp], rTime, True )
+        else:
+            motion.post.angleInterpolation( self.astrChain, [rPosInc,(math.pi/2)-rPosInc*self.rCoefArmAmp,(math.pi/2)-rPosInc*self.rCoefArmAmp], rTime, True )
+
+        if self.bUseSound:
+          if self.osx.noise2d(self.t,11) > 0.:
+            self.ap.post.playFile("/home/nao/tic3.wav")
+
+    def animateHip(self, motion,rTime,bWaitEnd=True):
+        rPosInc = self.osx.noise2d(self.t,30)*0.1
+        if bWaitEnd:
+            motion.angleInterpolation( "HipRoll", rPosInc, rTime, True )
+        else:
+            motion.post.angleInterpolation( "HipRoll", rPosInc, rTime, True )   
+    """
+
     def __init__( self ):
         
         # physical specification
@@ -451,6 +488,8 @@ class Perliner:
         
         self.bListening = False
         
+        self.bUseSound = True
+        
         if os.name != "nt":
             import naoqi
             self.motion = naoqi.ALProxy("ALMotion", "localhost", 9559)
@@ -467,6 +506,8 @@ class Perliner:
         else:
             self.leds = False
             
+    def setNoisePath( self, strNoisePath ):
+        self.strNoisePath = strNoisePath
             
         
     def wake(self):
@@ -477,11 +518,25 @@ class Perliner:
     def updateBodyPosture(self, rFullness = -1):
         
         if self.motion != None:
-            rMin = -self.rAmp*0.2
-            rMax = self.rAmp*0.2
+            
+            
+            rPosInc = noise.getSimplexNoise(self.t)*0.2
+            motion.post.angleInterpolation( self.astrChain, [rPosInc,(math.pi/2)-rPosInc*self.rCoefArmAmp,(math.pi/2)-rPosInc*self.rCoefArmAmp], rTime, True )
 
-            self.motion.setAngles(self.astrChain,[rPos+self.rOffsetHip,(math.pi/2)+rPos*self.rCoefArmAmp,(math.pi/2)+rPos*self.rCoefArmAmp],0.6)
+        if self.bUseSound:
+            strPath = self.strNoisePath
+            rSoundVolume = 2.
+            if noise.getSimplexNoise(self.timeLastUpdate,50) > 0.6:
+                sound_player.soundPlayer.playFile( strPath+"tic.wav", bWaitEnd=False, rSoundVolume=rSoundVolume)
+            if noise.getSimplexNoise(self.timeLastUpdate,100) > 0.8:
+                sound_player.soundPlayer.playFile( strPath+"tictic.wav", bWaitEnd=False, rSoundVolume=rSoundVolume)
+            if noise.getSimplexNoise(self.timeLastUpdate,150) > 0.6:
+                sound_player.soundPlayer.playFile( strPath+"tic2.wav", bWaitEnd=False, rSoundVolume=rSoundVolume)
+            if noise.getSimplexNoise(self.timeLastUpdate,200) > 0.7:
+                sound_player.soundPlayer.playFile( strPath+"tic3.wav", bWaitEnd=False, rSoundVolume=rSoundVolume)
 
+            
+            
     def updateHeadTalk(self):
         if self.motion != None:
             rOffset = -0.2
@@ -532,7 +587,7 @@ class Perliner:
         rTimeSinceLastUpdate = time.time() - self.timeLastUpdate
         self.timeLastUpdate = time.time()
         
-        #~ print("\n%5.2fs: DBG: Perliner.update: state: %s, rFullness: %4.2f, rExcitation: %5.1f, self.rTimeIdle: %5.2f, self.rTimeSpeak: %5.2f, rTimeSinceLastUpdate: %5.2f" % (time.time(),self.nState,self.rFullness,self.rExcitationRate, self.rTimeIdle,self.rTimeSpeak,rTimeSinceLastUpdate) )
+        #~ print("\n%5.2fs: DBG: Perliner.update: state: %s, self.rTimeIdle: %5.2f, self.rTimeSpeak: %5.2f, rTimeSinceLastUpdate: %5.2f" % (time.time(),self.nState,self.rTimeIdle,self.rTimeSpeak,rTimeSinceLastUpdate) )
         
         nPrevState = self.nState
         
@@ -546,6 +601,7 @@ class Perliner:
                     self.nState = Perliner.kStateIdle
                     
             self.updateBodyPosture()
+            if self.motion: updateHipRoll(self.motion)
             
             if self.nState == Perliner.kStateSpeak:
                 self.updateHeadTalk()
@@ -652,15 +708,17 @@ def init():
         breather.loadBreathIn( "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/breath/selected_intake/")
         breather.loadBreathOut( "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/breath/selected_outtake/")
         strTalkPath = "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut/rec3/" #rec2, for demos ou rec3
+        strNoisePath = "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/"
         mem = None
     else:
         breather.loadBreathIn( "/home/nao/breath/selected_intake/")
         breather.loadBreathOut( "/home/nao/breath/selected_outtake/")
         strTalkPath = "/home/nao/cut/rec3/"
+        strNoisePath = "/home/nao/"
         import naoqi
         mem = naoqi.ALProxy("ALMemory", "localhost", 9559)
         
-    return strTalkPath,mem
+    return strTalkPath,strNoisePath,mem
     
 def loadDialogsDemo():
     #msgs = ["s053__ah_merci_je_comprends_mieux_maintenant_je_suis_content_d_avoir_appris_seul_p1","s053__ah_merci_je_comprends_mieux_maintenant_je_suis_content_d_avoir_appris_seul_p2"]
@@ -812,7 +870,7 @@ def loadDialogsExpe():
     return msgs1,msgs2,msgs_ecoute,msgs_relance,msgs_reponse
 
 def demo():
-    strTalkPath,mem = init()
+    strTalkPath,strNoisePath,mem = init()
         
     rT = 0
     rBeginT = time.time()
@@ -891,7 +949,9 @@ def expe( nMode = 1 ):
         nAnimatorIdx = 1
     print("INF: Mode experimentation Ravir  - start, mode: %d, nFirstStory: %d, nAnimatorIdx: %s\n" % ( nMode, nStory, nAnimatorIdx ) )
     
-    strTalkPath,mem = init()
+    strTalkPath,strNoisePath,mem = init()
+    
+    perliner.setNoisePath(strNoisePath)
     
     aAnimators = [breather,perliner]
     animator = aAnimators[nAnimatorIdx]
@@ -928,6 +988,7 @@ def expe( nMode = 1 ):
         animator.update()
         
         time.sleep(0.05)
+        if nAnimatorIdx == 1: time.sleep(0.1)
         
         if nDialog != 0:
             if not animator.isSpeaking():
@@ -1116,7 +1177,6 @@ Ce qu'il manque, c'est une belle écoute active avec detection de voix et hunhun 
 if __name__ == "__main__":
      #~ demo()
      nMode = 1
-     print(sys.argv)
      if len(sys.argv)>1:
          nMode = int(sys.argv[1])
      expe(nMode)

@@ -29,11 +29,12 @@ for i in range(xpix):
         noise_val += 0.125* noise4([i/xpix, j/ypix])
 """
 
-def getSimplexNoise(t):
+def getSimplexNoise(t,y=0):
     """
     return a nicely moving noise in [-1 /+1].
     - t: a running time or simulated one, same t return same value. called with passing second should give a nice result.
-    - the sum of all noise tend to zero
+    - y: optionnal offset to give another type of value
+    the sum of all noise tend to zero
     """
     # min and max seems to be limited from -0.864 to 0.864
     maxval = 0.865
@@ -42,7 +43,7 @@ def getSimplexNoise(t):
     global global_gen
     if global_gen == None: global_gen = opensimplex.OpenSimplex()
     gen = global_gen
-    v = gen.noise2d(x=t,y=0,bUseCache=False)
+    v = gen.noise2d(x=t,y=y,bUseCache=False)
     #~ v = abs(v*255)
     v = v/maxval
     return v

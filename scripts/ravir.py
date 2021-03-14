@@ -989,7 +989,8 @@ def expe( nMode = 1 ):
                         nStep += 10
                         
                     if nStep == 40:
-                        nDialog = 1
+                        if nStory == 0: nDialog = 1
+                        else: nDialog = 2
                         nStep += 10
                         
                     if nStep == 60:
@@ -1013,7 +1014,8 @@ def expe( nMode = 1 ):
                         animator.setPaused(not animator.isPaused())
                         
                     if nStep == 120:
-                        nDialog = 2
+                        if nStory == 0: nDialog = 1
+                        else: nDialog = 2
 
                     if nStep == 130:
                         animator.setListening(True)

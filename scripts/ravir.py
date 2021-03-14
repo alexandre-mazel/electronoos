@@ -408,19 +408,241 @@ class Breather:
             
             
     def setListening(self, bNewState):
-        print("INF: Breather.setListening: %d => %d" % (breather.bListening,bNewState) )
+        print("INF: Breather.setListening: %d => %d" % (self.bListening,bNewState) )
         if bNewState:
             self.updateHeadLook(0)
             if self.leds: self.leds.post.fadeRGB("EarLeds", 0xFFFFFF, 0.2)
             time.sleep(0.3) # time for headlook a 0 to finish
         else:
             if self.leds: self.leds.post.fadeRGB("EarLeds", 0x000000, 0.2)
-        breather.bListening = bNewState
+        self.bListening = bNewState
         
 # class Breather - end
 
-
 breather = Breather()
+
+
+
+
+
+
+class Perliner:
+    kStateIdle = 0
+    kStateSpeak = 4
+    #~ kStateListen = 5 #not a real state, just a boolean added to the machine
+    kStatePause = 10 # do nothing, just stand
+    
+    def __init__( self ):
+        
+        # physical specification
+        self.rSpeakDurationWhenFull = 4. # in sec
+                
+        self.nState = Perliner.kStateIdle
+        self.timeLastUpdate = time.time()
+        
+        self.rTimeIdle = 0.
+        self.rTimeSpeak = 0.
+        
+        self.strFilenameToSay = "" # if set => want to speak
+        
+        self.motion = None
+        
+        self.idMoveHead = -1
+        
+        self.bListening = False
+        
+        if os.name != "nt":
+            import naoqi
+            self.motion = naoqi.ALProxy("ALMotion", "localhost", 9559)
+            self.leds = naoqi.ALProxy("ALLeds", "localhost", 9559)
+            self.astrChain = ["HipPitch","LShoulderPitch","RShoulderPitch"]
+            
+            self.rAmp = 0.2
+
+            self.rHeadDelay = 0.6
+            self.rHeadPos = self.rAmp*self.rCoefArmAmp*0.1*1.5
+            self.rOffsetHip = -0.0
+            
+            self.wake()
+        else:
+            self.leds = False
+            
+            
+        
+    def wake(self):
+        if self.motion:
+            self.motion.wakeUp()
+            self.motion.angleInterpolationWithSpeed("KneePitch",-0.0659611225, 0.05)
+        
+    def updateBodyPosture(self, rFullness = -1):
+        
+        if self.motion != None:
+            rMin = -self.rAmp*0.2
+            rMax = self.rAmp*0.2
+
+            self.motion.setAngles(self.astrChain,[rPos+self.rOffsetHip,(math.pi/2)+rPos*self.rCoefArmAmp,(math.pi/2)+rPos*self.rCoefArmAmp],0.6)
+
+    def updateHeadTalk(self):
+        if self.motion != None:
+            rOffset = -0.2
+            rInc = 0.02+random.random()*0.2+rOffset
+            self.motion.setAngles("HeadPitch", rInc, random.random()/15. )
+
+    def updateHeadListen(self):
+        if self.motion != None:
+            rOffset = -0.2
+            if random.random()<0.9:
+                return
+            rInc = 0.02+random.random()*0.1+rOffset
+            self.motion.setAngles("HeadPitch", rInc, random.random()/30. )            
+           
+    def setHeadIdleLook( self, listHeadOrientation, ratioTimeFirst ):
+        self.listHeadOrientation = listHeadOrientation
+        self.ratioTimeFirst = ratioTimeFirst
+        self.lastHeadMove = time.time()
+        
+    def updateHeadLook( self, nForcedAngle = -1):
+        """
+        nForcedAngle: force to look at this direction NOW
+        """
+        if not self.motion: return
+        if time.time() - self.lastHeadMove > 3 or nForcedAngle != -1:
+            if random.random()<0.7 and time.time() - self.lastHeadMove < 8 and nForcedAngle == -1: # proba de pas bouger
+                return
+            self.lastHeadMove = time.time()
+            if nForcedAngle == -1:
+                if random.random()<self.ratioTimeFirst:
+                    idx = 0
+                else:
+                    idx = random.randint(0,len(self.listHeadOrientation)-2)
+                    idx = idx + 1
+                rSpeed = 0.01+random.random()*0.2
+            else:
+                idx = nForcedAngle
+                rSpeed = 0.2
+            headPos = self.listHeadOrientation[idx]
+            try:
+                self.motion.killTask(self.idMoveHead)
+            except BaseException as err:
+                print("WRN: stopping task %d failed: %s" % (self.idMoveHead,err) )
+            self.idMoveHead=self.motion.post.angleInterpolationWithSpeed("Head",headPos,rSpeed)
+                
+            
+    def update( self, nForceNewState = None ):
+        rTimeSinceLastUpdate = time.time() - self.timeLastUpdate
+        self.timeLastUpdate = time.time()
+        
+        #~ print("\n%5.2fs: DBG: Perliner.update: state: %s, rFullness: %4.2f, rExcitation: %5.1f, self.rTimeIdle: %5.2f, self.rTimeSpeak: %5.2f, rTimeSinceLastUpdate: %5.2f" % (time.time(),self.nState,self.rFullness,self.rExcitationRate, self.rTimeIdle,self.rTimeSpeak,rTimeSinceLastUpdate) )
+        
+        nPrevState = self.nState
+        
+        if nForceNewState != None:
+            self.nState = nForceNewState
+            
+        if self.nState != Perliner.kStatePause:        
+            if self.nState == Perliner.kStateSpeak:
+                self.rTimeSpeak -= rTimeSinceLastUpdate
+                if self.rTimeSpeak < 0:
+                    self.nState = Perliner.kStateIdle
+                    
+            self.updateBodyPosture()
+            
+            if self.nState == Perliner.kStateSpeak:
+                self.updateHeadTalk()
+            elif not self.bListening:
+                self.updateHeadLook()
+                
+            if self.bListening:
+                self.updateHeadListen()
+                    
+                    
+            if self.strFilenameToSay != "" and self.nState != self.kStateSpeak:
+                self.updateHeadLook(0)
+                self.nState = Perliner.kStateSpeak
+            
+        if self.nState != nPrevState:
+            
+            ######################################
+            # change of state
+            ######################################
+            
+            if nPrevState == Perliner.kStatePause:
+                self.wake()
+                
+            if self.nState == Perliner.kStateIdle:
+                self.rTimeIdle = random.random() # jusqu'a 1sec d'idle
+                if self.leds: self.leds.post.fadeRGB("FaceLeds", 0x202020, 0.5)
+                if nPrevState == Perliner.kStateSpeak:
+                    self.rTimeIdle += 0.5
+
+            if self.nState == Perliner.kStateSpeak:
+                sound_player.soundPlayer.stopAll()
+                if self.leds: self.leds.fadeRGB("FaceLeds", 0x0000FF, 0.00)
+                sound_player.soundPlayer.playFile(self.strFilenameToSay, bWaitEnd=False)
+                #~ if self.motion != None:
+                    #~ rTimeEstim = self.rTimeSpeak
+                    #~ self.motion.stopMove()
+                    #~ self.motion.post.angleInterpolation( self.astrChain, [-self.rAmp*0.1+self.rOffsetHip,(math.pi/2)-self.rAmp*self.rCoefArmAmp*0.1,(math.pi/2)-self.rAmp*self.rCoefArmAmp*0.1], rTimeEstim-0.15, True )
+
+                self.strFilenameToSay = ""
+                
+            if self.nState == Perliner.kStatePause:
+                # reset state
+                sound_player.soundPlayer.stopAll()
+                self.updateHeadLook(0)
+                self.updateBodyPosture(1.) # ou rest ?
+                #~ self.motion.rest()
+            
+            print("%5.2fs: INF: Perliner.update: new state: %s" % (time.time(),self.nState) )
+        
+                
+    def isSpeaking( self ):
+        return self.strFilenameToSay != "" or self.nState == Perliner.kStateSpeak
+        
+    def sayTts( self, strText ):
+        import tts
+        if tts.tts.isLoaded(): tts.tts.load()
+        #~ self.strMessageToSay = txt
+        self.strFilenameToSay, self.rTimeSpeak = tts.tts.sayToFile( strText )
+        print("INF: Perliner.sayTts %s: rTimeSpeak: %5.2fs" % (strText,self.rTimeSpeak) )
+        
+    def sayFile( self, filename ):
+        #~ self.strMessageToSay = txt
+        self.strFilenameToSay = filename
+        w = wav.Wav(filename,bLoadData=False)
+        self.rTimeSpeak = w.getDuration() + 0.3 # the perliner always add a slight pause between each sentences (corresponding au breath in time)
+        print("INF: Perliner.sayFile %s: rTimeSpeak: %5.2fs" % (filename,self.rTimeSpeak) )
+                
+    def increaseExcitation( self, rInc ):
+        print("INF: adding external excitation: %5.1f" % rInc)
+        #~ self.rExcitationRate += rInc
+        self.bReceiveExcitationFromExternal = True
+        
+        
+    def isPaused(self):
+        return self.nState == Perliner.kStatePause
+        
+    def setPaused(self, bNewState):
+        print("INF: Perliner.setPaused: %d" % (bNewState) )
+        if bNewState:
+            self.update(Perliner.kStatePause)
+            time.sleep(1.) # time for touch to finish
+        else:
+            self.update(Perliner.kStateIdle)
+            
+            
+    def setListening(self, bNewState):
+        print("INF: Perliner.setListening: %d => %d" % (self.bListening,bNewState) )
+        if bNewState:
+            self.updateHeadLook(0)
+            if self.leds: self.leds.post.fadeRGB("EarLeds", 0xFFFFFF, 0.2)
+            time.sleep(0.3) # time for headlook a 0 to finish
+        else:
+            if self.leds: self.leds.post.fadeRGB("EarLeds", 0x000000, 0.2)
+        self.bListening = bNewState
+        
+# class Perliner - end
+perliner = Perliner()
 
 def init():
     """
@@ -650,10 +872,29 @@ def demo():
 #~ son sur ravir moteur: robot a 60 pour excitation a 1, 65 pour 0.5, = 90 sur mon ordi
 # change now, regler pour 72 pour l'experimentation: volume correct pour la voix
 
-def expe():
-    print("INF: mode experimentation ravir  - start!!!\n")
+def expe( nMode = 1 ):
+    """
+    - nMode define experimentations conditions
+        1: breath/perlin histoire1/histoire2
+        2: perlin/breath histoire1/histoire2
+        3: breath/perlin histoire2/histoire1
+        4: perlin/breath histoire2/histoire1
+    """
+    
+    nStory = 0
+    nAnimatorIdx = 0 # 0: respi, 1: breather
+    
+    if nMode > 2:
+        nStory = 1
+        
+    if (nMode % 2) == 0:
+        nAnimatorIdx = 1
+    print("INF: Mode experimentation Ravir  - start, mode: %d, nFirstStory: %d, nAnimatorIdx: %s\n" % ( nMode, nStory, nAnimatorIdx ) )
     
     strTalkPath,mem = init()
+    
+    aAnimators = [breather,perliner]
+    animator = aAnimators[nAnimatorIdx]
         
     rT = 0
     rBeginT = time.time()
@@ -671,24 +912,26 @@ def expe():
         [1.26,0.004], # porte
     ]
     ratioTimeFirst = 0.7 # first orientation is predominant, other orientation randomly
-    breather.setHeadIdleLook(listHeadOrientation,ratioTimeFirst)
     
-    breather.setPaused(True)
+    for a in aAnimators:
+        a.setHeadIdleLook(listHeadOrientation,ratioTimeFirst)
+        a.setPaused(True)
     
     nStep = 10
     
     nDialog = 0 # diff de 0 if in a dialog, 
     
     while 1:
+        
         rT = time.time() - rBeginT
         
-        breather.update()
+        animator.update()
         
         time.sleep(0.05)
         
         if nDialog != 0:
-            if not breather.isSpeaking():
-                breather.sayFile(strTalkPath + msgDials[nDialog-1][nIdxTxt] + ".wav")
+            if not animator.isSpeaking():
+                animator.sayFile(strTalkPath + msgDials[nDialog-1][nIdxTxt] + ".wav")
                 nIdxTxt += 1
                 if nIdxTxt >= len(msgDials[nDialog-1]):
                     nDialog = 0
@@ -727,7 +970,7 @@ def expe():
  70: "le gars a arreter de parler; repasse en idle avec reponse content.",
  80: "",
  90: "head pressed, pour passer en rest",
-100: "    le deplace",
+100: "    le deplace hors de la piece, puis le ramene",
 110: "head presser pour repasser en wake et mode idle",
 120: "dialog 2, longueur ok, mais changer: le chercheur qui rentre et qui sort, l'a tout le temps et toi des fois tu le met et des fois tu l'enleve.",
 130: "ecoute active pendant x minutes, le gars parle.",
@@ -742,7 +985,7 @@ def expe():
                     nStep += 10
                     print("\nINF: new step: %d: %s\n" % (nStep,descState[nStep]) )
                     if nStep == 20:
-                        breather.setPaused(not breather.isPaused())
+                        animator.setPaused(not animator.isPaused())
                         nStep += 10
                         
                     if nStep == 40:
@@ -750,34 +993,38 @@ def expe():
                         nStep += 10
                         
                     if nStep == 60:
-                        breather.setListening(True)
+                        animator.setListening(True)
 
                     if nStep == 70:
-                        breather.setListening(False)   
-                        #~ breather.sayFile(strTalkPath + msgDials[4][1] + ".wav")                        
+                        animator.setListening(False)   
+                        #~ animator.sayFile(strTalkPath + msgDials[4][1] + ".wav")                        
                         nDialog = 5
                         nStep += 10                    
                 
                     if nStep == 90:
-                        breather.setPaused(not breather.isPaused())
+                        animator.setPaused(not animator.isPaused())
                         nStep += 10
+                        # changement de condition de animator et de story
+                        nStory = (nStory + 1)%2
+                        nAnimatorIdx = (nAnimatorIdx + 1)%2
+                        animator = aAnimators[nAnimatorIdx]
                         
                     if nStep == 110:
-                        breather.setPaused(not breather.isPaused())
+                        animator.setPaused(not animator.isPaused())
                         
                     if nStep == 120:
                         nDialog = 2
 
                     if nStep == 130:
-                        breather.setListening(True)
+                        animator.setListening(True)
 
                     if nStep == 140:
-                        breather.setListening(False)
+                        animator.setListening(False)
                         nDialog = 5     
                         nStep += 10
                         
                     if nStep == 160:
-                        breather.setPaused(not breather.isPaused())
+                        animator.setPaused(not animator.isPaused())
                         
                     if nStep == 170:
                         nStep = 10
@@ -791,7 +1038,7 @@ def expe():
                     except:
                         nNumber=0
                     if nStep == 60 or nStep == 130:
-                        breather.sayFile(strTalkPath + msgDials[3][nNumber%len(msgDials[3])] + ".wav")
+                        animator.sayFile(strTalkPath + msgDials[3][nNumber%len(msgDials[3])] + ".wav")
                 elif "hun" in strActionRequired:
                     ####
                     # interaction dans l'éecoute
@@ -801,7 +1048,7 @@ def expe():
                         nNumber=int(strNumber)
                     except:
                         nNumber=0
-                    breather.sayFile(strTalkPath + msgDials[2][nNumber%len(msgDials[2])] + ".wav")
+                    animator.sayFile(strTalkPath + msgDials[2][nNumber%len(msgDials[2])] + ".wav")
                                                 
                     
                     
@@ -866,4 +1113,8 @@ Ce qu'il manque, c'est une belle écoute active avec detection de voix et hunhun 
 
 if __name__ == "__main__":
      #~ demo()
-     expe()
+     nMode = 1
+     print(sys.argv)
+     if len(sys.argv)>1:
+         nMode = int(sys.argv[1])
+     expe(nMode)

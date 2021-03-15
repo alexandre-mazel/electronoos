@@ -579,7 +579,9 @@ class Perliner:
                 rSpeed = 0.2
             headPos = self.listHeadOrientation[idx]
             try:
+                print("%s: DBG: avant head kill task" % str(time.time()) )
                 self.motion.killTask(self.idMoveHead)
+                print("%s: DBG: apres head kill task" % str(time.time()) )
             except BaseException as err:
                 print("WRN: stopping task %d failed: %s" % (self.idMoveHead,err) )
             self.idMoveHead=self.motion.post.angleInterpolationWithSpeed("Head",headPos,rSpeed)

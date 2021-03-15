@@ -898,6 +898,65 @@ disk_write 1024KB: ####################   2.29s (436.47 Mo/s)
 disk_read  1024KB: ####################   1.41s (708.34 Mo/s)
 
 
+*** Black portable Dell ***
+
+a@black:~/dev/electronoos/scripts$ cat /proc/cpuinfo 
+processor	: 0
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 37
+model name	: Intel(R) Core(TM) i5 CPU       M 480  @ 2.67GHz
+stepping	: 5
+microcode	: 0x2
+cpu MHz		: 1197.000
+cache size	: 3072 KB
+physical id	: 0
+siblings	: 4
+core id		: 0
+cpu cores	: 2
+apicid		: 0
+initial apicid	: 0
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 11
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf pni dtes64 monitor ds_cpl vmx est tm2 ssse3 cx16 xtpr pdcm pcid sse4_1 sse4_2 popcnt lahf_lm ida arat dtherm tpr_shadow vnmi flexpriority ept vpid
+bogomips	: 5319.90
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 36 bits physical, 48 bits virtual
+power management:
+
+a@black:~/dev/electronoos/scripts$ sudo python test_perf.py 
+[sudo] password for a: 
+Sorry, try again.
+[sudo] password for a: 
+Sorry, try again.
+[sudo] password for a: 
+Sorry, try again.
+sudo: 3 incorrect password attempts
+a@black:~/dev/electronoos/scripts$ sudo python test_perf.py 
+[sudo] password for a: 
+INF: Due to low empty disk space, reducing disk test size to 648 MB
+python version   : 2.7.6 (64bits) (4 core(s))
+cpu              : todo
+test_cpu_int2    : ####################   0.55s
+test_cpu_float2  : ####################   0.14s
+scipy.fftpack    : not found
+test_orb2.4.8    : ####################   0.28s (358.00fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : test_perf_vga_*.png: not found
+multiprocess x1 :  0.55s /  0.14s /  0.00s /  0.42s /  0.13s /  0.12s =>    1.38s
+multiprocess x4 :  1.08s /  0.30s /  0.01s /  0.89s /  0.27s /  0.27s =>    4.20s
+multiprocess x8 :  2.15s /  0.61s /  0.02s /  1.78s /  0.55s /  0.55s =>    9.85s
+multiprocess x32:  8.72s /  2.43s /  0.05s /  7.18s /  2.18s /  2.18s =>   32.61s
+disk_write    1KB: ####################   9.38s (69.10 Mo/s)
+disk_read     1KB: ####################   9.82s (66.00 Mo/s)
+disk_write 1024KB: ####################  11.18s (57.24 Mo/s)
+disk_read  1024KB: ####################   9.90s (64.64 Mo/s)
+
+
+
 
 
 

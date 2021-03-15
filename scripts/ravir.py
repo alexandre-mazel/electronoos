@@ -49,7 +49,7 @@ import time
 def updateHipRoll(motion):
     rPosInc = noise.getSimplexNoise(time.time()*0.3)*0.1
     rTime = random.random()*3+0.6
-    motion.angleInterpolation( "HipRoll", rPosInc, rTime, True )
+    motion.post.angleInterpolation( "HipRoll", rPosInc, rTime, True )
 
 class Breather:
     kStateIdle = 0
@@ -249,7 +249,7 @@ class Breather:
         rTimeSinceLastUpdate = time.time() - self.timeLastUpdate
         self.timeLastUpdate = time.time()
         
-        #~ print("\n%5.2fs: DBG: Breather.update: state: %s, rFullness: %4.2f, rExcitation: %5.1f, self.rTimeIdle: %5.2f, self.rTimeSpeak: %5.2f, rTimeSinceLastUpdate: %5.2f" % (time.time(),self.nState,self.rFullness,self.rExcitationRate, self.rTimeIdle,self.rTimeSpeak,rTimeSinceLastUpdate) )
+        print("\n%5.2fs: DBG: Breather.update: state: %s, rFullness: %4.2f, rExcitation: %5.1f, self.rTimeIdle: %5.2f, self.rTimeSpeak: %5.2f, rTimeSinceLastUpdate: %5.2f" % (time.time(),self.nState,self.rFullness,self.rExcitationRate, self.rTimeIdle,self.rTimeSpeak,rTimeSinceLastUpdate) )
         
         nPrevState = self.nState
         
@@ -497,6 +497,7 @@ class Perliner:
             self.astrChain = ["HipPitch","LShoulderPitch","RShoulderPitch"]
             
             self.rAmp = 0.2
+            self.rCoefArmAmp = 0.5
 
             self.rHeadDelay = 0.6
             self.rHeadPos = self.rAmp*self.rCoefArmAmp*0.1*1.5
@@ -520,13 +521,14 @@ class Perliner:
         if self.motion != None:
             
             
-            rPosInc = noise.getSimplexNoise(self.t)*0.2
-            motion.post.angleInterpolation( self.astrChain, [rPosInc,(math.pi/2)-rPosInc*self.rCoefArmAmp,(math.pi/2)-rPosInc*self.rCoefArmAmp], rTime, True )
+            rPosInc = noise.getSimplexNoise(self.timeLastUpdate)*0.2
+            rTime = 1.
+            self.motion.post.angleInterpolation( self.astrChain, [rPosInc,(math.pi/2)-rPosInc*self.rCoefArmAmp,(math.pi/2)-rPosInc*self.rCoefArmAmp], rTime, True )
 
         if self.bUseSound:
             strPath = self.strNoisePath
             rSoundVolume = 2.
-            if noise.getSimplexNoise(self.timeLastUpdate,50) > 0.6:
+            if noise.getSimplexNoise(self.timeLastUpdate,50) > 0.4:
                 sound_player.soundPlayer.playFile( strPath+"tic.wav", bWaitEnd=False, rSoundVolume=rSoundVolume)
             if noise.getSimplexNoise(self.timeLastUpdate,100) > 0.8:
                 sound_player.soundPlayer.playFile( strPath+"tictic.wav", bWaitEnd=False, rSoundVolume=rSoundVolume)
@@ -587,7 +589,7 @@ class Perliner:
         rTimeSinceLastUpdate = time.time() - self.timeLastUpdate
         self.timeLastUpdate = time.time()
         
-        #~ print("\n%5.2fs: DBG: Perliner.update: state: %s, self.rTimeIdle: %5.2f, self.rTimeSpeak: %5.2f, rTimeSinceLastUpdate: %5.2f" % (time.time(),self.nState,self.rTimeIdle,self.rTimeSpeak,rTimeSinceLastUpdate) )
+        print("\n%5.2fs: DBG: Perliner.update: state: %s, self.rTimeIdle: %5.2f, self.rTimeSpeak: %5.2f, rTimeSinceLastUpdate: %5.2f" % (time.time(),self.nState,self.rTimeIdle,self.rTimeSpeak,rTimeSinceLastUpdate) )
         
         nPrevState = self.nState
         
@@ -1047,10 +1049,14 @@ def expe( nMode = 1 ):
         
         rT = time.time() - rBeginT
         
+        print("update in")
         animator.update()
+        print("update out")
         
         time.sleep(0.05)
-        if nAnimatorIdx == 1: time.sleep(0.1)
+        #~ if nAnimatorIdx == 1: time.sleep(0.1)
+        if nAnimatorIdx == 1 and os.name == "nt": time.sleep(0.1)
+        
         
         if nDialog != 0:
             if not animator.isSpeaking():
@@ -1221,10 +1227,10 @@ Catherine croyait que c'etait une voix de synthese.
 """
 
 Notes du 5 mars:
-1) enregistrer un grand soupir de soulagement avec respiration et un sans respiration pour après l'explication.
+OK 1) enregistrer un grand soupir de soulagement avec respiration et un sans respiration pour après l'explication.
  grosse respi soulagé "ah ouaaaaais je suis content d'avoir appris cela" tres soulagé puis merci.
  et meme sans respi
-1b) + "je ne peux pas te répondre, ca ne fait pas partie de l'experience, je te demande simplement ton avis.". tout le temps actif.
+OK 1b) + "je ne peux pas te répondre, ca ne fait pas partie de l'experience, je te demande simplement ton avis.". tout le temps actif.
 2) virer tout mouvement aléatoire pendant qu'il parle, meme entre 2 phrases d'un dialog
 OK 3) ajouter au démarrage le settings des conditions 1/2/3/4 et gestion afférente.
 4) refaire schema du setup a jour

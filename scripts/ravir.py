@@ -47,9 +47,17 @@ import random
 import time
 
 def updateHipRoll(motion):
-    rPosInc = noise.getSimplexNoise(time.time()*0.3)*0.1
-    rTime = random.random()*3+0.6
-    motion.post.angleInterpolation( "HipRoll", rPosInc, rTime, True )
+    if noise.getSimplexNoise(time.time(),100)<0.8:
+        return
+    
+    print("%s: DBG: hiproll: avant noise" % str(time.time()) )
+    rPos = noise.getSimplexNoise(time.time()*0.3)*0.1
+    print("%s: DBG: hiproll: apres noise, avant angle" % str(time.time()) )
+    #~ rTime = random.random()*3+0.6
+    rSpeed = random.random()*0.2
+    #~ motion.post.angleInterpolation( "HipRoll", rPos, rTime, True ) # NB: LE POSTE NE POST PAS (pb a cause du meme proxy utilisé en meme temps???)
+    motion.setAngles( "HipRoll", rPos, rSpeed )
+    print("%s: DBG: hiproll: apres angle posted" % str(time.time()) )
 
 class Breather:
     kStateIdle = 0
@@ -197,7 +205,9 @@ class Breather:
             if rFullness > 1.6:
                 self.rFullness = 1.6 # we could have lock it to 1, but more is fine also (let's track some bugs) # seen once at 3.53 and the robot hadn't fall!
             rPos = rMin+self.rFullness*(rMax-rMin)
+            print("%s: DBG: avant body setangles" % str(time.time()) )
             self.motion.setAngles(self.astrChain,[rPos+self.rOffsetHip,(math.pi/2)+rPos*self.rCoefArmAmp,(math.pi/2)+rPos*self.rCoefArmAmp],0.6)
+            print("%s: DBG: apres body setangles" % str(time.time()) )
 
     def updateHeadTalk(self):
         if self.motion != None:
@@ -239,7 +249,9 @@ class Breather:
                 rSpeed = 0.2
             headPos = self.listHeadOrientation[idx]
             try:
+                print("%s: DBG: avant head kill task" % str(time.time()) )
                 self.motion.killTask(self.idMoveHead)
+                print("%s: DBG: apres head kill task" % str(time.time()) )
             except BaseException as err:
                 print("WRN: stopping task %d failed: %s" % (self.idMoveHead,err) )
             self.idMoveHead=self.motion.post.angleInterpolationWithSpeed("Head",headPos,rSpeed)
@@ -278,8 +290,10 @@ class Breather:
                 if self.rTimeSpeak < 0:
                     self.nState = Breather.kStateIdle
                     
+            print("%s: DBG: updatebody" % str(time.time()) )
             self.updateBodyPosture()
             if self.motion: updateHipRoll(self.motion)
+            print("%s: DBG: upbody2" % str(time.time()) )
             
             if self.nState == Breather.kStateSpeak:
                 self.updateHeadTalk()
@@ -288,6 +302,8 @@ class Breather:
                 
             if self.bListening:
                 self.updateHeadListen()
+                
+            print("%s: DBG: up head" % str(time.time()) )
                     
                     
             if self.strFilenameToSay != "" and self.nState != self.kStateSpeak:
@@ -306,6 +322,7 @@ class Breather:
                 if self.nState != Breather.kStateOut  and self.rFullness >= self.rTargetIn:
                     self.nState = Breather.kStateOut
             
+        print("%s: DBG: avant change state" % str(time.time()) )
         if self.nState != nPrevState:
             
             ######################################
@@ -374,6 +391,9 @@ class Breather:
                     self.rExcitationRate -= 0.02 # will mess  the nice simplex noise "average tends to 0"
                 else:
                     self.bReceiveExcitationFromExternal = False
+                    
+        print("\n%5.2fs: DBG: Breather.update: end" % time.time() )
+    # update - end
                 
     def isSpeaking( self ):
         return self.strFilenameToSay != "" or self.nState == Breather.kStateSpeak

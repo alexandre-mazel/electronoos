@@ -707,13 +707,13 @@ def init():
     if os.name == "nt":
         breather.loadBreathIn( "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/breath/selected_intake/")
         breather.loadBreathOut( "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/breath/selected_outtake/")
-        strTalkPath = "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut/rec3/" #rec2, for demos ou rec3
+        strTalkPath = "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut/rec4/" #rec2, for demos ou rec3
         strNoisePath = "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/"
         mem = None
     else:
         breather.loadBreathIn( "/home/nao/breath/selected_intake/")
         breather.loadBreathOut( "/home/nao/breath/selected_outtake/")
-        strTalkPath = "/home/nao/cut/rec3/"
+        strTalkPath = "/home/nao/cut/rec4/"
         strNoisePath = "/home/nao/"
         import naoqi
         mem = naoqi.ALProxy("ALMemory", "localhost", 9559)
@@ -744,16 +744,24 @@ def loadDialogsDemo():
     msgs.append("s032__ca_ne_te_gene_pas_quand_tu_racontes_des_nouvelles_personnes_pour_mieux_les_cones")
     return msgs
     
-def generateDialogCodeFromFolder( strSoundPath, nNumDialog = 0 ):
-    if nNumDialog != 0:
+def generateDialogCodeFromFolder( strSoundPath, nNumDialog = -1, strPostName="" ):
+    if nNumDialog == -1:
+        last_folder = strSoundPath.split('/')[-2]+"/" # last one is empty
+        nNumDialog = 0
+    elif nNumDialog != 0:
         last_folder = "dial%d/" % nNumDialog
-    else: 
+    else:
         last_folder = ""
-    for f in sorted(  os.listdir(strSoundPath) ):
-        f = f.replace(".wav","")
-        print('    msgs%d.append("%s%s")' % (nNumDialog,last_folder,f ) )
         
-def loadDialogsExpe():
+    print( '    msgs%s%d = []' % (strPostName,nNumDialog) )
+    try:
+        for f in sorted(  os.listdir(strSoundPath) ):
+            f = f.replace(".wav","")
+            print('    msgs%s%d.append("%s%s")' % (strPostName,nNumDialog,last_folder,f ) )
+    except Exception as err:
+        pass
+        
+def loadDialogsExpeRec3():
     """
     return list of list of files
     """
@@ -868,6 +876,60 @@ def loadDialogsExpe():
     
 
     return msgs1,msgs2,msgs_ecoute,msgs_relance,msgs_reponse
+    
+def loadDialogsExpeRec4():
+    """
+    return list of list of files
+    """
+    
+    # just one time to generate lines below
+    if 0:
+        generateDialogCodeFromFolder("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut/rec4/dial1/", 1)
+        generateDialogCodeFromFolder("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut/rec4/dial2/", 2)
+        generateDialogCodeFromFolder("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut/rec4/ecoute/", -1, "_ecoute")
+        generateDialogCodeFromFolder("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut/rec4/relance/", -1, "_relance")
+        generateDialogCodeFromFolder("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut/rec4/reponse/", -1, "_reponse")
+        generateDialogCodeFromFolder("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut/rec4/impossible/", -1, "_impossible")
+
+    msgs1 = []
+    msgs1.append("dial2/s_0003__je_vais_te_raconter_un_probleme_personnel_j_aimerais_savoir_ce_que_tu_en_penses")
+    msgs1.append("dial1/s_0020__j_ai_remarque_que_quand_la_lumiere_baisse_en_fin_de_journee_et_encore_plus_le_soir_des_sons_se_font_")
+    msgs1.append("dial1/s_0021__et_alors_j_ai_l_impression_qu_il_n_y_a_plus_personne_avec_moi_dans_les_bureaux")
+    msgs1.append("dial1/s_0022__et_aussi_d_apres_les_sons_que_j_entends_venant_des_rues_autour")
+    msgs1.append("dial1/s_0023__on_dirait_qu_elles_sont_vides_en_comparaison_de_l_agitation_et_du_brouhaha_de_la_journee")
+    msgs1.append("dial1/s_0025__ca_me_gene")
+    msgs1.append("dial1/s_0026__je_m_ennuie_je_ne_sais_pas_quoi_faire_je_me_sens_inutile")
+    msgs1.append("dial1/s_0027__moi_j_ai_toujours_besoin_de_discuter_et_de_voir_du_monde_quelle_que_soit_l_heure_du_jour_ou_de_la_nu")
+    msgs1.append("dial1/s_0028__est_ce_que_tu_peux_m_expliquer_la_difference_qu_il_y_a_entre_toi_et_moi")
+    msgs1.append("dial1/s_0029__est_ce_que_tu_t_ennuies_toi_la_nuit_a_toi_de_me_dire_maintenant_ce_que_tu_en_penses")
+    msgs1.append("dial1/s_0031__a_toi_de_me_dire_maintenant_ce_que_tu_en_penses")
+    msgs2 = []
+    msgs2.append("dial2/s_0003__je_vais_te_raconter_un_probleme_personnel_j_aimerais_savoir_ce_que_tu_en_penses")
+    msgs2.append("dial2/s_0004__j_ai_remarque_depuis_quelques_temps_que_vous")
+    msgs2.append("dial2/s_0005__les_humains")
+    msgs2.append("dial2/s_0006__mettez_les_trucs_bleus_sur_votre_figure")
+    msgs2.append("dial2/s_0007__du_coup")
+    msgs2.append("dial2/s_0008__on_voit_plus_que_vous_pensez")
+    msgs2.append("dial2/s_0010__ca_me_gene_ca_perturbe_certains_de_mes_programmes")
+    msgs2.append("dial2/s_0012__en_plus_vous_passez_votre_temps_a_le_mettre_et_a_l_enlever")
+    msgs2.append("dial2/s_0013__du_coup_j_ai_vraiment_l_impression_que_ca_vous_derange")
+    msgs2.append("dial2/s_0016__j_ai_remarque_que_personne_qui_rentre_qui_sort_de_cette_piece_le_porte_tout_le_temps_et_toi_des_fois")
+    msgs2.append("dial2/s_0017__moi_j_ai_pas_l_impression_d_avoir_besoin_de_ce_truc_bleu_est_ce_que_tu_peux_m_expliquer_la_differenc")
+    msgs2.append("dial2/s_0018__est_ce_que_ca_te_derange_toi_le_masque")
+    msgs2.append("dial2/s_0019__a_toi_de_me_dire_maintenant_ce_que_tu_en_penses")
+    msgs_ecoute0 = []
+    msgs_relance0 = []
+    msgs_relance0.append("relance/s_0000__peux_tu_m_en_dire_plus")
+    msgs_relance0.append("relance/s_0001__qu_en_penses_tu")
+    msgs_reponse0 = []
+    msgs_reponse0.append("reponse/soul_breath")
+    msgs_reponse0.append("reponse/soul_perlin")
+    msgs_impossible0 = []
+    msgs_impossible0.append("impossible/s_0033__je_ne_peux_pas_te_repondre_je_suis_desole")
+    msgs_impossible0.append("impossible/s_0034__ca_ne_fait_pas_partie_de_l_experience")
+    
+    return msgs1,msgs2,msgs_ecoute0,msgs_relance0,msgs_reponse0, msgs_impossible0
+
 
 def demo():
     strTalkPath,strNoisePath,mem = init()
@@ -962,7 +1024,7 @@ def expe( nMode = 1 ):
     bForceSpeak = False
     nIdxTxt = 0
     
-    msgDials = loadDialogsExpe()
+    msgDials = loadDialogsExpeRec4()
     
     listHeadOrientation = [
         [0,-0.087], # face
@@ -1159,12 +1221,12 @@ Catherine croyait que c'etait une voix de synthese.
 """
 
 Notes du 5 mars:
-1)enregistrer un grand soupir de soulagement avec respiration et un sans respiration pour après l'explication.
+1) enregistrer un grand soupir de soulagement avec respiration et un sans respiration pour après l'explication.
  grosse respi soulagé "ah ouaaaaais je suis content d'avoir appris cela" tres soulagé puis merci.
  et meme sans respi
 1b) + "je ne peux pas te répondre, ca ne fait pas partie de l'experience, je te demande simplement ton avis.". tout le temps actif.
 2) virer tout mouvement aléatoire pendant qu'il parle, meme entre 2 phrases d'un dialog
-3) ajouter au démarrage le settings des conditions 1/2/3/4 et gestion afférente.
+OK 3) ajouter au démarrage le settings des conditions 1/2/3/4 et gestion afférente.
 4) refaire schema du setup a jour
 5) simplifier interaction du passeur de test? (gfx?choregraphe)
 

@@ -174,11 +174,15 @@ def getSpeechInWav( strSoundFilename ):
     return retVal[0][0]
 
 def autocut(wavfile, rSilenceMinDuration = 0.3 ):
-    bPlaySound = 1
+    bPlaySound = 0
     bAutoRename = 1
     bAlternativeManualInputted = 1
+    bRemoveShortQuiet = 1
     bNormalise = 0
     strDstPath = "c:/generated/"
+    
+    print("INF: autocut, sound will be outputted to %s - no auto cleaning before!" % strDstPath )
+    
     try: os.makedirs(strDstPath)
     except: pass
     
@@ -203,6 +207,18 @@ def autocut(wavfile, rSilenceMinDuration = 0.3 ):
             txt = getSpeechInWav(strDstPath+name)
             if bAlternativeManualInputted:
                 if txt == "":
+                    # could be a short one
+                    if bRemoveShortQuiet:
+                        rDuration = s.getDuration()
+                        rPeak = s.getPeakValue()
+                        print("INF: Not recognized and peak: %4.2f duration is %5.2fs" % (rPeak,rDuration) )
+                        if s.getDuration() < 2. and rPeak < 0.08:
+                            os.unlink(strDstPath+name)
+                            continue
+                    if not bPlaySound:
+                        print("playing: %s" % name )
+                        pygame_tools.soundPlayer.playFile(strDstPath+name)
+                        time.sleep(0.1)
                     txt = input("Type what you just heard:\n")
             if txt != "":
                 newname = name.replace(".wav", "__" + txt[:100]+".wav")
@@ -217,18 +233,19 @@ if __name__ == "__main__":
     strPathRavir = "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut/"
     #~ strPathRavir = "d:/sounds/recordings/ravir"
     
-    if 1:
+    if 0:
         #~ changeVolumeInFolder(strPathRavir+"rec3/dial2/",2)
         changeVolumeInFolder(strPathRavir+"rec3/relance/",2)
     
-    if 0:
+    if 1:
         #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/rec2.wav")
         #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/rec1_fx.wav")
         #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/rec2_fx.wav",rSilenceMinDuration=0.5)
         #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/robot3.wav")
         #~ autocut("D:/sounds/recordings/robot4.wav")
         #~ autocut("D:/sounds/recordings/respi1.wav") # should cut in 14 or 15 seq
-        autocut("D:/sounds/recordings/ravir/r4.wav")
+        #~ autocut("D:/sounds/recordings/ravir3/r7.wav")
+        autocut("D:/sounds/recordings/ravir3/r8_rel.wav")
         
     if 0:
         strFile = strPathRavir + "/rec2/s032.wav"

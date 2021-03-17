@@ -14,7 +14,8 @@ import multiprocessing
 
 import sys
 sys.path.append("../alex_pytools/" )
-import misctools # just for cpumodel
+try: import misctools # just for cpumodel
+except: pass
 
 def getFreeDiskSpace():
     """
@@ -103,7 +104,11 @@ def print_version():
     print( "python version   : %d.%d.%d (%dbits) (%d core(s))" % (sys.version_info.major,sys.version_info.minor,sys.version_info.micro,8 * struct.calcsize("P"),multiprocessing.cpu_count()) )
     
 def print_cpu():
-    print( "cpu              : %s" % str(misctools.getCpuModel(bShort=True)) )
+    try:
+        strCpuModel = misctools.getCpuModel(bShort=True)
+    except:
+        strCpuModel = "TODO"
+    print( "cpu              : %s" % strCpuModel )
     
 def test_cpu_int( bPrint = True ):
     if bPrint: sys.stdout.write( "test_cpu_int2    : " )

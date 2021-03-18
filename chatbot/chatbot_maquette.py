@@ -24,22 +24,24 @@ def rectRotated( surface, color, pos, fill, border_radius, rotation_angle, rotat
         - rotation_angle in degree
         - rotation_offset_center: moving the center of the rotation: (-100,0) will turn the rectangle around a point 100 above center of the rectangle,
                             if (0,0), the rotation is at the center of the rectangle
-        - nAntialiasingRatio: set 1 for no antialising NB: very costly due to transparency per pixel of big area and ... on my MSTab4: rendering 4 rect at 8 => 4.9fps, at 4: 15fps
+        - nAntialiasingRatio: set 1 for no antialising NB: very costly due to transparency per pixel of big area and ... on my MSTab4: rendering 4 rect at 8 => 4.9fps, at 4: 15fps (timing when we were rendered at max(w,h)*max(w,h)
         """
-        bDebug = 1
+        bDebug = 0
         nRenderRatio = nAntialiasingRatio
         
-        
-        max_area = max( pos[2], pos[3] )
         # We need to add margin depending of the shape of the rectangle and the offset to center of rotation
         
         # idea: render everything around center of surface then copy the surface
         # render_margin is then half size of surface
+        
+        # intermediate rendering surface size
+        # it's important to find the smaller one to avoid bliting and scaling too much pixels
+        sw = pos[2]+abs(rotation_offset_center[0])*2
+        sh = pos[3]+abs(rotation_offset_center[1])*2
 
-        render_margin = max_area
-        max_area += render_margin
-        surfcenter = render_margin
-        s = pg.Surface( (max_area*nRenderRatio,max_area*nRenderRatio) )
+        surfcenterx = sw//2
+        surfcentery = sh//2
+        s = pg.Surface( (sw*nRenderRatio,sh*nRenderRatio) )
         s = s.convert_alpha()
         s.fill((0,0,0,0))
         if bDebug: s.fill((127,127,127))
@@ -47,13 +49,13 @@ def rectRotated( surface, color, pos, fill, border_radius, rotation_angle, rotat
         rw2=pos[2]//2 # halfwith of rectangle
         rh2=pos[3]//2
 
-        pg.draw.rect( s, color, ((surfcenter-rw2-rotation_offset_center[0])*nRenderRatio,(surfcenter-rh2-rotation_offset_center[1])*nRenderRatio,pos[2]*nRenderRatio,pos[3]*nRenderRatio), fill*nRenderRatio, border_radius=border_radius*nRenderRatio )
-        if bDebug: pg.draw.rect(s,(0,0,0),(surfcenter*nRenderRatio,surfcenter*nRenderRatio,2*nRenderRatio,2*nRenderRatio)) # draw center to debug
+        pg.draw.rect( s, color, ((surfcenterx-rw2-rotation_offset_center[0])*nRenderRatio,(surfcentery-rh2-rotation_offset_center[1])*nRenderRatio,pos[2]*nRenderRatio,pos[3]*nRenderRatio), fill*nRenderRatio, border_radius=border_radius*nRenderRatio )
+        if bDebug: pg.draw.rect(s,(0,0,0),(surfcenterx*nRenderRatio,surfcentery*nRenderRatio,2*nRenderRatio,2*nRenderRatio)) # draw center to debug
         s = pygame.transform.rotate( s, rotation_angle )        
         if nRenderRatio != 1: s = pygame.transform.smoothscale(s,(s.get_width()//nRenderRatio,s.get_height()//nRenderRatio))
-        incfromrotw = (s.get_width()-max_area)//2
-        incfromroth = (s.get_height()-max_area)//2
-        surface.blit( s, (pos[0]-surfcenter+rotation_offset_center[0]+rw2-incfromrotw,pos[1]-surfcenter+rotation_offset_center[1]+rh2-incfromroth) )
+        incfromrotw = (s.get_width()-sw)//2
+        incfromroth = (s.get_height()-sh)//2
+        surface.blit( s, (pos[0]-surfcenterx+rotation_offset_center[0]+rw2-incfromrotw,pos[1]-surfcentery+rotation_offset_center[1]+rh2-incfromroth) )
         
     
 def splitTextMultiline( strLongText, nNbrLetterMax = 20 ):
@@ -560,10 +562,13 @@ class Agent(object):
                 else:
                     self.rAngleArm1 = -2 +noise.getSimplexNoise((rTime)/3,20)*3
                     self.rAngleArm2 = -self.rAngleArm1
-            rectRotated(self.screen,colBotsSkin,(int(xArm1),int(yArm1),wArm,hArm), 0, border_radius=border_radius, rotation_angle=self.rAngleArm1, rotation_offset_center=(0,-60) )
+            rectRotated(self.screen,colBotsSkin,(int(xArm1),int(yArm1),wArm,hArm), 0, border_radius=border_radius, rotation_angle=self.rAngleArm1, rotation_offset_center=(0,-60),nAntialiasingRatio=1 )
             rectRotated(self.screen,colBlack,(int(xArm1)-1,int(yArm1)-1,wArm+1,hArm+1), 1, border_radius=border_radius, rotation_angle=self.rAngleArm1, rotation_offset_center=(0,-60),nAntialiasingRatio=4 )
             rectRotated(self.screen,colBotsSkin,(int(xArm2),int(yArm2),wArm,hArm), 0, border_radius=border_radius, rotation_angle=self.rAngleArm2, rotation_offset_center=(0,-60) )
             rectRotated(self.screen,colBlack,(int(xArm2)-1,int(yArm2)-1,wArm+1,hArm+1), 1, border_radius=border_radius, rotation_angle=self.rAngleArm2, rotation_offset_center=(0,-60),nAntialiasingRatio=4 )
+          
+            # test rectRotated:
+            #~ rectRotated(self.screen,colBlack,(100,300,wArm+1+100,hArm+1+5), 1, border_radius=border_radius, rotation_angle=self.rAngleArm2, rotation_offset_center=(110,100),nAntialiasingRatio=4)
           
         self.screen.blit(self.imBot, (xbot, ybot))
         

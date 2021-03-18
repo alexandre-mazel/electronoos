@@ -17,6 +17,36 @@ import os
 import pygame as pg
 import pygame.freetype  # Import the freetype module.
 
+def splitTextMultiline( strLongText, nNbrLetterMax = 20 ):
+    """
+    Insert "\n" in a long text
+    - strLongText: a long text, who can already include some \n
+    """
+    words = [word.split(' ') for word in strLongText.splitlines()]
+    print(words)
+    out = ""
+    
+    for j in range(len(words)):
+        txt = ""
+        line = words[j]
+        for word in line:
+            if len(txt)+len(word)>nNbrLetterMax:
+                out += txt
+                if txt != "":
+                    out += "\n"
+                txt = word
+            else:
+                if txt != "":
+                    txt += " "
+                txt += word
+        out += txt
+        if j < len(words)-1:
+            out += "\n"
+            
+    print("out: '%s'" % out)
+    return out
+    
+
 def renderTxtMultiline(surface, text, pos, font, color=pygame.Color('black'), nWidthMax = -1):
     """
     nWidthMax: limit width to a specific size
@@ -91,7 +121,8 @@ def renderTxtMultiline(surface, text, pos, font, color=pygame.Color('black'), nW
 
 def renderTxtMultilineCentered(surface, text, pos, font, color=pygame.Color('black'), nWidthMax = -1, nWidthTotal = -1, nHeightTotal = -1):
     """
-    nWidthMax: limit width to a specific size
+    - nWidthMax: limit width to a specific size
+    - nWidthTotal: nWidthTotal: max space to render
     return the rect
     """
     bVerbose = False
@@ -366,6 +397,8 @@ class Agent(object):
         self.timeStartSpeak = pg.time.get_ticks()/1000
         self.rDurationSpeak = len(txt)/20
         self.strTxtSpeak = txt
+        for i in range(len(astrAnswers)):
+            astrAnswers[i] = splitTextMultiline(astrAnswers[i],12)
         self.astrAnswers = astrAnswers
         
     def isSpeaking(self):
@@ -457,6 +490,21 @@ class Agent(object):
             xbot += 300*(rTime-self.timeBotsStartExit)/rTimeBotsInOut
         
         round_rect(self.screen, (xmargin,ycur,warea,harea), colBlue1, 10, 0)
+        if 1:
+            # draw arms
+            xArm1 = xbot+8
+            yArm1 = ybot+161
+            
+            xArm2 = xbot+173
+            yArm2 = yArm1
+            wArm = 18
+            hArm = 140
+            border_radius = 3
+            pg.draw.rect(self.screen,colBotsSkin,(int(xArm1),int(yArm1),wArm,hArm), 0, border_radius=border_radius )
+            pg.draw.rect(self.screen,colBlack,(int(xArm1)-1,int(yArm1)-1,wArm+1,hArm+1), 1, border_radius=border_radius )
+            pg.draw.rect(self.screen,colBotsSkin,(int(xArm2),int(yArm2),wArm,hArm), 0, border_radius=border_radius )
+            pg.draw.rect(self.screen,colBlack,(int(xArm2)-1,int(yArm2)-1,wArm+1,hArm+1), 1, border_radius=border_radius )
+          
         self.screen.blit(self.imBot, (xbot, ybot))
         
 
@@ -495,7 +543,8 @@ class Agent(object):
 
         pg.draw.ellipse(self.screen,colBlack,(xEye1-wEye//2,yEye-hEye//2,wEye,hEye) )
         pg.draw.ellipse(self.screen,colBlack,(xEye2-wEye//2,yEye-hEye//2,wEye,hEye) )
-            
+        
+           
         
         if self.isSpeaking() and pg.time.get_ticks()/1000-self.timeStartSpeak < self.rDurationSpeak:
             # change mouth
@@ -549,11 +598,20 @@ class Agent(object):
         random.seed(1000) # tune to have a blink during the first question
         self.listQ = []
         #~ self.listQ.append(["C?", ["Oui", "bof", "Non", "car","or"]])
-        self.listQ.append(["Comparé à votre précédente mission chez Sephora, celle ci vous a t'elle paru plus agréable?", ["Oui", "Bof", "Non"]])
-        self.listQ.append(["Super, et quel aspect vous a le plus plu?", ["Le\ncadre", "Les\ncollégues", "Le\nmanager", "un\npeu\ntout"]])
-        self.listQ.append(["J'ai adoré discuter avec vous!",["Moi\naussi!", "C'étais\npas mal.", "Moi\npas trop..."]] )
-        self.listQ.append(["Merci et à bientot!",["De rien, au revoir!", "Bye!"]] )
+        #~ self.listQ.append(["Comparé à votre précédente mission chez Sephora, celle ci vous a t'elle paru plus agréable?", ["Oui", "Bof", "Non"]])
+        #~ self.listQ.append(["Super, et quel aspect vous a le plus plu?", ["Le\ncadre", "Les\ncollégues", "Le\nmanager", "un\npeu\ntout"]])
+        #~ self.listQ.append(["J'ai adoré discuter avec vous!",["Moi\naussi!", "C'étais\npas mal.", "Moi\npas trop..."]] )
+        #~ self.listQ.append(["Merci et à bientot!",["De rien, au revoir!", "Bye!"]] )
         #~ self.listQ.append(["Merci à bientot!",["De rien, au revoir! Grave de la grosse balle atomiaque de gros malade!", "Bye!"]] )
+        self.listQ.append(["Comment avez-vous pris connaissance de cette offre d’emploi ?",["sur notre site internet", "sur un jobboard", "par le bouche à oreille"]] )
+        self.listQ.append(["Quel est le niveau de votre rémunération actuelle ?",["de 20000 à 30000€ brut annuel", "de 30000 à 40000€", "plus de 50000€"]] )
+        self.listQ.append(["Combien de temps vous faut il pour rejoindre le lieu de travail ?",["jusqu’à 30min", "de 30 à 45min", "plus de 45min"]] )
+        self.listQ.append(["Quel est votre niveau d’anglais ?",["bilingual", "professional", "average"]] )
+        self.listQ.append(["Combien d’années d’expérience avez-vous à ce poste ?",["Moins de 2 ans", "entre 2 et 4", "5 ans et plus"]] )
+        self.listQ.append(["Combien d’années d’études post bac ?",["0", "2", "4 et plus"]] )
+        #~ self.listQ.append(["?",["", "", ""]] )
+        
+        
         self.nNumQ = 0
         #~ self.nNumQ = 1;self.listQ[self.nNumQ][0]="C"
         #~ print(listQ)

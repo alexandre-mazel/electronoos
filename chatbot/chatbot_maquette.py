@@ -9,6 +9,8 @@ import misctools
 sys.path.append("../../rounded-rects-pygame/" ) # for roundrects
 from roundrects import round_rect
 from roundrects import aa_round_rect as round_rect
+
+import math
 import noise
 import random
 import time
@@ -17,17 +19,24 @@ import os
 import pygame as pg
 import pygame.freetype  # Import the freetype module.
 
-def rectRotated( surface, color, pos, fill, border_radius, angle ):
+def rectRotated( surface, color, pos, fill, border_radius, rotation_angle, rotation_offset_center = (0,0) ):
         """
-        - angle in degree
+        - rotation_angle in degree
+        - rotation_offset_center: moving the center of the rotation: (-100,0) will turn the rectangle around a point 100 above center of the rectangle
         """
         max_area = max( pos[2], pos[3] )
+        if 1:
+            # add big margin for potential rotation:
+            # idea: render everything around center of surface then copy the surface
+            # render_margin is then half size of surface
+            render_margin = max_area
+            max_area += render_margin
         s = pg.Surface( (max_area,max_area) )
         s = s.convert_alpha()
         s.fill((0,0,0,0))
-        pg.draw.rect( s, color, (0,0,pos[2],pos[3]), fill, border_radius=border_radius )
-        s = pygame.transform.rotate( s, angle )
-        surface.blit( s, (pos[0],pos[1]) )
+        pg.draw.rect( s, color, (-rotation_offset_center[0],-rotation_offset_center[1],pos[2],pos[3]), fill, border_radius=border_radius )
+        s = pygame.transform.rotate( s, rotation_angle )
+        surface.blit( s, (pos[0]+rotation_offset_center[0]*math.cos(rotation_angle*math.pi/180)-rotation_offset_center[1]*math.sin(rotation_angle*math.pi/180),pos[1]+rotation_offset_center[1]) )
     
     
     
@@ -510,16 +519,17 @@ class Agent(object):
             yArm1 = ybot+161
             
             xArm2 = xbot+173
+            xArm2 = xArm1
             yArm2 = yArm1
             wArm = 18
             hArm = 140
             border_radius = 3
-            rectRotated(self.screen,colBotsSkin,(int(xArm1),int(yArm1),wArm,hArm), 0, border_radius=border_radius, angle=45 )
-            rectRotated(self.screen,colBlack,(int(xArm1)-1,int(yArm1)-1,wArm+1,hArm+1), 1, border_radius=border_radius, angle=45 )
+            rectRotated(self.screen,colBotsSkin,(int(xArm1),int(yArm1),wArm,hArm), 0, border_radius=border_radius, rotation_angle=-45, rotation_offset_center=(0,-60) )
+            rectRotated(self.screen,colBlack,(int(xArm1)-1,int(yArm1)-1,wArm+1,hArm+1), 1, border_radius=border_radius, rotation_angle=-45, rotation_offset_center=(0,-60) )
             pg.draw.rect(self.screen,colBotsSkin,(int(xArm2),int(yArm2),wArm,hArm), 0, border_radius=border_radius )
-            pg.draw.rect(self.screen,colBlack,(int(xArm2)-1,int(yArm2)-1,wArm+1,hArm+1), 1, border_radius=border_radius )
+            rectRotated(self.screen,colBlack,(int(xArm2)-1,int(yArm2)-1,wArm+1,hArm+1), 1, border_radius=border_radius, rotation_angle=45, rotation_offset_center=(0,-60) )
           
-        self.screen.blit(self.imBot, (xbot, ybot))
+        #~ self.screen.blit(self.imBot, (xbot, ybot))
         
 
         xmouth = xbot+101

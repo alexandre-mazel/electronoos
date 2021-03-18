@@ -17,6 +17,20 @@ import os
 import pygame as pg
 import pygame.freetype  # Import the freetype module.
 
+def rectRotated( surface, color, pos, fill, border_radius, angle ):
+        """
+        - angle in degree
+        """
+        max_area = max( pos[2], pos[3] )
+        s = pg.Surface( (max_area,max_area) )
+        s = s.convert_alpha()
+        s.fill((0,0,0,0))
+        pg.draw.rect( s, color, (0,0,pos[2],pos[3]), fill, border_radius=border_radius )
+        s = pygame.transform.rotate( s, angle )
+        surface.blit( s, (pos[0],pos[1]) )
+    
+    
+    
 def splitTextMultiline( strLongText, nNbrLetterMax = 20 ):
     """
     Insert "\n" in a long text
@@ -500,8 +514,8 @@ class Agent(object):
             wArm = 18
             hArm = 140
             border_radius = 3
-            pg.draw.rect(self.screen,colBotsSkin,(int(xArm1),int(yArm1),wArm,hArm), 0, border_radius=border_radius )
-            pg.draw.rect(self.screen,colBlack,(int(xArm1)-1,int(yArm1)-1,wArm+1,hArm+1), 1, border_radius=border_radius )
+            rectRotated(self.screen,colBotsSkin,(int(xArm1),int(yArm1),wArm,hArm), 0, border_radius=border_radius, angle=45 )
+            rectRotated(self.screen,colBlack,(int(xArm1)-1,int(yArm1)-1,wArm+1,hArm+1), 1, border_radius=border_radius, angle=45 )
             pg.draw.rect(self.screen,colBotsSkin,(int(xArm2),int(yArm2),wArm,hArm), 0, border_radius=border_radius )
             pg.draw.rect(self.screen,colBlack,(int(xArm2)-1,int(yArm2)-1,wArm+1,hArm+1), 1, border_radius=border_radius )
           

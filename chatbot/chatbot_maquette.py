@@ -43,7 +43,6 @@ def rectRotated( surface, color, pos, fill, border_radius, rotation_angle, rotat
         rw2=pos[2]//2 # halfwith of rectangle
         rh2=pos[3]//2
 
-        
         pg.draw.rect( s, color, (surfcenter-rw2-rotation_offset_center[0],surfcenter-rh2-rotation_offset_center[1],pos[2],pos[3]), fill, border_radius=border_radius )
         if bDebug: pg.draw.rect(s,(0,0,0),(surfcenter,surfcenter,2,2)) # draw center to debug
         s = pygame.transform.rotate( s, rotation_angle )
@@ -516,8 +515,17 @@ class Agent(object):
         warea = w-xmargin*2
         harea = 500
         
+        
+        if self.isSpeaking():
+            bWritingQuestion = pg.time.get_ticks()/1000-self.timeStartSpeak < self.rDurationSpeak
+        else:
+            bWritingQuestion = False
+            
         xbot = xmargin+warea-self.imBot.get_rect().size[0]+xmargin//2 + 6
         ybot = ycur+harea-self.imBot.get_rect().size[1]#+ymargin//2
+        
+        if bWritingQuestion:
+            ybot += noise.getSimplexNoise(rTime/2,100)*4
         
         rTimeBotsInOut = 2.
         if rTime < rTimeBotsInOut:
@@ -527,11 +535,7 @@ class Agent(object):
             xbot += 300*(rTime-self.timeBotsStartExit)/rTimeBotsInOut
         
         round_rect(self.screen, (xmargin,ycur,warea,harea), colBlue1, 10, 0)
-        
-        if self.isSpeaking():
-            bWritingQuestion = pg.time.get_ticks()/1000-self.timeStartSpeak < self.rDurationSpeak
-        else:
-            bWritingQuestion = False
+
             
         if 1:
             # draw arms

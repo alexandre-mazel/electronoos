@@ -397,6 +397,8 @@ class Agent(object):
         self.bInBlink = False
         self.timeBotsStartExit = 0
         
+        self.rAngleArm1 = 0
+        
         self.strTxtSpeak = ""
         
         self.buttonManager = ButtonManager()
@@ -525,23 +527,36 @@ class Agent(object):
             xbot += 300*(rTime-self.timeBotsStartExit)/rTimeBotsInOut
         
         round_rect(self.screen, (xmargin,ycur,warea,harea), colBlue1, 10, 0)
+        
+        if self.isSpeaking():
+            bWritingQuestion = pg.time.get_ticks()/1000-self.timeStartSpeak < self.rDurationSpeak
+        else:
+            bWritingQuestion = False
+            
         if 1:
             # draw arms
             xArm1 = xbot+8
             yArm1 = ybot+161
             
             xArm2 = xbot+173
-            xArm2 = xArm1
             yArm2 = yArm1
             wArm = 18
             hArm = 140
             border_radius = 3
-            rectRotated(self.screen,colBotsSkin,(int(xArm1),int(yArm1),wArm,hArm), 0, border_radius=border_radius, rotation_angle=-45, rotation_offset_center=(0,-60) )
-            #~ rectRotated(self.screen,colBlack,(int(xArm1)-1,int(yArm1)-1,wArm+1,hArm+1), 1, border_radius=border_radius, rotation_angle=-45, rotation_offset_center=(0,-60) )
-            pg.draw.rect(self.screen,colBotsSkin,(int(xArm2),int(yArm2),wArm,hArm), 1, border_radius=border_radius )
-            #~ rectRotated(self.screen,colBlack,(int(xArm2)-1,int(yArm2)-1,wArm+1,hArm+1), 1, border_radius=border_radius, rotation_angle=45, rotation_offset_center=(0,-60) )
+            
+            if noise.getSimplexNoise(rTime*2) > 0.3 or 1:
+                if bWritingQuestion:
+                    self.rAngleArm1 = -20+ noise.getSimplexNoise((rTime)*4,20)*20
+                    self.rAngleArm2 =  20 - noise.getSimplexNoise((rTime)*4,30)*20
+                else:
+                    self.rAngleArm1 = -2 +noise.getSimplexNoise((rTime)/3,20)*3
+                    self.rAngleArm2 = -self.rAngleArm1
+            rectRotated(self.screen,colBotsSkin,(int(xArm1),int(yArm1),wArm,hArm), 0, border_radius=border_radius, rotation_angle=self.rAngleArm1, rotation_offset_center=(0,-60) )
+            rectRotated(self.screen,colBlack,(int(xArm1)-1,int(yArm1)-1,wArm+1,hArm+1), 1, border_radius=border_radius, rotation_angle=self.rAngleArm1, rotation_offset_center=(0,-60) )
+            rectRotated(self.screen,colBotsSkin,(int(xArm2),int(yArm2),wArm,hArm), 0, border_radius=border_radius, rotation_angle=self.rAngleArm2, rotation_offset_center=(0,-60) )
+            rectRotated(self.screen,colBlack,(int(xArm2)-1,int(yArm2)-1,wArm+1,hArm+1), 1, border_radius=border_radius, rotation_angle=self.rAngleArm2, rotation_offset_center=(0,-60) )
           
-        #~ self.screen.blit(self.imBot, (xbot, ybot))
+        self.screen.blit(self.imBot, (xbot, ybot))
         
 
         xmouth = xbot+101
@@ -582,7 +597,7 @@ class Agent(object):
         
            
         
-        if self.isSpeaking() and pg.time.get_ticks()/1000-self.timeStartSpeak < self.rDurationSpeak:
+        if self.isSpeaking() and bWritingQuestion:
             # change mouth
             pg.draw.rect(self.screen,colBotsSkin,(xmouth-wmouth//2,ymouth-hmouth//2,wmouth,hmouth) )
             
@@ -659,7 +674,7 @@ class Agent(object):
             self.event_loop()
             rTime = pg.time.get_ticks()/1000
             nTime = int(rTime)
-            if rTime >= 3. and not self.isSpeaking():
+            if rTime >= 4. and not self.isSpeaking():
                 #~ self.speak()
                 #~ self.nNumQ += 1
                 if self.nNumQ < len(self.listQ):

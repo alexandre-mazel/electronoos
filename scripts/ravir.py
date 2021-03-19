@@ -545,9 +545,9 @@ class Perliner:
         if self.motion != None:
             
             
-            rPosInc = noise.getSimplexNoise(self.timeLastUpdate)*0.2
+            rPosInc = noise.getSimplexNoise(self.timeLastUpdate)*self.rAmp
             rTime = 1.
-            self.motion.post.angleInterpolation( self.astrChain, [rPosInc,(math.pi/2)-rPosInc*self.rCoefArmAmp,(math.pi/2)-rPosInc*self.rCoefArmAmp], rTime, True )
+            self.motion.post.angleInterpolation( self.astrChain, [rPosInc,(math.pi/2)+rPosInc*self.rCoefArmAmp,(math.pi/2)+rPosInc*self.rCoefArmAmp], rTime, True )
 
         if self.bUseSound:
             strPath = self.strNoisePath
@@ -1272,6 +1272,10 @@ prochaine journée: paufineage
 coup d'apres: reglage des caméras et reglage complet
 
 Ce qu'il manque, c'est une belle écoute active avec detection de voix et hunhun a la fin des phrases.
+
+Notes du 19 Mars:
+- ajouter un etat: lire un wav avec un profil prédeterminé de volume d'air (pour soulage breath)
+- ajouter mouvement du bras quand parles
 """
 
 if __name__ == "__main__":

@@ -50,14 +50,14 @@ def updateHipRoll(motion):
     if noise.getSimplexNoise(time.time(),100)<0.8:
         return
     
-    print("%s: DBG: hiproll: avant noise" % str(time.time()) )
+    #~ print("%s: DBG: hiproll: avant noise" % str(time.time()) )
     rPos = noise.getSimplexNoise(time.time()*0.3)*0.1
-    print("%s: DBG: hiproll: apres noise, avant angle" % str(time.time()) )
+    #~ print("%s: DBG: hiproll: apres noise, avant angle" % str(time.time()) )
     #~ rTime = random.random()*3+0.6
     rSpeed = random.random()*0.2
     #~ motion.post.angleInterpolation( "HipRoll", rPos, rTime, True ) # NB: LE POSTE NE POST PAS (pb a cause du meme proxy utilisé en meme temps???)
     motion.setAngles( "HipRoll", rPos, rSpeed )
-    print("%s: DBG: hiproll: apres angle posted" % str(time.time()) )
+    #~ print("%s: DBG: hiproll: apres angle posted" % str(time.time()) )
 
 class Breather:
     kStateIdle = 0
@@ -205,15 +205,16 @@ class Breather:
             if rFullness > 1.6:
                 self.rFullness = 1.6 # we could have lock it to 1, but more is fine also (let's track some bugs) # seen once at 3.53 and the robot hadn't fall!
             rPos = rMin+self.rFullness*(rMax-rMin)
-            print("%s: DBG: avant body setangles" % str(time.time()) )
+            #~ print("%s: DBG: avant body setangles" % str(time.time()) )
             self.motion.setAngles(self.astrChain,[rPos+self.rOffsetHip,(math.pi/2)+rPos*self.rCoefArmAmp,(math.pi/2)+rPos*self.rCoefArmAmp],0.6)
-            print("%s: DBG: apres body setangles" % str(time.time()) )
+            #~ print("%s: DBG: apres body setangles" % str(time.time()) )
 
     def updateHeadTalk(self):
         if self.motion != None:
             rOffset = -0.2
             rInc = 0.02+random.random()*0.2+rOffset
-            self.motion.setAngles("HeadPitch", rInc, random.random()/15. )
+            self.motion.setAngles("HeadPitch", rInc, random.random()/20. )
+            self.lastHeadMove = time.time() +3. # prevent idle head look between two sentences
 
     def updateHeadListen(self):
         if self.motion != None:
@@ -221,7 +222,8 @@ class Breather:
             if random.random()<0.9:
                 return
             rInc = 0.02+random.random()*0.1+rOffset
-            self.motion.setAngles("HeadPitch", rInc, random.random()/30. )            
+            self.motion.setAngles("HeadPitch", rInc, random.random()/30. )     
+            self.lastHeadMove = time.time() +3. # prevent idle head look between two sentences
            
     def setHeadIdleLook( self, listHeadOrientation, ratioTimeFirst ):
         self.listHeadOrientation = listHeadOrientation
@@ -249,9 +251,9 @@ class Breather:
                 rSpeed = 0.2
             headPos = self.listHeadOrientation[idx]
             try:
-                print("%s: DBG: avant head kill task" % str(time.time()) )
+                #~ print("%s: DBG: avant head kill task" % str(time.time()) )
                 self.motion.killTask(self.idMoveHead)
-                print("%s: DBG: apres head kill task" % str(time.time()) )
+                #~ print("%s: DBG: apres head kill task" % str(time.time()) )
             except BaseException as err:
                 print("WRN: stopping task %d failed: %s" % (self.idMoveHead,err) )
             self.idMoveHead=self.motion.post.angleInterpolationWithSpeed("Head",headPos,rSpeed)
@@ -261,7 +263,9 @@ class Breather:
         rTimeSinceLastUpdate = time.time() - self.timeLastUpdate
         self.timeLastUpdate = time.time()
         
-        print("\n%5.2fs: DBG: Breather.update: state: %s, rFullness: %4.2f, rExcitation: %5.1f, self.rTimeIdle: %5.2f, self.rTimeSpeak: %5.2f, rTimeSinceLastUpdate: %5.2f" % (time.time(),self.nState,self.rFullness,self.rExcitationRate, self.rTimeIdle,self.rTimeSpeak,rTimeSinceLastUpdate) )
+        bVerbose = 0
+        
+        if bVerbose: print("\n%5.2fs: DBG: Breather.update: state: %s, rFullness: %4.2f, rExcitation: %5.1f, self.rTimeIdle: %5.2f, self.rTimeSpeak: %5.2f, rTimeSinceLastUpdate: %5.2f" % (time.time(),self.nState,self.rFullness,self.rExcitationRate, self.rTimeIdle,self.rTimeSpeak,rTimeSinceLastUpdate) )
         
         nPrevState = self.nState
         
@@ -290,10 +294,10 @@ class Breather:
                 if self.rTimeSpeak < 0:
                     self.nState = Breather.kStateIdle
                     
-            print("%s: DBG: updatebody" % str(time.time()) )
+            #~ print("%s: DBG: updatebody" % str(time.time()) )
             self.updateBodyPosture()
             if self.motion: updateHipRoll(self.motion)
-            print("%s: DBG: upbody2" % str(time.time()) )
+            #~ print("%s: DBG: upbody2" % str(time.time()) )
             
             if self.nState == Breather.kStateSpeak:
                 self.updateHeadTalk()
@@ -303,7 +307,7 @@ class Breather:
             if self.bListening:
                 self.updateHeadListen()
                 
-            print("%s: DBG: up head" % str(time.time()) )
+            #~ print("%s: DBG: up head" % str(time.time()) )
                     
                     
             if self.strFilenameToSay != "" and self.nState != self.kStateSpeak:
@@ -322,7 +326,7 @@ class Breather:
                 if self.nState != Breather.kStateOut  and self.rFullness >= self.rTargetIn:
                     self.nState = Breather.kStateOut
             
-        print("%s: DBG: avant change state" % str(time.time()) )
+        #~ print("%s: DBG: avant change state" % str(time.time()) )
         if self.nState != nPrevState:
             
             ######################################
@@ -392,7 +396,7 @@ class Breather:
                 else:
                     self.bReceiveExcitationFromExternal = False
                     
-        print("\n%5.2fs: DBG: Breather.update: end" % time.time() )
+        if bVerbose: print("\n%5.2fs: DBG: Breather.update: end" % time.time() )
     # update - end
                 
     def isSpeaking( self ):
@@ -564,6 +568,7 @@ class Perliner:
             rOffset = -0.2
             rInc = 0.02+random.random()*0.2+rOffset
             self.motion.setAngles("HeadPitch", rInc, random.random()/15. )
+            self.lastHeadMove = time.time() +3. # prevent idle head look between two sentences
 
     def updateHeadListen(self):
         if self.motion != None:
@@ -571,7 +576,8 @@ class Perliner:
             if random.random()<0.9:
                 return
             rInc = 0.02+random.random()*0.1+rOffset
-            self.motion.setAngles("HeadPitch", rInc, random.random()/30. )            
+            self.motion.setAngles("HeadPitch", rInc, random.random()/30. )
+            self.lastHeadMove = time.time() +3. # prevent idle head look between two sentences            
            
     def setHeadIdleLook( self, listHeadOrientation, ratioTimeFirst ):
         self.listHeadOrientation = listHeadOrientation
@@ -599,9 +605,9 @@ class Perliner:
                 rSpeed = 0.2
             headPos = self.listHeadOrientation[idx]
             try:
-                print("%s: DBG: avant head kill task" % str(time.time()) )
+                #~ print("%s: DBG: avant head kill task" % str(time.time()) )
                 self.motion.killTask(self.idMoveHead)
-                print("%s: DBG: apres head kill task" % str(time.time()) )
+                #~ print("%s: DBG: apres head kill task" % str(time.time()) )
             except BaseException as err:
                 print("WRN: stopping task %d failed: %s" % (self.idMoveHead,err) )
             self.idMoveHead=self.motion.post.angleInterpolationWithSpeed("Head",headPos,rSpeed)
@@ -611,7 +617,8 @@ class Perliner:
         rTimeSinceLastUpdate = time.time() - self.timeLastUpdate
         self.timeLastUpdate = time.time()
         
-        print("\n%5.2fs: DBG: Perliner.update: state: %s, self.rTimeIdle: %5.2f, self.rTimeSpeak: %5.2f, rTimeSinceLastUpdate: %5.2f" % (time.time(),self.nState,self.rTimeIdle,self.rTimeSpeak,rTimeSinceLastUpdate) )
+        bVerbose = False
+        if bVerbose: print("\n%5.2fs: DBG: Perliner.update: state: %s, self.rTimeIdle: %5.2f, self.rTimeSpeak: %5.2f, rTimeSinceLastUpdate: %5.2f" % (time.time(),self.nState,self.rTimeIdle,self.rTimeSpeak,rTimeSinceLastUpdate) )
         
         nPrevState = self.nState
         
@@ -674,6 +681,9 @@ class Perliner:
                 #~ self.motion.rest()
             
             print("%5.2fs: INF: Perliner.update: new state: %s" % (time.time(),self.nState) )
+            
+        if bVerbose: print("\n%5.2fs: DBG: Perliner.update: end" % time.time() )
+    # update - end
         
                 
     def isSpeaking( self ):
@@ -690,7 +700,7 @@ class Perliner:
         #~ self.strMessageToSay = txt
         self.strFilenameToSay = filename
         w = wav.Wav(filename,bLoadData=False)
-        self.rTimeSpeak = w.getDuration() + 0.3 # the perliner always add a slight pause between each sentences (corresponding au breath in time)
+        self.rTimeSpeak = w.getDuration() + 0.3 # the perliner always add a slight pause between each sentences (corresponding to the breathin time)
         print("INF: Perliner.sayFile %s: rTimeSpeak: %5.2fs" % (filename,self.rTimeSpeak) )
                 
     def increaseExcitation( self, rInc ):
@@ -926,7 +936,7 @@ def loadDialogsExpeRec4():
     msgs1.append("dial1/s_0027__moi_j_ai_toujours_besoin_de_discuter_et_de_voir_du_monde_quelle_que_soit_l_heure_du_jour_ou_de_la_nu")
     msgs1.append("dial1/s_0028__est_ce_que_tu_peux_m_expliquer_la_difference_qu_il_y_a_entre_toi_et_moi")
     msgs1.append("dial1/s_0029__est_ce_que_tu_t_ennuies_toi_la_nuit_a_toi_de_me_dire_maintenant_ce_que_tu_en_penses")
-    msgs1.append("dial1/s_0031__a_toi_de_me_dire_maintenant_ce_que_tu_en_penses")
+    #~ msgs1.append("dial1/s_0031__a_toi_de_me_dire_maintenant_ce_que_tu_en_penses")
     msgs2 = []
     msgs2.append("dial2/s_0003__je_vais_te_raconter_un_probleme_personnel_j_aimerais_savoir_ce_que_tu_en_penses")
     msgs2.append("dial2/s_0004__j_ai_remarque_depuis_quelques_temps_que_vous")
@@ -1071,9 +1081,9 @@ def expe( nMode = 1 ):
         
         rT = time.time() - rBeginT
         
-        print("update in")
+        #~ print("update in")
         animator.update()
-        print("update out")
+        #~ print("update out")
         
         time.sleep(0.05)
         #~ if nAnimatorIdx == 1: time.sleep(0.1)
@@ -1118,7 +1128,7 @@ def expe( nMode = 1 ):
  40: "lancer le dialogue, qui automatiquement déroule les phrases et enchaine (bloquer la tete pendant le dialogue) TODO",
  50: "    TODO: rallonger le dialogue => actuellement 25 et on aimerait 45. ca devrait etre avant la fin des questions quand la lumiere, le soir, les sons se font plus rare, et alors j'ai remarqué qu'il y avait plus personne et apres 22h, ... on enchaine la suite./ tourner autour du pot au début.",
  60: "ecoute active pendant x minutes, le gars parle.",
- 70: "le gars a arreter de parler; repasse en idle avec reponse content.",
+ 70: "le gars a arreter de parler; repasse en idle avec reponse soulager.",
  80: "",
  90: "head pressed, pour passer en rest",
 100: "    le deplace hors de la piece, puis le ramene",

@@ -7,7 +7,7 @@ sys.path.append(strElectroPath+"/alex_pytools/")
 #~ print sys.path
 import stringmatch
 
-def findInFile( filename, strToMatch ):
+def findInFile( filename, strToMatch, bVerbose = True ):
     """
     return the number of match
     """
@@ -17,14 +17,19 @@ def findInFile( filename, strToMatch ):
     file = open(filename,"rt")
     nCptLine = 1
     nNbrMatch = 0
+    nNbrErrorDecode = 0
     while 1:
         try:
             line = file.readline()
             if line == None or len(line) == 0:
                 break
         except UnicodeDecodeError as err:
-            print( "WRN: decode error: %s\n=> skipping line %d in '%s'" % (str(err),nCptLine, filename) )
+            if bVerbose: print( "WRN: decode error: %s\n=> skipping line %d in '%s'" % (str(err),nCptLine, filename) )
             nCptLine += 1
+            nNbrErrorDecode += 1
+            if nNbrErrorDecode > 3:
+                if bVerbose: print( "WRN: two much decode error, skipping '%s'\n" % filename )
+                return nNbrMatch
             continue
             
         #~ print(l)
@@ -60,7 +65,7 @@ def findInFile( filename, strToMatch ):
     return nNbrMatch
 
 
-def findInFiles( strPath, strToMatch, strFileMask = '*' ):
+def findInFiles( strPath, strToMatch, strFileMask = '*', bVerbose = True ):
     """
     return nbr files analysed, nbr file where match is found and nbr total lines
     """
@@ -73,13 +78,17 @@ def findInFiles( strPath, strToMatch, strFileMask = '*' ):
         strFullPath = strPath + os.sep + strFile
         if os.path.isdir(strFullPath):
             #recursively check the folders
-            na,nf,nl = findInFiles( strFullPath,strToMatch, mask)
+            na,nf,nl = findInFiles( strFullPath,strToMatch, mask,bVerbose=bVerbose)
             nbrFilesAnalysed += na
             nbrFilesWithMatch += nf
             nbrLines += nl
             continue
+        if 0:
+            if ".exe" in strFile or ".dll" in strFile:
+                if bVerbose: print("WRN: skipping binary style file: '%s'" % strFile)
+                continue
         if stringmatch.isMatch(strFile, strFileMask):
-            nl = findInFile(strFullPath,strToMatch)
+            nl = findInFile(strFullPath,strToMatch,bVerbose=bVerbose)
             if nl > 0:
                 nbrFilesWithMatch += 1
                 nbrLines += nl
@@ -91,7 +100,9 @@ if __name__ == "__main__":
         print( "\n  My Grep-clone v1.0\n\n  syntax: %s <string_to_match> <files_mask>\n\n  eg: %s a_word_in_a_line *.py\n  eg: %s *word1*word2* face*\n  eg: %s any_string_with_some* *" % ((sys.argv[0],)*4))
         exit(-1)
     print("\n")
+    bVerbose = 0 # TODO: analyse command line
     strToMatch,mask = sys.argv[1:3]
-    na,nf,nl = findInFiles(".",strToMatch,mask.lower())
+    print("INF: bVerbose: %s" % bVerbose ) 
+    na,nf,nl = findInFiles(".",strToMatch,mask.lower(),bVerbose=bVerbose)
     print("\nNbr Analysed Files: %d\nNbr Matching Files: %d\nNbr Total Line With Match: %d" % (na,nf,nl) )
             

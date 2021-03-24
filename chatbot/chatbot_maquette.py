@@ -531,6 +531,11 @@ class Agent(object):
         xbot = xmargin+warea-self.imBot.get_rect().size[0]+xmargin//2 + 6
         ybot = ycur+harea-self.imBot.get_rect().size[1]#+ymargin//2
         
+        if 1:
+            self.renderRobotStd(xbot,ybot)
+        else:
+            self.renderRobotObo(xbot,ybot)
+        
         if bWritingQuestion:
             ybot += noise.getSimplexNoise(rTime/2,100)*4
         

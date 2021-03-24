@@ -547,6 +547,7 @@ class Perliner:
             
             rPosInc = noise.getSimplexNoise(self.timeLastUpdate)*self.rAmp
             rTime = 1.
+            self.rCoefArmAmp = 2
             self.motion.post.angleInterpolation( self.astrChain, [rPosInc,(math.pi/2)+rPosInc*self.rCoefArmAmp,(math.pi/2)+rPosInc*self.rCoefArmAmp], rTime, True )
 
         if self.bUseSound:
@@ -1276,6 +1277,8 @@ Ce qu'il manque, c'est une belle écoute active avec detection de voix et hunhun 
 Notes du 19 Mars:
 - ajouter un etat: lire un wav avec un profil prédeterminé de volume d'air (pour soulage breath)
 - ajouter mouvement du bras quand parles
+- pquoi empile 150 appel en mode perliner ? (son?)
+- killer tout les motion restant au demarrage du script
 """
 
 if __name__ == "__main__":
@@ -1284,3 +1287,80 @@ if __name__ == "__main__":
      if len(sys.argv)>1:
          nMode = int(sys.argv[1])
      expe(nMode)
+     
+note chaise nao:
+Corentin: designer a Reims
+Diplome Juin21: perception de la curiosité de l'objet (non figuratif).
+Comment expliquer sa curiosité a l'egard de notre vie, de nos données.
+Apprentissage de l'objet. Qu'est ce qui le motive pour apprendre.
+Comment la forme de l'apprentissage peut etre ressenti par l'humain.
+Learning comme processus rendu visible par le mouvement robotique.
+
+Samuel: pref ensead, objet a comportement abstrait, art et design.
+ICRA: Chaire arts et robotiques. crais.
+notation du mvt avec Jean paul laumont.
+Questions relatives au question sur la respiration
+programme action nouveaux comanditaires.
+robotique non figuratives
+softrobotics: femto
+duriez inria a lille
+deformation et sonore
+rythme et amplitude
+question d'empathie
+Ont restreint expres les capacités visuelles de la chose pour se concentrer sur le mvt
+
+postdoc iviesse hugo (phd ircam): modelisation via IA base respiration, doit apprendre a animer une oeuvre en fonction
+du son, puis interaction mimetique ou empathique en fonction de la personne qui regarde l'oeuvre.
+postdoc: Il doit developper un outil pour modeliser des dynamiques respiratoires.
+
+La respiration, c'est de l'air qui bouge.
+Q: Si un objet respire, est ce que c'est parce qu'il est vivant ?
+empathie: entrer en relation avec ou sans dialogue ?
+
+Siege qui n'induit pas que c'est un bebe.
+Une assise, un systeme.
+
+Autonmisé dans son environnement, dans une chambre de malade ?
+La petite mascotte de compagnie.
+NAO sur une colonne: je peux bouger la colonne sans le toucher.
+"Un robot handicapé"
+On aimerait maintenir une impression inconsciente de sa présence.
+
+Présence pour quoi ?
+- lien affectif
+- se sentir rassuré? par la présence
+- sentiment de solitude ?
+- notion d'ennui
+- motivation: je me comporte pas pareil si y a qqun, je vais pas me mettre a jouer
+sur internet si il y a une présence.
+
+Maintenir une dyspnée experimentale a coté de qqun stresse plus que qqun de normal.
+
+Thomas deux interets:
+- pers seule dans sa chambre dhopital
+- pers seule dans un bureau
+
+gentiane venture: questionnaire pas orienté sur la robotique amené par un robot qui retient un peu la feuille
+du questionnaire ou pas.
+
+effet de présence testé au japon avec laumont et un japonais.
+Aspect culturel (animisme plus fort au japon qu'en france, relation au monde différent).
+Un mot japonais intraduisible existe pour ca.
+Religion ou animisme pensé que tout ce qu'on fait est evalué par une puissance supérieur.
+Psychanalitique: on est proche du surmoi.
+
+L'objet ne doit pas etre evocateur, ca doit etre qqchose de nouveau, pour ne pas
+pousser vers une représentation d'un humain (ou neutre) (!= chaise bebe => c'est un bebe).
+L'objet doit etre déplacable de maniere naturelle.
+
+Le robot pourrait se mettre automatiquement a la hauteur demandé par le robot.
+L'objet pourait etre un amplificateur de la respiration (chaise a bascule qui bouge avec le robot).
+Lumiere du mac qui respire, proche d'une respiration apaisée.
+Rapport a la continuité doux (fluide).
+
+Etape d'etude, legere en simulation.
+Etape 
+
+Doc sur PI a 3 à faire par Alexandre.
+Mesh surfacique, stl ou obj ci possible differente pose.
+

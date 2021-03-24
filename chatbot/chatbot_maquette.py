@@ -21,9 +21,9 @@ import pygame.freetype  # Import the freetype module.
 
 def rectRotated( surface, color, pos, fill, border_radius, rotation_angle, rotation_offset_center = (0,0), nAntialiasingRatio = 1 ):
         """
-        - rotation_angle in degree
+        - rotation_angle: in degree
         - rotation_offset_center: moving the center of the rotation: (-100,0) will turn the rectangle around a point 100 above center of the rectangle,
-                            if (0,0), the rotation is at the center of the rectangle
+                                             if (0,0) the rotation is at the center of the rectangle
         - nAntialiasingRatio: set 1 for no antialising NB: very costly due to transparency per pixel of big area and ... on my MSTab4: rendering 4 rect at 8 => 4.9fps, at 4: 15fps (timing when we were rendered at max(w,h)*max(w,h)
         """
         bDebug = 0
@@ -46,7 +46,7 @@ def rectRotated( surface, color, pos, fill, border_radius, rotation_angle, rotat
         s.fill((0,0,0,0))
         if bDebug: s.fill((127,127,127))
         
-        rw2=pos[2]//2 # halfwith of rectangle
+        rw2=pos[2]//2 # halfwidth of rectangle
         rh2=pos[3]//2
 
         pg.draw.rect( s, color, ((surfcenterx-rw2-rotation_offset_center[0])*nRenderRatio,(surfcentery-rh2-rotation_offset_center[1])*nRenderRatio,pos[2]*nRenderRatio,pos[3]*nRenderRatio), fill*nRenderRatio, border_radius=border_radius*nRenderRatio )

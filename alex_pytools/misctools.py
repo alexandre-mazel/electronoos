@@ -572,7 +572,7 @@ def ting():
     """
     play a bell or a simulated one if no bell available
     """
-    if playWav(getPathData()+"ting.wav",rSoundVolume=0.15):
+    if playWav(getPathData()+"ting.wav",rSoundVolume=0.10):
         return
     beep(1200, 100)
     time.sleep(200)
@@ -581,7 +581,7 @@ def bell():
     """
     play a bell or a simulated one if no bell available
     """
-    if playWav(getPathData()+"bell.wav",rSoundVolume=0.15):
+    if playWav(getPathData()+"bell.wav",rSoundVolume=0.10):
         return
     beep(440, 100)
     time.sleep(200)
@@ -590,7 +590,7 @@ def deepbell():
     """
     play a bell or a simulated one if no bell available ( as deep bell is long, it's an async method !!! 
     """
-    if playWav(getPathData()+"deep_bell.wav", bWaitEnd = False,rSoundVolume=0.15):
+    if playWav(getPathData()+"deep_bell.wav", bWaitEnd = False,rSoundVolume=0.10):
         return
     beep(330, 200)
    

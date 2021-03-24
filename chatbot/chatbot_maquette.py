@@ -279,7 +279,7 @@ class ButtonManager(object):
         surface is used just to know the available size
         """
         if self.font == None:
-            self.font = pygame.freetype.Font("../fonts/SF-Compact-Text-Semibold.otf", 15)
+            self.font = pygame.freetype.Font("../fonts/SF-Compact-Text-Semibold.otf", 12) # was 15
             self.font.pad = True
         if self.fontSmall == None:
             self.fontSmall = pygame.freetype.Font("../fonts/SF-Compact-Text-Semibold.otf", 12)
@@ -310,6 +310,9 @@ class ButtonManager(object):
                 nRealMarginX = nMarginX
             wButton = rect[2] + nRealMarginX*2
             hButton = rect[3] + nMarginY*2
+            print("hButton: %s" % hButton)
+            if hButton < 24:
+                hButton = 24 # evite les boutons a grosses boules aux extremites
             if not bAlignCenter:
                 #~ round_rect(surface,(x,y,wButton,hButton),colButton,11,0)
                 #~ surface.blit(txt_surface,(x+nRealMarginX,y+nMarginY))
@@ -457,84 +460,12 @@ class Agent(object):
         self.buttonManager.clearButtons()
         self.strTxtSpeak = ""
         
-
-    def draw(self):
-        #~ self.screen.blit(self.background, (0,0))
-        #~ self.screen.fill( pg.Color("lightslategrey") )
         
-        colBackground = (247,247,247)
-        colLight1 = (220,220,220)
-        colBlack = (0,0,0)
-        colDark1 = (22,22,22)
-        colBlue1 = (164,194,244)
+    def renderRobotStd(self,xbot,ybot,rTime,bWritingQuestion):
         colBotsSkin = (243,243,243)
         colBotsMicro = (153,153,153)
-        
-        fontSys = pygame.freetype.Font("../fonts/SF-UI-Display-Regular.otf", 20)
-        #~ fontSysSmall = pygame.freetype.Font("../fonts/SF-UI-Display-Regular.otf", 16)
-        fontSysSmall = pygame.freetype.Font("../fonts/SF-Compact-Text-Semibold.otf", 15)
-        fontTxt = pygame.freetype.Font("../fonts/SF-UI-Display-Regular.otf", 20)
-        
-        
-        w = self.w
-        h = self.h
-        
-        self.screen.fill( colBackground )
-
-        
-        # system
-        self.screen.blit(self.imTopBanner, (0+260+2, 0+10)) 
-        ycur = 10
-        
-        hour,min,sec =misctools.getTime()
-        #~ hour,min = 11,28
-        strTime = "%2d:%2d" % (hour,min)
-        textsurface,rect = fontSysSmall.render( strTime, (0, 0, 0) )
-        self.screen.blit(textsurface,(10+20+4 ,ycur+4))
-        
-        # title
-        ycur = 28+10
-        
-        for i in range(3):
-            y = ycur+i*6
-            pg.draw.line(self.screen, colDark1,(10+6+3,y),(30+6,y),2 )
-
-    
-        #~ fontSys = pg.font.SysFont('Comic Sans MS', 30)
-        #~ textsurface = fontSys.render('Faiska', False, (0, 0, 0))
-        #~ fontSys = pygame.freetype.SysFont('Verdana', 18)
-
-        #~ fontSys.underline = True
-        textsurface,rect = fontSys.render('Faiska', (0, 0, 0))
-        self.screen.blit(textsurface,(w//2-(rect[2]-rect[0])//2,ycur))
-        ycur += 24
-        
-        pg.draw.line(self.screen, colLight1,(0,ycur),(w,ycur) )
-        ycur += 1
-        
-        rTime = pg.time.get_ticks()/1000 #rTime in sec # the time of the game
-        
-        # screen
-        # round_rect(mat,(x,y,w,h),col1,round_size,border_size)
-        ycur += 20
-        xmargin=20
-        ymargin=20
-        warea = w-xmargin*2
-        harea = 500
-        
-        
-        if self.isSpeaking():
-            bWritingQuestion = pg.time.get_ticks()/1000-self.timeStartSpeak < self.rDurationSpeak
-        else:
-            bWritingQuestion = False
-            
-        xbot = xmargin+warea-self.imBot.get_rect().size[0]+xmargin//2 + 6
-        ybot = ycur+harea-self.imBot.get_rect().size[1]#+ymargin//2
-        
-        if 1:
-            self.renderRobotStd(xbot,ybot)
-        else:
-            self.renderRobotObo(xbot,ybot)
+        colBlack = (0,0,0)
+        colDark1 = (22,22,22)
         
         if bWritingQuestion:
             ybot += noise.getSimplexNoise(rTime/2,100)*4
@@ -545,8 +476,6 @@ class Agent(object):
             xbot += 300*(rTimeBotsInOut-rTime)
         elif self.timeBotsStartExit > 0:
             xbot += 300*(rTime-self.timeBotsStartExit)/rTimeBotsInOut
-        
-        round_rect(self.screen, (xmargin,ycur,warea,harea), colBlue1, 10, 0)
 
             
         if 1:
@@ -623,6 +552,186 @@ class Agent(object):
             #nMouthSize = (int(rTime)*3)%hmouth
             nMouthSize = int(abs(noise.getSimplexNoise(rTime*3))*hmouth)
             pg.draw.ellipse(self.screen,colDark1,(xmouth-nMouthSize,ymouth-nMouthSize//2,nMouthSize*2,nMouthSize) )
+            
+            # microphone over mouth
+            wmicro = 26
+            hmicro = 16
+            pg.draw.ellipse(self.screen,colBotsMicro,(xmouth-wmicro//2-26,ymouth-hmicro//2+2,wmicro,hmicro) )
+
+    def renderRobotObo(self,xbot,ybot,rTime,bWritingQuestion):
+        colBotsSkin = (243,243,243)
+        colBotsMicro = (153,153,153)
+        colBlack = (0,0,0)
+        colDark1 = (22,22,22)
+        
+        if bWritingQuestion:
+            ybot += noise.getSimplexNoise(rTime/2,100)*4
+        
+        rTimeBotsInOut = 2.
+        if rTime < rTimeBotsInOut:
+            # arrival
+            xbot += 300*(rTimeBotsInOut-rTime)
+        elif self.timeBotsStartExit > 0:
+            xbot += 300*(rTime-self.timeBotsStartExit)/rTimeBotsInOut
+
+            
+        if 1:
+            # draw arms
+            xArm1 = xbot+8
+            yArm1 = ybot+161
+            
+            xArm2 = xbot+173
+            yArm2 = yArm1
+            wArm = 18
+            hArm = 140
+            border_radius = 3
+            
+            if noise.getSimplexNoise(rTime*2) > 0.3 or 1:
+                if bWritingQuestion:
+                    self.rAngleArm1 = -20+ noise.getSimplexNoise((rTime)*4,20)*20
+                    self.rAngleArm2 =  20 - noise.getSimplexNoise((rTime)*4,30)*20
+                else:
+                    self.rAngleArm1 = -2 +noise.getSimplexNoise((rTime)/3,20)*3
+                    self.rAngleArm2 = -self.rAngleArm1
+            rectRotated(self.screen,colBotsSkin,(int(xArm1),int(yArm1),wArm,hArm), 0, border_radius=border_radius, rotation_angle=self.rAngleArm1, rotation_offset_center=(0,-60),nAntialiasingRatio=1 )
+            rectRotated(self.screen,colBlack,(int(xArm1)-1,int(yArm1)-1,wArm+1,hArm+1), 1, border_radius=border_radius, rotation_angle=self.rAngleArm1, rotation_offset_center=(0,-60),nAntialiasingRatio=4 )
+            rectRotated(self.screen,colBotsSkin,(int(xArm2),int(yArm2),wArm,hArm), 0, border_radius=border_radius, rotation_angle=self.rAngleArm2, rotation_offset_center=(0,-60) )
+            rectRotated(self.screen,colBlack,(int(xArm2)-1,int(yArm2)-1,wArm+1,hArm+1), 1, border_radius=border_radius, rotation_angle=self.rAngleArm2, rotation_offset_center=(0,-60),nAntialiasingRatio=4 )
+          
+            # test rectRotated:
+            #~ rectRotated(self.screen,colBlack,(100,300,wArm+1+100,hArm+1+5), 1, border_radius=border_radius, rotation_angle=self.rAngleArm2, rotation_offset_center=(110,100),nAntialiasingRatio=4)
+          
+        self.screen.blit(self.imBot, (xbot, ybot))
+        
+
+        xmouth = xbot+101
+        ymouth = ybot+96
+        wmouth = 40
+        hmouth = 30
+        
+        # animate bots
+        
+        xEye1=xbot+77
+        xEye2=xbot+122
+        yEye = ybot+54
+        wEyeMax = 30
+        hEyeMax = wEyeMax
+        pg.draw.rect(self.screen,colBotsSkin,(int(xEye1-wEyeMax//2),int(yEye-hEyeMax//2),wEyeMax,hEyeMax) )
+        pg.draw.rect(self.screen,colBotsSkin,(int(xEye2-wEyeMax//2),int(yEye-hEyeMax//2),wEyeMax,hEyeMax) )
+        
+        wEye = int( (wEyeMax+3)*(0.8+0.2*abs(noise.getSimplexNoise((rTime+10)/2))) )
+        hEye = wEye
+        
+        if self.bInBlink:
+            rTimeBlink = 0.1
+            rInBlink = (rTime - self.timeStartBlink)/rTimeBlink
+            if rInBlink >= 1.:
+                self.bInBlink = False
+            else:
+                if rInBlink < 0.5:
+                    hEye=int( (wEyeMax+3)*(0.5-rInBlink) )
+                else:
+                    hEye=int( (wEyeMax+3)*(rInBlink-0.5) )
+        else:
+            if random.random()>0.99:
+                self.bInBlink = True
+                self.timeStartBlink = rTime
+
+        pg.draw.ellipse(self.screen,colBlack,(xEye1-wEye//2,yEye-hEye//2,wEye,hEye) )
+        pg.draw.ellipse(self.screen,colBlack,(xEye2-wEye//2,yEye-hEye//2,wEye,hEye) )
+        
+           
+        
+        if self.isSpeaking() and bWritingQuestion:
+            # change mouth
+            pg.draw.rect(self.screen,colBotsSkin,(xmouth-wmouth//2,ymouth-hmouth//2,wmouth,hmouth) )
+            
+            #nMouthSize = (int(rTime)*3)%hmouth
+            nMouthSize = int(abs(noise.getSimplexNoise(rTime*3))*hmouth)
+            pg.draw.ellipse(self.screen,colDark1,(xmouth-nMouthSize,ymouth-nMouthSize//2,nMouthSize*2,nMouthSize) )
+            
+            # microphone over mouth
+            wmicro = 26
+            hmicro = 16
+            pg.draw.ellipse(self.screen,colBotsMicro,(xmouth-wmicro//2-26,ymouth-hmicro//2+2,wmicro,hmicro) )
+
+    def draw(self):
+        #~ self.screen.blit(self.background, (0,0))
+        #~ self.screen.fill( pg.Color("lightslategrey") )
+        
+        colBackground = (247,247,247)
+        colLight1 = (220,220,220)
+        colBlack = (0,0,0)
+        colDark1 = (22,22,22)
+        colBlue1 = (164,194,244)
+
+        
+        fontSys = pygame.freetype.Font("../fonts/SF-UI-Display-Regular.otf", 20)
+        #~ fontSysSmall = pygame.freetype.Font("../fonts/SF-UI-Display-Regular.otf", 16)
+        fontSysSmall = pygame.freetype.Font("../fonts/SF-Compact-Text-Semibold.otf", 15)
+        fontTxt = pygame.freetype.Font("../fonts/SF-UI-Display-Regular.otf", 20)
+        
+        
+        w = self.w
+        h = self.h
+        
+        self.screen.fill( colBackground )
+
+        
+        # system
+        self.screen.blit(self.imTopBanner, (0+260+2, 0+10)) 
+        ycur = 10
+        
+        hour,min,sec =misctools.getTime()
+        #~ hour,min = 11,28
+        strTime = "%2d:%2d" % (hour,min)
+        textsurface,rect = fontSysSmall.render( strTime, (0, 0, 0) )
+        self.screen.blit(textsurface,(10+20+4 ,ycur+4))
+        
+        # title
+        ycur = 28+10
+        
+        for i in range(3):
+            y = ycur+i*6
+            pg.draw.line(self.screen, colDark1,(10+6+3,y),(30+6,y),2 )
+
+    
+        #~ fontSys = pg.font.SysFont('Comic Sans MS', 30)
+        #~ textsurface = fontSys.render('Faiska', False, (0, 0, 0))
+        #~ fontSys = pygame.freetype.SysFont('Verdana', 18)
+
+        #~ fontSys.underline = True
+        textsurface,rect = fontSys.render('Faiska', (0, 0, 0))
+        self.screen.blit(textsurface,(w//2-(rect[2]-rect[0])//2,ycur))
+        ycur += 24
+        
+        pg.draw.line(self.screen, colLight1,(0,ycur),(w,ycur) )
+        ycur += 1
+        
+        rTime = pg.time.get_ticks()/1000 #rTime in sec # the time of the game
+        
+        # screen
+        # round_rect(mat,(x,y,w,h),col1,round_size,border_size)
+        ycur += 20
+        xmargin=20
+        ymargin=20
+        warea = w-xmargin*2
+        harea = 500
+        
+        
+        if self.isSpeaking():
+            bWritingQuestion = pg.time.get_ticks()/1000-self.timeStartSpeak < self.rDurationSpeak
+        else:
+            bWritingQuestion = False
+            
+        xbot = xmargin+warea-self.imBot.get_rect().size[0]+xmargin//2 + 6
+        ybot = ycur+harea-self.imBot.get_rect().size[1]#+ymargin//2
+        
+        round_rect(self.screen, (xmargin,ycur,warea,harea), colBlue1, 10, 0)
+        if 1:
+            self.renderRobotStd(xbot,ybot,rTime,bWritingQuestion)
+        else:
+            self.renderRobotObo(xbot,ybot,rTime,bWritingQuestion)
         
         if self.isSpeaking():
             # render question
@@ -638,11 +747,6 @@ class Agent(object):
                     txt += " "
             renderTxtMultiline( self.screen, txt, (xmargin*2,ycur+ymargin-5),fontTxt, colDark1,nWidthMax=300)
             ycur += harea+10
-        
-            # microphone over mouth
-            wmicro = 26
-            hmicro = 16
-            pg.draw.ellipse(self.screen,colBotsMicro,(xmouth-wmicro//2-26,ymouth-hmicro//2+2,wmicro,hmicro) )
 
             if nEnd >= len(self.strTxtSpeak):
                 self.renderUserButton( self.screen,(xmargin,ycur) )

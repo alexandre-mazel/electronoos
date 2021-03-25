@@ -591,7 +591,7 @@ class Agent(object):
 
     def renderRobotObo(self,xbot,ybot,rTime,bWritingQuestion):
 
-        xbot -= 50
+        xbot -= 50+60
         ybot -=20
         
         if bWritingQuestion:

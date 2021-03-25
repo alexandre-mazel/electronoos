@@ -236,7 +236,7 @@ def renderTxtMultilineCentered(surface, text, pos, font, color=pygame.Color('bla
 # renderTxtMultilineCentered - end
 
 class Button(object):
-    def __init__( self, txt, pos, size, margin, id=-1 ):
+    def __init__( self, txt, pos, size, margin, colText, colButton, colSelectedButton, id=-1 ):
         """
         - margin: spaces between button and text
         """
@@ -245,22 +245,24 @@ class Button(object):
         self.pos = pos
         self.size = size
         self.margin = margin
+        self.colText = colText
+        self.colButton = colButton
+        self.colSelectedButton = colSelectedButton
         
     def render( self, surface, font, bSelected=False ):
         """
         return painted rect position
         """
-        colTxt = (243,243,243)
-        colButton = (164//2,194//2,244//2)
-        colButtonSelected = (250//2,250//2,244//2)
         
         if bSelected:
-            colButton = colButtonSelected
+            colButton = self.colSelectedButton
+        else:
+            colButton = self.colButton
         
         #~ txt_surface, rect = font.render(self.txt, colTxt)
         round_rect(surface,self.pos+self.size,colButton,11,0)
         #~ surface.blit(txt_surface,(self.pos[0]+self.margin[0],self.pos[1]+self.margin[1]))
-        renderTxtMultilineCentered(surface,self.txt,(self.pos[0],self.pos[1]),font, colTxt,nWidthTotal = self.size[0], nHeightTotal=self.size[1])
+        renderTxtMultilineCentered(surface,self.txt,(self.pos[0],self.pos[1]),font, self.colText,nWidthTotal = self.size[0], nHeightTotal=self.size[1])
         
     def isOver(self,pos):
         if          pos[0] >= self.pos[0] and pos[0] < self.pos[0]+self.size[0] \
@@ -280,7 +282,7 @@ class ButtonManager(object):
     def hasButtons( self ):
         return len(self.aButtons) > 0
         
-    def createButtons( self, astrButton, surface, pos ):
+    def createButtons( self, astrButton, surface, pos, colTxt, colButton, colButtonSelected ):
         """
         surface is used just to know the available size
         """
@@ -322,7 +324,7 @@ class ButtonManager(object):
             if not bAlignCenter:
                 #~ round_rect(surface,(x,y,wButton,hButton),colButton,11,0)
                 #~ surface.blit(txt_surface,(x+nRealMarginX,y+nMarginY))
-                self.aButtons.append( Button(txt,(x,y),(wButton,hButton),(nRealMarginX,nMarginY)) )
+                self.aButtons.append( Button(txt,(x,y),(wButton,hButton),(nRealMarginX,nMarginY),colTxt, colButton, colButtonSelected) )
             else:
                 computedSize.append((x,y,wButton,hButton,nRealMarginX,nMarginY))
             x += wButton + nMarginX
@@ -352,7 +354,7 @@ class ButtonManager(object):
                     y += yVertical
                     yVertical += hButton+nMarginY*1
                     x = nRealMarginX
-                self.aButtons.append( Button(txt,(x,y),(wButton,hMax),(nRealMarginX,nMarginY)) )
+                self.aButtons.append( Button(txt,(x,y),(wButton,hMax),(nRealMarginX,nMarginY),colTxt, colButton, colButtonSelected) )
                 
      # createButtons - end
      
@@ -472,7 +474,14 @@ class Agent(object):
     
     def renderUserButton( self, surface, pos ):
         if not self.buttonManager.hasButtons():
-            self.buttonManager.createButtons(self.astrAnswers,surface,pos)
+            colTxt = (243,243,243)
+            colButton = (164//2,194//2,244//2)
+            colButtonSelected = (250//2,250//2,244//2)
+            if self.bAlternateColor:
+                colTxt = (0,0,0)
+                colButton = (222,217,102)
+                colButtonSelected = (191,144,0)                
+            self.buttonManager.createButtons(self.astrAnswers,surface,pos,colTxt,colButton,colButtonSelected)
         self.buttonManager.render(surface)
         
     def receiveAnswer(self,num):

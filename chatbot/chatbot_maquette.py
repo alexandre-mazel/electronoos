@@ -19,6 +19,12 @@ import os
 import pygame as pg
 import pygame.freetype  # Import the freetype module.
 
+def scaleImg( img,ratio):
+    s = img.get_rect().size
+    wdst = s[0]//ratio
+    img = pg.transform.scale(img, (wdst, int(wdst*s[1]/s[0])))
+    return img
+
 def rectRotated( surface, color, pos, fill, border_radius, rotation_angle, rotation_offset_center = (0,0), nAntialiasingRatio = 1 ):
         """
         - rotation_angle: in degree
@@ -400,9 +406,18 @@ class Agent(object):
         
         
         self.imBot = pg.image.load("robot_idle.png")
-        s = self.imBot.get_rect().size
-        wdst = s[0]//2
-        self.imBot = pg.transform.scale(self.imBot, (wdst, int(wdst*s[1]/s[0])))
+        self.imBot = scaleImg(self.imBot,2)
+
+        # obo part
+        self.imBotObo = pg.image.load("robot_idle_obo.png")
+        self.imBotObo = scaleImg(self.imBotObo,2)
+        self.imBotOboEyeL = pg.image.load("obo_leye.png")
+        self.imBotOboEyeL = scaleImg(self.imBotOboEyeL,2)
+        self.imBotOboEyeR = pg.image.load("obo_reye.png")
+        self.imBotOboEyeR = scaleImg(self.imBotOboEyeR,2)
+        self.imBotOboMouthSpeech = pg.image.load("obo_mouth_speech.png")
+        self.imBotOboMouthSpeech = scaleImg(self.imBotOboMouthSpeech,2)
+        
         self.bInBlink = False
         self.timeBotsStartExit = 0
         
@@ -558,67 +573,43 @@ class Agent(object):
             hmicro = 16
             pg.draw.ellipse(self.screen,colBotsMicro,(xmouth-wmicro//2-26,ymouth-hmicro//2+2,wmicro,hmicro) )
 
+
+
     def renderRobotObo(self,xbot,ybot,rTime,bWritingQuestion):
+        xbot -= 50
+        ybot -=20
         colBotsSkin = (243,243,243)
         colBotsMicro = (153,153,153)
         colBlack = (0,0,0)
         colDark1 = (22,22,22)
         
         if bWritingQuestion:
-            ybot += noise.getSimplexNoise(rTime/2,100)*4
-        
+            ybot += noise.getSimplexNoise(rTime/2,100)*8
+        else:
+            ybot += noise.getSimplexNoise(rTime/4,100)*3
+            
         rTimeBotsInOut = 2.
         if rTime < rTimeBotsInOut:
             # arrival
             xbot += 300*(rTimeBotsInOut-rTime)
         elif self.timeBotsStartExit > 0:
             xbot += 300*(rTime-self.timeBotsStartExit)/rTimeBotsInOut
-
             
-        if 1:
-            # draw arms
-            xArm1 = xbot+8
-            yArm1 = ybot+161
-            
-            xArm2 = xbot+173
-            yArm2 = yArm1
-            wArm = 18
-            hArm = 140
-            border_radius = 3
-            
-            if noise.getSimplexNoise(rTime*2) > 0.3 or 1:
-                if bWritingQuestion:
-                    self.rAngleArm1 = -20+ noise.getSimplexNoise((rTime)*4,20)*20
-                    self.rAngleArm2 =  20 - noise.getSimplexNoise((rTime)*4,30)*20
-                else:
-                    self.rAngleArm1 = -2 +noise.getSimplexNoise((rTime)/3,20)*3
-                    self.rAngleArm2 = -self.rAngleArm1
-            rectRotated(self.screen,colBotsSkin,(int(xArm1),int(yArm1),wArm,hArm), 0, border_radius=border_radius, rotation_angle=self.rAngleArm1, rotation_offset_center=(0,-60),nAntialiasingRatio=1 )
-            rectRotated(self.screen,colBlack,(int(xArm1)-1,int(yArm1)-1,wArm+1,hArm+1), 1, border_radius=border_radius, rotation_angle=self.rAngleArm1, rotation_offset_center=(0,-60),nAntialiasingRatio=4 )
-            rectRotated(self.screen,colBotsSkin,(int(xArm2),int(yArm2),wArm,hArm), 0, border_radius=border_radius, rotation_angle=self.rAngleArm2, rotation_offset_center=(0,-60) )
-            rectRotated(self.screen,colBlack,(int(xArm2)-1,int(yArm2)-1,wArm+1,hArm+1), 1, border_radius=border_radius, rotation_angle=self.rAngleArm2, rotation_offset_center=(0,-60),nAntialiasingRatio=4 )
-          
-            # test rectRotated:
-            #~ rectRotated(self.screen,colBlack,(100,300,wArm+1+100,hArm+1+5), 1, border_radius=border_radius, rotation_angle=self.rAngleArm2, rotation_offset_center=(110,100),nAntialiasingRatio=4)
-          
-        self.screen.blit(self.imBot, (xbot, ybot))
+        self.screen.blit(self.imBotObo, (xbot, ybot))
         
 
-        xmouth = xbot+101
-        ymouth = ybot+96
-        wmouth = 40
-        hmouth = 30
+        xmouth = xbot+101+26
+        ymouth = ybot+96-10
         
         # animate bots
         
-        xEye1=xbot+77
-        xEye2=xbot+122
-        yEye = ybot+54
+        xEye1=xbot+77+35
+        xEye2=xbot+122+46
+        yEye1 = ybot+54+8
+        yEye2 = yEye1+3
         wEyeMax = 30
         hEyeMax = wEyeMax
-        pg.draw.rect(self.screen,colBotsSkin,(int(xEye1-wEyeMax//2),int(yEye-hEyeMax//2),wEyeMax,hEyeMax) )
-        pg.draw.rect(self.screen,colBotsSkin,(int(xEye2-wEyeMax//2),int(yEye-hEyeMax//2),wEyeMax,hEyeMax) )
-        
+
         wEye = int( (wEyeMax+3)*(0.8+0.2*abs(noise.getSimplexNoise((rTime+10)/2))) )
         hEye = wEye
         
@@ -636,24 +627,33 @@ class Agent(object):
             if random.random()>0.99:
                 self.bInBlink = True
                 self.timeStartBlink = rTime
+                
+        if 1:
+            # animate eyes
+            rTimeMove = rTime
+            if bWritingQuestion:
+                rTimeMove = rTime*4
+            
+            if not bWritingQuestion:
+                xinc = noise.getSimplexNoise(rTimeMove/2,10)*5
+                xEye1+=xinc
+                xEye2+=xinc
 
-        pg.draw.ellipse(self.screen,colBlack,(xEye1-wEye//2,yEye-hEye//2,wEye,hEye) )
-        pg.draw.ellipse(self.screen,colBlack,(xEye2-wEye//2,yEye-hEye//2,wEye,hEye) )
+            yinc = noise.getSimplexNoise(rTimeMove,20)*3
+            yEye1+=yinc
+            yEye2+=yinc
+            
+        self.screen.blit(self.imBotOboEyeL, (xEye1, yEye1))
+        self.screen.blit(self.imBotOboEyeR, (xEye2, yEye2))    
         
            
         
         if self.isSpeaking() and bWritingQuestion:
-            # change mouth
-            pg.draw.rect(self.screen,colBotsSkin,(xmouth-wmouth//2,ymouth-hmouth//2,wmouth,hmouth) )
             
-            #nMouthSize = (int(rTime)*3)%hmouth
-            nMouthSize = int(abs(noise.getSimplexNoise(rTime*3))*hmouth)
-            pg.draw.ellipse(self.screen,colDark1,(xmouth-nMouthSize,ymouth-nMouthSize//2,nMouthSize*2,nMouthSize) )
-            
-            # microphone over mouth
-            wmicro = 26
-            hmicro = 16
-            pg.draw.ellipse(self.screen,colBotsMicro,(xmouth-wmicro//2-26,ymouth-hmicro//2+2,wmicro,hmicro) )
+            if noise.getSimplexNoise(rTime*8,30)>0.1:            
+                self.screen.blit(self.imBotOboMouthSpeech, (xmouth, ymouth))
+                
+                
 
     def draw(self):
         #~ self.screen.blit(self.background, (0,0))
@@ -684,7 +684,7 @@ class Agent(object):
         
         hour,min,sec =misctools.getTime()
         #~ hour,min = 11,28
-        strTime = "%2d:%2d" % (hour,min)
+        strTime = "%2d:%02d" % (hour,min)
         textsurface,rect = fontSysSmall.render( strTime, (0, 0, 0) )
         self.screen.blit(textsurface,(10+20+4 ,ycur+4))
         
@@ -816,7 +816,7 @@ class Agent(object):
                 
                     
             nCptImageTotal += 1
-            if 0: # if (nCptImageTotal % (500*1000)) == 0 or 1:
+            if 1: # if (nCptImageTotal % (500*1000)) == 0 or 1:
                 #ffmpeg -r 10 -i %d.png -vcodec libx264 -b:v 4M -an test.mp4 # -an: no audio
                 #ffmpeg -r 60 -i "%d.png" -vf "fps=10,scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 123 output.gif
                 filename = "d:/images_generated/" + str(nCptImageTotal) + ".png"

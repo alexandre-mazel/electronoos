@@ -409,13 +409,18 @@ class Agent(object):
         self.imBot = scaleImg(self.imBot,2)
 
         # obo part
-        self.imBotObo = pg.image.load("robot_idle_obo.png")
+        self.bAlternateColor = True
+        if self.bAlternateColor:
+            strExt = "_alt"
+        else:
+            strExt = ""
+        self.imBotObo = pg.image.load("robot_idle_obo%s.png" % strExt)
         self.imBotObo = scaleImg(self.imBotObo,2)
-        self.imBotOboEyeL = pg.image.load("obo_leye.png")
+        self.imBotOboEyeL = pg.image.load("obo_leye%s.png" % strExt)
         self.imBotOboEyeL = scaleImg(self.imBotOboEyeL,2)
-        self.imBotOboEyeR = pg.image.load("obo_reye.png")
+        self.imBotOboEyeR = pg.image.load("obo_reye%s.png" % strExt)
         self.imBotOboEyeR = scaleImg(self.imBotOboEyeR,2)
-        self.imBotOboMouthSpeech = pg.image.load("obo_mouth_speech.png")
+        self.imBotOboMouthSpeech = pg.image.load("obo_mouth_speech%s.png" % strExt)
         self.imBotOboMouthSpeech = scaleImg(self.imBotOboMouthSpeech,2)
         
         self.bInBlink = False
@@ -576,12 +581,9 @@ class Agent(object):
 
 
     def renderRobotObo(self,xbot,ybot,rTime,bWritingQuestion):
+
         xbot -= 50
         ybot -=20
-        colBotsSkin = (243,243,243)
-        colBotsMicro = (153,153,153)
-        colBlack = (0,0,0)
-        colDark1 = (22,22,22)
         
         if bWritingQuestion:
             ybot += noise.getSimplexNoise(rTime/2,100)*8
@@ -659,11 +661,16 @@ class Agent(object):
         #~ self.screen.blit(self.background, (0,0))
         #~ self.screen.fill( pg.Color("lightslategrey") )
         
+        
         colBackground = (247,247,247)
         colLight1 = (220,220,220)
         colBlack = (0,0,0)
         colDark1 = (22,22,22)
-        colBlue1 = (164,194,244)
+        
+        col1 = (164,194,244) # fond et highlight
+        
+        if self.bAlternateColor:
+            col1 = (254,252,221)
 
         
         fontSys = pygame.freetype.Font("../fonts/SF-UI-Display-Regular.otf", 20)
@@ -727,8 +734,8 @@ class Agent(object):
         xbot = xmargin+warea-self.imBot.get_rect().size[0]+xmargin//2 + 6
         ybot = ycur+harea-self.imBot.get_rect().size[1]#+ymargin//2
         
-        round_rect(self.screen, (xmargin,ycur,warea,harea), colBlue1, 10, 0)
-        if 1:
+        round_rect(self.screen, (xmargin,ycur,warea,harea), col1, 10, 0)
+        if 0:
             self.renderRobotStd(xbot,ybot,rTime,bWritingQuestion)
         else:
             self.renderRobotObo(xbot,ybot,rTime,bWritingQuestion)
@@ -759,7 +766,7 @@ class Agent(object):
         rProgress = (self.nNumQ) / len(self.listQ)
         if rProgress > 1.: rProgress = 1.
         if rProgress > 0.1:
-            round_rect(self.screen, (xmargin,ycur,int(warea*rProgress),20), colBlue1, 2, 0)
+            round_rect(self.screen, (xmargin,ycur,int(warea*rProgress),20), col1, 2, 0)
             
         if rProgress == 1.:
             if self.timeBotsStartExit == 0:
@@ -816,7 +823,7 @@ class Agent(object):
                 
                     
             nCptImageTotal += 1
-            if 1: # if (nCptImageTotal % (500*1000)) == 0 or 1:
+            if 0: # if (nCptImageTotal % (500*1000)) == 0 or 1:
                 #ffmpeg -r 10 -i %d.png -vcodec libx264 -b:v 4M -an test.mp4 # -an: no audio
                 #ffmpeg -r 60 -i "%d.png" -vf "fps=10,scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 123 output.gif
                 filename = "d:/images_generated/" + str(nCptImageTotal) + ".png"

@@ -412,8 +412,11 @@ class Agent(object):
 
         # obo part
         self.bAlternateColor = True
+        self.bAlternateColorDrawing = False
         if self.bAlternateColor:
             strExt = "_alt"
+        elif self.bAlternateColorDrawing:
+            strExt = "_alt0"
         else:
             strExt = ""
         self.imBotObo = pg.image.load("robot_idle_obo%s.png" % strExt)
@@ -461,13 +464,15 @@ class Agent(object):
         pass
         
         
-    def speak(self,txt,astrAnswers):
+    def speak(self,txt,astrAnswers,strSound=None):
         self.timeStartSpeak = pg.time.get_ticks()/1000
         self.rDurationSpeak = len(txt)/20
         self.strTxtSpeak = txt
         for i in range(len(astrAnswers)):
             astrAnswers[i] = splitTextMultiline(astrAnswers[i],12)
         self.astrAnswers = astrAnswers
+        if strSound:
+            misctools.playWav("sounds/robot_fx/" + strSound + ".wav",bWaitEnd=False)
         
     def isSpeaking(self):
         return self.strTxtSpeak != ""
@@ -612,12 +617,20 @@ class Agent(object):
         xmouth = xbot+101+26
         ymouth = ybot+96-10
         
+        
+        if self.bAlternateColor:
+            xmouth += 4
+            ymouth += 4
+            
+            
         # animate bots
         
         xEye1=xbot+77+35
         xEye2=xbot+122+46
         yEye1 = ybot+54+8
-        yEye2 = yEye1+3
+        yEye2 = yEye1
+        if self.bAlternateColorDrawing:
+            yEye2 += 3
         wEyeMax = 30
         hEyeMax = wEyeMax
 
@@ -801,6 +814,16 @@ class Agent(object):
         self.listQ.append(["Combien d’années d’études post bac ?",["0", "2", "4 et plus"]] )
         #~ self.listQ.append(["?",["", "", ""]] )
         
+        self.listSound = [
+            "comment_avez_vous_pris_connaissance",
+            "quel_est_le_remu",
+            "combien_de_temps_commute",
+            "quel_est_votre_niveau",
+            "combien_d_annees_d_experience",
+            "combien_d_anness_d_etudes_post_bac",
+        ]
+        
+        
         
         self.nNumQ = 0
         #~ self.nNumQ = 1;self.listQ[self.nNumQ][0]="C"
@@ -817,7 +840,7 @@ class Agent(object):
                 #~ self.speak()
                 #~ self.nNumQ += 1
                 if self.nNumQ < len(self.listQ):
-                    self.speak( self.listQ[self.nNumQ][0],self.listQ[self.nNumQ][1])
+                    self.speak( self.listQ[self.nNumQ][0],self.listQ[self.nNumQ][1],self.listSound[self.nNumQ])
                     #~ self.speak("C?", ["Oui", "bof", "Non", "car","or"])
             self.update()
             self.draw()

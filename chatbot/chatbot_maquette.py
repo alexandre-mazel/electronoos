@@ -6,6 +6,7 @@ Chatbot sample
 import sys
 sys.path.append("../alex_pytools/" )
 import misctools
+import sound_processing
 sys.path.append("../../rounded-rects-pygame/" ) # for roundrects
 from roundrects import round_rect
 from roundrects import aa_round_rect as round_rect
@@ -472,7 +473,7 @@ class Agent(object):
             astrAnswers[i] = splitTextMultiline(astrAnswers[i],12)
         self.astrAnswers = astrAnswers
         if strSound:
-            misctools.playWav("sounds/robot_fx/" + strSound + ".wav",bWaitEnd=False)
+            misctools.playWav("sounds/human/" + strSound + ".wav",bWaitEnd=False)
         
     def isSpeaking(self):
         return self.strTxtSpeak != ""
@@ -822,6 +823,7 @@ class Agent(object):
             "combien_d_annees_d_experience",
             "combien_d_anness_d_etudes_post_bac",
         ]
+        self.aStoreStartPlayTime = []
         
         
         
@@ -832,7 +834,8 @@ class Agent(object):
         nCpt = 0
         timeFps = time.time()
         nCptImageTotal = 0
-        while not self.done:
+        rTotalTime = time.time()
+        while not self.done and 1:
             self.event_loop()
             rTime = pg.time.get_ticks()/1000
             nTime = int(rTime)
@@ -842,6 +845,8 @@ class Agent(object):
                 if self.nNumQ < len(self.listQ):
                     self.speak( self.listQ[self.nNumQ][0],self.listQ[self.nNumQ][1],self.listSound[self.nNumQ])
                     #~ self.speak("C?", ["Oui", "bof", "Non", "car","or"])
+                    #self.aStoreStartPlayTime.append(rTime)
+                    self.aStoreStartPlayTime.append(time.time()-rTotalTime)
             self.update()
             self.draw()
             pg.display.update()
@@ -855,13 +860,37 @@ class Agent(object):
                 
                     
             nCptImageTotal += 1
-            if 0: # if (nCptImageTotal % (500*1000)) == 0 or 1:
+            if 1: # if (nCptImageTotal % (500*1000)) == 0 or 1:
                 #ffmpeg -r 10 -i %d.png -vcodec libx264 -b:v 4M -an test.mp4 # -an: no audio
                 #ffmpeg -r 60 -i "%d.png" -vf "fps=10,scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 123 output.gif
                 filename = "d:/images_generated/" + str(nCptImageTotal) + ".png"
                 pygame.image.save(self.screen, filename)
                 
+                rTargetFPS = 20
+                #rRemaining = (1./rTargetFPS)-(time.time()-timeThisFrame)
+                rRemaining = (nCptImageTotal/rTargetFPS)-(time.time()-rTotalTime)
+                print("DBG: rRemaining: %5.4fs" % rRemaining )
+                if rRemaining > 0.:
+                    time.sleep(rRemaining) # wait to match target
                 
+                
+        # while - end
+        if 1:
+            # generate the sound
+            sounds = []
+            for s in self.listSound:
+                sounds.append("sounds/human/" + s + ".wav" )
+            #~ self.aStoreStartPlayTime = [1,2,3]
+            print("DBG: self.aStoreStartPlayTime: %s" % self.aStoreStartPlayTime)
+            sound_processing.pasteSound(sounds,self.aStoreStartPlayTime,"d:/images_generated/sound.wav")
+            
+            # generate video with sound:
+            #ffmpeg -r 20 -i %d.png -i sound.wav -vcodec libx264 -b:v 2M  test.mp4
+            # r is the framerate at end, but not the duration of each images!
+            # framerate gives the duration of each image
+            # slow framerate generates bug in vlc !!!
+            # ffmpeg -framerate 20 -i %d.png -i sound.wav -vcodec libx264 -r 20 -b:v 4M  test.mp4
+            # ffmpeg -framerate 20 -i %d.png -i sound.wav -vcodec libx264 -c:a aac -r 20 -b:v 4M  -pix_fmt yuv420p test.mp4
 
 #class Agent - end
 

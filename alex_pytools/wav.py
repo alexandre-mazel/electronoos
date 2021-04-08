@@ -709,6 +709,23 @@ class Wav:
         self.data = self.data[::-1] # revert it back
     # def ensureSilence - end
     
+    def extendTo( self, rFinalDuration ):
+        """
+        extend a sound so its length will be at least of rFinalDuration
+        Return true if sth has been done
+        """
+        if self.rDuration >= rFinalDuration:
+            return False
+        if len(self.data) == 0:
+            self.data = np.zeros( 0, dtype=self.dataType )
+        nMissingSample = int((rFinalDuration - self.rDuration)* self.nSamplingRate)
+        print("DBG: Wav.extendTo: nMissingSample: %s" % nMissingSample)
+        print("DBG: Wav.extendTo: self.data: %s" % self.data)
+        print("DBG: Wav.extendTo: self.nNbrChannel: %s" % self.nNbrChannel)
+        self.data = np.concatenate( ( self.data, np.zeros( nMissingSample*self.nNbrChannel, dtype=self.dataType ) ) )
+        self.updateHeaderSizeFromDataLength()
+        return True
+    
     def removeGlitch( self, rGlitchMaxTresholdPercent = 5., rGlitchMaxDurationSec = 0.01, rSilenceTresholdPercent = 1., rSilenceMinDurationSec = 0.020 ):
         """
         Remove glitch, by replacing them with samples at 0.

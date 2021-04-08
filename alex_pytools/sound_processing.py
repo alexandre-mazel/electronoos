@@ -227,6 +227,44 @@ def autocut(wavfile, rSilenceMinDuration = 0.3 ):
                 os.rename(strDstPath+name, strDstPath+newname)
             
 # autocut - end
+
+
+def pasteSound( aListSoundFilenames, aListTimes, strOutfilename ):
+    """
+    Generate a sound by mixing many sound all together.
+    Pasting them at a time.
+    empty will be filled by silence
+    - aFilenameListSound: list of absolute filename
+    - aTimePosition: time of start of each sound, in sec
+    - strOutfilename: name of generated file. properties are taken from the first sound processed
+    """
+    out = None
+    for i in range(min(len(aListSoundFilenames),len(aListTimes)) ):
+        f = aListSoundFilenames[i]
+        rT = aListTimes[i]
+        w = wav.Wav(f)
+        assert(w.isOpen())
+        if out == None:
+            # create empty with same properties than the first one
+            out = wav.Wav()
+            out.copyHeader(w)
+            out.updateHeaderSizeFromDataLength()
+        rEndT = rT + w.getDuration()
+        if rEndT >= out.getDuration():
+            out.extendTo( rEndT+0.01 ) # add margin
+        # redo using numpy native function (add?)
+        nInsertSample = round(rT * out.nSamplingRate*out.nNbrChannel)
+        nEndSample =  nInsertSample+len(w.data)
+        print("DBG: pasteSound: nInsertSample: %s" % nInsertSample )
+        print("DBG: pasteSound: nEndSample: %s" % nEndSample )
+        print("DBG: pasteSound: len(out.data): %s" % len(out.data) )
+        print("DBG: pasteSound: len(w.data): %s" % len(w.data) )
+        out.data[nInsertSample:nEndSample] += w.data
+        
+    print( "INF: pasteSound: writing '%s' from %d sound files" % (strOutfilename,len(aListSoundFilenames) ) )
+    out.write(strOutfilename)
+# pasteSound - end
+            
     
     
 if __name__ == "__main__":
@@ -237,7 +275,7 @@ if __name__ == "__main__":
         #~ changeVolumeInFolder(strPathRavir+"rec3/dial2/",2)
         changeVolumeInFolder(strPathRavir+"rec3/relance/",2)
     
-    if 1:
+    if 0:
         #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/rec2.wav")
         #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/rec1_fx.wav")
         #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/rec2_fx.wav",rSilenceMinDuration=0.5)

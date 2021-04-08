@@ -1,2 +1,2 @@
-203;Notre chère salle d'informatique
+203;Notre chère salle d'informatique.
 Cantine;Ici on mange pleins de trucs plus ou moins bons.

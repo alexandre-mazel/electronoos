@@ -144,10 +144,8 @@ class DataSaver:
         print("after file")
             
         print("INF: saving to '%s'..." % afn )
-        if os.path.exists( afn ) or 1:
-            f = open(afn,"at") # seems to work on windows in python3 but not in python2 on RPI
-        else:
-            f = open(afn,"wt")
+        #if os.path.exists( afn ) or 1:
+        f = open(afn,"at")
         if bNewFile:
             # write headers
             f.write("time_stamp;")
@@ -201,7 +199,7 @@ dataSaver = DataSaver()
 
 def scrapAndSaveCryptoCurrency(strSavePath):
     dataSaver.changeSavePath(strSavePath)
-    dataSaver.nAutoSaveSec = 5
+    #~ dataSaver.nAutoSaveSec = 5
     d1 = scrapFromWeb_cours_crypto()
     print("INF: scrapAndSaveCryptoCurrency: (%d): %s" % (len(d1),d1) )
     dataSaver.update(d1)

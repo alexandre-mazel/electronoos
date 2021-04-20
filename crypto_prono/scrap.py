@@ -12,12 +12,13 @@
     
 import datetime
 import os
+import unicodedata
 import time
     
 
     
 def scrap_cours_crypto( strFileContent ):
-    bVerbose = 0
+    bVerbose = 1
     buf = strFileContent
     
     if 1:
@@ -59,8 +60,9 @@ def scrap_cours_crypto( strFileContent ):
         idx2 += idxStart+len(strJustBefore)
         if bVerbose: print("%s" % (buf[idx2:idx2+30]))
         
-        strEnd = "€"
+        strEnd =  unicodedata.lookup("EURO SIGN") # u"â‚¬" 
         idxEnd = buf[idx2:].find(strEnd)
+        if bVerbose: print("idxEnd: %s" % idxEnd)
         
         strValue = buf[idx2:idx2+idxEnd]
         strValue = strValue.replace("&#x27;","")
@@ -83,7 +85,8 @@ def scrapFromFile_cours_crypto( strFile ):
     return scrap_cours_crypto(buf)
     
 def scrapFromWeb_cours_crypto():
-    import urllib.request
+    #~ import urllib.request
+    from six.moves import urllib
     fp = urllib.request.urlopen("https://courscryptomonnaies.com/")
     mybytes = fp.read()
     mystr = mybytes.decode("utf8")
@@ -105,13 +108,13 @@ class DataSaver:
     take a dict of nammed value, save it smartly on disk with timestamp...
     csvs...
     """
-    def __init__( self, strPathToSave = "~/records/", nAutoSaveSec = 5*60 ):
+    def __init__( self, strPathToSave = "/tmp/", nAutoSaveSec = 5*60 ):
         self.reset()
-        self.strPath = strPathToSave
+        self.changeSavePath(strPathToSave)
         self.nAutoSaveSec = nAutoSaveSec
         
     def changeSavePath( self, strNewPathToSave ):
-        self.strPath = strNewPathToSave
+        self.strPath = os.path.abspath(strNewPathToSave)
         
     def reset(self):
         self.aIdxLabels = {} # for each label its idx
@@ -128,13 +131,23 @@ class DataSaver:
         fn = datetimeObject.strftime( "%Y_%m_%d.csv" );
         afn = self.strPath+os.sep+fn
         try:
+            os.makedirs(self.strPath)
+        except BaseException as err:
+            #~ print("WRN: while creating folder: %s" % str(err) )
+            pass
+        print("before file")
+        try:
             nSize = os.path.getsize(afn)
             bNewFile = nSize < 1
-        except FileNotFoundError as err:
+        except BaseException as err:
             bNewFile = True
+        print("after file")
             
         print("INF: saving to '%s'..." % afn )
-        f = open(afn,"at")
+        if os.path.exists( afn ) or 1:
+            f = open(afn,"at") # seems to work on windows in python3 but not in python2 on RPI
+        else:
+            f = open(afn,"wt")
         if bNewFile:
             # write headers
             f.write("time_stamp;")
@@ -176,6 +189,7 @@ class DataSaver:
                 idx = self.aIdxLabels[k]
             except KeyError as err:
                 print("WRN: new value appears, skipping it: '%s'" % k)
+                # dans le cas ou des valeurs disparaissent, on aura des 0
                 continue
             self.aDatas[-1][idx]=v
         print("DBG: self.aDatas (%3d): %s" % (len(self.aDatas),self.aDatas))
@@ -187,6 +201,7 @@ dataSaver = DataSaver()
 
 def scrapAndSaveCryptoCurrency(strSavePath):
     dataSaver.changeSavePath(strSavePath)
+    dataSaver.nAutoSaveSec = 5
     d1 = scrapFromWeb_cours_crypto()
     print("INF: scrapAndSaveCryptoCurrency: (%d): %s" % (len(d1),d1) )
     dataSaver.update(d1)
@@ -225,7 +240,7 @@ if __name__ == "__main__":
     if 1:
         dataSaver.nAutoSaveSec = 90
         for i in range(10):
-            scrapAndSaveCryptoCurrency("/tmp3/")
+            scrapAndSaveCryptoCurrency(os.path.expanduser("~/")+"/records/")
             time.sleep(30)
 
 

@@ -188,6 +188,9 @@ class Stater:
             "48:B0:2D:05:B6:9D": "Jetson AGX",
             "DC:A6:32:48:A4:0C": "Rasp4Therm",
             "18:03:73:17:D3:6C": "BigA",
+            "2C:F0:5D:9F:BF:DE": "XeniaDev",
+            "A0:32:99:D1:52:CA": "LenovoYoga",
+            "8A:E2:56:9A:7D:6A": "IphoneXAlex",
             
             
         }

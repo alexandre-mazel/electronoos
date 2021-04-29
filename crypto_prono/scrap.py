@@ -18,7 +18,7 @@ import time
 
     
 def scrap_cours_crypto( strFileContent ):
-    bVerbose = 1
+    bVerbose = 0
     buf = strFileContent
     
     if 1:
@@ -50,27 +50,30 @@ def scrap_cours_crypto( strFileContent ):
     
                                 
     for strCurrency in listCurrency:
-        idxStart = buf.find(strCurrency)
-        if bVerbose: print("%d: %s" % (idxStart, buf[idxStart:idxStart+300]))
-        idxPreTest = idxStart-100
-        if bVerbose: print("idxPreTest: %d: %s" % (idxPreTest, buf[idxPreTest:idxPreTest+105]))
-        
-        strJustBefore = '<td data-title="Cours" class="jsx-1338272632"><span class="">'
-        idx2 = buf[idxStart:].find(strJustBefore)
-        idx2 += idxStart+len(strJustBefore)
-        if bVerbose: print("%s" % (buf[idx2:idx2+30]))
-        
-        strEnd =  unicodedata.lookup("EURO SIGN") # u"€" 
-        idxEnd = buf[idx2:].find(strEnd)
-        if bVerbose: print("idxEnd: %s" % idxEnd)
-        
-        strValue = buf[idx2:idx2+idxEnd]
-        strValue = strValue.replace("&#x27;","")
-        if bVerbose: print("strValue: %s" % strValue )
-        
-        rValue = float(strValue)
-        if bVerbose: print("rValue: %s" % rValue )
-        dictOut[strCurrency] = rValue
+        try:
+            idxStart = buf.find(strCurrency)
+            if bVerbose: print("%d: %s" % (idxStart, buf[idxStart:idxStart+300]))
+            idxPreTest = idxStart-100
+            if bVerbose: print("idxPreTest: %d: %s" % (idxPreTest, buf[idxPreTest:idxPreTest+105]))
+            
+            strJustBefore = '<td data-title="Cours" class="jsx-1338272632"><span class="">'
+            idx2 = buf[idxStart:].find(strJustBefore)
+            idx2 += idxStart+len(strJustBefore)
+            if bVerbose: print("%s" % (buf[idx2:idx2+30]))
+            
+            strEnd =  unicodedata.lookup("EURO SIGN") # u"€" 
+            idxEnd = buf[idx2:].find(strEnd)
+            if bVerbose: print("idxEnd: %s" % idxEnd)
+            
+            strValue = buf[idx2:idx2+idxEnd]
+            strValue = strValue.replace("&#x27;","")
+            if bVerbose: print("strValue: %s" % strValue )
+            
+            rValue = float(strValue)
+            if bVerbose: print("rValue: %s" % rValue )
+            dictOut[strCurrency] = rValue
+        except BaseException as err:
+            print( "WRN: error when decoding value for '%s': err: %s" % str(err) ) 
         
     if bVerbose: print( "INF: %d value(s) found" % len(dictOut) )
     if bVerbose: print( dictOut )
@@ -120,7 +123,7 @@ class DataSaver:
         self.aIdxLabels = {} # for each label its idx
         self.aLabels = [] # a list of labels
         self.aDatas = [] # a list of list of data related to each label
-        self.aTime = [] # for each list of data, its time
+        self.aTimes = [] # for each list of data, its time
         self.lastTimeSave = time.time()
         
     def save( self ):
@@ -153,11 +156,13 @@ class DataSaver:
                 f.write( "%s;"% s)
             f.write("\n")
         for i,datas in enumerate(self.aDatas):
-            f.write("%s;" % self.aTime[i])
+            f.write("%s;" % self.aTimes[i])
             for data in datas:
                 f.write("%f;" % data)
             f.write("\n")
         f.close()
+        self.aDatas = []
+        self.aTimes = []
         
         
     def update( self, dictData ):
@@ -175,13 +180,13 @@ class DataSaver:
         t = datetimeObject.strftime( "%Y_%m_%d-%Hh%Mm%Ss%fms" );
         if os.name != "nt": t = t.replace( "000ms", "ms" ); 
         
-        self.aTime.append(t)
+        self.aTimes.append(t)
         
         self.aDatas.append([0]*len(self.aLabels))
-        print("DBG: self.aLabels (%3d): %s" % (len(self.aLabels),self.aLabels))
-        print("DBG: self.aIdxLabels (%3d): %s" % (len(self.aIdxLabels),self.aIdxLabels))
-        print("DBG: self.aDatas (%3d): %s" % (len(self.aDatas),self.aDatas))
-        print("DBG: self.aTime (%3d): %s" % (len(self.aTime),self.aTime))
+        #~ print("DBG: self.aLabels (%3d): %s" % (len(self.aLabels),self.aLabels))
+        #~ print("DBG: self.aIdxLabels (%3d): %s" % (len(self.aIdxLabels),self.aIdxLabels))
+        #~ print("DBG: self.aDatas (%3d): %s" % (len(self.aDatas),self.aDatas))
+        #~ print("DBG: self.aTimes (%3d): %s" % (len(self.aTimes),self.aTimes))
         for k,v in dictData.items():
             try:
                 idx = self.aIdxLabels[k]

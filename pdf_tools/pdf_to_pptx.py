@@ -10,18 +10,24 @@ aFiles = [
                 "../data/inconnus.jpg",
             ]
 
-wmax,hmax = 1920,1080
+
 multiplier = 9525
 
-for nNumPage, slideimgfilename in enumerate(aFiles):
-    slideimg = cv2.imread(slideimgfilename)
-    height,width = slideimg.shape[:2]
+wmax,hmax = 1920,1080 # HD ratio
+wmax,hmax = 2100,2970 # A4
 
-    if width > wmax:
-        wmax = width
-        
-    if height > hmax:
-        hmax = height
+if 0:
+    # find maximum, based on images (interesing if many images have equivalent size)
+    # else we will remains on a classic ratio
+    for nNumPage, slideimgfilename in enumerate(aFiles):
+        slideimg = cv2.imread(slideimgfilename)
+        height,width = slideimg.shape[:2]
+
+        if width > wmax:
+            wmax = width
+            
+        if height > hmax:
+            hmax = height
 
 
 # Set slide dimensions
@@ -36,7 +42,7 @@ for nNumPage, slideimgfilename in enumerate(aFiles):
     fit_h_w = int(hmax * width/height)
     # Cas 1: NoLose: on ne veut pas perdre des bouts d'images quitte a avoir du blanc sur les cotes
     # Cas 2: NoWhite: On ne veut pas avoir de blanc quitte a perdre un peu d'images
-    bNoLose = 1 # else it's NoWhite
+    bNoLose = 0 # else it's NoWhite
     if (bNoLose and fit_w_h > hmax) or (not bNoLose and fit_w_h < hmax):
         # on garde fit_h_w
         wnew, hnew = fit_h_w,hmax

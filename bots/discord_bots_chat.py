@@ -1,8 +1,12 @@
 #from https://www.youtube.com/watch?v=SPTfmiYiuok
 #~ https://discord.com/api/oauth2/authorize?client_id=839853679459696730&permissions=199744&scope=bot
 
+import asyncio
 import discord
 import os
+import random
+import threading
+import time
 
 def loadLocalEnv(strLocalFileName = ".env"):
     """
@@ -22,7 +26,7 @@ def loadLocalEnv(strLocalFileName = ".env"):
         if data[0] == '"' and data[-1] == '"':
             data = data[1:-1]
         dictNewEnv[key] = data
-        print("DBG: loadLocalEnv: add '%s'=>'%s'" % (key,data) )
+        print("DBG: loadLocalEnv: add '%s' => '%s'" % (key,data) )
     f.close()
     return dictNewEnv
         
@@ -40,9 +44,38 @@ def getEnv(strName, strDefault = None ):
     if retVal == None:
         retVal = strDefault
     return retVal
+    
+class ChatBot:
+    def __init__( self ):
+        pass
+        
+    def receive( self, strMessage, strAuthor ):
+        """
+        receive a text from an author and reply to it
+        return the text to reply
+        """
+        msg = strMessage.lower()
+        strReply = ""
+        if "hello" in msg:
+            strReply = "Hello!"
+        if "pourquoi" in msg:
+            strReply = "parce que!"
+        if "comment" in msg:
+            strReply = "Je ne sais pas, et toi ?"
+        return strReply
+        
+    def update( self ):
+        """
+        call it from time to time, if sth is to be said, it will return it
+        """
+        if random.random() > 0.1:
+            return "hum hum..."
+        return ""
 
 
 client = discord.Client()
+clientLastChannel = None
+chatBot = ChatBot()
 
 @client.event
 async def on_ready():
@@ -51,7 +84,8 @@ async def on_ready():
     
 @client.event
 async def on_message(msg):
-    print("DBG: message: " + str(msg) )
+    #~ print("DBG: message: " + str(msg) )
+    print("DBG: on_message: salon: '%s', author: '%s', message: '%s'" % (msg.channel.name,msg.author,msg.content) )
     if msg.author == client.user:
         return
     if msg.channel.name != 'salon-de-test':
@@ -59,17 +93,54 @@ async def on_message(msg):
         
     print("INF: received: %s" % msg.content )
     
-    strReply = ""
-    if "hello" in msg.content.lower():
-        strReply = "Hello!"
-    if "pourquoi" in msg.content.lower():
-        strReply = "parce que!"
-    if "comment" in msg.content.lower():
-        strReply = "Je ne sais pas, et toi ?"
+    
+    strReply = chatBot.receive(msg.content,msg.author  )
     if strReply != "":
         print("INF: replying: %s" % strReply )
         await msg.channel.send(strReply)
+    global clientLastChannel 
+    clientLastChannel = msg.channel
+    
+    
+#~ def updater():
+    #~ while 1:
+        #~ print(".")
+        #~ strReply=chatBot.update()
+        #~ print(strReply)
+        #~ print(clientLastChannel)
+        #~ if strReply != "" and clientLastChannel != None:
+            #~ print("INF: replying (from update): %s" % strReply )
+            #~ clientLastChannel.send(strReply)
+        #~ time.sleep(6) #burk
+        
+async def my_background_task():
+    try:
+        await client.wait_until_ready()
+        print("INF: my_background_task: started")
+        while not client.is_closed():
+            print(".")
+            strReply=chatBot.update()
+            if strReply != "":
+                for server in client.guilds:
+                    for channel in server.channels:
+                        if channel.name == "salon-de-test":
+                            await channel.send(strReply)
+                #~ if clientLastChannel != None:
+                    #~ await client.send_message(clientLastChannel, strReply)
+            await asyncio.sleep(6) # task runs every 60 seconds
+        print("INF: my_background_task: stopped")
+    except BaseException as err:
+        print("ERR: my_background_task, err: %s" % str(err) )
+        
+
     
 strToken = getEnv("TOKEN")
-print( strToken)
+#~ print( strToken)
+
+
+#~ update_thread = threading.Thread(target=updater, name="Updater", args="")
+#~ update_thread.start()
+
+client.loop.create_task(my_background_task())
+
 client.run(strToken)

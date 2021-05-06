@@ -51,7 +51,8 @@ async def on_ready():
     
 @client.event
 async def on_message(msg):
-    print("DBG: message: " + str(msg) )
+    #~ print("DBG: message: " + str(msg) )
+    print("DBG: on_message: salon: '%s', author: '%s', message: '%s'" % (msg.channel.name,msg.author,msg.content) )
     if msg.author == client.user:
         return
     if msg.channel.name != 'salon-de-test':
@@ -71,5 +72,5 @@ async def on_message(msg):
         await msg.channel.send(strReply)
     
 strToken = getEnv("TOKEN")
-print( strToken)
+#~ print( strToken)
 client.run(strToken)

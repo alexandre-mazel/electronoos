@@ -55,9 +55,11 @@ def response(user_response):
     global global_strPrev
     robo_response=''
     sent_tokens.append(user_response)    
+    print("sent_tokens:%s" % sent_tokens )
     TfidfVec = TfidfVectorizer(tokenizer=LemNormalize, stop_words='english')
     tfidf = TfidfVec.fit_transform(sent_tokens)
     vals = cosine_similarity(tfidf[-1], tfidf)
+    print("vals:%s" % vals )
     idx=vals.argsort()[0][-2]
     flat = vals.flatten()
     flat.sort()

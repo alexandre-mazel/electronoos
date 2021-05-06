@@ -69,7 +69,7 @@ class ChatBot:
         call it from time to time, if sth is to be said, it will return it
         """
         if random.random() > 0.1:
-            return "hum hum..."
+            return "C'est l'heure de la fin du cours!"
         return ""
 
 
@@ -123,7 +123,8 @@ async def my_background_task():
             if strReply != "":
                 for server in client.guilds:
                     for channel in server.channels:
-                        if channel.name == "salon-de-test":
+                        print(dir(channel))
+                        if channel.name == "salon-de-test": #ecrire certains message dans tout les channel de type ecriture: type, typing, topic,permissions_for, members, _state
                             await channel.send(strReply)
                 #~ if clientLastChannel != None:
                     #~ await client.send_message(clientLastChannel, strReply)

@@ -4,6 +4,44 @@
 import discord
 import os
 
+def loadLocalEnv(strLocalFileName = ".env"):
+    """
+    load variable from a local file, typically .env
+    """
+    dictNewEnv = {}
+    f = open(strLocalFileName,"rt")
+    while 1:
+        li = f.readline()
+        if len(li) < 1:
+            break
+        if li[0] =='#':
+            continue
+        elems = li.split("=")
+        key = elems[0]
+        data = elems[1]
+        if data[0] == '"' and data[-1] == '"':
+            data = data[1:-1]
+        dictNewEnv[key] = data
+        print("DBG: loadLocalEnv: add '%s'=>'%s'" % (key,data) )
+    f.close()
+    return dictNewEnv
+        
+
+def getEnv(strName, strDefault = None ):
+    """
+    get a value from local env, then from environnement
+    """
+    dLocal = loadLocalEnv()
+    try:
+        return dLocal[strName]
+    except:
+        pass
+    retVal = os.getenv(strName)
+    if retVal == None:
+        retVal = strDefault
+    return retVal
+
+
 client = discord.Client()
 
 @client.event
@@ -32,5 +70,6 @@ async def on_message(msg):
         print("INF: replying: %s" % strReply )
         await msg.channel.send(strReply)
     
-strToken = "ODM5ODUzNjc5NDU5Njk2NzMw.YJPssA.VEOFVEXPkc_-3f_lll_IT571c2U"
+strToken = getEnv("TOKEN")
+print( strToken)
 client.run(strToken)

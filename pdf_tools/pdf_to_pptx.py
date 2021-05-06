@@ -1,7 +1,41 @@
 import pptx # pip install python-pptx
 import cv2
 
+def pdfToImages( strPdfFilename ):
+    """
+    Take a pdf file and export each files to a folder.
+    Return the list of generated images files
+    """
+        
+    import fitz # pip install PyMuPDF # https://pypi.org/project/PyMuPDF/#files
+    
+    doc = fitz.open(strPdfFilename)
+    print("INF: pdfToImages: doc page number: %d" % (doc.pageCount) )
+    print("INF: pdfToImages: doc meta: %s" % (doc.metadata) )
+    
+    listImgs = []
+    for nNumPage in range(doc.pageCount):
+        print( "INF: pdfToImages: generating for page %d" % (nNumPage+1) )
+        page = doc.loadPage(nNumPage) #number of page
+        if 1:
+            zoom_x = 2.0  # 2 => double resolution 72 dpi => 144
+            zoom_y = 2.0  # vertical zoom
+            mat = fitz.Matrix(zoom_x, zoom_y)  # zoom factor 2 in each dimension
+            pix = page.getPixmap(matrix = mat)
+        else:
+            pix = page.getPixmap()
+        output = "/tmp/outfile%04d.png" % nNumPage
+        pix.writePNG(output)
+        listImgs.append(output)
+
+    doc.close()
+    
+    return listImgs
+
 def imagesToPres( listFileImages, strDestFilenamePPT = "generated.pptx" ):
+    """
+    Take a list of images and paste them in a ppt
+    """
     pres = pptx.Presentation()
     blank_slide_layout = pres.slide_layouts[6]
 
@@ -55,19 +89,14 @@ def imagesToPres( listFileImages, strDestFilenamePPT = "generated.pptx" ):
     pres.save(strDestFilenamePPT)
 # imagesToPres - end
 
-def auto_test2():
+def convertPdfToPpt( strSrcPdfFilename ):
+    strOut = strSrcPdfFilename.replace(".pdf",".pptx")
+    li = pdfToImages(strSrcPdfFilename)
+    imagesToPres(li,strOut)
 
-    aFiles = [
-                    "../data/fruit_face.jpg",
-                    "../data/face_bw5.jpg",
-                    "../data/inconnus.jpg",
-                ]
-                
-    imagesToPres(aFiles)
-    print("Conversion complete. :)")
     
-def auto_test2():
-
+def auto_test_im_to_pptx():
+    # imgs to pptx
     aFiles = [
                     "../data/fruit_face.jpg",
                     "../data/face_bw5.jpg",
@@ -75,9 +104,13 @@ def auto_test2():
                 ]
                 
     imagesToPres(aFiles)
-    print("Conversion complete. :)")
-
+    
+def auto_test():
+    li = pdfToImages("devoirs.pdf")
+    imagesToPres(li)
+    
 if __name__ == "__main__":
-    auto_test1()
-    auto_test2()
+    #~ auto_test_im_to_pptx()
+    #~ auto_test()
+    convertPdfToPpt("nda.pdf")
     

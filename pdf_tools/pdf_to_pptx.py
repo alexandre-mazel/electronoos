@@ -1,5 +1,6 @@
 import pptx # pip install python-pptx
 import cv2
+import sys
 
 def pdfToImages( strPdfFilename ):
     """
@@ -89,10 +90,13 @@ def imagesToPres( listFileImages, strDestFilenamePPT = "generated.pptx" ):
     pres.save(strDestFilenamePPT)
 # imagesToPres - end
 
-def convertPdfToPpt( strSrcPdfFilename ):
-    strOut = strSrcPdfFilename.replace(".pdf",".pptx")
+def convertPdfToPpt( strSrcPdfFilename, strFilenameDest = None ):
+    if strFilenameDest == None:
+        strFilenameDest = strSrcPdfFilename.replace(".pdf",".pptx")
+    print("INF: convertPdfToPpt: converting '%s' to '%s'" % (strSrcPdfFilename,strFilenameDest) )
     li = pdfToImages(strSrcPdfFilename)
-    imagesToPres(li,strOut)
+    imagesToPres(li,strFilenameDest)
+    return True
 
     
 def auto_test_im_to_pptx():
@@ -112,5 +116,20 @@ def auto_test():
 if __name__ == "__main__":
     #~ auto_test_im_to_pptx()
     #~ auto_test()
-    convertPdfToPpt("nda.pdf")
+    #~ convertPdfToPpt("nda.pdf")
+    
+    strPdfFile = ""
+    strFilenameDest = None
+    if len(sys.argv) < 2:
+        print( "\nPdfToPPT\n\nSyntaxe: %s <pdf filename> [<ppt destination filename>]"  % sys.argv[0] )
+        exit( 0 )
+    strPdfFile = sys.argv[1]
+    if len(sys.argv)>2:
+        strFilenameDest = sys.argv[1]
+    convertPdfToPpt( strPdfFile, strFilenameDest )
+    
+    
+    
+    
+    
     

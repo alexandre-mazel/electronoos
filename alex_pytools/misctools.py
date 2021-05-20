@@ -785,6 +785,16 @@ class Cache:
         self.stored[key] = data
 # class Cache - end
 cache = Cache()
+
+
+def getWebPage( strAddr ):
+    #~ import urllib.request
+    from six.moves import urllib
+    fp = urllib.request.urlopen(strAddr)
+    mybytes = fp.read()
+    mystr = mybytes.decode("utf8")
+    fp.close()
+    return  mystr
         
      
     

@@ -175,6 +175,7 @@ async def my_background_task():
             #~ print(".")
             strReply=chatBot.update()
             if strReply != "":
+                #~ strReply = "/tts\n" + strReply
                 print( "INF: after update, sending: %s" % strReply )
                 for server in client.guilds:
                     for channel in server.channels:

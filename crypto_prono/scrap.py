@@ -1,5 +1,7 @@
 # coding: cp1252
 
+# this file has been moved to git/castle!!!
+
 #~ import xml.etree.ElementTree as ET
 
 #~ from lxml import etree
@@ -245,6 +247,9 @@ if __name__ == "__main__":
         for i in range(10):
             scrapAndSaveCryptoCurrency(os.path.expanduser("~/")+"/records/")
             time.sleep(30)
+
+
+# this file has been moved to git/castle!!!
 
 
     

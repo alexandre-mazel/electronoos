@@ -37,13 +37,13 @@ def findSubString( buf, strBefore, strAfter= "", nOccurence = 1, bQuiet=False ):
 def timeCompareSubString(nTimes):
     import time
     import re
-    ss,se = "salut","enfants"
-    s1 = "salut les enfants"
-    s2= "#"*1000000+s1
-    s3= s1 + "#"*10000000
-    s4= "#"*100000+s1+"#"*10000000
-    s5= s4*4
-    for s in [s1,s2,s2,s3,s4,s5]:
+    ss,se = "salut","enfants"   # time for 1000 loops (finsubstring-RE): ms4 / RPI3 2.7--3.8 / linux
+    s1 = "salut les enfants"                       # 0.002-0.003         /  0.018-0.031 -- 0.022-0.032
+    s2= "#"*1000000+s1                           # 0.30-0.38                / 3.64-11.60 -- 3.66-8.13
+    s3= s1 + "#"*10000000                       # 4.86-0.003            / 27.8-0.029 -- 27.8-0.029
+    s4= "#"*100000+s1+"#"*10000000     # 4.86-0.040             / 28.0-1.20 -- 28.2-0.849 
+    s5= s4*4                                            # 20.0-040                  / 112-1.17 -- 112-0.746
+    for s in [s1,s2,s3,s4,s5]:
         timeBegin = time.time()
         #~ print(s)
         for i in range(nTimes):
@@ -56,7 +56,7 @@ def timeCompareSubString(nTimes):
             out = re.search(ss + "(.*?)" + se, s).group(1)
         duration = time.time()-timeBegin
         print("RE: %5.3fs" % duration )    
-timeCompareSubString(1000)
+#~ timeCompareSubString(1000)
     
 assert_equal(findSubString("Alexandre est content oui", "Alexandre ", " content"), "est")
 assert_equal(findSubString("Alexandre est content oui", "content ", "blabla"), "oui")

@@ -134,7 +134,16 @@ chatBot = ChatBot()
 async def on_ready():
     print("INF: we are logged as " + str(client.user) + ", detail: " + str(client) )
     
-    
+"""
+changer le nickname de la personne qui parle:
+@bot.command(pass_context=True)
+async def nick(message):    
+    list = ["saltymeow","huhyouexist","edgyhell","hellicey","iceyhell","coldhvrt","dxrksxul","umgoaway"]
+    name = rand(list)
+    print(name)
+    await message.author.edit(nick=name)
+"""
+
 @client.event
 async def on_message(msg):
     #~ print("DBG: message: " + str(msg) )
@@ -143,9 +152,8 @@ async def on_message(msg):
         return
     if msg.channel.name != 'salon-de-test':
         return
-        
     print("INF: received: %s" % msg.content )
-    
+    #~ msg.author.edit(nick="toto")    
     
     strReply = chatBot.receive(msg.content,msg.author )
     if strReply != "":
@@ -180,7 +188,7 @@ async def my_background_task():
                     for channel in server.channels:
                         #~ print(dir(channel))
                         if channel.name == "salon-de-test": #ecrire certains message dans tout les channel de type ecriture: type, typing, topic,permissions_for, members, _state
-                            await channel.send(strReply)
+                            await channel.send(strReply, tts=False)
                 #~ if clientLastChannel != None:
                     #~ await client.send_message(clientLastChannel, strReply)
             await asyncio.sleep(6) # task runs every 6 seconds

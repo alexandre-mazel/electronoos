@@ -7,6 +7,7 @@ import os
 def loadLocalEnv(strLocalFileName = ".env"):
     """
     load variable from a local file, typically .env
+    Return a dict key => value
     """
     dictNewEnv = {}
     f = open(strLocalFileName,"rt")

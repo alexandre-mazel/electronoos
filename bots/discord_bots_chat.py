@@ -57,7 +57,6 @@ def pickElem( aList ):
     
 def getRandomSeCoucherMoinsBete():
     page=misctools.getWebPage( "https://secouchermoinsbete.fr/random" ) # warning, need to change the signature of the opener in request.py: in OpenerDirector: around line 436: client_version =
-    #~ page=misctools.getWebPage( "https://engrenage.studio" ) 
     #~ print(page.encode(sys.stdout.encoding, errors='replace'))
     strFirst = """a pas de complément" class="metadata details off"></a>
                 <a href="/"""

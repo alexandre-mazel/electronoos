@@ -37,6 +37,11 @@ def findSubString( buf, strBefore, strAfter= "", nOccurence = 1, bQuiet=False ):
 def timeCompareSubString(nTimes):
     import time
     import re
+    import sys
+    import struct
+    import multiprocessing
+    print( "python version   : %d.%d.%d (%dbits) (%d core(s))" % (sys.version_info.major,sys.version_info.minor,sys.version_info.micro,8 * struct.calcsize("P"),multiprocessing.cpu_count()) )
+    
     ss,se = "salut","enfants"   # time for 1000 loops (finsubstring-RE): ms4 / RPI3 2.7--3.8 / linux
     s1 = "salut les enfants"                       # 0.002-0.003         /  0.018-0.031 -- 0.022-0.032
     s2= "#"*1000000+s1                           # 0.30-0.38                / 3.64-11.60 -- 3.66-8.13
@@ -56,7 +61,7 @@ def timeCompareSubString(nTimes):
             out = re.search(ss + "(.*?)" + se, s).group(1)
         duration = time.time()-timeBegin
         print("RE: %5.3fs" % duration )    
-#~ timeCompareSubString(1000)
+timeCompareSubString(1000)
     
 assert_equal(findSubString("Alexandre est content oui", "Alexandre ", " content"), "est")
 assert_equal(findSubString("Alexandre est content oui", "content ", "blabla"), "oui")

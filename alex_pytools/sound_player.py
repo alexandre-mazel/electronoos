@@ -66,6 +66,9 @@ class SoundPlayer:
         
         
     def playFile( self, strFilename, bWaitEnd = True, rSoundVolume = 1. ):
+        """
+        rSoundVolume in [0,1]
+        """
         if self.player: 
             return self.player.playFile(strFilename, bWaitEnd = bWaitEnd, rSoundVolume=rSoundVolume)
         

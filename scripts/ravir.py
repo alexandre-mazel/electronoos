@@ -54,7 +54,7 @@ def updateHipRoll(motion):
     rPos = noise.getSimplexNoise(time.time()*0.3)*0.1
     #~ print("%s: DBG: hiproll: apres noise, avant angle" % str(time.time()) )
     #~ rTime = random.random()*3+0.6
-    rSpeed = random.random()*0.2
+    rSpeed = random.random()*0.1
     #~ motion.post.angleInterpolation( "HipRoll", rPos, rTime, True ) # NB: LE POSTE NE POST PAS (pb a cause du meme proxy utilisé en meme temps???)
     motion.setAngles( "HipRoll", rPos, rSpeed )
     #~ print("%s: DBG: hiproll: apres angle posted" % str(time.time()) )
@@ -316,6 +316,9 @@ class Breather:
                     self.nState = Breather.kStateSpeak
                 else:
                     self.nState = Breather.kStateInBeforeSpeak
+                    if self.rFullnessToSay > 1.:
+                        self.rFullnessToSay = 1.
+                    
 
             
             if self.nState != Breather.kStateSpeak and self.nState != Breather.kStateInBeforeSpeak:
@@ -513,6 +516,9 @@ class Perliner:
         self.bListening = False
         
         self.bUseSound = True
+        self.nNbrSoundEstim = 0 # an estimation of the current nbr of played sound
+        
+        self.rFullness = 0 # just here for compatibilty with breather
         
         if os.name != "nt":
             import naoqi
@@ -544,23 +550,30 @@ class Perliner:
         
         if self.motion != None:
             
-            
             rPosInc = noise.getSimplexNoise(self.timeLastUpdate)*self.rAmp
-            rTime = 1.
-            self.rCoefArmAmp = 2
-            self.motion.post.angleInterpolation( self.astrChain, [rPosInc,(math.pi/2)+rPosInc*self.rCoefArmAmp,(math.pi/2)+rPosInc*self.rCoefArmAmp], rTime, True )
+            if abs(rPosInc > 0.1):
+                rTime = 1.
+                self.rCoefArmAmp = 2
+                self.motion.post.angleInterpolation( self.astrChain, [rPosInc,(math.pi/2)+rPosInc*self.rCoefArmAmp,(math.pi/2)+rPosInc*self.rCoefArmAmp], rTime, True )
 
         if self.bUseSound:
             strPath = self.strNoisePath
-            rSoundVolume = 2.
-            if noise.getSimplexNoise(self.timeLastUpdate,50) > 0.4:
-                sound_player.soundPlayer.playFile( strPath+"tic.wav", bWaitEnd=False, rSoundVolume=rSoundVolume)
-            if noise.getSimplexNoise(self.timeLastUpdate,100) > 0.8:
-                sound_player.soundPlayer.playFile( strPath+"tictic.wav", bWaitEnd=False, rSoundVolume=rSoundVolume)
-            if noise.getSimplexNoise(self.timeLastUpdate,150) > 0.6:
-                sound_player.soundPlayer.playFile( strPath+"tic2.wav", bWaitEnd=False, rSoundVolume=rSoundVolume)
-            if noise.getSimplexNoise(self.timeLastUpdate,200) > 0.7:
-                sound_player.soundPlayer.playFile( strPath+"tic3.wav", bWaitEnd=False, rSoundVolume=rSoundVolume)
+            rSoundVolume = 1.
+            if self.nNbrSoundEstim < 10:
+                if noise.getSimplexNoise(self.timeLastUpdate,50) > 0.4:
+                    sound_player.soundPlayer.playFile( strPath+"tic.wav", bWaitEnd=False, rSoundVolume=rSoundVolume)
+                    self.nNbrSoundEstim += 1
+                if noise.getSimplexNoise(self.timeLastUpdate,100) > 0.8:
+                    sound_player.soundPlayer.playFile( strPath+"tictic.wav", bWaitEnd=False, rSoundVolume=rSoundVolume)
+                    self.nNbrSoundEstim += 1
+                if noise.getSimplexNoise(self.timeLastUpdate,150) > 0.6:
+                    sound_player.soundPlayer.playFile( strPath+"tic2.wav", bWaitEnd=False, rSoundVolume=rSoundVolume)
+                    self.nNbrSoundEstim += 1
+                if noise.getSimplexNoise(self.timeLastUpdate,200) > 0.7:
+                    sound_player.soundPlayer.playFile( strPath+"tic3.wav", bWaitEnd=False, rSoundVolume=rSoundVolume)
+                    self.nNbrSoundEstim += 1
+            if self.nNbrSoundEstim > 0:
+                self.nNbrSoundEstim -= 1
 
             
             
@@ -964,6 +977,56 @@ def loadDialogsExpeRec4():
     msgs_impossible0.append("impossible/s_0034__ca_ne_fait_pas_partie_de_l_experience")
     
     return msgs1,msgs2,msgs_ecoute0,msgs_relance0,msgs_reponse0, msgs_impossible0
+    
+    
+def playWavAndBreathProfile( strWav, animator, timing, rStartFullness = -1, rSoundVolume = 0.1 ):
+    """
+    play a wav, with hand designed time of inpi and expi.
+    - strWav: wav filename
+    - timing: a list sequence of [debit, duration] debit / per sec: positif if inspiring, negatif if expiring: 1. 
+                  eg: [ [0.3,3],[-0.1,6] ] => will inspire quickly for 3 second and expire slowly for 6s
+    - animator: animator to call to animate the robot
+    """
+    if rStartFullness != -1:
+        # will go to the start fullness in a neutral breating fashion 0.2 / sec
+        nFrameDT = 20 # nbr frame per sec
+        nNbrSec = abs(rStartFullness-animator.rFullness)/0.2
+        nNbrFrame = int(round(nFrameDT*nNbrSec))
+        if nNbrFrame > 0:
+            rIncPerFrame = (rStartFullness-animator.rFullness) / nNbrFrame
+            print("INF: playWavAndBreathProfile: pre-animation: nNbrFrame: %d, rIncPerFrame: %5.2f" % nNbrFrame )
+            while nNbrFrame > 0:
+                print("INF: playWavAndBreathProfile: going to initial state: nNbrFrame: %d (fullness:%5.2f)" % (nNbrFrame,animator.rFullness) )
+                animator.rFullness += rIncPerFrame
+                animator.updateBodyPosture()
+                time.sleep(1./nFrameDT)
+                nNbrFrame -= 1
+        
+    sound_player.soundPlayer.stopAll()
+    timeNextStep = time.time()
+    nIdxKey = -1
+    rCurrentDebit = 0
+    timeLastUpdate = time.time()
+    sound_player.soundPlayer.playFile(strWav, bWaitEnd=False, rSoundVolume=rSoundVolume)
+    while 1:
+        print("INF: playWavAndBreathProfile: timeNextStep: %5.2f / time: %5.2f (fullness:%5.2f)" % (timeNextStep,time.time(),animator.rFullness ) )
+        if timeNextStep <= time.time():
+            nIdxKey += 1
+            if nIdxKey >= len(timing):
+                break
+            print("INF: playWavAndBreathProfile: jump to next key: %d" % (nIdxKey) )
+            rCurrentDebitPerSec = timing[nIdxKey][0]
+            timeNextStep += timing[nIdxKey][1]
+            print("INF: playWavAndBreathProfile: jump to next key: %d, rCurrentDebitPerSec: %5.2f, timeNextStep: %5.2f" % (nIdxKey,rCurrentDebitPerSec,timeNextStep) )
+            
+        rTimeSinceLastUpdate = time.time() - timeLastUpdate
+        timeLastUpdate = time.time()
+        animator.rFullness += rCurrentDebitPerSec*rTimeSinceLastUpdate
+        animator.updateBodyPosture()
+    
+        time.sleep(0.05)
+        
+        
 
 
 def demo():
@@ -1078,6 +1141,32 @@ def expe( nMode = 1 ):
     
     nDialog = 0 # diff de 0 if in a dialog, 
     
+    if 1:
+        animator.updateBodyPosture()
+        time.sleep(1)
+        print("playWavAndBreathProfile: test begin")
+        nDialog = 5
+        strWav = strTalkPath + msgDials[nDialog-1][nIdxTxt] + ".wav"
+        animation = [
+                            [0.2,3],
+                            [-0.1,6],
+                            ]
+        animation = [
+                            # [0.,0.254], #this is in the sound, but because mouvement takes time to be started, let's remove an offset
+                            [1.,1.],
+                            [0.,0.28],
+                            [-0.2,4.8],
+                            [0.,0.3],
+                            [1.2,0.8],
+                            [0.,0.18],
+                            [-0.8,1.2],
+                            ]
+        playWavAndBreathProfile(strWav,animator,animation, 0)
+        print("playWavAndBreathProfile: test mid")
+        #~ playWavAndBreathProfile(strWav,animator,animation, 1)
+        #~ print("playWavAndBreathProfile: test end")
+        return
+    
     while 1:
         
         rT = time.time() - rBeginT
@@ -1145,6 +1234,12 @@ def expe( nMode = 1 ):
                 if "next" in strActionRequired:
                     # Next Action
                     nStep += 10
+                    if 1:
+                        # debug soulagement direct
+                        if nStep == 20:
+                            nStep = 60
+                            animator.setPaused(not animator.isPaused())
+                            
                     print("\nINF: new step: %d: %s\n" % (nStep,descState[nStep]) )
                     if nStep == 20:
                         animator.setPaused(not animator.isPaused())
@@ -1161,7 +1256,7 @@ def expe( nMode = 1 ):
                     if nStep == 70:
                         animator.setListening(False)   
                         #~ animator.sayFile(strTalkPath + msgDials[4][1] + ".wav")                        
-                        nDialog = 5
+                        nDialog = 5  # soulagement
                         nStep += 10                    
                 
                     if nStep == 90:
@@ -1184,7 +1279,7 @@ def expe( nMode = 1 ):
 
                     if nStep == 140:
                         animator.setListening(False)
-                        nDialog = 5     
+                        nDialog = 5      # soulagement !
                         nStep += 10
                         
                     if nStep == 160:

@@ -3,7 +3,8 @@ process big wav file, cut them...
 """
 import wav
 import misctools
-import pygame_tools
+try: import pygame_tools
+except: pass
 
 
 import os
@@ -47,6 +48,29 @@ def cleanNameInFolder(strPath):
         if cleaned != f:
             print("INF: %s => %s" % (f,cleaned) )
             os.rename(tf, strPath+cleaned)
+            
+            
+def changeVolumeInFolder(strPath,rRatio=2):
+    """
+    remove all not ascii 128 character in filename
+    """
+    listFile = sorted(  os.listdir(strPath) )
+    for f in listFile:
+        tf = strPath + f
+        print("INF: %s => %s * %5.1f" % ( f,f,rRatio ) )
+        rNewDuration = wav.changeVolume( tf, rRatio )
+            
+            
+
+def insertSilenceInFolder(strPath, rSilenceDuration):
+    """
+    add a silence to all wav in a folder
+    """
+    listFile = sorted(  os.listdir(strPath) )
+    for f in listFile:
+        tf = strPath + f
+        rNewDuration = wav.insertSilenceAtBeginning(tf,rSilenceDuration)
+        print("INF: %s: added %5.3fs resulting in a sound of %5.3fs" % (f,rSilenceDuration,rNewDuration) )
     
 
 def cleanText(rawResume):
@@ -151,10 +175,19 @@ def getSpeechInWav( strSoundFilename ):
 
 def autocut(wavfile, rSilenceMinDuration = 0.3 ):
     bPlaySound = 0
-    bAutoRename = 0
+    bAutoRename = 1
     bAlternativeManualInputted = 1
+    bRemoveShortQuiet = 1
     bNormalise = 0
-    nPeakRatioToKeep = 128 #si respi, 16 sinon
+    strDstPath = "c:/generated/"
+    
+    print("INF: autocut, sound will be outputted to %s - no auto cleaning before!" % strDstPath )
+    
+    try: os.makedirs(strDstPath)
+    except: pass
+    
+    nPeakRatioToKeep = 128 # 128 si respi a enlever, 16 sinon
+    
     w = wav.Wav(wavfile,bQuiet=False)
     print(w)
     #~ w.write("/tmp/t.wav")
@@ -162,37 +195,96 @@ def autocut(wavfile, rSilenceMinDuration = 0.3 ):
     print("INF: nbr part: %s" % len(seq) )
     for i,s in enumerate(seq):
         if bNormalise: s.normalise()
-        strPath = "c:/generated/"
+        
         name = "s_%04d.wav" % i 
-        s.write(strPath+name)
+        s.write(strDstPath+name)
         if bPlaySound:
             print("playing: %s" % name )
-            pygame_tools.soundPlayer.playFile(strPath+name)
+            pygame_tools.soundPlayer.playFile(strDstPath+name)
             time.sleep(0.1)
             
         if bAutoRename:
-            txt = getSpeechInWav(strPath+name)
+            txt = getSpeechInWav(strDstPath+name)
             if bAlternativeManualInputted:
                 if txt == "":
+                    # could be a short one
+                    if bRemoveShortQuiet:
+                        rDuration = s.getDuration()
+                        rPeak = s.getPeakValue()
+                        print("INF: Not recognized and peak: %4.2f duration is %5.2fs" % (rPeak,rDuration) )
+                        if s.getDuration() < 2. and rPeak < 0.08:
+                            os.unlink(strDstPath+name)
+                            continue
+                    if not bPlaySound:
+                        print("playing: %s" % name )
+                        pygame_tools.soundPlayer.playFile(strDstPath+name)
+                        time.sleep(0.1)
                     txt = input("Type what you just heard:\n")
             if txt != "":
                 newname = name.replace(".wav", "__" + txt[:100]+".wav")
                 newname = cleanStringAnsi128(newname)
                 print("INF: Renammed to '%s'\n" % newname )
-                os.rename(strPath+name, strPath+newname)
+                os.rename(strDstPath+name, strDstPath+newname)
             
 # autocut - end
+
+
+def pasteSound( aListSoundFilenames, aListTimes, strOutfilename ):
+    """
+    Generate a sound by mixing many sound all together.
+    Pasting them at a time.
+    empty will be filled by silence
+    - aFilenameListSound: list of absolute filename
+    - aTimePosition: time of start of each sound, in sec
+    - strOutfilename: name of generated file. properties are taken from the first sound processed
+    """
+    out = None
+    for i in range(min(len(aListSoundFilenames),len(aListTimes)) ):
+        f = aListSoundFilenames[i]
+        rT = aListTimes[i]
+        w = wav.Wav(f)
+        assert(w.isOpen())
+        if out == None:
+            # create empty with same properties than the first one
+            out = wav.Wav()
+            out.copyHeader(w)
+            out.updateHeaderSizeFromDataLength()
+        rEndT = rT + w.getDuration()
+        if rEndT >= out.getDuration():
+            out.extendTo( rEndT+0.01 ) # add margin
+        # redo using numpy native function (add?)
+        nInsertSample = round(rT * out.nSamplingRate*out.nNbrChannel)
+        nEndSample =  nInsertSample+len(w.data)
+        print("DBG: pasteSound: nInsertSample: %s" % nInsertSample )
+        print("DBG: pasteSound: nEndSample: %s" % nEndSample )
+        print("DBG: pasteSound: len(out.data): %s" % len(out.data) )
+        print("DBG: pasteSound: len(w.data): %s" % len(w.data) )
+        out.data[nInsertSample:nEndSample] += w.data
+        
+    print( "INF: pasteSound: writing '%s' from %d sound files" % (strOutfilename,len(aListSoundFilenames) ) )
+    out.write(strOutfilename)
+# pasteSound - end
+            
     
     
 if __name__ == "__main__":
     strPathRavir = "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut/"
-    if 1:
+    #~ strPathRavir = "d:/sounds/recordings/ravir"
+    
+    if 0:
+        #~ changeVolumeInFolder(strPathRavir+"rec3/dial2/",2)
+        changeVolumeInFolder(strPathRavir+"rec3/relance/",2)
+    
+    if 0:
         #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/rec2.wav")
         #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/rec1_fx.wav")
         #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/rec2_fx.wav",rSilenceMinDuration=0.5)
         #~ autocut("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/robot3.wav")
         #~ autocut("D:/sounds/recordings/robot4.wav")
-        autocut("D:/sounds/recordings/respi1.wav") # should cut in 14 or 15 seq
+        #~ autocut("D:/sounds/recordings/respi1.wav") # should cut in 14 or 15 seq
+        #~ autocut("D:/sounds/recordings/ravir3/r7.wav")
+        autocut("D:/sounds/recordings/ravir3/r8_rel.wav")
+        
     if 0:
         strFile = strPathRavir + "/rec2/s032.wav"
         strFile = "/tmp/s032.wav"
@@ -205,6 +297,14 @@ if __name__ == "__main__":
     if 0:
         cleanNameInFolder(strPathRavir + "/rec1/")
         cleanNameInFolder(strPathRavir + "/rec2/")
+        
+    if 0:
+        # add silence at beginning of each sound
+        rTimeAdded = 0.1
+        strPath = "/tmp2/brea/selected_intake/"
+        strPath = "/home/nao/breath/selected_intake/"
+        insertSilenceInFolder(strPath, rTimeAdded)
+        insertSilenceInFolder("/home/nao/breath/selected_outtake/", rTimeAdded)
         
     
     

@@ -155,7 +155,7 @@ class Stater:
             f=open(self.strSaveFileName, "rt")
             data = f.read()
             reconstructed = eval(data) # harsh unsafe!
-            print("DBG: Stater.load: loading: '%s'" % str(reconstructed) )
+            #print("DBG: Stater.load: loading: '%s'" % str(reconstructed) )
             self.dStatPerDay, self.nCptRestartToday  = reconstructed
             self.nCptRestartToday += 1
             f.close()  
@@ -188,6 +188,9 @@ class Stater:
             "48:B0:2D:05:B6:9D": "Jetson AGX",
             "DC:A6:32:48:A4:0C": "Rasp4Therm",
             "18:03:73:17:D3:6C": "BigA",
+            "2C:F0:5D:9F:BF:DE": "XeniaDev",
+            "A0:32:99:D1:52:CA": "LenovoYoga",
+            "8A:E2:56:9A:7D:6A": "IphoneXAlex",
             
             
         }
@@ -255,7 +258,7 @@ class Stater:
                 statToday[k][2] = False
         self.nLastTime = time.time()
         
-        print(self.dStatPerDay)
+        #print(self.dStatPerDay)
 
         return bNewDay
     
@@ -284,6 +287,13 @@ class Stater:
         
 # class Stater - end
 
+sys.path.append(strLocalPath+"/../crypto_prono/")
+import scrap
+def updateScrap():
+    strPath = os.path.expanduser("~/")+"/records/"
+    strPath = "/home/pi/records/"
+    scrap.scrapAndSaveCryptoCurrency(strPath)
+
 def loopUpdate():
     logDebug("loopUpdate: begin")
     stats = Stater()
@@ -300,6 +310,7 @@ def loopUpdate():
                 stats.generatePage(stats.strDate, "/var/www/html/stat_up.html")                                
                 if misctools.isEvery10min() or 0:
                     stats.save()
+                updateScrap()
             except BaseException as err:
                 strErr = "ERR: loopUpdate: err: %s" % str(err)
                 print(strErr)

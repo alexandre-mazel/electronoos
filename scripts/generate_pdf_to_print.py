@@ -38,7 +38,8 @@ def generatePdfFromImagesAndText( listImgs, strOutPdfFilename, strVersoText = No
     nNumImage = 0
     bDoubleForVerso = False # prepare for being printed with verso corresponding to same image
     nIdxArea = 0
-    nNbrImageThisPage = 1000
+    nNbrImageThisPage = 1000 # force add a new page at first time
+    bAddPageNum = True
     while 1:
         print("image %d/%d" % (nNumImage,len(listImgs)) )
         if nNbrImageThisPage >= nNbrImagePerPage:
@@ -46,28 +47,39 @@ def generatePdfFromImagesAndText( listImgs, strOutPdfFilename, strVersoText = No
             nNbrImageThisPage = 0
 
         strFilename = listImgs[nNumImage]
-        bDeleteImg = False
+        bDeleteCroppedImg = False
         if aListArea != None:
             im = cv2.imread(strFilename)
             r = aListArea[nIdxArea]
             im = im[r[1]:r[3],r[0]:r[2]]
             strFilename = "/tmp/crop%s.jpg" % str(time.time() )
-            cv2.imwrite(strFilename, im, [int(cv2.IMWRITE_JPEG_QUALITY), 70])
+            cv2.imwrite(strFilename, im, [int(cv2.IMWRITE_JPEG_QUALITY), 70]) #here you can change the quality!
             nIdxArea += 1
             if nIdxArea >= len(aListArea):
                 nIdxArea = 0
                 nNumImage += 1
-            bDeleteImg = True
+            bDeleteCroppedImg = True
         else:
             nNumImage += 1
             
         pdf.image(strFilename,x=int(nImageW*(nNbrImageThisPage%2)), y=int(nImageH*(nNbrImageThisPage//2)), w=nImageW)
-        if bDeleteImg: os.remove(strFilename)
+        if bDeleteCroppedImg: os.remove(strFilename)
         
         nNbrImageThisPage += 1
-        
+
+            
+        if bAddPageNum:
+            pdf.set_font('Arial', '', 10)
+            txt = "%d/%d" % (nNumImage,len(listImgs))
+            hInterlign = 8
+            x = nImageW//2 # centered
+            x = nImageW-5 # right
+            pdfMultiCell( pdf, x, nImageH-2, txt, hInterlign, bCentered=True )
+            
         if nNumImage >= len(listImgs):
             break
+            
+    # while - end
             
     if strVersoText != None:
         # add some text
@@ -127,5 +139,24 @@ def generateSchoolBook():
     generatePdfFromImagesAndText(listImages, '/tmp/generated.pdf', nNbrImagePerPage = 1, aListArea=aListArea)
 # generateSchoolBook - end
 
+def generatePdfFromScans(strFilenameSkul, strDestPdf):
+    """
+    take all images matching strFilenameSkul and paste them in one pdf, one image per page, fullscreen
+    """
+    
+    listImages = []
+    aListArea = [(0,0,999999,999999)] # full image size
+    aListArea = None # to leave full image per page, will use png and not a compressed jpg
+    for nNumPage in range(500):
+        strFileName = strFilenameSkul%nNumPage
+        if os.path.isfile( strFileName ):
+            listImages.append(strFileName)
+            
+        
+    print("listImages: %s" % listImages )
+    generatePdfFromImagesAndText(listImages, strDestPdf, nNbrImagePerPage = 1, aListArea=aListArea)
+# generatePdfFromScans - end    
+    
 #~ generateGaiaBirthday()
-generateSchoolBook()
+#~ generateSchoolBook()
+generatePdfFromScans("C:/tmpScan/b%02d.png","c:/tmpScan/pasted.pdf")

@@ -14,7 +14,8 @@ import multiprocessing
 
 import sys
 sys.path.append("../alex_pytools/" )
-import misctools # just for cpumodel
+try: import misctools # just for cpumodel
+except: pass
 
 def getFreeDiskSpace():
     """
@@ -103,7 +104,11 @@ def print_version():
     print( "python version   : %d.%d.%d (%dbits) (%d core(s))" % (sys.version_info.major,sys.version_info.minor,sys.version_info.micro,8 * struct.calcsize("P"),multiprocessing.cpu_count()) )
     
 def print_cpu():
-    print( "cpu              : %s" % str(misctools.getCpuModel(bShort=True)) )
+    try:
+        strCpuModel = misctools.getCpuModel(bShort=True)
+    except:
+        strCpuModel = "TODO"
+    print( "cpu              : %s" % strCpuModel )
     
 def test_cpu_int( bPrint = True ):
     if bPrint: sys.stdout.write( "test_cpu_int2    : " )
@@ -857,6 +862,104 @@ disk_write    1KB: ####################  13.29s (75.26 Mo/s)
 disk_read     1KB: ####################   4.25s (235.43 Mo/s)
 disk_write 1024KB: ####################  10.66s (93.84 Mo/s)
 disk_read  1024KB: ####################   3.35s (298.94 Mo/s)
+
+
+xenia@xenia-test-server:~/alex/git/electronoos/scripts$ python3 test_perf.py 50000
+INF: Changing disk test size to 50000 MB
+python version   : 3.8.5 (64bits) (8 core(s))
+cpu              : todo
+test_cpu_int2    : ####################   0.23s
+test_cpu_float2  : ####################   0.05s
+scipy.fftpack    : not found
+test_orb4.5.1    : ####################   0.09s (1172.23fps)
+opencv (orb)    : not found
+opencv (orb)    : not found
+multiprocess x1 :  0.23s /  0.05s /  0.00s /  0.00s /  0.00s /  0.00s =>    0.29s
+multiprocess x4 :  0.24s /  0.05s /  0.00s /  0.00s /  0.00s /  0.00s =>    0.59s
+multiprocess x8 :  0.25s /  0.06s /  0.00s /  0.00s /  0.00s /  0.00s =>    0.91s
+multiprocess x32:  1.00s /  0.22s /  0.01s /  0.01s /  0.01s /  0.01s =>    2.19s
+disk_write    1KB: ####################  36.40s (1373.69 Mo/s)
+disk_read     1KB: ####################  38.64s (1294.00 Mo/s)
+disk_write 1024KB: ####################  45.93s (1088.53 Mo/s)
+disk_read  1024KB: ####################  45.87s (1090.02 Mo/s)
+xenia@xenia-test-server:~/alex/git/electronoos/scripts$
+
+xenia@xenia-test-server:~/alex/git/electronoos/scripts$ python3 test_perf.py
+python version   : 3.8.5 (64bits) (8 core(s))
+cpu              : todo
+test_cpu_int2    : ####################   0.23s
+test_cpu_float2  : ####################   0.05s
+scipy.fftpack    : not found
+test_orb4.5.1    : ####################   0.09s (1172.23fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : test_perf_vga_*.png: not found
+multiprocess x1 :  0.28s /  0.05s /  0.00s /  0.15s /  0.06s /  0.06s =>    0.60s
+multiprocess x4 :  0.24s /  0.05s /  0.00s /  0.16s /  0.06s /  0.06s =>    1.18s
+multiprocess x8 :  0.25s /  0.06s /  0.00s /  0.18s /  0.06s /  0.06s =>    1.80s
+multiprocess x32:  1.00s /  0.22s /  0.02s /  0.77s /  0.24s /  0.24s =>    4.30s
+disk_write    1KB: ####################   2.58s (387.25 Mo/s)
+disk_read     1KB: ####################   1.67s (600.11 Mo/s)
+disk_write 1024KB: ####################   2.29s (436.47 Mo/s)
+disk_read  1024KB: ####################   1.41s (708.34 Mo/s)
+
+
+*** Black portable Dell ***
+
+a@black:~/dev/electronoos/scripts$ cat /proc/cpuinfo 
+processor	: 0
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 37
+model name	: Intel(R) Core(TM) i5 CPU       M 480  @ 2.67GHz
+stepping	: 5
+microcode	: 0x2
+cpu MHz		: 1197.000
+cache size	: 3072 KB
+physical id	: 0
+siblings	: 4
+core id		: 0
+cpu cores	: 2
+apicid		: 0
+initial apicid	: 0
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 11
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aperfmperf pni dtes64 monitor ds_cpl vmx est tm2 ssse3 cx16 xtpr pdcm pcid sse4_1 sse4_2 popcnt lahf_lm ida arat dtherm tpr_shadow vnmi flexpriority ept vpid
+bogomips	: 5319.90
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 36 bits physical, 48 bits virtual
+power management:
+
+a@black:~/dev/electronoos/scripts$ sudo python test_perf.py 
+[sudo] password for a: 
+Sorry, try again.
+[sudo] password for a: 
+Sorry, try again.
+[sudo] password for a: 
+Sorry, try again.
+sudo: 3 incorrect password attempts
+a@black:~/dev/electronoos/scripts$ sudo python test_perf.py 
+[sudo] password for a: 
+INF: Due to low empty disk space, reducing disk test size to 648 MB
+python version   : 2.7.6 (64bits) (4 core(s))
+cpu              : todo
+test_cpu_int2    : ####################   0.55s
+test_cpu_float2  : ####################   0.14s
+scipy.fftpack    : not found
+test_orb2.4.8    : ####################   0.28s (358.00fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : test_perf_vga_*.png: not found
+multiprocess x1 :  0.55s /  0.14s /  0.00s /  0.42s /  0.13s /  0.12s =>    1.38s
+multiprocess x4 :  1.08s /  0.30s /  0.01s /  0.89s /  0.27s /  0.27s =>    4.20s
+multiprocess x8 :  2.15s /  0.61s /  0.02s /  1.78s /  0.55s /  0.55s =>    9.85s
+multiprocess x32:  8.72s /  2.43s /  0.05s /  7.18s /  2.18s /  2.18s =>   32.61s
+disk_write    1KB: ####################   9.38s (69.10 Mo/s)
+disk_read     1KB: ####################   9.82s (66.00 Mo/s)
+disk_write 1024KB: ####################  11.18s (57.24 Mo/s)
+disk_read  1024KB: ####################   9.90s (64.64 Mo/s)
+
 
 
 

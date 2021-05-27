@@ -61,11 +61,17 @@ class SoundPlayer:
         preload file before playing them
         """
         sound = self.player.loadFile(strFilename)
+        if not sound: print("WRN: sound_player.loadFile: loading error: '%s'" % strFilename)
         return sound
         
         
     def playFile( self, strFilename, bWaitEnd = True, rSoundVolume = 1. ):
-        if self.player: return self.player.playFile(strFilename, bWaitEnd = bWaitEnd, rSoundVolume=rSoundVolume)
+        """
+        rSoundVolume in [0,1]
+        """
+        if self.player: 
+            return self.player.playFile(strFilename, bWaitEnd = bWaitEnd, rSoundVolume=rSoundVolume)
+        
         if os.name == "nt":
             #windows standard
             print("DBG: SoundPlayer.playFile: using standard windows api")

@@ -1,13 +1,17 @@
 # coding: cp1252
+
 """
 Chatbot sample
 """
 import sys
 sys.path.append("../alex_pytools/" )
 import misctools
+import sound_processing
 sys.path.append("../../rounded-rects-pygame/" ) # for roundrects
 from roundrects import round_rect
 from roundrects import aa_round_rect as round_rect
+
+import math
 import noise
 import random
 import time
@@ -15,6 +19,81 @@ import time
 import os
 import pygame as pg
 import pygame.freetype  # Import the freetype module.
+
+def scaleImg( img,ratio):
+    s = img.get_rect().size
+    wdst = s[0]//ratio
+    img = pg.transform.scale(img, (wdst, int(wdst*s[1]/s[0])))
+    return img
+
+def rectRotated( surface, color, pos, fill, border_radius, rotation_angle, rotation_offset_center = (0,0), nAntialiasingRatio = 1 ):
+        """
+        - rotation_angle: in degree
+        - rotation_offset_center: moving the center of the rotation: (-100,0) will turn the rectangle around a point 100 above center of the rectangle,
+                                             if (0,0) the rotation is at the center of the rectangle
+        - nAntialiasingRatio: set 1 for no antialising NB: very costly due to transparency per pixel of big area and ... on my MSTab4: rendering 4 rect at 8 => 4.9fps, at 4: 15fps (timing when we were rendered at max(w,h)*max(w,h)
+        """
+        bDebug = 0
+        nRenderRatio = nAntialiasingRatio
+        
+        # We need to add margin depending of the shape of the rectangle and the offset to center of rotation
+        
+        # idea: render everything around center of surface then copy the surface
+        # render_margin is then half size of surface
+        
+        # intermediate rendering surface size
+        # it's important to find the smaller one to avoid bliting and scaling too much pixels
+        sw = pos[2]+abs(rotation_offset_center[0])*2
+        sh = pos[3]+abs(rotation_offset_center[1])*2
+
+        surfcenterx = sw//2
+        surfcentery = sh//2
+        s = pg.Surface( (sw*nRenderRatio,sh*nRenderRatio) )
+        s = s.convert_alpha()
+        s.fill((0,0,0,0))
+        if bDebug: s.fill((127,127,127))
+        
+        rw2=pos[2]//2 # halfwidth of rectangle
+        rh2=pos[3]//2
+
+        pg.draw.rect( s, color, ((surfcenterx-rw2-rotation_offset_center[0])*nRenderRatio,(surfcentery-rh2-rotation_offset_center[1])*nRenderRatio,pos[2]*nRenderRatio,pos[3]*nRenderRatio), fill*nRenderRatio, border_radius=border_radius*nRenderRatio )
+        if bDebug: pg.draw.rect(s,(0,0,0),(surfcenterx*nRenderRatio,surfcentery*nRenderRatio,2*nRenderRatio,2*nRenderRatio)) # draw center to debug
+        s = pygame.transform.rotate( s, rotation_angle )        
+        if nRenderRatio != 1: s = pygame.transform.smoothscale(s,(s.get_width()//nRenderRatio,s.get_height()//nRenderRatio))
+        incfromrotw = (s.get_width()-sw)//2
+        incfromroth = (s.get_height()-sh)//2
+        surface.blit( s, (pos[0]-surfcenterx+rotation_offset_center[0]+rw2-incfromrotw,pos[1]-surfcentery+rotation_offset_center[1]+rh2-incfromroth) )
+        
+    
+def splitTextMultiline( strLongText, nNbrLetterMax = 20 ):
+    """
+    Insert "\n" in a long text
+    - strLongText: a long text, who can already include some \n
+    """
+    words = [word.split(' ') for word in strLongText.splitlines()]
+    print(words)
+    out = ""
+    
+    for j in range(len(words)):
+        txt = ""
+        line = words[j]
+        for word in line:
+            if len(txt)+len(word)>nNbrLetterMax:
+                out += txt
+                if txt != "":
+                    out += "\n"
+                txt = word
+            else:
+                if txt != "":
+                    txt += " "
+                txt += word
+        out += txt
+        if j < len(words)-1:
+            out += "\n"
+            
+    print("out: '%s'" % out)
+    return out
+    
 
 def renderTxtMultiline(surface, text, pos, font, color=pygame.Color('black'), nWidthMax = -1):
     """
@@ -90,7 +169,8 @@ def renderTxtMultiline(surface, text, pos, font, color=pygame.Color('black'), nW
 
 def renderTxtMultilineCentered(surface, text, pos, font, color=pygame.Color('black'), nWidthMax = -1, nWidthTotal = -1, nHeightTotal = -1):
     """
-    nWidthMax: limit width to a specific size
+    - nWidthMax: limit width to a specific size
+    - nWidthTotal: nWidthTotal: max space to render
     return the rect
     """
     bVerbose = False
@@ -157,7 +237,7 @@ def renderTxtMultilineCentered(surface, text, pos, font, color=pygame.Color('bla
 # renderTxtMultilineCentered - end
 
 class Button(object):
-    def __init__( self, txt, pos, size, margin, id=-1 ):
+    def __init__( self, txt, pos, size, margin, colText, colButton, colSelectedButton, id=-1 ):
         """
         - margin: spaces between button and text
         """
@@ -166,22 +246,24 @@ class Button(object):
         self.pos = pos
         self.size = size
         self.margin = margin
+        self.colText = colText
+        self.colButton = colButton
+        self.colSelectedButton = colSelectedButton
         
     def render( self, surface, font, bSelected=False ):
         """
         return painted rect position
         """
-        colTxt = (243,243,243)
-        colButton = (164//2,194//2,244//2)
-        colButtonSelected = (250//2,250//2,244//2)
         
         if bSelected:
-            colButton = colButtonSelected
+            colButton = self.colSelectedButton
+        else:
+            colButton = self.colButton
         
         #~ txt_surface, rect = font.render(self.txt, colTxt)
         round_rect(surface,self.pos+self.size,colButton,11,0)
         #~ surface.blit(txt_surface,(self.pos[0]+self.margin[0],self.pos[1]+self.margin[1]))
-        renderTxtMultilineCentered(surface,self.txt,(self.pos[0],self.pos[1]),font, colTxt,nWidthTotal = self.size[0], nHeightTotal=self.size[1])
+        renderTxtMultilineCentered(surface,self.txt,(self.pos[0],self.pos[1]),font, self.colText,nWidthTotal = self.size[0], nHeightTotal=self.size[1])
         
     def isOver(self,pos):
         if          pos[0] >= self.pos[0] and pos[0] < self.pos[0]+self.size[0] \
@@ -201,12 +283,12 @@ class ButtonManager(object):
     def hasButtons( self ):
         return len(self.aButtons) > 0
         
-    def createButtons( self, astrButton, surface, pos ):
+    def createButtons( self, astrButton, surface, pos, colTxt, colButton, colButtonSelected ):
         """
         surface is used just to know the available size
         """
         if self.font == None:
-            self.font = pygame.freetype.Font("../fonts/SF-Compact-Text-Semibold.otf", 15)
+            self.font = pygame.freetype.Font("../fonts/SF-Compact-Text-Semibold.otf", 12) # was 15
             self.font.pad = True
         if self.fontSmall == None:
             self.fontSmall = pygame.freetype.Font("../fonts/SF-Compact-Text-Semibold.otf", 12)
@@ -237,10 +319,13 @@ class ButtonManager(object):
                 nRealMarginX = nMarginX
             wButton = rect[2] + nRealMarginX*2
             hButton = rect[3] + nMarginY*2
+            print("hButton: %s" % hButton)
+            if hButton < 24:
+                hButton = 24 # evite les boutons a grosses boules aux extremites
             if not bAlignCenter:
                 #~ round_rect(surface,(x,y,wButton,hButton),colButton,11,0)
                 #~ surface.blit(txt_surface,(x+nRealMarginX,y+nMarginY))
-                self.aButtons.append( Button(txt,(x,y),(wButton,hButton),(nRealMarginX,nMarginY)) )
+                self.aButtons.append( Button(txt,(x,y),(wButton,hButton),(nRealMarginX,nMarginY),colTxt, colButton, colButtonSelected) )
             else:
                 computedSize.append((x,y,wButton,hButton,nRealMarginX,nMarginY))
             x += wButton + nMarginX
@@ -270,7 +355,7 @@ class ButtonManager(object):
                     y += yVertical
                     yVertical += hButton+nMarginY*1
                     x = nRealMarginX
-                self.aButtons.append( Button(txt,(x,y),(wButton,hMax),(nRealMarginX,nMarginY)) )
+                self.aButtons.append( Button(txt,(x,y),(wButton,hMax),(nRealMarginX,nMarginY),colTxt, colButton, colButtonSelected) )
                 
      # createButtons - end
      
@@ -324,11 +409,30 @@ class Agent(object):
         
         
         self.imBot = pg.image.load("robot_idle.png")
-        s = self.imBot.get_rect().size
-        wdst = s[0]//2
-        self.imBot = pg.transform.scale(self.imBot, (wdst, int(wdst*s[1]/s[0])))
+        self.imBot = scaleImg(self.imBot,2)
+
+        # obo part
+        self.bAlternateColor = True
+        self.bAlternateColorDrawing = False
+        if self.bAlternateColor:
+            strExt = "_alt"
+        elif self.bAlternateColorDrawing:
+            strExt = "_alt0"
+        else:
+            strExt = ""
+        self.imBotObo = pg.image.load("robot_idle_obo%s.png" % strExt)
+        self.imBotObo = scaleImg(self.imBotObo,2)
+        self.imBotOboEyeL = pg.image.load("obo_leye%s.png" % strExt)
+        self.imBotOboEyeL = scaleImg(self.imBotOboEyeL,2)
+        self.imBotOboEyeR = pg.image.load("obo_reye%s.png" % strExt)
+        self.imBotOboEyeR = scaleImg(self.imBotOboEyeR,2)
+        self.imBotOboMouthSpeech = pg.image.load("obo_mouth_speech%s.png" % strExt)
+        self.imBotOboMouthSpeech = scaleImg(self.imBotOboMouthSpeech,2)
+        
         self.bInBlink = False
         self.timeBotsStartExit = 0
+        
+        self.rAngleArm1 = 0
         
         self.strTxtSpeak = ""
         
@@ -361,18 +465,29 @@ class Agent(object):
         pass
         
         
-    def speak(self,txt,astrAnswers):
+    def speak(self,txt,astrAnswers,strSound=None):
         self.timeStartSpeak = pg.time.get_ticks()/1000
         self.rDurationSpeak = len(txt)/20
         self.strTxtSpeak = txt
+        for i in range(len(astrAnswers)):
+            astrAnswers[i] = splitTextMultiline(astrAnswers[i],12)
         self.astrAnswers = astrAnswers
+        if strSound:
+            misctools.playWav("sounds/human/" + strSound + ".wav",bWaitEnd=False)
         
     def isSpeaking(self):
         return self.strTxtSpeak != ""
     
     def renderUserButton( self, surface, pos ):
         if not self.buttonManager.hasButtons():
-            self.buttonManager.createButtons(self.astrAnswers,surface,pos)
+            colTxt = (243,243,243)
+            colButton = (164//2,194//2,244//2)
+            colButtonSelected = (250//2,250//2,244//2)
+            if self.bAlternateColor:
+                colTxt = (0,0,0)
+                colButton = (222,217,102)
+                colButtonSelected = (191,144,0)                
+            self.buttonManager.createButtons(self.astrAnswers,surface,pos,colTxt,colButton,colButtonSelected)
         self.buttonManager.render(surface)
         
     def receiveAnswer(self,num):
@@ -380,73 +495,15 @@ class Agent(object):
         self.buttonManager.clearButtons()
         self.strTxtSpeak = ""
         
-
-    def draw(self):
-        #~ self.screen.blit(self.background, (0,0))
-        #~ self.screen.fill( pg.Color("lightslategrey") )
         
-        colBackground = (247,247,247)
-        colLight1 = (220,220,220)
-        colBlack = (0,0,0)
-        colDark1 = (22,22,22)
-        colBlue1 = (164,194,244)
+    def renderRobotStd(self,xbot,ybot,rTime,bWritingQuestion):
         colBotsSkin = (243,243,243)
         colBotsMicro = (153,153,153)
+        colBlack = (0,0,0)
+        colDark1 = (22,22,22)
         
-        fontSys = pygame.freetype.Font("../fonts/SF-UI-Display-Regular.otf", 20)
-        #~ fontSysSmall = pygame.freetype.Font("../fonts/SF-UI-Display-Regular.otf", 16)
-        fontSysSmall = pygame.freetype.Font("../fonts/SF-Compact-Text-Semibold.otf", 15)
-        fontTxt = pygame.freetype.Font("../fonts/SF-UI-Display-Regular.otf", 20)
-        
-        
-        w = self.w
-        h = self.h
-        
-        self.screen.fill( colBackground )
-
-        
-        # system
-        self.screen.blit(self.imTopBanner, (0+260+2, 0+10)) 
-        ycur = 10
-        
-        hour,min,sec =misctools.getTime()
-        #~ hour,min = 11,28
-        strTime = "%2d:%2d" % (hour,min)
-        textsurface,rect = fontSysSmall.render( strTime, (0, 0, 0) )
-        self.screen.blit(textsurface,(10+20+4 ,ycur+4))
-        
-        # title
-        ycur = 28+10
-        
-        for i in range(3):
-            y = ycur+i*6
-            pg.draw.line(self.screen, colDark1,(10+6+3,y),(30+6,y),2 )
-
-    
-        #~ fontSys = pg.font.SysFont('Comic Sans MS', 30)
-        #~ textsurface = fontSys.render('Faiska', False, (0, 0, 0))
-        #~ fontSys = pygame.freetype.SysFont('Verdana', 18)
-
-        #~ fontSys.underline = True
-        textsurface,rect = fontSys.render('Faiska', (0, 0, 0))
-        self.screen.blit(textsurface,(w//2-(rect[2]-rect[0])//2,ycur))
-        ycur += 24
-        
-        pg.draw.line(self.screen, colLight1,(0,ycur),(w,ycur) )
-        ycur += 1
-        
-        rTime = pg.time.get_ticks()/1000 #rTime in sec # the time of the game
-        
-        # screen
-        # round_rect(mat,(x,y,w,h),col1,round_size,border_size)
-        ycur += 20
-        xmargin=20
-        ymargin=20
-        warea = w-xmargin*2
-        harea = 500
-        
-        xbot = xmargin+warea-self.imBot.get_rect().size[0]+xmargin//2 + 6
-        ybot = ycur+harea-self.imBot.get_rect().size[1]#+ymargin//2
+        if bWritingQuestion:
+            ybot += noise.getSimplexNoise(rTime/2,100)*4
         
         rTimeBotsInOut = 2.
         if rTime < rTimeBotsInOut:
@@ -454,8 +511,34 @@ class Agent(object):
             xbot += 300*(rTimeBotsInOut-rTime)
         elif self.timeBotsStartExit > 0:
             xbot += 300*(rTime-self.timeBotsStartExit)/rTimeBotsInOut
-        
-        round_rect(self.screen, (xmargin,ycur,warea,harea), colBlue1, 10, 0)
+
+            
+        if 1:
+            # draw arms
+            xArm1 = xbot+8
+            yArm1 = ybot+161
+            
+            xArm2 = xbot+173
+            yArm2 = yArm1
+            wArm = 18
+            hArm = 140
+            border_radius = 3
+            
+            if noise.getSimplexNoise(rTime*2) > 0.3 or 1:
+                if bWritingQuestion:
+                    self.rAngleArm1 = -20+ noise.getSimplexNoise((rTime)*4,20)*20
+                    self.rAngleArm2 =  20 - noise.getSimplexNoise((rTime)*4,30)*20
+                else:
+                    self.rAngleArm1 = -2 +noise.getSimplexNoise((rTime)/3,20)*3
+                    self.rAngleArm2 = -self.rAngleArm1
+            rectRotated(self.screen,colBotsSkin,(int(xArm1),int(yArm1),wArm,hArm), 0, border_radius=border_radius, rotation_angle=self.rAngleArm1, rotation_offset_center=(0,-60),nAntialiasingRatio=1 )
+            rectRotated(self.screen,colBlack,(int(xArm1)-1,int(yArm1)-1,wArm+1,hArm+1), 1, border_radius=border_radius, rotation_angle=self.rAngleArm1, rotation_offset_center=(0,-60),nAntialiasingRatio=4 )
+            rectRotated(self.screen,colBotsSkin,(int(xArm2),int(yArm2),wArm,hArm), 0, border_radius=border_radius, rotation_angle=self.rAngleArm2, rotation_offset_center=(0,-60) )
+            rectRotated(self.screen,colBlack,(int(xArm2)-1,int(yArm2)-1,wArm+1,hArm+1), 1, border_radius=border_radius, rotation_angle=self.rAngleArm2, rotation_offset_center=(0,-60),nAntialiasingRatio=4 )
+          
+            # test rectRotated:
+            #~ rectRotated(self.screen,colBlack,(100,300,wArm+1+100,hArm+1+5), 1, border_radius=border_radius, rotation_angle=self.rAngleArm2, rotation_offset_center=(110,100),nAntialiasingRatio=4)
+          
         self.screen.blit(self.imBot, (xbot, ybot))
         
 
@@ -494,15 +577,191 @@ class Agent(object):
 
         pg.draw.ellipse(self.screen,colBlack,(xEye1-wEye//2,yEye-hEye//2,wEye,hEye) )
         pg.draw.ellipse(self.screen,colBlack,(xEye2-wEye//2,yEye-hEye//2,wEye,hEye) )
-            
         
-        if self.isSpeaking() and pg.time.get_ticks()/1000-self.timeStartSpeak < self.rDurationSpeak:
+           
+        
+        if self.isSpeaking() and bWritingQuestion:
             # change mouth
             pg.draw.rect(self.screen,colBotsSkin,(xmouth-wmouth//2,ymouth-hmouth//2,wmouth,hmouth) )
             
             #nMouthSize = (int(rTime)*3)%hmouth
             nMouthSize = int(abs(noise.getSimplexNoise(rTime*3))*hmouth)
             pg.draw.ellipse(self.screen,colDark1,(xmouth-nMouthSize,ymouth-nMouthSize//2,nMouthSize*2,nMouthSize) )
+            
+            # microphone over mouth
+            wmicro = 26
+            hmicro = 16
+            pg.draw.ellipse(self.screen,colBotsMicro,(xmouth-wmicro//2-26,ymouth-hmicro//2+2,wmicro,hmicro) )
+
+
+
+    def renderRobotObo(self,xbot,ybot,rTime,bWritingQuestion):
+
+        xbot -= 50+60
+        ybot -=20
+        
+        if bWritingQuestion:
+            ybot += noise.getSimplexNoise(rTime/2,100)*8
+        else:
+            ybot += noise.getSimplexNoise(rTime/4,100)*3
+            
+        rTimeBotsInOut = 2.
+        if rTime < rTimeBotsInOut:
+            # arrival
+            xbot += 300*(rTimeBotsInOut-rTime)
+        elif self.timeBotsStartExit > 0:
+            xbot += 300*(rTime-self.timeBotsStartExit)/rTimeBotsInOut
+            
+        self.screen.blit(self.imBotObo, (xbot, ybot))
+        
+
+        xmouth = xbot+101+26
+        ymouth = ybot+96-10
+        
+        
+        if self.bAlternateColor:
+            xmouth += 4
+            ymouth += 4
+            
+            
+        # animate bots
+        
+        xEye1=xbot+77+35
+        xEye2=xbot+122+46
+        yEye1 = ybot+54+8
+        yEye2 = yEye1
+        if self.bAlternateColorDrawing:
+            yEye2 += 3
+        wEyeMax = 30
+        hEyeMax = wEyeMax
+
+        wEye = int( (wEyeMax+3)*(0.8+0.2*abs(noise.getSimplexNoise((rTime+10)/2))) )
+        hEye = wEye
+        
+        if self.bInBlink:
+            rTimeBlink = 0.1
+            rInBlink = (rTime - self.timeStartBlink)/rTimeBlink
+            if rInBlink >= 1.:
+                self.bInBlink = False
+            else:
+                if rInBlink < 0.5:
+                    hEye=int( (wEyeMax+3)*(0.5-rInBlink) )
+                else:
+                    hEye=int( (wEyeMax+3)*(rInBlink-0.5) )
+        else:
+            if random.random()>0.99:
+                self.bInBlink = True
+                self.timeStartBlink = rTime
+                
+        if 1:
+            # animate eyes
+            rTimeMove = rTime
+            if bWritingQuestion:
+                rTimeMove = rTime*4
+            
+            if not bWritingQuestion:
+                xinc = noise.getSimplexNoise(rTimeMove/2,10)*5
+                xEye1+=xinc
+                xEye2+=xinc
+
+            yinc = noise.getSimplexNoise(rTimeMove,20)*3
+            yEye1+=yinc
+            yEye2+=yinc
+            
+        self.screen.blit(self.imBotOboEyeL, (xEye1, yEye1))
+        self.screen.blit(self.imBotOboEyeR, (xEye2, yEye2))    
+        
+           
+        
+        if self.isSpeaking() and bWritingQuestion:
+            
+            if noise.getSimplexNoise(rTime*8,30)>0.1:            
+                self.screen.blit(self.imBotOboMouthSpeech, (xmouth, ymouth))
+                
+                
+
+    def draw(self):
+        #~ self.screen.blit(self.background, (0,0))
+        #~ self.screen.fill( pg.Color("lightslategrey") )
+        
+        
+        colBackground = (247,247,247)
+        colLight1 = (220,220,220)
+        colBlack = (0,0,0)
+        colDark1 = (22,22,22)
+        
+        col1 = (164,194,244) # fond et highlight
+        
+        if self.bAlternateColor:
+            col1 = (254,252,221)
+
+        
+        fontSys = pygame.freetype.Font("../fonts/SF-UI-Display-Regular.otf", 20)
+        #~ fontSysSmall = pygame.freetype.Font("../fonts/SF-UI-Display-Regular.otf", 16)
+        fontSysSmall = pygame.freetype.Font("../fonts/SF-Compact-Text-Semibold.otf", 15)
+        fontTxt = pygame.freetype.Font("../fonts/SF-UI-Display-Regular.otf", 20)
+        
+        
+        w = self.w
+        h = self.h
+        
+        self.screen.fill( colBackground )
+
+        
+        # system
+        self.screen.blit(self.imTopBanner, (0+260+2, 0+10)) 
+        ycur = 10
+        
+        hour,min,sec =misctools.getTime()
+        #~ hour,min = 11,28
+        strTime = "%2d:%02d" % (hour,min)
+        textsurface,rect = fontSysSmall.render( strTime, (0, 0, 0) )
+        self.screen.blit(textsurface,(10+20+4 ,ycur+4))
+        
+        # title
+        ycur = 28+10
+        
+        for i in range(3):
+            y = ycur+i*6
+            pg.draw.line(self.screen, colDark1,(10+6+3,y),(30+6,y),2 )
+
+    
+        #~ fontSys = pg.font.SysFont('Comic Sans MS', 30)
+        #~ textsurface = fontSys.render('Faiska', False, (0, 0, 0))
+        #~ fontSys = pygame.freetype.SysFont('Verdana', 18)
+
+        #~ fontSys.underline = True
+        textsurface,rect = fontSys.render('Faiska', (0, 0, 0))
+        self.screen.blit(textsurface,(w//2-(rect[2]-rect[0])//2,ycur))
+        ycur += 24
+        
+        pg.draw.line(self.screen, colLight1,(0,ycur),(w,ycur) )
+        ycur += 1
+        
+        rTime = pg.time.get_ticks()/1000 #rTime in sec # the time of the game
+        
+        # screen
+        # round_rect(mat,(x,y,w,h),col1,round_size,border_size)
+        ycur += 20
+        xmargin=20
+        ymargin=20
+        warea = w-xmargin*2
+        harea = 500
+        
+        
+        if self.isSpeaking():
+            bWritingQuestion = pg.time.get_ticks()/1000-self.timeStartSpeak < self.rDurationSpeak
+        else:
+            bWritingQuestion = False
+            
+        xbot = xmargin+warea-self.imBot.get_rect().size[0]+xmargin//2 + 6
+        ybot = ycur+harea-self.imBot.get_rect().size[1]#+ymargin//2
+        
+        round_rect(self.screen, (xmargin,ycur,warea,harea), col1, 10, 0)
+        if 0:
+            self.renderRobotStd(xbot,ybot,rTime,bWritingQuestion)
+        else:
+            self.renderRobotObo(xbot,ybot,rTime,bWritingQuestion)
         
         if self.isSpeaking():
             # render question
@@ -518,11 +777,6 @@ class Agent(object):
                     txt += " "
             renderTxtMultiline( self.screen, txt, (xmargin*2,ycur+ymargin-5),fontTxt, colDark1,nWidthMax=300)
             ycur += harea+10
-        
-            # microphone over mouth
-            wmicro = 26
-            hmicro = 16
-            pg.draw.ellipse(self.screen,colBotsMicro,(xmouth-wmicro//2-26,ymouth-hmicro//2+2,wmicro,hmicro) )
 
             if nEnd >= len(self.strTxtSpeak):
                 self.renderUserButton( self.screen,(xmargin,ycur) )
@@ -535,7 +789,7 @@ class Agent(object):
         rProgress = (self.nNumQ) / len(self.listQ)
         if rProgress > 1.: rProgress = 1.
         if rProgress > 0.1:
-            round_rect(self.screen, (xmargin,ycur,int(warea*rProgress),20), colBlue1, 2, 0)
+            round_rect(self.screen, (xmargin,ycur,int(warea*rProgress),20), col1, 2, 0)
             
         if rProgress == 1.:
             if self.timeBotsStartExit == 0:
@@ -548,11 +802,31 @@ class Agent(object):
         random.seed(1000) # tune to have a blink during the first question
         self.listQ = []
         #~ self.listQ.append(["C?", ["Oui", "bof", "Non", "car","or"]])
-        self.listQ.append(["Comparé à votre précédente mission chez Sephora, celle ci vous a t'elle paru plus agréable?", ["Oui", "Bof", "Non"]])
-        self.listQ.append(["Super, et quel aspect vous a le plus plu?", ["Le\ncadre", "Les\ncollégues", "Le\nmanager", "un\npeu\ntout"]])
-        self.listQ.append(["J'ai adoré discuter avec vous!",["Moi\naussi!", "C'étais\npas mal.", "Moi\npas trop..."]] )
-        self.listQ.append(["Merci et à bientot!",["De rien, au revoir!", "Bye!"]] )
+        #~ self.listQ.append(["Comparé à votre précédente mission chez Sephora, celle ci vous a t'elle paru plus agréable?", ["Oui", "Bof", "Non"]])
+        #~ self.listQ.append(["Super, et quel aspect vous a le plus plu?", ["Le\ncadre", "Les\ncollégues", "Le\nmanager", "un\npeu\ntout"]])
+        #~ self.listQ.append(["J'ai adoré discuter avec vous!",["Moi\naussi!", "C'étais\npas mal.", "Moi\npas trop..."]] )
+        #~ self.listQ.append(["Merci et à bientot!",["De rien, au revoir!", "Bye!"]] )
         #~ self.listQ.append(["Merci à bientot!",["De rien, au revoir! Grave de la grosse balle atomiaque de gros malade!", "Bye!"]] )
+        self.listQ.append(["Comment avez-vous pris connaissance de cette offre d’emploi ?",["sur notre site internet", "sur un jobboard", "par le bouche à oreille"]] )
+        self.listQ.append(["Quel est le niveau de votre rémunération actuelle ?",["de 20000 à 30000€ brut annuel", "de 30000 à 40000€", "plus de 50000€"]] )
+        self.listQ.append(["Combien de temps vous faut il pour rejoindre le lieu de travail ?",["jusqu’à 30min", "de 30 à 45min", "plus de 45min"]] )
+        self.listQ.append(["Quel est votre niveau d’anglais ?",["bilingual", "professional", "average"]] )
+        self.listQ.append(["Combien d’années d’expérience avez-vous à ce poste ?",["Moins de 2 ans", "entre 2 et 4", "5 ans et plus"]] )
+        self.listQ.append(["Combien d’années d’études post bac ?",["0", "2", "4 et plus"]] )
+        #~ self.listQ.append(["?",["", "", ""]] )
+        
+        self.listSound = [
+            "comment_avez_vous_pris_connaissance",
+            "quel_est_le_remu",
+            "combien_de_temps_commute",
+            "quel_est_votre_niveau",
+            "combien_d_annees_d_experience",
+            "combien_d_anness_d_etudes_post_bac",
+        ]
+        self.aStoreStartPlayTime = []
+        
+        
+        
         self.nNumQ = 0
         #~ self.nNumQ = 1;self.listQ[self.nNumQ][0]="C"
         #~ print(listQ)
@@ -560,16 +834,19 @@ class Agent(object):
         nCpt = 0
         timeFps = time.time()
         nCptImageTotal = 0
-        while not self.done:
+        rTotalTime = time.time()
+        while not self.done and 1:
             self.event_loop()
             rTime = pg.time.get_ticks()/1000
             nTime = int(rTime)
-            if rTime >= 3. and not self.isSpeaking():
+            if rTime >= 4. and not self.isSpeaking():
                 #~ self.speak()
                 #~ self.nNumQ += 1
                 if self.nNumQ < len(self.listQ):
-                    self.speak( self.listQ[self.nNumQ][0],self.listQ[self.nNumQ][1])
+                    self.speak( self.listQ[self.nNumQ][0],self.listQ[self.nNumQ][1],self.listSound[self.nNumQ])
                     #~ self.speak("C?", ["Oui", "bof", "Non", "car","or"])
+                    #self.aStoreStartPlayTime.append(rTime)
+                    self.aStoreStartPlayTime.append(time.time()-rTotalTime)
             self.update()
             self.draw()
             pg.display.update()
@@ -583,13 +860,37 @@ class Agent(object):
                 
                     
             nCptImageTotal += 1
-            if 0: # if (nCptImageTotal % (500*1000)) == 0 or 1:
+            if 1: # if (nCptImageTotal % (500*1000)) == 0 or 1:
                 #ffmpeg -r 10 -i %d.png -vcodec libx264 -b:v 4M -an test.mp4 # -an: no audio
                 #ffmpeg -r 60 -i "%d.png" -vf "fps=10,scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 123 output.gif
                 filename = "d:/images_generated/" + str(nCptImageTotal) + ".png"
                 pygame.image.save(self.screen, filename)
                 
+                rTargetFPS = 20
+                #rRemaining = (1./rTargetFPS)-(time.time()-timeThisFrame)
+                rRemaining = (nCptImageTotal/rTargetFPS)-(time.time()-rTotalTime)
+                print("DBG: rRemaining: %5.4fs" % rRemaining )
+                if rRemaining > 0.:
+                    time.sleep(rRemaining) # wait to match target
                 
+                
+        # while - end
+        if 1:
+            # generate the sound
+            sounds = []
+            for s in self.listSound:
+                sounds.append("sounds/human/" + s + ".wav" )
+            #~ self.aStoreStartPlayTime = [1,2,3]
+            print("DBG: self.aStoreStartPlayTime: %s" % self.aStoreStartPlayTime)
+            sound_processing.pasteSound(sounds,self.aStoreStartPlayTime,"d:/images_generated/sound.wav")
+            
+            # generate video with sound:
+            #ffmpeg -r 20 -i %d.png -i sound.wav -vcodec libx264 -b:v 2M  test.mp4
+            # r is the framerate at end, but not the duration of each images!
+            # framerate gives the duration of each image
+            # slow framerate generates bug in vlc !!!
+            # ffmpeg -framerate 20 -i %d.png -i sound.wav -vcodec libx264 -r 20 -b:v 4M  test.mp4
+            # ffmpeg -framerate 20 -i %d.png -i sound.wav -vcodec libx264 -c:a aac -r 20 -b:v 4M  -pix_fmt yuv420p test.mp4
 
 #class Agent - end
 

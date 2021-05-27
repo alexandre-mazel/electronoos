@@ -352,6 +352,7 @@ def showAndSaveAllCameras( strSavePath = None,rThresholdDifferenceToSave =0.01):
             #~ print(str(frame.shape))
             if ret:
                 bAutoRotateFishEyePatchCrado = True
+                bAutoRotateFishEyePatchCrado = False
                 if bAutoRotateFishEyePatchCrado and frame.shape[1] > 160:
                     # we use a properties my laptop camera are in 16/9 thus there's black border around images
                     pix = frame[0,frame.shape[1]//2]

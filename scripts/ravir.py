@@ -1418,7 +1418,7 @@ Notes du 19 Mars:
 Notes du 27 Mai:
 - ajouter mouvement du bras quand parles
 - ajouter mouvement dans playWavAndBreathProfile dans le cas de Perlin (faire un random basé sur le profil passé, cad fullness)
-  pour tester facilement:  cligne 1273: if 1 # debug soulagement direct
+  pour tester facilement:  ligne 1273: if 1 # debug soulagement direct
 """
 
 if __name__ == "__main__":

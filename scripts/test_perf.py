@@ -965,7 +965,35 @@ disk_read  1024KB: ####################   9.90s (64.64 Mo/s)
 
 
 
+comparison test writing on ms tab 4:
 
+new sandisk fit mini usb 128Go sur port usb
 
+E:\>python c:test_perf.py 1000
+disk_write    1KB: ####################  19.55s (51.16 Mo/s)
+disk_read     1KB: ####################   3.59s (278.21 Mo/s)
+disk_write 1024KB: ####################  20.55s (48.66 Mo/s)
+disk_read  1024KB: ####################   0.67s (1488.13 Mo/s)
+
+microsd nintendo switch 128 avec adapteur usb de Sophie
+E:\>python c:test_perf.py 1000
+disk_write    1KB: ####################  72.02s (13.89 Mo/s)
+disk_read     1KB: ####################   3.81s (262.24 Mo/s)
+disk_write 1024KB: ####################  72.97s (13.70 Mo/s)
+disk_read  1024KB: ####################   0.47s (2133.94 Mo/s)
+
+microsd nintendo switch 128 dans slot microsd
+D:\>python c:test_perf.py 1000
+disk_write    1KB: ####################  16.71s (59.85 Mo/s)
+disk_read     1KB: ####################   3.34s (298.99 Mo/s)
+disk_write 1024KB: ####################  16.58s (60.31 Mo/s)
+disk_read  1024KB: ####################   0.44s (2283.54 Mo/s)
+
+microsd sandisk extreme 256 (celle de md tab) dans slot microsd
+D:\>python c:test_perf.py 1000
+disk_write    1KB: ####################  17.18s (58.22 Mo/s)
+disk_read     1KB: ####################   3.38s (296.26 Mo/s)
+disk_write 1024KB: ####################  16.47s (60.70 Mo/s)
+disk_read  1024KB: ####################   0.45s (2205.17 Mo/s)
 
 """

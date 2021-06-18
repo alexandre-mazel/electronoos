@@ -1502,7 +1502,10 @@ Notes du 27 Mai:
   pour tester facilement:  ligne 1261: if 1 # debug soulagement direct
 
 Notes du 18  Juin:
-- pendant ecoute il y a eu un mvt de tete ?
+- pendant ecoute il y a eu un mvt de tete ? => j'ai ajouté des raz de la tete:self.updateHeadLook(0)
+- ajouter mouvement du bras quand parles
+- reste encore un peu de tuning sur perlin soulage: mettre un peu de lateral pour ne pas trop faire respiration
+  pour tester facilement:  ligne 1261: if 1 # debug soulagement direct
 
 
 """

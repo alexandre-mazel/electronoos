@@ -562,12 +562,31 @@ class Perliner:
             self.motion.wakeUp()
             self.motion.angleInterpolationWithSpeed("KneePitch",-0.0659611225, 0.05)
         
-    def updateBodyPosture(self, rFullness = -1):
+    def updateBodyPosture(self, rAmp = -100, bUseSound = -100, t = -100 ):
+        """
+        rAmp: amplitude of movement
+        """
         
+        
+        if rAmp == -100:
+            rAmp = self.rAmp
+            bForceMove = False
+        else:
+            # piloted from outside
+            bForceMove = True
+            
+        if bUseSound == -100:
+            bUseSound = self.bUseSound
+
+        if t == -100:
+            t = self.timeLastUpdate
+            
         if self.motion != None:
             
-            rPosInc = noise.getSimplexNoise(self.timeLastUpdate)*self.rAmp
-            if abs(rPosInc) > 0.03 and self.timeLastUpdateBody + 0.5 < time.time():
+            rPosInc = noise.getSimplexNoise(t)*rAmp
+
+            print("updateBodyPosture: bForceMove: %s, rPosInc: %.3f, self.timeLastUpdateBody: %.3fs" % (bForceMove,rPosInc,self.timeLastUpdateBody ) )
+            if (abs(rPosInc) > 0.03 or bForceMove ) and self.timeLastUpdateBody + 0.5 < time.time():
                 rTime = 1.
                 self.rCoefArmAmp = 2
                 print( "DBG: updateBodyPosture: launching new movement, with rPosInc at %5.3f (time:%5.2fs)" % (rPosInc,time.time() ) )
@@ -575,21 +594,21 @@ class Perliner:
                 self.idMoveBody = self.motion.post.angleInterpolation( self.astrChain, [rPosInc,(math.pi/2)+rPosInc*self.rCoefArmAmp,(math.pi/2)+rPosInc*self.rCoefArmAmp], rTime, True )
                 self.timeLastUpdateBody = time.time()
 
-        if self.bUseSound:
+        if bUseSound:
             strPath = self.strNoisePath
             rSoundVolume = 1.
             if self.nNbrSoundEstim < 60:
                 rTimePerSound = 20
-                if noise.getSimplexNoise(self.timeLastUpdate,50) > 0.4:
+                if noise.getSimplexNoise(t,50) > 0.4:
                     sound_player.soundPlayer.playFile( strPath+"tic.wav", bWaitEnd=False, rSoundVolume=rSoundVolume)
                     self.nNbrSoundEstim += rTimePerSound
-                if noise.getSimplexNoise(self.timeLastUpdate,100) > 0.8:
+                if noise.getSimplexNoise(t,100) > 0.8:
                     sound_player.soundPlayer.playFile( strPath+"tictic.wav", bWaitEnd=False, rSoundVolume=rSoundVolume)
                     self.nNbrSoundEstim += rTimePerSound
-                if noise.getSimplexNoise(self.timeLastUpdate,150) > 0.6:
+                if noise.getSimplexNoise(t,150) > 0.6:
                     sound_player.soundPlayer.playFile( strPath+"tic2.wav", bWaitEnd=False, rSoundVolume=rSoundVolume)
                     self.nNbrSoundEstim += rTimePerSound
-                if noise.getSimplexNoise(self.timeLastUpdate,200) > 0.7:
+                if noise.getSimplexNoise(t,200) > 0.7:
                     sound_player.soundPlayer.playFile( strPath+"tic3.wav", bWaitEnd=False, rSoundVolume=rSoundVolume)
                     self.nNbrSoundEstim += rTimePerSound
             if self.nNbrSoundEstim > 0:
@@ -1066,25 +1085,28 @@ def playWavAndPerlinProfile( strWav, animator, timing,  rSoundVolume = 1. ):
        
     sound_player.soundPlayer.stopAll()
     timeNextStep = time.time()
+    timeStart = time.time()
     nIdxKey = -1
-    rCurrentDebit = 0
+    rMoveAmount = 0
     timeLastUpdate = time.time()
     sound_player.soundPlayer.playFile(strWav, bWaitEnd=False, rSoundVolume=rSoundVolume)
     while 1:
-        print("INF: playWavAndBreathProfile: timeNextStep: %5.2f / time: %5.2f (fullness:%5.2f)" % (timeNextStep,time.time(),animator.rFullness ) )
+        print("INF: playWavAndPerlinProfile: timeNextStep: %5.2f / time: %5.2f (rMoveAmount:%5.2f)" % (timeNextStep,time.time(),rMoveAmount ) )
         if timeNextStep <= time.time():
             nIdxKey += 1
             if nIdxKey >= len(timing):
                 break
             print("INF: playWavAndBreathProfile: jump to next key: %d" % (nIdxKey) )
-            rCurrentDebitPerSec = timing[nIdxKey][0]
+            rMoveAmount = timing[nIdxKey][0]
             timeNextStep += timing[nIdxKey][1]
-            print("INF: playWavAndBreathProfile: jump to next key: %d, rCurrentDebitPerSec: %5.2f, timeNextStep: %5.2f" % (nIdxKey,rCurrentDebitPerSec,timeNextStep) )
+            print("INF: playWavAndBreathProfile: jump to next key: %d, rMoveAmount: %5.2f, timeNextStep: %5.2f" % (nIdxKey,rMoveAmount,timeNextStep) )
             
         rTimeSinceLastUpdate = time.time() - timeLastUpdate
         timeLastUpdate = time.time()
-        animator.rFullness += rCurrentDebitPerSec*rTimeSinceLastUpdate
-        animator.updateBodyPosture()
+        
+        if rMoveAmount > 0.:
+            print("update!")
+            animator.updateBodyPosture(rAmp=rMoveAmount*0.2,bUseSound=False,t=time.time()-timeStart)
     
         time.sleep(0.05)
         
@@ -1210,8 +1232,7 @@ def expe( nMode = 1 ):
     nDialog = 0 # diff de 0 if in a dialog, 
     
     
-    animationSoulage = 
-    [
+    animationSoulage = [
         [
                         # [0.,0.254], #this is in the sound, but because mouvement takes time to be started, let's remove an offset
                         [1.,1.],
@@ -1241,13 +1262,14 @@ def expe( nMode = 1 ):
         time.sleep(1)
         print("playWavAndBreathProfile: test begin")
         nDialog = 5
-        strWav = strTalkPath + msgDials[nDialog-1][nIdxTxt] + ".wav"
-        animation = [
-                            [0.2,3],
-                            [-0.1,6],
-                            ]
+        strWav = strTalkPath + msgDials[nDialog-1][nIdxTxt+nAnimatorIdx] + ".wav"
+        #~ animation = [
+                            #~ [0.2,3],
+                            #~ [-0.1,6],
+                            #~ ]
 
-        playWavAndBreathProfile(strWav,animator,animationSoulage, 0)
+        if nAnimatorIdx == 0: playWavAndBreathProfile(strWav,animator,animationSoulage[nAnimatorIdx], 0)
+        else: playWavAndPerlinProfile(strWav,animator,animationSoulage[nAnimatorIdx])
         print("playWavAndBreathProfile: test mid")
         #~ playWavAndBreathProfile(strWav,animator,animation, 1)
         #~ print("playWavAndBreathProfile: test end")

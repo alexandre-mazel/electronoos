@@ -1007,7 +1007,7 @@ def loadDialogsExpeRec4():
     
 def playWavAndBreathProfile( strWav, animator, timing, rStartFullness = -1, rSoundVolume = 1. ):
     """
-    play a wav, with hand designed time of inpi and expi.
+    play a wav, with hand designed time of inspi and expi.
     - strWav: wav filename
     - timing: a list sequence of [debit, duration] debit / per sec: positif if inspiring, negatif if expiring: 1. 
                   eg: [ [0.3,3],[-0.1,6] ] => will inspire quickly for 3 second and expire slowly for 6s
@@ -1055,6 +1055,42 @@ def playWavAndBreathProfile( strWav, animator, timing, rStartFullness = -1, rSou
         
     animator.resetTimeLastUpdate()
 # playWavAndBreathProfile - end
+
+def playWavAndPerlinProfile( strWav, animator, timing,  rSoundVolume = 1. ):
+    """
+    play a wav, with hand designed time of move / still
+    - strWav: wav filename
+    - timing: a list sequence of [move amount, duration] 0 => don't move, 1 => move a lot
+    - animator: animator to call to animate the robot
+    """
+       
+    sound_player.soundPlayer.stopAll()
+    timeNextStep = time.time()
+    nIdxKey = -1
+    rCurrentDebit = 0
+    timeLastUpdate = time.time()
+    sound_player.soundPlayer.playFile(strWav, bWaitEnd=False, rSoundVolume=rSoundVolume)
+    while 1:
+        print("INF: playWavAndBreathProfile: timeNextStep: %5.2f / time: %5.2f (fullness:%5.2f)" % (timeNextStep,time.time(),animator.rFullness ) )
+        if timeNextStep <= time.time():
+            nIdxKey += 1
+            if nIdxKey >= len(timing):
+                break
+            print("INF: playWavAndBreathProfile: jump to next key: %d" % (nIdxKey) )
+            rCurrentDebitPerSec = timing[nIdxKey][0]
+            timeNextStep += timing[nIdxKey][1]
+            print("INF: playWavAndBreathProfile: jump to next key: %d, rCurrentDebitPerSec: %5.2f, timeNextStep: %5.2f" % (nIdxKey,rCurrentDebitPerSec,timeNextStep) )
+            
+        rTimeSinceLastUpdate = time.time() - timeLastUpdate
+        timeLastUpdate = time.time()
+        animator.rFullness += rCurrentDebitPerSec*rTimeSinceLastUpdate
+        animator.updateBodyPosture()
+    
+        time.sleep(0.05)
+        
+    animator.resetTimeLastUpdate()
+# playWavAndBreathProfile - end
+
         
         
 
@@ -1174,7 +1210,9 @@ def expe( nMode = 1 ):
     nDialog = 0 # diff de 0 if in a dialog, 
     
     
-    animationSoulage = [
+    animationSoulage = 
+    [
+        [
                         # [0.,0.254], #this is in the sound, but because mouvement takes time to be started, let's remove an offset
                         [1.,1.],
                         [0.,0.28],
@@ -1183,7 +1221,19 @@ def expe( nMode = 1 ):
                         [1.2,0.8],
                         [0.,0.18],
                         [-0.8,1.2],
-                        ]
+        ],
+        # second sound without breathing
+        [
+            # amplitude of mvt, time, 0 => no move
+            
+                        # [0.,0.118], #this is in the sound, but because mouvement takes time to be started, let's remove an offset
+                        [1.,1.1],
+                        [0.,1.7],
+                        [1,2.05],
+                        [0.,1.],
+                        [1,2.2],
+        ],
+    ]
                         
     if 0:
         # test playWavAndBreathProfile
@@ -1294,7 +1344,8 @@ def expe( nMode = 1 ):
                         #~ animator.sayFile(strTalkPath + msgDials[4][1] + ".wav")                        
                         #~ nDialog = 5  # soulagement
                         strWavSoulage = strTalkPath + msgDials[5-1][nIdxTxt+nAnimatorIdx] + ".wav"
-                        playWavAndBreathProfile(strWavSoulage,animator,animationSoulage, 0)
+                        if nAnimatorIdx==0: playWavAndBreathProfile(strWavSoulage,animator,animationSoulage[nAnimatorIdx], 0)
+                        else: playWavAndPerlinProfile(strWavSoulage,animator,animationSoulage[nAnimatorIdx])
                         nStep += 10                    
                 
                     if nStep == 90:
@@ -1319,7 +1370,8 @@ def expe( nMode = 1 ):
                         animator.setListening(False)
                         # nDialog = 5      # soulagement !
                         strWavSoulage = strTalkPath + msgDials[5-1][nIdxTxt+nAnimatorIdx] + ".wav"
-                        playWavAndBreathProfile(strWavSoulage,animator,animationSoulage, 0)
+                        if nAnimatorIdx==0: playWavAndBreathProfile(strWavSoulage,animator,animationSoulage[nAnimatorIdx], 0)
+                        else: playWavAndPerlinProfile(strWavSoulage,animator,animationSoulage[nAnimatorIdx])
                         nStep += 10
                         
                     if nStep == 160:

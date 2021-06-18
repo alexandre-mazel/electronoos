@@ -968,7 +968,6 @@ disk_read  1024KB: ####################   9.90s (64.64 Mo/s)
 comparison test writing on ms tab 4:
 
 new sandisk fit mini usb 128Go sur port usb
-
 E:\>python c:test_perf.py 1000
 disk_write    1KB: ####################  19.55s (51.16 Mo/s)
 disk_read     1KB: ####################   3.59s (278.21 Mo/s)

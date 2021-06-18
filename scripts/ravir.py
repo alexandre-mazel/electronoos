@@ -386,6 +386,7 @@ class Breather:
             if self.nState == Breather.kStateSpeak:
                 sound_player.soundPlayer.stopAll()
                 if self.leds: self.leds.fadeRGB("FaceLeds", 0x0000FF, 0.00)
+                self.updateHeadLook(0)
                 sound_player.soundPlayer.playFile(self.strFilenameToSay, bWaitEnd=False)
                 #~ if self.motion != None:
                     #~ rTimeEstim = self.rTimeSpeak
@@ -585,11 +586,11 @@ class Perliner:
             
             rPosInc = noise.getSimplexNoise(t)*rAmp
 
-            print("updateBodyPosture: bForceMove: %s, rPosInc: %.3f, self.timeLastUpdateBody: %.3fs" % (bForceMove,rPosInc,self.timeLastUpdateBody ) )
+            #~ print("updateBodyPosture: bForceMove: %s, rPosInc: %.3f, self.timeLastUpdateBody: %.3fs" % (bForceMove,rPosInc,self.timeLastUpdateBody ) )
             if (abs(rPosInc) > 0.03 or bForceMove ) and self.timeLastUpdateBody + 0.5 < time.time():
                 rTime = 1.
                 self.rCoefArmAmp = 2
-                print( "DBG: updateBodyPosture: launching new movement, with rPosInc at %5.3f (time:%5.2fs)" % (rPosInc,time.time() ) )
+                #~ print( "DBG: updateBodyPosture: launching new movement, with rPosInc at %5.3f (time:%5.2fs)" % (rPosInc,time.time() ) )
                 self.motion.killTask(self.idMoveBody)
                 self.idMoveBody = self.motion.post.angleInterpolation( self.astrChain, [rPosInc,(math.pi/2)+rPosInc*self.rCoefArmAmp,(math.pi/2)+rPosInc*self.rCoefArmAmp], rTime, True )
                 self.timeLastUpdateBody = time.time()
@@ -724,6 +725,7 @@ class Perliner:
             if self.nState == Perliner.kStateSpeak:
                 sound_player.soundPlayer.stopAll()
                 if self.leds: self.leds.fadeRGB("FaceLeds", 0x0000FF, 0.00)
+                self.updateHeadLook(0)
                 sound_player.soundPlayer.playFile(self.strFilenameToSay, bWaitEnd=False)
                 #~ if self.motion != None:
                     #~ rTimeEstim = self.rTimeSpeak
@@ -1210,7 +1212,7 @@ def expe( nMode = 1 ):
     rBeginT = time.time()
     rTimeLastSpeak = time.time()-10
     bForceSpeak = False
-    nIdxTxt = 0
+    nIdxTxt = -1
     
     msgDials = loadDialogsExpeRec4()
     
@@ -1248,11 +1250,11 @@ def expe( nMode = 1 ):
             # amplitude of mvt, time, 0 => no move
             
                         # [0.,0.118], #this is in the sound, but because mouvement takes time to be started, let's remove an offset
-                        [1.,1.1],
-                        [0.,1.7],
+                        [1.,1.7],
+                        [0.,0.5],
                         [1,2.05],
                         [0.,1.],
-                        [1,2.2],
+                        [1,1.8],
         ],
     ]
                         
@@ -1262,7 +1264,7 @@ def expe( nMode = 1 ):
         time.sleep(1)
         print("playWavAndBreathProfile: test begin")
         nDialog = 5
-        strWav = strTalkPath + msgDials[nDialog-1][nIdxTxt+nAnimatorIdx] + ".wav"
+        strWav = strTalkPath + msgDials[nDialog-1][0+nAnimatorIdx] + ".wav"
         #~ animation = [
                             #~ [0.2,3],
                             #~ [-0.1,6],
@@ -1287,15 +1289,20 @@ def expe( nMode = 1 ):
         #~ if nAnimatorIdx == 1: time.sleep(0.1)
         if nAnimatorIdx == 1 and os.name == "nt": time.sleep(0.1)
         
+        bForceNextStep = False
+        
         
         if nDialog != 0:
             if not animator.isSpeaking():
-                animator.sayFile(strTalkPath + msgDials[nDialog-1][nIdxTxt] + ".wav")
                 nIdxTxt += 1
                 if nIdxTxt >= len(msgDials[nDialog-1]):
                     nDialog = 0
-                    nIdxTxt = 0
-                rTimeLastSpeak = time.time()
+                    nIdxTxt = -1
+                    bForceNextStep = True
+                else:
+                    self.updateHeadLook(0)
+                    animator.sayFile(strTalkPath + msgDials[nDialog-1][nIdxTxt] + ".wav")
+                    rTimeLastSpeak = time.time()
             
         
         # interaction with the world
@@ -1315,7 +1322,7 @@ def expe( nMode = 1 ):
                 bTouch = True
                 strActionRequired = False # we erase it as in real robot, we won't received it in that case
                 
-        if bTouch and nStep in [10,80,100,140]:
+        if (bTouch and nStep in [10,80,100,150]) or bForceNextStep:
             strActionRequired = "next"
             
         if strActionRequired != False:
@@ -1492,7 +1499,12 @@ Notes du 19 Mars:
 Notes du 27 Mai:
 - ajouter mouvement du bras quand parles
 - ajouter mouvement dans playWavAndBreathProfile dans le cas de Perlin (faire un random basé sur le profil passé, cad fullness)
-  pour tester facilement:  ligne 1273: if 1 # debug soulagement direct
+  pour tester facilement:  ligne 1261: if 1 # debug soulagement direct
+
+Notes du 18  Juin:
+- pendant ecoute il y a eu un mvt de tete ?
+
+
 """
 
 if __name__ == "__main__":

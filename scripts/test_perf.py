@@ -13,7 +13,9 @@ import time
 import multiprocessing
 
 import sys
-sys.path.append("../alex_pytools/" )
+strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
+if strLocalPath == "": strLocalPath = './'
+sys.path.append(strLocalPath+"../alex_pytools/" )
 try: import misctools # just for cpumodel
 except: pass
 
@@ -106,7 +108,8 @@ def print_version():
 def print_cpu():
     try:
         strCpuModel = misctools.getCpuModel(bShort=True)
-    except:
+    except BaseException as err:
+        print("ERR: %s" % err)
         strCpuModel = "TODO"
     print( "cpu              : %s" % strCpuModel )
     

@@ -1,6 +1,8 @@
 # coding: cp1252
 
 """
+Sophie et Marie-Cécile.
+
 Breath engine for RAVIR project
 # copy manually all breathing to Pepper:
 scp -r C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/breath* nao@192.168.0.:/home/nao/
@@ -30,6 +32,10 @@ C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut/
 -    Noise reduction
 -    (shift+ctrl+R fait les 2 actions et ferme le fichier)
 - sound_processing.changeVolumeInFolder(,2) # pour arriver a un son qui se tient d'un jour d'enregistrement a l'autre
+
+Record images during experience:
+cd ~/dev/git/protolab_group/scripts
+nohup python nao_camera_viewer.py
 """
 
 import os
@@ -242,9 +248,10 @@ class Breather:
         """
         nForcedAngle: force to look at this direction NOW
         """
+        #~ print("INF: updateHeadLook: nForcedAngle: %d" % nForcedAngle )
         if not self.motion: return
         if time.time() - self.lastHeadMove > 3 or nForcedAngle != -1:
-            if random.random()<0.7 and time.time() - self.lastHeadMove < 8 and nForcedAngle == -1: # proba de pas bouger
+            if( random.random()<0.7 or time.time() - self.lastHeadMove < 8 ) and nForcedAngle == -1: # proba de pas bouger
                 return
             self.lastHeadMove = time.time()
             if nForcedAngle == -1:
@@ -597,7 +604,7 @@ class Perliner:
 
         if bUseSound:
             strPath = self.strNoisePath
-            rSoundVolume = 1.
+            rSoundVolume = 0.8
             if self.nNbrSoundEstim < 60:
                 rTimePerSound = 20
                 if noise.getSimplexNoise(t,50) > 0.4:
@@ -644,7 +651,7 @@ class Perliner:
         """
         if not self.motion: return
         if time.time() - self.lastHeadMove > 3 or nForcedAngle != -1:
-            if random.random()<0.7 and time.time() - self.lastHeadMove < 8 and nForcedAngle == -1: # proba de pas bouger
+            if( random.random()<0.7 or time.time() - self.lastHeadMove < 8 ) and nForcedAngle == -1: # proba de pas bouger
                 return
             self.lastHeadMove = time.time()
             if nForcedAngle == -1:
@@ -1277,6 +1284,7 @@ def expe( nMode = 1 ):
         #~ print("playWavAndBreathProfile: test end")
         return
     
+    rSoundVolumeSoulage = 0.9
     while 1:
         
         rT = time.time() - rBeginT
@@ -1300,7 +1308,7 @@ def expe( nMode = 1 ):
                     nIdxTxt = -1
                     bForceNextStep = True
                 else:
-                    self.updateHeadLook(0)
+                    animator.updateHeadLook(0)
                     animator.sayFile(strTalkPath + msgDials[nDialog-1][nIdxTxt] + ".wav")
                     rTimeLastSpeak = time.time()
             
@@ -1372,9 +1380,10 @@ def expe( nMode = 1 ):
                         animator.setListening(False)
                         #~ animator.sayFile(strTalkPath + msgDials[4][1] + ".wav")                        
                         #~ nDialog = 5  # soulagement
-                        strWavSoulage = strTalkPath + msgDials[5-1][nIdxTxt+nAnimatorIdx] + ".wav"
-                        if nAnimatorIdx==0: playWavAndBreathProfile(strWavSoulage,animator,animationSoulage[nAnimatorIdx], 0)
-                        else: playWavAndPerlinProfile(strWavSoulage,animator,animationSoulage[nAnimatorIdx])
+                        strWavSoulage = strTalkPath + msgDials[5-1][0+nAnimatorIdx] + ".wav"
+                        if nAnimatorIdx==0: playWavAndBreathProfile(strWavSoulage,animator,animationSoulage[nAnimatorIdx], 0, rSoundVolume=rSoundVolumeSoulage)
+                        else: playWavAndPerlinProfile(strWavSoulage,animator,animationSoulage[nAnimatorIdx], rSoundVolume=rSoundVolumeSoulage)
+                        animator.updateHeadLook(0) # prevent head turning just after
                         nStep += 10                    
                 
                     if nStep == 90:
@@ -1398,9 +1407,10 @@ def expe( nMode = 1 ):
                     if nStep == 140:
                         animator.setListening(False)
                         # nDialog = 5      # soulagement !
-                        strWavSoulage = strTalkPath + msgDials[5-1][nIdxTxt+nAnimatorIdx] + ".wav"
-                        if nAnimatorIdx==0: playWavAndBreathProfile(strWavSoulage,animator,animationSoulage[nAnimatorIdx], 0)
-                        else: playWavAndPerlinProfile(strWavSoulage,animator,animationSoulage[nAnimatorIdx])
+                        strWavSoulage = strTalkPath + msgDials[5-1][0+nAnimatorIdx] + ".wav"
+                        if nAnimatorIdx==0: playWavAndBreathProfile(strWavSoulage,animator,animationSoulage[nAnimatorIdx], 0, rSoundVolume=rSoundVolumeSoulage)
+                        else: playWavAndPerlinProfile(strWavSoulage,animator,animationSoulage[nAnimatorIdx], rSoundVolume=rSoundVolumeSoulage)
+                        animator.updateHeadLook(0) # prevent head turning just after
                         nStep += 10
                         
                     if nStep == 160:
@@ -1506,6 +1516,7 @@ Notes du 18  Juin:
 - ajouter mouvement du bras quand parles
 - reste encore un peu de tuning sur perlin soulage: mettre un peu de lateral pour ne pas trop faire respiration
   pour tester facilement:  ligne 1261: if 1 # debug soulagement direct
+- remonter sons des tictics
 
 
 """

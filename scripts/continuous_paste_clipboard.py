@@ -1,5 +1,5 @@
 # pip install pillow
-from PIL import ImageGrab
+from PIL import ImageGrab # pip install pillow
 
 import os
 import sys
@@ -66,17 +66,30 @@ def continuousSave():
     nFrameWithoutSave = 0
     while 1:
         beepEveryHalf()
-        img = ImageGrab.grabclipboard()
+        try:
+            img = ImageGrab.grabclipboard()
+        except OSError as err:
+            print( "WRN: OSError in ImageGrab.grabclipboard: err: %s" % str(err))
+            
         # or ImageGrab.grab() to grab the whole screen!
         if img == None:
             time.sleep(0.5)
             continue
-        if not isPilImgEqual( img, img_prev ):
+        bIsImageEqual = True
+        try:
+            bIsImageEqual = isPilImgEqual( img, img_prev )
+        except AttributeError as err:
+            print( "WRN: isPilImgEqual: error: %s" % str(err))
+            
+        if not bIsImageEqual:
             img_prev = img
             name = "/tmp_scr/" + misctools.getFilenameFromTime() + ".png"
             print( "INF: saving to '%s'" % name ) 
-            img.save( name, 'PNG' )
-            bipInform()
+            try:
+                img.save( name, 'PNG' )
+                bipInform()
+            except AttributeError as err:
+                print( "WRN: img.save: error: %s" % str(err))
             nFrameWithoutSave = 0
         else:
             if nFrameWithoutSave > 20:

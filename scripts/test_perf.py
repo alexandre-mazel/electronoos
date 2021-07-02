@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# -*- coding: cp1252 -*- 
+# cp1252 ou utf-8
 
 #
 # Sound Acceptance test
@@ -15,9 +16,11 @@ import multiprocessing
 import sys
 strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
 if strLocalPath == "": strLocalPath = './'
-sys.path.append(strLocalPath+"../alex_pytools/" )
+strLocalPath += "/../alex_pytools/"
+#~ print("DBG: adding to path: '%s'" % strLocalPath )
+sys.path.append(strLocalPath )
 try: import misctools # just for cpumodel
-except: pass
+except Exception as err: print("WRN: importing misctools => err: %s" % str(err))
 
 def getFreeDiskSpace():
     """
@@ -40,7 +43,7 @@ class FlushableFile:
         import platform
         self.bWindows = "windows" in platform.system().lower()
         if self.bWindows:
-            import win32file
+            import win32file # pip install pywin32
             flag = win32file.GENERIC_READ
             if 'w' in strMode:
                 flag = win32file.GENERIC_WRITE
@@ -163,7 +166,7 @@ def test_numpy( bPrint = True ):
         nSizeArray = nLengthSec*48000*2
         n = numpy.random.randint( -32000,32000+1,nSizeArray)
         res = scipy.fftpack.fft(n)
-        n = numpy.zeros(nSizeArray, dtype=numpy.float)
+        n = numpy.zeros(nSizeArray, dtype=numpy.float64) # was numpy.float => float or numpy.float64
         res = scipy.fftpack.dct(n)
         if bPrint: sys.stdout.write( "#" );
         sys.stdout.flush();
@@ -963,6 +966,51 @@ disk_read     1KB: ####################   9.82s (66.00 Mo/s)
 disk_write 1024KB: ####################  11.18s (57.24 Mo/s)
 disk_read  1024KB: ####################   9.90s (64.64 Mo/s)
 
+ms tab7:
+
+INF: Changing disk test size to 1000 MB
+python version   : 3.8.2 (32bits) (8 core(s))
+cpu              : Intel(R) Core(TM) i7-1065G7 CPU @ 1.30GHz
+test_cpu_int2    : ####################   1.16s
+test_cpu_float2  : ####################   0.70s
+test_scipy_xxt   : ####################   1.65s (242.70x)
+test_orb4.2.0    : ####################   0.44s (225.08fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : test_perf_vga_*.png: not found
+disk_write    1KB: ####################   8.85s (113.02 Mo/s)
+disk_read     1KB: ####################   8.54s (117.12 Mo/s)
+disk_write 1024KB: ####################   2.43s (411.55 Mo/s)
+disk_read  1024KB: ####################   0.44s (2274.59 Mo/s)
+
+low perf:
+INF: Changing disk test size to 1000 MB
+python version   : 3.9.5 (64bits) (8 core(s))
+cpu              : Intel(R) Core(TM) i7-1065G7 CPU @ 1.30GHz
+test_cpu_int2    : ####################   0.72s
+test_cpu_float2  : ####################   0.11s
+scipy.fftpack    : not found
+opencv (orb)      : not found
+opencv (orb)    : not found
+opencv (orb)    : not found
+disk_write    1KB: ####################   7.94s (125.99 Mo/s)
+disk_read     1KB: ####################  15.67s (63.82 Mo/s)
+disk_write 1024KB: ####################   2.85s (351.07 Mo/s)
+disk_read  1024KB: ####################   0.43s (2317.90 Mo/s)
+
+high perf:
+INF: Changing disk test size to 1000 MB
+python version   : 3.9.5 (64bits) (8 core(s))
+cpu              : Intel(R) Core(TM) i7-1065G7 CPU @ 1.30GHz
+test_cpu_int2    : ####################   0.43s
+test_cpu_float2  : ####################   0.06s
+scipy.fftpack    : not found
+opencv (orb)      : not found
+opencv (orb)    : not found
+opencv (orb)    : not found
+disk_write    1KB: ####################   5.48s (182.55 Mo/s)
+disk_read     1KB: ####################   5.23s (191.25 Mo/s)
+disk_write 1024KB: ####################   1.63s (612.46 Mo/s)
+disk_read  1024KB: ####################   0.32s (3121.12 Mo/s)
 
 
 comparison test writing on ms tab 4:

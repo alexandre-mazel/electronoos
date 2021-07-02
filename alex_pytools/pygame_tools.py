@@ -2,7 +2,7 @@
 some addons to the pygame libs
 """
 
-import pygame as pg
+import pygame as pg # pip install pygame
 import time
 
 class SoundPlayer:

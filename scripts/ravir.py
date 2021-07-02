@@ -9,7 +9,7 @@ scp -r C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/breath* nao@192.168.0.:/hom
 scp -r C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut* nao@192.168.0.:/home/nao/
 scp d:/Python38-32/Lib/site-packages/opensimplex/*.py nao@192.168.0.:/home/nao/.local/lib/python2.7/site-packages/
 
-scp -pw nao C:/Users/amazel/dev/git/electronoos/scripts/rav*.py nao@192.168.1.211:/home/nao/dev/git/electronoos/scripts/
+scp -pw nao C:/Users/alexa/dev/git/electronoos/scripts/rav*.py nao@192.168.1.211:/home/nao/dev/git/electronoos/scripts/
 
 Currently I'm inserting a silence at the beginning of each breath:
 sound_processing:
@@ -248,9 +248,9 @@ class Breather:
         """
         nForcedAngle: force to look at this direction NOW
         """
-        #~ print("INF: updateHeadLook: nForcedAngle: %d" % nForcedAngle )
         if not self.motion: return
         if time.time() - self.lastHeadMove > 3 or nForcedAngle != -1:
+            print("INF: updateHeadLook: nForcedAngle: %d" % nForcedAngle )
             if( random.random()<0.7 or time.time() - self.lastHeadMove < 8 ) and nForcedAngle == -1: # proba de pas bouger
                 return
             self.lastHeadMove = time.time()
@@ -272,6 +272,11 @@ class Breather:
             except BaseException as err:
                 print("WRN: stopping task %d failed: %s" % (self.idMoveHead,err) )
             self.idMoveHead=self.motion.post.angleInterpolationWithSpeed("Head",headPos,rSpeed)
+            if nForcedAngle == 0:
+                # often we really need the head to be at the good place, so let's wait a bit
+                if abs( self.motion.getAngles(["HeadYaw"],True)[0] - self.listHeadOrientation[idx][0] )>0.1:
+                    print("DBG: updateHeadLook: wait move 0 finished...")
+                    self.motion.wait(self.idMoveHead,0)
                 
     def resetTimeLastUpdate( self ):
         """
@@ -651,6 +656,7 @@ class Perliner:
         """
         if not self.motion: return
         if time.time() - self.lastHeadMove > 3 or nForcedAngle != -1:
+            print("INF: updateHeadLook: entering, nForcedAngle: %d" % nForcedAngle )
             if( random.random()<0.7 or time.time() - self.lastHeadMove < 8 ) and nForcedAngle == -1: # proba de pas bouger
                 return
             self.lastHeadMove = time.time()
@@ -672,6 +678,11 @@ class Perliner:
             except BaseException as err:
                 print("WRN: stopping task %d failed: %s" % (self.idMoveHead,err) )
             self.idMoveHead=self.motion.post.angleInterpolationWithSpeed("Head",headPos,rSpeed)
+            if nForcedAngle == 0:
+                # often we really need the head to be at the good place, so let's wait a bit
+                if abs( self.motion.getAngles(["HeadYaw"],True)[0] - self.listHeadOrientation[idx][0] )>0.1:
+                    print("DBG: updateHeadLook: wait move 0 finished...")
+                    self.motion.wait(self.idMoveHead,0)
                 
         
     def resetTimeLastUpdate( self ):

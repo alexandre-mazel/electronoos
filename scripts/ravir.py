@@ -544,7 +544,8 @@ class Perliner:
         
         self.bListening = False
         
-        self.bUseSound = True
+        self.bUseSound = False #remove them to avoid the unpleasing aspect
+        
         self.nNbrSoundEstim = 0 # an estimation of the current nbr of played sound
         
         self.rFullness = 0 # just here for compatibilty with breather
@@ -578,6 +579,7 @@ class Perliner:
     def updateBodyPosture(self, rAmp = -100, bUseSound = -100, t = -100 ):
         """
         rAmp: amplitude of movement
+        bUseSound: to force to use sound or not, if -100, use the value of the object
         """
         
         

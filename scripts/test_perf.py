@@ -1036,11 +1036,38 @@ disk_read     1KB: ####################   3.34s (298.99 Mo/s)
 disk_write 1024KB: ####################  16.58s (60.31 Mo/s)
 disk_read  1024KB: ####################   0.44s (2283.54 Mo/s)
 
-microsd sandisk extreme 256 (celle de md tab) dans slot microsd
+microsd sandisk extreme 256 (celle de ms tab) dans slot microsd
 D:\>python c:test_perf.py 1000
 disk_write    1KB: ####################  17.18s (58.22 Mo/s)
 disk_read     1KB: ####################   3.38s (296.26 Mo/s)
 disk_write 1024KB: ####################  16.47s (60.70 Mo/s)
 disk_read  1024KB: ####################   0.45s (2205.17 Mo/s)
+
+surface7:
+sur c:
+python version   : 3.9.5 (64bits) (8 core(s))
+cpu              : Intel(R) Core(TM) i7-1065G7 CPU @ 1.30GHz
+test_cpu_int2    : ####################   0.47s
+test_cpu_float2  : ####################   0.07s
+test_scipy_xxt   : ####################   0.96s (418.01x)
+test_orb4.5.2    : ####################   0.21s (466.26fps)
+test_orbcv imgs  : test_perf_vga_*.png: not found
+test_orbcv bis   : test_perf_vga_*.png: not found
+disk_write    1KB: ####################   6.09s (164.19 Mo/s)
+disk_read     1KB: ####################   5.46s (183.12 Mo/s)
+disk_write 1024KB: ####################   1.64s (608.30 Mo/s)
+disk_read  1024KB: ####################   0.31s (3219.90 Mo/s)
+
+microsd sandisk extreme 256 (celle de ms tab) dans slot microsd:
+disk_write    1KB: ####################  17.16s (58.26 Mo/s)
+disk_read     1KB: ####################   2.91s (343.35 Mo/s)
+disk_write 1024KB: ####################  15.15s (66.01 Mo/s)
+disk_read  1024KB: ####################   0.30s (3330.45 Mo/s)
+
+new sandisk fit mini usb 128Go sur port usb:
+disk_write    1KB: ####################  25.82s (38.73 Mo/s)
+disk_read     1KB: ####################   2.86s (349.32 Mo/s)
+disk_write 1024KB: ####################  24.92s (40.13 Mo/s)
+disk_read  1024KB: ####################   0.30s (3281.97 Mo/s)
 
 """

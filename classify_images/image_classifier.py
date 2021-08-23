@@ -45,7 +45,7 @@ def generateExifNameToTagNum():
     Add to PIL library a dictionnary of name and index of tag
     """
     PIL.ExifTags.tag2Num = dict()
-    for num, name in PIL.ExifTags.TAGS.iteritems():
+    for num, name in PIL.ExifTags.TAGS.items():
         PIL.ExifTags.tag2Num[name] = num 
 
 generateExifNameToTagNum()    
@@ -59,16 +59,21 @@ def getShootDateAndApnModel( strImgFilename ):
     #~ print PIL.ExifTags.tag2Num
     #~ print exif_data[PIL.ExifTags.tag2Num["Model"]]
     
-    img = PIL.Image.open(strImgFilename)
+    try:
+        img = PIL.Image.open(strImgFilename)
+    except PIL.Image.UnidentifiedImageError as err:
+        print( "WRN: getShootDateAndApnModel: image type error: " + str(err) )
+        return[ None, "exif_error", None ]
+        
     try:
         exif_data = img._getexif()
-    except BaseException, err:
+    except BaseException as err:
         print( "WRN: exif reading error: " + str(err) )
         return[ "1900", "exif_error", None ]
         
     if( exif_data == None ):
         return [None, None, None]
-    print exif_data        
+    print("DBG: getShootDateAndApnModel: exif_data: %s" % str(exif_data) )        
     strDate = None
     strCameraName = None
     strCameraOwnerName = None
@@ -87,7 +92,7 @@ def getShootDateAndApnModel( strImgFilename ):
     except: pass
     try:
         strDate = exif_data[PIL.ExifTags.tag2Num["DateTimeOriginal"]]
-    except BaseException, err: print err
+    except BaseException as err: print( err )
     
     
     return [strDate, strCameraName, strCameraOwnerName]
@@ -192,30 +197,35 @@ def renamePathUsingExif( strPathSrc, bAndroidStyle = True ):
     rename all files in a path, using the exif shoot time stamp
     IMG_9354 => 20170207_105754__IMG_9354 # AndroidStyle
     or
-    IMG_9354 => 2017_02_07_-_10_57_54__IMG_9354 # Alexandre Style (NDEV?)
+    IMG_9354 => 2017_02_07_-_10h57m54__IMG_9354 # Alexandre Style
     """
     cpt = 0
     cptRenamed = 0
+    bOnlyStartingWithIMG = False
     for file in sorted(os.listdir( strPathSrc )):
         cpt += 1
-        if "IMG_" != file[:4]:
+        if bOnlyStartingWithIMG and "IMG_" != file[:4]:
             continue
         strSrc = strPathSrc + "/" + file
         timeStamp = getPreciseShootDate( strSrc )
         if timeStamp == []:
             continue            
-        cptRenamed += 1
         nYear, nMonth, nDay, nHour, nMin, nSec = timeStamp
         if bAndroidStyle:
             strPre = "%4d%02d%02d_%02d%02d%02d" % (nYear, nMonth, nDay, nHour, nMin, nSec)
         else:
-            strPre = "%4d_%02d_%02d_-_%02d_%02d_%02d" % (nYear, nMonth, nDay, nHour, nMin, nSec)
+            strPre = "%4d_%02d_%02d_-_%02dh%02dm%02d" % (nYear, nMonth, nDay, nHour, nMin, nSec)
+        if strPre == file[:len(strPre)]:
+            print("INF: renamePathUsingExif: %s: looks already renammed, skipping" % file )
+            continue
         strDest = strPathSrc + strPre + "__" + file
         print( "INF: renamePathUsingExif: %s => %s" % (strSrc, strDest) )    
         os.rename( strSrc, strDest )
+        cptRenamed += 1
         
     print( "INF: renamePathUsingExif: analysed: %d, renamed: %d" % (cpt,cptRenamed) )
 # renamePathUsingExif - end
 #renamePathUsingExif( "C:/tmp_image_ren/" )
-renamePathUsingExif( "/photos/photos17_i/2017-02-05_-_Florence/" )
+#~ renamePathUsingExif( "/photos/photos17_i/2017-02-05_-_Florence/" )
+renamePathUsingExif( "d:/zphotos_summer_fusion_effacable/", bAndroidStyle = True )
 

@@ -2,7 +2,7 @@
 # I'm in a plane on windows, and no grep on my computer, let's develop one
 import os
 import sys
-strElectroPath = "C:/Users/amazel/dev/git/electronoos/"
+strElectroPath = "C:/Users/alexa/dev/git/electronoos/"
 sys.path.append(strElectroPath+"/alex_pytools/")
 #~ print sys.path
 import stringmatch

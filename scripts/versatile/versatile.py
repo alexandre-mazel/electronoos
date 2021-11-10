@@ -9,6 +9,9 @@
 #       eg: python this_script_name 192.168.0.4 step 5
 #           will return set the data step to "5"
 # Aldebaran Robotics (c) 2008 All Rights Reserved
+# NB:
+# To kill python processus on windows:
+# taskkill /im python.exe /f
 ###########################################################
 
 """

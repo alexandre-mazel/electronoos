@@ -1,7 +1,7 @@
 import cv2
 import sys
 import time
-sys.path.append( "../versatile_almemory" )
+sys.path.append( "../versatile" )
 from versatile import Versatile
 
 def broadcastWebcam( nCameraIndex = 0 ):

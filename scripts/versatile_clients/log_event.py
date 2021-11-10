@@ -16,10 +16,12 @@ class VersatileLogEvents(Versatile):
         please inherits this method in your own program
         """
 
-        if command == Versatile.nCommandType_Value:
-            print("received: %s" % command_parameters )
+        if command == Versatile.nCommandType_Set:
+            strDataName = command_parameters[0]
+            value = command_parameters[1]
+            print("INF: VersatileLogEvents.handleCommand: received data: %s, value: %s" % (strDataName, value) )
+            # log it !
             return 1
-
         
         # other command keep standard behavior
         return Versatile.handleCommand( self, command, command_parameters, client )

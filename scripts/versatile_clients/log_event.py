@@ -1,4 +1,3 @@
-import cv2
 import sys
 import time
 sys.path.append( "../versatile" )

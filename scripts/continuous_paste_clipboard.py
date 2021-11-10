@@ -83,7 +83,7 @@ def continuousSave():
             
         if not bIsImageEqual:
             img_prev = img
-            name = "/tmp_scr/" + misctools.getFilenameFromTime() + ".png"
+            name = "/scr/" + misctools.getFilenameFromTime() + ".png"
             print( "INF: saving to '%s'" % name ) 
             try:
                 img.save( name, 'PNG' )

@@ -1070,4 +1070,10 @@ disk_read     1KB: ####################   2.86s (349.32 Mo/s)
 disk_write 1024KB: ####################  24.92s (40.13 Mo/s)
 disk_read  1024KB: ####################   0.30s (3281.97 Mo/s)
 
+new SSD samsgun 1To sur Sabrent (usb):
+disk_write    1KB: ####################  11.53s (86.76 Mo/s)
+disk_read     1KB: ####################   5.57s (179.62 Mo/s)
+disk_write 1024KB: ####################   4.08s (244.82 Mo/s)
+disk_read  1024KB: ####################   0.34s (2911.05 Mo/s)
+
 """

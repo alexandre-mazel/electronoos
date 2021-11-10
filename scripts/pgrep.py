@@ -21,6 +21,7 @@ def findInFile( filename, strToMatch, bVerbose = True ):
     while 1:
         try:
             line = file.readline()
+            #~ print("DBG: nCptLine: %d, offset: %s" % (nCptLine,file.tell() ) )
             if line == None or len(line) == 0:
                 break
         except UnicodeDecodeError as err:
@@ -87,7 +88,9 @@ def findInFiles( strPath, strToMatch, strFileMask = '*', bVerbose = True ):
             if ".exe" in strFile or ".dll" in strFile:
                 if bVerbose: print("WRN: skipping binary style file: '%s'" % strFile)
                 continue
-        if stringmatch.isMatch(strFile, strFileMask):
+        bMatch = stringmatch.isMatch(strFile.lower(), strFileMask)
+        if "ous" in strFile and 0: print("DBG: match: '%s' / '%s' => %s" % (strFile, strFileMask,bMatch) )
+        if bMatch:
             nl = findInFile(strFullPath,strToMatch,bVerbose=bVerbose)
             if nl > 0:
                 nbrFilesWithMatch += 1

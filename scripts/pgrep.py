@@ -79,7 +79,7 @@ def findInFiles( strPath, strToMatch, strFileMask = '*', bVerbose = True ):
         strFullPath = strPath + os.sep + strFile
         if os.path.isdir(strFullPath):
             #recursively check the folders
-            na,nf,nl = findInFiles( strFullPath,strToMatch, mask,bVerbose=bVerbose)
+            na,nf,nl = findInFiles( strFullPath,strToMatch, strFileMask,bVerbose=bVerbose)
             nbrFilesAnalysed += na
             nbrFilesWithMatch += nf
             nbrLines += nl

@@ -5,7 +5,7 @@
 # https://www.tophebergeur.com/blog/projet-chatbot-python/
 # https://towardsdatascience.com/how-to-create-a-chatbot-with-python-deep-learning-in-less-than-an-hour-56a063bdfc44
 
-import nltk
+import nltk # pip install nltk
 import numpy as np
 import random
 import re

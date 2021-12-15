@@ -6,8 +6,6 @@ import os
 import shutil
 import sys
 
-import xeniadb
-
 def assert_equal(a,b):
     if a == b:
         print("(%s==%s) => ok" % (a,b))
@@ -280,7 +278,10 @@ def removeAccent( c ):
         # mark of char on two chars at ovh, don't complain
         c = ""
     else:
-        print("DBG: removeAccent: not found: %c (%s)" % (c,ord(c) ))
+        try:
+            print("DBG: removeAccent: not found: %c (%s)" % (c,ord(c) ))
+        except BaseException as err:
+            print("DBG: removeAccent: catch else: ord: %s, err: %s" % (ord(c),err) )
         c="" # it should remains only invisible char like the square before "oe"
     return c
     
@@ -309,8 +310,11 @@ class Cities:
         self.dupZipPerZip = {} # some zip are for the same cities, we store them here alternateZip => Zip
         
     def load(self):
+        print("INF: Cities: loading city data...")
         bVerbose = 0
-        strFilename = 'datas/villes_france.csv'
+        strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
+        #~ print("strLocalPath: " + strLocalPath)
+        strFilename = strLocalPath + '/datas/villes_france.csv'
         enc = 'utf-8'
         file = openWithEncoding(strFilename, "rt", encoding = enc)
         line = file.readline() # skip first line
@@ -347,8 +351,14 @@ class Cities:
         if bVerbose: 
             print("DBG: self.dupZipPerZip: %s" % str(self.dupZipPerZip))
             print("DBG: self.dupCityPerZip: %s" % str(self.dupCityPerZip))
-            
     # load - end
+    
+    @staticmethod
+    def getCityRealName( c ):
+        """
+        take a city description and return the real name
+        """
+        return c[3]
     def findByZip( self, zip, bQuiet = True ):
         """
         return info on a city or None if not nound
@@ -471,6 +481,10 @@ class Cities:
         return listAll
         
 #class Cities - end
+
+# create Cities static method
+#~ # ne semble pas utile...
+#~ Cities.getCityRealName = staticmethod(Cities.getCityRealName)
 
 
 
@@ -657,19 +671,21 @@ def generateStatHousing( cnx, bOutputHtml ):
     
     
 def statByRegion(bOutputHtml=False):
-
+    import xeniadb
     #~ listPeoples(cnx)
     cnx = xeniadb.connect()
     generateStatHousing(cnx,bOutputHtml=bOutputHtml)
     cnx.close()
     
 if __name__ == "__main__":
-    """
-    Syntaxe:
-        [--output_html]
-    """
-    #~ autotest_cities()
-    bOutputHtml = False
-    if len(sys.argv)>1:
-        bOutputHtml = True
-    statByRegion( bOutputHtml = bOutputHtml )
+    if 1:
+        autotest_cities()
+    if 0:        
+        """
+        Syntaxe:
+            [--output_html]
+        """
+        bOutputHtml = False
+        if len(sys.argv)>1:
+            bOutputHtml = True
+        statByRegion( bOutputHtml = bOutputHtml )

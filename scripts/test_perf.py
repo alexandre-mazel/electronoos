@@ -1070,6 +1070,12 @@ disk_read     1KB: ####################   2.86s (349.32 Mo/s)
 disk_write 1024KB: ####################  24.92s (40.13 Mo/s)
 disk_read  1024KB: ####################   0.30s (3281.97 Mo/s)
 
+new sandisk ultra fit mini usb 128Go sur port usb usb 3.1 gen1:
+disk_write    1KB: ####################  21.23s (47.10 Mo/s)
+disk_read     1KB: ####################   3.04s (328.93 Mo/s)
+disk_write 1024KB: ####################  21.22s (47.13 Mo/s)
+disk_read  1024KB: ####################   0.46s (2181.99 Mo/s)
+
 new SSD samsgun 1To sur Sabrent (usb):
 disk_write    1KB: ####################  11.53s (86.76 Mo/s)
 disk_read     1KB: ####################   5.57s (179.62 Mo/s)

@@ -1,4 +1,6 @@
-sudo ln -s /etc/rc5.d/S01background_task
+sudo ln -s /etc/init.d/S01background_task /etc/rc5.d/S01background_task
+sudo chmod +x /etc/init.d/S01background_task
+chmod +x ~/dev/git/electronoos/ubuntu/daemon/background_task.py
 
 xenia@xenia-test-server:~$ ls /etc/rc5.d -la
 total 16

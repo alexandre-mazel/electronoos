@@ -966,6 +966,210 @@ disk_read     1KB: ####################   9.82s (66.00 Mo/s)
 disk_write 1024KB: ####################  11.18s (57.24 Mo/s)
 disk_read  1024KB: ####################   9.90s (64.64 Mo/s)
 
+# champion1
+
+python version   : 3.8.10 (64bits) (8 core(s))
+cpu              : todo
+test_cpu_int2    : ####################   0.23s
+test_cpu_float2  : ####################   0.05s
+scipy.fftpack    : not found
+test_orb4.5.5    : ####################   0.09s (1171.16fps)
+[ WARN:0@0.546] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@0.546] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+test_orbcv imgs  : test_perf_vga_*.png: not found
+[ WARN:0@0.603] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@0.603] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+test_orbcv bis   : test_perf_vga_*.png: not found
+multiprocess x1 :  0.23s /  0.05s /  0.00s /  0.16s /[ WARN:0@1.108] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@1.108] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+  0.06s /[ WARN:0@1.167] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@1.167] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+  0.06s =>    0.56s
+multiprocess x4 :  0.24s /  0.05s /  0.00s /  0.17s /[ WARN:0@1.697] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@1.697] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@1.697] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@1.697] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@1.698] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@1.698] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@1.698] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@1.699] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+  0.06s /[ WARN:0@1.760] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@1.760] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@1.760] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@1.760] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@1.761] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@1.761] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@1.761] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@1.761] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+  0.06s =>    1.16s
+multiprocess x8 :  0.25s /  0.06s /  0.01s /  0.19s /[ WARN:0@2.321] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.321] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.322] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.322] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.322] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.322] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.323] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.323] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.323] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.323] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.323] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.324] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.324] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.324] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.325] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.325] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+  0.07s /[ WARN:0@2.387] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.387] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.388] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.388] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.388] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.388] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.389] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.389] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.389] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.389] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.390] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.390] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.390] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.390] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.391] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@2.391] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+  0.07s =>    1.79s
+multiprocess x32:  0.99s /  0.22s /  0.02s /  0.78s /[ WARN:0@4.593] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.619] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.596] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.596] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.623] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.623] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.597] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.624] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.624] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.599] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.627] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.630] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.630] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.632] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.632] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.606] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.607] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.613] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.635] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.635] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.635] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.638] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.638] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.614] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.627] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.639] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.640] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.640] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.640] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.640] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.641] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.641] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.641] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.641] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.641] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.641] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.643] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.643] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.644] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.644] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.645] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.645] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.646] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.646] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.646] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.646] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.646] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.646] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.647] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.647] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.648] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.648] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.648] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.648] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.648] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.648] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.649] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.649] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.650] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.650] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.652] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.652] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.653] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.653] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+  0.26s /[ WARN:0@4.857] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.871] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.860] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.865] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.879] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.879] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.867] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.867] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.868] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.870] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.883] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.883] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.883] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.883] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.889] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.899] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.900] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.893] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.901] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.894] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.896] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.897] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.897] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.902] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.902] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.902] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.903] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.903] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.903] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.903] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.903] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.903] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.903] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.903] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.903] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.897] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.897] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.898] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.899] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.903] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.903] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.903] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.899] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.899] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.903] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.903] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.900] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.904] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.904] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.901] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.904] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.901] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.901] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.901] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.904] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.904] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.904] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.901] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.905] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.905] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.904] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.905] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.911] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_01.png'): can't open/read file: check file path/integrity
+[ WARN:0@4.911] global /io/opencv/modules/imgcodecs/src/loadsave.cpp (239) findDecoder imread_('test_perf_vga_02.png'): can't open/read file: check file path/integrity
+  0.26s =>    4.31s
+disk_write    1KB: ####################   1.00s (1001.50 Mo/s)
+[sudo] password for a: disk_read     1KB: ####################   0.54s (1840.89 Mo/s)
+disk_write 1024KB: ####################   0.79s (1266.54 Mo/s)
+disk_read  1024KB: ####################   0.18s (5675.28 Mo/s)
+
+
 ms tab7:
 
 INF: Changing disk test size to 1000 MB

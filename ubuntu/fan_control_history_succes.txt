@@ -1,0 +1,657 @@
+    1  sudo apt update
+    2  sudo apt upgrade
+    3  python --version
+    4  sudo apt install python3
+    5  python3
+    6  python
+    7  ls
+    8  mkdir alex
+    9  cd alex/
+   10  ls
+   11  mkdir git
+   12  cd git
+   13  ls
+   14  git clone http://github.com/alexandre-mazel/electronoos.git
+   15  ifconfig
+   16  sudo apt install net-tools
+   17  xconfig
+   18  ifconfig
+   19  cd electronoos/
+   20  cd scripts/
+   21  python~ test_perf.py 
+   22  python3 test_perf.py 
+   23  scite
+   24  sudo apt install scite
+   25  startx
+   26  sudo apt install xinit
+   27  startx
+   28  ifconfig
+   29  htop
+   30  df -h
+   31  ls
+   32  cd alex
+   33  cd git/
+   34  cd electronoos/
+   35  ls
+   36  nano
+   37  nano alex_pytools/misctools.py 
+   38  python3 scripts/test_perf.py 
+   39  cd scripts/
+   40  python test_p
+   41  python test_perf.py 
+   42  python3 test_perf.py 
+   43  sudo pip install numpy
+   44  pip install numpy
+   45  apt install pip
+   46  sudo apt install pip
+   47  ls
+   48  cd alex
+   49  ls
+   50  python -m pip --version
+   51  python3 -m pip --version
+   52  curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+   53  python3 get-pip.py 
+   54  pip install numpy
+   55  cd test
+   56  cd git
+   57  /home/xenia/.local/bin/pip install numpy
+   58  cd electronoos/
+   59  cd scripts/
+   60  python3 test_perf.py 
+   61  [A
+   62  python3 test_perf.py 
+   63  killall python3
+   64  clear
+   65  resrt
+   66  reset
+   67  ls
+   68  htop
+   69  sudo python3 test_perf.py 500
+   70  python3 test_perf.py 500
+   71  python3 test_perf.py 50000
+   72  pip install opencv
+   73  /home/xenia/.local/bin/pip install cv2
+   74  /home/xenia/.local/bin/pip install opencv
+   75  apt-cache search opencv
+   76  sudo apt install libopencv-core4.2
+   77  python3 test_perf.py 
+   78  python3
+   79  /home/xenia/.local/bin/pip install opencv-python
+   80  python3 test_perf.py 
+   81  cd
+   82  ls
+   83  mkdir test
+   84  mkdir alonso
+   85  su
+   86  sudo halt
+   87  X3n14*
+   88  sudo halt
+   89  firefox
+   90  history
+   91  history | grep -i install
+   92  sudo apt remove xinit
+   93  udo reboot
+   94  sudo reboot
+   95  man startx
+   96  sudo vim /etc/init.d/x11-common
+   97  sudo apt autoremove
+   98  sudo apt remove xinit
+   99  sudo apt remove xserver-xorg-core
+  100  sudo apt autoremove
+  101  sudo reboot
+  102  ls
+  103  ls /etc/init.d/
+  104  nano /etc/init.d/x11-common 
+  105  sudo nano /etc/init.d/x11-common 
+  106  ls /etc/init.d/*x*
+  107  ls /etc/init.d/*s*
+  108  sudo apt purge libx11* libqt* libgtk*
+  109  sudo reboot
+  110  ls /etc/rc5.d/.d
+  111  ls /etc/rc5.d/.
+  112  ls /etc/rc6
+  113  ls /etc/rc6.d/
+  114  sudo halt -p now
+  115  sudo halt -p 
+  116  sudo systemctl set-default multi-user
+  117  dmesg
+  118  ls /etc/systemd/system/default.target
+  119  ls /etc/systemd/system/default.target -la
+  120  ls
+  121  htop
+  122  cat /proc/cpu
+  123  cat /proc/cpuinfo 
+  124  lscpu | grep MHz
+  125  sudo dmidecode -t processor
+  126  watch "grep 'cpu MHz' /proc/cpuinfo"
+  127  cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq
+  128  cd test
+  129  watch "grep 'cpu MHz' /proc/cpuinfo"
+  130  cpufreq-info | grep "frequency is"
+  131  sudo apt install cpufrequtils
+  132  cpufreq-info | grep "frequency is"
+  133  cpufreq-info
+  134  ls /sys/devices/system/cpu/*/cpufreq/
+  135  nano /sys/devices/system/cpu/cpu7/cpufreq/
+  136  nano /sys/devices/system/cpu/cpu7/cpufreq/scaling_min_freq 
+  137  cat /sys/devices/system/cpu/cpu7/cpufreq/scaling_min_freq 
+  138  sudo nano /sys/devices/system/cpu/cpu7/cpufreq/scaling_min_freq 
+  139  watch "grep 'cpu MHz' /proc/cpuinfo"
+  140  cat /sys/devices/system/cpu/cpu7/cpufreq/scaling_min_freq 
+  141  sudo nano /sys/devices/system/cpu/cpu7/cpufreq/scaling_min_freq 
+  142  cpufreq-set -f 1700
+  143  sudo cpufreq-set -f 1700
+  144  sudo cpufreq-set
+  145  sudo cpufreq-set -f 600
+  146  sudo cpufreq-set -f 900
+  147  sudo cpufreq-set
+  148  sudo cpufreq-set -f 900 -cpu 1
+  149  sudo cpufreq-set -f 900 -cpu 0
+  150  sudo cpufreq-set -f 700 -cpu 0
+  151  sudo cpufreq-set -f 700 -c 0
+  152  sudo halt -p
+  153  htop
+  154  s
+  155  sudo halt -p
+  156  scite toto
+  157  exit
+  158  ls
+  159  history
+  160  cat /sys/devices/system/cpu/cpu7/cpufreq/scaling_min_freq
+  161  cd /sys/devices/system/cpu
+  162  cat ./cpu0/cpufreq/cpuinfo_min_freq
+  163  cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies
+  164  cat /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_min_freq 
+  165  sudo nano /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_min_freq 
+  166  sudo echo 700000> /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_min_freq 
+  167  cd /sys/devices/system/cpu
+  168  ls
+  169  ls power
+  170  ls cpufreq/
+  171  ls cpu0
+  172  ls cpu0/power/
+  173  ls cpu0/
+  174  ls cpu0/cpufreq
+  175  sudo apt install apache2
+  176  history
+  177  scite toto
+  178  sudo apt install scite
+  179  sudo apt install screen
+  180  screen
+  181  ls
+  182  nmap
+  183  sudo apt install net-tools scite nmap
+  184  cmake
+  185  sudo apt install net-tools scite nmap cmake
+  186  ls
+  187  cd
+  188  ls
+  189  ls /var/www/
+  190  ls test
+  191  ls Work/
+  192  ls Work/SymfonyWebsite/
+  193  ls
+  194  cd xenia
+  195  ls
+  196  cd Work/
+  197  ls
+  198  cd SymfonyWebsite/
+  199  ls
+  200  cd xenia
+  201  ls
+  202  cd ..
+  203  ls
+  204  cat composer.phar
+  205  cd xenia
+  206  cat composer.phar
+  207  resert
+  208  reset
+  209  ls
+  210  ls templates/
+  211  ls
+  212  ls public/
+  213  ls
+  214  find . -iname *.env
+  215  ls .env
+  216  ls
+  217  cat .env
+  218  scite .env
+  219  history
+  220  sudo apt install lightdm
+  221  history
+  222  history | grep -i server
+  223  history | grep -i 10
+  224  history | more
+  225  ls -la /etc/systemd/system/default.target
+  226  sudo restart
+  227  sudo reboot
+  228  sudo apt install composer 
+  229  la
+  230  mkdir Work
+  231  cd Work/
+  232  mkdir SymfonyWebsite
+  233  cd SymfonyWebsite/
+  234  git clone https://Alonso-Ybanez@bitbucket.org/neoslux/xenia.git
+  235  vim
+  236  df -h
+  237  pydf
+  238  sudo apt install pydf
+  239  pydf
+  240  sudo apt remove pydf
+  241  sudo apt remove discus
+  242  discus
+  243  di
+  244  sudo apt install di
+  245  di
+  246  ncdu -x /
+  247  sudo apt install ncdu
+  248  sudo apt remove di
+  249  ncdu -x /
+  250  df -h
+  251  df --o
+  252  df --o -h
+  253  sudo parted /dev/nvme0 print
+  254  sudo parted /dev/nvme0n1 print
+  255  mount /dev/nvme0n1p3 
+  256  exit
+  257  ls
+  258  cd Work/
+  259  ls
+  260  cd SymfonyWebsite/
+  261  scite .env
+  262  ls
+  263  cd xenia
+  264  ls
+  265  scite .env
+  266  scite .env*
+  267  bg
+  268  df . -h
+  269  df  -h
+  270  dm
+  271  df  -h
+  272  df . -h
+  273  ls
+  274  ls /var/www
+  275  ls /var/www/html
+  276  ls public
+  277  cp public/* /var/www/html
+  278  cp -r public/* /var/www/html
+  279  sudo cp -r public/* /var/www/html
+  280  ls /var/www/html
+  281  rm /var/www/html/index.html
+  282  sudo rm /var/www/html/index.html
+  283  ls
+  284  sudo mount -a
+  285  df . -h
+  286  df  -h
+  287  sudo parted
+  288  disk-manager
+  289  sudo -H disk-manager
+  290  sudo halt -p
+  291  sudo parted /dev/nvme0n1 print
+  292  mysql
+  293  sudo apt install mysql-client-core-8.0
+  294  mysql
+  295  mysql -u username -h host -p
+  296  cd Work/
+  297  ls
+  298  cd SymfonyWebsite/
+  299  ls
+  300  cd xenia/
+  301  scite .env*
+  302  bg
+  303  mysql -u username -h xeniacnneos.mysql.db -p
+  304  ls
+  305  composer install
+  306  php --ver
+  307  php --version
+  308  sudo apt-get install php7.4-xml
+  309  composer install
+  310  sudo apt-get install php7.4-gd
+  311  composer install
+  312  sudo apt-get install php7.4-zip
+  313  composer install
+  314  bin/compose cache :clear
+  315  bin/console cache :clear
+  316  bin/console cache:clear
+  317  composer install
+  318  composer recipes
+  319  composer recipes:install
+  320  composer recipes:install -v
+  321  ls
+  322  ls /var/www
+  323  ls /var/www/html/
+  324  rm /var/www/html
+  325  rm /var/www/html -rf
+  326  sudo rm /var/www/html -rf
+  327  sudo rm /var/www/html/* -rf
+  328  ls /var/www/html
+  329  composer install
+  330  ls /Var/www
+  331  ls /var/www
+  332  ls /var/www/html/
+  333  composer install
+  334  sudo apt-get install php7.4-mysql
+  335  bin/console cache:clear
+  336  composer install
+  337  php bin/console doctrine:schema:create --dump-sql
+  338  bin/console doctrine:databse:create
+  339  bin/console doctrine:databse create
+  340  bin/console doctrine:database:create
+  341  composer install
+  342  bin/console cache:clear
+  343  composer install
+  344  ls
+  345  find -iname abstract
+  346  find -iname *abstract*
+  347  find -iname *abstractmysql*
+  348  scite ./vendor/doctrine/dbal/lib/Doctrine/DBAL/Driver/AbstractMySQLDriver.php
+  349  bg
+  350  composer install
+  351  ls
+  352  find -iname *PDOC*
+  353  scite ./vendor/doctrine/dbal/lib/Doctrine/DBAL/Driver/PDOConnection.php
+  354  composer install
+  355  bin/console cache:clear
+  356  ls
+  357  ls -la
+  358  ./composer.phar 
+  359  ls
+  360  composer install
+  361  ls
+  362  bin/console doctrine :schema:update
+  363  bin/console doctrine:schema:update
+  364  ls
+  365  rm symfony.lock 
+  366  composer install
+  367  bin/console doctrine:database:create
+  368  ls
+  369  find -iname doctrine.yaml
+  370  scite ./config/packages/doctrine.yaml ./config/packages/prod/doctrine.yaml
+  371  bg
+  372  composer install
+  373  bin/console doctrine:database:create
+  374  ping xeniacnneos.mysql.db
+  375  sudo mysql
+  376  composer install
+  377  bin/console cache:clear
+  378  composer install
+  379  systemctl status mysql.service
+  380  mysqladmin
+  381  sudo mysqladmin -p -u root version
+  382  composer install
+  383  ls /var/www/html/
+  384  composer recipes
+  385  bin/console doctrine:database:create
+  386  mysql
+  387  sudo mysql
+  388  bin/console doctrine:database:create
+  389  bin/console doctrine:schema:upate --force
+  390  bin/console doctrine:schema:update --force
+  391  cat env.local
+  392  ls
+  393  ls -la
+  394  cp env.test env.local
+  395  cp .env.test env.local
+  396  bin/console doctrine:schema:update --forcehistory
+  397  history
+  398  bin/console cache:clear
+  399  bin/console doctrine:schema:update --force
+  400  ls
+  401  ls /var/www/html
+  402  ls var
+  403  ls -la
+  404  ls public
+  405  ls
+  406  ls src
+  407  ls var
+  408  ls tests
+  409  ls
+  410  find . -iname "*.php"
+  411  find . -iname "*.php" | more
+  412  ls
+  413  ls src
+  414  ls tests
+  415  ls var/cache
+  416  ls var/cache/prod
+  417  ls
+  418  cat phpunit.xml.dist
+  419  history
+  420  composer recipes
+  421  composer recipes | deploy
+  422  composer install
+  423  ls /var/www/html
+  424  ls
+  425  exit
+  426  sudo apt update
+  427  sudo apt upgrade
+  428  who
+  429  sudo apt install fanspeed
+  430  apt-cache search fanspeed
+  431  apt-cache search ls-controls
+  432  apt-cache search lm-controls
+  433  apt-cache search lm-control
+  434  apt-cache search lm-sensor
+  435  apt-cache search lm-sensors
+  436  sudo apt install fancontrol
+  437  fancontrol
+  438  sudo fancontrol
+  439  fancontrol --h
+  440  fancontrol --help
+  441  sudo apt install fancontrol
+  442  fancontrol
+  443  /etc/init.d/fancontrol 
+  444  /etc/init.d/fancontrol start
+  445  sudo /etc/init.d/fancontrol start
+  446  fancontrol
+  447  sudo apt install lm-sensors
+  448  fancontrol
+  449  sudo pwmcontrol
+  450  sudo pwmcontrolq
+  451  sudo pwmcontrols
+  452  history
+  453  sudo pwmconfigs
+  454  sudo pwmconfig
+  455  lm-sensors
+  456  pwmconfig
+  457  sudo pwmconfig
+  458  sensors-detect
+  459  sudo sensors-detect
+  460  sudo /etc/init.d/kmod start
+  461  sudo pwmconfig
+  462  sudo sensors-detect
+  463  fancontrol 
+  464  sudo fancontrol 
+  465  sensors
+  466  sudo sensors
+  467  fanspeed
+  468  fancontrol 20
+  469  sudo fancontrol 20
+  470  sensors
+  471  sudo pwmconfig
+  472  libsensors4 
+  473  dpkg -l | grep libsensors4
+  474  sudo apt install libsensors4
+  475  sudo apt install sensors4
+  476  apt-cache search sensors4
+  477  sudo apt install libsensors4-dev
+  478  sensors
+  479  sudo sensors-detect 
+  480  lsmod
+  481  lsmod|grep sensors
+  482  lsmod|grep -i sensors
+  483  lsmod|grep -i temp
+  484  modprobe lm-sensors
+  485  cat /sys/class/thermal/thermal_zone0/temp
+  486  sensors
+  487  cat /sys/class/thermal/thermal_zone0/temp
+  488  sudo service kmod restart
+  489  sensors
+  490  sudo pwmconfig
+  491  fancontrol
+  492  sudo fancontrol
+  493  sudo pwmconfig
+  494  history
+  495  sensors
+  496  sudo pwmconfig --help
+  497  fancontrol
+  498  cat /etc/fancontrol 
+  499  fancontrol
+  500  sudo fancontrol
+  501  pwmconfig
+  502  sudo pwmconfig
+  503  cat /etc/fancontrol 
+  504  sudo nano /etc/fancontrol 
+  505  sensor
+  506  sudo sensors
+  507  sensors
+  508  sensors coretemp-isa-0000
+  509  sudo fancontrol
+  510  sudo fancontrol 122
+  511  sudo nano /etc/fancontrol 
+  512  echo 255 > /sys/bus/i2c/devices/1-0290/pwm1 
+  513  sensors
+  514  sudo nano /etc/fancontrol 
+  515  ls /sys/bus
+  516  ls /sys/bus/acpi
+  517  find /sys/bus -iname pwm
+  518  find /sys/bus/ -iname pwm
+  519  find /sys/bus/ -iname "*pwm*"
+  520  echo 0 > /sys/bus/platform/drivers/pwm-lpss
+  521  echo 0 > /sys/bus/pci/drivers/pwm-lpss
+  522  ls /sys/bus/isa
+  523  ls /sys/bus/isa/devices/
+  524  ls /sys/bus/isa/drivers
+  525  ls /sys/bus/isa/uevent 
+  526  cat /sys/bus/isa/uevent 
+  527  sudo cat /sys/bus/isa/uevent 
+  528  sensors-detect
+  529  sudo sensors-detect
+  530  sudo pwmconfig
+  531  find /sys/bus/ -iname "*hwmon*"
+  532  sudo pwmconfig
+  533  ls /sys/class/hwmon/hwmon3/pwm1
+  534  cat /sys/class/hwmon/hwmon3/pwm1
+  535  echo 0 >/sys/class/hwmon/hwmon3/pwm1
+  536  sudo echo 0 >/sys/class/hwmon/hwmon3/pwm1
+  537  sudo echo 0 >/sys/class/hwmon/hwmon3/pwm2
+  538  sudo echo 0 >/sys/class/hwmon/hwmon3/pwm3
+  539  sudo echo 0 >/sys/class/hwmon/hwmon3/pwm4
+  540  sudo echo 0 >/sys/class/hwmon/hwmon3/pwm5
+  541  sudo echo 0 >/sys/class/hwmon/hwmon3/pwm6
+  542  sudo echo 0 >/sys/class/hwmon/hwmon3/pwm7
+  543  sudo echo 0 >/sys/class/hwmon/hwmon3/pwm8
+  544  ls /sys/class/hwmon/
+  545  ls /sys/class/hwmon/hwmon3
+  546  sudo echo 0 >/sys/class/hwmon/hwmon3/pwm4
+  547  sudo pwmconfig
+  548  cat /sys/class/hwmon/hwmon3/pwm4_enable
+  549  cat /sys/class/hwmon/hwmon3/pwm1_enable
+  550  cat /sys/class/hwmon/hwmon3/pwm2_enable
+  551  cat /sys/class/hwmon/hwmon3/pwm3_enable
+  552  cat /sys/class/hwmon/hwmon3/pwm4_enable
+  553  sudo echo 1> /sys/class/hwmon/hwmon3/pwm4_enable
+  554  sudo echo 1> /sys/class/hwmon/hwmon3/pwm1_enable
+  555  sudo echo 1> /sys/class/hwmon/hwmon3/pwm2_enable
+  556  sudo lsmod
+  557  sudo modprobe -r 
+  558  sudo modprobe -r coretemp
+  559  sudo echo 1> /sys/class/hwmon/hwmon3/pwm2_enable
+  560  lsof /sys/class/hwmon/hwmon3/pwm2_enable
+  561  lsof /sys/class/hwmon/hwmon3
+  562  sudo lsof /sys/class/hwmon/hwmon3
+  563  lsof /dev/null
+  564  lsof xenia
+  565  lsof -u xenia
+  566  sudo lsof -i TCP:80
+  567  sudo lsof /sys/class/hwmon/
+  568  sudo lsof /sys/class/
+  569  sudo lsof /sys/
+  570  echo 1|sudo tee /sys/class/hwmon/hwmon3/pwm1_enable
+  571  echo 1|sudo tee /sys/class/hwmon/hwmon3/pwm2_enable
+  572  echo 1|sudo tee /sys/class/hwmon/hwmon3/pwm3_enable
+  573  echo 1|sudo tee /sys/class/hwmon/hwmon3/pwm4_enable
+  574  echo 1|sudo tee /sys/class/hwmon/hwmon3/pwm5_enable
+  575  echo 1|sudo tee /sys/class/hwmon/hwmon3/pwm6_enable
+  576  echo 1|sudo tee /sys/class/hwmon/hwmon3/pwm7_enable
+  577  echo 0|sudo tee /sys/class/hwmon/hwmon3/pwm1
+  578  echo 0|sudo tee /sys/class/hwmon/hwmon3/pwm2
+  579  echo 0|sudo tee /sys/class/hwmon/hwmon3/pwm3
+  580  echo 0|sudo tee /sys/class/hwmon/hwmon3/pwm4
+  581  echo 0|sudo tee /sys/class/hwmon/hwmon3/pwm5
+  582  echo 0|sudo tee /sys/class/hwmon/hwmon3/pwm6
+  583  echo 0|sudo tee /sys/class/hwmon/hwmon3/pwm7
+  584  sensors
+  585  sudo modprobe coretemp
+  586  sensors
+  587  history
+  588  sensors
+  589  sensors coretemp-isa-0000
+  590  cat /sys/class/thermal/thermal_zone0/temp
+  591  sensors coretemp-isa-0000
+  592  cat /sys/class/thermal/thermal_zone0/temp
+  593  sensors
+  594  echo 255|sudo tee /sys/class/hwmon/hwmon3/pwm0
+  595  echo 255|sudo tee /sys/class/hwmon/hwmon3/pwm1
+  596  echo 255|sudo tee /sys/class/hwmon/hwmon3/pwm2
+  597  echo 0|sudo tee /sys/class/hwmon/hwmon3/pwm2
+  598  echo 255|sudo tee /sys/class/hwmon/hwmon3/pwm2
+  599  echo 0|sudo tee /sys/class/hwmon/hwmon3/pwm2
+  600  echo 255|sudo tee /sys/class/hwmon/hwmon3/pwm3
+  601  echo 0|sudo tee /sys/class/hwmon/hwmon3/pwm3
+  602  echo 255|sudo tee /sys/class/hwmon/hwmon3/pwm4
+  603  echo 255|sudo tee /sys/class/hwmon/hwmon3/pwm5
+  604  echo 255|sudo tee /sys/class/hwmon/hwmon3/pwm6
+  605  echo 0|sudo tee /sys/class/hwmon/hwmon3/pwm6
+  606  echo 255|sudo tee /sys/class/hwmon/hwmon3/pwm7
+  607  echo 255|sudo tee /sys/class/hwmon/hwmon3/pwm8
+  608  ls
+  609  sudo nano /var/www/html/index.html
+  610  ssh --help
+  611  ssh engrenage.studio -p 45022
+  612  who
+  613  sensors
+  614  echo 255|sudo tee /sys/class/hwmon/hwmon3/pwm6
+  615  echo 0|sudo tee /sys/class/hwmon/hwmon3/pwm6
+  616  echo 255|sudo tee /sys/class/hwmon/hwmon3/pwm3
+  617  sensors
+  618  sensors coretemp-isa-000
+  619  sensors coretemp-isa-00
+  620  echo 30|sudo tee /sys/class/hwmon/hwmon3/pwm3
+  621  echo 60|sudo tee /sys/class/hwmon/hwmon3/pwm3
+  622  echo 100|sudo tee /sys/class/hwmon/hwmon3/pwm3
+  623  echo 100|sudo tee /sys/class/hwmon/hwmon3/pwm6
+  624  echo 100|sudo tee /sys/class/hwmon/hwmon3/pwm2
+  625  echo 40|sudo tee /sys/class/hwmon/hwmon3/pwm2
+  626  echo 40|sudo tee /sys/class/hwmon/hwmon3/pwm6
+  627  sensors
+  628  echo 100|sudo tee /sys/class/hwmon/hwmon3/pwm6
+  629  sensors
+  630  echo 80|sudo tee /sys/class/hwmon/hwmon3/pwm6
+  631  sensors
+  632  echo 60|sudo tee /sys/class/hwmon/hwmon3/pwm6
+  633  sensors
+  634  history
+  635  echo 60|sudo tee /sys/class/hwmon/hwmon3/pwm2
+  636  echo 60|sudo tee /sys/class/hwmon/hwmon3/pwm3
+  637  history
+  638  sensors
+  639  pip install dlib
+  640  sudo pip install dlib
+  641  sensors
+  642  who
+  643  sudo halt -p
+  644  history
+  645  cat /sys/class/hwmon/hwmon3/pwm2
+  646  cat /sys/class/hwmon/hwmon3/
+  647  sensors
+  648  modprobe coretemp
+  649  sudo modprobe coretemp
+  650  sudo service kmod restart
+  651  at /sys/class/hwmon/hwmon3/
+  652  sudo modprobe Nct6775
+  653  sudo modprobe nct6775
+  654  history
+  655  sensors coretemp-isa-00
+  656  sudo fancontrol
+  657  history >fan_control_history_succes.txt

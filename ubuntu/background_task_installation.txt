@@ -1,0 +1,10 @@
+xenia@xenia-test-server:~$ ls /etc/rc5.d -la
+total 16
+drwxr-xr-x   2 root root  4096 févr.  9  2021 .
+drwxr-xr-x 137 root root 12288 oct.  11 10:44 ..
+lrwxrwxrwx   1 root root    29 janv. 28  2021 K01apache-htcacheclean -> ../init.d/apache-htcacheclean
+lrwxrwxrwx   1 root root    17 janv. 28  2021 S01apache2 -> ../init.d/apache2
+lrwxrwxrwx   1 root root    16 juil. 31  2020 S01apport -> ../init.d/apport
+lrwxrwxrwx   1 root root    13 juil. 31  2020 S01atd -> ../init.d/atd
+lrwxrwxrwx   1 root root    22 janv. 28  2021 S01avahi-daemon -> ../init.d/avahi-daemon
+lrwxrwxrwx   1 root root    25 févr.  9  2021 S01background_task -> ../init.d/background_task

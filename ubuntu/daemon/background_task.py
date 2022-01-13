@@ -17,7 +17,11 @@ def getTimeStamp():
 
 
 def log(strTxt):
-    file = open("/home/xenia/background_task.log", "at")
+    #~ filename = "~/background_task.log"
+    #~ filename = os.path.expanduser(filename)
+    # cant use ~ as we're not root
+    filename = "/home/a/background_task.log"
+    file = open(filename, "at")
     strOut = "%s: INF: %s\n" % (getTimeStamp(), strTxt)
     print( strOut )
     file.write( strOut )
@@ -70,13 +74,14 @@ def changeFanSpeed(rSpeedCpu, rSpeedBoard):
     
     idxGroupCpu = [2,3]
     idxGroupBoard = [6]
+    # attention apres avoir installé une carte nvidia, j'ai du changer hwmon2 en hwmon3
     for idx in idxGroupCpu:
-        os.system( "echo 1 >/sys/class/hwmon/hwmon2/pwm%d_enable" % idx )
-        os.system( "echo %d > /sys/class/hwmon/hwmon2/pwm%d" % (nSpeedFanGroupCpu, idx) )
+        os.system( "echo 1 >/sys/class/hwmon/hwmon3/pwm%d_enable" % idx )
+        os.system( "echo %d > /sys/class/hwmon/hwmon3/pwm%d" % (nSpeedFanGroupCpu, idx) )
 
     for idx in idxGroupBoard:
-        os.system( "echo 1 >/sys/class/hwmon/hwmon2/pwm%d_enable" % idx )
-        os.system( "echo %d > /sys/class/hwmon/hwmon2/pwm%d" % (nSpeedFanGroupBoard, idx) )
+        os.system( "echo 1 >/sys/class/hwmon/hwmon3/pwm%d_enable" % idx )
+        os.system( "echo %d > /sys/class/hwmon/hwmon3/pwm%d" % (nSpeedFanGroupBoard, idx) )
         
 def getGoodSpeed(rTemp):
     """

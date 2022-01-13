@@ -15,7 +15,7 @@
 #sudo update-rc.d background_task defaults
 ### END INIT INFO
 
-DAEMON="/home/xenia/Work/daemon/background_task.py" #ligne de commande du programme, attention à l'extension .py.
+DAEMON="/home/a/dev/git/electronoos/ubuntu/daemon/background_task.py" #ligne de commande du programme, attention à l'extension .py.
 daemon_OPT=""  #argument à utiliser par le programme - Remplacer Utilisateur par votre nom de login
 DAEMONUSER="root" #utilisateur du programme
 daemon_NAME="background_task.py" #Nom du programme (doit être identique à l'exécutable).

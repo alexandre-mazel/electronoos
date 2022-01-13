@@ -1,3 +1,5 @@
+sudo ln -s /etc/rc5.d/S01background_task
+
 xenia@xenia-test-server:~$ ls /etc/rc5.d -la
 total 16
 drwxr-xr-x   2 root root  4096 févr.  9  2021 .

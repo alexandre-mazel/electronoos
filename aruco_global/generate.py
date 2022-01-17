@@ -153,7 +153,7 @@ def genereatePdfFromImages( listImgs, strOutPdfFilename, nOuputType=0 ):
     """
     Generate a pdf files from a list of images
     nRectoVersoHandling:
-    - 0: print all
+    - nOuputType: 0: print all NDEV
     """
     pdf = FPDF('P', 'mm', 'A4') # Portrait, measures in mm, format is A4
     #~ pdf.add_page()

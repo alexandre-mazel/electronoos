@@ -359,6 +359,7 @@ class Cities:
         take a city description and return the real name
         """
         return c[3]
+        
     def findByZip( self, zip, bQuiet = True ):
         """
         return info on a city or None if not nound
@@ -667,8 +668,40 @@ def generateStatHousing( cnx, bOutputHtml ):
             file.close()
         
 # generateStatHousing - end
+
+
+def bigCityToZip( strCity ):
+    """
+    return the generic zip of big cities
+    """
+    cityzip = [
+                        ("Paris", "75000"),
+                        ( "Marseille", "13000"), 
+                        ( "Lyon", "69000"), 
+                        ( "Toulouse","31000"), 
+                        ( "Nice","06000"), 
+                        ( "Nantes","44000"), 
+                        ( "Montpellier","34000"), 
+                        ( "Strasbourg","67000"), 
+                        ( "Bordeaux","33000"), 
+                        ( "Lille", "59000"), 
+                    ]
+    for i in range(len(cityzip)):
+        if cityzip[i][0].lower() == strCity.lower():
+            return cityzip[i][1]
+    print("ERR: cities_data.bigCityToZip: '%s' not found" % strCity )
+    assert(1)
+    return "-1"
     
-    
+if 0:
+    cities = Cities()
+    cities.load()
+    rdist=cities.distTwoZip("75001",bigCityToZip("Paris"))
+    print(rdist)
+    rdist=cities.distTwoZip("75001",bigCityToZip("Marseille"))
+    print(rdist)    
+    rdist=cities.distTwoZip("75001",bigCityToZip("Nice"))
+    print(rdist)    
     
 def statByRegion(bOutputHtml=False):
     import xeniadb

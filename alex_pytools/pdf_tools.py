@@ -1,4 +1,62 @@
 from fpdf import FPDF # pip3 install fpdf
+import fitz # pip install PyMuPDF # https://pypi.org/project/PyMuPDF/#files
+
+
+def addTextToPdf( src,dst, aText, colorText = (1,1,1) ):
+    """
+    add text to a pdf.
+    aText: is a list of text, fontsize, x, and y in percent in page
+    """
+    #~ pdf = FPDF(src,)
+    doc = fitz.open(src)
+    page = doc[0]
+    page.clean_contents() # remove all specific orientation and weird settings
+    
+    
+    bShadow = 1
+    
+    dict_ = page.get_text('dict')
+    w = dict_["width"]
+    h = dict_["height"]
+    print("w, h: %s, %s" % ( w, h ) )
+    
+    for data in aText:
+        text, fontsize, x, y = data
+        assert(0<= x <=1)
+        assert(0<= y <=1)
+        
+        xtext = int(x*w)
+        ytext = int(y*h)
+        print("xtext, ytext: %s, %s" % ( xtext, ytext ) )
+        rect = fitz.Rect( xtext, ytext, 2000, 2000)
+        
+        if  bShadow:
+            rectShadow = rect
+            #~ print(dir(rectShadow))
+            rectShadow.x0 += 20
+            rectShadow.y0 += 20
+            rc = page.insert_textbox(rectShadow, text, fontsize = fontsize, # choose fontsize (float)
+                               fontname = "Times-Roman",       # a PDF standard font
+                               fontfile = None,                # could be a file on your system
+                               color=(0,0,0),
+                               align = 0)                      # 0 = left, 1 = center, 2 = right
+
+        rc = page.insert_textbox(rect, text, fontsize = fontsize, # choose fontsize (float)
+                           fontname = "Times-Roman",       # a PDF standard font
+                           fontfile = None,                # could be a file on your system
+                           color=colorText,
+                           align = 0)                      # 0 = left, 1 = center, 2 = right
+    
+    for j in range(10):                 
+        for i in range(10):
+            pt = fitz.Point( i*100, j*100)
+            page.insert_text(pt, "x: %d, y:%d" % (i,j), fontsize = 10, color=(1,1,1),rotate=0)
+            
+    doc.save(dst)
+
+    
+    
+addTextToPdf( "cv_sample.pdf", "temp.pdf", [["Coucou", 20, 0.01,0.01],["Hello", 20, 0.9,0.1]] )
 
 def pdfMultiCell( pdf, x, y, txt, hInterlign, bCentered = False ):
     # please document !
@@ -50,8 +108,8 @@ def generatePdfFromImages( listImgs, strOutPdfFilename, strVersoText = None, nNb
             import cv2
             import numpy as np
             im = cv2.imread(strFilename,cv2.IMREAD_ANYDEPTH)
-            print(im.dtype)
-            print(im.shape)
+            print("DBG: pdfMultiCell: im.dtype: %s" % str(im.dtype))
+            print("DBG: pdfMultiCell: im.shape: %s" % str(im.shape))
             if im.dtype == np.uint16:
                 # convert to 8 bits
                 print("INF: pdfMultiCell: converting on the fly to 8 bits" )
@@ -126,4 +184,6 @@ def test():
         generatePdfFromImages(["../data/alexandre.jpg"]*4, "temp4_%s.pdf" % bNumPage,nNbrImagePerPage=4,bAddPageNum=bNumPage)
 
 if __name__ == "__main__":
-    test()
+    pass
+    #~ test()
+    

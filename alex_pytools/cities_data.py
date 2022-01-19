@@ -13,6 +13,13 @@ def assert_equal(a,b):
         print("(%s==%s) => NOT ok (type:%s and %s)" % (a,b,type(a),type(b)))
         assert(0)
 
+def assert_diff(a,b,diff):
+    if abs(a-b)<diff:
+        print("(%s diff %s < %s) => ok" % (a,b,diff))
+    else:
+        print("(%s diff %s) => NOT ok (type:%s and %s)" % (a,b,type(a),type(b)))
+        assert(0)
+        
 def getTimeStamp():
     """
     
@@ -150,7 +157,7 @@ def distLongLat( lo1, la1, lo2, la2 ):
     a multiplier par 60 pour passer aux degres.
     """
     #~ print(lo1, la1, lo2, la2)
-    x = (lo2-lo1)*math.cos((la2+la1)/2)
+    x = (lo2-lo1)*math.cos(((la2+la1)/2)*math.pi/180)
     y = (la2-la1)
     z = math.sqrt(x*x+y*y)
     d=1.852*60*z
@@ -412,9 +419,13 @@ class Cities:
         print("WRN: Cities.findByRealName: city '%s' not found" % strCityName)
         return -1
         
-    def distTwoZip(self,zip1,zip2):
+    def distTwoZip(self,zip1,zip2,bVerbose=False):
         c1 = self.findByZip(zip1)
         c2 = self.findByZip(zip2)
+        if bVerbose: print("DBG: distTwoZip: ville 1: %s" % str(c1) )
+        if bVerbose: print("DBG: distTwoZip: ville 1: long: %.3f, lat: %.3f" % (c1[4],c1[5]) )
+        if bVerbose: print("DBG: distTwoZip: ville 2: %s" % str(c2) )
+        if bVerbose: print("DBG: distTwoZip: ville 2: long: %.3f, lat: %.3f" % (c2[4],c2[5]) )
         return distLongLat(c1[4],c1[5],c2[4],c2[5])
         
     def getLongLat(self,zip,bDefaultToClermont = False ):
@@ -513,6 +524,31 @@ def autotest_cities():
         if retVal != -1:
             print("detail: %s" % str(cities.findByZip(retVal)))
         print("")
+        
+    # bug dist bondy/velizy2
+    zip1 = cities.findByRealName("Bondy")
+    assert_equal(zip1,"93140")
+    #~ zip2 = cities.findByRealName("Vélizy")
+    zip2 = "78140"
+    dist = cities.distTwoZip(zip1,zip2,bVerbose=True)
+    assert_diff(dist,22,5)
+    
+    # bug Schiltigheim / parly
+    zip1 = cities.findByRealName("Schiltigheim")
+    assert_equal(zip1,"67300")
+    #~ zip2 = cities.findByRealName("Parly")
+    #~ zip2 = cities.findByRealName("Le Chesnay-Rocquencourt")
+    #~ assert_equal(zip2,"78150")
+    zip2 = "78150"
+    dist = cities.distTwoZip(zip1,zip2,bVerbose=True)
+    assert_diff(dist,397,20)
+    
+
+    dist = cities.distTwoZip("75006","34000",bVerbose=True)
+    assert_diff(dist,596,20)        
+
+    dist = cities.distTwoZip("33000","67000",bVerbose=True)
+    assert_diff(dist,760,20)      
 
 def findNearestUniv( zip_host, cities, dictUniv ):
     """

@@ -32,7 +32,7 @@ class FaceDetector:
         return im (as given)
         """
         for oneres in res:
-            startX, startY, endX, endY,confidence = oneres
+            startX, startY, endX, endY, confidence = oneres
             cv2.rectangle(im, (startX,startY),(endX, endY),color)
             # etiquette and confidence
             cv2.rectangle(im,(startX, startY-14),(startX+40, startY), color, thickness=-1 )
@@ -55,7 +55,7 @@ class FaceDetector:
             if confidence > 0.5:
                 box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
                 (startX, startY, endX, endY) = box.astype("int")
-                res.append((startX, startY, endX, endY,confidence))
+                res.append((startX, startY, endX, endY, confidence))
                 print("DBG: box: %s" % str(box))
                 print("DBG: x,y: %d,%d" % (startX, startY))
                 

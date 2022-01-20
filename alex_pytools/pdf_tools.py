@@ -2,10 +2,127 @@ from fpdf import FPDF # pip3 install fpdf
 import fitz # pip install PyMuPDF # https://pypi.org/project/PyMuPDF/#files
 from copy import deepcopy
 
+class PdfMod:
+    
+    def __init__( self, src ):
+        self.src = src # to know when saving if it's an update or a write (needed by the library)
+        self.doc = fitz.open(src)
+        self.page = self.doc[0]
+        self.page.clean_contents() # remove all specific orientation and weird settings
+        
+        dict_ = self.page.get_text('dict')
+        w = dict_["width"]
+        h = dict_["height"]
+        print("w, h: %s, %s" % ( w, h ) )
+        self.w = w
+        self.h = h
+        
+    def addRect( self, rect, color = (1,1,1), bShadow=0, fillColor=None, transparency=0 ):
+        rect = fitz.Rect( int(rect[0]*self.w), int(rect[1]*self.h), int(rect[2]*self.w), int(rect[3]*self.h) )
+        
+
+        if bShadow:
+            rectShadow = deepcopy(rect)
+            #~ print(dir(rectShadow))
+            offx = 1
+            offy = 1
+            rectShadow.x0 += offx
+            rectShadow.y0 += offy
+            rectShadow.x1 += offx
+            rectShadow.y1 += offy
+            self.page.draw_rect(rectShadow,(0,0,0))
+        
+        self.page.draw_rect(rect,color,fill=fillColor,fill_opacity=1.-transparency)
+        
+    def addText( self, text, pos, fontsize, colorText = (1,1,1), bShadow=0 ):
+        """
+        pos: x, and y in percent in page
+        """
+        fontname = "Times-Roman"
+        bContour = 0 # test de contour, mais beurk
+        x,y = pos
+
+        assert(0<= x <=1)
+        assert(0<= y <=1)
+        
+        xtext = int(x*self.w)
+        ytext = int(y*self.h)
+        print("xtext, ytext: %s, %s" % ( xtext, ytext ) )
+        
+        text_lenght = fitz.get_text_length(text, fontname=fontname, fontsize=fontsize)
+        
+        rect = fitz.Rect( xtext, ytext, xtext+text_lenght+1, ytext+fontsize*1+1 )
+        
+        listoffsets = []
+        fontsizeShadow = fontsize
+        if  bShadow:
+            listoffsets = [[1,1]]
+        if bContour:
+            # divers essais peu concluant:
+            if 1:
+                listoffsets += [[1,0],[-1,0],[0,1],[0,-1]]
+                listoffsets += [[1,1],[-1,-1],[1,-1],[-1,1]]
+            
+            if 0:
+                listoffsets = [[-2,-1]]
+                fontsizeShadow = fontsize+2
+            
+        for offsets in listoffsets:
+            offx,offy = offsets
+            rectShadow = deepcopy(rect)
+            #~ print(dir(rectShadow))
+            offset = 1
+            rectShadow.x0 += offx
+            rectShadow.y0 += offy
+            rectShadow.x1 += offx
+            rectShadow.y1 += offy
+            #
+            #
+            #
+            # align:  0 = left, 1 = center, 2 = right, 3: justify
+            rc = self.page.insert_textbox(rectShadow, text, fontsize = fontsizeShadow, fontname = fontname, fontfile = None, color=(0,0,0), align = 0)
+
+        #~ self.page.draw_rect(rect,colorText)
+        bUseTextBox = 0
+        if bUseTextBox:
+            y_offset_text -= 10 # textbox render everything lower
+            rc = self.page.insert_textbox(rect, text, fontsize = fontsize, # choose fontsize (float)
+                               fontname = fontname,       # a PDF standard font: "Times-Roman"
+                               fontfile = None,                # could be a file on your system
+                               color=colorText,
+                               #~ border_width=3,
+                               align=0)                      # 0 = left, 1 = center, 2 = right;
+        else:
+            rc = self.page.insert_text((rect[0],rect[1]-fontsize//2), text, fontsize = fontsize, # choose fontsize (float)
+                               fontname = fontname,       # a PDF standard font: "Times-Roman"
+                               fontfile = None,                # could be a file on your system
+                               color=colorText,
+                               #~ border_width=3,
+                               )                      # 0 = left, 1 = center, 2 = right;
+        
+    def save( self, dst ):
+        self.doc.save(dst,incremental=self.src==dst,encryption=fitz.PDF_ENCRYPT_KEEP)
+        
+# class PdfMod
+
+if 1:
+    #~ addTextToPdf( "cv_sample.pdf", "temp.pdf", [["Coucou", 20, 0.01,0.01],["Hello", 20, 0.9,0.1]] )
+    p = PdfMod("cv_sample.pdf")
+    colorRect = (0.5,0.5,0.5)
+    xo = 0.86
+    sizetxt=10
+    p.addRect( (xo-0.02,0.0,1.,0.05),color=colorRect, fillColor=colorRect, transparency=0.07 )
+    p.addText( "luxe: 0.4", (xo,0.), sizetxt, colorText = (0,0,0) )
+    p.addText( "premium: 0.4 (Kenzo, kookai,...)", (xo,0.015), sizetxt, colorText = (0,0,0) )
+    p.addText( "dist: 18km (75000)", (xo,0.03), sizetxt, colorText = (0,0,0) )
+    p.save("temp.pdf")
+
+
 def addRectToPdf( src,dst, rect, color = (1,1,1), bShadow=0, fillColor=None, transparency=0 ):
     """
     rect in % of the document
     """
+
     
     #  draw_rect(rect, color=None, fill=None, width=1, dashes=None, lineCap=0, lineJoin=0, overlay=True, morph=None, stroke_opacity=1, fill_opacity=1, oc=0)
     
@@ -119,7 +236,7 @@ def addTextToPdf( src,dst, aText, colorText = (1,1,1), bShadow=0 ):
 
     
     
-if 1:
+if 0:
     #~ addTextToPdf( "cv_sample.pdf", "temp.pdf", [["Coucou", 20, 0.01,0.01],["Hello", 20, 0.9,0.1]] )
 
     colorRect = (0.5,0.5,0.5)

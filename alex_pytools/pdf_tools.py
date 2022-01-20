@@ -105,145 +105,16 @@ class PdfMod:
         
 # class PdfMod
 
-if 1:
-    #~ addTextToPdf( "cv_sample.pdf", "temp.pdf", [["Coucou", 20, 0.01,0.01],["Hello", 20, 0.9,0.1]] )
+if 0:
     p = PdfMod("cv_sample.pdf")
     colorRect = (0.5,0.5,0.5)
-    xo = 0.86
+    xo = 0.75
     sizetxt=10
-    p.addRect( (xo-0.02,0.0,1.,0.05),color=colorRect, fillColor=colorRect, transparency=0.07 )
+    p.addRect( (xo-0.01,0.0,1.,0.05),color=colorRect, fillColor=colorRect, transparency=0.07 )
     p.addText( "luxe: 0.4", (xo,0.), sizetxt, colorText = (0,0,0) )
     p.addText( "premium: 0.4 (Kenzo, kookai,...)", (xo,0.015), sizetxt, colorText = (0,0,0) )
     p.addText( "dist: 18km (75000)", (xo,0.03), sizetxt, colorText = (0,0,0) )
     p.save("temp.pdf")
-
-
-def addRectToPdf( src,dst, rect, color = (1,1,1), bShadow=0, fillColor=None, transparency=0 ):
-    """
-    rect in % of the document
-    """
-
-    
-    #  draw_rect(rect, color=None, fill=None, width=1, dashes=None, lineCap=0, lineJoin=0, overlay=True, morph=None, stroke_opacity=1, fill_opacity=1, oc=0)
-    
-    doc = fitz.open(src)
-    page = doc[0]
-    page.clean_contents() # remove all specific orientation and weird settings
-    
-    dict_ = page.get_text('dict')
-    w = dict_["width"]
-    h = dict_["height"]
-    print("w, h: %s, %s" % ( w, h ) )
-    
-    
-    rect = fitz.Rect( int(rect[0]*w), int(rect[1]*h), int(rect[2]*w), int(rect[3]*h) )
-    
-
-    if bShadow:
-        rectShadow = deepcopy(rect)
-        #~ print(dir(rectShadow))
-        offx = 1
-        offy = 1
-        rectShadow.x0 += offx
-        rectShadow.y0 += offy
-        rectShadow.x1 += offx
-        rectShadow.y1 += offy
-        page.draw_rect(rectShadow,(0,0,0))
-    
-    page.draw_rect(rect,color,fill=fillColor,fill_opacity=1.-transparency)
-    
-    doc.save(dst,incremental=src==dst,encryption=fitz.PDF_ENCRYPT_KEEP)
-
-def addTextToPdf( src,dst, aText, colorText = (1,1,1), bShadow=0 ):
-    """
-    add text to a pdf.
-    aText: is a list of text, fontsize, x, and y in percent in page
-    """
-    fontname = "Times-Roman"
-    
-    #~ pdf = FPDF(src,)
-    doc = fitz.open(src)
-    page = doc[0]
-    page.clean_contents() # remove all specific orientation and weird settings
-    
-    bContour = 0 # beurk
-    
-    dict_ = page.get_text('dict')
-    w = dict_["width"]
-    h = dict_["height"]
-    print("w, h: %s, %s" % ( w, h ) )
-
-    
-    for data in aText:
-        text, fontsize, x, y = data
-        assert(0<= x <=1)
-        assert(0<= y <=1)
-        
-        xtext = int(x*w)
-        ytext = int(y*h)
-        print("xtext, ytext: %s, %s" % ( xtext, ytext ) )
-        
-        text_lenght = fitz.get_text_length(text, fontname=fontname, fontsize=fontsize)
-        
-        rect = fitz.Rect( xtext, ytext, xtext+text_lenght+1, ytext+fontsize*1+1 )
-        
-        listoffsets = []
-        fontsizeShadow = fontsize
-        if  bShadow:
-            listoffsets = [[1,1]]
-        if bContour:
-            # divers essais peu concluant:
-            if 1:
-                listoffsets += [[1,0],[-1,0],[0,1],[0,-1]]
-                listoffsets += [[1,1],[-1,-1],[1,-1],[-1,1]]
-            
-            if 0:
-                listoffsets = [[-2,-1]]
-                fontsizeShadow = fontsize+2
-            
-        for offsets in listoffsets:
-            offx,offy = offsets
-            rectShadow = deepcopy(rect)
-            #~ print(dir(rectShadow))
-            offset = 1
-            rectShadow.x0 += offx
-            rectShadow.y0 += offy
-            rectShadow.x1 += offx
-            rectShadow.y1 += offy
-            #
-            #
-            #
-            # align:  0 = left, 1 = center, 2 = right, 3: justify
-            rc = page.insert_textbox(rectShadow, text, fontsize = fontsizeShadow, fontname = fontname, fontfile = None, color=(0,0,0), align = 0)
-
-        rc = page.insert_textbox(rect, text, fontsize = fontsize, # choose fontsize (float)
-                           fontname = fontname,       # a PDF standard font: "Times-Roman"
-                           fontfile = None,                # could be a file on your system
-                           color=colorText,
-                           #~ border_width=3,
-                           align = 0)                      # 0 = left, 1 = center, 2 = right;
-    
-    if 0:
-        # imprime une moire
-        for j in range(10):                 
-            for i in range(10):
-                x=i*100
-                y=j*100
-                pt = fitz.Point( x, y )
-                page.insert_text(pt, "x: %d, y:%d" % (x,y), fontsize = 10, color=(1,1,1),rotate=0)
-            
-    doc.save(dst,incremental=src==dst,encryption=fitz.PDF_ENCRYPT_KEEP)
-
-    
-    
-if 0:
-    #~ addTextToPdf( "cv_sample.pdf", "temp.pdf", [["Coucou", 20, 0.01,0.01],["Hello", 20, 0.9,0.1]] )
-
-    colorRect = (0.5,0.5,0.5)
-    xo = 0.86
-    sizetxt=10
-    addRectToPdf( "cv_sample.pdf", "temp.pdf", (xo-0.02,0.0,1.,0.1),color=colorRect, fillColor=colorRect, transparency=0.07 )
-    addTextToPdf( "temp.pdf", "temp.pdf", [["luxe: 0.4", sizetxt, xo,0.],["premium: 0.45", sizetxt, xo,0.02],["distance: 12km", sizetxt, xo,0.04]], colorText = (0,0,0) )
 
 def pdfMultiCell( pdf, x, y, txt, hInterlign, bCentered = False ):
     # please document !

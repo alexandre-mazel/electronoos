@@ -54,7 +54,7 @@ class FaceTracker:
             success, tracker_box = self.tracker.update(im)
             print("DBG: tracker success: %s" % success )
             if success:
-                if bRenderDebug and bRenderSquare and 0:
+                if bRenderDebug and bRenderSquare and 1:
                     (x, y, w, h) = [int(v) for v in tracker_box]
                     cv2.rectangle(im, (x, y), (x + w, y + h), (0, 255, 0), 2)
             else:
@@ -74,7 +74,8 @@ class FaceTracker:
                     self.bTrackerRunning = True
                     
         facesProfile = []
-        if not bFaceFound or 1:
+        facesHaar = []
+        if not bFaceFound or 0:
             # try profile
             facesHaar=self.haar_face_detect.detect_face(im,bCompleteSearch=True)
             facesProfile=self.haar_profile_detect.detect_face(im,bCompleteSearch=True)
@@ -115,10 +116,10 @@ class FaceTracker:
             
         if bRenderDebug:
             if bRenderSquare:
-                #~ self.fdcv3.render_res(im, res)
-                #~ im = self.fdl._renderFaceInfo(im,facelandmark)
-                im = face_detector.drawRectForFaces( im, facesHaar, color = (255,255,0) )
-                im = face_detector.drawRectForFaces( im, facesProfile )
+                self.fdcv3.render_res(im, res)
+                im = self.fdl._renderFaceInfo(im,facelandmark)
+                if facesHaar != []: im = face_detector.drawRectForFaces( im, facesHaar, color = (255,255,0) )
+                if facesProfile != []: im = face_detector.drawRectForFaces( im, facesProfile )
                 pass
             if bLookAt:
                 facerect = facerecognition_dlib.getFaceRect(facelandmark)
@@ -163,9 +164,10 @@ def analyseFolder(folder):
     #~ f="camera_viewer_0__1396576320_50_6246.jpg" # bug de tracking sur fausse detection
     f="camera_viewer_0__1396576503_70_7383.jpg" # start to look at pepper
     #~ f= "camera_viewer_0__1396576535_31_7629.jpg" # side face with hair => not found [OK]
-    f = "camera_viewer_0__1396576341_74_6448.jpg" # tres mauvaise detection
+    #~ f = "camera_viewer_0__1396576341_74_6448.jpg" # tres mauvaise detection serie
+    #~ f = "camera_viewer_0__1396576342_16_6453.jpg" # direct sur la mauvaise detection
     idx = listFiles.index(f)
-    idx -= 10
+    #~ idx -= 10
     #~ idx = 1
     
     #~ camera_viewer_0__1396576251_08_5712.jpg # has a fake face vith 0.77 of confidence

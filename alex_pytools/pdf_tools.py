@@ -123,9 +123,10 @@ if 1:
     #~ addTextToPdf( "cv_sample.pdf", "temp.pdf", [["Coucou", 20, 0.01,0.01],["Hello", 20, 0.9,0.1]] )
 
     colorRect = (0.5,0.5,0.5)
-    xo = 0.84
-    addRectToPdf( "cv_sample.pdf", "temp.pdf", (xo-0.02,0.0,1.,0.1),color=colorRect, fillColor=colorRect, transparency=0.1 )
-    addTextToPdf( "temp.pdf", "temp.pdf", [["luxe: 0.4", 10, xo,0.],["premium: 0.45", 10, xo,0.02],["distance: 12km", 10, xo,0.04]], colorText = (0,0,0) )
+    xo = 0.86
+    sizetxt=10
+    addRectToPdf( "cv_sample.pdf", "temp.pdf", (xo-0.02,0.0,1.,0.1),color=colorRect, fillColor=colorRect, transparency=0.07 )
+    addTextToPdf( "temp.pdf", "temp.pdf", [["luxe: 0.4", sizetxt, xo,0.],["premium: 0.45", sizetxt, xo,0.02],["distance: 12km", sizetxt, xo,0.04]], colorText = (0,0,0) )
 
 def pdfMultiCell( pdf, x, y, txt, hInterlign, bCentered = False ):
     # please document !

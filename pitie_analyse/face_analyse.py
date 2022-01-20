@@ -41,6 +41,7 @@ class FaceTracker:
         bFaceFound = 0
         bLookAt = 0
         bRenderSquare = 1
+        bActivateTracker = 1
             
         
         if facelandmark != []:
@@ -77,11 +78,12 @@ class FaceTracker:
         facesHaar = []
         if not bFaceFound or 0:
             # try profile
-            facesHaar=self.haar_face_detect.detect_face(im,bCompleteSearch=True)
-            facesProfile=self.haar_profile_detect.detect_face(im,bCompleteSearch=True)
+            #~ facesHaar=self.haar_face_detect.detect_face(im,bCompleteSearch=True)
+            #~ facesProfile=self.haar_profile_detect.detect_face(im,bCompleteSearch=False)
             #~ assert(len(resProfile)==0)
+            pass
                     
-        if not bFaceFound:
+        if not bFaceFound and bActivateTracker:
             # no face found
             # use info from tracking
             
@@ -117,7 +119,7 @@ class FaceTracker:
         if bRenderDebug:
             if bRenderSquare:
                 self.fdcv3.render_res(im, res)
-                im = self.fdl._renderFaceInfo(im,facelandmark)
+                #~ im = self.fdl._renderFaceInfo(im,facelandmark)
                 if facesHaar != []: im = face_detector.drawRectForFaces( im, facesHaar, color = (255,255,0) )
                 if facesProfile != []: im = face_detector.drawRectForFaces( im, facesProfile )
                 pass
@@ -154,10 +156,10 @@ def analyseFolder(folder):
     listFiles = sorted(os.listdir(folder))
     f = "camera_viewer_0__1396576150_45_4656.jpg"
     f = "camera_viewer_0__1396576179_12_4987.jpg"
-    idx = listFiles.index(f)
+    #~ idx = listFiles.index(f)
     #~ idx -= 122
     #~ idx = 1
-    idx += 260
+    #~ idx += 260
     f="camera_viewer_0__1396576205_70_5284.jpg"  # pour aller sur une frame ou quelques une apres on va la perdre
     #~ f="camera_viewer_0__1396576244_54_5643.jpg" #bug du facedetect puis du tracker
     #~ f="camera_viewer_0__1396576218_27_5382.jpg" # debut d'un pan
@@ -166,17 +168,22 @@ def analyseFolder(folder):
     #~ f= "camera_viewer_0__1396576535_31_7629.jpg" # side face with hair => not found [OK]
     #~ f = "camera_viewer_0__1396576341_74_6448.jpg" # tres mauvaise detection serie
     #~ f = "camera_viewer_0__1396576342_16_6453.jpg" # direct sur la mauvaise detection
-    idx = listFiles.index(f)
+    f = "camera_viewer_0__1396576519_11_7505.jpg" # sophie regard par en dessous
+    #~ idx = listFiles.index(f)
     #~ idx -= 10
     #~ idx = 1
+    idx = 0
     
     #~ camera_viewer_0__1396576251_08_5712.jpg # has a fake face vith 0.77 of confidence
     while idx<len(listFiles):
         f = listFiles[idx]
         print("%4d/%4d: %s" % (idx,len(listFiles),f) )
+        if not "jpg" in f:
+            idx += 1
+            continue
         absf = folder + f
         im = cv2.imread(absf)
-        ft.update(im,0,absf,bRenderDebug=1)
+        ft.update(im,0,absf,bRenderDebug=0)
         idx += 1
         if (idx % 100)==0:
             facerecognition_dlib.storedFeatures.save()
@@ -187,4 +194,4 @@ def analyseMovie():
     analyse a movie (mp4)
     """
     
-analyseFolder("d:/pitie2/")
+analyseFolder("d:/pitie3/")

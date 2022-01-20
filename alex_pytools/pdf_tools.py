@@ -1,21 +1,49 @@
 from fpdf import FPDF # pip3 install fpdf
 import fitz # pip install PyMuPDF # https://pypi.org/project/PyMuPDF/#files
 from copy import deepcopy
+import os
 
 class PdfMod:
     
     def __init__( self, src ):
+        self.load(src)
+        
+    def load( self, src ):
+        print("DBG: PdfMod.load: loading '%s'" % src )
         self.src = src # to know when saving if it's an update or a write (needed by the library)
         self.doc = fitz.open(src)
         self.page = self.doc[0]
         self.page.clean_contents() # remove all specific orientation and weird settings
         
         dict_ = self.page.get_text('dict')
+        #~ self.page.Annot.clean_contents() 
         w = dict_["width"]
         h = dict_["height"]
-        print("w, h: %s, %s" % ( w, h ) )
+        print("DBG: PdfMod.load: page has w, h: %s, %s" % ( w, h ) )
         self.w = w
         self.h = h
+        
+        #~ rotation = self.page.rotation
+        #~ self.page.set_rotation(1)
+        
+        # reset the crop box !!! (else, text are offsetter compare to rectangle drawing)
+        cropbox = self.page.cropbox
+        self.page.set_cropbox((0,0,w,h))
+
+        
+        if 0:
+            print("*"*40)
+            print("DBG: PdfMod.load: is_wrapped: %s" % self.page.is_wrapped )
+            print("DBG: PdfMod.load: _dict_: %s" % dict_.keys() )
+            block = dict_['blocks']
+            print("blocks nbr: %d" % len(block))
+            for b in block:
+                print("block: %s" % b.keys() )
+                print("   block: number: %s" % b['number'] )
+                print("   block: type: %s" % b['type'] )
+                print("   block: bbox: %s" % str(b['bbox']) )
+                if b['type'] == 0:
+                    print("   block: lines: %s" % str(b['lines']) )
         
     def addRect( self, rect, color = (1,1,1), bShadow=0, fillColor=None, transparency=0 ):
         rect = fitz.Rect( int(rect[0]*self.w), int(rect[1]*self.h), int(rect[2]*self.w), int(rect[3]*self.h) )
@@ -36,7 +64,8 @@ class PdfMod:
         
     def addText( self, text, pos, fontsize, colorText = (1,1,1), bShadow=0 ):
         """
-        pos: x, and y in percent in page
+        pos: x, and y in percent in page, from top of letter
+        NB: sur certains cv les textes arrivent plus bas que les rectangle associees...
         """
         fontname = "Times-Roman"
         bContour = 0 # test de contour, mais beurk
@@ -82,8 +111,11 @@ class PdfMod:
             # align:  0 = left, 1 = center, 2 = right, 3: justify
             rc = self.page.insert_textbox(rectShadow, text, fontsize = fontsizeShadow, fontname = fontname, fontfile = None, color=(0,0,0), align = 0)
 
-        #~ self.page.draw_rect(rect,colorText)
-        bUseTextBox = 0
+        bUseTextBox = 0 # 1: ready for some alignement in the future
+        
+        #~ self.page.draw_rect(rect,colorText) # rect to debug
+        
+        y_offset_text = 0
         if bUseTextBox:
             y_offset_text -= 10 # textbox render everything lower
             rc = self.page.insert_textbox(rect, text, fontsize = fontsize, # choose fontsize (float)
@@ -93,28 +125,46 @@ class PdfMod:
                                #~ border_width=3,
                                align=0)                      # 0 = left, 1 = center, 2 = right;
         else:
-            rc = self.page.insert_text((rect[0],rect[1]-fontsize//2), text, fontsize = fontsize, # choose fontsize (float)
+            y_offset_text += fontsize # origin is from the bottom left corner
+            rc = self.page.insert_text((rect[0],rect[1]+y_offset_text), text, fontsize = fontsize, # choose fontsize (float)
                                fontname = fontname,       # a PDF standard font: "Times-Roman"
                                fontfile = None,                # could be a file on your system
                                color=colorText,
                                #~ border_width=3,
                                )                      # 0 = left, 1 = center, 2 = right;
+        print("rc: %s" % str(rc))
         
     def save( self, dst ):
-        self.doc.save(dst,incremental=self.src==dst,encryption=fitz.PDF_ENCRYPT_KEEP)
+        print("INF: PdfMod: saving to '%s'" % dst )
+        if 0:
+            # using increment save, (but doesn't work on a repaired file...)
+            self.doc.save(dst,incremental=self.src==dst,encryption=fitz.PDF_ENCRYPT_KEEP)
+        if self.src != dst:
+            self.doc.save(dst,encryption=fitz.PDF_ENCRYPT_KEEP)
+        else:
+            dst_temp = dst.replace(".pdf", "_temp.pdf")
+            self.doc.save(dst_temp,encryption=fitz.PDF_ENCRYPT_KEEP)
+            self.doc = None
+            os.unlink(dst)
+            os.rename(dst_temp,dst)
+            self.load(dst) # optionnal, just to keep the object ready to next modification
         
 # class PdfMod
 
-if 0:
-    p = PdfMod("cv_sample.pdf")
-    colorRect = (0.5,0.5,0.5)
-    xo = 0.75
-    sizetxt=10
-    p.addRect( (xo-0.01,0.0,1.,0.05),color=colorRect, fillColor=colorRect, transparency=0.07 )
-    p.addText( "luxe: 0.4", (xo,0.), sizetxt, colorText = (0,0,0) )
-    p.addText( "premium: 0.4 (Kenzo, kookai,...)", (xo,0.015), sizetxt, colorText = (0,0,0) )
-    p.addText( "dist: 18km (75000)", (xo,0.03), sizetxt, colorText = (0,0,0) )
-    p.save("temp.pdf")
+def testPdfMod():
+    files = []
+    files.append(("cv_sample.pdf", "temp.pdf")) # cv with some offset when rendering
+    files.append(("cv_sample2.pdf", "temp2.pdf")) # cv ok
+    for src,dst in files:
+        p = PdfMod(src)
+        colorRect = (0.5,0.5,0.5)
+        xo = 0.75
+        sizetxt=10
+        p.addRect( (xo-0.01,0.0,1.,0.05),color=colorRect, fillColor=colorRect, transparency=0.07 )
+        p.addText( "luxe: 0.4", (xo,0.), sizetxt, colorText = (0,0,0) )
+        p.addText( "premium: 0.4 (Kenzo, kookai,...)", (xo,0.015), sizetxt, colorText = (0,0,0) )
+        p.addText( "dist: 18km (75000)", (xo,0.03), sizetxt, colorText = (0,0,0) )
+        p.save(dst)
 
 def pdfMultiCell( pdf, x, y, txt, hInterlign, bCentered = False ):
     # please document !
@@ -244,4 +294,5 @@ def test():
 if __name__ == "__main__":
     pass
     #~ test()
+    testPdfMod()
     

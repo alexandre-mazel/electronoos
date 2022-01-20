@@ -98,7 +98,8 @@ class FaceDetector:
         timeBegin = time.time()
         self.net.setInput(blob)
         detections = self.net.forward()
-        print("INF: detections: %s\nanalyse takes: %5.2fs\n" % (str(detections),time.time()-timeBegin))
+        #~ print("INF: detections: %s\n" % (str(detections)))
+        print("INF: analyse takes: %5.2fs\n" % (time.time()-timeBegin))
         res = []
         for i in range(0, detections.shape[2]):
             confidence = detections[0, 0, i, 2]
@@ -106,8 +107,8 @@ class FaceDetector:
                 box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
                 (startX, startY, endX, endY) = box.astype("int")
                 res.append((startX, startY, endX, endY, confidence))
-                print("DBG: box: %s" % str(box))
-                print("DBG: x,y: %d,%d" % (startX, startY))
+                #~ print("DBG: box: %s" % str(box))
+                #~ print("DBG: x,y: %d,%d" % (startX, startY))
                 
         if bRenderBox: self.render_res( im, res )
         return res

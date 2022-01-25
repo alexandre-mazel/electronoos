@@ -458,6 +458,8 @@ class CVOpenPose:
         self.strModelPath = strOptionnalModelPath
         self.net = None
         self.strMode = strMode
+        self.timeTakenByNetworkTotal = 0
+        self.nbrAnalyse = 0
         
         if strMode == "COCO":
             print("COCO")
@@ -511,6 +513,8 @@ class CVOpenPose:
         inpBlob = cv2.dnn.blobFromImage(im, 1.0 / 255, (inWidth, inHeight), (0, 0, 0), swapRB=False, crop=False)
         self.net.setInput(inpBlob)        
         output = self.net.forward()
+        self.timeTakenByNetworkTotal += time.time() - t
+        self.nbrAnalyse += 1
         print("INF: time taken by network: {:.3f}".format(time.time() - t)) # biga-U18: gpu: 0.40 first, 0.11 next -- cpu: 5.5s ----MsTab4: 6.5s        
         #~ print("output: %s" % str(output) )
         print("output len: %s" % len(output) )
@@ -715,6 +719,9 @@ class CVOpenPose:
         skels.save(strSkelFilename)
         return skels
     # analyseFromFile - end
+    
+    def getAverageTimeTakenByNetwork(self):
+        return self.timeTakenByNetworkTotal / self.nbrAnalyse
 
 
 
@@ -826,9 +833,36 @@ if __name__ == "__main__":
             filename = "../data/" + f
             op.analyseFromFile(filename,bForceRecompute=True,bForceAlternateAngles=False)
         duration = time.time()-timeBegin
-        print("INF: duration: load models: %.1fs" % durationLoadModels) 
-        print("INF: duration: %.1fs (%.2fs per im)" % (duration,duration/len(listFile)) )
+        print("    duration: load models: %.2fs" % durationLoadModels) 
+        print("    avg net : %.2fs"% op.getAverageTimeTakenByNetwork() )
+        print("    duration: %.1fs (%.2fs per im)" % (duration,duration/len(listFile)) )
         exit(0)
+    """
+    mstab7:
+        cpu mode:
+            duration: load models: 0.42s
+            avg net : 1.16s
+            duration: 7.1s (1.77s per im)
+        gpu mode:
+            (la lib opencv n'a pas ete recompile non plus pour utilise le gpu)
+
+    biga:
+        cpu mode:
+            duration:
+            duration:
+            
+    Champion1:
+        cpu mode:
+            duration: load models: 0.1s
+            duration: 2.3s (0.58s per im)
+        gpu mode:
+            # check with nvtop that something is loading !!!
+            # need to recompile opencv with cuda support !!!
+            
+
+    
+    
+    """
     
         
     if 1:

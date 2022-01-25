@@ -1,7 +1,12 @@
 # Encapsulation in a nett class of the opencv openpose pose estimation
 # inspired from https://www.learnopencv.com/deep-learning-based-human-pose-estimation-using-opencv-cpp-python/
 #
-# on my biga: export PYTHONPATH=/usr/local/lib/python3.6/dist-packages/cv2/python-3.6:$PYTHONPATH
+# manual library link:
+# on my biga: 
+# export PYTHONPATH=/usr/local/lib/python3.6/dist-packages/cv2/python-3.6:$PYTHONPATH
+# on champion:
+# export PYTHONPATH=/usr/local/lib/python3.8/site-packages/cv2/python-3.8/:$PYTHONPATH
+
 
 import cv2
 import math
@@ -460,6 +465,7 @@ class CVOpenPose:
         self.strMode = strMode
         self.timeTakenByNetworkTotal = 0
         self.nbrAnalyse = 0
+        self.timeFirstAnalyse = 0 # first one is often slower
         
         if strMode == "COCO":
             print("COCO")
@@ -513,8 +519,11 @@ class CVOpenPose:
         inpBlob = cv2.dnn.blobFromImage(im, 1.0 / 255, (inWidth, inHeight), (0, 0, 0), swapRB=False, crop=False)
         self.net.setInput(inpBlob)        
         output = self.net.forward()
-        self.timeTakenByNetworkTotal += time.time() - t
-        self.nbrAnalyse += 1
+        if self.timeFirstAnalyse == 0:
+            self.timeFirstAnalyse = time.time() - t
+        else:
+            self.timeTakenByNetworkTotal += time.time() - t
+            self.nbrAnalyse += 1
         print("INF: time taken by network: {:.3f}".format(time.time() - t)) # biga-U18: gpu: 0.40 first, 0.11 next -- cpu: 5.5s ----MsTab4: 6.5s        
         #~ print("output: %s" % str(output) )
         print("output len: %s" % len(output) )
@@ -719,7 +728,10 @@ class CVOpenPose:
         skels.save(strSkelFilename)
         return skels
     # analyseFromFile - end
-    
+
+    def getFirstTimeTakenByNetwork(self):
+        return self.timeFirstAnalyse
+        
     def getAverageTimeTakenByNetwork(self):
         return self.timeTakenByNetworkTotal / self.nbrAnalyse
 
@@ -828,21 +840,23 @@ if __name__ == "__main__":
         op._loadModels()
         durationLoadModels = time.time()-timeBegin
         timeBegin = time.time()
-        listFile = ["alexandre.jpg","multiple_humans.jpg","human_upsidedown.png","alexandre_rot1.jpg"]
+        listFile = ["alexandre.jpg","multiple_humans.jpg","human_upsidedown.png","alexandre_rot1.jpg","alexandre_rot2.jpg","alexandre_rot3.jpg"]
         for f in listFile:
             filename = "../data/" + f
             op.analyseFromFile(filename,bForceRecompute=True,bForceAlternateAngles=False)
         duration = time.time()-timeBegin
         print("    duration: load models: %.2fs" % durationLoadModels) 
+        print("    fst net : %.2fs"% op.getFirstTimeTakenByNetwork() )
         print("    avg net : %.2fs"% op.getAverageTimeTakenByNetwork() )
         print("    duration: %.1fs (%.2fs per im)" % (duration,duration/len(listFile)) )
         exit(0)
     """
     mstab7:
         cpu mode:
-            duration: load models: 0.42s
-            avg net : 1.16s
-            duration: 7.1s (1.77s per im)
+            duration: load models: 0.36s
+            fst net : 1.15s
+            avg net : 1.08s
+            duration: 10.1s (1.69s per im)
         gpu mode:
             (la lib opencv n'a pas ete recompile non plus pour utilise le gpu)
 
@@ -853,11 +867,16 @@ if __name__ == "__main__":
             
     Champion1:
         cpu mode:
-            duration: load models: 0.1s
-            duration: 2.3s (0.58s per im)
+            duration: load models: 0.13s
+            avg net : 0.37s
+            duration: 2.4s (0.60s per im)
         gpu mode:
             # check with nvtop that something is loading !!!
             # need to recompile opencv with cuda support !!!
+            duration: load models: 0.13s
+            avg net : 0.32s
+            duration: 2.1s (0.52s per im)
+
             
 
     

@@ -25,7 +25,7 @@ class FaceTracker:
         self.haar_face_detect = face_detector.FaceDetectOpenCV(bVerbose=True)
         self.haar_profile_detect = face_detector.FaceDetectOpenCV(bVerbose=True,strCascadeFile="haarcascade_profileface.xml")
         # Discriminative Correlation Filter (with Channel and Spatial Reliability). Tends to be more accurate than KCF but slightly slower. (minimum OpenCV 3.4.2)
-        self.tracker = cv2.TrackerCSRT_create() # python -m pip install opencv-contrib-python
+        self.tracker = cv2.TrackerCSRT_create() # python -m pip install opencv-contrib-python OR export PYTHONPATH=/usr/local/lib/python3.8/site-packages/cv2/python-3.8/:$PYTHONPATH 
         self.bTrackerRunning = False
         self.nCptFrameOnlyOnTracking = 0
         
@@ -219,7 +219,9 @@ def analyseFolder(folder):
         if bSpeedTest:
             if idx > 30:
                 ft.getAvgDuration()
-                print("    Total time: %.1fs" % (time.time() - timeBegin) )
+                duration = time.time() - timeBegin
+                print("    Avg time:   %.2fs" % (duration/idx) )
+                print("    Total time: %.1fs" % (duration) )
                 break
                 
 """
@@ -228,8 +230,16 @@ mstab7:
     face fdcv2: 0.021s
     face dlib : 0.494s
     face haar : 0.006s
+    Avg time:   0.55s
     Total time: 16.5s
     
+champion:
+    gpu mode:
+    face fdcv2: 0.009s
+    face dlib : 0.109s
+    face haar : 0.044s
+    Avg time:   0.20s
+    Total time: 5.9s
 """
             
 

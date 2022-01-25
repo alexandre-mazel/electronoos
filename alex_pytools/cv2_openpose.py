@@ -874,6 +874,13 @@ if __name__ == "__main__":
             fst net : 0.43s
             avg net : 0.42s
             duration: 3.9s (0.66s per im)
+            
+            after reboot and removing gpu board:
+            duration: load models: 0.12s
+            fst net : 0.37s
+            avg net : 0.37s
+            duration: 3.5s (0.58s per im)
+
 
         gpu mode:
             # check with nvtop that something is loading !!!

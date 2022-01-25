@@ -193,5 +193,10 @@ def analyseMovie():
     """
     analyse a movie (mp4)
     """
+    pass
     
-analyseFolder("d:/pitie3/")
+if os.name == "nt":
+    strPath = "d:/pitie3/"
+else:
+    strPath = "/home/a/pitie4/"
+analyseFolder(strPath)

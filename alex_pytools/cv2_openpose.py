@@ -720,7 +720,7 @@ class CVOpenPose:
 
 # class CVOpenPose - end
 
-def analyseOneFile( strFilename, bForceRecompute=False, bForceAlternateAngles = False ):
+def analyseOneFile( strFilename, bForceRecompute=False, bForceAlternateAngles = False, bRender = True ):
     
     op = CVOpenPose()
     if 0:
@@ -733,10 +733,11 @@ def analyseOneFile( strFilename, bForceRecompute=False, bForceAlternateAngles = 
         im = cv2.imread(strFilename)
     skels.render(im)
     
-    zoom=1
-    im = cv2.resize(im,None,fx=zoom,fy=zoom)
-    cv2.imshow('Output-Skeleton', im)
-    cv2.waitKey(0)    
+    if bRender:
+        zoom=1
+        im = cv2.resize(im,None,fx=zoom,fy=zoom)
+        cv2.imshow('Output-Skeleton', im)
+        cv2.waitKey(0)    
     
     #~ skels.save("/tmp/test.skl") # test saving
     
@@ -812,6 +813,24 @@ if __name__ == "__main__":
     strFilename = "../data/alexandre_rot1.jpg"
     #~ strFilename = "../data/alexandre_rot2.jpg"
     #~ strFilename = "../data/alexandre_rot3.jpg"
+    
+    bTestPerf = 1
+    if bTestPerf:
+        timeBegin = time.time()
+        op = CVOpenPose()
+        op._loadModels()
+        durationLoadModels = time.time()-timeBegin
+        timeBegin = time.time()
+        listFile = ["alexandre.jpg","multiple_humans.jpg","human_upsidedown.png","alexandre_rot1.jpg"]
+        for f in listFile:
+            filename = "../data/" + f
+            op.analyseFromFile(filename,bForceRecompute=True,bForceAlternateAngles=False)
+        duration = time.time()-timeBegin
+        print("INF: duration: load models: %.1fs" % durationLoadModels) 
+        print("INF: duration: %.1fs (%.2fs per im)" % (duration,duration/len(listFile)) )
+        exit(0)
+    
+        
     if 1:
         analyseOneFile(strFilename,bForceRecompute=True,bForceAlternateAngles=True)
     elif 0:

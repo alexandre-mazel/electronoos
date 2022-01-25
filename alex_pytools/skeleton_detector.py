@@ -1,6 +1,7 @@
 import cv2
-protoFile = "pose/mpi/pose_deploy_linevec_faster_4_stages.prototxt"
-weightsFile = "pose/mpi/pose_iter_160000.caffemodel"
+strModelPath = "C:\\Users\\alexa\\dev\\openpose_cv\\"
+protoFile = strModelPath+"pose/mpi/pose_deploy_linevec_faster_4_stages.prototxt"
+weightsFile = strModelPath+"pose/mpi/pose_iter_160000.caffemodel"
 # Read the network into Memory
 net = cv2.dnn.readNetFromCaffe(protoFile, weightsFile)
 

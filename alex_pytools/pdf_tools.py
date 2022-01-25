@@ -1,15 +1,16 @@
 from fpdf import FPDF # pip3 install fpdf
-import fitz # pip install PyMuPDF # https://pypi.org/project/PyMuPDF/#files
+import fitz # pip install fitz PyMuPDF # https://pypi.org/project/PyMuPDF/#files # rpi: try first: sudo apt-get install mupdf libmupdf-dev
 from copy import deepcopy
 import os
 
 class PdfMod:
     
     def __init__( self, src ):
+        self.bVerbose=0
         self.load(src)
         
     def load( self, src ):
-        print("DBG: PdfMod.load: loading '%s'" % src )
+        if self.bVerbose: print("DBG: PdfMod.load: loading '%s'" % src )
         self.src = src # to know when saving if it's an update or a write (needed by the library)
         self.doc = fitz.open(src)
         self.page = self.doc[0]
@@ -19,7 +20,7 @@ class PdfMod:
         #~ self.page.Annot.clean_contents() 
         w = dict_["width"]
         h = dict_["height"]
-        print("DBG: PdfMod.load: page has w, h: %s, %s" % ( w, h ) )
+        if self.bVerbose: print("DBG: PdfMod.load: page has w, h: %s, %s" % ( w, h ) )
         self.w = w
         self.h = h
         
@@ -76,7 +77,7 @@ class PdfMod:
         
         xtext = int(x*self.w)
         ytext = int(y*self.h)
-        print("xtext, ytext: %s, %s" % ( xtext, ytext ) )
+        if self.bVerbose: print("xtext, ytext: %s, %s" % ( xtext, ytext ) )
         
         text_lenght = fitz.get_text_length(text, fontname=fontname, fontsize=fontsize)
         
@@ -132,7 +133,7 @@ class PdfMod:
                                color=colorText,
                                #~ border_width=3,
                                )                      # 0 = left, 1 = center, 2 = right;
-        print("rc: %s" % str(rc))
+        if self.bVerbose: print("rc: %s" % str(rc))
         
     def save( self, dst ):
         print("INF: PdfMod: saving to '%s'" % dst )

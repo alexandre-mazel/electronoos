@@ -234,12 +234,19 @@ mstab7:
     Total time: 16.5s
     
 champion:
+    cpu mode (card removed):
+        face fdcv2: 0.008s # seems not to use gpu
+        face dlib : 0.000s # impossible to measure: fail without gpu (with my current compilation)
+        face haar : 0.044s # seems not to use gpu
+        Avg time:   0.06s
+        Total time: 1.7s
+
     gpu mode:
-    face fdcv2: 0.009s
-    face dlib : 0.109s
-    face haar : 0.044s
-    Avg time:   0.20s
-    Total time: 5.9s
+        face fdcv2: 0.009s
+        face dlib : 0.109s
+        face haar : 0.044s
+        Avg time:   0.20s
+        Total time: 5.9s
 """
             
 
@@ -252,5 +259,5 @@ def analyseMovie():
 if os.name == "nt":
     strPath = "d:/pitie3/"
 else:
-    strPath = "/home/a/pitie4/"
+    strPath = os.path.expanduser("~/pitie4/")
 analyseFolder(strPath)

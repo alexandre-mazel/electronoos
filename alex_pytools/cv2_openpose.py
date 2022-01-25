@@ -862,11 +862,19 @@ if __name__ == "__main__":
             duration: 10.1s (1.69s per im)
         gpu mode:
             (la lib opencv n'a pas ete recompile non plus pour utilise le gpu)
-
-    biga:
+         
+    Big A (linux):
         cpu mode:
-            duration:
-            duration:
+            duration: load models: 0.24s
+            fst net : 6.43s
+            avg net : 6.43s
+            duration: 53.0s (8.83s per im)
+        gpu mode:
+            duration: load models: 1.47s
+            fst net : 0.41s
+            avg net : 0.10s
+            duration: 2.6s (0.43s per im)
+
             
     Champion1:
         cpu mode:

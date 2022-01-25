@@ -3,6 +3,7 @@
 import cv2
 import os
 import sys
+import time
 
 sys.path.append("../../electronoos/alex_pytools")
 import face_detector_cv3
@@ -28,6 +29,10 @@ class FaceTracker:
         self.bTrackerRunning = False
         self.nCptFrameOnlyOnTracking = 0
         
+        self.timefacedlib = 0
+        self.timefacedetectcv3 = 0
+        self.timehaar = 0
+        
     def update( self, im, t = 0, name = None, bRenderDebug = True ):
         """
         receive a new image and analyse it
@@ -35,8 +40,12 @@ class FaceTracker:
         - name: name of the image (filename or ...) for optimisation/caching purpose
         """
         self.nImageAnalysed += 1
+        t = time.time()
         res = self.fdcv3.detect(im,bRenderBox=False,confidence_threshold=0.1) # ~0.06s on mstab7 on a VGA one face image
+        if self.nImageAnalysed > 1: self.timefacedetectcv3 += time.time() - t
+        t = time.time()
         rConfidence, features, faceshape,facelandmark = self.fdl.extractFeaturesFromImg( im, name ) # ~0.7s on mstab7 on a VGA one face image (no cuda) # average other images: 0.48s, 0.17s when no face
+        if self.nImageAnalysed > 1: self.timefacedlib += time.time() - t
         
         bFaceFound = 0
         bLookAt = 0
@@ -78,9 +87,11 @@ class FaceTracker:
         facesHaar = []
         if not bFaceFound or 0:
             # try profile
-            #~ facesHaar=self.haar_face_detect.detect_face(im,bCompleteSearch=True)
-            #~ facesProfile=self.haar_profile_detect.detect_face(im,bCompleteSearch=False)
+            t = time.time()
+            facesHaar=self.haar_face_detect.detect_face(im,bCompleteSearch=True)
+            facesProfile=self.haar_profile_detect.detect_face(im,bCompleteSearch=False)
             #~ assert(len(resProfile)==0)
+            if self.nImageAnalysed > 1: self.timehaar += time.time() - t
             pass
                     
         if not bFaceFound and bActivateTracker:
@@ -145,6 +156,16 @@ class FaceTracker:
     def getStats( self ):
         pass
         
+    def getAvgDuration(self):
+        n = self.nImageAnalysed - 1
+        print("INF: FaceTracker.getAvgDuration per frame:")
+        print( "    face fdcv2: %.3fs" % (self.timefacedetectcv3/n) )
+        print( "    face dlib : %.3fs" % (self.timefacedlib/n) )
+        print( "    face haar : %.3fs" % (self.timehaar/n) )
+        
+        return self.timefacedetectcv3/n,self.timefacedlib/n,self.timehaar/n
+        
+        
 # class FaceTracker - end
 
 ft = FaceTracker()
@@ -153,6 +174,9 @@ def analyseFolder(folder):
     """
     analyse a folder with a bunch of images
     """
+    bSpeedTest = 1
+    timeBegin = time.time()
+    
     listFiles = sorted(os.listdir(folder))
     f = "camera_viewer_0__1396576150_45_4656.jpg"
     f = "camera_viewer_0__1396576179_12_4987.jpg"
@@ -174,6 +198,8 @@ def analyseFolder(folder):
     #~ idx = 1
     idx = 0
     
+    if bSpeedTest: idx = 0
+    
     #~ camera_viewer_0__1396576251_08_5712.jpg # has a fake face vith 0.77 of confidence
     while idx<len(listFiles):
         f = listFiles[idx]
@@ -183,10 +209,28 @@ def analyseFolder(folder):
             continue
         absf = folder + f
         im = cv2.imread(absf)
+        if bSpeedTest: absf = None
         ft.update(im,0,absf,bRenderDebug=0)
         idx += 1
         if (idx % 100)==0:
             facerecognition_dlib.storedFeatures.save()
+        
+        bSpeedTest = 1           
+        if bSpeedTest:
+            if idx > 30:
+                ft.getAvgDuration()
+                print("    Total time: %.1fs" % (time.time() - timeBegin) )
+                break
+                
+"""
+result:
+mstab7:
+    face fdcv2: 0.021s
+    face dlib : 0.494s
+    face haar : 0.006s
+    Total time: 16.5s
+    
+"""
             
 
 def analyseMovie():

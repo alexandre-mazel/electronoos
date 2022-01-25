@@ -733,6 +733,9 @@ class CVOpenPose:
         return self.timeFirstAnalyse
         
     def getAverageTimeTakenByNetwork(self):
+        """
+        Not counting the first one !!!
+        """
         return self.timeTakenByNetworkTotal / self.nbrAnalyse
 
 
@@ -868,14 +871,18 @@ if __name__ == "__main__":
     Champion1:
         cpu mode:
             duration: load models: 0.13s
-            avg net : 0.37s
-            duration: 2.4s (0.60s per im)
+            fst net : 0.43s
+            avg net : 0.42s
+            duration: 3.9s (0.66s per im)
+
         gpu mode:
             # check with nvtop that something is loading !!!
             # need to recompile opencv with cuda support !!!
             duration: load models: 0.13s
-            avg net : 0.32s
-            duration: 2.1s (0.52s per im)
+            fst net : 1.42s
+            avg net : 0.04s
+            duration: 2.3s (0.38s per im)
+
 
             
 

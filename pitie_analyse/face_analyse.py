@@ -233,6 +233,13 @@ mstab7:
     Avg time:   0.55s
     Total time: 16.5s
     
+bigA:
+    face fdcv2: 0.087s
+    face dlib : 0.285s
+    face haar : 0.131s
+    Avg time:   0.57s
+    Total time: 17.6s
+    
 champion:
     cpu mode (card removed):
         face fdcv2: 0.008s # seems not to use gpu

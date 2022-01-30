@@ -458,7 +458,7 @@ class CVOpenPose:
     cf analyse for output description
     """
     
-    def __init__( self, strOptionnalModelPath = "../models/", strMode = "COCO" ):
+    def __init__( self, strOptionnalModelPath = "../models/", strMode = "COCO", bStressTest = False ):
         #~ strMode = "MPI"
         self.strModelPath = strOptionnalModelPath
         self.net = None
@@ -466,6 +466,7 @@ class CVOpenPose:
         self.timeTakenByNetworkTotal = 0
         self.nbrAnalyse = 0
         self.timeFirstAnalyse = 0 # first one is often slower
+        self.bStressTest = bStressTest
         
         if strMode == "COCO":
             print("COCO")
@@ -517,8 +518,14 @@ class CVOpenPose:
         #~ inWidth //= 2
         #~ inHeight //= 2
         inpBlob = cv2.dnn.blobFromImage(im, 1.0 / 255, (inWidth, inHeight), (0, 0, 0), swapRB=False, crop=False)
-        self.net.setInput(inpBlob)        
+        self.net.setInput(inpBlob) 
         output = self.net.forward()
+        if self.bStressTest:
+            print("INF: stress test net..." )
+            for i in range(1000):
+                inpBlob = cv2.dnn.blobFromImage(im, 1.0 / 255, (inWidth, inHeight), (0, 0, 0), swapRB=False, crop=False)
+                self.net.setInput(inpBlob) 
+                output = self.net.forward()
         if self.timeFirstAnalyse == 0:
             self.timeFirstAnalyse = time.time() - t
         else:
@@ -837,23 +844,27 @@ if __name__ == "__main__":
     #~ strFilename = "../data/alexandre_rot3.jpg"
     
     bTestPerf = 1
-    if bTestPerf:
-        timeBegin = time.time()
-        op = CVOpenPose()
-        op._loadModels()
-        durationLoadModels = time.time()-timeBegin
-        timeBegin = time.time()
-        listFile = ["alexandre.jpg","multiple_humans.jpg","human_upsidedown.png","alexandre_rot1.jpg","alexandre_rot2.jpg","alexandre_rot3.jpg"]
-        for f in listFile:
-            filename = "../data/" + f
-            op.analyseFromFile(filename,bForceRecompute=True,bForceAlternateAngles=False)
-        duration = time.time()-timeBegin
-        print("    duration: load models: %.2fs" % durationLoadModels) 
-        print("    fst net : %.2fs"% op.getFirstTimeTakenByNetwork() )
-        print("    avg net : %.2fs"% op.getAverageTimeTakenByNetwork() )
-        print("    duration: %.1fs (%.2fs per im)" % (duration,duration/len(listFile)) )
-        exit(0)
+    bStressTest = 0
+    if bTestPerf or bStressTest:
+        while 1:
+            timeBegin = time.time()
+            op = CVOpenPose(bStressTest=bStressTest)
+            op._loadModels()
+            durationLoadModels = time.time()-timeBegin
+            timeBegin = time.time()
+            listFile = ["alexandre.jpg","multiple_humans.jpg","human_upsidedown.png","alexandre_rot1.jpg","alexandre_rot2.jpg","alexandre_rot3.jpg"]
+            for f in listFile:
+                filename = "../data/" + f
+                op.analyseFromFile(filename,bForceRecompute=True,bForceAlternateAngles=False)
+            duration = time.time()-timeBegin
+            print("    duration: load models: %.2fs" % durationLoadModels) 
+            print("    fst net : %.2fs"% op.getFirstTimeTakenByNetwork() )
+            print("    avg net : %.2fs"% op.getAverageTimeTakenByNetwork() )
+            print("    duration: %.1fs (%.2fs per im)" % (duration,duration/len(listFile)) )
+            if not bStressTest: exit(0)
+            
     """
+    CV2_OpenCV:
     mstab7:
         cpu mode:
             duration: load models: 0.36s

@@ -1,10 +1,11 @@
 import pptx # pip install python-pptx
 import cv2
+import os
 import sys
 
-def pdfToImages( strPdfFilename ):
+def pdfToImages( strPdfFilename, strDest = "/tmp/" ):
     """
-    Take a pdf file and export each files to a folder.
+    Take a pdf file and export each images to a file in a folder.
     Return the list of generated images files
     """
         
@@ -25,7 +26,7 @@ def pdfToImages( strPdfFilename ):
             pix = page.getPixmap(matrix = mat)
         else:
             pix = page.getPixmap()
-        output = "/tmp/outfile%04d.png" % nNumPage
+        output = strDest + "outfile%04d.png" % nNumPage
         pix.writePNG(output)
         listImgs.append(output)
 
@@ -92,7 +93,9 @@ def imagesToPres( listFileImages, strDestFilenamePPT = "generated.pptx" ):
 
 def convertPdfToPpt( strSrcPdfFilename, strFilenameDest = None ):
     if strFilenameDest == None:
-        strFilenameDest = strSrcPdfFilename.replace(".pdf",".pptx")
+        # strFilenameDest = strSrcPdfFilename.replace(".pdf",".pptx") # don't work with .PDF => changing to be more robust:
+        filename, file_extension = os.path.splitext(strSrcPdfFilename)
+        strFilenameDest = filename + ".pptx"
     print("INF: convertPdfToPpt: converting '%s' to '%s'" % (strSrcPdfFilename,strFilenameDest) )
     li = pdfToImages(strSrcPdfFilename)
     imagesToPres(li,strFilenameDest)
@@ -125,7 +128,7 @@ if __name__ == "__main__":
         exit( 0 )
     strPdfFile = sys.argv[1]
     if len(sys.argv)>2:
-        strFilenameDest = sys.argv[1]
+        strFilenameDest = sys.argv[2]
     convertPdfToPpt( strPdfFile, strFilenameDest )
     
     

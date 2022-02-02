@@ -38,7 +38,12 @@ class FaceTracker:
         receive a new image and analyse it
         - t: image time stamp in sec
         - name: name of the image (filename or ...) for optimisation/caching purpose
+        return 0 if user want to exit
         """
+        if im is None or im.shape[0] < 1:
+            print("WRN: this image is empty!!!")
+            return 1
+            
         self.nImageAnalysed += 1
         t = time.time()
         res = self.fdcv3.detect(im,bRenderBox=False,confidence_threshold=0.1) # ~0.06s on mstab7 on a VGA one face image
@@ -88,8 +93,8 @@ class FaceTracker:
         if not bFaceFound or 0:
             # try profile
             t = time.time()
-            facesHaar=self.haar_face_detect.detect_face(im,bCompleteSearch=True)
-            facesProfile=self.haar_profile_detect.detect_face(im,bCompleteSearch=False)
+            #~ facesHaar=self.haar_face_detect.detect_face(im,bCompleteSearch=True)
+            #~ facesProfile=self.haar_profile_detect.detect_face(im,bCompleteSearch=False)
             #~ assert(len(resProfile)==0)
             if self.nImageAnalysed > 1: self.timehaar += time.time() - t
             pass
@@ -143,18 +148,23 @@ class FaceTracker:
             cv2_tools.drawHighligthedText(im, "look: %d" % self.nImageLookingAt, (30,90))
             
             
+            im = cv2.resize(im,(0,0),fx=3,fy=3)
             cv2.imshow("FaceTracker",im)
             key=cv2.waitKey(1) # time for image to refresh even if continuously pressing a key
             key=cv2.waitKey(0)
             print(key)
             if key == 27:
                 #~ facerecognition_dlib.storedFeatures.save()
-                exit(1)
+                return 0
+        return 1
             
         
         
     def getStats( self ):
-        pass
+        """
+        return nbr analysed, nbr face, nbr look
+        """
+        return self.nImageAnalysed, self.nImageWithFace, self.nImageLookingAt
         
     def getAvgDuration(self):
         n = self.nImageAnalysed - 1
@@ -174,7 +184,13 @@ def analyseFolder(folder):
     """
     analyse a folder with a bunch of images
     """
-    bSpeedTest = 1
+    bSpeedTest = 0
+    #~ bSpeedTest = 1
+    
+    bRenderDebug = 0
+    #~ bRenderDebug = 1
+    
+    
     timeBegin = time.time()
     
     listFiles = sorted(os.listdir(folder))
@@ -198,7 +214,25 @@ def analyseFolder(folder):
     #~ idx = 1
     idx = 0
     
+    
+    #######################
+    # pitie4
+    idx = 145 # pour un humain
+    idx = 2061 # pour un visage (pas forcément le premier)
+    idx = 2088 # pour un regard vers le robot (mais regard en coin)
+    idx = 0
+    #~ idx = 18670
+    
+    # result on all images:
+    """
+    nImageAnalysed : 18716
+    nImageWithFace : 7139 ( 38.1%)
+    nImageLookingAt: 1644 (  8.8%) ( 23.0%)
+    """
+    
+    
     if bSpeedTest: idx = 0
+    if bSpeedTest: bRenderDebug = 0
     
     #~ camera_viewer_0__1396576251_08_5712.jpg # has a fake face vith 0.77 of confidence
     while idx<len(listFiles):
@@ -210,12 +244,13 @@ def analyseFolder(folder):
         absf = folder + f
         im = cv2.imread(absf)
         if bSpeedTest: absf = None
-        ft.update(im,0,absf,bRenderDebug=0)
+        bRet = ft.update(im,0,absf,bRenderDebug=bRenderDebug)
+        if not bRet:
+            break
         idx += 1
         if (idx % 100)==0:
             facerecognition_dlib.storedFeatures.save()
         
-        bSpeedTest = 1           
         if bSpeedTest:
             if idx > 30:
                 ft.getAvgDuration()
@@ -223,7 +258,14 @@ def analyseFolder(folder):
                 print("    Avg time:   %.2fs" % (duration/idx) )
                 print("    Total time: %.1fs" % (duration) )
                 break
-                
+
+    facerecognition_dlib.storedFeatures.save()                
+    nImageAnalysed, nImageWithFace, nImageLookingAt = ft.getStats()
+    print("nImageAnalysed : %d" % (nImageAnalysed) )
+    print("nImageWithFace : %d (%5.1f%%)" % (nImageWithFace,100*nImageWithFace/nImageAnalysed) )
+    print("nImageLookingAt: %d (%5.1f%%) (%5.1f%%)" % (nImageLookingAt,100*nImageLookingAt/nImageAnalysed,100*nImageLookingAt/nImageWithFace) )
+
+
 """
 result:
 mstab7:
@@ -264,7 +306,7 @@ def analyseMovie():
     pass
     
 if os.name == "nt":
-    strPath = "d:/pitie3/"
+    strPath = "d:/pitie4/"
 else:
     strPath = os.path.expanduser("~/pitie4/")
 analyseFolder(strPath)

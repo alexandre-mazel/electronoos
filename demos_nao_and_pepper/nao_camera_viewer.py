@@ -13,8 +13,9 @@
 import copy
 import math
 import numpy
-import random
 
+
+import abcdk.filetools as filetools # rapido for ravir
 # some constants
 
 kQQVGA = 0;
@@ -45,7 +46,7 @@ kCameraGainID = 6;
 #strNaoIp = "10.0.253.75"; # NaoAlex
 #~ strNaoIp = "10.0.253.68"; # NaoAlex16
 #~ strNaoIp = "10.0.254.27"; # stereo2
-#~ strNaoIp = "10.0.254.176"; # Manu3Dqa
+#~ strNaoIp = "10.0.254.176"; # Manu3D
 #strNaoIp = "10.0.254.54"; # Laurent3D
 strNaoIp = "192.168.1.141"; # TheFreak
 strNaoIp = "10.0.253.99"; # NaoAlexBlue
@@ -57,18 +58,15 @@ strNaoIp = "198.18.0.1" # Default Romeo
 #~ strNaoIp = "10.0.161.16" # PepperAlex
 #~ strNaoIp = "NaoLaurentV5BT.local"
 #~ strNaoIp = "10.0.164.226"
-#~ strNaoIp = "192.168.100.210"rq
+#~ strNaoIp = "192.168.100.210"
 strNaoIp = "10.0.164.245"
 strNaoIp = "10.0.165.65"
 strNaoIp = "192.168.1.231"
 strNaoIp = "10.0.204.252"
-strNaoIp = "10.0.206.254"
-strNaoIp = "10.0.164.207"
-strNaoIp = "10.0.205.46"
-#~ strNaoIp = "10.0.160.218" # 206.80
-strNaoIp = "10.0.207.44"
+strNaoIp = "192.168.1.211"
+strNaoIp = "localhost"
 
-nWantedResolution = kVGA;
+nWantedResolution = kVGA
 bOutputTimeStampToFilename = False;
 anVFlipCamera = [0, 0]; # normal settings
 anHFlipCamera = [0, 0];
@@ -83,8 +81,7 @@ bMoveEyes = False;
 
 bBlinkWhenSaving = True;
 
-bRomeoMode = False
-#~ bRomeoMode = True
+bRomeoMode = True
 if( bRomeoMode ):
     bStereoMode = True
 
@@ -146,14 +143,14 @@ def getFileContents( szFilename, bQuiet = False ):
     aBuf = "";
     try:
         file = open( szFilename );
-    except BaseException, err:
+    except BaseException as err:
         if( not bQuiet ):
             print( "ERR: filetools.getFileContents open failure: %s" % err );
         return "";
         
     try:
         aBuf = file.read();
-    except BaseException, err:
+    except BaseException as err:
         if( not bQuiet ):
             print( "ERR: filetools.getFileContents read failure: %s" % err );
         file.close();
@@ -161,7 +158,7 @@ def getFileContents( szFilename, bQuiet = False ):
         
     try:
         file.close();
-    except BaseException, err:
+    except BaseException as err:
         if( not bQuiet ):
             print( "ERR: filetools.getFileContents close failure: %s" % err );
         pass
@@ -436,7 +433,7 @@ def findRedAndBlueMarks( imageBuffer, imageBufferForDrawingDebug = None, _nDetec
     equalizeColorImage( imageBuffer, bEqualiseEachChannelIndependantly = False );
     
     #~ cv.Threshold( imageBuffer, imageBuffer, 127, 18, cv.CV_THRESH_BINARY );
-    #~ cv.SetImageCOI(  imageBuffer, 1 ); # a retester: c'est peut etre plus optimal (non: plein de methode ne marche pas avec les COI)
+    #~ cv.SetImageCOI(  imageBuffer, 1 ); # a retester: c'est peut etre plus optimal (non: plein de méthode ne marche pas avec les COI)
     #~ grey = cv.CreateImage( cv.GetSize(imageBuffer), 8, 1 );
     workR = cv.CreateImage( cv.GetSize(imageBuffer), 8, 1 );
     workB = cv.CreateImage( cv.GetSize(imageBuffer), 8, 1 );
@@ -612,10 +609,11 @@ def convertYUV_ToBGR_cv2( image, nSizeX, nSizeY ):
 
 # import naoqi lib
 strPath = getNaoqiPath();
-home = `os.environ.get("HOME")`
+home = "" # `os.environ.get("HOME")`
+
 
 if strPath == "None":
-  print "the environnement variable AL_DIR is not set, aborting..."
+  print( "the environnement variable AL_DIR is not set, aborting..." )
   sys.exit(1)
 else:
   #alPath = strPath + "/extern/python/aldebaran"
@@ -634,19 +632,22 @@ else:
 try:
     led = ALProxy( "ALLeds",  strNaoIp, 9559 );
     led.fade( "AllLeds", 0., 0. );
-except BaseException, err:
+except BaseException as err:
     print( "WRN: while setting leds to 0, err: %s" % str(err) );
 
 mem = ALProxy( "ALMemory",  strNaoIp, 9559 );
 
 
-strDebugWindowName = "Video Monitor"; # "DebugWindow"; # set to false to have no debug windows
-cv.NamedWindow( strDebugWindowName, cv.CV_WINDOW_AUTOSIZE);
-cv.MoveWindow( strDebugWindowName, 0, -1 );
+bRenderImage = False # todo: automatically if robot detected
+
+if bRenderImage:
+    strDebugWindowName = "Video Monitor"; # "DebugWindow"; # set to false to have no debug windows
+    cv.NamedWindow( strDebugWindowName, cv.CV_WINDOW_AUTOSIZE);
+    cv.MoveWindow( strDebugWindowName, 0, -1 );
 
 if( bUseMultiStreamModule ):
     strDebugWindowName2 = "Video Monitor Right (or Bottom)"; # "DebugWindow"; # set to false to have no debug windows
-    cv.NamedWindow( strDebugWindowName2, cv.CV_WINDOW_AUTOSIZE);
+    if bRenderImage: cv.NamedWindow( strDebugWindowName2, cv.CV_WINDOW_AUTOSIZE);
     if( nWantedResolution == k4VGA ):
         aWantedResolution = (1280, 960);    
     if( nWantedResolution == kVGA ):
@@ -657,9 +658,9 @@ if( bUseMultiStreamModule ):
         aWantedResolution = (160, 120);
         
     if( bStereoMode ):
-        cv.MoveWindow( strDebugWindowName2, aWantedResolution[0]+20, -1 );
+        if bRenderImage: cv.MoveWindow( strDebugWindowName2, aWantedResolution[0]+20, -1 );
     else:
-        cv.MoveWindow( strDebugWindowName2, -1, aWantedResolution[1]+40 );
+        if bRenderImage: cv.MoveWindow( strDebugWindowName2, -1, aWantedResolution[1]+40 );
 
 
 avd = ALProxy( "ALVideoDevice",  strNaoIp, 9559 );
@@ -700,18 +701,17 @@ avd.setParam( kSelectCamera, nCameraToUse ); # change camera
 #~ setCameraParamForRedAndBlue(False); # reset camera
 #~ setCameraParamForRedAndBlue();
 
+
 bKeyPressed = False;
 nCptFrame = 0;
 nCptImageSaved = 0;
 timeBegin = time.time();
 bSaveFrame = False;
-bRecordMode = False;
+bRecordMode = not bRenderImage; # if not render, then record !
 bTestFrame = False;
 bSaveStereoFrame = False;
 nSaveStereoFramePass = 0;
 bChangeCamera = False;
-bRecordingForAlbanExperimentation = False
-strPathPepperArmRecording = "pepper_arm"
 nShowProcessed = 0; # 0: show source, other value: show steps
 work = cv.CreateImage( cv.GetSize(bufferImageToDraw), cv.IPL_DEPTH_8U, 3 );
 
@@ -719,6 +719,9 @@ bDrawInfo = True;
 bDrawInfo = 0;
 rLastComputedFps = 0;
 bBlinkOn = False;
+
+bTrackWithBase = 1
+bSaveOnlyWhenHeadIsCentered = 1
 
 if( bDrawInfo ):
     nThickness = 1;
@@ -757,10 +760,16 @@ if nColorSpace == kYUV422:
 if nColorSpace == kBGR:
     nNbrColorLayer = 3
     
-motion = None
-alban_move_step = 0
-alban_arm_index= [0,0,0,0]
-
+if bTrackWithBase:
+    import abcdk.extractortools
+    afd = naoqi.ALProxy("ALFaceDetection", "localhost", 9559)
+    afd.post._run() # explicit start (instead of registering to event)
+    motion = naoqi.ALProxy("ALMotion", "localhost", 9559)
+    motion.wakeUp()
+    motion.setExternalCollisionProtectionEnabled("All",0)
+    
+if bSaveOnlyWhenHeadIsCentered and not bTrackWithBase:
+    motion = naoqi.ALProxy("ALMotion", "localhost", 9559)
 
 while( not bKeyPressed ):
     nCptRetrieve += 1;
@@ -770,7 +779,7 @@ while( not bKeyPressed ):
             try:
                 retVal = avd.getParam( i );
                 print( "param %d: %s" % ( i, str( retVal ) ) );
-            except BaseException, err:
+            except BaseException as err:
                 print( "DBG: get param(%d) => error: %s" % ( i, str( err ) ) );            
     #~ try:
     if( 1 ):
@@ -889,15 +898,15 @@ while( not bKeyPressed ):
                 cv.PutText( bufferImageToDraw, "fps: %5.2f" % rLastComputedFps, (0,16), font, colorText );
                 
             if( nShowProcessed == 0 ):
-                cv.ShowImage( strDebugWindowName, bufferImageToDraw );
+                if bRenderImage: cv.ShowImage( strDebugWindowName, bufferImageToDraw );
                 if( bUseMultiStreamModule ):
-                    cv.ShowImage( strDebugWindowName2, bufferImageToDraw2 );
+                    if bRenderImage: cv.ShowImage( strDebugWindowName2, bufferImageToDraw2 );
             else:
                 pass
                 if( nShowProcessed == 1 ):
-                    cv.ShowImage( strDebugWindowName, work );
+                    if bRenderImage: cv.ShowImage( strDebugWindowName, work );
                 else:
-                    cv.ShowImage( strDebugWindowName, work );
+                    if bRenderImage: cv.ShowImage( strDebugWindowName, work );
             nCptFrame +=1;
 
             if( not bUseMultiStreamModule ):
@@ -921,20 +930,6 @@ while( not bKeyPressed ):
                     strFilenameR = strFilename.replace( ".p", "_r.p" );
                     if( not bRomeoMode ):
                         led.fade( "AllLeds", 1., 0.2 );
-                        
-                    if bRecordingForAlbanExperimentation:
-                        # save configuration
-                        allJointsName = motion.getJointNames("Body")
-                        allAngles = motion.getAngles("Body", True)
-                        file = open( strPathPepperArmRecording+"/pos/%s_joint_config.txt" % strTime, "wt" )
-                        file.write( ",".join(allJointsName)  + "\n")
-                        for i in range(len(allAngles)):
-                            allAngles[i] = "%f" % allAngles[i]
-                        file.write( ",".join(allAngles) )
-                        file.close()
-                        strFilenameL = strPathPepperArmRecording+ "/l/" + strFilenameL
-                        strFilenameR = strPathPepperArmRecording + "/r/" + strFilenameR
-                        
                     print( "Saving image to %s" % strFilenameL );                    
                     cv.SaveImage( strFilenameL, bufferImageToDraw );
                     print( "Saving image to %s" % strFilenameR );                    
@@ -947,13 +942,15 @@ while( not bKeyPressed ):
                 if( bOutputTimeStampToFilename ):
                     strTime = "_%5.2f" % time.time();
                     strTime = strTime.replace( ".", "_" );
+                strTime = filetools.getFilenameFromTime()
                 strFilename = "camera_viewer_%d_%s_%04d.png" % ( avd.getParam(kSelectCamera),  strTime, nCptImageSaved );
                 if( bRecordMode ):
                     strFilename = strFilename.replace( ".png", ".jpg" );
-                    strFilename = "/tmp/recorded_images/" + strFilename;
+                    #~ strFilename = "/tmp/recorded_images/" + strFilename;
+                    strFilename = "/home/nao/recorded_images/" + strFilename;  # todo: if not exists, rale!
                 bSkip = False;
                 if( bRecordMode ): 
-                    if( 0 ):
+                    if( 1 ):
                         # skip not moving image
                         img_numpy = numpy.frombuffer( image, dtype=numpy.uint8 );
                         if( img_prev != None ):
@@ -962,14 +959,22 @@ while( not bKeyPressed ):
                             nMaxDiff = diff.max();
                             rMean = numpy.mean( diff );
                             print( "INF: max diff: %s, mean: %s" % (nMaxDiff, rMean) );
-                            if( rMean <= 1.85 ): # 1.6 # 2.6 isn't enough for mouth moving!
+                            if( rMean <= 5.3 ): # 1.6 # 2.6 isn't enough for mouth moving!
                                 bSkip = True;
                         img_prev = copy.deepcopy(img_numpy);
+                    if bSaveOnlyWhenHeadIsCentered:
+                        angles = motion.getAngles("HeadYaw",1)[0]
+                        if abs(angles)>0.1:
+                            bSkip = True
                         
                 if( not bSkip ): 
                     print( "Saving image to %s" % strFilename );                    
                     if( not bRecordMode and not bRomeoMode ): led.fade( "AllLeds", 1., 0.2 );
-                    cv.SaveImage( strFilename, bufferImageToDraw );
+                    bRet = cv.SaveImage( strFilename, bufferImageToDraw );
+                    #print(bRet)
+                    if not os.path.isfile(strFilename):
+                        print("ERR: can't write...")
+                        exit(-1)
                     if( not bRecordMode and not bRomeoMode ): led.fade( "AllLeds", 0., 0.1 );
                     bSaveFrame = False;
                     nCptImageSaved += 1;
@@ -983,7 +988,35 @@ while( not bKeyPressed ):
                                 nColor = 0xFF0080;
                             bBlinkOn = not bBlinkOn;
                             abcdk.leds.dcmMethod.setEyesOneLed( nIndex=7, rTime=0.1, nColor = nColor, nEyesMask = 0x3 );
-                        
+                    if bTrackWithBase and (nCptImageSaved&8)==0:
+                        datas = mem.getData("FaceDetection/FaceDetected")
+                        print("datas: %s" % datas)
+                        #~ datas = mem.getData("FaceDetected")
+                        #~ print("datas: %s" % datas)
+                        #~ exit(1)
+                        # autre possibilité: recognizeFromFile
+                        faceinfo = abcdk.extractortools.FaceDetectionNew_decodeInfos(datas)
+                        #~ print(str(faceinfo))
+                        #~ print("objects: %d" % len(faceinfo.objects))
+                        if len(faceinfo.objects) > 0:
+                            angles = motion.getAngles("HeadYaw",1)[0]
+                            if abs(angles)<0.1:
+                                face_info = faceinfo.objects[0].faceInfo
+                                print("face1.faceInfo: %s" % face_info)
+                                resdiv2 = 320/2
+                                face_x = (((face_info.vertices[0][0]+face_info.vertices[1][0])/2.)-resdiv2)/resdiv2
+                                print("face_x: %s" % face_x)
+                                if abs(face_x)>0.07 and face_info.rConfidence>0.4:
+                                    rDir = 1
+                                    rDist = 0.3*face_x
+                                    rMaxMove = 0.4
+                                    if rDist > rMaxMove:
+                                        rDist = rMaxMove
+                                    elif rDist < -rMaxMove:
+                                        rDist = -rMaxMove
+                                    print("rDist: %s" % rDist )
+                                    motion.post.moveTo(0.,0., -rDist,0.5)
+                                
                         
             if( bChangeCamera ):
                 avd.setParam(kSelectCamera, (avd.getParam(kSelectCamera)+1)%2);
@@ -1007,14 +1040,14 @@ while( not bKeyPressed ):
     #~ except BaseException, err:
         #~ print( "ERR: camera_viewer: (err:%s)" % (str(err)) );
         
-    nKey =  cv.WaitKey(1) & 0xFF;
+    if bRenderImage: nKey =  cv.WaitKey(1) & 0xFF;
+    else: nKey = 0
     bKeyPressed = ( nKey == ord( 'q' ) or nKey == ord( 'Q' ) );
     bSaveFrame = ( nKey == ord( 's' ) );
     bSaveStereoFrame = ( nKey == ord( 'S' ) );
     bToggleRecordMode = ( nKey == ord( 'r' ) );    
     bTestFrame = ( nKey == ord( 't' ) );
     bChangeCamera = ( nKey == ord( 'c' ) );
-    bToggleAlbanExperiment = ( nKey == ord( 'a' ) );
     if( nKey == ord( 'p' ) ):
         nShowProcessed = ( nShowProcessed + 1 ) % 4 ;
         
@@ -1039,70 +1072,6 @@ while( not bKeyPressed ):
         else:
             nSide = +0.1;
         abcdk.motiontools.eyesMover.moveLeft( [nSide,0.], 0.1, bWaitEnd = False );
-                
-    if bToggleAlbanExperiment:
-        bRecordingForAlbanExperimentation = not bRecordingForAlbanExperimentation        
-        if bRecordingForAlbanExperimentation:
-            print( "bRecordingForAlbanExperimentation is ON !!!" )
-            bSaveStereoFrame = True
-            try: os.makedirs( strPathPepperArmRecording + "/r/" )
-            except: pass            
-            try: os.makedirs( strPathPepperArmRecording + "/l/" )
-            except: pass            
-            try: os.makedirs( strPathPepperArmRecording + "/pos/" )
-            except: pass            
-            
-            if motion == None:
-                motion = ALProxy( "ALMotion",  strNaoIp, 9559 )
-            motion.wakeUp()
-            motion.stiffnessInterpolation("RArm", 1., 1.)
-            motion.stiffnessInterpolation("Head", 1., 1.)
-            motion.setExternalCollisionProtectionEnabled( "All", False )
-    if bRecordingForAlbanExperimentation:
-        alban_move_step += 1
-        
-        # move a bit
-        if (alban_move_step % 10) == 0:
-            if (alban_move_step % 100) == 0:
-                motion.moveTo( [0.1,0.,0.] ) # front 1 / 10
-            else:
-                motion.moveTo( [0.,0.,0.1] )  # turn  9/10
-        else:
-            
-            # move the arm
-            # alban_arm_index = [0,0,0,0]
-            for i in range(4):
-                alban_arm_index[i] += 1
-        
-        # random values
-        #~ ShoulderRoll in [-1, 0]
-        #~ ShoulderPitch in [-1, 1]        
-        #~ ElbowYaw in [-1; 1]
-        #~ ElbowRoll in [0, 1]        
-        aMinMax = [ [-1,0], [-1,1], [-1,1], [0,1] ]
-        alban_arm_value = [0,0,0,0]
-        for i in range(4):
-            alban_arm_value[i] = aMinMax[i][0] + (aMinMax[i][1]-aMinMax[i][0] * random.random()) # -1/1 => (random.random()*2)-1
-            # avg visualisation
-            alban_arm_value[i] = (aMinMax[i][1]+aMinMax[i][0] ) / 2
-        while( 1 ):
-            motion.stiffnessInterpolation("RArm", 1., 0.1)
-            motion.stiffnessInterpolation("Head", 1., 0.1)
-            aStiffValue = motion.getStiffnesses( "RArm" )
-            aStiffValueH = motion.getStiffnesses( "Head" )
-            print( "stiff: %s, head: %s" % (aStiffValue, aStiffValueH ) )
-            if( sum(aStiffValue) > 0.1 and sum(aStiffValueH) > 0.1 ):
-                break
-            time.sleep( 10. )
-            rShoulderT = mem.getData( "Device/SubDeviceList/RShoulderPitch/Temperature/Sensor/Value" )
-            print( "%s: ARM too hot, waiting... (%5.1f°)" % (str(time.time()), rShoulderT) )
-        motion.angleInterpolationWithSpeed( ["RShoulderRoll", "RShoulderPitch", "RElbowYaw", "RElbowRoll"], alban_arm_value, 0.5 )
-        headAngles = [-0.7,0.253]
-        headAngles = [-0.9341,-0.4601]
-        motion.post.angleInterpolationWithSpeed( "Head", headAngles, 0.3 ) # cause along the day motion move the head to the ground!
-        time.sleep( 0.2 ) # stabilize
-        bSaveStereoFrame = True
-        
 # while - end
 cv.SaveImage( "camera_viewer_at_exit.png", bufferImageToDraw ); # save last image at quit
 

@@ -33,9 +33,15 @@ C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut/
 -    (shift+ctrl+R fait les 2 actions et ferme le fichier)
 - sound_processing.changeVolumeInFolder(,2) # pour arriver a un son qui se tient d'un jour d'enregistrement a l'autre
 
-Record images during experience:
+# Record images during experience:
 cd ~/dev/git/protolab_group/scripts
 nohup python nao_camera_viewer.py
+
+# copy le script depuis l'ordi:
+scp C:\Users\alexa\dev\git\electronoos\demos_nao_and_pepper\nao_camera_viewer.py nao@192.168.1.211:/home/nao/dev/git/protolab_group/scripts/
+
+# backup le script nao_camera_viewer sur mon ordi:
+scp nao@192.168.1.211:/home/nao/dev/git/protolab_group/scripts/nao_camera_viewer.py C:\Users\alexa\dev\git\electronoos\demos_nao_and_pepper\
 """
 
 import os
@@ -545,6 +551,7 @@ class Perliner:
         self.bListening = False
         
         self.bUseSound = False #remove them to avoid the unpleasing aspect
+        self.bUseSound = True # ou alors oui mais vraiment pas fort
         
         self.nNbrSoundEstim = 0 # an estimation of the current nbr of played sound
         
@@ -582,6 +589,11 @@ class Perliner:
         bUseSound: to force to use sound or not, if -100, use the value of the object
         """
         
+        if rAmp == 1.:
+            # compat avec le breather:
+            rAmp = self.rAmp
+            bForceMove = True
+        
         
         if rAmp == -100:
             rAmp = self.rAmp
@@ -611,7 +623,7 @@ class Perliner:
 
         if bUseSound:
             strPath = self.strNoisePath
-            rSoundVolume = 0.8
+            rSoundVolume = 0.21 # doit rester pas fort
             if self.nNbrSoundEstim < 60:
                 rTimePerSound = 20
                 if noise.getSimplexNoise(t,50) > 0.4:
@@ -1228,6 +1240,14 @@ def expe( nMode = 1 ):
         
     animator.motion.killAll();
     
+    leds = None
+    try:
+        import naoqi
+        leds = naoqi.ALProxy("ALLeds", "localhost", 9559)
+        if leds: leds.fadeRGB("ChestLeds", 0x0, 1.)
+    except BaseException as err:
+        print("ERR: while creating proxy: err: %s" % err )
+    
     rT = 0
     rBeginT = time.time()
     rTimeLastSpeak = time.time()-10
@@ -1379,6 +1399,7 @@ def expe( nMode = 1 ):
                     print("\nINF: new step: %d: %s\n" % (nStep,descState[nStep]) )
                     if nStep == 20:
                         animator.setPaused(not animator.isPaused())
+                        if leds: leds.fadeRGB("ChestLeds", 0xFF, 0.3)
                         nStep += 10
                         
                     if nStep == 40:
@@ -1401,6 +1422,7 @@ def expe( nMode = 1 ):
                 
                     if nStep == 90:
                         animator.setPaused(not animator.isPaused())
+                        if leds: leds.fadeRGB("ChestLeds", 0x0, 1.)
                         nStep += 10
                         # changement de condition de animator et de story
                         nStory = (nStory + 1)%2
@@ -1408,6 +1430,7 @@ def expe( nMode = 1 ):
                         animator = aAnimators[nAnimatorIdx]
                         
                     if nStep == 110:
+                        if leds: leds.fadeRGB("ChestLeds", 0xFF00, 0.3)
                         animator.setPaused(not animator.isPaused())
                         
                     if nStep == 120:
@@ -1427,6 +1450,7 @@ def expe( nMode = 1 ):
                         nStep += 10
                         
                     if nStep == 160:
+                        if leds: leds.fadeRGB("ChestLeds", 0x0, 1.)
                         animator.setPaused(not animator.isPaused())
                         
                     if nStep == 170:

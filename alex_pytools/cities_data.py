@@ -315,6 +315,7 @@ class Cities:
         self.dictCities = {} # city per zip (zip as a string, could start with unsignifiant 00 )=> (strDept,strZip,strCity Slug,strCity Real (including casse),float(strLong),float(strLat))
         self.dupCityPerZip = {} # some cities have same zip, so we store for each overwritten city slug their zip
         self.dupZipPerZip = {} # some zip are for the same cities, we store them here alternateZip => Zip
+        self.cacheLastFindByRealName = (0,0,0) # city, partof, result of last research
         
     def load(self):
         print("INF: Cities: loading city data...")
@@ -407,16 +408,40 @@ class Cities:
     def findByRealName( self, strCityName, bPartOf=False ):
         """
         return the zip related to a city real name
+        bPartOf, ne fonctionne pas si dans dupCityPerZip
         """
+        bVerbose = 0
+        
+        if strCityName == "":
+            return -1
+            
+        if self.cacheLastFindByRealName[0] == strCityName and self.cacheLastFindByRealName[1] == bPartOf:
+            return self.cacheLastFindByRealName[2]
+            
         strNormalisedCityName = cleanString(strCityName)
         for k,v in self.dictCities.items():
             #~ if 0: print("%s=>%s to compare with %s=>%s" % (strCityName,strNormalisedCityName,v[3],cleanString(v[3]) ) ) # at ovh: UnicodeDecodeError: 'ascii' codec can't decode byte 0xc3 in position 5: ordinal not in range(128)
-            #~ if 1: print("%s to compare with %s" % (strNormalisedCityName,cleanString(v[3]) ) )
+            if bVerbose: print("DBG: findByRealName: 1: '%s' to compare with '%s'" % (strNormalisedCityName,cleanString(v[3]) ) )
             if cleanString(v[3]) == strNormalisedCityName or (bPartOf and strNormalisedCityName in v[3]):
+                if bVerbose: print("DBG: findByRealName: MATCH 1")
+                self.cacheLastFindByRealName = (strCityName,bPartOf,k)
                 return k
+            if 0:
+                # cherche dans les villes sans -, mais en fait si c'est dans dupCityPerZip, on les trouve pas. # a refactorer
+                nohyp1 = strNormalisedCityName.replace('-',' ')
+                nohyp2 = cleanString(v[3]).replace('-',' ')
+                if bVerbose: print("DBG: findByRealName: 2: '%s' to compare with '%s'" % (nohyp1,nohyp2) )
+                if nohyp1 == nohyp2:
+                    if bVerbose: print("WRN: findByRealName: found, but with different '-'" )
+                    return k
+        #~ print("DBG: findByRealName: self.dupCityPerZip: %s" % self.dupCityPerZip.keys())
         if strNormalisedCityName in self.dupCityPerZip.keys(): # here bug: comparing real name and slug!
-            return self.dupCityPerZip[strNormalisedCityName]
-        print("WRN: Cities.findByRealName: city '%s' not found" % strCityName)
+            out = self.dupCityPerZip[strNormalisedCityName]
+            self.cacheLastFindByRealName = (strCityName,bPartOf,out)
+            if bVerbose: print("DBG: findByRealName: MATCH 2: %s" % out)
+            return out
+        print("WRN: Cities.findByRealName: city '%s' not found (bPartOf:%d)" % (strCityName,bPartOf))
+        self.cacheLastFindByRealName = (strCityName,bPartOf,-1)
         return -1
         
     def distTwoZip(self,zip1,zip2,bVerbose=False):
@@ -511,6 +536,9 @@ def autotest_cities():
     assert_equal( cities.findByRealName("Nancy"), "54100" )
     assert_equal( cities.findByRealName("beaumont-pied-de-boeuf"), "72500" ) # oe
     assert_equal( cities.findByRealName("oeuf-en-ternois"), "62130" ) # oe en premier
+    assert_equal( cities.findByRealName("ANCY-sur-moselle"), "57130" ) 
+    #~ assert_equal( cities.findByRealName("ANCY sur moselle"), "57130" ) # real name is ANCY-sur-moselle, et c'est dans dupCityPerZip, donc pas trouvé
+    
     
     
     

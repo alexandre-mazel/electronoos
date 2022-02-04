@@ -5,6 +5,7 @@ import math
 import os
 import shutil
 import sys
+import time
 
 def assert_equal(a,b):
     if a == b:
@@ -440,7 +441,7 @@ class Cities:
             self.cacheLastFindByRealName = (strCityName,bPartOf,out)
             if bVerbose: print("DBG: findByRealName: MATCH 2: %s" % out)
             return out
-        print("WRN: Cities.findByRealName: city '%s' not found (bPartOf:%d)" % (strCityName,bPartOf))
+        if bVerbose: print("WRN: Cities.findByRealName: city '%s' not found (bPartOf:%d)" % (strCityName,bPartOf))
         self.cacheLastFindByRealName = (strCityName,bPartOf,-1)
         return -1
         
@@ -577,6 +578,17 @@ def autotest_cities():
 
     dist = cities.distTwoZip("33000","67000",bVerbose=True)
     assert_diff(dist,760,20)      
+    
+    timeBegin = time.time()
+    for i in range(100):
+        # en mettre plusieurs différent permet de zapper le cache
+        cities.findByRealName("ozan") # le premier
+        cities.findByRealName("oeuf-en-ternois")
+        cities.findByRealName("paris")
+        cities.findByRealName("marseille")
+        cities.findByRealName("zanzibar") # inconnu
+    duration = time.time() - timeBegin
+    print("INF: 500 tests: %.1fs (%.1fms/recherche)" % (duration,duration/0.5 ) )
 
 def findNearestUniv( zip_host, cities, dictUniv ):
     """

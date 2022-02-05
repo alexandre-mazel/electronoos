@@ -318,17 +318,64 @@ def cleanString( s ):
     #~ if bPrintResultForDebug: print("=> %s" % o )
     return o
     
+def simpleString( s ):
+    """
+    change a string to lower case without accent and no hypen
+    """
+    bPrintResultForDebug = 0
+    o = ""
+    for c in s:
+        if ord(c)>127:
+            #~ print("in %s: %c" % (s,c) )
+            c = removeAccent(c)
+            #~ print("=> %c" % c )
+            bPrintResultForDebug = 1
+        elif c == '-':
+            c = ' '
+        c = c.lower()
+        o += c
+    #~ if bPrintResultForDebug: print("=> %s" % o )
+    return o
+    
+    
+def appendToDict( d, k, v ):
+    """
+    assign a value to a list in an element of a dict, if first time, create the list
+    """
+    try:
+        d[k].append(v)
+    except KeyError:
+        d[k] = [v]
     
 class Cities:
+    """
+    Uses:
+    1: Autocomplete, eg on a website: enter start of city, it completes with "full name (zip)"
+        FindByRealName( city, bPartOf = True )
+         
+    2: Adress detection: give a zip and a city, it will validate it's really an adress, and can correct it.
+        correctAdress( zip, city ), return (zip,city,confidence) confidence of the right correction.
+         
+    3: Distance between two city: give two zip, it returns the distance
+        distTwoZip( zip1, zip2 )
+    """
     def __init__(self):
         self.dictCities = {} # city per zip (zip as a string, could start with unsignifiant 00 )=> (strDept,strZip,strCity Slug,strCity Real (including casse),float(strLong),float(strLat))
         self.dupCityPerZip = {} # some cities have same zip, so we store for each overwritten city slug their zip
         self.dupZipPerZip = {} # some zip are for the same cities, we store them here alternateZip => Zip
         self.cacheLastFindByRealName = (None,None,None) # city, partof, result of last research
         
-        # refactor:
-        self.cityPerSlug = {} # assume slug is unique, so we have a dict with one element per city
+        # refactor
+        #  assume slug is unique, so we have a dict with one element per city 
+        # for each slug: (strDept,strZip,strCitySimple,strCityReal,float(strLong),float(strLat))
+        self.cityPerSlug = {}
         
+        self.zipToSlug = {} # for each zip, a list of associated slugs
+        self.realNameToSlug = {} # for each city name in lower case, a list of associated slugs name
+        self.simpleNameToSlug = {} # for each city name in lower case unhyphenised without accent, a list of associated slugs name
+       
+        self.warnMessages = [] # handle warn messages, not overflowing the output
+
     def load(self):
         print("INF: Cities: loading city data...")
         bVerbose = 0
@@ -350,11 +397,19 @@ class Cities:
             if strDept == "dept":
                 continue
             strZip = fields[8]
+            strCitySimple = fields[4]
             strCityReal = fields[5]
             strCitySlug = fields[2]
             strLong = fields[19]
             strLat = fields[20]
             if bVerbose: print("strDept: %s, strZip: %s, strCity: %s, strLong: %s, strLat: %s" % (strDept,strZip,strCitySlug,strLong,strLat) ) 
+            
+            listZips = []
+            if "-" not in strZip:
+                listZips.append(strZip)
+            else:
+                listZips = strZip.split('-')
+                
             if "-" in strZip:
                 strAllZip = strZip.split('-')
                 strNewZip = strAllZip[0][:-2]+"01" # prend le premier est kill les 2 derniers zeros
@@ -368,10 +423,22 @@ class Cities:
                 self.dupCityPerZip[self.dictCities[strZip][2]] = strZip
                 pass
             self.dictCities[strZip] = (strDept,strZip,strCitySlug,strCityReal,float(strLong),float(strLat))
+            # refactor
+            self.cityPerSlug[strCitySlug] = (strDept,strZip,strCitySimple,strCityReal,float(strLong),float(strLat))
+            for z in listZips:
+                appendToDict(self.zipToSlug, z,strCitySlug)
+            appendToDict(self.realNameToSlug, strCityReal,strCitySlug)
+            appendToDict(self.simpleNameToSlug, strCitySimple,strCitySlug)
         if bVerbose: 
             print("DBG: self.dupZipPerZip: %s" % str(self.dupZipPerZip))
             print("DBG: self.dupCityPerZip: %s" % str(self.dupCityPerZip))
     # load - end
+    
+    def warn(self,msg):
+        if msg in self.warnMessages:
+            return
+        self.warnMessages.append(msg)
+        print(msg)
     
     @staticmethod
     def getCityRealName( c ):
@@ -386,6 +453,18 @@ class Cities:
         """
         if isinstance(zip, int):
             zip = "%05d" % zip
+            
+        if 1:
+            # use hashed dict
+            try:
+                listSlug = self.zipToSlug[zip]
+            except KeyError:
+                return None
+                
+            if len(listSlug)>1:
+                self.warn("WRN: findByRealName: this city has different zip: %s" % (listSlug) )
+            k = listSlug[0]
+            return self.cityPerSlug[k]
             
         try:
             return self.dictCities[zip]
@@ -419,7 +498,7 @@ class Cities:
 
     def findByRealName( self, strCityName, bPartOf=False ):
         """
-        return the zip related to a city real name
+        return the zip related to a city real name or -1 if not found
         bPartOf, ne fonctionne pas si dans dupCityPerZip
         """
         bVerbose = 0
@@ -429,6 +508,30 @@ class Cities:
             
         if self.cacheLastFindByRealName[0] == strCityName and self.cacheLastFindByRealName[1] == bPartOf:
             return self.cacheLastFindByRealName[2]
+            
+        if 1:
+            # use hashed dict
+            try:
+                listSlug = self.realNameToSlug[strCityName]
+            except KeyError:
+                strSimpleName = simpleString(strCityName)
+                try:
+                    listSlug = self.simpleNameToSlug[strSimpleName]
+                except KeyError:
+                    if not bPartOf:
+                        return -1
+                    for k,v in self.simpleNameToSlug.items():
+                        if strSimpleName in k:
+                            listSlug = v
+                            break
+                    else:
+                        return -1
+
+            
+            if len(listSlug)>1:
+                self.warn("WRN: findByRealName: this city has different zip: %s" % (listSlug) )
+            k = listSlug[0]
+            return self.cityPerSlug[k][1] # get zip
             
         strNormalisedCityName = cleanString(strCityName)
         for k,v in self.dictCities.items():
@@ -538,6 +641,8 @@ class Cities:
 
 
 def autotest_cities():
+    bUseHash = 1 # deactivate some test not working in previous version
+    
     cities = Cities()
     cities.load()
     
@@ -546,12 +651,28 @@ def autotest_cities():
     assert_equal( cities.findByRealName("Saint-etienne"), "42001" )
     assert_equal( cities.findByRealName("Orléans"), "45001" )
     assert_equal( cities.findByRealName("Nancy"), "54100" )
-    assert_equal( cities.findByRealName("beaumont-pied-de-boeuf"), "72500" ) # oe
+    retVal = cities.findByRealName("beaumont-pied-de-boeuf") # oe
+    assert( retVal in ["53290","72500"] ) 
     assert_equal( cities.findByRealName("oeuf-en-ternois"), "62130" ) # oe en premier
     assert_equal( cities.findByRealName("ANCY-sur-moselle"), "57130" ) 
-    #~ assert_equal( cities.findByRealName("ANCY sur moselle"), "57130" ) # real name is ANCY-sur-moselle, et c'est dans dupCityPerZip, donc pas trouvé
+    if bUseHash:
+        assert_equal( cities.findByRealName("ANCY sur moselle"), "57130" ) # real name is ANCY-sur-moselle, et c'est dans dupCityPerZip, donc pas trouvé
+        assert_equal( cities.findByRealName("nissan lez enserune"),"34440")
+        assert_equal( cities.findByRealName("nissan", bPartOf=True),"11220") # Tournissan
+        assert_equal( cities.findByRealName("nissan lez", bPartOf=True),"34440") # Tournissan
     
+
+    retVal = cities.findByZip("25000")
+    assert_equal( retVal[1], "25000" )
+
+    retVal = cities.findByZip("34400")
+    assert_equal( retVal[1], "34400" )
     
+    retVal = cities.findByZip("75014")
+    assert_equal( retVal[1], "75001" )
+
+    retVal = cities.findByZip("94440")
+    assert_equal( retVal[1], "94440" )
     
     
     for city in ["Nissan", "Colombiers","Paris"]:
@@ -563,7 +684,10 @@ def autotest_cities():
         print("INF: find Real'%s', return: %s" % (city,str(retVal) ) )
         if retVal != -1:
             print("detail: %s" % str(cities.findByZip(retVal)))
-        print("")
+        print(""), 
+        
+        
+    assert_equal( cities.findBySlugName("velizy"), "455" )
         
     # bug dist bondy/velizy2
     zip1 = cities.findByRealName("Bondy")
@@ -599,8 +723,39 @@ def autotest_cities():
         cities.findByRealName("marseille")
         cities.findByRealName("zanzibar") # inconnu
     duration = time.time() - timeBegin
-    print("INF: 500 tests: %.1fs (%.1fms/recherche)" % (duration,duration/0.5 ) )
+    print("INF: 1: 500 tests: %.1fs (%.1fms/recherche)" % (duration,duration/0.5 ) )
     # mstab7: 500 tests: 4.5s (9ms/recherche)
+    # mstab7: passage au slugToZip:
+    # 500 tests: 0.0s (0.0ms/recherche)
+    
+    timeBegin = time.time()
+    for i in range(100):
+        # en mettre plusieurs différent permet de zapper le cache
+        cities.findByRealName("oza", bPartOf=1) # le premier
+        cities.findByRealName("st-pierre-et-", bPartOf=1) # le dernier
+        cities.findByRealName("pari", bPartOf=1)
+        cities.findByRealName("marseill", bPartOf=1)
+        cities.findByRealName("zanzibar" , bPartOf=1) # inconnu
+    duration = time.time() - timeBegin
+    print("INF: 2: 500 tests: %.1fs (%.1fms/recherche)" % (duration,duration/0.5 ) )
+    # mstab7: 500 tests: 4.9s (9.8ms/recherche)
+    # mstab7: passage au slugToZip
+    # 500 tests: 0.7s (1.3ms/recherche)
+    
+    timeBegin = time.time()
+    for i in range(100):
+        # zip equally repartited
+        retVal = cities.findByZip("10000")
+        retVal = cities.findByZip("34440")
+        retVal = cities.findByZip("54000")
+        retVal = cities.findByZip("75014")
+        retVal = cities.findByZip("94270")
+        
+    duration = time.time() - timeBegin
+    print("INF: 2: 500 tests: %.1fs (%.1fms/recherche)" % (duration,duration/0.5 ) )
+    # mstab7: 500 tests: 0.0s (0.0ms/recherche)
+    # mstab7: passage au slugToZip (vaguement moins avantageux car on perd la recherche dans un dico en direct) (indirection)
+    # 500 tests: 0.0s (0.0ms/recherche)
 
 def findNearestUniv( zip_host, cities, dictUniv ):
     """

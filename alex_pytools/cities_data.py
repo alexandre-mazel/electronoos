@@ -273,6 +273,8 @@ def removeAccent( c ):
         if ord(c) == acc_ord_ovh[i]:
             return noacc[i]      
             
+    if c == "æ" or ord(c)==230:
+        c = "ae"
     if c == "œ" or ord(c)==339:
         c = "oe"
     elif c == "Œ" or ord(c)==338:
@@ -291,6 +293,9 @@ def removeAccent( c ):
     elif ord(c) == 8216 or ord(c) == 8217:
         # type de '
         c = "'"
+    elif ord(c) == 8220:
+        # type de 
+        c = '"'
     elif ord(c) == 8230:
         c = "..."
     else:
@@ -574,8 +579,10 @@ class Cities:
     def isValidAdress( self, zip, strCityName ):
         """
         is this zip correpond roughly to this city.
-        return matching [0..1]
+        return zip, real name, confidence [0..1]
+        or None,None,0
         """
+        retVal = None,None,0.
         
         if isinstance(zip, int):
             zip = "%05d" % zip
@@ -583,18 +590,20 @@ class Cities:
         try:
             listSlug = self.zipToSlug[zip]
         except KeyError:
-            return 0.
+            return retVal
             
         strCityName = simpleString( strCityName )
         for k in listSlug:
             city = self.cityPerSlug[k]
-            if strCityName in city[2]:
-                rDiff = abs(len(city[2])-len(strCityName)) / max(len(city[2]),len(strCityName))# on aurait pu faire une distance de Levenstein
-                # rDiff can be from 1 to 0
+            if strCityName in city[2]: # look in simplename
+                sumLen = len(city[2]) + len(strCityName) # or max des 2, ca se discute
+                rDiff = abs(len(city[2])-len(strCityName)) / sumLen # on aurait pu faire une distance de Levenstein
+                # rDiff can be from 0 to nearly 1
                 rConfidence = 1. - rDiff
-                print("DBG: isValidAdress: %s and %s, rConfidence: %.2f" % (zip, strCityName, rConfidence) )
-                return rConfidence
-        return 0.
+                
+                print("DBG: isValidAdress: %s and %s => %s: %s, rConfidence: %.2f" % (zip, strCityName, zip, city[2], rConfidence) )
+                return zip, city[2], rConfidence
+        return retVal
         
     def distTwoZip(self,zip1,zip2,bVerbose=False):
         c1 = self.findByZip(zip1)
@@ -952,10 +961,11 @@ def autotest_cities():
     assert_diff(dist,760,20)      
     
     
-    assert_diff(cities.isValidAdress( "34440","colombier"),0.9)
-    assert_diff(cities.isValidAdress( "34440","colom"),0.5)
-    assert_diff(cities.isValidAdress( "34440","nissa"),0.26)
-    
+    assert_diff(cities.isValidAdress( "34440","colombier")[2],0.95)
+    assert_diff(cities.isValidAdress( "34440","colom")[2],0.67)
+    assert_diff(cities.isValidAdress( "34440","nissa")[2],0.42)
+    assert_diff(cities.isValidAdress( "34440","a")[2],0.1)
+    assert_diff(cities.isValidAdress( "34440","y")[2],0.)    
     
     timeBegin = time.time()
     for i in range(100):

@@ -207,7 +207,7 @@ def loadListUnivercityCity():
     
 
 def removeAccent( c ):
-    acc="ÉÈÎâàçéêëèîïôûüùŷÿ"
+    acc="ÉÈÎâàçéêëèîïôûüùŷÿ" # TODO A avec accent
     noacc="EEIaaceeeeiiouuuyy"
     #~ idx=acc.find(c) # in python 2.7: UnicodeDecodeError: 'ascii' codec can't decode byte 0xc3 in position 0: ordinal not in range(128) // ord(value) was 233
     #~ if idx != -1:
@@ -285,6 +285,14 @@ def removeAccent( c ):
     elif ord(c) == 195 or ord(c) == 197:
         # mark of char on two chars at ovh, don't complain
         c = ""
+    elif ord(c) == 8211 or ord(c) == 8212:
+        # custom hyphen
+        c = "-"
+    elif ord(c) == 8216 or ord(c) == 8217:
+        # type de '
+        c = "'"
+    elif ord(c) == 8230:
+        c = "..."
     else:
         try:
             print("DBG: removeAccent: not found: %c (%s)" % (c,ord(c) ))
@@ -316,7 +324,10 @@ class Cities:
         self.dictCities = {} # city per zip (zip as a string, could start with unsignifiant 00 )=> (strDept,strZip,strCity Slug,strCity Real (including casse),float(strLong),float(strLat))
         self.dupCityPerZip = {} # some cities have same zip, so we store for each overwritten city slug their zip
         self.dupZipPerZip = {} # some zip are for the same cities, we store them here alternateZip => Zip
-        self.cacheLastFindByRealName = (0,0,0) # city, partof, result of last research
+        self.cacheLastFindByRealName = (None,None,None) # city, partof, result of last research
+        
+        # refactor:
+        self.cityPerSlug = {} # assume slug is unique, so we have a dict with one element per city
         
     def load(self):
         print("INF: Cities: loading city data...")
@@ -583,12 +594,13 @@ def autotest_cities():
     for i in range(100):
         # en mettre plusieurs différent permet de zapper le cache
         cities.findByRealName("ozan") # le premier
-        cities.findByRealName("oeuf-en-ternois")
+        cities.findByRealName("st-pierre-et-miquelon") # le dernier
         cities.findByRealName("paris")
         cities.findByRealName("marseille")
         cities.findByRealName("zanzibar") # inconnu
     duration = time.time() - timeBegin
     print("INF: 500 tests: %.1fs (%.1fms/recherche)" % (duration,duration/0.5 ) )
+    # mstab7: 500 tests: 4.5s (9ms/recherche)
 
 def findNearestUniv( zip_host, cities, dictUniv ):
     """

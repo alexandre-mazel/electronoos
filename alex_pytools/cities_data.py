@@ -14,7 +14,7 @@ def assert_equal(a,b):
         print("(%s==%s) => NOT ok (type:%s and %s)" % (a,b,type(a),type(b)))
         assert(0)
 
-def assert_diff(a,b,diff):
+def assert_diff(a,b,diff=0.1):
     if abs(a-b)<diff:
         print("(%s diff %s < %s) => ok" % (a,b,diff))
     else:
@@ -354,7 +354,7 @@ class Cities:
         FindByRealName( city, bPartOf = True )
          
     2: Adress detection: give a zip and a city, it will validate it's really an adress, and can correct it.
-        correctAdress( zip, city ), return (zip,city,confidence) confidence of the right correction.
+        isValidAdress( zip, city ), return (zip,city,confidence) confidence of the right correction.
          
     3: Distance between two city: give two zip, it returns the distance
         distTwoZip( zip1, zip2 )
@@ -462,7 +462,7 @@ class Cities:
                 return None
                 
             if len(listSlug)>1:
-                self.warn("WRN: findByRealName: this city has different zip: %s" % (listSlug) )
+                self.warn("WRN: findByZip: this zip belongs to different cities: %s" % (listSlug) )
             k = listSlug[0]
             return self.cityPerSlug[k]
             
@@ -482,7 +482,19 @@ class Cities:
         """
         return the zip related to a city slug name
         """
-        strNormalisedCityName = strCityName.lower().replace('-', ' ')
+        
+        if 1:
+            # use hashed dict
+            strCityName = strCityName.lower()
+            try:
+                city = self.cityPerSlug[strCityName]
+                return city[1] # 1: get zip
+            except KeyError:
+                pass
+            return None
+
+            
+        strNormalisedCityName = strCityName.lower().replace('-', ' ') # WHY ? slugs have hyphens!
         for k,v in self.dictCities.items():
             #~ print(v[2])
             if v[2] == strNormalisedCityName or (bPartOf and strNormalisedCityName in v[2]):
@@ -531,7 +543,7 @@ class Cities:
             if len(listSlug)>1:
                 self.warn("WRN: findByRealName: this city has different zip: %s" % (listSlug) )
             k = listSlug[0]
-            return self.cityPerSlug[k][1] # get zip
+            return self.cityPerSlug[k][1] # 1: get zip
             
         strNormalisedCityName = cleanString(strCityName)
         for k,v in self.dictCities.items():
@@ -558,6 +570,31 @@ class Cities:
         if bVerbose: print("WRN: Cities.findByRealName: city '%s' not found (bPartOf:%d)" % (strCityName,bPartOf))
         self.cacheLastFindByRealName = (strCityName,bPartOf,-1)
         return -1
+        
+    def isValidAdress( self, zip, strCityName ):
+        """
+        is this zip correpond roughly to this city.
+        return matching [0..1]
+        """
+        
+        if isinstance(zip, int):
+            zip = "%05d" % zip
+            
+        try:
+            listSlug = self.zipToSlug[zip]
+        except KeyError:
+            return 0.
+            
+        strCityName = simpleString( strCityName )
+        for k in listSlug:
+            city = self.cityPerSlug[k]
+            if strCityName in city[2]:
+                rDiff = abs(len(city[2])-len(strCityName)) / max(len(city[2]),len(strCityName))# on aurait pu faire une distance de Levenstein
+                # rDiff can be from 1 to 0
+                rConfidence = 1. - rDiff
+                print("DBG: isValidAdress: %s and %s, rConfidence: %.2f" % (zip, strCityName, rConfidence) )
+                return rConfidence
+        return 0.
         
     def distTwoZip(self,zip1,zip2,bVerbose=False):
         c1 = self.findByZip(zip1)
@@ -639,123 +676,6 @@ class Cities:
 #~ Cities.getCityRealName = staticmethod(Cities.getCityRealName)
 
 
-
-def autotest_cities():
-    bUseHash = 1 # deactivate some test not working in previous version
-    
-    cities = Cities()
-    cities.load()
-    
-    assert_equal( cities.findByRealName("Besançon"), "25000" )
-    assert_equal( cities.findByRealName("Besancon"), "25000" )
-    assert_equal( cities.findByRealName("Saint-etienne"), "42001" )
-    assert_equal( cities.findByRealName("Orléans"), "45001" )
-    assert_equal( cities.findByRealName("Nancy"), "54100" )
-    retVal = cities.findByRealName("beaumont-pied-de-boeuf") # oe
-    assert( retVal in ["53290","72500"] ) 
-    assert_equal( cities.findByRealName("oeuf-en-ternois"), "62130" ) # oe en premier
-    assert_equal( cities.findByRealName("ANCY-sur-moselle"), "57130" ) 
-    if bUseHash:
-        assert_equal( cities.findByRealName("ANCY sur moselle"), "57130" ) # real name is ANCY-sur-moselle, et c'est dans dupCityPerZip, donc pas trouvé
-        assert_equal( cities.findByRealName("nissan lez enserune"),"34440")
-        assert_equal( cities.findByRealName("nissan", bPartOf=True),"11220") # Tournissan
-        assert_equal( cities.findByRealName("nissan lez", bPartOf=True),"34440") # Tournissan
-    
-
-    retVal = cities.findByZip("25000")
-    assert_equal( retVal[1], "25000" )
-
-    retVal = cities.findByZip("34400")
-    assert_equal( retVal[1], "34400" )
-    
-    retVal = cities.findByZip("75014")
-    assert_equal( retVal[1], "75001" )
-
-    retVal = cities.findByZip("94440")
-    assert_equal( retVal[1], "94440" )
-    
-    
-    for city in ["Nissan", "Colombiers","Paris"]:
-        retVal = cities.findBySlugName(city,bPartOf=True)
-        print("INF: find Slug'%s', return: %s" % (city,str(retVal) ) )
-        if retVal != -1:
-            print("detail: %s" % str(cities.findByZip(retVal)))
-        retVal = cities.findByRealName(city,bPartOf=False)
-        print("INF: find Real'%s', return: %s" % (city,str(retVal) ) )
-        if retVal != -1:
-            print("detail: %s" % str(cities.findByZip(retVal)))
-        print(""), 
-        
-        
-    assert_equal( cities.findBySlugName("velizy"), "455" )
-        
-    # bug dist bondy/velizy2
-    zip1 = cities.findByRealName("Bondy")
-    assert_equal(zip1,"93140")
-    #~ zip2 = cities.findByRealName("Vélizy")
-    zip2 = "78140"
-    dist = cities.distTwoZip(zip1,zip2,bVerbose=True)
-    assert_diff(dist,22,5)
-    
-    # bug Schiltigheim / parly
-    zip1 = cities.findByRealName("Schiltigheim")
-    assert_equal(zip1,"67300")
-    #~ zip2 = cities.findByRealName("Parly")
-    #~ zip2 = cities.findByRealName("Le Chesnay-Rocquencourt")
-    #~ assert_equal(zip2,"78150")
-    zip2 = "78150"
-    dist = cities.distTwoZip(zip1,zip2,bVerbose=True)
-    assert_diff(dist,397,20)
-    
-
-    dist = cities.distTwoZip("75006","34000",bVerbose=True)
-    assert_diff(dist,596,20)        
-
-    dist = cities.distTwoZip("33000","67000",bVerbose=True)
-    assert_diff(dist,760,20)      
-    
-    timeBegin = time.time()
-    for i in range(100):
-        # en mettre plusieurs différent permet de zapper le cache
-        cities.findByRealName("ozan") # le premier
-        cities.findByRealName("st-pierre-et-miquelon") # le dernier
-        cities.findByRealName("paris")
-        cities.findByRealName("marseille")
-        cities.findByRealName("zanzibar") # inconnu
-    duration = time.time() - timeBegin
-    print("INF: 1: 500 tests: %.1fs (%.1fms/recherche)" % (duration,duration/0.5 ) )
-    # mstab7: 500 tests: 4.5s (9ms/recherche)
-    # mstab7: passage au slugToZip:
-    # 500 tests: 0.0s (0.0ms/recherche)
-    
-    timeBegin = time.time()
-    for i in range(100):
-        # en mettre plusieurs différent permet de zapper le cache
-        cities.findByRealName("oza", bPartOf=1) # le premier
-        cities.findByRealName("st-pierre-et-", bPartOf=1) # le dernier
-        cities.findByRealName("pari", bPartOf=1)
-        cities.findByRealName("marseill", bPartOf=1)
-        cities.findByRealName("zanzibar" , bPartOf=1) # inconnu
-    duration = time.time() - timeBegin
-    print("INF: 2: 500 tests: %.1fs (%.1fms/recherche)" % (duration,duration/0.5 ) )
-    # mstab7: 500 tests: 4.9s (9.8ms/recherche)
-    # mstab7: passage au slugToZip
-    # 500 tests: 0.7s (1.3ms/recherche)
-    
-    timeBegin = time.time()
-    for i in range(100):
-        # zip equally repartited
-        retVal = cities.findByZip("10000")
-        retVal = cities.findByZip("34440")
-        retVal = cities.findByZip("54000")
-        retVal = cities.findByZip("75014")
-        retVal = cities.findByZip("94270")
-        
-    duration = time.time() - timeBegin
-    print("INF: 2: 500 tests: %.1fs (%.1fms/recherche)" % (duration,duration/0.5 ) )
-    # mstab7: 500 tests: 0.0s (0.0ms/recherche)
-    # mstab7: passage au slugToZip (vaguement moins avantageux car on perd la recherche dans un dico en direct) (indirection)
-    # 500 tests: 0.0s (0.0ms/recherche)
 
 def findNearestUniv( zip_host, cities, dictUniv ):
     """
@@ -952,6 +872,135 @@ def statByRegion(bOutputHtml=False):
     cnx = xeniadb.connect()
     generateStatHousing(cnx,bOutputHtml=bOutputHtml)
     cnx.close()
+    
+    
+
+
+def autotest_cities():
+    bUseHash = 1 # deactivate some test not working in previous version
+    
+    cities = Cities()
+    cities.load()
+    
+    assert_equal( cities.findByRealName("Besançon"), "25000" )
+    assert_equal( cities.findByRealName("Besancon"), "25000" )
+    assert_equal( cities.findByRealName("Saint-etienne"), "42001" )
+    assert_equal( cities.findByRealName("Orléans"), "45001" )
+    assert_equal( cities.findByRealName("Nancy"), "54100" )
+    retVal = cities.findByRealName("beaumont-pied-de-boeuf") # oe
+    assert( retVal in ["53290","72500"] ) 
+    assert_equal( cities.findByRealName("oeuf-en-ternois"), "62130" ) # oe en premier
+    assert_equal( cities.findByRealName("ANCY-sur-moselle"), "57130" ) 
+    if bUseHash:
+        assert_equal( cities.findByRealName("ANCY sur moselle"), "57130" ) # real name is ANCY-sur-moselle, et c'est dans dupCityPerZip, donc pas trouvé
+        assert_equal( cities.findByRealName("nissan lez enserune"),"34440")
+        assert_equal( cities.findByRealName("nissan", bPartOf=True),"11220") # Tournissan
+        assert_equal( cities.findByRealName("nissan lez", bPartOf=True),"34440") # Tournissan
+    
+
+    retVal = cities.findByZip("25000")
+    assert_equal( retVal[1], "25000" )
+
+    retVal = cities.findByZip("34400")
+    assert_equal( retVal[1], "34400" )
+    
+    retVal = cities.findByZip("75014")
+    assert_equal( retVal[1], "75001" )
+
+    retVal = cities.findByZip("94440")
+    assert_equal( retVal[1], "94440" )
+    
+    
+    for city in ["Nissan", "Colombiers","Paris"]:
+        retVal = cities.findBySlugName(city,bPartOf=True)
+        print("INF: autotest: find Slug '%s', return: %s" % (city,str(retVal) ) )
+        if retVal != -1:
+            print("INF: autotest: detail: %s" % str(cities.findByZip(retVal)))
+        retVal = cities.findByRealName(city,bPartOf=False)
+        print("INF: autotest: find Real '%s', return: %s" % (city,str(retVal) ) )
+        if retVal != -1:
+            print("INF: autotest: detail: %s" % str(cities.findByZip(retVal)))
+        print(""), 
+        
+        
+    assert_equal( cities.findBySlugName("Paris"), "75001" )
+    assert_equal( cities.findBySlugName("tremblay-sur-mauldre"), "78490" )
+        
+    # bug dist bondy/velizy2
+    zip1 = cities.findByRealName("Bondy")
+    assert_equal(zip1,"93140")
+    #~ zip2 = cities.findByRealName("Vélizy")
+    zip2 = "78140"
+    dist = cities.distTwoZip(zip1,zip2,bVerbose=True)
+    assert_diff(dist,22,5)
+    
+    # bug Schiltigheim / parly
+    zip1 = cities.findByRealName("Schiltigheim")
+    assert_equal(zip1,"67300")
+    #~ zip2 = cities.findByRealName("Parly")
+    #~ zip2 = cities.findByRealName("Le Chesnay-Rocquencourt")
+    #~ assert_equal(zip2,"78150")
+    zip2 = "78150"
+    dist = cities.distTwoZip(zip1,zip2,bVerbose=True)
+    assert_diff(dist,397,20)
+    
+
+    dist = cities.distTwoZip("75006","34000",bVerbose=True)
+    assert_diff(dist,596,20)        
+
+    dist = cities.distTwoZip("33000","67000",bVerbose=True)
+    assert_diff(dist,760,20)      
+    
+    
+    assert_diff(cities.isValidAdress( "34440","colombier"),0.9)
+    assert_diff(cities.isValidAdress( "34440","colom"),0.5)
+    assert_diff(cities.isValidAdress( "34440","nissa"),0.26)
+    
+    
+    timeBegin = time.time()
+    for i in range(100):
+        # en mettre plusieurs différent permet de zapper le cache
+        cities.findByRealName("ozan") # le premier
+        cities.findByRealName("st-pierre-et-miquelon") # le dernier
+        cities.findByRealName("paris")
+        cities.findByRealName("marseille")
+        cities.findByRealName("zanzibar") # inconnu
+    duration = time.time() - timeBegin
+    print("INF: 1: 500 tests: %.1fs (%.1fms/recherche)" % (duration,duration/0.5 ) )
+    # mstab7: 500 tests: 4.5s (9ms/recherche)
+    # mstab7: passage au slugToZip:
+    # 500 tests: 0.0s (0.0ms/recherche)
+    
+    timeBegin = time.time()
+    for i in range(100):
+        # en mettre plusieurs différent permet de zapper le cache
+        cities.findByRealName("oza", bPartOf=1) # le premier
+        cities.findByRealName("st-pierre-et-", bPartOf=1) # le dernier
+        cities.findByRealName("pari", bPartOf=1)
+        cities.findByRealName("marseill", bPartOf=1)
+        cities.findByRealName("zanzibar" , bPartOf=1) # inconnu
+    duration = time.time() - timeBegin
+    print("INF: 2: 500 tests: %.1fs (%.1fms/recherche)" % (duration,duration/0.5 ) )
+    # mstab7: 500 tests: 4.9s (9.8ms/recherche)
+    # mstab7: passage au slugToZip
+    # 500 tests: 0.7s (1.3ms/recherche)
+    
+    timeBegin = time.time()
+    for i in range(100):
+        # zip equally repartited
+        retVal = cities.findByZip("10000")
+        retVal = cities.findByZip("34440")
+        retVal = cities.findByZip("54000")
+        retVal = cities.findByZip("75014")
+        retVal = cities.findByZip("94270")
+        
+    duration = time.time() - timeBegin
+    print("INF: 2: 500 tests: %.1fs (%.1fms/recherche)" % (duration,duration/0.5 ) )
+    # mstab7: 500 tests: 0.0s (0.0ms/recherche)
+    # mstab7: passage au slugToZip (vaguement moins avantageux car on perd la recherche dans un dico en direct) (indirection)
+    # 500 tests: 0.0s (0.0ms/recherche)
+    
+# autotest - end
     
 if __name__ == "__main__":
     if 1:

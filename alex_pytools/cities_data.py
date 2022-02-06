@@ -371,6 +371,7 @@ class Cities:
         self.cacheLastFindByRealName = (None,None,None) # city, partof, result of last research
         
         # refactor
+        self.bEnableHash = 1
         #  assume slug is unique, so we have a dict with one element per city 
         # for each slug: (strDept,strZip,strCitySimple,strCityReal,float(strLong),float(strLat))
         self.cityPerSlug = {}
@@ -409,11 +410,12 @@ class Cities:
             strLat = fields[20]
             if bVerbose: print("strDept: %s, strZip: %s, strCity: %s, strLong: %s, strLat: %s" % (strDept,strZip,strCitySlug,strLong,strLat) ) 
             
-            listZips = []
-            if "-" not in strZip:
-                listZips.append(strZip)
-            else:
-                listZips = strZip.split('-')
+            if self.bEnableHash:
+                listZips = []
+                if "-" not in strZip:
+                    listZips.append(strZip)
+                else:
+                    listZips = strZip.split('-')
                 
             if "-" in strZip:
                 strAllZip = strZip.split('-')
@@ -428,12 +430,13 @@ class Cities:
                 self.dupCityPerZip[self.dictCities[strZip][2]] = strZip
                 pass
             self.dictCities[strZip] = (strDept,strZip,strCitySlug,strCityReal,float(strLong),float(strLat))
-            # refactor
-            self.cityPerSlug[strCitySlug] = (strDept,strZip,strCitySimple,strCityReal,float(strLong),float(strLat))
-            for z in listZips:
-                appendToDict(self.zipToSlug, z,strCitySlug)
-            appendToDict(self.realNameToSlug, strCityReal,strCitySlug)
-            appendToDict(self.simpleNameToSlug, strCitySimple,strCitySlug)
+            
+            if self.bEnableHash:
+                self.cityPerSlug[strCitySlug] = (strDept,strZip,strCitySimple,strCityReal,float(strLong),float(strLat))
+                for z in listZips:
+                    appendToDict(self.zipToSlug, z,strCitySlug)
+                appendToDict(self.realNameToSlug, strCityReal,strCitySlug)
+                appendToDict(self.simpleNameToSlug, strCitySimple,strCitySlug)
         if bVerbose: 
             print("DBG: self.dupZipPerZip: %s" % str(self.dupZipPerZip))
             print("DBG: self.dupCityPerZip: %s" % str(self.dupCityPerZip))
@@ -459,7 +462,7 @@ class Cities:
         if isinstance(zip, int):
             zip = "%05d" % zip
             
-        if 1:
+        if self.bEnableHash:
             # use hashed dict
             try:
                 listSlug = self.zipToSlug[zip]
@@ -488,7 +491,7 @@ class Cities:
         return the zip related to a city slug name
         """
         
-        if 1:
+        if self.bEnableHash:
             # use hashed dict
             strCityName = strCityName.lower()
             try:
@@ -526,7 +529,7 @@ class Cities:
         if self.cacheLastFindByRealName[0] == strCityName and self.cacheLastFindByRealName[1] == bPartOf:
             return self.cacheLastFindByRealName[2]
             
-        if 1:
+        if self.bEnableHash:
             # use hashed dict
             try:
                 listSlug = self.realNameToSlug[strCityName]
@@ -671,6 +674,11 @@ class Cities:
         return all loaded cities  (including the dupped) as a list of list city,cp,long,lat
         """
         listAll = []
+        if self.bEnableHash:
+            for k,v in self.cityPerSlug.items():
+                listAll.append([ v[3],v[1],v[4],v[5] ])       
+            return listAll
+
         for k,v in self.dictCities.items():
             listAll.append([ v[3],v[0],v[4],v[5] ])
         for k,v in self.dupCityPerZip.items():

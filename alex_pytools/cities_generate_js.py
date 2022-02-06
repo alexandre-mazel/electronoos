@@ -3,6 +3,7 @@
 # generate a javascript list of cities
 
 import cities_data
+import stringtools
 
 cities = cities_data.Cities()
 cities.load()
@@ -15,10 +16,16 @@ if 0:
         txt += '"%s",' % city
     txt += "];"
 else:
+    # city, cp, long, lat
     allcities=cities.getAllRealCitiesAndDatas()
     txt = "citiesAndDatas=["
-    for city in allcities:
-        txt += '%s,' % city
+    for datas in allcities:
+        # change t'on les accents en &eacute; oui.
+        if 1:
+            city, cp, long, lat = datas
+            city=stringtools.accentToHtml(city)
+            datas = [city, cp, long, lat]
+        txt += '%s,' % str(datas)
     txt += "];"
     
 output = "generated.js"

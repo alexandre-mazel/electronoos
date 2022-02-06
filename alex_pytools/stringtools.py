@@ -61,6 +61,54 @@ def timeCompareSubString(nTimes):
             out = re.search(ss + "(.*?)" + se, s).group(1)
         duration = time.time()-timeBegin
         print("RE: %5.3fs" % duration )    
+        
+        
+accToHtml = [
+                ["á","aacute"],
+                ["à","agrave"],
+                ["â","acirc"],
+                ["ä","auml"],
+                ["ã","atilde"],
+                ["å","aring"],
+
+                ["é","eacute"],
+                ["è","egrave"],
+                ["ê","ecirc"],
+                ["ë","euml"],
+
+                ["í","iacute"],
+                ["ì","igrave"],
+                ["î","icirc"],
+                ["ï","iuml"],
+
+                ["ó","oacute"],
+                ["ò","ograve"],
+                ["ô","ocirc"],
+                ["ö","ouml"],
+
+                ["ú","uacute"],
+                ["ù","ugrave"],
+                ["û","ucirc"],
+                ["ü","uuml"],                    
+            ]
+            
+def accentToHtml(s):
+    """
+    change a string to the same with accent transformed to html
+    """
+
+                
+    #~ for c in s:
+        #~ print("%s %d" % (c,ord(c)) )
+
+        
+    for acc,norm in accToHtml:
+        #~ print("acc: %s %d" % (acc,ord(acc)) )
+        s = s.replace(acc,"&"+norm+";")
+        #s = s.replace(acc.decode('cp1252').encode('utf-8'),norm) # as this source ile is ascii encoded
+        
+    #~ print("killAccent: return: %s" % s )
+    return s
 
 if __name__ == "__main__":
     #~ timeCompareSubString(1000)
@@ -69,3 +117,4 @@ if __name__ == "__main__":
     assert_equal(findSubString("Alexandre est content oui", "content ", "blabla"), "oui")
 
     assert_equal(findSubString("Alexandre est content", "Alexandre "), "est content")
+    assert_equal(accentToHtml("Un élève épatant à Noël"), "Un &eacute;l&egrave;ve &eacute;patant &agrave; No&euml;l")

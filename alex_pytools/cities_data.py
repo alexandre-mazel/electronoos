@@ -462,6 +462,9 @@ class Cities:
         if isinstance(zip, int):
             zip = "%05d" % zip
             
+        if zip == "75000":
+            zip = "75001"
+            
         if self.bEnableHash:
             # use hashed dict
             try:

@@ -464,6 +464,14 @@ class Cities:
             
         if zip == "75000":
             zip = "75001"
+        elif zip == "69000":
+            zip = "69001"
+        elif zip == "31000":
+            zip = "31100"
+        elif isBigCityZip(zip):
+            newzip = "%05d" % (int(zip)+1)
+            print("DBG: findByZip: changing zip %s to %s" % (zip,newzip) )
+            zip = newzip
             
         if self.bEnableHash:
             # use hashed dict
@@ -614,6 +622,14 @@ class Cities:
     def distTwoZip(self,zip1,zip2,bVerbose=False):
         c1 = self.findByZip(zip1)
         c2 = self.findByZip(zip2)
+        if c1 == None:
+            print("WRN: distTwoZip: zip1 '%s' not found" % zip1)
+            assert(0)
+            return 99999
+        if c2 == None:
+            print("WRN: distTwoZip: zip2 '%s' not found" % zip2)
+            assert(0)
+            return 99999
         if bVerbose: print("DBG: distTwoZip: ville 1: %s" % str(c1) )
         if bVerbose: print("DBG: distTwoZip: ville 1: long: %.3f, lat: %.3f" % (c1[4],c1[5]) )
         if bVerbose: print("DBG: distTwoZip: ville 2: %s" % str(c2) )
@@ -853,28 +869,35 @@ def generateStatHousing( cnx, bOutputHtml ):
 # generateStatHousing - end
 
 
+bigCityZip = [
+                    ("Paris", "75000"),
+                    ( "Marseille", "13000"), 
+                    ( "Lyon", "69000"), 
+                    ( "Toulouse","31000"), 
+                    ( "Nice","06000"), 
+                    ( "Nantes","44000"), 
+                    ( "Montpellier","34000"), 
+                    ( "Strasbourg","67000"), 
+                    ( "Bordeaux","33000"), 
+                    ( "Lille", "59000"), 
+                ]
+                
 def bigCityToZip( strCity ):
     """
     return the generic zip of big cities
     """
-    cityzip = [
-                        ("Paris", "75000"),
-                        ( "Marseille", "13000"), 
-                        ( "Lyon", "69000"), 
-                        ( "Toulouse","31000"), 
-                        ( "Nice","06000"), 
-                        ( "Nantes","44000"), 
-                        ( "Montpellier","34000"), 
-                        ( "Strasbourg","67000"), 
-                        ( "Bordeaux","33000"), 
-                        ( "Lille", "59000"), 
-                    ]
-    for i in range(len(cityzip)):
-        if cityzip[i][0].lower() == strCity.lower():
-            return cityzip[i][1]
+    for i in range(len(bigCityZip)):
+        if bigCityZip[i][0].lower() == strCity.lower():
+            return bigCityZip[i][1]
     print("ERR: cities_data.bigCityToZip: '%s' not found" % strCity )
     assert(1)
     return "-1"
+    
+def isBigCityZip(zip):
+    for city,zipbig in bigCityZip:
+        if zip == zipbig:
+            return 1
+    return 0
     
 if 0:
     cities = Cities()
@@ -1006,6 +1029,18 @@ def autotest_cities():
     # mstab7: passage au slugToZip
     # 500 tests: 0.7s (1.3ms/recherche)
     
+    retVal = cities.findByZip("06000")
+    assert_equal(retVal[1],"06001")
+
+    retVal = cities.findByZip("06000")
+    assert_equal(retVal[1],"06001")
+    
+    retVal = cities.findByZip("56000")
+    assert_equal(retVal[1],"56000")
+
+    retVal = cities.findByZip("69000")
+    assert_equal(retVal[1],"69001")
+    
     timeBegin = time.time()
     for i in range(100):
         # zip equally repartited
@@ -1020,6 +1055,9 @@ def autotest_cities():
     # mstab7: 500 tests: 0.0s (0.0ms/recherche)
     # mstab7: passage au slugToZip (vaguement moins avantageux car on perd la recherche dans un dico en direct) (indirection)
     # 500 tests: 0.0s (0.0ms/recherche)
+    
+    assert_equal(isBigCityZip("67000"),1)
+    assert_equal(isBigCityZip("34440"),0)
     
 # autotest - end
     

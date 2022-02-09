@@ -148,7 +148,7 @@ class FaceTracker:
             cv2_tools.drawHighligthedText(im, "look: %d" % self.nImageLookingAt, (30,90))
             
             
-            im = cv2.resize(im,(0,0),fx=3,fy=3)
+            im = cv2.resize(im,(0,0),fx=2,fy=2)
             cv2.imshow("FaceTracker",im)
             key=cv2.waitKey(1) # time for image to refresh even if continuously pressing a key
             key=cv2.waitKey(0)
@@ -188,7 +188,7 @@ def analyseFolder(folder):
     #~ bSpeedTest = 1
     
     bRenderDebug = 0
-    #~ bRenderDebug = 1
+    bRenderDebug = 1
     
     
     timeBegin = time.time()
@@ -229,6 +229,21 @@ def analyseFolder(folder):
     nImageWithFace : 7139 ( 38.1%)
     nImageLookingAt: 1644 (  8.8%) ( 23.0%)
     """
+
+    #######################    
+    # pitie5
+    idx = 0
+    idx = 2985 # regard en coin
+    idx = 3019 # autre regard en coin
+    
+    # result on all images:
+    """
+    nImageAnalysed : 7203
+    nImageWithFace : 1306 ( 18.1%)
+    nImageLookingAt: 3 (  0.0%) (  0.2%)
+    """
+
+
     
     
     if bSpeedTest: idx = 0
@@ -306,7 +321,7 @@ def analyseMovie():
     pass
     
 if os.name == "nt":
-    strPath = "d:/pitie4/"
+    strPath = "d:/pitie5/"
 else:
     strPath = os.path.expanduser("~/pitie4/")
 analyseFolder(strPath)

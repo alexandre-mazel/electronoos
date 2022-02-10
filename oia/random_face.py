@@ -46,6 +46,7 @@ class FaceDetector:
 
 #~ class FaceDetector - end
 
+
 fd =FaceDetector()
 cpt = 0
 cpt_found = 0

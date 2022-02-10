@@ -9,7 +9,7 @@ scp -r C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/breath* nao@192.168.0.:/hom
 scp -r C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut* nao@192.168.0.:/home/nao/
 scp d:/Python38-32/Lib/site-packages/opensimplex/*.py nao@192.168.0.:/home/nao/.local/lib/python2.7/site-packages/
 
-scp -pw nao C:/Users/alexa/dev/git/electronoos/scripts/rav*.py nao@192.168.1.211:/home/nao/dev/git/electronoos/scripts/
+scp C:/Users/alexa/dev/git/electronoos/scripts/rav*.py nao@192.168.1.211:/home/nao/dev/git/electronoos/scripts/
 
 Currently I'm inserting a silence at the beginning of each breath:
 sound_processing:
@@ -72,12 +72,25 @@ def updateHipRoll(motion):
     rPos = noise.getSimplexNoise(time.time()*0.3)*0.1
     #~ print("%s: DBG: hiproll: apres noise, avant angle" % str(time.time()) )
     #~ rTime = random.random()*3+0.6
+    rMax = 0.3
+    if rPos > rMax:
+        rPos = rMax
+    elif rPos < -rMax:
+        rPos = -rMax
     rSpeed = random.random()*0.1
     #~ motion.post.angleInterpolation( "HipRoll", rPos, rTime, True ) # NB: LE POSTE NE POST PAS (pb a cause du meme proxy utilisé en meme temps???)
     motion.setAngles( "HipRoll", rPos, rSpeed )
     #~ print("%s: DBG: hiproll: apres angle posted" % str(time.time()) )
     print("DBG: updateHipRoll sent at %5.2fs" % time.time() )
     global_lastTimeUpdateHipRoll = time.time()
+    
+def resetHipRoll(motion):
+    rPos = 0
+    rSpeed = 0.1
+    motion.setAngles( "HipRoll", rPos, rSpeed )
+    global_lastTimeUpdateHipRoll = time.time()+10 # empeche de re-hiproller en random pendant une phrase a venir
+    while abs(motion.getAngles( "HipRoll",1)[0])>0.1:
+        time.sleep(0.1) # wait for setAngles to finish 
 
 class Breather:
     kStateIdle = 0
@@ -343,6 +356,7 @@ class Breather:
                     
             if self.strFilenameToSay != "" and self.nState != self.kStateSpeak:
                 self.updateHeadLook(0)
+                if self.motion: resetHipRoll(self.motion)
                 if self.rFullnessToSay < self.rFullness:
                     self.nState = Breather.kStateSpeak
                 else:
@@ -405,6 +419,7 @@ class Breather:
                 sound_player.soundPlayer.stopAll()
                 if self.leds: self.leds.fadeRGB("FaceLeds", 0x0000FF, 0.00)
                 self.updateHeadLook(0)
+                if self.motion: resetHipRoll(self.motion)
                 sound_player.soundPlayer.playFile(self.strFilenameToSay, bWaitEnd=False)
                 #~ if self.motion != None:
                     #~ rTimeEstim = self.rTimeSpeak
@@ -737,6 +752,7 @@ class Perliner:
                     
             if self.strFilenameToSay != "" and self.nState != self.kStateSpeak:
                 self.updateHeadLook(0)
+                if self.motion: resetHipRoll(self.motion)
                 self.nState = Perliner.kStateSpeak
             
         if self.nState != nPrevState:
@@ -758,6 +774,7 @@ class Perliner:
                 sound_player.soundPlayer.stopAll()
                 if self.leds: self.leds.fadeRGB("FaceLeds", 0x0000FF, 0.00)
                 self.updateHeadLook(0)
+                if self.motion: resetHipRoll(self.motion)
                 sound_player.soundPlayer.playFile(self.strFilenameToSay, bWaitEnd=False)
                 #~ if self.motion != None:
                     #~ rTimeEstim = self.rTimeSpeak
@@ -1239,6 +1256,8 @@ def expe( nMode = 1 ):
     animator = aAnimators[nAnimatorIdx]
         
     animator.motion.killAll();
+    time.sleep(0.3)
+    resetHipRoll(animator.motion)
     
     leds = None
     try:

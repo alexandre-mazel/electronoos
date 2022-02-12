@@ -50,8 +50,12 @@ def generate_inkdrop(w, h, nbrplane=3, nbrColor = 256, bMirror = 0):
         x = np.random.randint(w)
         y = np.random.randint(h)
         r = np.random.randint(w/16)
+        if np.random.random() > 0.4:
+            r //= 2 # on veut plus de petites
+        if r<1:
+            r = 1
         color = (0,0,0)
-        if nbrplane>1 and 1:
+        if nbrplane>1:
             color_r,g,b=0,0,0
             if np.random.random()>0.5:color_r=255
             if np.random.random()>0.5:g=255
@@ -67,7 +71,7 @@ def generate_inkdrop(w, h, nbrplane=3, nbrColor = 256, bMirror = 0):
             cv2.circle(im,(dx,dy),r,color,-1)
         len_radiance = int(r/(np.random.randint(3)+np.random.randint(2)+1))
         len_radiance = 30
-        nbr_radiance = np.random.randint(4)+12
+        nbr_radiance = np.random.randint(14)+7 # was (4)+12
         rr = int(r/20)
         if rr > 0:
             for j in range(nbr_radiance):
@@ -124,6 +128,21 @@ def generate_inkdrop(w, h, nbrplane=3, nbrColor = 256, bMirror = 0):
                         yt = y + int( (k+offset+r) * math.sin(angle) )
                         cv2.circle(im,(xt,yt),int(rrt),color,-1)
                 
+    # pleins de petite taches simples
+    nbr_circle = w//12
+    for i in range(nbr_circle):
+        x = np.random.randint(w)
+        y = np.random.randint(h)
+        r = np.random.randint(6)+1
+        color = (0,0,0)
+        if nbrplane>1:
+            color_r,g,b=0,0,0
+            if np.random.random()>0.5:color_r=255
+            if np.random.random()>0.5:g=255
+            if np.random.random()>0.5:b=255
+            color = (color_r,g,b)
+        cv2.circle(im,(x,y),r,color,-1)
+        
     
     if bMirror:
         # mirror vertic
@@ -186,8 +205,9 @@ while 1:
         im = generate_random_img(60,120,1) # 120,000 images => rien (61.6fps)
     elif 1:
         #~ im = generate_raindrop(320,480)
-        im = generate_inkdrop(1280,900)
-        #~ im = generate_inkdrop(320,480,bMirror=1)
+        #~ im = generate_inkdrop(1280,900)
+        im = generate_inkdrop(1280,900,nbrplane=1)
+        #~ im = generate_inkdrop(320,480,nbrplane=1,bMirror=1)
         #~ im = cv2.resize(im,(0,0),fx=2,fy=2)
         
         cv2.imshow("random img", im)

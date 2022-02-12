@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+import math
 import time
 
 import sys
@@ -35,6 +36,89 @@ def generate_raindrop(w, h, nbrplane=1, nbrColor = 256):
         ret,im = cv2.threshold(im,100,255,cv2.THRESH_BINARY)
         
     im = 255-im
+    return im
+    
+def generate_inkdrop(w, h, nbrplane=1, nbrColor = 256):
+    im = np.zeros((h,w,nbrplane), dtype=np.uint8)
+    im[:] = 255
+    
+    nbr_circle = np.random.randint(w/10)
+    #~ nbr_circle = 4
+    listTaches = [] # x,y,r
+    for i in range(nbr_circle):
+        x = np.random.randint(w)
+        y = np.random.randint(h)
+        r = np.random.randint(w/10)
+        listTaches.append((x,y,r))
+        cv2.circle(im,(x,y),r,(0,0,0),-1)
+        if 1:
+            # deforme le rond
+            dx = x + np.random.randint(7)-3
+            dy = y + np.random.randint(7)-3
+            cv2.circle(im,(dx,dy),r,(0,0,0),-1)
+        len_radiance = int(r/(np.random.randint(3)+np.random.randint(2)+1))
+        len_radiance = 30
+        nbr_radiance = np.random.randint(4)+12
+        rr = int(r/20)
+        if rr > 0:
+            for j in range(nbr_radiance):
+                angle = j*2*math.pi/nbr_radiance
+                rrt = rr
+                for k in range(len_radiance+1):
+
+                    angle += (np.random.random()-0.5)/20.
+                    xr = x + int( (k+r) * math.cos(angle) )
+                    yr = y + int( (k+r) * math.sin(angle) )
+                    #~ rrt = rr
+                    #~ if k == len_radiance and 0:
+                        #~ rrt = int(rrt*1.3)
+                    #~ else:
+                        #~ rrt = rr+np.random.randint(4)
+                    rrt += np.random.randint(4) - 2 # decrease little by little
+                    if rrt< 1:
+                        continue
+                    cv2.circle(im,(xr,yr),rrt,(0,0,0),-1)
+                    # 
+                if 0:
+                    # lissage des 2 cercles
+                    for angle_offset in [-0.2,+0.2]:
+                        anglel = angle+angle_offset
+                        xrl = x + int( (len_radiance+r-rr*0.) * math.cos(anglel) )
+                        yrl = y + int( (len_radiance+r-rr*0.) * math.sin(anglel) )
+                        cv2.circle(im,(xrl,yrl),int(rr/2),(0,0,0),-1)
+                        
+
+    if 1:
+        im = 255-im
+        kernel = np.ones((5, 5), 'uint8')
+        im = cv2.dilate(im, kernel, iterations=1)
+        im = 255-im
+        
+    # apres le dilate on ajoute des projections
+    for (x,y,r) in listTaches:
+        if 1:
+            # fines projections autour de la tache
+            if r>10:
+                for j in range(np.random.randint(8)+2):
+                    angle = np.random.randint(360)
+                    lent = np.random.randint(40)
+                    offset = r+np.random.randint(8)
+                    rrt = np.random.randint(2)+1
+                    rrt_inc = (np.random.randint(11)-5)/10
+                    #~ rrt_inc = 0
+                    for k in range(lent):
+                        if k%3==0:
+                            rrt += rrt_inc
+                        if rrt < 1:
+                            break
+                        xt = x + int( (k+offset+r) * math.cos(angle) )
+                        yt = y + int( (k+offset+r) * math.sin(angle) )
+                        cv2.circle(im,(xt,yt),int(rrt),(0,0,0),-1)
+                
+    
+    if 0:
+        # mirror vertic
+        im[:,w//2:w] = im[:,w//2:0:-1]
     return im
 
 def generate_random_img(w, h, nbrplane=3, nbrColor = 256, bShow = 1):
@@ -91,10 +175,14 @@ while 1:
     if 0:
         #~ im = generate_random_img(640,480)
         im = generate_random_img(60,120,1) # 120,000 images => rien (61.6fps)
-    elif 0:
-        im = generate_raindrop(320,480)
+    elif 1:
+        #~ im = generate_raindrop(320,480)
+        im = generate_inkdrop(1280,900)
+        #~ im = generate_inkdrop(320,480)
+        #~ im = cv2.resize(im,(0,0),fx=2,fy=2)
+        
         cv2.imshow("random img", im)
-        if 1:
+        if 0:
             key = cv2.waitKey(1)
         else:
             key = cv2.waitKey(0)
@@ -105,7 +193,7 @@ while 1:
         im = cv2.resize(im,(0,0),fx=10,fy=10,interpolation = cv2.INTER_CUBIC ) # INTER_CUBIC, 
     
     #~ im = cv2.imread("../data/multiple_humans.jpg")
-    if 0:
+    if 1:
         # haarcascade
         faces = fd.detect(im)
         if len(faces)>0:
@@ -125,7 +213,7 @@ while 1:
             window_name = "faces %d!" % cpt
             cv2.imshow(window_name,im_to_render)
             cv2.moveWindow(window_name,128*(cpt_found%8),200)
-            cv2.waitKey(0)
+            cv2.waitKey(10)
             cpt_found += 1
     cpt += 1
     if (cpt%100)==0:

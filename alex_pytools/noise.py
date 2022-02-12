@@ -38,7 +38,7 @@ def getSimplexNoise(t,y=0):
     """
     # min and max seems to be limited from -0.864 to 0.864
     maxval = 0.865
-    import opensimplex
+    import opensimplex # pip install opensimplex
     #~ gen = opensimplex.OpenSimplex(sizegrid=sizegrid)
     global global_gen
     if global_gen == None: global_gen = opensimplex.OpenSimplex()
@@ -55,7 +55,7 @@ def generateImageSimplex(w,h,rZoom=1,sizegrid=256,offsetx=0,offsety=0):
     """
     # min and max seems to be limited from -0.864 to 0.864
     maxval = 0.865
-    import opensimplex
+    import opensimplex # from electronoos
     #~ gen = opensimplex.OpenSimplex(sizegrid=sizegrid)
     global global_gen
     if global_gen == None: global_gen = opensimplex.OpenSimplex()

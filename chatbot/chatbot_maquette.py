@@ -8,7 +8,7 @@ sys.path.append("../alex_pytools/" )
 import misctools
 import sound_processing
 sys.path.append("../../rounded-rects-pygame/" ) # for roundrects
-from roundrects import round_rect
+from roundrects import round_rect # cf le path append ligne du dessus
 from roundrects import aa_round_rect as round_rect
 
 import math
@@ -473,6 +473,7 @@ class Agent(object):
             astrAnswers[i] = splitTextMultiline(astrAnswers[i],12)
         self.astrAnswers = astrAnswers
         if strSound:
+            # human or robot_fx
             misctools.playWav("sounds/human/" + strSound + ".wav",bWaitEnd=False)
         
     def isSpeaking(self):
@@ -799,6 +800,9 @@ class Agent(object):
 
 
     def main_loop(self):
+        
+        bWriteDemoToDisk = 0
+        
         random.seed(1000) # tune to have a blink during the first question
         self.listQ = []
         #~ self.listQ.append(["C?", ["Oui", "bof", "Non", "car","or"]])
@@ -860,7 +864,8 @@ class Agent(object):
                 
                     
             nCptImageTotal += 1
-            if 1: # if (nCptImageTotal % (500*1000)) == 0 or 1:
+            
+            if bWriteDemoToDisk: # if (nCptImageTotal % (500*1000)) == 0 or 1:
                 #ffmpeg -r 10 -i %d.png -vcodec libx264 -b:v 4M -an test.mp4 # -an: no audio
                 #ffmpeg -r 60 -i "%d.png" -vf "fps=10,scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 123 output.gif
                 filename = "d:/images_generated/" + str(nCptImageTotal) + ".png"
@@ -875,7 +880,7 @@ class Agent(object):
                 
                 
         # while - end
-        if 1:
+        if bWriteDemoToDisk:
             # generate the sound
             sounds = []
             for s in self.listSound:

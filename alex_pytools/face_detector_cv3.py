@@ -76,6 +76,7 @@ class FaceDetector:
         """
         for oneres in res:
             startX, startY, endX, endY, confidence = oneres
+            print("DBG: render_res: confidence: %s" % confidence )
             col = color
             if confidence < 0.5:
                 col = (col[0]//2,col[1]//2,col[2]//2)
@@ -83,16 +84,18 @@ class FaceDetector:
                 col = (col[0]//2,col[1]//2,col[2]//2)
             if confidence < 0.14:
                 continue
-            cv2.rectangle(im, (startX,startY),(endX, endY),col)
+            cv2.rectangle( im, (startX,startY), (endX, endY), col )
             # etiquette and confidence
             cv2.rectangle(im,(startX, startY-14),(startX+40, startY), col, thickness=-1 )
             cv2.putText(im,"%.2f"%confidence,(startX+2, startY-2),cv2.FONT_HERSHEY_SIMPLEX, 0.5, color=(255,255,255), thickness = 1 )
         return im
         
     def detect( self, im, bRenderBox = True,confidence_threshold = 0.5 ):
+        if len(im.shape)==2 or im.shape[2] == 1: 
+            im = cv2.cvtColor(im, cv2.COLOR_GRAY2BGR)
         blob = cv2.dnn.blobFromImage( im, 1.0, (300, 300), (104.0, 177.0, 123.0) )
         h,w,n=im.shape
-        print("DBG: src is %dx%d" % (w,h) )
+        print("DBG: detect: src is %dx%dx%d" % (w,h,n) )
 
         print("DBG: computing face detections...")
         timeBegin = time.time()

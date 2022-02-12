@@ -38,24 +38,33 @@ def generate_raindrop(w, h, nbrplane=1, nbrColor = 256):
     im = 255-im
     return im
     
-def generate_inkdrop(w, h, nbrplane=1, nbrColor = 256):
+def generate_inkdrop(w, h, nbrplane=3, nbrColor = 256, bMirror = 0):
     im = np.zeros((h,w,nbrplane), dtype=np.uint8)
     im[:] = 255
     
-    nbr_circle = np.random.randint(w/10)
-    #~ nbr_circle = 4
-    listTaches = [] # x,y,r
+    nbr_circle = np.random.randint(w/20)
+    nbr_circle = np.random.randint(40)
+    #~ nbr_circle = 20
+    listTaches = [] # x,y,r,col
     for i in range(nbr_circle):
         x = np.random.randint(w)
         y = np.random.randint(h)
-        r = np.random.randint(w/10)
-        listTaches.append((x,y,r))
-        cv2.circle(im,(x,y),r,(0,0,0),-1)
+        r = np.random.randint(w/16)
+        color = (0,0,0)
+        if nbrplane>1 and 1:
+            color_r,g,b=0,0,0
+            if np.random.random()>0.5:color_r=255
+            if np.random.random()>0.5:g=255
+            if np.random.random()>0.5:b=255
+            color = (color_r,g,b)
+            #~ color = (0,0,0)
+        listTaches.append((x,y,r,color))
+        cv2.circle(im,(x,y),r,color,-1)
         if 1:
             # deforme le rond
-            dx = x + np.random.randint(7)-3
-            dy = y + np.random.randint(7)-3
-            cv2.circle(im,(dx,dy),r,(0,0,0),-1)
+            dx = x + np.random.randint(11)-5
+            dy = y + np.random.randint(11)-5
+            cv2.circle(im,(dx,dy),r,color,-1)
         len_radiance = int(r/(np.random.randint(3)+np.random.randint(2)+1))
         len_radiance = 30
         nbr_radiance = np.random.randint(4)+12
@@ -77,7 +86,7 @@ def generate_inkdrop(w, h, nbrplane=1, nbrColor = 256):
                     rrt += np.random.randint(4) - 2 # decrease little by little
                     if rrt< 1:
                         continue
-                    cv2.circle(im,(xr,yr),rrt,(0,0,0),-1)
+                    cv2.circle(im,(xr,yr),rrt,color,-1)
                     # 
                 if 0:
                     # lissage des 2 cercles
@@ -85,7 +94,7 @@ def generate_inkdrop(w, h, nbrplane=1, nbrColor = 256):
                         anglel = angle+angle_offset
                         xrl = x + int( (len_radiance+r-rr*0.) * math.cos(anglel) )
                         yrl = y + int( (len_radiance+r-rr*0.) * math.sin(anglel) )
-                        cv2.circle(im,(xrl,yrl),int(rr/2),(0,0,0),-1)
+                        cv2.circle(im,(xrl,yrl),int(rr/2),color,-1)
                         
 
     if 1:
@@ -95,7 +104,7 @@ def generate_inkdrop(w, h, nbrplane=1, nbrColor = 256):
         im = 255-im
         
     # apres le dilate on ajoute des projections
-    for (x,y,r) in listTaches:
+    for (x,y,r,color) in listTaches:
         if 1:
             # fines projections autour de la tache
             if r>10:
@@ -113,10 +122,10 @@ def generate_inkdrop(w, h, nbrplane=1, nbrColor = 256):
                             break
                         xt = x + int( (k+offset+r) * math.cos(angle) )
                         yt = y + int( (k+offset+r) * math.sin(angle) )
-                        cv2.circle(im,(xt,yt),int(rrt),(0,0,0),-1)
+                        cv2.circle(im,(xt,yt),int(rrt),color,-1)
                 
     
-    if 0:
+    if bMirror:
         # mirror vertic
         im[:,w//2:w] = im[:,w//2:0:-1]
     return im
@@ -178,7 +187,7 @@ while 1:
     elif 1:
         #~ im = generate_raindrop(320,480)
         im = generate_inkdrop(1280,900)
-        #~ im = generate_inkdrop(320,480)
+        #~ im = generate_inkdrop(320,480,bMirror=1)
         #~ im = cv2.resize(im,(0,0),fx=2,fy=2)
         
         cv2.imshow("random img", im)
@@ -201,7 +210,7 @@ while 1:
             im_to_render = fd.renderFaces(im,faces)
             window_name = "faces %d!" % cpt
             cv2.imshow(window_name,im_to_render)
-            cv2.moveWindow(window_name,128*(cpt_found%8),200)
+            cv2.moveWindow(window_name,im.shape[1]*(cpt_found%8),200)
             cv2.waitKey(10)
             cpt_found += 1
     else:

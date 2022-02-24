@@ -207,104 +207,109 @@ def loadListUnivercityCity():
     
 
 def removeAccent( c ):
-    acc="ÉÈÎâàçéêëèîïôûüùŷÿ" # TODO A avec accent
-    noacc="EEIaaceeeeiiouuuyy"
-    #~ idx=acc.find(c) # in python 2.7: UnicodeDecodeError: 'ascii' codec can't decode byte 0xc3 in position 0: ordinal not in range(128) // ord(value) was 233
-    #~ if idx != -1:
-        #~ return noacc[idx]
-    #~ for i in range(len(acc)):
-        #~ if c == acc[i]:
-            #~ return noacc[i]
-    if 0:
-        # generate acc_ord code value
-        for c in acc:
-            print("%s," % ord(c) )
-            
-    acc_ord = [
-        201,
-        200,
-        206,
-        226,
-        224,
-        231,
-        233,
-        234,
-        235,
-        232,
-        238,
-        239,
-        244,
-        251,
-        252,
-        249,
-        375,
-        255
+    try:
+        acc="ÉÈÎâàçéêëèîïôûüùŷÿ" # TODO A avec accent
+        noacc="EEIaaceeeeiiouuuyy"
+        #~ idx=acc.find(c) # in python 2.7: UnicodeDecodeError: 'ascii' codec can't decode byte 0xc3 in position 0: ordinal not in range(128) // ord(value) was 233
+        #~ if idx != -1:
+            #~ return noacc[idx]
+        #~ for i in range(len(acc)):
+            #~ if c == acc[i]:
+                #~ return noacc[i]
+        if 0:
+            # generate acc_ord code value
+            for c in acc:
+                print("%s," % ord(c) )
+                
+        acc_ord = [
+            201,
+            200,
+            206,
+            226,
+            224,
+            231,
+            233,
+            234,
+            235,
+            232,
+            238,
+            239,
+            244,
+            251,
+            252,
+            249,
+            375,
+            255
+            ]
+
+        # same chars at ovh (preceded by a 195 or 197 in front of 183)
+        acc_ord_ovh = [
+            137,
+            136,
+            142,
+            162,
+            160,
+            167,
+            169,
+            170,
+            171,
+            168,
+            174,
+            175,
+            180,
+            187,
+            188,
+            185,
+            183,
+            191
         ]
 
-    # same chars at ovh (preceded by a 195 or 197 in front of 183)
-    acc_ord_ovh = [
-        137,
-        136,
-        142,
-        162,
-        160,
-        167,
-        169,
-        170,
-        171,
-        168,
-        174,
-        175,
-        180,
-        187,
-        188,
-        185,
-        183,
-        191
-    ]
+        #~ assert_equal( len(acc_ord),len(noacc) )
+        for i in range(len(acc_ord)):
+            if ord(c) == acc_ord[i]:
+                return noacc[i]        
 
-    #~ assert_equal( len(acc_ord),len(noacc) )
-    for i in range(len(acc_ord)):
-        if ord(c) == acc_ord[i]:
-            return noacc[i]        
-
-    #~ assert_equal( len(acc_ord),len(acc_ord_ovh) )
-    for i in range(len(acc_ord_ovh)):
-        if ord(c) == acc_ord_ovh[i]:
-            return noacc[i]      
-            
-    if c == "æ" or ord(c)==230:
-        c = "ae"
-    if c == "œ" or ord(c)==339:
-        c = "oe"
-    elif c == "Œ" or ord(c)==338:
-        c = "OE"
-    elif ord(c) == 231: # c cedile not detected previously
-        c = "c"
-    elif ord(c) == 156 or ord(c) == 140:
-        # second part of oe, don't complain (minuscule then majuscule)
-        c = ""
-    elif ord(c) == 195 or ord(c) == 197:
-        # mark of char on two chars at ovh, don't complain
-        c = ""
-    elif ord(c) == 8211 or ord(c) == 8212:
-        # custom hyphen
-        c = "-"
-    elif ord(c) == 8216 or ord(c) == 8217:
-        # type de '
-        c = "'"
-    elif ord(c) == 8220:
-        # type de 
-        c = '"'
-    elif ord(c) == 8230:
-        c = "..."
-    else:
-        try:
-            print("DBG: removeAccent: not found: %c (%s)" % (c,ord(c) ))
-        except BaseException as err:
-            print("DBG: removeAccent: catch else: ord: %s, err: %s" % (ord(c),err) )
-        c="" # it should remains only invisible char like the square before "oe"
-    return c
+        #~ assert_equal( len(acc_ord),len(acc_ord_ovh) )
+        for i in range(len(acc_ord_ovh)):
+            if ord(c) == acc_ord_ovh[i]:
+                return noacc[i]      
+                
+        if c == "æ" or ord(c)==230:
+            c = "ae"
+        if c == "œ" or ord(c)==339:
+            c = "oe"
+        elif c == "Œ" or ord(c)==338:
+            c = "OE"
+        elif ord(c) == 231: # c cedile not detected previously
+            c = "c"
+        elif ord(c) == 156 or ord(c) == 140:
+            # second part of oe, don't complain (minuscule then majuscule)
+            c = ""
+        elif ord(c) == 195 or ord(c) == 197:
+            # mark of char on two chars at ovh, don't complain
+            c = ""
+        elif ord(c) == 8211 or ord(c) == 8212:
+            # custom hyphen
+            c = "-"
+        elif ord(c) == 8216 or ord(c) == 8217:
+            # type de '
+            c = "'"
+        elif ord(c) == 8220:
+            # type de 
+            c = '"'
+        elif ord(c) == 8230:
+            c = "..."
+        else:
+            try:
+                print("DBG: removeAccent: not found: %c (%s)" % (c,ord(c) ))
+            except BaseException as err:
+                print("DBG: removeAccent: catch else: ord: %s, err: %s" % (ord(c),err) )
+            c="" # it should remains only invisible char like the square before "oe"
+        return c
+    except TypeError as err:
+        print("DBG: removeAccent:type error: %s, returning '_'" % str(err) )
+    return "_"
+        
     
 def cleanString( s ):
     """
@@ -351,6 +356,70 @@ def appendToDict( d, k, v ):
         d[k].append(v)
     except KeyError:
         d[k] = [v]
+        
+class Regions:
+    """
+    get region by department 
+    and departement by region
+    """
+    def __init__( self ):
+        #~ self.dictRegionId = {} # for each region, it's index
+        self.dictRegionByDept = {} # dept_number as string (pour 2A => region name
+        self.dictDeptByRegion = {} # region name => list of dept_number (as string)
+        self.dictDeptByName = {} # dept name => dept_number (as string)
+        self.dictDeptByNumber = {} #  dept_number (as string) => dept_name
+        
+    def load( self ):
+        print("INF: Regions.load: loading regions data...")
+        bVerbose = 0
+        strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
+        #~ print("strLocalPath: " + strLocalPath)
+        strFilename = strLocalPath + '/datas/region_dept.csv'
+        enc = 'utf-8'
+        enc = 'cp1252'
+        file = openWithEncoding(strFilename, "rt", encoding = enc)
+        line = file.readline() # skip first line
+
+        while 1:
+            line = file.readline()
+            if len(line)<1:
+                break
+            if bVerbose: print("DBG: Regions.load: line: %s" % str(line) )
+            line = line.replace('"','')
+            fields = line.split(';')
+            if bVerbose: print("DBG: Regions.load: fields: %s" % str(fields) )
+            strDeptNumber, strDeptName, strRegionName = fields
+            strRegionName = strRegionName.replace("\n", "" )
+            #~ nDeptNumber = int(strDeptNumber) # bug 2A
+            self.dictRegionByDept[strDeptNumber] = strRegionName
+            self.dictDeptByName[strDeptName] = strDeptNumber
+            self.dictDeptByNumber[strDeptNumber] = strDeptName
+            appendToDict( self.dictDeptByRegion, cleanString(strRegionName),strDeptNumber)
+            
+                
+    def findDept( self, region ):
+        region = cleanString(region)
+        try:
+            return self.dictDeptByRegion[region]
+        except KeyError as err:
+            print("INF: Regions.findDept: can't find region '%s'" % region )
+            return []
+            
+    def findRegion( self, num_dept ):
+        num_dept = str(num_dept)
+        return self.dictRegionByDept[num_dept]
+        
+    def getDeptName( self, num_dept ):
+        num_dept = str(num_dept)
+        return self.dictDeptByNumber[num_dept]
+        
+    def getDeptNumber( self, name_dept ):
+        return self.dictDeptByName[name_dept]
+        
+    def getListRegions( self ):
+        return self.dictDeptByRegion.keys()
+        
+# class Regions - end
     
 class Cities:
     """
@@ -468,10 +537,13 @@ class Cities:
             zip = "69001"
         elif zip == "31000":
             zip = "31100"
-        elif isBigCityZip(zip):
-            newzip = "%05d" % (int(zip)+1)
-            print("DBG: findByZip: changing zip %s to %s" % (zip,newzip) )
-            zip = newzip
+        elif zip == "13000":
+            zip = "13001"            
+        # ne fonctione pas pour toutes les bigs cities
+        #~ elif isBigCityZip(zip):
+            #~ newzip = "%05d" % (int(zip)+1)
+            #~ print("DBG: findByZip: changing zip %s to %s" % (zip,newzip) )
+            #~ zip = newzip
             
         if self.bEnableHash:
             # use hashed dict
@@ -992,7 +1064,7 @@ def autotest_cities():
     assert_diff(dist,596,20)        
 
     dist = cities.distTwoZip("33000","67000",bVerbose=True)
-    assert_diff(dist,760,20)      
+    assert_diff(dist,760,20)
     
     
     assert_diff(cities.isValidAdress( "34440","colombier")[2],0.95)
@@ -1040,6 +1112,17 @@ def autotest_cities():
 
     retVal = cities.findByZip("69000")
     assert_equal(retVal[1],"69001")
+
+    retVal = cities.findByZip("67000")
+    assert_equal(retVal[1],"67001")
+    
+    # test all big city:
+    for city,zip in bigCityZip:
+        print( "INF: autotest: bigCityZip: testing %s" % zip )
+        retVal = cities.findByZip(zip)
+        print( "INF: autotest: bigCityZip: returning %s" % str(retVal) )
+        if retVal == None or (retVal[1] != zip and retVal[1][:-1] != zip[:-1]):
+            assert(0)        
     
     timeBegin = time.time()
     for i in range(100):
@@ -1059,11 +1142,34 @@ def autotest_cities():
     assert_equal(isBigCityZip("67000"),1)
     assert_equal(isBigCityZip("34440"),0)
     
-# autotest - end
+# autotest_cities - end
+
+def autotest_region():
+    r = Regions()
+    r.load()
+    print( "autotest_region: Regions list: %s" % str(r.getListRegions() ) )
+    
+    dpt = r.findDept( "Île-de-France" )
+    assert_equal( dpt, ["75","77","78","91","92","93","94","95"] )
+
+    region = r.findRegion( 34 )
+    assert_equal( region, "Occitanie" )
+    
+    region = r.findRegion( 94 )
+    assert_equal( region, "Île-de-France" )
+    
+    val = r.getDeptName( 94 )
+    assert_equal( val, "Val-de-Marne" )
+    
+    val = r.getDeptNumber( "Paris" )
+    assert_equal( val, "75" )
+    
+# autotest_region - end
     
 if __name__ == "__main__":
     if 1:
         autotest_cities()
+        autotest_region()
     if 0:        
         """
         Syntaxe:

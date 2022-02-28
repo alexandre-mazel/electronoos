@@ -407,7 +407,12 @@ class Regions:
             
     def findRegion( self, num_dept ):
         num_dept = str(num_dept)
-        return self.dictRegionByDept[num_dept]
+        try:
+            return self.dictRegionByDept[num_dept]
+        except KeyError as err:
+            if num_dept == "20":
+                return self.dictRegionByDept["2A"]
+        return "Unknown Region"
         
     def getDeptName( self, num_dept ):
         num_dept = str(num_dept)
@@ -1154,6 +1159,9 @@ def autotest_region():
 
     region = r.findRegion( 34 )
     assert_equal( region, "Occitanie" )
+
+    region = r.findRegion( 20 )
+    assert_equal( region, "Corse" )
     
     region = r.findRegion( 94 )
     assert_equal( region, "Île-de-France" )
@@ -1168,7 +1176,7 @@ def autotest_region():
     
 if __name__ == "__main__":
     if 1:
-        autotest_cities()
+        #~ autotest_cities()
         autotest_region()
     if 0:        
         """

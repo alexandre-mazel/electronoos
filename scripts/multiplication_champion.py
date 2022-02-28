@@ -64,9 +64,14 @@ def print_best_table():
 def get_rank(score):
     return st.get_rank(score)
         
-time_begin = time.time()
-nbr_question = 1
+input("appuie sur entree pour commencer...")
+print("")
+
+nbr_question = 8
 print("C'est parti pour %d questions !" % nbr_question )
+
+time_begin = time.time()
+
 game(nbr_question)
 duration = time.time() - time_begin
 rTime = duration/nbr_question

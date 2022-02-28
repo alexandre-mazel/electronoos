@@ -35,7 +35,7 @@ def get_best():
         r = float(r)
         f.close()
     except:
-        r,name = 10, "inconnu"
+        r,name = 20, "inconnu"
     return r,name
     
 def store_best(score,name):
@@ -50,12 +50,12 @@ print("C'est parti pour %d questions !" % nbr_question )
 game(nbr_question)
 duration = time.time() - time_begin
 rTime = duration/nbr_question
-print("\nTemps par multiplication: %.3f" % ( rTime ) )
+print("\nTemps par multiplication: %.3fs" % ( rTime ) )
 
 best_time, best_name = get_best()
 if best_time > rTime:
-    print("Bravo!\n tu as battu le record de %.3f fait par %s." % (best_time,best_name) )
+    print("Bravo!\ntu as battu le record de %.3fs fait par %s." % (best_time,best_name) )
     name = input("Quel est ton nom ? ")
     store_best(rTime, name)
 else:
-    print("Dommage, tu n'as pas battu le record de %.3f fait par %s." % (best_time,best_name) )    
+    print("Dommage, tu n'as pas battu le record de %.3fs fait par %s." % (best_time,best_name) )    

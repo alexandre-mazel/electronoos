@@ -2,7 +2,7 @@ import random
 import sys
 import time
 
-sys.append("../alex_pytools")
+sys.path.append("../alex_pytools")
 import score_table
 
 
@@ -31,7 +31,7 @@ def game(nbr_question):
                 print("essaye encore!")
         n += 1
         
-        
+"""
 def get_best():
     try:
         f = open("multiplication_best.dat", "rt")
@@ -47,10 +47,25 @@ def store_best(score,name):
     f = open("multiplication_best.dat", "wt")
     f.write(str((score,name)))
     f.close()
+    
+"""
+st = score_table.ScoreTable("multiplication",True)
+def get_best():
+    return st.get_best()[:]
+    
+def store_best(score,name):
+    st.add_score(score,name)
+    st.save()
+    
+def print_best_table():
+    s = str(st)
+    print(s)
         
+def get_rank(score):
+    return st.get_rank(score)
         
 time_begin = time.time()
-nbr_question = 8
+nbr_question = 1
 print("C'est parti pour %d questions !" % nbr_question )
 game(nbr_question)
 duration = time.time() - time_begin
@@ -63,4 +78,11 @@ if best_time > rTime:
     name = input("Quel est ton nom ? ")
     store_best(rTime, name)
 else:
-    print("Dommage, tu n'as pas battu le record de %.3fs fait par %s." % (best_time,best_name) )    
+    print("Dommage, tu n'as pas battu le record de %.3fs fait par %s." % (best_time,best_name) )
+    if get_rank(rTime)<10:
+        print("Mais tu as quand meme fait un bon score..." )
+        name = input("Quel est ton nom ? ")
+        store_best(rTime, name)
+
+print("\nLegend table:\n")
+print_best_table()    

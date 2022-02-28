@@ -1,4 +1,4 @@
-import csv
+import csv_loader
 
 class ScoreTable:
     """
@@ -14,10 +14,10 @@ class ScoreTable:
         self.listScore = [] # list of pair (score,name)
         
     def load( self ):
-        self.listScore = csv.load_csv( "/tmp/score_%s.dat" % self.strGameName)
+        self.listScore = csv_loader.load_csv( "/tmp/score_%s.dat" % self.strGameName)
         
     def save( self ):
-        csv.save_csv( "/tmp/score_%s.dat" % self.strGameName, self.listScore )
+        csv_loader.save_csv( "/tmp/score_%s.dat" % self.strGameName, self.listScore )
         
     def add_score(self, score, name):
         for i in range(len(self.listScore)):
@@ -37,15 +37,28 @@ class ScoreTable:
         return score,name of the best
         """
         if len(self.listScore) < 1:
-            if bMinimumIsBest: return 9999,"Unknown"
+            if self.bMinimumIsBest: return 9999,"Unknown"
             else: return -1,"Unknown"
         return self.listScore[0]
         
+    def get_rank(self,score):
+        """
+        return rank 0..n
+        """
+        for i in range(len(self.listScore)):
+            if \
+                    ( self.bMinimumIsBest and score < self.listScore[i][0] ) \
+                or \
+                    ( not self.bMinimumIsBest and score > self.listScore[i][0] ) \
+            :
+                return i
+        return len(self.listScore)
+                
     def __str__( self ):
         s = ""
         nRank = 1
         for scorepair in self.listScore:
-            s += "\t%3d: %5d - %s\n" % ( nRank, scorepair[0], scorepair[1] )
+            s += "\t%3d: %5.3f - %s\n" % ( nRank, scorepair[0], scorepair[1] )
             nRank += 1
         return s
 

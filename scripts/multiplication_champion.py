@@ -1,5 +1,10 @@
 import random
+import sys
 import time
+
+sys.append("../alex_pytools")
+import score_table
+
 
 def pick(choice):
     i = random.randint(0, len(choice)-1)

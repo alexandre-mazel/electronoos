@@ -18,6 +18,10 @@ def game(nbr_question):
         print("")
         bCorrect = False
         while not bCorrect:
+            if random.random()>0.5: 
+                c = n1
+                n1 = n2
+                n2 = c
             res = input("%d x %d ? " % (n1,n2))
             try:
                 res = int(res)
@@ -58,8 +62,7 @@ def store_best(score,name):
     st.save()
     
 def print_best_table():
-    s = str(st)
-    print(s)
+    print(st.get_results(10))
         
 def get_rank(score):
     return st.get_rank(score)

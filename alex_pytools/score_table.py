@@ -54,11 +54,13 @@ class ScoreTable:
                 return i
         return len(self.listScore)
                 
-    def __str__( self ):
+    def get_results( self, nLimitTo = -1 ):
         s = ""
         nRank = 1
         for scorepair in self.listScore:
             s += "\t%3d: %5.3f - %s\n" % ( nRank, scorepair[0], scorepair[1] )
+            if nLimitTo != -1 and nRank >= nLimitTo:
+                break
             nRank += 1
         return s
 
@@ -75,8 +77,8 @@ def autotest():
     
     st2 = ScoreTable("autotest")
     
-    s1 = str(st)
-    s2 = str(st2)
+    s1 = st.get_results()
+    s2 = st2.get_results()
     print("s1:\n%s" % s1 )
     print("s2:\n%s" % s2 )
     assert(s1==s2)

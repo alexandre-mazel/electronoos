@@ -13,8 +13,8 @@ def pick(choice):
 def game(nbr_question):
     n = 0
     while n < nbr_question:
-        n1 = pick(range(1,1))
-        n2 = pick(range(1,1))
+        n1 = pick(range(2,10))
+        n2 = pick(range(5,10))
         print("")
         bCorrect = False
         while not bCorrect:
@@ -23,12 +23,12 @@ def game(nbr_question):
                 n1 = n2
                 n2 = c
             res = input("%d x %d ? " % (n1,n2))
+            res_correct = n1*n2
             try:
                 res = int(res)
-                res_correct = n1*n2
                 bCorrect = res == res_correct
             except:
-                pass
+                res = -100 # for the presque case when typing a letter
                 
             if bCorrect:
                 print("ok!")

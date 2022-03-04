@@ -13,8 +13,8 @@ def pick(choice):
 def game(nbr_question):
     n = 0
     while n < nbr_question:
-        n1 = pick(range(2,9))
-        n2 = pick(range(5,9))
+        n1 = pick(range(2,10))
+        n2 = pick(range(5,10))
         print("")
         bCorrect = False
         while not bCorrect:
@@ -25,14 +25,18 @@ def game(nbr_question):
             res = input("%d x %d ? " % (n1,n2))
             try:
                 res = int(res)
-                bCorrect = res == n1*n2
+                res_correct = n1*n2
+                bCorrect = res == res_correct
             except:
                 pass
                 
             if bCorrect:
                 print("ok!")
             else:
-                print("essaye encore!")
+                if abs(res - res_correct) <= 2:
+                    print("presque...")
+                else:
+                    print("essaye encore!")
         n += 1
         
 """
@@ -62,7 +66,7 @@ def store_best(score,name):
     st.save()
     
 def print_best_table():
-    print(st.get_results(10))
+    print(st.get_results(15))
         
 def get_rank(score):
     return st.get_rank(score)

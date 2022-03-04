@@ -13,8 +13,8 @@ def pick(choice):
 def game(nbr_question):
     n = 0
     while n < nbr_question:
-        n1 = pick(range(2,10))
-        n2 = pick(range(5,10))
+        n1 = pick(range(1,1))
+        n2 = pick(range(1,1))
         print("")
         bCorrect = False
         while not bCorrect:

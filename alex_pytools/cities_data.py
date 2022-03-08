@@ -533,6 +533,9 @@ class Cities:
         """
         return info on a city or None if not nound
         """
+        if zip == None:
+            print("WRN: findByZip: called with None => returning None" )
+            return None
         if isinstance(zip, int):
             zip = "%05d" % zip
             
@@ -555,7 +558,10 @@ class Cities:
             try:
                 listSlug = self.zipToSlug[zip]
             except KeyError:
-                return None
+                try:
+                    listSlug = self.zipToSlug[zip[:-1]+"0"]
+                except KeyError:
+                    return None
                 
             if len(listSlug)>1:
                 self.warn("WRN: findByZip: this zip belongs to different cities: %s" % (listSlug) )
@@ -1120,6 +1126,13 @@ def autotest_cities():
 
     retVal = cities.findByZip("67000")
     assert_equal(retVal[1],"67001")
+
+    retVal = cities.findByZip("63000")
+    assert_equal(retVal[1],"63001")
+
+    retVal = cities.findByZip("63001")
+    assert_equal(retVal[1],"63001")
+    
     
     # test all big city:
     for city,zip in bigCityZip:
@@ -1176,7 +1189,7 @@ def autotest_region():
     
 if __name__ == "__main__":
     if 1:
-        #~ autotest_cities()
+        autotest_cities()
         autotest_region()
     if 0:        
         """

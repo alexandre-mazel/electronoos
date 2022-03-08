@@ -68,72 +68,77 @@ class PdfMod:
         pos: x, and y in percent in page, from top of letter
         NB: sur certains cv les textes arrivent plus bas que les rectangle associees...
         """
-        fontname = "Times-Roman"
-        bContour = 0 # test de contour, mais beurk
-        x,y = pos
+        try:
+            fontname = "Times-Roman"
+            bContour = 0 # test de contour, mais beurk
+            x,y = pos
 
-        assert(0<= x <=1)
-        assert(0<= y <=1)
-        
-        xtext = int(x*self.w)
-        ytext = int(y*self.h)
-        if self.bVerbose: print("xtext, ytext: %s, %s" % ( xtext, ytext ) )
-        
-        text_lenght = fitz.get_text_length(text, fontname=fontname, fontsize=fontsize)
-        
-        rect = fitz.Rect( xtext, ytext, xtext+text_lenght+1, ytext+fontsize*1+1 )
-        
-        listoffsets = []
-        fontsizeShadow = fontsize
-        if  bShadow:
-            listoffsets = [[1,1]]
-        if bContour:
-            # divers essais peu concluant:
-            if 1:
-                listoffsets += [[1,0],[-1,0],[0,1],[0,-1]]
-                listoffsets += [[1,1],[-1,-1],[1,-1],[-1,1]]
+            assert(0<= x <=1)
+            assert(0<= y <=1)
             
-            if 0:
-                listoffsets = [[-2,-1]]
-                fontsizeShadow = fontsize+2
+            xtext = int(x*self.w)
+            ytext = int(y*self.h)
+            if self.bVerbose: print("xtext, ytext: %s, %s" % ( xtext, ytext ) )
             
-        for offsets in listoffsets:
-            offx,offy = offsets
-            rectShadow = deepcopy(rect)
-            #~ print(dir(rectShadow))
-            offset = 1
-            rectShadow.x0 += offx
-            rectShadow.y0 += offy
-            rectShadow.x1 += offx
-            rectShadow.y1 += offy
-            #
-            #
-            #
-            # align:  0 = left, 1 = center, 2 = right, 3: justify
-            rc = self.page.insert_textbox(rectShadow, text, fontsize = fontsizeShadow, fontname = fontname, fontfile = None, color=(0,0,0), align = 0)
+            text_lenght = fitz.get_text_length(text, fontname=fontname, fontsize=fontsize)
+            
+            rect = fitz.Rect( xtext, ytext, xtext+text_lenght+1, ytext+fontsize*1+1 )
+            
+            listoffsets = []
+            fontsizeShadow = fontsize
+            if  bShadow:
+                listoffsets = [[1,1]]
+            if bContour:
+                # divers essais peu concluant:
+                if 1:
+                    listoffsets += [[1,0],[-1,0],[0,1],[0,-1]]
+                    listoffsets += [[1,1],[-1,-1],[1,-1],[-1,1]]
+                
+                if 0:
+                    listoffsets = [[-2,-1]]
+                    fontsizeShadow = fontsize+2
+                
+            for offsets in listoffsets:
+                offx,offy = offsets
+                rectShadow = deepcopy(rect)
+                #~ print(dir(rectShadow))
+                offset = 1
+                rectShadow.x0 += offx
+                rectShadow.y0 += offy
+                rectShadow.x1 += offx
+                rectShadow.y1 += offy
+                #
+                #
+                #
+                # align:  0 = left, 1 = center, 2 = right, 3: justify
+                rc = self.page.insert_textbox(rectShadow, text, fontsize = fontsizeShadow, fontname = fontname, fontfile = None, color=(0,0,0), align = 0)
 
-        bUseTextBox = 0 # 1: ready for some alignement in the future
-        
-        #~ self.page.draw_rect(rect,colorText) # rect to debug
-        
-        y_offset_text = 0
-        if bUseTextBox:
-            y_offset_text -= 10 # textbox render everything lower
-            rc = self.page.insert_textbox(rect, text, fontsize = fontsize, # choose fontsize (float)
-                               fontname = fontname,       # a PDF standard font: "Times-Roman"
-                               fontfile = None,                # could be a file on your system
-                               color=colorText,
-                               #~ border_width=3,
-                               align=0)                      # 0 = left, 1 = center, 2 = right;
-        else:
-            y_offset_text += fontsize # origin is from the bottom left corner
-            rc = self.page.insert_text((rect[0],rect[1]+y_offset_text), text, fontsize = fontsize, # choose fontsize (float)
-                               fontname = fontname,       # a PDF standard font: "Times-Roman"
-                               fontfile = None,                # could be a file on your system
-                               color=colorText,
-                               #~ border_width=3,
-                               )                      # 0 = left, 1 = center, 2 = right;
-        if self.bVerbose: print("rc: %s" % str(rc))
+            bUseTextBox = 0 # 1: ready for some alignement in the future
+            
+            #~ self.page.draw_rect(rect,colorText) # rect to debug
+            
+            y_offset_text = 0
+            if bUseTextBox:
+                y_offset_text -= 10 # textbox render everything lower
+                rc = self.page.insert_textbox(rect, text, fontsize = fontsize, # choose fontsize (float)
+                                   fontname = fontname,       # a PDF standard font: "Times-Roman"
+                                   fontfile = None,                # could be a file on your system
+                                   color=colorText,
+                                   #~ border_width=3,
+                                   align=0)                      # 0 = left, 1 = center, 2 = right;
+            else:
+                y_offset_text += fontsize # origin is from the bottom left corner
+                rc = self.page.insert_text((rect[0],rect[1]+y_offset_text), text, fontsize = fontsize, # choose fontsize (float)
+                                   fontname = fontname,       # a PDF standard font: "Times-Roman"
+                                   fontfile = None,                # could be a file on your system
+                                   color=colorText,
+                                   #~ border_width=3,
+                                   )                      # 0 = left, 1 = center, 2 = right;
+            if self.bVerbose: print("rc: %s" % str(rc))
+        except ValueError as err:
+            # got a bug with 1cef88666bef8f9cbf8e5525d1746a866905b2ed.pdf when cartelling:
+            # error: xref is not a font
+            print("ERR: PdfMod.addText: looks like a random error: %s" % str(err))
         
     def save( self, dst ):
         print("INF: PdfMod: saving to '%s'" % dst )

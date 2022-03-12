@@ -9,5 +9,8 @@ rem try to enable a "pop 2 "that will jump to POP_DIR2, works but the cd doesnt 
   set varname=PUSH_DIR%1
   set pathdir=!%varname%!
 rem endlocal enableDelayedExpansion
-  call changedir %pathdir%
+  rem echo changing...
+  rem (cmd /c cd %pathdir%)
+  
+  (changedir %pathdir%)
 )

@@ -65,8 +65,8 @@ def store_best(score,name):
     st.add_score(score,name)
     st.save()
     
-def print_best_table():
-    print(st.get_results(15))
+def print_best_table(nbr_best):
+    print(st.get_results(nbr_best))
         
 def get_rank(score):
     return st.get_rank(score)
@@ -75,6 +75,7 @@ input("appuie sur entree pour commencer...")
 print("")
 
 nbr_question = 8
+nbr_best = 20
 print("C'est parti pour %d questions !" % nbr_question )
 
 time_begin = time.time()
@@ -91,10 +92,10 @@ if best_time > rTime:
     store_best(rTime, name)
 else:
     print("Dommage, tu n'as pas battu le record de %.3fs fait par %s." % (best_time,best_name) )
-    if get_rank(rTime)<10:
+    if get_rank(rTime)<nbr_best:
         print("Mais tu as quand meme fait un bon score..." )
         name = input("Quel est ton nom ? ")
         store_best(rTime, name)
 
 print("\nLegend table:\n")
-print_best_table()    
+print_best_table(nbr_best)    

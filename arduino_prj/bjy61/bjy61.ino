@@ -201,7 +201,7 @@ void loop()
    if( millis() - timeLastOutput > 200 )
    {
       if( 1 )
-      {
+      {
         Serial.print( "# " );     
         Serial.print( millis(), DEC );
         Serial.print( ", fps: " );

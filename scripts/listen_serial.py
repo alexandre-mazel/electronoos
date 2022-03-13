@@ -25,14 +25,16 @@ def listPorts():
             sys.stdout.write("    desc: {}\n".format(desc))
             sys.stdout.write("    hwid: {}\n".format(hwid))
         
+        
+def monitorPort(strPortName):
+    ser = serial.Serial(strPortName)
+    print("INF: %s is open: %s" % (ser.name,ser.is_open) )
+
+    buf = ser.read(100)
+    print(buf)
+    ser.close()
 
 listPorts()
-exit(1)
 strPortName = '/dev/ttyUSB0'
-strPortName = 'COM4'
-ser = serial.Serial(strPortName)  # open serial port
-print("INF: %s is open: %s" % (ser.name,ser.is_open) )
-
-buf = ser.read(100)
-print(buf)
-ser.close()
+strPortName = 'COM7'
+monitorPort(strPortName)

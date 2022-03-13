@@ -29,9 +29,14 @@ def listPorts():
 def monitorPort(strPortName):
     ser = serial.Serial(strPortName)
     print("INF: %s is open: %s" % (ser.name,ser.is_open) )
-
-    buf = ser.read(100)
-    print(buf)
+    #~ for i in range(100):
+    while 1:
+        buf = ser.readline()
+        buf = str(buf)
+        buf = buf.replace("\n","")
+        buf = buf.replace("\r","")
+        buf = buf.replace("\\r\\n","")
+        print("%s"%buf)
     ser.close()
 
 listPorts()

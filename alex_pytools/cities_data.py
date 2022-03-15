@@ -18,7 +18,7 @@ def assert_diff(a,b,diff=0.1):
     if abs(a-b)<diff:
         print("(%s diff %s < %s) => ok" % (a,b,diff))
     else:
-        print("(%s diff %s) => NOT ok (type:%s and %s)" % (a,b,type(a),type(b)))
+        print("(%s diff %s < %s)) => NOT ok (type:%s and %s)" % (a,b,diff, type(a),type(b)))
         assert(0)
         
 def getTimeStamp():
@@ -374,6 +374,7 @@ class Regions:
         bVerbose = 0
         strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
         #~ print("strLocalPath: " + strLocalPath)
+        if strLocalPath == "": strLocalPath = '.'
         strFilename = strLocalPath + '/datas/region_dept.csv'
         enc = 'utf-8'
         enc = 'cp1252'
@@ -458,9 +459,11 @@ class Cities:
 
     def load(self):
         print("INF: Cities: loading city data...")
+        timeBegin = time.time()
         bVerbose = 0
         strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
         #~ print("strLocalPath: " + strLocalPath)
+        if strLocalPath == "": strLocalPath = '.'
         strFilename = strLocalPath + '/datas/villes_france.csv'
         enc = 'utf-8'
         file = openWithEncoding(strFilename, "rt", encoding = enc)
@@ -514,6 +517,10 @@ class Cities:
         if bVerbose: 
             print("DBG: self.dupZipPerZip: %s" % str(self.dupZipPerZip))
             print("DBG: self.dupCityPerZip: %s" % str(self.dupCityPerZip))
+        print("INF: Cities: loading city data - end duration: %.2fs" % (time.time()-timeBegin) )
+        # mstab7: 
+        # rpi4 2.7: 11.8s
+        # rpi4 3.7: 1.18s
     # load - end
     
     def warn(self,msg):
@@ -694,7 +701,7 @@ class Cities:
             city = self.cityPerSlug[k]
             if strCityName in city[2]: # look in simplename
                 sumLen = len(city[2]) + len(strCityName) # or max des 2, ca se discute
-                rDiff = abs(len(city[2])-len(strCityName)) / sumLen # on aurait pu faire une distance de Levenstein
+                rDiff = abs(len(city[2])-len(strCityName)) / float(sumLen) # on aurait pu faire une distance de Levenstein
                 # rDiff can be from 0 to nearly 1
                 rConfidence = 1. - rDiff
                 
@@ -1111,6 +1118,9 @@ def autotest_cities():
     # mstab7: 500 tests: 4.9s (9.8ms/recherche)
     # mstab7: passage au slugToZip
     # 500 tests: 0.7s (1.3ms/recherche)
+    # mstab7: 500 tests: 0.0s (0.0ms/recherche)
+    # RPI4_2.7: 500 tests: 0.0s (0.0ms/recherche)
+    # RPI4_3.7: 500 tests: 0.0s (0.0ms/recherche)
     
     retVal = cities.findByZip("06000")
     assert_equal(retVal[1],"06001")
@@ -1156,6 +1166,8 @@ def autotest_cities():
     # mstab7: 500 tests: 0.0s (0.0ms/recherche)
     # mstab7: passage au slugToZip (vaguement moins avantageux car on perd la recherche dans un dico en direct) (indirection)
     # 500 tests: 0.0s (0.0ms/recherche)
+    # RPI4_2.7: 500 tests: 23.8s (47.7ms/recherche)
+    # RPI4_3.7: 500 tests: 0.0s (0.0ms/recherche)
     
     assert_equal(isBigCityZip("67000"),1)
     assert_equal(isBigCityZip("34440"),0)

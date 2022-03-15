@@ -518,7 +518,7 @@ class Cities:
             print("DBG: self.dupZipPerZip: %s" % str(self.dupZipPerZip))
             print("DBG: self.dupCityPerZip: %s" % str(self.dupCityPerZip))
         print("INF: Cities: loading city data - end duration: %.2fs" % (time.time()-timeBegin) )
-        # mstab7: 
+        # mstab7: 0.27s
         # rpi4 2.7: 11.8s
         # rpi4 3.7: 1.18s
     # load - end

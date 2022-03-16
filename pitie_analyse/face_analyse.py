@@ -16,22 +16,37 @@ import face_detector
 
 class FaceTracker:
     def __init__( self ):
+        self.nImageAnalysed = 0
         self.nImageWithFace = 0
         self.nImageLookingAt = 0
-        self.nImageAnalysed = 0
+        self.nImageSmile = 0
         
         self.fdcv3 = face_detector_cv3.facedetector
         self.fdl = facerecognition_dlib.faceRecogniser
         self.haar_face_detect = face_detector.FaceDetectOpenCV(bVerbose=True)
         self.haar_profile_detect = face_detector.FaceDetectOpenCV(bVerbose=True,strCascadeFile="haarcascade_profileface.xml")
+        self.haar_smile_ndev = face_detector.FaceDetectOpenCV(bVerbose=True,strCascadeFile="haarcascade_smile.xml")
         # Discriminative Correlation Filter (with Channel and Spatial Reliability). Tends to be more accurate than KCF but slightly slower. (minimum OpenCV 3.4.2)
         self.tracker = cv2.TrackerCSRT_create() # python -m pip install opencv-contrib-python OR export PYTHONPATH=/usr/local/lib/python3.8/site-packages/cv2/python-3.8/:$PYTHONPATH 
         self.bTrackerRunning = False
         self.nCptFrameOnlyOnTracking = 0
+        self.nCptFrameSinceRestartTracking = 0
         
         self.timefacedlib = 0
         self.timefacedetectcv3 = 0
         self.timehaar = 0
+        
+        
+    def detectSmileInImage( self, im, faces ):
+        #~ faces from = face_cascade.detectMultiScale(gray, 1.3, 5)
+        # untested
+        for (x, y, w, h) in faces:
+            roi_gray = im[y:y + h, x:x + w]
+            smiles = smile_cascade.detectMultiScale(roi_gray, 1.8, 20)
+            for (sx, sy, sw, sh) in smiles:
+                cv2.rectangle(roi_color, (sx, sy), ((sx + sw), (sy + sh)), (0, 0, 255), 2)
+        return frame
+
         
     def update( self, im, t = 0, name = None, bRenderDebug = True ):
         """
@@ -54,14 +69,20 @@ class FaceTracker:
         
         bFaceFound = 0
         bLookAt = 0
+        bSmile = 0
         bRenderSquare = 1
         bActivateTracker = 1
             
-        
+         
+        rSmile = 0
+        rRatioSmile = 0
         if facelandmark != []:
             yaw, pitch,roll = facerecognition_dlib.getFaceOrientation(facelandmark)
             print("yaw: %5.2f, pitch: %5.2f,roll: %5.2f" % (yaw, pitch,roll) )
             bLookAt = abs(yaw)<0.55 and abs(pitch)<0.2
+            rSmile, rRatioSmile = facerecognition_dlib.getSmileAmount(facelandmark)
+            print("rSmile: %.2f (ratio: %.2f)" % (rSmile,rRatioSmile) )
+            if rSmile > 0.: bSmile = 1
             
         
         tracker_box = []
@@ -81,12 +102,19 @@ class FaceTracker:
                 bFaceFound = 1
                 self.nCptFrameOnlyOnTracking = 0
             
-            if not self.bTrackerRunning: # or confidence > 0.95 # le réapprentissage fait trop de bug
+            if not self.bTrackerRunning or (confidence > 0.95 and self.nCptFrameSinceRestartTracking > 20):
+                # or confidence > 0.95 : le réapprentissage fait trop de bug
+                # mais de pas réapprendre c'est dommage aussi.
+                if (confidence > 0.95 and self.nCptFrameSinceRestartTracking > 20):
+                    print("DBG: forcing a tracker reset")
                 if confidence > 0.8: # ne surtout pas apprendre sur un visage pas completement sur
                     # reset tracking
                     bb = (startX, startY, endX-startX, endY-startY)
                     self.tracker.init(im,bb)
                     self.bTrackerRunning = True
+                    self.nCptFrameSinceRestartTracking = 0
+            else:
+                self.nCptFrameSinceRestartTracking += 1
                     
         facesProfile = []
         facesHaar = []
@@ -132,10 +160,14 @@ class FaceTracker:
         if bLookAt:
             self.nImageLookingAt += 1
             
+        if bSmile:
+            self.nImageSmile += 1
+            
         if bRenderDebug:
+            #~ im = cv2.resize(im,(0,0),fx=2,fy=2)
             if bRenderSquare:
                 self.fdcv3.render_res(im, res)
-                #~ im = self.fdl._renderFaceInfo(im,facelandmark)
+                im = self.fdl._renderFaceInfo(im,facelandmark,bRenderNumber=False,nAddOffset=-80)
                 if facesHaar != []: im = face_detector.drawRectForFaces( im, facesHaar, color = (255,255,0) )
                 if facesProfile != []: im = face_detector.drawRectForFaces( im, facesProfile )
                 pass
@@ -146,6 +178,8 @@ class FaceTracker:
             cv2_tools.drawHighligthedText(im, "analysed: %d" % self.nImageAnalysed, (30,30))
             cv2_tools.drawHighligthedText(im, "face: %d" % self.nImageWithFace, (30,60))
             cv2_tools.drawHighligthedText(im, "look: %d" % self.nImageLookingAt, (30,90))
+            cv2_tools.drawHighligthedText(im, "smile: %d" % self.nImageSmile, (30,120))
+            cv2_tools.drawHighligthedText(im, "rSmile: %.2f (ratio: %.2f)" % (rSmile,rRatioSmile), (30,150))
             
             
             im = cv2.resize(im,(0,0),fx=2,fy=2)
@@ -164,7 +198,7 @@ class FaceTracker:
         """
         return nbr analysed, nbr face, nbr look
         """
-        return self.nImageAnalysed, self.nImageWithFace, self.nImageLookingAt
+        return self.nImageAnalysed, self.nImageWithFace, self.nImageLookingAt, self.nImageSmile
         
     def getAvgDuration(self):
         n = self.nImageAnalysed - 1
@@ -188,7 +222,7 @@ def analyseFolder(folder):
     #~ bSpeedTest = 1
     
     bRenderDebug = 0
-    bRenderDebug = 1
+    #~ bRenderDebug = 1
     
     
     timeBegin = time.time()
@@ -235,6 +269,9 @@ def analyseFolder(folder):
     idx = 0
     idx = 2985 # regard en coin
     idx = 3019 # autre regard en coin
+    idx = 3100 # bug du tracker qui part sur la main
+    idx = 3448 # regard face
+
     
     # result on all images:
     """
@@ -242,7 +279,33 @@ def analyseFolder(folder):
     nImageWithFace : 1306 ( 18.1%)
     nImageLookingAt: 3 (  0.0%) (  0.2%)
     """
+    
+    #######################    
+    # img_pitie/2022_03_11_9h - regard tout le temps en coin
+    idx = 0
+    #~ idx = 950 # presque debut interaction
+    #~ idx = 1050 # debut interaction
+    #~ idx = 1375 # exemple de regard en coin
+    #~ idx = 1750
+    
+    # result on all images:
+    """
 
+    """
+    
+    #######################    
+    # img_pitie/2022_03_04_00h serait souriante ?
+    idx = 0
+    idx = 500 # ff
+    idx = 600 # bug de tracking qui commence sur un demi visage et reste coincé dessus - corrigé avec nCptFrameSinceRestartTracking
+    idx = 890 # int
+    
+    idx = 0
+    
+    # result on all images:
+    """
+
+    """
 
     
     
@@ -275,10 +338,11 @@ def analyseFolder(folder):
                 break
 
     facerecognition_dlib.storedFeatures.save()                
-    nImageAnalysed, nImageWithFace, nImageLookingAt = ft.getStats()
+    nImageAnalysed, nImageWithFace, nImageLookingAt, nSmile = ft.getStats()
     print("nImageAnalysed : %d" % (nImageAnalysed) )
     print("nImageWithFace : %d (%5.1f%%)" % (nImageWithFace,100*nImageWithFace/nImageAnalysed) )
     print("nImageLookingAt: %d (%5.1f%%) (%5.1f%%)" % (nImageLookingAt,100*nImageLookingAt/nImageAnalysed,100*nImageLookingAt/nImageWithFace) )
+    print("nImageSmile    : %d (%5.1f%%) (%5.1f%%)" % (nSmile,100*nSmile/nImageAnalysed,100*nSmile/nImageWithFace) )
 
 
 """
@@ -322,6 +386,8 @@ def analyseMovie():
     
 if os.name == "nt":
     strPath = "d:/pitie5/"
+    strPath = "d:/img_pitie/2022_03_11_9h/"
+    strPath = "d:/img_pitie/2022_03_04_00h/"
 else:
     strPath = os.path.expanduser("~/pitie4/")
 analyseFolder(strPath)

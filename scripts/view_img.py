@@ -11,6 +11,13 @@ import sys
 import numpy as np
 import time
 
+#~ def _getBasePath( self ):
+        #~ strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
+        #~ print( "DBG: loadModels: strLocalPath: %s" % strLocalPath )
+        #~ if strLocalPath == "":
+            #~ strLocalPath = "."
+        #~ return strLocalPath
+
 
 def mse(imageA, imageB):
     # the 'Mean Squared Error' between the two images is the
@@ -232,12 +239,12 @@ def viewImg( strFilename, bAnalyse = False, bAnalyseAlt = False ):
                     if not fr:
                         import sys
                         import os
-                        sys.path.append(os.path.expanduser("~/dev/git/protolab_group/face_tools/") )
+                        sys.path.append(os.path.expanduser("~/dev/git/face_tools/") )
                         import facerecognition_dlib
                         fr = facerecognition_dlib.FaceRecogniser()
                         fr.loadModels()        
                         fr.setVerbose(1)                          
-                    rConf, feat, facepos = fr.extractFeaturesFromFile( strFileToShow )
+                    rConf, feat, facepos, facelandmark = fr.extractFeaturesFromFile( strFileToShow )
                     if (idx % 100) == 0:
                         facerecognition_dlib.storedFeatures.save()
 

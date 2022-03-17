@@ -31,6 +31,6 @@ def chatbot_run():
         # gestion relance
         if time.time() > timeRelance:
             timeRelance = time.time() + 5
-            print("tu aimes les choux fleurs ?")
+            print("Au fait, tu aimes les choux fleurs ?")
         
 chatbot_run()

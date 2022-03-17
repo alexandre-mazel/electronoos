@@ -64,7 +64,7 @@ class FaceTracker:
         res = self.fdcv3.detect(im,bRenderBox=False,confidence_threshold=0.1) # ~0.06s on mstab7 on a VGA one face image
         if self.nImageAnalysed > 1: self.timefacedetectcv3 += time.time() - t
         t = time.time()
-        rConfidence, features, faceshape,facelandmark = self.fdl.extractFeaturesFromImg( im, name ) # ~0.7s on mstab7 on a VGA one face image (no cuda) # average other images: 0.48s, 0.17s when no face
+        rConfidence, features, faceshape,facelandmark = self.fdl.extractFeaturesFromImg( im, name, bForceRecompute = 0 ) # ~0.7s on mstab7 on a VGA one face image (no cuda) # average other images: 0.48s, 0.17s when no face
         if self.nImageAnalysed > 1: self.timefacedlib += time.time() - t
         
         bFaceFound = 0
@@ -222,7 +222,7 @@ def analyseFolder(folder):
     #~ bSpeedTest = 1
     
     bRenderDebug = 0
-    #~ bRenderDebug = 1
+    bRenderDebug = 1
     
     
     timeBegin = time.time()
@@ -300,11 +300,14 @@ def analyseFolder(folder):
     idx = 600 # bug de tracking qui commence sur un demi visage et reste coincé dessus - corrigé avec nCptFrameSinceRestartTracking
     idx = 890 # int
     
-    idx = 0
+    #~ idx = 0
     
     # result on all images:
     """
-
+    nImageAnalysed : 9826
+    nImageWithFace : 6438 ( 65.5%)
+    nImageLookingAt: 1462 ( 14.9%) ( 22.7%)
+    nImageSmile    : 3578 ( 36.4%) ( 55.6%)
     """
 
     

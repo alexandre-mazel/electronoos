@@ -33,10 +33,10 @@ def openWithEncoding( filename, mode, encoding, errors = 'strict' ):
     return open( filename, mode, encoding=encoding, errors=errors )
         
 def removeAccent( c ):
-    bVerbose = 0
+    bVerbose = 1
     try:
-        acc="ÉÈÎâàçéêëèîïôûüùŷÿ" # TODO A avec accent
-        noacc="EEIaaceeeeiiouuuyy"
+        acc="ÉÈÎâàáãäåçéêëèîïíìôóòðöøõûüùúŷÿÁ" # TODO A avec accent
+        noacc="EEIaaaaaaceeeeiiiiooooooouuuuyyA"
         #~ idx=acc.find(c) # in python 2.7: UnicodeDecodeError: 'ascii' codec can't decode byte 0xc3 in position 0: ordinal not in range(128) // ord(value) was 233
         #~ if idx != -1:
             #~ return noacc[idx]
@@ -54,6 +54,11 @@ def removeAccent( c ):
             206,
             226,
             224,
+            225,
+            227,
+            228
+            229, #dernier a
+            
             231,
             233,
             234,
@@ -61,12 +66,22 @@ def removeAccent( c ):
             232,
             238,
             239,
+            237,
+            236, # dernier i
             244,
+            243,
+            242,
+            240,
+            246,
+            248,
+            245, #dernier o
             251,
             252,
             249,
+            250, # dernier u
             375,
-            255
+            255,
+            193,
             ]
 
         # same chars at ovh (preceded by a 195 or 197 in front of 183)
@@ -76,6 +91,11 @@ def removeAccent( c ):
             142,
             162,
             160,
+            161,
+            163,
+            164,
+            165, #dernier a
+            
             167,
             169,
             170,
@@ -83,26 +103,38 @@ def removeAccent( c ):
             168,
             174,
             175,
+            173,
+            172, #dernier i
             180,
+            179,
+            178,
+            176,
+            182,
+            184,
+            181, # dernier o
             187,
             188,
             185,
+            186, #dernier u
             183,
-            191
+            191,
+            129, # untested
         ]
 
-        #~ assert_equal( len(acc_ord),len(noacc) )
+        assert_equal( len(acc_ord),len(noacc) )
         for i in range(len(acc_ord)):
             if ord(c) == acc_ord[i]:
                 return noacc[i]        
 
-        #~ assert_equal( len(acc_ord),len(acc_ord_ovh) )
+        assert_equal( len(acc_ord),len(acc_ord_ovh) )
         for i in range(len(acc_ord_ovh)):
             if ord(c) == acc_ord_ovh[i]:
                 return noacc[i]      
                 
         if c == "æ" or ord(c)==230:
             c = "ae"
+        if c == "Æ" or ord(c)==198:
+            c = "AE"
         if c == "œ" or ord(c)==339:
             c = "oe"
         elif c == "Œ" or ord(c)==338:
@@ -188,23 +220,57 @@ class Firstnames:
             if bVerbose: print("DBG: Regions.load: fields: %s" % str(fields) )
             strFirstname, strGender, strCountry, strOccurence = fields
             strFirstname = strFirstname[0].upper() + strFirstname[1:]
+            # some name are doubbled, eg; Jean (1) and Jean (2)
+            if '(' in strFirstname:
+                strFirstname = strFirstname.split('(')[0]
+                #~ print("strFirstname: '%s'" % strFirstname )
+                strFirstname = strFirstname.strip()
             bFemale = strGender == 'f'
             listCountries = strCountry.split(',')
             listCountries = [k.strip() for k in listCountries]
             strOccurence = strOccurence.replace("\n", "" )
             rOccurence = float(strOccurence)
+            #~ print(strFirstname)
             k = simpleString(strFirstname)
-            self.dictFirstname[k] = (strFirstname, bFemale, tuple(listCountries), rOccurence)
+            if k in self.dictFirstname.keys():
+                if bVerbose: print("WRN: Firstnames.load: forgetting dubbled %s (perhaps due to various accent simplified)" % (k) )
+            else:
+                self.dictFirstname[k] = (strFirstname, bFemale, tuple(listCountries), rOccurence)
             
     def get( self, strFirstname ):
         """
-        return None if not found
+        return (strFirstname, bFemale, tupleCountries, rOccurence) 
+        or None if not found
         """
         try:
             k = simpleString(strFirstname)
             return self.dictFirstname[k]
         except KeyError as err:
             return None
+            
+    def getCompound( self, strFirstname ):
+        """
+        search for compound firstname, eg: Jean-Bernard
+        return a construction with minimal of less use firstname div by number of firstname
+        return None if at least one firstname is not a known one
+        """
+        listFirstName = strFirstname.replace('-', ' ')
+        listFirstName = listFirstName.split(' ')
+        minOcc = 150
+        firstAnswer = None
+        for f in listFirstName:
+            #~ print("DBG: getCompound: checking '%s'" % f )
+            res = self.get(f)
+            if res == None:
+                #~ print("DBG: getCompound: checking '%s' => not found" % f )
+                return None
+            if firstAnswer == None:
+                firstAnswer = res
+            occ = res[3]
+            if occ < minOcc:
+                minOcc = occ
+        return firstAnswer[:-1]+(minOcc,)
+            
 
 # class Firstnames - end
 firstnames = Firstnames()
@@ -226,6 +292,42 @@ def autotest():
     assert_equal( val[1], True )
     assert_equal( val[2], ('english', 'german', 'swedish') )
     assert_diff( val[3], 5.51 )
+    
+    val = firstnames.get( "Jean" )
+    assert_equal( val[0], "Jean" )
+    
+    val = firstnames.get( "abdul-aziz" )
+    assert_equal( val[0], "Abdul-aziz" )
+    
+    
+    val = firstnames.get( "Tutu" )
+    assert_equal( val, None )
+    
+    val = firstnames.get( "Jean-René" )
+    assert_equal( val, None )
+
+    val = firstnames.get( "De" )
+    assert_equal( val, None )
+
+    val = firstnames.get( "íde" )
+    assert_equal( val, "íde" )    
+    
+
+    val = firstnames.getCompound( "Jean-Bernard" )
+    assert_equal( val[0], "Jean" )
+    assert_equal( val[1], False )
+    assert_equal( val[3], 0.0 )
+
+    val = firstnames.getCompound( "Jean-René" )
+    assert_equal( val[0], "Jean" )
+    assert_equal( val[1], False )
+    assert_equal( val[3], 0.0 )
+    
+    val = firstnames.getCompound( "Jean René" )
+    assert_equal( val[0], "Jean" )
+    assert_equal( val[1], False )
+    assert_equal( val[3], 0.0 )
+    
 # autotest- end
     
 if __name__ == "__main__":

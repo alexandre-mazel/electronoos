@@ -35,8 +35,8 @@ def openWithEncoding( filename, mode, encoding, errors = 'strict' ):
 def removeAccent( c ):
     bVerbose = 1
     try:
-        acc="ÉÈÎâàáãäåçéêëèîïíìôóòðöøõûüùúŷÿÁ" # TODO A avec accent
-        noacc="EEIaaaaaaceeeeiiiiooooooouuuuyyA"
+        acc="ÁÉÈÎÍÓÖÙâàáãäåçéêëèîïíìñôóòðöøõûüùúŷÿ" # TODO A avec accent
+        noacc="AEEIIOOUaaaaaaceeeeiiiinooooooouuuuyy"
         #~ idx=acc.find(c) # in python 2.7: UnicodeDecodeError: 'ascii' codec can't decode byte 0xc3 in position 0: ordinal not in range(128) // ord(value) was 233
         #~ if idx != -1:
             #~ return noacc[idx]
@@ -49,14 +49,19 @@ def removeAccent( c ):
                 print("%s," % ord(c) )
                 
         acc_ord = [
+            193, # A
             201,
             200,
-            206,
+            206, # premier I
+            205,
+            211, # premier O
+            214,
+            217, # premier U
             226,
             224,
             225,
             227,
-            228
+            228,
             229, #dernier a
             
             231,
@@ -68,6 +73,7 @@ def removeAccent( c ):
             239,
             237,
             236, # dernier i
+            241,
             244,
             243,
             242,
@@ -81,14 +87,18 @@ def removeAccent( c ):
             250, # dernier u
             375,
             255,
-            193,
             ]
 
         # same chars at ovh (preceded by a 195 or 197 in front of 183)
         acc_ord_ovh = [
+            129, # A untested
             137,
             136,
-            142,
+            142, # premier I
+            141,
+            147, # premier O
+            150,
+            153, # premier U
             162,
             160,
             161,
@@ -105,6 +115,7 @@ def removeAccent( c ):
             175,
             173,
             172, #dernier i
+            177,
             180,
             179,
             178,
@@ -118,7 +129,6 @@ def removeAccent( c ):
             186, #dernier u
             183,
             191,
-            129, # untested
         ]
 
         assert_equal( len(acc_ord),len(noacc) )
@@ -309,8 +319,8 @@ def autotest():
     val = firstnames.get( "De" )
     assert_equal( val, None )
 
-    val = firstnames.get( "íde" )
-    assert_equal( val, "íde" )    
+    val = firstnames.get( "Íde" )
+    assert_equal( val[0], "Íde" )    
     
 
     val = firstnames.getCompound( "Jean-Bernard" )

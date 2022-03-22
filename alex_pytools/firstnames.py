@@ -131,12 +131,12 @@ def removeAccent( c ):
             191,
         ]
 
-        assert_equal( len(acc_ord),len(noacc) )
+        #~ assert_equal( len(acc_ord),len(noacc) )
         for i in range(len(acc_ord)):
             if ord(c) == acc_ord[i]:
                 return noacc[i]        
 
-        assert_equal( len(acc_ord),len(acc_ord_ovh) )
+        #~ assert_equal( len(acc_ord),len(acc_ord_ovh) )
         for i in range(len(acc_ord_ovh)):
             if ord(c) == acc_ord_ovh[i]:
                 return noacc[i]      
@@ -156,6 +156,9 @@ def removeAccent( c ):
             c = ""
         elif ord(c) == 195 or ord(c) == 197:
             # mark of char on two chars at ovh, don't complain
+            c = ""
+        elif ord(c) == 222 or ord(c) == 254:
+            # truc bizarre qui ressemble a une barre avec un demi cercle dessus
             c = ""
         elif ord(c) == 8211 or ord(c) == 8212:
             # custom hyphen

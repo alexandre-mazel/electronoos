@@ -15,7 +15,7 @@ def findCloser( listFaceResult, rect, confidence_treshold = 0.13 ):
     or [] if no intersection
     - rect: a rect (startX, startY, endX, endY)
     """
-    print("DBG: findCloser: looking to match %s" % str(rect) )
+    #~ print("DBG: findCloser: looking to match %s" % str(rect) )
     rScoreMax = 0
     best = [] # intersection and original rect
     sx,sy,ex,ey = rect
@@ -34,7 +34,7 @@ def findCloser( listFaceResult, rect, confidence_treshold = 0.13 ):
             continue
         inter_area = (ex-sx)*(ey-sy)
         ratio_inter = inter_area / ((area_1+area_2)/2)
-        print("DBG: findCloser: rect: %s, inter_area: %d, ratio_inter: %.1f" % (str(oneres[:4]), inter_area, ratio_inter ) )
+        #~ print("DBG: findCloser: rect: %s, inter_area: %d, ratio_inter: %.1f" % (str(oneres[:4]), inter_area, ratio_inter ) )
         if rScoreMax < ratio_inter:
             rScoreMax = ratio_inter
             best = (sx,sy,ex,ey), (rsx, rsy, rex, rey), ratio_inter, confidence

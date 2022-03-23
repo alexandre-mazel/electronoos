@@ -82,7 +82,7 @@ class FaceTracker:
             bLookAt = abs(yaw)<0.55 and abs(pitch)<0.2
             rSmile, rRatioSmile = facerecognition_dlib.getSmileAmount(facelandmark)
             print("rSmile: %.2f (ratio: %.2f)" % (rSmile,rRatioSmile) )
-            if rSmile > 0.: bSmile = 1
+            if rSmile > 0.34: bSmile = 1
             
         
         tracker_box = []
@@ -222,7 +222,7 @@ def analyseFolder(folder):
     #~ bSpeedTest = 1
     
     bRenderDebug = 0
-    bRenderDebug = 1
+    #~ bRenderDebug = 1
     
     
     timeBegin = time.time()
@@ -281,26 +281,32 @@ def analyseFolder(folder):
     """
     
     #######################    
-    # img_pitie/2022_03_11_9h - regard tout le temps en coin
+    # img_pitie/2022_03_11_9h - regard tout le temps en coin.
+    # a partir de 0.35 inclus, c'est un sourire pour elle
     idx = 0
     #~ idx = 950 # presque debut interaction
-    #~ idx = 1050 # debut interaction
+    idx = 1050 # debut interaction
     #~ idx = 1375 # exemple de regard en coin
     #~ idx = 1750
     
     # result on all images:
     """
-
+    # 2022/03/23: redone with enhancement on smile detection:
+    nImageAnalysed : 7127
+    nImageWithFace : 2665 ( 37.4%)
+    nImageLookingAt: 104 (  1.5%) (  3.9%)
+    nImageSmile    : 326 (  4.6%) ( 12.2%)
     """
     
     #######################    
-    # img_pitie/2022_03_04_00h serait souriante ?
-    idx = 0
-    idx = 500 # ff
-    idx = 600 # bug de tracking qui commence sur un demi visage et reste coincé dessus - corrigé avec nCptFrameSinceRestartTracking
-    idx = 890 # int
+    # img_pitie/2022_03_04_00h bien souriante ?
+    if 0:
+        idx = 0
+        idx = 500 # ff
+        idx = 600 # bug de tracking qui commence sur un demi visage et reste coincé dessus - corrigé avec nCptFrameSinceRestartTracking
+        idx = 890 # int
     
-    #~ idx = 0
+    idx = 0
     
     # result on all images:
     """
@@ -308,6 +314,12 @@ def analyseFolder(folder):
     nImageWithFace : 6438 ( 65.5%)
     nImageLookingAt: 1462 ( 14.9%) ( 22.7%)
     nImageSmile    : 3578 ( 36.4%) ( 55.6%)
+    
+    # 2022/03/23: redone with enhancement on smile detection:
+    nImageAnalysed : 9826
+    nImageWithFace : 6438 ( 65.5%)
+    nImageLookingAt: 1462 ( 14.9%) ( 22.7%)
+    nImageSmile    : 2747 ( 28.0%) ( 42.7%)
     """
 
     
@@ -389,7 +401,7 @@ def analyseMovie():
     
 if os.name == "nt":
     strPath = "d:/pitie5/"
-    strPath = "d:/img_pitie/2022_03_11_9h/"
+    #~ strPath = "d:/img_pitie/2022_03_11_9h/"
     strPath = "d:/img_pitie/2022_03_04_00h/"
 else:
     strPath = os.path.expanduser("~/pitie4/")

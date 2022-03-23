@@ -213,6 +213,13 @@ class Firstnames:
         
     def load( self ):
         print("INF: Firstnames.load: loading firstnames data...")
+        """
+        A la main, j'ai effacé du fichier:
+        sans;m;;1715.23
+        sens;f;;331.35
+        Et j'ai ajouté:
+        corto
+        """
         bVerbose = 0
         strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
         #~ print("strLocalPath: " + strLocalPath)
@@ -283,11 +290,16 @@ class Firstnames:
             if occ < minOcc:
                 minOcc = occ
         return firstAnswer[:-1]+(minOcc,)
-            
+        
+    def printListByOcc( self ):
+        out = sorted(self.dictFirstname.values(),key=lambda x: x[3],reverse=True)
+        for e in out:
+            print(e)
 
 # class Firstnames - end
 firstnames = Firstnames()
 firstnames.load()
+#~ firstnames.printListByOcc()
 
 def autotest():
     val = firstnames.get( "Alexandre" )

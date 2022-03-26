@@ -352,6 +352,9 @@ def autotest():
     assert_equal( val[0], "Jean" )
     assert_equal( val[1], False )
     assert_equal( val[3], 0.0 )
+
+    val = firstnames.getCompound( "Juliana" )
+    assert_equal( val[0], "Juliana" )
     
 # autotest- end
     

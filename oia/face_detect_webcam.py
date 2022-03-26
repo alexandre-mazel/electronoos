@@ -3,15 +3,15 @@ import cv2
 # Load the cascade
 face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
-
-cap = cv2.VideoCapture(0) #ouvre la webcam
-
+cap = cv2.VideoCapture(1) #ouvre la webcam
 
 while 1:
     
     ret, img = cap.read() # lis et stocke l'image dans frame
     
     #~ img = cv2.resize(img, None, fx=2,fy=2)
+    
+    #~ img = cv2.flip(img,0) # flip vertic
 
     # Convert into grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -19,7 +19,7 @@ while 1:
     # Detect faces
     faces = face_cascade.detectMultiScale(gray, 1.1, 4)
 
-    if 0:
+    if 1:
         # Draw rectangle around the faces
         for (x, y, w, h) in faces:
             cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2)
@@ -33,7 +33,7 @@ while 1:
             blurred=img[y:y+h,x:x+w]
             blurred = cv2.GaussianBlur(blurred,(0,0),8)
             img[y:y+h,x:x+w]=blurred
-    if 1:
+    if 0:
         # swap faces (amusant mais ca fait pas naturel)
         if len(faces) > 1:
             x1, y1, w1, h1 = faces[0]

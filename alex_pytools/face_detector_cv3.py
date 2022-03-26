@@ -69,7 +69,7 @@ class FaceDetector:
         strModel = strPath + "facedetect_res10_300x300_ssd_iter_140000.caffemodel"
         self.net = cv2.dnn.readNetFromCaffe( strProtoTxt, strModel )
         
-    def render_res( self, im, res, color = (255,0,0) ):
+    def render_res( self, im, res, color = (255,0,0), bRenderAll = False ):
         """
         render result from a previous analyse in im
         return im (as given)
@@ -82,7 +82,7 @@ class FaceDetector:
                 col = (col[0]//2,col[1]//2,col[2]//2)
             if confidence < 0.25:
                 col = (col[0]//2,col[1]//2,col[2]//2)
-            if confidence < 0.14:
+            if confidence < 0.14 and not bRenderAll:
                 continue
             cv2.rectangle( im, (startX,startY), (endX, endY), col )
             # etiquette and confidence

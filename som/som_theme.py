@@ -7,6 +7,9 @@ sys.path.append("../alex_pytools")
 import csv_loader
 
 
+todo: faire une méthode qui trace un blob qui doit englober n point., avec un super effet joli
+zone d'influence, ou niveau d'altitude...
+
 successes, failures = pygame.init()
 print("INF: pygame int: %s successes and %s failure(s)" % (successes, failures))
 

@@ -58,21 +58,9 @@ def getCommon(list1,list2):
         if l in list2:
             n+=1
     return n
-
-class Agent:
-    def __init__( self, strName, nTheme, size_world ):
-        print("DBG: Agent: creating '%s' theme %d" % (strName, nTheme) )
-        self.strName = strName
-        self.anTheme = [nTheme]
-        self.pos = [ random.randint(0,size_world[0]-1),random.randint(0,size_world[1]-1) ]
-
-        self.text_img = font.render(strName, True, white)
-        #~ self.text_img = font.render(str(nTheme), True, green, blue) # for debug
-        self.text_img = font.render(str(nTheme), True, white) # for debug
- 
-        self.text_rect = self.text_img.get_rect()
-        self.text_rect.center = self.pos
-        
+    
+class Sphere:
+    def __init__( self, nTheme ):
         self.zone_size = 128
         sx = self.zone_size
         sy = self.zone_size
@@ -85,6 +73,27 @@ class Agent:
                 a = crop(a,255)
                 self.zone.set_at((i,j), (color[0],color[1],color[2],a) )
                 
+    def render(self, screen, pos ):
+        screen.blit(self.zone, [pos[0]-self.zone_size//2+20,pos[1]-self.zone_size//2+10])
+
+aSphereByTheme = [] # 0 => theme1, 1=> theme2...
+
+class Agent:
+    def __init__( self, strName, nTheme, size_world ):
+        print("DBG: Agent: creating '%s' theme %d" % (strName, nTheme) )
+        self.strName = strName
+        self.anTheme = [nTheme]
+        self.pos = [ random.randint(0,size_world[0]-1),random.randint(0,size_world[1]-1) ]
+
+        self.text_img = font.render(strName, True, white)
+        #~ self.text_img = font.render(str(nTheme), True, green, blue) # for debug
+        #~ self.text_img = font.render(str(nTheme), True, white) # for debug
+ 
+        self.text_rect = self.text_img.get_rect()
+        self.text_rect.center = self.pos
+        
+        self.zone = Sphere(nTheme) # unused
+                
     def addTheme(self,nTheme):
         self.anTheme.append(nTheme)
 
@@ -92,7 +101,10 @@ class Agent:
         self.text_rect.center = [int(self.pos[0]),int(self.pos[1])]
         
     def render( self, screen ):
-        screen.blit(self.zone, [self.text_rect[0]-self.zone_size//2+20,self.text_rect[1]-self.zone_size//2+10])
+        #~ screen.blit(self.zone, [self.text_rect[0]-self.zone_size//2+20,self.text_rect[1]-self.zone_size//2+10])
+        #~ self.zone.render(screen,self.text_rect)
+        for n in self.anTheme:
+            aSphereByTheme[n-1].render(screen,self.text_rect)
         screen.blit(self.text_img, self.text_rect)
 
         
@@ -113,8 +125,19 @@ class Game:
         print(data)
         for line in data[1:]:
             for idx, word in enumerate(line):
-                self.agents.append(Agent(word,idx+1,self.size_world))
-        
+                if len(word)>1:
+                    nTheme = idx+1
+                    #~ self.agents.append(Agent(word,nTheme,self.size_world))
+                    for i in range(len(self.agents)):
+                        if self.agents[i].strName == word:
+                            self.agents[i].addTheme(nTheme)
+                            break
+                    else:
+                        self.agents.append(Agent(word,nTheme,self.size_world))
+                        
+        nbrTheme = 9
+        for n in range(nbrTheme):
+            aSphereByTheme.append( Sphere(n) )
     
     def update(self):
         self.clock.tick(self.fps)
@@ -125,14 +148,12 @@ class Game:
             if event.type == pygame.QUIT:
                 return True
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_w:
-                    rect.move_ip(0, -2)
-                elif event.key == pygame.K_s:
-                    rect.move_ip(0, 2)
-                elif event.key == pygame.K_a:
-                    rect.move_ip(-2, 0)
-                elif event.key == pygame.K_d:
-                    rect.move_ip(2, 0)
+                if event.key == pygame.K_e:
+                    # explode
+                    maxr  = self.size_world[0]//20
+                    for i in range(len(self.agents)):
+                        self.agents[i].pos[0] += random.randint(0,maxr)-maxr//2
+                        self.agents[i].pos[1] += random.randint(0,maxr)-maxr//2
                     
 
             
@@ -148,11 +169,13 @@ class Game:
                     jmin = j
             # j is nearest:
             j = jmin
-            if self.agents[i].nTheme == self.agents[j].nTheme and rDistMin > 200:
+            #~ if self.agents[i].nTheme == self.agents[j].nTheme and rDistMin > 200:
+            nDistLimit = 4000 # squared dist
+            if getCommon(self.agents[i].anTheme,self.agents[j].anTheme) > 1 and rDistMin > nDistLimit:
                 # attract
                 rCoef = 0.5
                 
-                if rDistMin > 250:
+                if rDistMin > nDistLimit*1.1:
                     x = self.agents[i].pos[0]*(1-rCoef) + self.agents[j].pos[0]*(rCoef)
                     y = self.agents[i].pos[1]*(1-rCoef) + self.agents[j].pos[1]*(rCoef)
                     

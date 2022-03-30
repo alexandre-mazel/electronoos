@@ -6,9 +6,8 @@ def openWithEncoding( filename, mode, encoding, errors = 'strict' ):
         return io.open( filename, mode, encoding=encoding, errors=errors )
     return open( filename, mode, encoding=encoding, errors=errors )
 
-def load_csv(filename):
-    bVerbose=1
-    bVerbose=0
+def load_csv(filename, sepa = ';',bSkipFirstLine = 0, bVerbose=0 ):
+
     data = []
     enc = 'utf-8'    
     try:
@@ -16,7 +15,8 @@ def load_csv(filename):
     except:
         return data
         
-    #~ line = file.readline() # skip first line
+    if bSkipFirstLine:
+        line = file.readline() # skip first line
     
     while 1:
         line = file.readline()
@@ -24,12 +24,12 @@ def load_csv(filename):
             break
         if bVerbose: print("DBG: load_csv: line: '%s'" % line )
         if line[-1] == '\n': line = line[:-1] # erase last \n
-        fields = line.split(';')
+        fields = line.split(sepa)
         for i in range(len(fields)):
-            if bVerbose: print("DBG: load_csv: fields[i]: '%s'" % fields[i] )
-            if fields[i][0] == '"' and fields[i][-1] == '"':
+            if bVerbose: print("DBG: load_csv: fields[%d]: '%s'" % (i,fields[i]) )
+            if len(fields[i])>1 and fields[i][0] == '"' and fields[i][-1] == '"':
                 fields[i] = fields[i][1:-1]
-            else:
+            elif not isinstance(fields[i], str):
                 # TODO: handle array
                 if '.' in fields[i]:
                     fields[i] = float(fields[i])

@@ -21,12 +21,12 @@ listColor = [
                     (0, 255, 0),
                     (255, 0, 0),
                     
-                    (127, 0, 255),
-                    (0, 255, 127),
-                    (255, 0, 127),
+                    (127, 0, 127),
+                    (0, 127, 127),
+                    (127, 0, 127),
                     
                     (127, 127, 255),
-                    (127, 255, 127),
+                    (64, 255, 127),
                     (255, 127, 255),
             ]
 
@@ -48,12 +48,22 @@ def crop(x,max):
     if x >= max:
         return max-1
     return x
+    
+def getCommon(list1,list2):
+    """
+    return nbr of common element both lists
+    """
+    n = 0
+    for l in list1:
+        if l in list2:
+            n+=1
+    return n
 
 class Agent:
     def __init__( self, strName, nTheme, size_world ):
         print("DBG: Agent: creating '%s' theme %d" % (strName, nTheme) )
         self.strName = strName
-        self.nTheme = nTheme
+        self.anTheme = [nTheme]
         self.pos = [ random.randint(0,size_world[0]-1),random.randint(0,size_world[1]-1) ]
 
         self.text_img = font.render(strName, True, white)
@@ -74,6 +84,9 @@ class Agent:
                 a = 4*int(64-math.sqrt(dist2D2((i,j),(sx//2,sy//2))))
                 a = crop(a,255)
                 self.zone.set_at((i,j), (color[0],color[1],color[2],a) )
+                
+    def addTheme(self,nTheme):
+        self.anTheme.append(nTheme)
 
     def update( self ):
         self.text_rect.center = [int(self.pos[0]),int(self.pos[1])]
@@ -139,7 +152,7 @@ class Game:
                 # attract
                 rCoef = 0.5
                 
-                if rDistMin > 100:
+                if rDistMin > 250:
                     x = self.agents[i].pos[0]*(1-rCoef) + self.agents[j].pos[0]*(rCoef)
                     y = self.agents[i].pos[1]*(1-rCoef) + self.agents[j].pos[1]*(rCoef)
                     

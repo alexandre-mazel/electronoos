@@ -205,6 +205,40 @@ def loadListUnivercityCity():
                     
     return dictCityNbrStudent
     
+        
+def getLongLatParis(zip):
+    """
+    return None if zip not in paris
+    """
+    dMairieByArrt = {
+    "75001": (48.860229481701275, 2.341144718898233),
+    "75002": (48.86691549409705, 2.3405526632345692),
+    "75003": (45.760454328146665, 4.849619942213573),
+    "75004": (45.77439665631134, 4.827901461166257),
+    "75005": (48.84728895451373, 2.3444269031033427),
+    "75006": (48.85186486570257, 2.332323906701487),
+    "75007": (48.857964521292004, 2.3203047419951717),
+    "75008": (48.8778735550223, 2.3175353470467672),
+    "75009": (48.87461575312214, 2.340110188782279),
+    "75010": (48.872026438530554, 2.3575061446349297),
+    "75011": (48.85883038976746, 2.379526708674561),
+    "75012": (48.841188747402434, 2.3880029516825205),
+    "75013": (48.83400181758377, 2.355797863333225),
+    "75014": (48.8333833024, 2.3269441538671694),
+    "75015": (48.84156802519426, 2.300377494022698),
+    "75016": (48.8639710753748, 2.2765973930774925),
+    "75017": (48.884640668829505, 2.3221624511967787),
+    "75018": (48.89245470756174, 2.344460607631557),
+    "75019": (48.884160133854074, 2.381934739473095),
+    "75020": (48.865226484167344, 2.39903486037782),
+    }
+    
+    try:
+        return dMairieByArrt[str(zip)][::-1]
+    except KeyError:
+        pass
+    return None
+    
 
 def removeAccent( c ):
     try:
@@ -710,21 +744,32 @@ class Cities:
         return retVal
         
     def distTwoZip(self,zip1,zip2,bVerbose=False):
-        c1 = self.findByZip(zip1)
-        c2 = self.findByZip(zip2)
-        if c1 == None:
-            print("WRN: distTwoZip: zip1 '%s' not found" % zip1)
-            assert(0)
-            return 99999
-        if c2 == None:
-            print("WRN: distTwoZip: zip2 '%s' not found" % zip2)
-            assert(0)
-            return 99999
-        if bVerbose: print("DBG: distTwoZip: ville 1: %s" % str(c1) )
-        if bVerbose: print("DBG: distTwoZip: ville 1: long: %.3f, lat: %.3f" % (c1[4],c1[5]) )
-        if bVerbose: print("DBG: distTwoZip: ville 2: %s" % str(c2) )
-        if bVerbose: print("DBG: distTwoZip: ville 2: long: %.3f, lat: %.3f" % (c2[4],c2[5]) )
-        return distLongLat(c1[4],c1[5],c2[4],c2[5])
+        c1 = getLongLatParis(zip1)
+        if c1 is None:
+
+            c1 = self.findByZip(zip1)
+            if c1 == None:
+                print("WRN: distTwoZip: zip1 '%s' not found" % zip1)
+                assert(0)
+                return 99999
+            if bVerbose: print("DBG: distTwoZip: ville 1: %s" % str(c1) )
+            if bVerbose: print("DBG: distTwoZip: ville 1: long: %.3f, lat: %.3f" % (c1[4],c1[5]) )
+            c1 = c1[4:6]
+            
+        c2 = getLongLatParis(zip2)
+        if c2 is None:
+            c2 = self.findByZip(zip2)
+            if c2 == None:
+                print("WRN: distTwoZip: zip2 '%s' not found" % zip2)
+                assert(0)
+                return 99999
+                
+            if bVerbose: print("DBG: distTwoZip: ville 2: %s" % str(c2) )
+            if bVerbose: print("DBG: distTwoZip: ville 2: long: %.3f, lat: %.3f" % (c2[4],c2[5]) )
+            c2 = c2[4:6]
+            
+        #~ return distLongLat(c1[4],c1[5],c2[4],c2[5])
+        return distLongLat(c1[0],c1[1],c2[0],c2[1])
         
     def getLongLat(self,zip,bDefaultToClermont = False ):
         """
@@ -1078,11 +1123,19 @@ def autotest_cities():
     assert_diff(dist,397,20)
     
 
+    dist = cities.distTwoZip("75000","75001",bVerbose=True)
+    assert_diff(dist,1,5)  
+    
     dist = cities.distTwoZip("75006","34000",bVerbose=True)
     assert_diff(dist,596,20)        
 
     dist = cities.distTwoZip("33000","67000",bVerbose=True)
     assert_diff(dist,760,20)
+
+    dist = cities.distTwoZip("75000","75001",bVerbose=True)
+    
+    dist = cities.distTwoZip("75020","75016",bVerbose=True)
+    assert_diff(dist,9,4)
     
     
     assert_diff(cities.isValidAdress( "34440","colombier")[2],0.95)

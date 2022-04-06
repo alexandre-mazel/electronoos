@@ -36,7 +36,10 @@ def detectEmotion( image, bDebug = False ):
     """
     
     if image is None:
+        print("WRN: detectEmotion: image is empty")
         return None
+        
+    if bDebug: print("INF: detectEmotion: image shape: %s" % str(image.shape))
     
     timeBegin = time.time()
     out = []
@@ -50,12 +53,17 @@ def detectEmotion( image, bDebug = False ):
     # Define padding for face ROI
     padding = 3
     
+    hi,wi,dummy=image.shape
+    
     # Iterate process for all detected faces
     for x,y,w,h in faces:
-        if bDebug: print("DBG: detectEmotion: face found: %s" % str(x,y,w,h) ) 
+        if bDebug: print("DBG: detectEmotion: face found: %s" % str((x,y,w,h)) ) 
+        if x>wi or x+w<0 or y>hi or y+h<0:
+            if bDebug: print("WRN: this face is out of image!")
+            continue
         
         # Get the Face from image
-        face = img_copy[y-padding:y+h+padding,x-padding:x+w+padding]
+        face = img_copy[max(0,y-padding):y+h+padding,max(0,x-padding):x+w+padding]
         
         # Convert the detected face from BGR to Gray scale
         gray = cv2.cvtColor(face,cv2.COLOR_BGR2GRAY)
@@ -81,13 +89,17 @@ def detectEmotion( image, bDebug = False ):
         
         # Get the predicted emotion
         idxmax = prob.argmax()
-        predicted_emotion = emotions[idxmax]
+        strPredictedEmotion = emotions[idxmax]
         rConf = prob[idxmax]
-        out.append([(x,y,w,h),idxmax,rConf,predicted_emotion])
+        if rConf < 0.55 and 1:
+            if bDebug: print("DBG: not enough confidence %.3f on detected %s" % (rConf,strPredictedEmotion) )
+            continue
+            
+        out.append([(x,y,w,h),idxmax,rConf,strPredictedEmotion])
        
         if bDebug:
             # Write predicted emotion on image
-            cv2.putText(img_copy,'{}'.format(predicted_emotion),(x,y+h+(1*20)), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,255), 
+            cv2.putText(img_copy,'{}'.format(strPredictedEmotion),(x,y+h+(1*20)), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,255), 
                             2, cv2.LINE_AA)
             # Draw a rectangular box on the detected face
             cv2.rectangle(img_copy,(x,y),(x+w,y+h),(0,0,255),2)

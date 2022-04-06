@@ -91,18 +91,22 @@ def detectEmotion( image, bDebug = False ):
         idxmax = prob.argmax()
         strPredictedEmotion = emotions[idxmax]
         rConf = prob[idxmax]
-        if rConf < 0.55 and 1:
+        if rConf < 0.4 and 1:
             if bDebug: print("DBG: not enough confidence %.3f on detected %s" % (rConf,strPredictedEmotion) )
             continue
             
         out.append([(x,y,w,h),idxmax,rConf,strPredictedEmotion])
        
         if bDebug:
+            color = (255,0,0)
             # Write predicted emotion on image
-            cv2.putText(img_copy,'{}'.format(strPredictedEmotion),(x,y+h+(1*20)), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,255), 
-                            2, cv2.LINE_AA)
+            cv2.putText( img_copy,'{}'.format(strPredictedEmotion),(x,y+h+(1*20)), cv2.FONT_HERSHEY_SIMPLEX, 1, color,2, cv2.LINE_AA )
             # Draw a rectangular box on the detected face
-            cv2.rectangle(img_copy,(x,y),(x+w,y+h),(0,0,255),2)
+            cv2.rectangle( img_copy, (x,y), (x+w,y+h), color, 2 )
+            
+            cv2.rectangle(img_copy,(x, y-14),(x+40, y), color, thickness=-1 )
+            cv2.putText(img_copy,"%.2f"%rConf,(x+2, y-2),cv2.FONT_HERSHEY_SIMPLEX, 0.5, color=(255,255,255), thickness = 1 )
+
     
     print("INF: detectEmotion: detected:\n%s" % str(out))
     if bDebug:
@@ -127,14 +131,19 @@ def testDetect():
     path_faces = "../../face_tools/faces/"
     listFiles = []
     #~ listFiles.append("../data/multiple_humans.jpg")
+    #~ listFiles.append(path_faces+"0_alexandre0.jpg")
     #~ listFiles.append(path_faces+"frown/frown_0.jpg")
     #~ listFiles.append(path_faces+"frown/frown_e.jpg")
-    listFiles.append(path_faces+"frown/frown_k.jpg")
-    listFiles.append(path_faces+"frown/frown_q.jpg")
+    #~ listFiles.append(path_faces+"frown/frown_k.jpg")
+    #~ listFiles.append(path_faces+"frown/frown_q.jpg")
     listFiles.append(path_faces+"neutral/neutral_2.jpg")
     listFiles.append(path_faces+"neutral/neutral_j.jpg")
-    listFiles.append(path_faces+"smile/smile_x1.jpg")
-    listFiles.append(path_faces+"smile/smile_xk.jpg")
+    #~ listFiles.append(path_faces+"smile/smile_x1.jpg")
+    #~ listFiles.append(path_faces+"smile/smile_xa.jpg")
+    #~ listFiles.append(path_faces+"smile/smile_xc.jpg")
+    #~ listFiles.append(path_faces+"smile/smile_xd.jpg")
+    #~ listFiles.append(path_faces+"smile/smile_xf.jpg")
+    #~ listFiles.append(path_faces+"smile/smile_xk.jpg")
     
 
     for f in listFiles:

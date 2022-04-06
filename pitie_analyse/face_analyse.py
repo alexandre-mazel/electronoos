@@ -321,6 +321,11 @@ def analyseFolder(folder):
     nImageLookingAt: 1462 ( 14.9%) ( 22.7%)
     nImageSmile    : 2747 ( 28.0%) ( 42.7%)
     """
+    
+    #######################    
+    # img_pitie/2022_03_25_9h/m1 comparaison avec annotation manuelle Clara
+    idx = 0
+    
 
     
     
@@ -402,7 +407,8 @@ def analyseMovie():
 if os.name == "nt":
     strPath = "d:/pitie5/"
     #~ strPath = "d:/img_pitie/2022_03_11_9h/"
-    strPath = "d:/img_pitie/2022_03_04_00h/"
+    #~ strPath = "d:/img_pitie/2022_03_04_00h/"
+    strPath = "d:/img_pitie/2022_03_25_9h/m1/"
 else:
     strPath = os.path.expanduser("~/pitie4/")
 analyseFolder(strPath)

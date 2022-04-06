@@ -15,6 +15,8 @@ import time
 
 def init_emotion(model="models/emotion-ferplus-8.onnx"):
     
+    timeBegin = time.time()
+    
     # Set global variables
     global net,emotions
     
@@ -23,9 +25,21 @@ def init_emotion(model="models/emotion-ferplus-8.onnx"):
     
     # Initialize the DNN module
     net = cv2.dnn.readNetFromONNX(model)
-    print( "INF: init_emotion: Done" )
+    print( "INF: init_emotion: done in %.3fs" % ( time.time()-timeBegin) )
     
-def emotion(image,returndata=False):
+def getLibelleEmotion(idx):
+    return emotions[idx]
+    
+def detectEmotion( image, bDebug = False ):
+    """
+    return a list of [face_pos, id emotion, confidence, libelle emotion]
+    """
+    
+    if image is None:
+        return None
+    
+    timeBegin = time.time()
+    out = []
     
     # Make copy of  image
     img_copy = image.copy()
@@ -34,10 +48,11 @@ def emotion(image,returndata=False):
     faces = fd.ssd_detect(img_copy,conf=0.2)
     
     # Define padding for face ROI
-    padding = 3 
+    padding = 3
     
     # Iterate process for all detected faces
     for x,y,w,h in faces:
+        if bDebug: print("DBG: detectEmotion: face found: %s" % str(x,y,w,h) ) 
         
         # Get the Face from image
         face = img_copy[y-padding:y+h+padding,x-padding:x+w+padding]
@@ -65,29 +80,57 @@ def emotion(image,returndata=False):
         prob = np.squeeze(probablities)
         
         # Get the predicted emotion
-        predicted_emotion = emotions[prob.argmax()]
+        idxmax = prob.argmax()
+        predicted_emotion = emotions[idxmax]
+        rConf = prob[idxmax]
+        out.append([(x,y,w,h),idxmax,rConf,predicted_emotion])
        
-        # Write predicted emotion on image
-        cv2.putText(img_copy,'{}'.format(predicted_emotion),(x,y+h+(1*20)), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,255), 
-                        2, cv2.LINE_AA)
-        # Draw a rectangular box on the detected face
-        cv2.rectangle(img_copy,(x,y),(x+w,y+h),(0,0,255),2)
+        if bDebug:
+            # Write predicted emotion on image
+            cv2.putText(img_copy,'{}'.format(predicted_emotion),(x,y+h+(1*20)), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,255), 
+                            2, cv2.LINE_AA)
+            # Draw a rectangular box on the detected face
+            cv2.rectangle(img_copy,(x,y),(x+w,y+h),(0,0,255),2)
     
-    if  returndata:
-        # Return the the final image if return data is True
-        return img_copy
-
-    else:
+    print("INF: detectEmotion: detected:\n%s" % str(out))
+    if bDebug:
         # Display the image
         if 1:
             cv2.imshow("emotions",img_copy)
             cv2.waitKey(0)
         else:
             plt.figure(figsize=(10,10))
-            plt.imshow(img_copy[:,:,::-1]);plt.axis("off");          
+            plt.imshow(img_copy[:,:,::-1]);plt.axis("off");        
+
+    duration = time.time()-timeBegin
+    print("INF: detectEmotion takes %.3fs" % duration )
+    return out
+# detectEmotion - end
         
         
 init_emotion()
-image = cv2.imread("../data/multiple_humans.jpg")
-res = emotion(image)
-print("INF: res: %s" % str(res))
+
+def testDetect():
+    bDebug = 1
+    path_faces = "../../face_tools/faces/"
+    listFiles = []
+    #~ listFiles.append("../data/multiple_humans.jpg")
+    #~ listFiles.append(path_faces+"frown/frown_0.jpg")
+    #~ listFiles.append(path_faces+"frown/frown_e.jpg")
+    listFiles.append(path_faces+"frown/frown_k.jpg")
+    listFiles.append(path_faces+"frown/frown_q.jpg")
+    listFiles.append(path_faces+"neutral/neutral_2.jpg")
+    listFiles.append(path_faces+"neutral/neutral_j.jpg")
+    listFiles.append(path_faces+"smile/smile_x1.jpg")
+    listFiles.append(path_faces+"smile/smile_xk.jpg")
+    
+
+    for f in listFiles:
+        print("\nINF: processing '%s'" % f )
+        image = cv2.imread(f)
+        res = detectEmotion(image,bDebug=bDebug)
+        print("INF: res: %s" % str(res))    
+    
+    
+if __name__ == "__main__":
+    testDetect()

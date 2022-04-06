@@ -12,7 +12,7 @@ def drawHighligthedText(im,txt, position, fontface=cv2.FONT_HERSHEY_SIMPLEX, fon
     """
     
     textsize, baseline = cv2.getTextSize(txt, fontface, fontscale, thickness)
-    print("textsize: %s, baseline: %s" % (textsize, baseline) )
+    #~ print("textsize: %s, baseline: %s" % (textsize, baseline) )
     # on ajoute des +1 et +2 pour aerer
     nExtraLeft = thickness//2+1
     nExtraBottom = thickness//2+2

@@ -12,6 +12,7 @@ import cv2_tools
 sys.path.append("../../face_tools")
 import facerecognition_dlib
 import face_detector
+import emotion_detector
 
 
 class FaceTracker:
@@ -20,6 +21,7 @@ class FaceTracker:
         self.nImageWithFace = 0
         self.nImageLookingAt = 0
         self.nImageSmile = 0
+        self.nImageHappy = 0
         
         self.fdcv3 = face_detector_cv3.facedetector
         self.fdl = facerecognition_dlib.faceRecogniser
@@ -70,6 +72,7 @@ class FaceTracker:
         bFaceFound = 0
         bLookAt = 0
         bSmile = 0
+        bHappy = 0
         bRenderSquare = 1
         bActivateTracker = 1
             
@@ -83,6 +86,16 @@ class FaceTracker:
             rSmile, rRatioSmile = facerecognition_dlib.getSmileAmount(facelandmark)
             print("rSmile: %.2f (ratio: %.2f)" % (rSmile,rRatioSmile) )
             if rSmile > 0.34: bSmile = 1
+            
+
+        detectedEmotions = emotion_detector.detectEmotion( im )
+        if detectedEmotions != []:
+            if bRenderDebug: emotion_detector.renderEmotion(im,detectedEmotions,40)
+            nEmoID = detectedEmotions[0][1]
+            rConfEmo = detectedEmotions[0][2]
+            if nEmoID == 1 and rConfEmo > 0.6:
+                bHappy = 1
+        
             
         
         tracker_box = []
@@ -162,6 +175,9 @@ class FaceTracker:
             
         if bSmile:
             self.nImageSmile += 1
+
+        if bHappy:
+            self.nImageHappy += 1
             
         if bRenderDebug:
             #~ im = cv2.resize(im,(0,0),fx=2,fy=2)
@@ -179,7 +195,8 @@ class FaceTracker:
             cv2_tools.drawHighligthedText(im, "face: %d" % self.nImageWithFace, (30,60))
             cv2_tools.drawHighligthedText(im, "look: %d" % self.nImageLookingAt, (30,90))
             cv2_tools.drawHighligthedText(im, "smile: %d" % self.nImageSmile, (30,120))
-            cv2_tools.drawHighligthedText(im, "rSmile: %.2f (ratio: %.2f)" % (rSmile,rRatioSmile), (30,150))
+            cv2_tools.drawHighligthedText(im, "happy: %d" % self.nImageHappy, (30,150))
+            cv2_tools.drawHighligthedText(im, "rSmile: %.2f (ratio: %.2f)" % (rSmile,rRatioSmile), (30,180))
             
             
             im = cv2.resize(im,(0,0),fx=2,fy=2)
@@ -198,7 +215,7 @@ class FaceTracker:
         """
         return nbr analysed, nbr face, nbr look
         """
-        return self.nImageAnalysed, self.nImageWithFace, self.nImageLookingAt, self.nImageSmile
+        return self.nImageAnalysed, self.nImageWithFace, self.nImageLookingAt, self.nImageSmile, self.nImageHappy
         
     def getAvgDuration(self):
         n = self.nImageAnalysed - 1
@@ -218,11 +235,13 @@ def analyseFolder(folder):
     """
     analyse a folder with a bunch of images
     """
+    bSpeedTest = 1
     bSpeedTest = 0
-    #~ bSpeedTest = 1
     
+    
+    bRenderDebug = 1
     bRenderDebug = 0
-    #~ bRenderDebug = 1
+    
     
     
     timeBegin = time.time()
@@ -300,7 +319,7 @@ def analyseFolder(folder):
     
     #######################    
     # img_pitie/2022_03_04_00h bien souriante ?
-    if 0:
+    if 1:
         idx = 0
         idx = 500 # ff
         idx = 600 # bug de tracking qui commence sur un demi visage et reste coincé dessus - corrigé avec nCptFrameSinceRestartTracking
@@ -324,7 +343,8 @@ def analyseFolder(folder):
     
     #######################    
     # img_pitie/2022_03_25_9h/m1 comparaison avec annotation manuelle Clara
-    idx = 0
+    if 0:
+        idx = 0
     
     """
     # computed on 2022/03/23:
@@ -373,11 +393,12 @@ def analyseFolder(folder):
                 break
 
     facerecognition_dlib.storedFeatures.save()                
-    nImageAnalysed, nImageWithFace, nImageLookingAt, nSmile = ft.getStats()
+    nImageAnalysed, nImageWithFace, nImageLookingAt, nSmile, nHappy = ft.getStats()
     print("nImageAnalysed : %d" % (nImageAnalysed) )
     print("nImageWithFace : %d (%5.1f%%)" % (nImageWithFace,100*nImageWithFace/nImageAnalysed) )
     print("nImageLookingAt: %d (%5.1f%%) (%5.1f%%)" % (nImageLookingAt,100*nImageLookingAt/nImageAnalysed,100*nImageLookingAt/nImageWithFace) )
     print("nImageSmile    : %d (%5.1f%%) (%5.1f%%)" % (nSmile,100*nSmile/nImageAnalysed,100*nSmile/nImageWithFace) )
+    print("nImageHappy    : %d (%5.1f%%) (%5.1f%%)" % (nHappy,100*nHappy/nImageAnalysed,100*nHappy/nImageWithFace) )
 
 
 """
@@ -422,8 +443,8 @@ def analyseMovie():
 if os.name == "nt":
     strPath = "d:/pitie5/"
     #~ strPath = "d:/img_pitie/2022_03_11_9h/"
-    #~ strPath = "d:/img_pitie/2022_03_04_00h/"
-    strPath = "d:/img_pitie/2022_03_25_9h/m2/"
+    strPath = "d:/img_pitie/2022_03_04_00h/"
+    #~ strPath = "d:/img_pitie/2022_03_25_9h/m2/"
 else:
     strPath = os.path.expanduser("~/pitie4/")
 analyseFolder(strPath)

@@ -315,6 +315,8 @@ def analyseFolder(folder):
     nImageWithFace : 2665 ( 37.4%)
     nImageLookingAt: 104 (  1.5%) (  3.9%)
     nImageSmile    : 326 (  4.6%) ( 12.2%)
+    
+    todo sur 2022_03_11_9h: separation en m1/m2 puis recompute avec happy
     """
     
     #######################    
@@ -356,11 +358,18 @@ def analyseFolder(folder):
     nImageSmile      : 871 ( 29.1%) ( 40.9%)
     nImageHappy    : 416 ( 13.9%) ( 19.5%)
     
+    clara: 66s/767s => 8.6%
+    
     # m2:
     nImageAnalysed : 3817
     nImageWithFace : 3229 ( 84.6%)
     nImageLookingAt: 187 (  4.9%) (  5.8%)
-    nImageSmile      : 677 ( 17.7%) ( 21.0%)
+    nImageSmile      : 677 ( 17.7%) ( 21.0%) 0.608 du premier / 0.513
+    nImageHappy    : 490 ( 12.8%) ( 15.2%) 0.920 du premier / 0.779
+    
+    clara: 55s/712s => 7.7% - 0.897 du premier
+    
+    Le calcul happy en ratio / totale est approchante de la méthode de Clara.
     """
     
 

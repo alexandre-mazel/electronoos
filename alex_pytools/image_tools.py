@@ -3,6 +3,61 @@ import numpy as np
 
 import cv2_tools
 
+def countNbrDifferentColorsPix(pix):
+    """
+    pix is a fitz pixel map
+    """    
+    #~ print(pix)
+    if 0:
+        dictColors = {}
+        for j in range(pix.h):
+            print(j)
+            timeBegin = time.time()
+            print(pix.w)
+            for i in range(pix.w):
+                # 9sec:
+                #~ r = pix.samples[(j*pix.w+i)*3+0]
+                #~ g = pix.samples[(j*pix.w+i)*3+1]
+                #~ b = pix.samples[(j*pix.w+i)*3+2]
+                # 3sec:
+                r,g,b=pix.samples[(j*pix.w+i)*3+0:(j*pix.w+i)*3+3]
+                #~ print((r,g,b))
+                k="%d_%d_%d"%(r,g,b)
+                dictColors[k] = 0
+            print("duration: %5.2fs" % (time.time()-timeBegin))
+                
+        nbrColors = len(dictColors)
+    else:
+        img_array=pix.samples[0:pix.h*pix.w*3]
+        im = np.frombuffer(img_array,dtype=np.int8)
+        im = im.reshape((pix.h,pix.w,3))
+        nbrColors = countNbrDifferentColors(im)
+
+    
+    
+    print("DBG: countNbrDifferentColors: count_nbr_different_colors: %s" % nbrColors )
+            
+    return nbrColors
+    
+def countNbrDifferentColors(im):
+    
+    # jpg compression generate more different value of a single tone
+    bColorAveraging = True
+    bColorAveraging = False
+    
+    print("DBG: countNbrDifferentColors: shape: %s" % str(im.shape))
+    #~ print("first pixels: %s" %str(im[0:4,0:4]))
+    if bColorAveraging:
+        im = im//8 # reduce color difference
+        print("DBG: countNbrDifferentColors: shape after color averaging: %s" % str(im.shape))    
+        print("DBG: countNbrDifferentColors: first pixels: %s" %str(im[0:4,0:4]))
+    #~ ret = np.unique(im)
+    nbrChannel = 1
+    if len(im.shape)>2: nbrChannel = im.shape[2]
+    ret = np.unique(im.reshape(-1, nbrChannel), axis=0)
+    #~ print("unique: %s" % str(ret))
+    nbrColors = len(ret)
+    return nbrColors
 
 def isLookLikePhoto(im,roi,bDebug=False):
     """
@@ -31,6 +86,9 @@ def isLookLikePhoto(im,roi,bDebug=False):
     laplacian = cv2.Laplacian(imc,cv2.CV_64F,ksize=3) # ksize=3
     diff2 = abs(np.mean(laplacian)*100)
     print("DBG: isLookLikePhoto: diffLapla2: %.3f" % diff2 )
+    
+    nNbrColor = countNbrDifferentColors(imc)
+    print("DBG: isLookLikePhoto: nNbrColor: %d" % nNbrColor )
 
     
 

@@ -326,6 +326,21 @@ def analyseFolder(folder):
     # img_pitie/2022_03_25_9h/m1 comparaison avec annotation manuelle Clara
     idx = 0
     
+    """
+    # computed on 2022/03/23:
+    # m1:
+    nImageAnalysed : 2993
+    nImageWithFace : 2128 ( 71.1%)
+    nImageLookingAt: 120 (  4.0%) (  5.6%)
+    nImageSmile      : 871 ( 29.1%) ( 40.9%)
+    
+    # m2:
+    nImageAnalysed : 3817
+    nImageWithFace : 3229 ( 84.6%)
+    nImageLookingAt: 187 (  4.9%) (  5.8%)
+    nImageSmile      : 677 ( 17.7%) ( 21.0%)
+    """
+    
 
     
     
@@ -408,7 +423,7 @@ if os.name == "nt":
     strPath = "d:/pitie5/"
     #~ strPath = "d:/img_pitie/2022_03_11_9h/"
     #~ strPath = "d:/img_pitie/2022_03_04_00h/"
-    strPath = "d:/img_pitie/2022_03_25_9h/m1/"
+    strPath = "d:/img_pitie/2022_03_25_9h/m2/"
 else:
     strPath = os.path.expanduser("~/pitie4/")
 analyseFolder(strPath)

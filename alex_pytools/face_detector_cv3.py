@@ -76,7 +76,7 @@ class FaceDetector:
         """
         for oneres in res:
             startX, startY, endX, endY, confidence = oneres
-            print("DBG: render_res: confidence: %s" % confidence )
+            #~ print("DBG: render_res: confidence: %s" % confidence )
             col = color
             if confidence < 0.5:
                 col = (col[0]//2,col[1]//2,col[2]//2)

@@ -18,6 +18,8 @@ class Game:
         self.square_img = pygame.Surface((32, 32))
         self.square_img.fill(white)
         self.square_pos = [0,0]
+        
+        self.keypressed={}
     
     def update(self):
         self.clock.tick(self.fps)
@@ -28,14 +30,26 @@ class Game:
             if event.type == pygame.QUIT:
                 return True
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_w:
-                    rect.move_ip(0, -2)
-                elif event.key == pygame.K_s:
-                    rect.move_ip(0, 2)
-                elif event.key == pygame.K_a:
-                    rect.move_ip(-2, 0)
-                elif event.key == pygame.K_d:
-                    rect.move_ip(2, 0)
+                
+                """
+                #work well but only when changing state from nothing to keydown
+                if event.key == pygame.K_a:
+                    self.square_pos[1] += 1
+                elif event.key == pygame.K_q:
+                    self.square_pos[1] -= 1
+                """
+                    
+                self.keypressed[event.key] = 1
+                
+            if event.type == pygame.KEYUP:
+                self.keypressed[event.key] = 0
+                
+            for key in [pygame.K_a,pygame.K_q]:
+                if key in self.keypressed.keys() and self.keypressed[key]:
+                    if key == pygame.K_a:
+                        self.square_pos[1] += 1
+                    elif key == pygame.K_q:
+                        self.square_pos[1] -= 1
                     
         return False
 

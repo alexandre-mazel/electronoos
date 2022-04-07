@@ -356,6 +356,11 @@ def autotest():
     val = firstnames.getCompound( "Juliana" )
     assert_equal( val[0], "Juliana" )
     
+    line = "hell- ° CV envoyé par HelloWork. Contient des données personnelles : ne pas utiliser, diffuser, copier sans le consentement de son auteur.Wurk"
+    for w in line.split():
+        ret = firstnames.getCompound(w)
+        assert( ret is None )
+    
 # autotest- end
     
 if __name__ == "__main__":

@@ -3,6 +3,20 @@ import numpy as np
 
 import cv2_tools
 
+def getRatioWB(im):
+    """
+    return the ratio of pixel white and black in the image
+    """
+    if len(im.shape)>2 and im.shape[2]>1:
+        im = cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
+    n_white_pix = np.sum(im >= 250)
+    n_black_pix = np.sum(im <= 5)
+    total = im.shape[0]*im.shape[1]
+    return n_white_pix/total,n_black_pix/total
+    
+
+    
+
 def countNbrDifferentColorsPix(pix):
     """
     pix is a fitz pixel map
@@ -39,24 +53,38 @@ def countNbrDifferentColorsPix(pix):
             
     return nbrColors
     
-def countNbrDifferentColors(im):
+def countNbrDifferentColors(im,bColorAveraging=False):
     
     # jpg compression generate more different value of a single tone
-    bColorAveraging = True
-    bColorAveraging = False
-    
+
     print("DBG: countNbrDifferentColors: shape: %s" % str(im.shape))
     #~ print("first pixels: %s" %str(im[0:4,0:4]))
     if bColorAveraging:
         im = im//8 # reduce color difference
-        print("DBG: countNbrDifferentColors: shape after color averaging: %s" % str(im.shape))    
-        print("DBG: countNbrDifferentColors: first pixels: %s" %str(im[0:4,0:4]))
+        #~ print("DBG: countNbrDifferentColors: shape after color averaging: %s" % str(im.shape))    
+        #~ print("DBG: countNbrDifferentColors: first pixels: %s" %str(im[0:4,0:4]))
     #~ ret = np.unique(im)
     nbrChannel = 1
     if len(im.shape)>2: nbrChannel = im.shape[2]
     ret = np.unique(im.reshape(-1, nbrChannel), axis=0)
     #~ print("unique: %s" % str(ret))
     nbrColors = len(ret)
+    return nbrColors
+    
+def countNbrDifferentColorsSlow(im):
+    
+    # jpg compression generate more different value of a single tone
+
+    print("DBG: countNbrDifferentColors: shape: %s" % str(im.shape))
+    dictColor = {}
+    for j in range(im.shape[0]):
+        for i in range(im.shape[1]):
+            pix = im[j,i]
+            try:
+                dictColor[pix] += 1
+            except KeyError as err:
+                dictColor[pix] = 1
+    nbrColors =  len(dictColor)
     return nbrColors
 
 def isLookLikePhoto(im,roi,bDebug=False):
@@ -65,11 +93,18 @@ def isLookLikePhoto(im,roi,bDebug=False):
     - roi: if None => full image
     """
     
+    if bDebug: print("")
+    
     if roi == None:
         roi = [0,0,im.shape[1],im.shape[0]]
+
     
     imc = im.copy()
     imc = imc[ max(0,roi[1]):roi[1]+roi[3] , max(0,roi[0]):roi[0]+roi[2] ]
+
+    if imc.shape[1] < 1 or imc.shape[0] < 1:
+        return False
+        
     if len(imc.shape)>2 and imc.shape[2]>1:
         imc = cv2.cvtColor(imc,cv2.COLOR_BGR2GRAY)
     
@@ -84,13 +119,26 @@ def isLookLikePhoto(im,roi,bDebug=False):
         print("DBG: isLookLikePhoto: diffLapla: %.3f" % diff )
     
     laplacian = cv2.Laplacian(imc,cv2.CV_64F,ksize=3) # ksize=3
-    diff2 = abs(np.mean(laplacian)*100)
-    print("DBG: isLookLikePhoto: diffLapla2: %.3f" % diff2 )
-    
-    nNbrColor = countNbrDifferentColors(imc)
-    print("DBG: isLookLikePhoto: nNbrColor: %d" % nNbrColor )
 
+    cnz = np.count_nonzero(laplacian)/(imc.shape[0]*imc.shape[1])
+    #~ print("DBG: isLookLikePhoto: cnz: %s" % cnz )
+
+    diff2 = abs(np.mean(laplacian)*100)
+    if bDebug: print("DBG: isLookLikePhoto: diffLapla2: %.3f" % diff2 )
     
+    if bDebug:
+        nNbrColor = countNbrDifferentColors(imc)
+        print("DBG: isLookLikePhoto no avg: nNbrColor: %d" % nNbrColor )
+
+        nNbrColor2 = countNbrDifferentColors(imc,1)
+        print("DBG: isLookLikePhoto avg: nNbrColor2: %d" % nNbrColor2 )  
+
+        nNbrColor3 = countNbrDifferentColorsSlow(imc)
+        print("DBG: isLookLikePhoto avg: nNbrColor3: %d" % nNbrColor3 )  
+        
+
+    rW,rB = getRatioWB(imc)
+    if bDebug: print("DBG: isLookLikePhoto ratio b/w: %s" % str((rW,rB)) )       
 
     if bDebug and  0:
         from matplotlib import pyplot as plt
@@ -101,8 +149,10 @@ def isLookLikePhoto(im,roi,bDebug=False):
         plt.show()
 
     #~ bRet = diff > 0.1
-    bRet = diff2 > 20
     #~ bRet = diff2 > 150 # exploring other ksize
+    bRet = (diff2 > 20 and rW < 0.2 and rB < 0.2) or (diff2 > 5 and rW < 0.05 and rB < 0.05)
+    bRet = cnz >0.8 and bRet
+
     
     if bDebug and 1: 
         print("DBG: isLookLikePhoto: ret: %s" % bRet )
@@ -124,6 +174,15 @@ def autoTest():
     
     bAssert = 0
     bAssert = 1
+    
+    img = np.zeros((100,200,3), np.uint8)
+    img[0:10,0:10] = 255
+    img[10:20,0:10] = 127
+    
+    ret = getRatioWB(img)
+    print("getRatioWB: %s" % str(ret))
+    if bAssert: assert(ret[0]==(10*10)/(100*200))
+    if bAssert: assert(ret[1]==((100*200)-200)/(100*200))    
     
     im = cv2.imread("../data/multiple_humans.jpg")
     bRet = isLookLikePhoto(im,None,bDebug=bDebug)

@@ -266,6 +266,7 @@ def analyseFolder(folder):
     #~ idx -= 10
     #~ idx = 1
     idx = 0
+    idx_end = 0
     
     
     #######################
@@ -303,10 +304,17 @@ def analyseFolder(folder):
     # img_pitie/2022_03_11_9h - regard tout le temps en coin.
     # a partir de 0.35 inclus, c'est un sourire pour elle
     idx = 0
+    idx = 504    # debut m1
+    #~ idx = 2420  # fin m1
+    idx = 2634  # debut m2
+    #~ idx = 4888  # fin m2
+    
     #~ idx = 950 # presque debut interaction
-    idx = 1050 # debut interaction
+    #~ idx = 1050 # debut interaction
     #~ idx = 1375 # exemple de regard en coin
     #~ idx = 1750
+    
+    idx_end = 4888
     
     # result on all images:
     """
@@ -316,18 +324,31 @@ def analyseFolder(folder):
     nImageLookingAt: 104 (  1.5%) (  3.9%)
     nImageSmile    : 326 (  4.6%) ( 12.2%)
     
-    todo sur 2022_03_11_9h: separation en m1/m2 puis recompute avec happy
+    todo sur 2022_03_11_9h: separation en m1/m2 puis recompute avec happy:
+    m1:
+    nImageAnalysed : 1917
+    nImageWithFace : 1214 ( 63.3%)
+    nImageLookingAt: 9 (  0.5%) (  0.7%)
+    nImageSmile    : 187 (  9.8%) ( 15.4%)
+    nImageHappy    : 116 (  6.1%) (  9.6%)
+
+    m2:
+    nImageAnalysed : 2255
+    nImageWithFace : 1276 ( 56.6%)
+    nImageLookingAt: 26 (  1.2%) (  2.0%)
+    nImageSmile    : 83 (  3.7%) (  6.5%)
+    nImageHappy    : 96 (  4.3%) (  7.5%)
     """
     
     #######################    
     # img_pitie/2022_03_04_00h bien souriante ?
-    if 1:
+    if 0:
         idx = 0
         idx = 500 # ff
         idx = 600 # bug de tracking qui commence sur un demi visage et reste coincé dessus - corrigé avec nCptFrameSinceRestartTracking
         idx = 890 # int
     
-    idx = 0
+    #~ idx = 0
     
     # result on all images:
     """
@@ -346,7 +367,7 @@ def analyseFolder(folder):
     
     #######################    
     # img_pitie/2022_03_25_9h/m1 comparaison avec annotation manuelle Clara
-    if 1:
+    if 0:
         idx = 0
     
     """
@@ -402,6 +423,9 @@ def analyseFolder(folder):
                 print("    Avg time:   %.2fs" % (duration/idx) )
                 print("    Total time: %.1fs" % (duration) )
                 break
+                
+        if idx_end != 0 and idx>idx_end:
+            break
 
     facerecognition_dlib.storedFeatures.save()                
     nImageAnalysed, nImageWithFace, nImageLookingAt, nSmile, nHappy = ft.getStats()
@@ -453,9 +477,9 @@ def analyseMovie():
     
 if os.name == "nt":
     strPath = "d:/pitie5/"
-    #~ strPath = "d:/img_pitie/2022_03_11_9h/"
-    strPath = "d:/img_pitie/2022_03_04_00h/"
-    strPath = "d:/img_pitie/2022_03_25_9h/m2/"
+    strPath = "d:/img_pitie/2022_03_11_9h/"
+    #~ strPath = "d:/img_pitie/2022_03_04_00h/"
+    #~ strPath = "d:/img_pitie/2022_03_25_9h/m2/"
 else:
     strPath = os.path.expanduser("~/pitie4/")
 analyseFolder(strPath)

@@ -10,20 +10,43 @@ def pick(choice):
     i = random.randint(0, len(choice)-1)
     return choice[i]
     
-def game(nbr_question):
+def game(nMode,nbr_question):
+    """
+    mode:
+    0: mult
+    1: add
+    2: melange
+    """
+    nModeMax = 2
     n = 0
     while n < nbr_question:
+        print("")
+        
         n1 = pick(range(2,10))
         n2 = pick(range(5,10))
-        print("")
+        
+        if random.random()>0.5: 
+            c = n1
+            n1 = n2
+            n2 = c
+        
+        nChoice = nMode
+        if nMode == 2:
+            nChoice = random.randint(0,nModeMax-1)
+            
+        if nChoice == 1:
+            n1 *= random.randint(1,4)
+            n2 *= random.randint(1,4)
+
         bCorrect = False
         while not bCorrect:
-            if random.random()>0.5: 
-                c = n1
-                n1 = n2
-                n2 = c
-            res = input("%d x %d ? " % (n1,n2))
-            res_correct = n1*n2
+
+            if nChoice == 0:
+                res = input("%d x %d ? " % (n1,n2))
+                res_correct = n1*n2
+            else:
+                res = input("%d + %d ? " % (n1,n2))
+                res_correct = n1+n2                
             try:
                 res = int(res)
                 bCorrect = res == res_correct
@@ -57,7 +80,7 @@ def store_best(score,name):
     f.close()
     
 """
-st = score_table.ScoreTable("multiplication",True)
+
 def get_best():
     return st.get_best()[:]
     
@@ -71,8 +94,31 @@ def print_best_table(nbr_best):
 def get_rank(score):
     return st.get_rank(score)
         
+if 1:
+    print("")
+    print("Choix du mode de jeu:")
+    print("  1: multiplication")
+    print("  2: additition")
+    print("  3: mix")
+    print("")
+    strMode = input( "Ton choix: ")
+    nMode = int(strMode)-1
+    
+
+
+tabGameName = [
+    "multiplication",
+    "addition",
+    "mix"
+]
+strGameName = tabGameName[nMode]
+
+print("Enclenchment du mode %s" % strGameName)
+print("")
 input("appuie sur entree pour commencer...")
 print("")
+
+st = score_table.ScoreTable(strGameName,True)
 
 nbr_question = 8
 nbr_best = 20
@@ -80,12 +126,12 @@ print("C'est parti pour %d questions !" % nbr_question )
 
 time_begin = time.time()
 
-game(nbr_question)
+game(nMode,nbr_question)
 duration = time.time() - time_begin
 rTime = duration/nbr_question
 print("\nTemps par multiplication: %.3fs" % ( rTime ) )
 
-best_time, best_name = get_best()
+best_time, best_name = get_best()[:2]
 if best_time > rTime:
     print("Bravo!\ntu as battu le record de %.3fs fait par %s." % (best_time,best_name) )
     name = input("Quel est ton nom ? ")

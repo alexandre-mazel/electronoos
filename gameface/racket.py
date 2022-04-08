@@ -166,6 +166,7 @@ def runGame():
             vy = -vy
             
         if by+ball_radius > screen_h:
+            bx = screen_w // 2
             by = ball_radius+1
             vx = (random.random()-0.5)*4
             vy = 3

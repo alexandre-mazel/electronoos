@@ -5,6 +5,12 @@ def openWithEncoding( filename, mode, encoding, errors = 'strict' ):
         import io
         return io.open( filename, mode, encoding=encoding, errors=errors )
     return open( filename, mode, encoding=encoding, errors=errors )
+    
+def looksLikeNumber(s):
+    for c in s:
+        if not c.isdigit() and c != '.':
+            return False
+    return True
 
 def load_csv(filename, sepa = ';',bSkipFirstLine = 0, bVerbose=0 ):
 
@@ -27,9 +33,11 @@ def load_csv(filename, sepa = ';',bSkipFirstLine = 0, bVerbose=0 ):
         fields = line.split(sepa)
         for i in range(len(fields)):
             if bVerbose: print("DBG: load_csv: fields[%d]: '%s'" % (i,fields[i]) )
+            if bVerbose: print("DBG: load_csv: field %d: '%s',type: %s" % (i, fields[i],type(fields[i]) ) )
             if len(fields[i])>1 and fields[i][0] == '"' and fields[i][-1] == '"':
                 fields[i] = fields[i][1:-1]
-            elif not isinstance(fields[i], str):
+            #~ elif not isinstance(fields[i], str):
+            elif looksLikeNumber(fields[i]):
                 # TODO: handle array
                 if '.' in fields[i]:
                     fields[i] = float(fields[i])

@@ -2,9 +2,14 @@ import cv2
 import math
 import numpy as np
 import random
+import sys
 import time
 
 import bleedfacedetector as fd # pip install bleedfacedetector
+
+sys.path.append("../alex_pytools")
+import misctools
+import score_table
 
 class FaceTracker:
     """
@@ -84,6 +89,8 @@ def runGame():
     
 
     score = 0
+    
+    st = score_table.ScoreTable("face_racket")
 
     while 1:
         
@@ -141,6 +148,16 @@ def runGame():
             img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
             cv2.putText(img,"score: %d" % final_score, (10,40),cv2.FONT_HERSHEY_SIMPLEX,1,(255,0,0),2)
             cv2.putText(img,"Looser!", (rx-15,ry-face_h//2),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),2)
+            cv2.imwrite("/tmp/"+misctools.getFilenameFromTime()+".jpg", img )
+            if 1:
+                score_x = screen_w-340
+                score_y = 20
+                cv2.rectangle(img,(score_x-10,score_y-20),(score_x-10+300,score_y+120), (0,0,0), -1 )
+                hiscore = st.get_results(10)
+                hiscore = hiscore.split('\n')
+                for pt,line in enumerate(hiscore):
+                    line = line.replace('\t','')
+                    cv2.putText( img, line, (score_x,score_y+pt*12), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255,255,255), 1 )
             img = cv2.resize(img,(0,0),fx=zoom,fy=zoom)
             cv2.imshow('img', img)
             nCptFrame += 1
@@ -171,7 +188,13 @@ def runGame():
             vx = (random.random()-0.5)*4
             vy = 3
             print("You loose!")
-            final_score = score
+            final_score = score//10
+            rank = st.get_rank(final_score)
+            print("DBG: rank: %s" % rank)
+            if rank < 10:
+                st.add_score(final_score,"")
+                st.save()
+                
             score = 0
             timeEndLoose = time.time()+4
 
@@ -189,6 +212,7 @@ def runGame():
         # rendering
         cv2.rectangle(img, (rx, ry), (rx+sx, ry+sy), (255, 255, 255), -1)
         cv2.circle(img, (int(bx), int(by)), ball_radius, (255, 0, 0), -1)
+        cv2.putText(img,"score: %d" % (score//10), (10,40//2),cv2.FONT_HERSHEY_SIMPLEX,1/2,(255,0,0),2)
             
             
         # Display

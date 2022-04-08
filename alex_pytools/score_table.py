@@ -60,12 +60,18 @@ class ScoreTable:
     def get_results( self, nLimitTo = -1 ):
         s = ""
         nRank = 1
+        if self.bMinimumIsBest:
+            strScoreFormat = "%5.3f"
+        else:
+            strScoreFormat = "%d"
+        
         for scorepair in self.listScore:
             strTimeStamp = ""
             #~ print("scorepair: %s" % str(scorepair))
             if len(scorepair)>2:
                 strTimeStamp = "(" + scorepair[2] + ")"
-            s += "\t%3d: %5.3f - %s \t\t%s\n" % ( nRank, scorepair[0], scorepair[1], strTimeStamp )
+            strFormat = "\t%3d: SCORE_FORMAT - %s \t\t%s\n".replace("SCORE_FORMAT",strScoreFormat)
+            s += strFormat % ( nRank, scorepair[0], scorepair[1], strTimeStamp )
             if nLimitTo != -1 and nRank >= nLimitTo:
                 break
             nRank += 1

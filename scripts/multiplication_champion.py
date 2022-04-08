@@ -15,9 +15,10 @@ def game(nMode,nbr_question):
     mode:
     0: mult
     1: add
-    2: melange
+    2: mix
+    3: mult hard
     """
-    nModeMax = 2
+    nModeMaxForMix = 1
     n = 0
     while n < nbr_question:
         print("")
@@ -27,12 +28,15 @@ def game(nMode,nbr_question):
         
         nChoice = nMode
         if nMode == 2:
-            nChoice = random.randint(0,nModeMax-1)
+            nChoice = random.randint(0,nModeMaxForMix)
             
         if nChoice == 1:
             n1 = random.randint(1,40)
             n2 = random.randint(20,50)
-            
+
+        if nChoice == 3:
+            n1 = random.randint(6,15)
+            n2 = random.randint(2,15)      
         
         if random.random()>0.5: 
             c = n1
@@ -42,7 +46,7 @@ def game(nMode,nbr_question):
         bCorrect = False
         while not bCorrect:
 
-            if nChoice == 0:
+            if nChoice == 0 or nChoice == 3:
                 res = input("%d x %d ? " % (n1,n2))
                 res_correct = n1*n2
             else:
@@ -101,6 +105,7 @@ if 1:
     print("  1: multiplication")
     print("  2: additition")
     print("  3: mix")
+    print("  4: multiplication_hard")
     print("")
     strMode = input( "Ton choix: ")
     nMode = int(strMode)-1
@@ -110,7 +115,8 @@ if 1:
 tabGameName = [
     "multiplication",
     "addition",
-    "mix"
+    "mix",
+    "multiplication_hard"
 ]
 strGameName = tabGameName[nMode]
 

@@ -25,18 +25,19 @@ def game(nMode,nbr_question):
         n1 = pick(range(2,10))
         n2 = pick(range(5,10))
         
-        if random.random()>0.5: 
-            c = n1
-            n1 = n2
-            n2 = c
-        
         nChoice = nMode
         if nMode == 2:
             nChoice = random.randint(0,nModeMax-1)
             
         if nChoice == 1:
-            n1 *= random.randint(1,4)
-            n2 *= random.randint(1,4)
+            n1 = random.randint(1,40)
+            n2 = random.randint(20,50)
+            
+        
+        if random.random()>0.5: 
+            c = n1
+            n1 = n2
+            n2 = c
 
         bCorrect = False
         while not bCorrect:

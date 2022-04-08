@@ -139,8 +139,8 @@ def runGame():
         if time.time() < timeEndLoose:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
-            cv2.putText(img,"score: %d" % final_score, (0,50),cv2.FONT_HERSHEY_SIMPLEX,1,(255,0,0))
-            cv2.putText(img,"Looser!", (rx-15,ry-face_h//2),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255))
+            cv2.putText(img,"score: %d" % final_score, (10,40),cv2.FONT_HERSHEY_SIMPLEX,1,(255,0,0),2)
+            cv2.putText(img,"Looser!", (rx-15,ry-face_h//2),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),2)
             img = cv2.resize(img,(0,0),fx=zoom,fy=zoom)
             cv2.imshow('img', img)
             nCptFrame += 1

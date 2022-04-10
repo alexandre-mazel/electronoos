@@ -89,6 +89,9 @@ def runGame():
     
 
     score = 0
+    nRank = 0
+    
+    nAccelerator = 0
     
     st = score_table.ScoreTable("face_racket")
 
@@ -146,9 +149,17 @@ def runGame():
         if time.time() < timeEndLoose:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+            
             cv2.putText(img,"score: %d" % final_score, (10,40),cv2.FONT_HERSHEY_SIMPLEX,1,(255,0,0),2)
-            cv2.putText(img,"Looser!", (rx-15,ry-face_h//2),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),2)
+            
+            if nRank < 10 or 0:
+                if ((nCptFrame//3) %2) == 0:
+                    cv2.putText(img,"rank : %d" % (nRank+1), (10,40+30),cv2.FONT_HERSHEY_SIMPLEX,1,(0,255,0),2)
+                
             cv2.imwrite("/tmp/"+misctools.getFilenameFromTime()+".jpg", img )
+            
+            cv2.putText(img,"Looser!", (rx-15,ry-face_h//2),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),2)
+
             if 1:
                 score_x = screen_w-340
                 score_y = 20
@@ -189,9 +200,9 @@ def runGame():
             vy = 3
             print("You loose!")
             final_score = score//10
-            rank = st.get_rank(final_score)
-            print("DBG: rank: %s" % rank)
-            if rank < 10:
+            nRank = st.get_rank(final_score)
+            print("DBG: rank: %s" % nRank)
+            if nRank < 10:
                 st.add_score(final_score,"")
                 st.save()
                 
@@ -208,6 +219,13 @@ def runGame():
             
             
         score += abs(vx)+abs(vy)
+        
+        div500 = score // 5000
+        if div500 > nAccelerator:
+            print("DBG: score: %s, div500: %s, nAccelerator: %s" % (score,div500,nAccelerator) )
+            vy *= 1.2
+            nAccelerator = div500
+            
                 
         # rendering
         cv2.rectangle(img, (rx, ry), (rx+sx, ry+sy), (255, 255, 255), -1)

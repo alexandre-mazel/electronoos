@@ -217,16 +217,18 @@ def runGame():
             
         
         # compute intermediate position:
-        nNbrIntermediate = 20
+        nNbrIntermediate = 50
         for i in range(nNbrIntermediate+1):
             ball_test_x = ball_prev_x * (1-i/nNbrIntermediate) + bx * i/nNbrIntermediate
             ball_test_y = ball_prev_y * (1-i/nNbrIntermediate) + by * i/nNbrIntermediate
+            r_test_x = old_rx * (1-i/nNbrIntermediate) + rx * i/nNbrIntermediate
+            r_test_y = old_ry * (1-i/nNbrIntermediate) + ry * i/nNbrIntermediate
             
-            if ball_test_x+ball_radius >= rx and ball_test_x-ball_radius<rx+sx and ball_test_y+ball_radius > ry and ball_test_y-ball_radius < ry+sy:
+            if ball_test_x+ball_radius >= r_test_x and ball_test_x-ball_radius<r_test_x+sx and ball_test_y+ball_radius > r_test_y and ball_test_y-ball_radius < r_test_y+sy:
                 # colliding
-                vx += (ball_test_x-(rx+sx/2))*0.1 + racket_vx/10
+                vx += (ball_test_x-(r_test_x+sx/2))*0.1 + racket_vx/10
                 
-                if ball_test_y < ry:            
+                if ball_test_y < r_test_y:            
                     vy = -abs(vy) + racket_vy/10
                     # move ball so it doesn't look into the racket
                     by = ry - ball_radius

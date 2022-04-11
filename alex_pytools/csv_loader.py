@@ -46,7 +46,7 @@ def load_csv(filename, sepa = ';',bSkipFirstLine = 0, bVerbose=0 ):
         data.append(fields)
     return data
     
-def load_datas_from_xlsx( filename ):
+def load_datas_from_xlsx( filename, bVerbose = 0 ):
     """
     return a dict tab name then lines (without handling headers)
     """
@@ -55,24 +55,28 @@ def load_datas_from_xlsx( filename ):
     import pandas as pd
     import numpy as np
     df = pd.read_excel( filename, sheet_name=None, header=None )
-    print(len(df))
-    print(df)
-    print(df.keys())
+    if bVerbose: print(len(df))
+    if bVerbose: print(df)
+    if bVerbose: print(df.keys())
     dOut = {}
     for sheet_name,sheet_data in df.items():
-        print("\nDBG: load_datas_from_xlsx: sheet_name: '%s', line(s): %d" % (sheet_name,len(sheet_data) ) )
+        if bVerbose: print("\nDBG: load_datas_from_xlsx: sheet_name: '%s', line(s): %d" % (sheet_name,len(sheet_data) ) )
         listLine = []
         sheet_data = sheet_data.fillna(value='nan')
         for data in sheet_data.itertuples(index=False):
-            print(str(data))
+            if bVerbose: print(str(data))
             #~ listLine.append(data[:])
+            oneLine = []
             for col in data:
+                if bVerbose: print("col: %s" % col)
                 if col == 'nan':
                     break
-                listLine.append(col)
+                oneLine.append(col)
+            listLine.append(oneLine)
 
         dOut[sheet_name] = listLine
-    if 1:
+    if bVerbose:
+        print( "\nDBG: load_datas_from_xlsx: output: %s" % dOut )
         print( "\nDBG: load_datas_from_xlsx: output:" )
         for sheet_name,sheet_data in dOut.items():
             print("\nDBG: load_datas_from_xlsx: sheet_name: '%s', line(s): %d" % (sheet_name,len(sheet_data) ) )

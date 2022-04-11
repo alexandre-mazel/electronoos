@@ -46,6 +46,45 @@ def load_csv(filename, sepa = ';',bSkipFirstLine = 0, bVerbose=0 ):
         data.append(fields)
     return data
     
+def load_datas_from_xlsx( filename ):
+    """
+    return a dict tab name then lines (without handling headers)
+    """
+    import xlrd # pip install xlrd 
+    import openpyxl # pip install openpyxl 
+    import pandas as pd
+    import numpy as np
+    df = pd.read_excel( filename, sheet_name=None, header=None )
+    print(len(df))
+    print(df)
+    print(df.keys())
+    dOut = {}
+    for sheet_name,sheet_data in df.items():
+        print("\nDBG: load_datas_from_xlsx: sheet_name: '%s', line(s): %d" % (sheet_name,len(sheet_data) ) )
+        listLine = []
+        sheet_data = sheet_data.fillna(value='nan')
+        for data in sheet_data.itertuples(index=False):
+            print(str(data))
+            #~ listLine.append(data[:])
+            for col in data:
+                if col == 'nan':
+                    break
+                listLine.append(col)
+
+        dOut[sheet_name] = listLine
+    if 1:
+        print( "\nDBG: load_datas_from_xlsx: output:" )
+        for sheet_name,sheet_data in dOut.items():
+            print("\nDBG: load_datas_from_xlsx: sheet_name: '%s', line(s): %d" % (sheet_name,len(sheet_data) ) )
+            for line in sheet_data:
+                print("")
+                for col in line:
+                    print("   '%s'" % col)
+    
+    return dOut
+    
+#~ load_datas_from_xlsx( r"C:\Users\alexa\dev\git\obo\www\chatbot\OBO_Recruitement_dialog.xlsx")
+    
 def save_csv(filename, data):
     file = open(filename, "wt")
     for fields in data:

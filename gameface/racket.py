@@ -111,7 +111,7 @@ def runGame():
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # < 0.00000s
             faces = face_cascade.detectMultiScale(gray, 1.1, 10) # 0.05s
         else:
-            faces = fd.ssd_detect(img,conf=0.5) # 0.03s
+            faces = fd.ssd_detect(img,conf=0.3) # 0.03s
         
         #~ print("DBG: time analysis: %.5fs" % (time.time()-timeProcess))
 
@@ -121,7 +121,6 @@ def runGame():
                 cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2)
                 
 
-        # the game !
         old_rx = rx
         old_ry = ry
         
@@ -147,16 +146,19 @@ def runGame():
         
         
         if time.time() < timeEndLoose:
+            # end game sequence
+            imgsave = img.copy()
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
             
-            cv2.putText(img,"score: %d" % final_score, (10,40),cv2.FONT_HERSHEY_SIMPLEX,1,(255,0,0),2)
+            for image in [imgsave,img]:
+                cv2.putText(image,"score: %d" % final_score, (10,40),cv2.FONT_HERSHEY_SIMPLEX,1,(255,0,0),2)
             
-            if nRank < 10 or 0:
-                if ((nCptFrame//3) %2) == 0:
-                    cv2.putText(img,"rank : %d" % (nRank+1), (10,40+30),cv2.FONT_HERSHEY_SIMPLEX,1,(0,255,0),2)
+                if nRank < 10 or 0:
+                    if ((nCptFrame//3) %2) == 0:
+                        cv2.putText(image,"rank : %d" % (nRank+1), (10,40+30),cv2.FONT_HERSHEY_SIMPLEX,1,(0,255,0),2)
                 
-            cv2.imwrite("/tmp/"+misctools.getFilenameFromTime()+".jpg", img )
+            cv2.imwrite("/tmp/"+misctools.getFilenameFromTime()+".jpg", imgsave )
             
             cv2.putText(img,"Looser!", (rx-15,ry-face_h//2),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),2)
 
@@ -178,6 +180,10 @@ def runGame():
             continue
                 
         # update
+        
+        ball_prev_x = bx
+        ball_prev_y = by
+        
         if vy<0:
             vy += 0.1
         else:
@@ -208,13 +214,24 @@ def runGame():
                 
             score = 0
             timeEndLoose = time.time()+4
-
-        if bx+ball_radius >= rx and bx-ball_radius<rx+sx and by+ball_radius > ry and by-ball_radius < ry+sy:
-            # colliding
-            vx += (bx-(rx+sx/2))*0.1 + racket_vx/10
-            vy = -abs(vy) + racket_vy/10
-            # move ball so it doesn't look into the racket
-            by = ry - ball_radius
+            
+        
+        # compute intermediate position:
+        nNbrIntermediate = 20
+        for i in range(nNbrIntermediate+1):
+            ball_test_x = ball_prev_x * (1-i/nNbrIntermediate) + bx * i/nNbrIntermediate
+            ball_test_y = ball_prev_y * (1-i/nNbrIntermediate) + by * i/nNbrIntermediate
+            
+            if ball_test_x+ball_radius >= rx and ball_test_x-ball_radius<rx+sx and ball_test_y+ball_radius > ry and ball_test_y-ball_radius < ry+sy:
+                # colliding
+                vx += (ball_test_x-(rx+sx/2))*0.1 + racket_vx/10
+                
+                if ball_test_y < ry:            
+                    vy = -abs(vy) + racket_vy/10
+                    # move ball so it doesn't look into the racket
+                    by = ry - ball_radius
+                # else the ball continue down
+                break
 
             
             

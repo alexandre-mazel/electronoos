@@ -5,7 +5,6 @@ import random
 import sys
 import time
 
-import bleedfacedetector as fd # pip install bleedfacedetector
 
 sys.path.append("../alex_pytools")
 import misctools

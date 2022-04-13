@@ -269,5 +269,4 @@ def runGame():
             nCptFrame = 0
             timeFps = time.time()
             
-            
 runGame()

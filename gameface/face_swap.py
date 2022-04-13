@@ -98,7 +98,7 @@ def analyseFolder(folder):
     facerecognition_dlib.storedFeatures.save()
 # analyseFolder - end
 
-def getDiffFacePosture( s1,l1,s2,l2):
+def getDiffFacePosture( s1,l1,s2,l2,bRemoveContour=0):
     """
     return diff of comparison of both faceshape, facelandmark for two faces
     """
@@ -111,6 +111,11 @@ def getDiffFacePosture( s1,l1,s2,l2):
     offset_y = s2[0]-s1[0]
     rx = (s1[2]-s1[0]) / (s2[2]-s2[0])  # ratio_x
     ry = (s1[3]-s1[1]) / (s2[3]-s2[1])
+    
+    if bRemoveContour:
+        l1 = l1[17:]
+        l2 = l2[17:]
+
     
     rSumDiff = 0
     # first facelandmark element is faceshape !
@@ -140,8 +145,8 @@ def faceSwap(folder1,folder2,folder3 = None):
         listFiles3 = sorted(os.listdir(folder3))
         listFiles2.extend(listFiles3)
     
-    idx = 0
-    idx = 900
+    idx = 100
+    #~ idx = 900
     
     fdl = facerecognition_dlib.faceRecogniser
     
@@ -159,6 +164,7 @@ def faceSwap(folder1,folder2,folder3 = None):
                 
         rDiffMin = 99999999999
         fMin = ""
+        numMin = -1
         for numf2,f2 in enumerate(listFiles2):
             #~ if numf2 % 100 == 0: print("%d/%d/%d" % (idx,numf2,len(listFiles2)))
             absf2 = folder2 + f2
@@ -175,15 +181,18 @@ def faceSwap(folder1,folder2,folder3 = None):
             if rDiff < rDiffMin:
                 fMin = f2
                 rDiffMin = rDiff
+                numMin = numf2
         
-        print("rDif)fMin: %.3f" % rDiffMin)
+        print("rDiffMin: %.3f" % rDiffMin)
         im = cv2.imread(absf)
         absf2 = folder2+fMin
         im2 = cv2.imread(absf2)
         rConfidence2, features2, faceshape2,facelandmark2 = fdl.extractFeaturesFromImg( None, absf2 )
         
-        im = fdl._renderFaceInfo(im,facelandmark)
-        im2 = fdl._renderFaceInfo(im2,facelandmark2)
+        im = fdl._renderFaceInfo(im,facelandmark,nAddOffset=120)
+        im2 = fdl._renderFaceInfo(im2,facelandmark2,nAddOffset=-120)
+        cv2.putText(im,str(idx),(640-60,40),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,255),1)
+        cv2.putText(im2,str(numMin),(20,40),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,255),1)
         
         cv2.imshow("1",im)
         cv2.imshow("2",im2)
@@ -196,8 +205,8 @@ def faceSwap(folder1,folder2,folder3 = None):
         idx += 1
             
 if os.name == "nt":
-    if 1:
-        strPath = "d:/face_swap_test/f3/"
+    if 0:
+        strPath = "d:/face_swap_test/f6/"
         analyseFolder(strPath)
         exit(0)
 
@@ -205,4 +214,7 @@ if os.name == "nt":
     folder2 = "d:/face_swap_test/f2/"
     folder3 = "d:/face_swap_test/f1/"
     folder3 = None
+    
+    folder1 = "d:/face_swap_test/f3/"
+    folder2 = "d:/face_swap_test/f4/"
     faceSwap(folder1,folder2,folder3)

@@ -303,10 +303,10 @@ def analyseFolder(folder):
     #######################    
     # img_pitie/2022_03_11_9h - regard tout le temps en coin.
     # a partir de 0.35 inclus, c'est un sourire pour elle
-    idx = 0
-    idx = 504    # debut m1
+
+    #~ idx = 504    # debut m1
     #~ idx = 2420  # fin m1
-    idx = 2634  # debut m2
+    #~ idx = 2634  # debut m2
     #~ idx = 4888  # fin m2
     
     #~ idx = 950 # presque debut interaction
@@ -314,7 +314,7 @@ def analyseFolder(folder):
     #~ idx = 1375 # exemple de regard en coin
     #~ idx = 1750
     
-    idx_end = 4888
+    #~ idx_end = 4888
     
     # result on all images:
     """
@@ -338,17 +338,29 @@ def analyseFolder(folder):
     nImageLookingAt: 26 (  1.2%) (  2.0%)
     nImageSmile    : 83 (  3.7%) (  6.5%)
     nImageHappy    : 96 (  4.3%) (  7.5%)
+    
+    annotation clara:
+    - m1: sourire 24s / 4% du temps
+    - m1: sourire 26.5s / 4.5 % du temps
+    
+    
     """
     
     #######################    
-    # img_pitie/2022_03_04_00h bien souriante ?
-    if 0:
+    # img_pitie/2022_03_04_00h bien souriante ? (en fait c'est 11h15)
+    if 1:
         idx = 0
         idx = 500 # ff
         idx = 600 # bug de tracking qui commence sur un demi visage et reste coincé dessus - corrigé avec nCptFrameSinceRestartTracking
         idx = 890 # int
+        
+        idx = 41    # debut m1
+        #~ idx = 3535  # fin m1
+        idx = 3925 # debut m2
+        #~ idx = 6100 # fin m2
     
     #~ idx = 0
+    idx_end = 6100
     
     # result on all images:
     """
@@ -363,10 +375,26 @@ def analyseFolder(folder):
     nImageLookingAt: 1462 ( 14.9%) ( 22.7%)
     nImageSmile    : 2747 ( 28.0%) ( 42.7%)
     nImageHappy    : 2182 ( 22.2%) ( 33.9%)
+    
+    # 2022/04/13: 
+    m1:
+    nImageAnalysed : 3495
+    nImageWithFace : 1727 ( 49.4%)
+    nImageLookingAt: 467 ( 13.4%) ( 27.0%)
+    nImageSmile    : 969 ( 27.7%) ( 56.1%)
+    nImageHappy    : 866 ( 24.8%) ( 50.1%)
+    
+    m2:
+    nImageAnalysed : 2176
+    nImageWithFace : 1329 ( 61.1%)
+    nImageLookingAt: 330 ( 15.2%) ( 24.8%)
+    nImageSmile    : 872 ( 40.1%) ( 65.6%)
+    nImageHappy    : 571 ( 26.2%) ( 43.0%)
+
     """
     
     #######################    
-    # img_pitie/2022_03_25_9h/m1 comparaison avec annotation manuelle Clara
+    # img_pitie/2022_03_25_9h/m1 premiere comparaison avec annotation manuelle Clara
     if 0:
         idx = 0
     
@@ -477,8 +505,8 @@ def analyseMovie():
     
 if os.name == "nt":
     strPath = "d:/pitie5/"
-    strPath = "d:/img_pitie/2022_03_11_9h/"
-    #~ strPath = "d:/img_pitie/2022_03_04_00h/"
+    #~ strPath = "d:/img_pitie/2022_03_11_9h/"
+    strPath = "d:/img_pitie/2022_03_04_00h/"
     #~ strPath = "d:/img_pitie/2022_03_25_9h/m2/"
 else:
     strPath = os.path.expanduser("~/pitie4/")

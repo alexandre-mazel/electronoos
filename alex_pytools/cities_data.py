@@ -1137,6 +1137,9 @@ def autotest_cities():
     dist = cities.distTwoZip("75020","75016",bVerbose=True)
     assert_diff(dist,9,4)
     
+    dist = cities.distTwoZip("75008","75017",bVerbose=True)
+    assert_diff(dist,0.82,0.3)
+
     
     assert_diff(cities.isValidAdress( "34440","colombier")[2],0.95)
     assert_diff(cities.isValidAdress( "34440","colom")[2],0.67)

@@ -81,11 +81,13 @@ class Ball:
 
             
 class Game:
-    def __init__( self, screen_w, screen_h ):
+    def __init__( self, screen_w, screen_h, nNumPlayer ):     
+        print( "Game: Starting with %d player(s)" % nNumPlayer )        
         self.screen_w = screen_w
         self.screen_h = screen_h
         self.zoom = 2
-        self.nNumPlayer = 1
+        self.nNumPlayer = nNumPlayer
+        
         
         self.fts = []
         self.fts.append( FaceTracker(screen_w*1/4, screen_h/2) )
@@ -95,7 +97,9 @@ class Game:
         self.rackets = []
         self.rackets.append( Racket(screen_w*1/4, screen_h/2) )
         if self.nNumPlayer > 1:
-            self.rackets.append( Racket(screen_w*3/4, screen_h/2) )
+            self.rackets.append( Racket(screen_w*3/4, screen_h/2))
+            
+        self.faceInfo = [[0]*4]*2
         
         self.ball = Ball(screen_w/2,100)
 
@@ -108,6 +112,8 @@ class Game:
         self.nAccelerator = 0
         
         self.scoreTable = score_table.ScoreTable("face_racket")
+        
+        self.nCptFrame = 0
 
         
     def launchEndOfGame( self ):
@@ -118,9 +124,9 @@ class Game:
         print("You loose!")
         self.final_score = self.score//10
         self.nRank = self.scoreTable.get_rank(self.final_score)
-        print("DBG: rank: %s" % nRank)
-        if nRank < 10:
-            self.scoreTable.add_score(final_score,"")
+        print("DBG: rank: %s" % self.nRank)
+        if self.nRank < 10:
+            self.scoreTable.add_score(self.final_score,"")
             self.scoreTable.save()
             
         self.score = 0
@@ -140,7 +146,7 @@ class Game:
         self.ball.y += self.ball.vy
         
         if self.ball.x + self.ball.radius > self.screen_w or self.ball.x - self.ball.radius < 0:
-            # out of screen side
+            # out of screen on side
             self.ball.vx = -self.ball.vx
             
         if self.ball.y - self.ball.radius < 0:
@@ -150,12 +156,14 @@ class Game:
             self.launchEndOfGame()
             
     def update( self, faces ):
+
         
         for i in range(self.nNumPlayer):
             self.rackets[i].px = self.rackets[i].x
             self.rackets[i].py = self.rackets[i].y
         
             x,y,w,h =  self.fts[i].update(faces)
+            self.faceInfo[i] = x,y,w,h
              
             self.rackets[i].x = int(x - self.rackets[i].sx//2)
             self.rackets[i].y = int(y-h//2+h*0.7)
@@ -163,6 +171,9 @@ class Game:
             self.rackets[i].vx = self.rackets[i].x - self.rackets[i].px
             self.rackets[i].vy = self.rackets[i].y - self.rackets[i].py
         
+        if time.time() < self.timeEndLoose:
+            return
+            
         self.updateBall()
             
         bCollide = False
@@ -173,7 +184,7 @@ class Game:
             nNbrIntermediate = 50
             for di in range(nNbrIntermediate+1):
                 ball_test_x = self.ball.px * (1-di/nNbrIntermediate) + self.ball.x * di/nNbrIntermediate
-                ball_test_y = self.ball.py * (1-di/nNbrIntermediate) + self.ball.py * di/nNbrIntermediate
+                ball_test_y = self.ball.py * (1-di/nNbrIntermediate) + self.ball.y * di/nNbrIntermediate
                 r_test_x = self.rackets[i].px * (1-di/nNbrIntermediate) + self.rackets[i].x * di/nNbrIntermediate
                 r_test_y = self.rackets[i].py * (1-di/nNbrIntermediate) + self.rackets[i].y * di/nNbrIntermediate
                 
@@ -188,8 +199,6 @@ class Game:
                     # else the ball continue down
                     bCollide = True
                     break
-
-            
             
         self.score += abs(self.ball.vx)+abs(self.ball.vy)
         
@@ -207,21 +216,21 @@ class Game:
         img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
         
         for image in [imgsave,img]:
-            cv2.putText(image,"score: %d" % final_score, (10,40),cv2.FONT_HERSHEY_SIMPLEX,1,(255,0,0),2)
+            cv2.putText(image,"score: %d" % self.final_score, (10,40),cv2.FONT_HERSHEY_SIMPLEX,1,(255,0,0),2)
         
-            if nRank < 10 or 0:
-                if ((nCptFrame//3) %2) == 0:
+            if self.nRank < 10 or 0:
+                if ((self.nCptFrame//3) %2) == 0:
                     cv2.putText(image,"rank : %d" % (nRank+1), (10,40+30),cv2.FONT_HERSHEY_SIMPLEX,1,(0,255,0),2)
             
         cv2.imwrite("/tmp/"+misctools.getFilenameFromTime()+".jpg", imgsave )
         
-        cv2.putText(img,"Looser!", (rx-15,ry-face_h//2),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),2)
+        cv2.putText(img,"Looser!", (self.rackets[0].x-15,self.rackets[0].y-self.faceInfo[0][3]//2),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),2)
 
         if 1:
-            score_x = screen_w-340
+            score_x = self.screen_w-340
             score_y = 20
             cv2.rectangle(img,(score_x-10,score_y-20),(score_x-10+300,score_y+120), (0,0,0), -1 )
-            hiscore = st.get_results(10)
+            hiscore = self.scoreTable.get_results(10)
             hiscore = hiscore.split('\n')
             for pt,line in enumerate(hiscore):
                 line = line.replace('\t','')
@@ -235,7 +244,7 @@ class Game:
         """
         
         if time.time() < self.timeEndLoose:
-            img = self.renderLooser()
+            img = self.renderLooser(img)
         else:
             # rendering
             for i in range(self.nNumPlayer):
@@ -245,6 +254,8 @@ class Game:
                 
         img = cv2.resize(img,(0,0),fx=self.zoom,fy=self.zoom)
         cv2.imshow('Racket Face Game', img)
+        
+        self.nCptFrame += 1
 
         key = cv2.waitKey(1)
         return key != 27
@@ -261,7 +272,12 @@ def runGame():
     cam_fps = int(cap.get(cv2.CAP_PROP_FPS))
     print("INF: cam_fps: %s" % cam_fps )
     
-    game = Game(screen_w,screen_h)
+    nNumPlayer = 1
+    ret, img = cap.read()
+    faces = fd.ssd_detect(img,conf=0.3)
+    if len(faces)>1:
+        nNumPlayer = 2
+    game = Game(screen_w,screen_h,nNumPlayer)
     
     
     nCptFrame = 0

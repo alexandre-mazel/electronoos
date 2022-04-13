@@ -26,8 +26,8 @@ class FacesTracker:
     def reset(self,nNumObject):
         self.listPos = []
         for i in range(nNumObject):
-            x = (1+i)*self.screen_width // (nNumObject*2)
-            y = (1+i)*self.screen_heigth // (nNumObject*2)
+            x = (1+i*3)*self.screen_width // (nNumObject*2)
+            y = self.screen_heigth // 2
             w = 50
             h = 50  
             self.listPos.append([x,y,w,h])            
@@ -38,31 +38,32 @@ class FacesTracker:
         return a list of [x,y,w,h]
         If no face, return -1 and previous position
         """
-        print("DBG: FacesTracker: update: in: %s" % str(self.listPos) )
-        print("DBG: FacesTracker: update: faces: %s" % str(faces) )
+        bDebug = 0
+        if bDebug: print("DBG: FacesTracker: update: in: %s" % str(self.listPos) )
+        if bDebug: print("DBG: FacesTracker: update: faces: %s" % str(faces) )
         
         # find nearest pos for each face, so if one face disappears, we won't mess another position
         newPos = self.listPos[:]
-        print(newPos)
+        #~ print(newPos)
         for idx,(x, y, w, h) in enumerate(faces):
-            cx = x+w/2
+            cx = x+w/2 # centerx
             cy = y+h/2
             nearest_dist = 9999999999999
             nearest_i = -1
             for i in range(len(self.listPos)):
                 dist = (self.listPos[i][0]-cx)*(self.listPos[i][0]-cx)+(self.listPos[i][1]-cy)*(self.listPos[i][1]-cy)
-                print("dist: %.3f" % dist )
+                if bDebug: print("dist: %.3f" % dist )
                 if dist < nearest_dist:
                     nearest_dist = dist
                     nearest_i = i
                 
-            print("DBG: FacesTracker: update: nearest_i: %s" % nearest_i )
+            if bDebug: print("DBG: FacesTracker: update: nearest_i: %s" % nearest_i )
             if nearest_i != -1:
                 newPos[nearest_i]=[cx,cy,w,h]
                 self.listPos[nearest_i] = [999999,999999,999999,99999] # ne selectionne plus celui ci
                 
         self.listPos = newPos
-        print("DBG: FacesTracker: update: out: %s" % str(self.listPos) )
+        if bDebug: print("DBG: FacesTracker: update: out: %s" % str(self.listPos) )
         return self.listPos[:] # return a copy, for safety
 # FacesTracker - end
 
@@ -71,7 +72,7 @@ class Racket:
     simple object to store data
     """
     def __init__( self, x, y ):
-        self.x = x
+        self.x = x #left corner
         self.y = y
         self.px = x # previous position
         self.py = y
@@ -94,6 +95,18 @@ class Ball:
         self.vx = 0
         self.vy = 3
         
+class Ground:
+    """
+    simple object to store data
+    """
+    def __init__( self, x, y, sx ):
+        self.x = x # left corner
+        self.y = y
+        self.vx = 0
+        self.vy = 0
+        self.sx = sx
+        self.sy = 4
+        
     
 
             
@@ -101,7 +114,7 @@ class Game:
     def __init__( self, screen_w, screen_h,nNumPlayer ):
         self.screen_w = screen_w
         self.screen_h = screen_h
-        self.zoom = 2
+        self.zoom = 1.83
         
         self.reset(nNumPlayer)
         
@@ -126,6 +139,8 @@ class Game:
         self.faceInfo = [[0]*4]*2
         
         self.ball = Ball(self.screen_w/2,100)
+        
+        self.ground = Ground(self.screen_w//2-50,self.screen_h-4,100)
 
         self.timeEndLoose = time.time() - 20
         
@@ -181,7 +196,17 @@ class Game:
             self.ball.vy = -self.ball.vy
             
         if self.ball.y + self.ball.radius > self.screen_h:
-            self.launchEndOfGame()
+            
+            if self.nNumPlayer > 1:
+                if not( self.ball.x + self.ball.radius < self.ground.x or self.ball.x - self.ball.radius > self.ground.x + self.ground.sx ):
+                    self.ball.vy = -self.ball.vy
+                else:
+                    self.launchEndOfGame()
+            else:
+                self.launchEndOfGame()
+                
+                
+            
             
     def update( self, faces ):
         
@@ -209,11 +234,11 @@ class Game:
             if self.nNumPlayer > 1:
                 # block racket on each side
                 if i == 0:
-                    if self.rackets[i].x + self.rackets[i].sx/2 > self.screen_w/2:
-                        self.rackets[i].x = self.screen_w//2-self.rackets[i].sx//2
+                    if self.rackets[i].x + self.rackets[i].sx > self.screen_w/2:
+                        self.rackets[i].x = self.screen_w//2-self.rackets[i].sx
                 else:
-                    if self.rackets[i].x - self.rackets[i].sx/2 < self.screen_w/2:
-                        self.rackets[i].x = self.screen_w//2+self.rackets[i].sx//2                
+                    if self.rackets[i].x < self.screen_w/2:
+                        self.rackets[i].x = self.screen_w//2             
 
             self.rackets[i].vx = self.rackets[i].x - self.rackets[i].px
             self.rackets[i].vy = self.rackets[i].y - self.rackets[i].py
@@ -293,7 +318,7 @@ class Game:
         if time.time() < self.timeEndLoose:
             img = self.renderLooser(img)
         else:
-            # rendering
+            if self.nNumPlayer > 1: cv2.rectangle(img, (self.ground.x, self.ground.y), (self.ground.x+self.ground.sx, self.ground.y+self.ground.sy), (170, 170, 170), -1)
             for i in range(self.nNumPlayer):
                 cv2.rectangle(img, (self.rackets[i].x, self.rackets[i].y), (self.rackets[i].x+self.rackets[i].sx, self.rackets[i].y+self.rackets[i].sy), (255, 255, 255), -1)
             cv2.circle(img, (int(self.ball.x), int(self.ball.y)), self.ball.radius, (255, 0, 0), -1)

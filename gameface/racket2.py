@@ -11,43 +11,60 @@ sys.path.append("../alex_pytools")
 import misctools
 import score_table
 
-class FaceTracker:
+class FacesTracker:
     """
-    choose a face (the most centered) then stuck on it
+    choose faces then stuck on them
     """
-    def __init__(self,screen_width,screen_heigth):
+    def __init__(self,screen_width,screen_heigth,nNumObject):
         # default behavior: look for the most centered
         # look for center of the face
-        self.fx = screen_width//2
-        self.fy = screen_heigth//2
-        self.fw = 50
-        self.fh = 50
+        self.screen_width = screen_width
+        self.screen_heigth = screen_heigth
+        
+        self.reset(nNumObject)
+        
+    def reset(self,nNumObject):
+        self.listPos = []
+        for i in range(nNumObject):
+            x = (1+i)*self.screen_width // (nNumObject*2)
+            y = (1+i)*self.screen_heigth // (nNumObject*2)
+            w = 50
+            h = 50  
+            self.listPos.append([x,y,w,h])            
         
     def update(self,faces):
         """
-        Receive a list of face, find the good one and return updated information about the same face than before
-        If no face, return previous one
+        Receive a list of face, find the best pairing and return updated information about faces in the same order than before
+        return a list of [x,y,w,h]
+        If no face, return -1 and previous position
         """
-        nearest_dist = 9999999
-        nearest_idx = -1
+        print("DBG: FacesTracker: update: in: %s" % str(self.listPos) )
+        print("DBG: FacesTracker: update: faces: %s" % str(faces) )
+        
+        # find nearest pos for each face, so if one face disappears, we won't mess another position
+        newPos = self.listPos[:]
+        print(newPos)
         for idx,(x, y, w, h) in enumerate(faces):
             cx = x+w/2
             cy = y+h/2
-            dist = (self.fx-cx)*(self.fx-cx)+(self.fy-cy)*(self.fy-cy)
-            if dist < nearest_dist:
-                nearest_dist = dist
-                nearest_idx = idx
+            nearest_dist = 9999999999999
+            nearest_i = -1
+            for i in range(len(self.listPos)):
+                dist = (self.listPos[i][0]-cx)*(self.listPos[i][0]-cx)+(self.listPos[i][1]-cy)*(self.listPos[i][1]-cy)
+                print("dist: %.3f" % dist )
+                if dist < nearest_dist:
+                    nearest_dist = dist
+                    nearest_i = i
                 
-        if nearest_idx != -1:
-            #~ print("nearest_dist: %s" % nearest_dist )
-            x, y, w, h = faces[nearest_idx]
-            self.fx = int(x+w/2)
-            self.fy = int(y+h/2)
-            self.fw = w
-            self.fh = h
-            
-        return self.fx,self.fy,self.fw,self.fh
-# FaceTracker - end
+            print("DBG: FacesTracker: update: nearest_i: %s" % nearest_i )
+            if nearest_i != -1:
+                newPos[nearest_i]=[cx,cy,w,h]
+                self.listPos[nearest_i] = [999999,999999,999999,99999] # ne selectionne plus celui ci
+                
+        self.listPos = newPos
+        print("DBG: FacesTracker: update: out: %s" % str(self.listPos) )
+        return self.listPos[:] # return a copy, for safety
+# FacesTracker - end
 
 class Racket:
     """
@@ -81,27 +98,34 @@ class Ball:
 
             
 class Game:
-    def __init__( self, screen_w, screen_h, nNumPlayer ):     
-        print( "Game: Starting with %d player(s)" % nNumPlayer )        
+    def __init__( self, screen_w, screen_h,nNumPlayer ):
         self.screen_w = screen_w
         self.screen_h = screen_h
         self.zoom = 2
+        
+        self.reset(nNumPlayer)
+        
+    def reset( self, nNumPlayer ):
+        print( "Game: Starting with %d player(s)" % nNumPlayer )        
+
         self.nNumPlayer = nNumPlayer
         
         
-        self.fts = []
-        self.fts.append( FaceTracker(screen_w*1/4, screen_h/2) )
-        if self.nNumPlayer > 1:
-            self.fts.append( FaceTracker(screen_w*3/4, screen_h/2) )
+        #~ self.fts = []
+        #~ self.fts.append( FaceTracker(screen_w*1/4, screen_h/2) )
+        #~ if self.nNumPlayer > 1:
+            #~ self.fts.append( FaceTracker(screen_w*3/4, screen_h/2) )
+            
+        self.ft = FacesTracker(self.screen_w, self.screen_h, nNumPlayer)
         
         self.rackets = []
-        self.rackets.append( Racket(screen_w*1/4, screen_h/2) )
+        self.rackets.append( Racket(self.screen_w*1/4, self.screen_h/2) )
         if self.nNumPlayer > 1:
-            self.rackets.append( Racket(screen_w*3/4, screen_h/2))
+            self.rackets.append( Racket(self.screen_w*3/4, self.screen_h/2))
             
         self.faceInfo = [[0]*4]*2
         
-        self.ball = Ball(screen_w/2,100)
+        self.ball = Ball(self.screen_w/2,100)
 
         self.timeEndLoose = time.time() - 20
         
@@ -117,6 +141,9 @@ class Game:
 
         
     def launchEndOfGame( self ):
+        self.numLooser = 0
+        if self.nNumPlayer > 1 and self.ball.x > self.screen_w // 2:
+            self.numLooser = 1
         self.ball.x = self.screen_w // 2
         self.ball.y = self.ball.radius + 1
         self.ball.vx = (random.random()-0.5)*4
@@ -131,6 +158,7 @@ class Game:
             
         self.score = 0
         self.timeEndLoose = time.time()+4
+        self.ft.reset(self.nNumPlayer)
         
     def updateBall( self ):
         
@@ -156,17 +184,36 @@ class Game:
             self.launchEndOfGame()
             
     def update( self, faces ):
-
+        
+        # update rackets
+        
+        self.faceInfo = self.ft.update(faces)
         
         for i in range(self.nNumPlayer):
+            if 0:
+                # when each tracker tracks only one face
+                idx,x,y,w,h =  self.fts[i].update(faces)
+                
+                if idx != -1:
+                    del faces[idx]
+                self.faceInfo[i] = x,y,w,h
+            else:
+                x,y,w,h = self.faceInfo[i]
+                
             self.rackets[i].px = self.rackets[i].x
             self.rackets[i].py = self.rackets[i].y
-        
-            x,y,w,h =  self.fts[i].update(faces)
-            self.faceInfo[i] = x,y,w,h
              
             self.rackets[i].x = int(x - self.rackets[i].sx//2)
             self.rackets[i].y = int(y-h//2+h*0.7)
+            
+            if self.nNumPlayer > 1:
+                # block racket on each side
+                if i == 0:
+                    if self.rackets[i].x + self.rackets[i].sx/2 > self.screen_w/2:
+                        self.rackets[i].x = self.screen_w//2-self.rackets[i].sx//2
+                else:
+                    if self.rackets[i].x - self.rackets[i].sx/2 < self.screen_w/2:
+                        self.rackets[i].x = self.screen_w//2+self.rackets[i].sx//2                
 
             self.rackets[i].vx = self.rackets[i].x - self.rackets[i].px
             self.rackets[i].vy = self.rackets[i].y - self.rackets[i].py
@@ -224,7 +271,7 @@ class Game:
             
         cv2.imwrite("/tmp/"+misctools.getFilenameFromTime()+".jpg", imgsave )
         
-        cv2.putText(img,"Looser!", (self.rackets[0].x-15,self.rackets[0].y-self.faceInfo[0][3]//2),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),2)
+        cv2.putText(img,"Looser!", (int(self.faceInfo[self.numLooser][0]-self.faceInfo[self.numLooser][2]//2),int(self.faceInfo[self.numLooser][1]-self.faceInfo[self.numLooser][3]*1//3)),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),2)
 
         if 1:
             score_x = self.screen_w-340

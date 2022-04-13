@@ -70,7 +70,7 @@ def analyseFolder(folder):
             idx += 1
             continue
         absf = folder + f
-        if 0:
+        if 1:
             im = cv2.imread(absf)
         else:
             # when everything is precomputed
@@ -129,13 +129,18 @@ def getDiffFacePosture( s1,l1,s2,l2):
         
     return rSumDiff
 
-def faceSwap(folder1,folder2):
+def faceSwap(folder1,folder2,folder3 = None):
     """
-    for each face in folder1, find one in f2 with the same angle and expressivity, then paste it
+    for each face in folder1, find one in f2 (or f3) with the same angle and expressivity, then paste it
     """
     listFiles = sorted(os.listdir(folder1))
     listFiles2 = sorted(os.listdir(folder2))
+    if folder3 != None:
+        # ne marche pas car il faut alors aussi changer absf3
+        listFiles3 = sorted(os.listdir(folder3))
+        listFiles2.extend(listFiles3)
     
+    idx = 0
     idx = 900
     
     fdl = facerecognition_dlib.faceRecogniser
@@ -191,9 +196,13 @@ def faceSwap(folder1,folder2):
         idx += 1
             
 if os.name == "nt":
-    strPath = "d:/face_swap_test/f2/"
-#~ analyseFolder(strPath)
+    if 1:
+        strPath = "d:/face_swap_test/f3/"
+        analyseFolder(strPath)
+        exit(0)
 
     folder1 = "d:/face_swap_test/f1/"
     folder2 = "d:/face_swap_test/f2/"
-    faceSwap(folder1,folder2)
+    folder3 = "d:/face_swap_test/f1/"
+    folder3 = None
+    faceSwap(folder1,folder2,folder3)

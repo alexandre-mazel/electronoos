@@ -390,7 +390,6 @@ def analyseFolder(folder):
     nImageLookingAt: 330 ( 15.2%) ( 24.8%)
     nImageSmile    : 872 ( 40.1%) ( 65.6%)
     nImageHappy    : 571 ( 26.2%) ( 43.0%)
-
     """
     
     #######################    

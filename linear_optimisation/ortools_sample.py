@@ -1,12 +1,7 @@
 # from https://towardsdatascience.com/introduction-to-linear-programming-in-python-9261e7eb44b
 
 import ortools # pip install ortools
-
 from ortools.linear_solver import pywraplp
-
-# Create a solver using the GLOP backend
-solver = pywraplp.Solver('Maximize army power', pywraplp.Solver.GLOP_LINEAR_PROGRAMMING)
-
 
 """
 Imagine you are a strategist recruiting an army. You have:
@@ -18,6 +13,12 @@ Horsemen are stronger than bowmen,
 who are in turn stronger than swordsmen.
 (cf power below)
 """
+
+# Create a solver using the GLOP backend
+solver = pywraplp.Solver('Maximize army power', pywraplp.Solver.GLOP_LINEAR_PROGRAMMING)
+
+
+
 
 # Create the variables we want to optimize, and their range
 swordsmen = solver.IntVar(0, solver.infinity(), 'swordsmen')

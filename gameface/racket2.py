@@ -45,7 +45,7 @@ class FacesTracker:
         # find nearest pos for each face, so if one face disappears, we won't mess another position
         newPos = self.listPos[:]
         #~ print(newPos)
-        for idx,(x, y, w, h) in enumerate(faces):
+        for idx,(x, y, w, h,conf) in enumerate(faces):
             cx = x+w/2 # centerx
             cy = y+h/2
             nearest_dist = 9999999999999
@@ -292,7 +292,7 @@ class Game:
         
             if self.nRank < 10 or 0:
                 if ((self.nCptFrame//3) %2) == 0:
-                    cv2.putText(image,"rank : %d" % (nRank+1), (10,40+30),cv2.FONT_HERSHEY_SIMPLEX,1,(0,255,0),2)
+                    cv2.putText(image,"rank : %d" % (self.nRank+1), (10,40+30),cv2.FONT_HERSHEY_SIMPLEX,1,(0,255,0),2)
             
         cv2.imwrite("/tmp/"+misctools.getFilenameFromTime()+".jpg", imgsave )
         
@@ -369,7 +369,11 @@ def runGame():
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # < 0.00000s
             faces = face_cascade.detectMultiScale(gray, 1.1, 10) # 0.05s
         else:
-            faces = fd.ssd_detect(img,conf=0.3) # 0.03s
+            faces = fd.ssd_detect(img,conf=0.3,returnconf=True) # 0.03s
+            print("DBG: faces: %s" % str(faces))
+            # TODO: ici on pourrait enlever un visage si on en a plus que de joueurs, et qu'il y en a un avec bien moins de conf.
+            # par exemple quand j'etais seul, j'ai eu ca:
+            # DBG: faces: [[267, 210, 111, 126, 0.98029757], [283, 214, 77, 73, 0.34878302]]
         
         #~ print("DBG: time analysis: %.5fs" % (time.time()-timeProcess))
 

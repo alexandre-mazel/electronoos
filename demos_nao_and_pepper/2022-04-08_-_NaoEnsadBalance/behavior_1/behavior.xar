@@ -15,7 +15,7 @@
       <BehaviorLayer name="behavior_layer1">
         <BehaviorKeyframe name="keyframe1" index="1">
           <Diagram>
-            <Box name="Timeline" id="1" localization="8" tooltip="This box is empty (contains a single motion layer with no motor position&#x0A;defined in it) and should be used to create any animation you would like." x="338" y="207">
+            <Box name="head " id="1" localization="8" tooltip="This box is empty (contains a single motion layer with no motor position&#x0A;defined in it) and should be used to create any animation you would like." x="338" y="207">
               <bitmap>media/images/box/movement/move.png</bitmap>
               <script language="4">
                 <content>
@@ -119,7 +119,7 @@
                     <Diagram />
                   </BehaviorKeyframe>
                 </BehaviorLayer>
-                <ActuatorList model="Nao">
+                <ActuatorList model="nao">
                   <ActuatorCurve name="value" actuator="HeadPitch" mute="0" unit="0">
                     <Key frame="25" value="9.75358" />
                     <Key frame="50" value="9.75358" />
@@ -449,7 +449,7 @@
                 </ActuatorList>
               </Timeline>
             </Box>
-            <Box name="movelegs" id="8" localization="8" tooltip="" x="104" y="922">
+            <Box name="movelegs &amp; head code" id="8" localization="8" tooltip="" x="121" y="895">
               <bitmap>media/images/box/box-python-script.png</bitmap>
               <script language="4">
                 <content>
@@ -468,13 +468,26 @@ class MyClass(GeneratedClass):
         pass
 
     def onInput_onStart(self):
-        rHead = -0.1
-        self.mot.post.angleInterpolation(["HeadPitch"],[-rHead],1.,False)
-        self.mot.angleInterpolation(["RHipPitch","LHipPitch"],[-0.05,-0.05],1.,False)
-        time.sleep(1.5)
-        self.mot.post.angleInterpolation(["HeadPitch"],[+rHead],1.,False)
-        self.mot.angleInterpolation(["RHipPitch","LHipPitch"],[+0.05,+0.05],1.,False)
-        time.sleep(1.5)
+    # head pitch a -1.2deg et ankle pitch a 3deg, kneepitch a 6.3, shoulder pitcha 81.9
+    # shoulder a 67 c'est encore miex.
+        bHead = 0
+        #bHead = 1
+
+        rHead = +0.1  # sens de respiration naturel
+        # rHead = -0.1 # send pour se balancer
+
+        rTimePause = 0.5
+        rTimePause = 1.
+        rTimePause = 1.5-0.1-0.1
+
+        rMoveHip = 0.05*1.5*3
+
+        if bHead: self.mot.post.angleInterpolation(["HeadPitch"],[-rHead],1.,False)
+        self.mot.angleInterpolation(["RHipPitch","LHipPitch"],[-rMoveHip,-rMoveHip],1.,False)
+        time.sleep(rTimePause)
+        if bHead: self.mot.post.angleInterpolation(["HeadPitch"],[+rHead],1.,False)
+        self.mot.angleInterpolation(["RHipPitch","LHipPitch"],[+rMoveHip,+rMoveHip],1.,False)
+        time.sleep(rTimePause)
         self.onStopped() #activate the output of the box
         pass
 
@@ -497,6 +510,7 @@ class MyClass(GeneratedClass):
             <Link inputowner="5" indexofinput="2" outputowner="6" indexofoutput="4" />
             <Link inputowner="7" indexofinput="2" outputowner="7" indexofoutput="4" />
             <Link inputowner="8" indexofinput="2" outputowner="8" indexofoutput="4" />
+            <Link inputowner="8" indexofinput="2" outputowner="0" indexofoutput="2" />
           </Diagram>
         </BehaviorKeyframe>
       </BehaviorLayer>

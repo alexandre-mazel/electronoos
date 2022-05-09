@@ -494,6 +494,24 @@ champion:
         Avg time:   0.20s
         Total time: 5.9s
 """
+
+"""
+A analyser:
+cond 1:
+M 014SA 23/02_13h
+F 052NS 31/03_9h
+2:
+M 044SM 24/3 11h
+F 054 LM 1/4 16h
+3:
+M 013DD 23/2 11h
+F 021RL 2/3 13h
+4: 
+M 067EF 20/4 11h
+F 031BL 11/3 9h
+
+13,14,21,31,44,52,54,67
+"""
             
 
 def analyseMovie():

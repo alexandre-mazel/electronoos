@@ -7,6 +7,7 @@
     <Dialogs />
     <Resources>
         <File name="explosion" src="explosion.mp3" />
+        <File name="robot_community_event_tablet_res" src="behavior_1/robot_community_event_tablet_res.png" />
     </Resources>
     <Topics />
     <IgnoredPaths />

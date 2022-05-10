@@ -43,10 +43,9 @@
             <translation type="obsolete">Hello Zaimah, how are you ? I ask that, though i guess you're well 'cause you look wonderfull today!</translation>
         </message>
         <message>
-            <location filename="behavior_1/behavior.xar" line="0"/>
             <source>Hello</source>
             <comment>Text</comment>
-            <translation type="unfinished">Hello</translation>
+            <translation type="obsolete">Hello</translation>
         </message>
     </context>
     <context>

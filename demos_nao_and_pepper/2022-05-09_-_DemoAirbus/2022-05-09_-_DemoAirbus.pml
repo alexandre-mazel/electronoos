@@ -9,6 +9,7 @@
         <File name="explosion" src="explosion.mp3" />
         <File name="robot_community_event_tablet_res" src="behavior_1/robot_community_event_tablet_res.png" />
         <File name="psst2" src="behavior_1/psst2.wav" />
+        <File name="epicsax" src="behavior_1/epicsax.ogg" />
     </Resources>
     <Topics />
     <IgnoredPaths />

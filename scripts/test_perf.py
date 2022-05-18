@@ -1049,7 +1049,7 @@ disk_read     1KB: ####################   3.38s (296.26 Mo/s)
 disk_write 1024KB: ####################  16.47s (60.70 Mo/s)
 disk_read  1024KB: ####################   0.45s (2205.17 Mo/s)
 
-surface7:
+*** surface7:
 sur c:
 python version   : 3.9.5 (64bits) (8 core(s))
 cpu              : Intel(R) Core(TM) i7-1065G7 CPU @ 1.30GHz
@@ -1087,5 +1087,22 @@ disk_write    1KB: ####################  11.53s (86.76 Mo/s)
 disk_read     1KB: ####################   5.57s (179.62 Mo/s)
 disk_write 1024KB: ####################   4.08s (244.82 Mo/s)
 disk_read  1024KB: ####################   0.34s (2911.05 Mo/s)
+
+
+*** Dell Corto/Elsa:
+windows disk size 5000
+python version   : 3.10.4 (64bits) (16 core(s))
+cpu              :  11th Gen Intel(R) Core(TM) i7-11800H CPU @ 2.30GHz
+test_cpu_int2    : ####################   0.35s
+test_cpu_float2  : ####################   0.06s
+test_scipy_xxt   : ####################   0.64s (622x)
+test_orb4.5.5    : ####################   0.13s (768.35fps)
+test_orbcv imgs  : ####################   0.66s (151fps)
+test_orbcv bis   : ####################   0.54s (183.35fps)
+disk_write    1KB: ####################   19.43s (235 Mo/s)
+disk_read     1KB: ####################   17.74s (281 Mo/s)
+disk_write 1024KB: ####################   3.31s (1375 Mo/s)
+disk_read  1024KB: ####################   1.23s (4078 Mo/s)
+
 
 """

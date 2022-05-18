@@ -59,6 +59,7 @@ class MyClass(GeneratedClass):
     def onInput_onStart(self):
         self.motion.setBreathEnabled( "Arms", False )
         self.motion.setExternalCollisionProtectionEnabled( "All", False)
+        self.motion.setSmartStiffnessEnabled( 1 ) # because we disable it in some resting
         self.onStopped() #activate the output of the box
         pass
 
@@ -2710,7 +2711,7 @@ class MyClass(GeneratedClass):
 		GeneratedClass.__init__(self)
 
 	def onInput_onStart(self):
-		self.onStopped("7 min slide transformation: entree puis launch poorly automated culture change.\nwe have a highway in front of us, let\'s use it.")]]></content></script><pluginContent><text><![CDATA[7 min slide transformation: entree puis launch poorly automated culture change.
+		self.onStopped("7 min slide transformation: entree puis launch on \"poorly\" automated culture change.\nwe have a highway in front of us, let\'s use it.")]]></content></script><pluginContent><text><![CDATA[7 min slide transformation: entree puis launch on "poorly" automated culture change.
 we have a highway in front of us, let's use it.]]></text></pluginContent><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" /></Box><Link inputowner="3" indexofinput="5" outputowner="4" indexofoutput="3" /><Link inputowner="9" indexofinput="2" outputowner="10" indexofoutput="3" /><Link inputowner="12" indexofinput="2" outputowner="9" indexofoutput="4" /><Link inputowner="6" indexofinput="2" outputowner="5" indexofoutput="3" /><Link inputowner="7" indexofinput="2" outputowner="6" indexofoutput="4" /><Link inputowner="1" indexofinput="2" outputowner="7" indexofoutput="4" /><Link inputowner="8" indexofinput="2" outputowner="2" indexofoutput="4" /><Link inputowner="2" indexofinput="2" outputowner="11" indexofoutput="3" /><Link inputowner="14" indexofinput="2" outputowner="11" indexofoutput="3" /><Link inputowner="10" indexofinput="2" outputowner="14" indexofoutput="4" /></Diagram></BehaviorKeyframe></BehaviorLayer></Timeline></Box><Box name="test_mike" id="9" localization="8" tooltip="" x="607" y="162"><bitmap>media/images/box/box-diagram.png</bitmap><script language="4"><content><![CDATA[]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Timeline enable="0"><BehaviorLayer name="behavior_layer1"><BehaviorKeyframe name="keyframe1" index="1"><Diagram><Box name="abcdk_BodyTalk" id="3" localization="8" tooltip="The abcdk_bodytalk: start fast and lightweight.&#x0A;&#x0A;v0.96: optionnal no wait at end&#x0A;v0.95: handle obstacles and exclude joint&#x0A;v0.94: patching on every error case&#x0A;v0.93: onSay: add the global speech speed&#x0A;v0.92: onSay: add a pause before speaking&#x0A;v0.91b: add comments&#x0A;v0.91: add direct txt inputing&#x0A;v0.9: change initialisation&#x0A;v0.8: add a track face&#x0A;v0.7: add an option to disable head movement (so you can launch what you want on it)" x="952" y="384"><bitmap>media/images/box/interaction/say.png</bitmap><bitmap>media/images/box/movement/move.png</bitmap><script language="4"><content><![CDATA[# abcdk_BodyTalk
 # v0.96
 
@@ -3815,7 +3816,7 @@ class MyClass(GeneratedClass):
 		GeneratedClass.__init__(self)
 
 	def onInput_onStart(self):
-		self.onStopped("You will help to shape the industrial system of the future, the shopfloor of the future, transform the daily lives of tens of thousands of our colleagues.")]]></content></script><pluginContent><text><![CDATA[You will help to shape the industrial system of the future, the shopfloor of the future, transform the daily lives of tens of thousands of our colleagues.]]></text></pluginContent><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" /></Box><Box name="Comment (1)" id="18" localization="8" tooltip="To comment your behavior. Enter the text here and move the box where you like&#x0A;to add the comment.&#x0A;&#x0A;Note: This box is not functional and has no effect on the behavior." plugin="textedit_plugin" x="408" y="261"><bitmap>media/images/box/box-script.png</bitmap><script language="4"><content><![CDATA[# /!\ Generated content. Do not edit!
+		self.onStopped("18:31: You will help to shape the industrial system of the future, the shopfloor of the future, transform the daily lives of tens of thousands of our colleagues.")]]></content></script><pluginContent><text><![CDATA[18:31: You will help to shape the industrial system of the future, the shopfloor of the future, transform the daily lives of tens of thousands of our colleagues.]]></text></pluginContent><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" /></Box><Box name="Comment (1)" id="18" localization="8" tooltip="To comment your behavior. Enter the text here and move the box where you like&#x0A;to add the comment.&#x0A;&#x0A;Note: This box is not functional and has no effect on the behavior." plugin="textedit_plugin" x="408" y="261"><bitmap>media/images/box/box-script.png</bitmap><script language="4"><content><![CDATA[# /!\ Generated content. Do not edit!
 class MyClass(GeneratedClass):
 	def __init__(self):
 		GeneratedClass.__init__(self)
@@ -4184,7 +4185,92 @@ class MyClass(GeneratedClass):
                     pass # cas ou la méthode a fini entre le test et le stop
                 self.nCurrentMoveID = -1;
 # HeadRandomStoppable - end
-pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Parameter name="nMaxWait" inherits_from_parent="0" content_type="1" value="3000" default_value="3000" min="1" max="100000000" tooltip="Maximum milliseconds of wait between two movement" id="5" /><Parameter name="nSpeedMovement" inherits_from_parent="0" content_type="1" value="2" default_value="2" min="1" max="100" tooltip="speed movement in %" id="6" /><Parameter name="rPitchOffset" inherits_from_parent="0" content_type="2" value="-0.2" default_value="-0.2" min="-2" max="2" tooltip="Offset to add to the barycentre of all position (to look around top or ...)" id="7" /><Parameter name="rPitchRangeMax" inherits_from_parent="0" content_type="2" value="0.3" default_value="0.3" min="0" max="2" tooltip="max of movement range" id="8" /><Parameter name="rYawRangeMax" inherits_from_parent="0" content_type="2" value="1" default_value="1" min="0" max="2" tooltip="max of movement range" id="9" /><Parameter name="bRegularTiming" inherits_from_parent="0" content_type="0" value="1" default_value="0" tooltip="Enable this value to make a new movement at a regular timing (the maxwait parameter is then used as a regular time)" id="10" /></Box><Box name="goto_rest" id="16" localization="8" tooltip="This box is empty (contains a single motion layer with no motor position&#x0A;defined in it) and should be used to create any animation you would like." x="148" y="601"><bitmap>media/images/box/movement/move.png</bitmap><script language="4"><content><![CDATA[]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Timeline enable="1" fps="25" start_frame="1" end_frame="-1" size="55"><BehaviorLayer name="behavior_layer1"><BehaviorKeyframe name="keyframe1" index="1"><Diagram /></BehaviorKeyframe></BehaviorLayer><ActuatorList model="juliette"><ActuatorCurve name="value" actuator="HeadPitch" mute="0" unit="0"><Key frame="55" value="-21.8848" /></ActuatorCurve><ActuatorCurve name="value" actuator="HeadYaw" mute="0" unit="0"><Key frame="55" value="0.175782" /></ActuatorCurve><ActuatorCurve name="value" actuator="HipPitch" mute="0" unit="0"><Key frame="55" value="-8.26171" /></ActuatorCurve><ActuatorCurve name="value" actuator="HipRoll" mute="0" unit="0"><Key frame="55" value="-0.615236" /></ActuatorCurve><ActuatorCurve name="value" actuator="KneePitch" mute="0" unit="0"><Key frame="55" value="-1.14258" /></ActuatorCurve><ActuatorCurve name="value" actuator="LElbowRoll" mute="0" unit="0"><Key frame="55" value="-5.18555" /></ActuatorCurve><ActuatorCurve name="value" actuator="LElbowYaw" mute="0" unit="0"><Key frame="55" value="-98.6133" /></ActuatorCurve><ActuatorCurve name="value" actuator="LHand" mute="0" unit="1"><Key frame="55" value="0.672232" /></ActuatorCurve><ActuatorCurve name="value" actuator="LShoulderPitch" mute="0" unit="0"><Key frame="55" value="84.1113" /></ActuatorCurve><ActuatorCurve name="value" actuator="LShoulderRoll" mute="0" unit="0"><Key frame="55" value="5.27344" /></ActuatorCurve><ActuatorCurve name="value" actuator="LWristYaw" mute="0" unit="0"><Key frame="55" value="5.79845" /></ActuatorCurve><ActuatorCurve name="value" actuator="RElbowRoll" mute="0" unit="0"><Key frame="55" value="11.7774" /></ActuatorCurve><ActuatorCurve name="value" actuator="RElbowYaw" mute="0" unit="0"><Key frame="55" value="96.3281" /></ActuatorCurve><ActuatorCurve name="value" actuator="RHand" mute="0" unit="1"><Key frame="55" value="0.650264" /></ActuatorCurve><ActuatorCurve name="value" actuator="RShoulderPitch" mute="0" unit="0"><Key frame="55" value="92.6367" /></ActuatorCurve><ActuatorCurve name="value" actuator="RShoulderRoll" mute="0" unit="0"><Key frame="55" value="-5.625" /></ActuatorCurve><ActuatorCurve name="value" actuator="RWristYaw" mute="0" unit="0"><Key frame="55" value="-6.24271" /></ActuatorCurve></ActuatorList></Timeline></Box><Link inputowner="13" indexofinput="2" outputowner="14" indexofoutput="4" /><Link inputowner="13" indexofinput="3" outputowner="14" indexofoutput="5" /><Link inputowner="15" indexofinput="2" outputowner="14" indexofoutput="4" /><Link inputowner="15" indexofinput="3" outputowner="14" indexofoutput="5" /><Link inputowner="16" indexofinput="2" outputowner="13" indexofoutput="4" /></Diagram></BehaviorKeyframe></BehaviorLayer></Timeline></Box><Box name="Comment" id="27" localization="8" tooltip="To comment your behavior. Enter the text here and move the box where you like&#x0A;to add the comment.&#x0A;&#x0A;Note: This box is not functional and has no effect on the behavior." plugin="textedit_plugin" x="17" y="43"><bitmap>media/images/box/box-script.png</bitmap><script language="4"><content><![CDATA[# /!\ Generated content. Do not edit!
+pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Parameter name="nMaxWait" inherits_from_parent="0" content_type="1" value="3000" default_value="3000" min="1" max="100000000" tooltip="Maximum milliseconds of wait between two movement" id="5" /><Parameter name="nSpeedMovement" inherits_from_parent="0" content_type="1" value="2" default_value="2" min="1" max="100" tooltip="speed movement in %" id="6" /><Parameter name="rPitchOffset" inherits_from_parent="0" content_type="2" value="-0.2" default_value="-0.2" min="-2" max="2" tooltip="Offset to add to the barycentre of all position (to look around top or ...)" id="7" /><Parameter name="rPitchRangeMax" inherits_from_parent="0" content_type="2" value="0.3" default_value="0.3" min="0" max="2" tooltip="max of movement range" id="8" /><Parameter name="rYawRangeMax" inherits_from_parent="0" content_type="2" value="1" default_value="1" min="0" max="2" tooltip="max of movement range" id="9" /><Parameter name="bRegularTiming" inherits_from_parent="0" content_type="0" value="1" default_value="0" tooltip="Enable this value to make a new movement at a regular timing (the maxwait parameter is then used as a regular time)" id="10" /></Box><Box name="goto_rest" id="16" localization="8" tooltip="This box is empty (contains a single motion layer with no motor position&#x0A;defined in it) and should be used to create any animation you would like." x="148" y="601"><bitmap>media/images/box/movement/move.png</bitmap><script language="4"><content><![CDATA[]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Timeline enable="1" fps="25" start_frame="1" end_frame="-1" size="55"><BehaviorLayer name="behavior_layer1"><BehaviorKeyframe name="keyframe1" index="1"><Diagram /></BehaviorKeyframe></BehaviorLayer><ActuatorList model="juliette"><ActuatorCurve name="value" actuator="HeadPitch" mute="0" unit="0"><Key frame="55" value="-21.8848" /></ActuatorCurve><ActuatorCurve name="value" actuator="HeadYaw" mute="0" unit="0"><Key frame="55" value="0.175782" /></ActuatorCurve><ActuatorCurve name="value" actuator="HipPitch" mute="0" unit="0"><Key frame="55" value="-8.26171" /></ActuatorCurve><ActuatorCurve name="value" actuator="HipRoll" mute="0" unit="0"><Key frame="55" value="-0.615236" /></ActuatorCurve><ActuatorCurve name="value" actuator="KneePitch" mute="0" unit="0"><Key frame="55" value="-1.14258" /></ActuatorCurve><ActuatorCurve name="value" actuator="LElbowRoll" mute="0" unit="0"><Key frame="55" value="-5.18555" /></ActuatorCurve><ActuatorCurve name="value" actuator="LElbowYaw" mute="0" unit="0"><Key frame="55" value="-98.6133" /></ActuatorCurve><ActuatorCurve name="value" actuator="LHand" mute="0" unit="1"><Key frame="55" value="0.672232" /></ActuatorCurve><ActuatorCurve name="value" actuator="LShoulderPitch" mute="0" unit="0"><Key frame="55" value="84.1113" /></ActuatorCurve><ActuatorCurve name="value" actuator="LShoulderRoll" mute="0" unit="0"><Key frame="55" value="5.27344" /></ActuatorCurve><ActuatorCurve name="value" actuator="LWristYaw" mute="0" unit="0"><Key frame="55" value="5.79845" /></ActuatorCurve><ActuatorCurve name="value" actuator="RElbowRoll" mute="0" unit="0"><Key frame="55" value="11.7774" /></ActuatorCurve><ActuatorCurve name="value" actuator="RElbowYaw" mute="0" unit="0"><Key frame="55" value="96.3281" /></ActuatorCurve><ActuatorCurve name="value" actuator="RHand" mute="0" unit="1"><Key frame="55" value="0.650264" /></ActuatorCurve><ActuatorCurve name="value" actuator="RShoulderPitch" mute="0" unit="0"><Key frame="55" value="92.6367" /></ActuatorCurve><ActuatorCurve name="value" actuator="RShoulderRoll" mute="0" unit="0"><Key frame="55" value="-5.625" /></ActuatorCurve><ActuatorCurve name="value" actuator="RWristYaw" mute="0" unit="0"><Key frame="55" value="-6.24271" /></ActuatorCurve></ActuatorList></Timeline></Box><Box name="abcdk_BodyTalk" id="17" localization="8" tooltip="The abcdk_bodytalk: start fast and lightweight.&#x0A;&#x0A;v0.96: optionnal no wait at end&#x0A;v0.95: handle obstacles and exclude joint&#x0A;v0.94: patching on every error case&#x0A;v0.93: onSay: add the global speech speed&#x0A;v0.92: onSay: add a pause before speaking&#x0A;v0.91b: add comments&#x0A;v0.91: add direct txt inputing&#x0A;v0.9: change initialisation&#x0A;v0.8: add a track face&#x0A;v0.7: add an option to disable head movement (so you can launch what you want on it)" x="751" y="224"><bitmap>media/images/box/interaction/say.png</bitmap><bitmap>media/images/box/movement/move.png</bitmap><script language="4"><content><![CDATA[# abcdk_BodyTalk
+# v0.96
+
+try: import abcdk.bodytalk
+except: pass # this error could occurs only on first execution, it's handled in the installer
+try: import abcdk.naoqitools
+except: pass
+try: import abcdk.speech
+except: pass
+
+if( 1 ):
+    import abcdk.bodytalk
+    reload(abcdk.bodytalk)
+    import abcdk.motiontools
+    reload(abcdk.motiontools)
+    reload(abcdk.speech)
+    import abcdk.tracking
+    reload(abcdk.tracking)
+    import abcdk.leds
+    reload(abcdk.leds)
+
+import time
+class MyClass(GeneratedClass):
+    """ insert here your comments about this class """
+    def __init__(self):
+        GeneratedClass.__init__(self);
+        try:
+            self.tts = ALProxy( "ALTextToSpeech" );
+        except Exception, err:
+            self.log( "ERR: tts seems not to be present, so we won't use it..." );
+            self.tts = False;
+
+    def onLoad(self):
+        self.bMustStop = False;
+        self.bIsRunning = False;
+
+    def onUnload(self):
+        self.onInput_onStop(); # stop current loop execution
+
+    def onInput_onPrepare(self):
+        abcdk.bodytalk.bodyTalk.prepare( bUseHead = self.getParameter( 'bUseHead' ), rSide = self.getParameter( "rSide" ), rElevation = self.getParameter( "rElevation" ),
+                    astrJointsToExclude = eval(self.getParameter( "astrJointsToExclude" )),
+                    astrObstacles = eval(self.getParameter( "astrObstacles" )),
+        );
+
+    def startBodyTalk( self, nSayID ):
+        self.log( self.boxName + ": start - begin" );
+
+        if( self.bIsRunning ):
+            self.log( self.boxName + ": already started => nothing" );
+            return;
+
+        self.bIsRunning = True;
+        self.bMustStop = False;
+
+        abcdk.bodytalk.bodyTalk.start( bUseHead = self.getParameter( 'bUseHead' ), bTrackFace = self.getParameter( 'bTrackFace' ),
+                nSayID = nSayID, astrJointsToExclude = eval(self.getParameter( "astrJointsToExclude" )), astrObstacles = eval(self.getParameter( "astrObstacles" )),
+        );
+        rPeriod = 0.5;
+        while( not self.bMustStop ):
+            bRet = abcdk.bodytalk.bodyTalk.update( rSide = self.getParameter( "rSide" ), rElevation = self.getParameter( "rElevation" ) );
+            if( not bRet ):
+                self.bMustStop = True;
+            time.sleep( rPeriod );
+        # end while
+        abcdk.bodytalk.bodyTalk.stop(self.getParameter("bWaitEndOfRestMovement"));
+        self.bIsRunning = False;
+        self.onStopped();
+        self.log( self.boxName + ": start - end" );
+
+
+    def onInput_onStart(self):
+        self.startBodyTalk( -1 );
+
+    def onInput_onStop(self):
+        self.bMustStop = True; # stop current loop execution
+
+    def onInput_onSay( self, strTxt ):
+        if( self.bIsRunning ):
+            self.log( "Already running => nothing..." );
+            return;
+        nSayID = self.tts.post.say( "\\PAU=700\\ " + abcdk.speech.getTextWithCurrentSpeed( strTxt ) );
+        self.startBodyTalk( nSayID );
+
+# abcdk_BodyTalk - end
+pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onPrepare" type="1" type_size="1" nature="1" inner="0" tooltip="If you know you will talk, you can prepare to have a starting more reactive." id="2" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Start the box behavior" id="3" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="4" /><Input name="onSay" type="3" type_size="1" nature="1" inner="0" tooltip="automatic say and animate imput: just send some text, and it will say them while talking, if the text is enough long..." id="5" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="6" /><Parameter name="bUseHead" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Do we send movements to the head ?" id="7" /><Parameter name="rElevation" inherits_from_parent="0" content_type="2" value="0" default_value="0" min="-0.5" max="0.5" tooltip="" id="8" /><Parameter name="rSide" inherits_from_parent="0" content_type="2" value="0" default_value="0" min="-1" max="1" tooltip="" id="9" /><Parameter name="bTrackFace" inherits_from_parent="0" content_type="0" value="0" default_value="0" tooltip="Mario use face tracking to look at human" id="10" /><Parameter name="astrJointsToExclude" inherits_from_parent="0" content_type="3" value="[]" default_value='[&quot;RArm&quot;]' custom_choice="1" tooltip="a string to evaluate as an array: it&apos;s a list of obstacles" id="11"><Choice value="[]" /><Choice value='[&quot;RHand&quot;]' /><Choice value='[&quot;RArm&quot;]' /></Parameter><Parameter name="astrObstacles" inherits_from_parent="0" content_type="3" value="[]" default_value='[&quot;Table&quot;]' custom_choice="0" tooltip="a string to evaluate as an array: it&apos;s a list of obstacles" id="12"><Choice value="[]" /><Choice value='[&quot;Table&quot;]' /></Parameter><Parameter name="bWaitEndOfRestMovement" inherits_from_parent="0" content_type="0" value="0" default_value="1" tooltip="The box will wait for the rest movement to be finished. So when the stop is triggered, no movement is on the stack. (default)" id="13" /></Box><Link inputowner="13" indexofinput="2" outputowner="14" indexofoutput="4" /><Link inputowner="13" indexofinput="3" outputowner="14" indexofoutput="5" /><Link inputowner="15" indexofinput="2" outputowner="14" indexofoutput="4" /><Link inputowner="15" indexofinput="3" outputowner="14" indexofoutput="5" /><Link inputowner="16" indexofinput="2" outputowner="13" indexofoutput="4" /></Diagram></BehaviorKeyframe></BehaviorLayer></Timeline></Box><Box name="Comment" id="27" localization="8" tooltip="To comment your behavior. Enter the text here and move the box where you like&#x0A;to add the comment.&#x0A;&#x0A;Note: This box is not functional and has no effect on the behavior." plugin="textedit_plugin" x="17" y="43"><bitmap>media/images/box/box-script.png</bitmap><script language="4"><content><![CDATA[# /!\ Generated content. Do not edit!
 class MyClass(GeneratedClass):
 	def __init__(self):
 		GeneratedClass.__init__(self)
@@ -4212,4 +4298,482 @@ class MyClass(GeneratedClass):
 
     def onInput_onStop(self):
         self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
-        self.onStopped() #activate the output of the box]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /></Box><Box name="arms walk" id="29" localization="8" tooltip="This box is empty (contains a single motion layer with no motor position&#x0A;defined in it) and should be used to create any animation you would like." x="305" y="385"><bitmap>media/images/box/movement/move.png</bitmap><script language="4"><content><![CDATA[]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Timeline enable="1" fps="15" start_frame="1" end_frame="-1" size="199"><BehaviorLayer name="behavior_layer1"><BehaviorKeyframe name="keyframe1" index="1"><Diagram /></BehaviorKeyframe></BehaviorLayer><ActuatorList model="Juliette"><ActuatorCurve name="value" actuator="LElbowRoll" mute="0" unit="0"><Key frame="25" value="-5.27344" /><Key frame="50" value="-3.33984" /><Key frame="75" value="-15.6445" /><Key frame="100" value="-3.33984" /><Key frame="125" value="-15.6445" /><Key frame="150" value="-3.33984" /><Key frame="175" value="-15.6445" /><Key frame="199" value="-6.15235" /></ActuatorCurve><ActuatorCurve name="value" actuator="LElbowYaw" mute="0" unit="0"><Key frame="25" value="-99.0527" /><Key frame="50" value="-98.5254" /><Key frame="75" value="-97.1191" /><Key frame="100" value="-98.5254" /><Key frame="125" value="-97.1191" /><Key frame="150" value="-98.5254" /><Key frame="175" value="-97.1191" /><Key frame="199" value="-97.2949" /></ActuatorCurve><ActuatorCurve name="value" actuator="LHand" mute="0" unit="1"><Key frame="25" value="0.64587" /><Key frame="50" value="0.64587" /><Key frame="75" value="0.622144" /><Key frame="100" value="0.64587" /><Key frame="125" value="0.622144" /><Key frame="150" value="0.64587" /><Key frame="175" value="0.622144" /><Key frame="199" value="0.628295" /></ActuatorCurve><ActuatorCurve name="value" actuator="LShoulderPitch" mute="0" unit="0"><Key frame="25" value="88.3301" /><Key frame="50" value="108.896" /><Key frame="75" value="52.4707" /><Key frame="100" value="108.896" /><Key frame="125" value="52.4707" /><Key frame="150" value="108.896" /><Key frame="175" value="52.4707" /><Key frame="199" value="85.3418" /></ActuatorCurve><ActuatorCurve name="value" actuator="LShoulderRoll" mute="0" unit="0"><Key frame="25" value="5.88868" /><Key frame="50" value="5.27344" /><Key frame="75" value="6.76758" /><Key frame="100" value="5.27344" /><Key frame="125" value="6.76758" /><Key frame="150" value="5.27344" /><Key frame="175" value="6.76758" /><Key frame="199" value="6.67969" /></ActuatorCurve><ActuatorCurve name="value" actuator="LWristYaw" mute="0" unit="0"><Key frame="25" value="4.56796" /><Key frame="50" value="5.18321" /><Key frame="75" value="6.3306" /><Key frame="100" value="5.18321" /><Key frame="125" value="6.3306" /><Key frame="150" value="5.18321" /><Key frame="175" value="6.3306" /><Key frame="199" value="6.4137" /></ActuatorCurve><ActuatorCurve name="value" actuator="RElbowRoll" mute="0" unit="0"><Key frame="25" value="11.9531" /><Key frame="50" value="15.6445" /><Key frame="75" value="3.33984" /><Key frame="100" value="15.6445" /><Key frame="125" value="3.33984" /><Key frame="150" value="15.6445" /><Key frame="175" value="3.33984" /><Key frame="199" value="11.1621" /></ActuatorCurve><ActuatorCurve name="value" actuator="RElbowYaw" mute="0" unit="0"><Key frame="25" value="97.0313" /><Key frame="50" value="97.1191" /><Key frame="75" value="98.5254" /><Key frame="100" value="97.1191" /><Key frame="125" value="98.5254" /><Key frame="150" value="97.1191" /><Key frame="175" value="98.5254" /><Key frame="199" value="97.9102" /></ActuatorCurve><ActuatorCurve name="value" actuator="RHand" mute="0" unit="1"><Key frame="25" value="0.632689" /><Key frame="50" value="0.622144" /><Key frame="75" value="0.64587" /><Key frame="100" value="0.622144" /><Key frame="125" value="0.64587" /><Key frame="150" value="0.622144" /><Key frame="175" value="0.64587" /><Key frame="199" value="0.633568" /></ActuatorCurve><ActuatorCurve name="value" actuator="RShoulderPitch" mute="0" unit="0"><Key frame="25" value="92.9004" /><Key frame="50" value="52.4707" /><Key frame="75" value="108.896" /><Key frame="100" value="52.4707" /><Key frame="125" value="108.896" /><Key frame="150" value="52.4707" /><Key frame="175" value="108.896" /><Key frame="199" value="94.4824" /></ActuatorCurve><ActuatorCurve name="value" actuator="RShoulderRoll" mute="0" unit="0"><Key frame="25" value="-6.06446" /><Key frame="50" value="-6.76758" /><Key frame="75" value="-5.27344" /><Key frame="100" value="-6.76758" /><Key frame="125" value="-5.27344" /><Key frame="150" value="-6.76758" /><Key frame="175" value="-5.27344" /><Key frame="199" value="-5.80078" /></ActuatorCurve><ActuatorCurve name="value" actuator="RWristYaw" mute="0" unit="0"><Key frame="25" value="-5.3638" /><Key frame="50" value="-6.3306" /><Key frame="75" value="-5.18321" /><Key frame="100" value="-6.3306" /><Key frame="125" value="-5.18321" /><Key frame="150" value="-6.3306" /><Key frame="175" value="-5.18321" /><Key frame="199" value="-6.3306" /></ActuatorCurve></ActuatorList></Timeline></Box><Link inputowner="21" indexofinput="2" outputowner="23" indexofoutput="3" /><Link inputowner="24" indexofinput="2" outputowner="23" indexofoutput="3" /><Link inputowner="22" indexofinput="2" outputowner="24" indexofoutput="4" /><Link inputowner="15" indexofinput="2" outputowner="13" indexofoutput="4" /><Link inputowner="15" indexofinput="2" outputowner="28" indexofoutput="4" /><Link inputowner="15" indexofinput="2" outputowner="5" indexofoutput="4" /></Diagram></BehaviorKeyframe></BehaviorLayer></Timeline></Box></ChoregrapheProject>
+        self.onStopped() #activate the output of the box]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /></Box><Box name="arms walk" id="29" localization="8" tooltip="This box is empty (contains a single motion layer with no motor position&#x0A;defined in it) and should be used to create any animation you would like." x="305" y="385"><bitmap>media/images/box/movement/move.png</bitmap><script language="4"><content><![CDATA[]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Timeline enable="1" fps="15" start_frame="1" end_frame="-1" size="199"><BehaviorLayer name="behavior_layer1"><BehaviorKeyframe name="keyframe1" index="1"><Diagram /></BehaviorKeyframe></BehaviorLayer><ActuatorList model="juliette"><ActuatorCurve name="value" actuator="LElbowRoll" mute="0" unit="0"><Key frame="25" value="-5.27344" /><Key frame="50" value="-3.33984" /><Key frame="75" value="-15.6445" /><Key frame="100" value="-3.33984" /><Key frame="125" value="-15.6445" /><Key frame="150" value="-3.33984" /><Key frame="175" value="-15.6445" /><Key frame="199" value="-6.15235" /></ActuatorCurve><ActuatorCurve name="value" actuator="LElbowYaw" mute="0" unit="0"><Key frame="25" value="-99.0527" /><Key frame="50" value="-98.5254" /><Key frame="75" value="-97.1191" /><Key frame="100" value="-98.5254" /><Key frame="125" value="-97.1191" /><Key frame="150" value="-98.5254" /><Key frame="175" value="-97.1191" /><Key frame="199" value="-97.2949" /></ActuatorCurve><ActuatorCurve name="value" actuator="LHand" mute="0" unit="1"><Key frame="25" value="0.64587" /><Key frame="50" value="0.64587" /><Key frame="75" value="0.622144" /><Key frame="100" value="0.64587" /><Key frame="125" value="0.622144" /><Key frame="150" value="0.64587" /><Key frame="175" value="0.622144" /><Key frame="199" value="0.628295" /></ActuatorCurve><ActuatorCurve name="value" actuator="LShoulderPitch" mute="0" unit="0"><Key frame="25" value="88.3301" /><Key frame="50" value="108.896" /><Key frame="75" value="52.4707" /><Key frame="100" value="108.896" /><Key frame="125" value="52.4707" /><Key frame="150" value="108.896" /><Key frame="175" value="52.4707" /><Key frame="199" value="85.3418" /></ActuatorCurve><ActuatorCurve name="value" actuator="LShoulderRoll" mute="0" unit="0"><Key frame="25" value="5.88868" /><Key frame="50" value="5.27344" /><Key frame="75" value="6.76758" /><Key frame="100" value="5.27344" /><Key frame="125" value="6.76758" /><Key frame="150" value="5.27344" /><Key frame="175" value="6.76758" /><Key frame="199" value="6.67969" /></ActuatorCurve><ActuatorCurve name="value" actuator="LWristYaw" mute="0" unit="0"><Key frame="25" value="4.56796" /><Key frame="50" value="5.18321" /><Key frame="75" value="6.3306" /><Key frame="100" value="5.18321" /><Key frame="125" value="6.3306" /><Key frame="150" value="5.18321" /><Key frame="175" value="6.3306" /><Key frame="199" value="6.4137" /></ActuatorCurve><ActuatorCurve name="value" actuator="RElbowRoll" mute="0" unit="0"><Key frame="25" value="11.9531" /><Key frame="50" value="15.6445" /><Key frame="75" value="3.33984" /><Key frame="100" value="15.6445" /><Key frame="125" value="3.33984" /><Key frame="150" value="15.6445" /><Key frame="175" value="3.33984" /><Key frame="199" value="11.1621" /></ActuatorCurve><ActuatorCurve name="value" actuator="RElbowYaw" mute="0" unit="0"><Key frame="25" value="97.0313" /><Key frame="50" value="97.1191" /><Key frame="75" value="98.5254" /><Key frame="100" value="97.1191" /><Key frame="125" value="98.5254" /><Key frame="150" value="97.1191" /><Key frame="175" value="98.5254" /><Key frame="199" value="97.9102" /></ActuatorCurve><ActuatorCurve name="value" actuator="RHand" mute="0" unit="1"><Key frame="25" value="0.632689" /><Key frame="50" value="0.622144" /><Key frame="75" value="0.64587" /><Key frame="100" value="0.622144" /><Key frame="125" value="0.64587" /><Key frame="150" value="0.622144" /><Key frame="175" value="0.64587" /><Key frame="199" value="0.633568" /></ActuatorCurve><ActuatorCurve name="value" actuator="RShoulderPitch" mute="0" unit="0"><Key frame="25" value="92.9004" /><Key frame="50" value="52.4707" /><Key frame="75" value="108.896" /><Key frame="100" value="52.4707" /><Key frame="125" value="108.896" /><Key frame="150" value="52.4707" /><Key frame="175" value="108.896" /><Key frame="199" value="94.4824" /></ActuatorCurve><ActuatorCurve name="value" actuator="RShoulderRoll" mute="0" unit="0"><Key frame="25" value="-6.06446" /><Key frame="50" value="-6.76758" /><Key frame="75" value="-5.27344" /><Key frame="100" value="-6.76758" /><Key frame="125" value="-5.27344" /><Key frame="150" value="-6.76758" /><Key frame="175" value="-5.27344" /><Key frame="199" value="-5.80078" /></ActuatorCurve><ActuatorCurve name="value" actuator="RWristYaw" mute="0" unit="0"><Key frame="25" value="-5.3638" /><Key frame="50" value="-6.3306" /><Key frame="75" value="-5.18321" /><Key frame="100" value="-6.3306" /><Key frame="125" value="-5.18321" /><Key frame="150" value="-6.3306" /><Key frame="175" value="-5.18321" /><Key frame="199" value="-6.3306" /></ActuatorCurve></ActuatorList></Timeline></Box><Box name="restMove" id="32" localization="8" tooltip="" x="873" y="273"><bitmap>media/images/box/box-diagram.png</bitmap><script language="4"><content><![CDATA[]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Timeline enable="0"><BehaviorLayer name="behavior_layer1"><BehaviorKeyframe name="keyframe1" index="1"><Diagram><Box name="RestLeg" id="30" localization="8" tooltip="crouch &amp; remove legs stiffnes" x="496" y="276"><bitmap>media/images/box/box-python-script.png</bitmap><script language="4"><content><![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+        self.motion = ALProxy("ALMotion")
+
+    def onLoad(self):
+        #put initialization code here
+        pass
+
+    def onUnload(self):
+        #put clean-up code here
+        pass
+
+    def onInput_onStart(self):
+        listJoint = ["HipPitch","KneePitch"]
+        self.motion.angleInterpolation(listJoint,[-1.02,0.51],2,True)
+        #self.motion.stiffnessInterpolation(listJoint,0.,2) # doest'nt work
+        self.motion.setSmartStiffnessEnabled( 0 )
+        self.motion._setStiffnesses(listJoint,0.1)
+        self.onStopped() #activate the output of the box
+        pass
+
+    def onInput_onStop(self):
+        self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
+        self.onStopped() #activate the output of the box]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /></Box><Box name="RestLeg (1)" id="31" localization="8" tooltip="crouch &amp; remove legs stiffnes" x="619" y="175"><bitmap>media/images/box/box-python-script.png</bitmap><script language="4"><content><![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+        self.motion = ALProxy("ALMotion")
+
+    def onLoad(self):
+        #put initialization code here
+        pass
+
+    def onUnload(self):
+        #put clean-up code here
+        pass
+
+    def onInput_onStart(self):
+        self.motion.rest()
+        listJoint = ["Head","Arms"]
+        #self.motion.stiffnessInterpolation(listJoint,1.,2) # doest'nt work
+        self.motion.setSmartStiffnessEnabled( 0 )
+        self.motion._setStiffnesses(listJoint,1.) # but angleinterpolation won't work
+        self.onStopped() #activate the output of the box
+        pass
+
+    def onInput_onStop(self):
+        self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
+        self.onStopped() #activate the output of the box]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /></Box><Box name="AutoArmsBreath" id="13" localization="8" tooltip="Auto random arms moves (multi robot)&#x0A;v0.3" x="902" y="396"><bitmap>media/images/box/loop.png</bitmap><script language="4"><content><![CDATA[# RomeoArmsBreath
+# v0.3
+# todo: essayer de tirer un pitch et un yaw puis appliquer au prorata de la distance de l'epaule
+import random
+import time
+class MyClass(GeneratedClass):
+    """ insert here your comments about this class """
+    def __init__(self):
+        GeneratedClass.__init__(self);
+
+    def onLoad(self):
+        self.bMustStop = False;
+        self.bIsRunning = False;
+        self.motion = ALProxy( "ALMotion" );
+        self.id = -1;
+
+    def onUnload(self):
+        self.onInput_onStop(); # stop current loop execution
+
+    def onInput_onStart(self):
+        self.log( self.boxName + ": start - begin" );
+
+        if( self.bIsRunning ):
+            self.log( self.boxName + ": already started => nothing" );
+            return;
+
+        self.bIsRunning = True;
+        self.bMustStop = False;
+
+        rPeriod = self.getParameter( 'rPeriod' );
+        listJointsRef = self.motion.getJointNames( "Arms" );
+        listJointsPosRef = self.motion.getAngles( listJointsRef, True ); # store this position as a ref
+        print( "listJointsRef: %s" % listJointsRef );
+        print( "listJointsPosRef: %s" % listJointsRef );
+        self.id = -1;
+        while( not self.bMustStop ):
+            if( random.random() > 0 ):
+                # select some joints, and apply a small moves from the ref position
+                listJoints = [];
+                listJointsPos = [];
+                for idx, joint in enumerate(listJointsRef):
+                    if( random.random() > 0.5 ):
+                        listJoints.append( joint );
+                        if( "Hand" in joint ):
+                            if( random.random() > 0.5 ):
+                                rVal = 0.01;
+                            else:
+                                rVal = 0.95;
+                        else:
+                            rOffset = (random.random()-0.5)*0.2;
+                            if( "WristRoll" in joint ):
+                                rOffset *= 5.;
+                            elif( "Wrist" in joint ):
+                                rOffset *= 3.;
+                            elif( "Elbow" in joint ):
+                                rOffset *= 1.5;
+                            rVal = listJointsPosRef[idx] + rOffset;
+                        listJointsPos.append( rVal );
+                if( len(listJoints) > 0 ):
+                    print( "listJoints: %s" % listJoints );
+                    print( "listJointsPos: %s" % listJointsPos );
+                    nLoop = random.randint(1,3);
+                    for i in range(nLoop):
+                        self.id = self.motion.post.angleInterpolationWithSpeed( listJoints, listJointsPos, 0.02+random.random()/20 );
+                        self.motion.wait( self.id, 0 );
+                        if( self.bMustStop ):
+                            break;
+                        time.sleep( random.random() );
+                        if( self.bMustStop ):
+                            break;
+
+                        self.id = self.motion.post.angleInterpolationWithSpeed( listJointsRef, listJointsPosRef, 0.02+random.random()/20 );
+                        self.motion.wait( self.id, 0 );
+                        time.sleep( random.random() + 1. );
+                        if( self.bMustStop ):
+                            break;
+                    if( self.bMustStop ):
+                        break;
+                    self.id = self.motion.post.angleInterpolationWithSpeed( listJoints, listJointsPos, 0.02+random.random()/20 );
+                    self.motion.wait( self.id, 0 );
+
+            else:
+                # place all joint to the ref pos but some to other pose
+                listJoints = listJointsRef[:];
+                listJointsPos = listJointsPosRef[:];
+                for idx, joint in enumerate(listJointsRef):
+                    if( random.random() > 0.8 ):
+                        listJointsPos[idx] += (random.random()-0.5)*0.2;
+                if( len(listJoints) > 0 ):
+                    print( "listJoints: %s" % listJoints );
+                    print( "listJointsPos: %s" % listJointsPos );
+                    self.id = self.motion.post.angleInterpolationWithSpeed( listJoints, listJointsPos, 0.1 );
+                    self.motion.wait( self.id, 0 );
+            if( self.bMustStop ):
+                break;
+            time.sleep( rPeriod * random.random() + 1. );
+        # end while
+        if( self.id != -1 ):
+            try:
+                self.motion.stop( self.id );
+            except BaseException, err:
+                print( "err in stop: %s" % err );
+        self.bIsRunning = False;
+        self.onStopped();
+        self.log( self.boxName + ": start - end" );
+
+    def onInput_onStop(self):
+        self.bMustStop = True; # stop current loop execution
+        if( self.id != -1 ):
+            try:
+                self.motion.stop( self.id );
+            except BaseException, err:
+                print( "err in stop: %s" % err );
+
+# Template_White - end
+pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Parameter name="rPeriod" inherits_from_parent="0" content_type="2" value="1" default_value="1" min="0" max="100000" tooltip="period in seconds" id="5" /></Box><Box name="start/stop" id="14" localization="8" tooltip="" x="750" y="309"><bitmap>media/images/box/box-python-script.png</bitmap><script language="4"><content><![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onLoad(self):
+        #put initialization code here
+        pass
+
+    def onUnload(self):
+        #put clean-up code here
+        pass
+
+    def onInput_onStart(self):
+        self.output_started() #activate the output of the box
+        pass
+
+    def onInput_onStop(self):
+        self.output_stopped() #activate the output of the box
+        pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="output_started" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Output name="output_stopped" type="1" type_size="1" nature="1" inner="0" tooltip="" id="5" /></Box><Box name="HeadRandomStoppable" id="15" localization="8" tooltip="Random head behaviour - the robot move his head randomly, fully customisable.&#x0A;&#x0A;It&apos;s designed to stop very fast.&#x0A;&#x0A;v0.8" x="882" y="277"><bitmap>media/images/box/interaction/face.png</bitmap><script language="4"><content><![CDATA[# HeadRandomStoppable
+# v0.8
+import random
+import time
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+        self.chain = "Head"
+        self.duration = 0.8 # 1 second
+        self.motionProxy = ALProxy('ALMotion')
+        # Put adequate max
+        self.nMaxPitch = self.getParameter( 'rPitchRangeMax' );
+        self.nMaxYaw = self.getParameter( 'rYawRangeMax' );
+        self.nPitchOffset = self.getParameter( 'rPitchOffset' ); # direction of look
+        self.nSpeedMovement = self.getParameter( 'nSpeedMovement' ); # direction of look
+        self.bMustStop = False;
+        self.bIsRunning = False;
+        self.nCurrentMoveID = -1;
+        self.nCurrentSleepID = -1;
+
+    def onLoad(self):
+        self.bMustStop = False;
+        self.bIsRunning = False;
+
+    def onUnload(self):
+        self.onInput_onStop()
+
+    def waitStoppable( self, rDurationSec ):
+        timeBegin = time.time();
+        while( time.time() - timeBegin < rDurationSec and not self.bMustStop ):
+            time.sleep( 0.04 ); # this is the max stop reactivity: at worst, one thread remain occupied, but it's not a big deal (it's not a moving one)
+
+    def onInput_onStart(self):
+        self.log( "%s: on start - begin" % self.boxName );
+        if( self.bIsRunning ):
+            self.log( "%s: on start - already started" % self.boxName );
+            return;
+        self.bIsRunning = True;
+        self.bMustStop = False;
+        nMaxWait = self.getParameter( "nMaxWait" );
+        bRegularTiming = self.getParameter( "bRegularTiming" );
+        while not self.bMustStop:
+            nValPitch = random.uniform( -self.nMaxPitch , self.nMaxPitch  );
+            nValYaw = random.uniform( -self.nMaxYaw , self.nMaxYaw );
+            angles = [nValYaw,nValPitch+self.nPitchOffset] # add an offset on pitch
+            #if nValPitch*nValPitch + nValYaw*nValYaw > 0.04:
+            self.nCurrentMoveID = self.motionProxy.post.angleInterpolationWithSpeed(self.chain, angles, self.nSpeedMovement / 100. );
+            self.motionProxy.wait( self.nCurrentMoveID, 0 )
+            self.nCurrentMoveID = -1;
+            if( not self.bMustStop ):
+                nTimeToWaitMs = 500 + random.randint(0,nMaxWait);
+                if( bRegularTiming ):
+                    nTimeToWaitMs = nMaxWait;
+                self.waitStoppable( nTimeToWaitMs/1000. );
+            if( random.uniform( 0, 1.0 ) > 0.5 and not self.bMustStop ):
+                # often add a return to center
+                self.nCurrentMoveID = self.motionProxy.post.angleInterpolationWithSpeed( self.chain, [0,self.nPitchOffset], random.randint( 1, self.nSpeedMovement * 2 ) / 100. ); # la vitesse du return to center est aléatoire, et peut etre plus rapide
+                self.motionProxy.wait( self.nCurrentMoveID, 0 )
+                self.nCurrentMoveID = -1;
+                if( not self.bMustStop ):
+                    nTimeToWaitMs = 500 + random.randint(0,nMaxWait);
+                    if( bRegularTiming ):
+                        nTimeToWaitMs = nMaxWait;
+                    self.waitStoppable( nTimeToWaitMs/1000. );
+            # if random - end
+        # while - end
+        self.bIsRunning = False;
+        self.onStopped();
+        self.log( self.boxName + ": start - end" );
+    # onInput_onStart - end
+
+    def onInput_onStop(self):
+            if( self.bIsRunning ):
+                self.bMustStop = True;
+            if( self.nCurrentMoveID != -1 ):
+                try:
+                    self.motionProxy.stop( self.nCurrentMoveID );
+                except:
+                    pass # cas ou la méthode a fini entre le test et le stop
+                self.nCurrentMoveID = -1;
+# HeadRandomStoppable - end
+pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Parameter name="nMaxWait" inherits_from_parent="0" content_type="1" value="3000" default_value="3000" min="1" max="100000000" tooltip="Maximum milliseconds of wait between two movement" id="5" /><Parameter name="nSpeedMovement" inherits_from_parent="0" content_type="1" value="2" default_value="2" min="1" max="100" tooltip="speed movement in %" id="6" /><Parameter name="rPitchOffset" inherits_from_parent="0" content_type="2" value="-0.38" default_value="-0.2" min="-2" max="2" tooltip="Offset to add to the barycentre of all position (to look around top or ...)" id="7" /><Parameter name="rPitchRangeMax" inherits_from_parent="0" content_type="2" value="0.3" default_value="0.3" min="0" max="2" tooltip="max of movement range" id="8" /><Parameter name="rYawRangeMax" inherits_from_parent="0" content_type="2" value="1" default_value="1" min="0" max="2" tooltip="max of movement range" id="9" /><Parameter name="bRegularTiming" inherits_from_parent="0" content_type="0" value="1" default_value="0" tooltip="Enable this value to make a new movement at a regular timing (the maxwait parameter is then used as a regular time)" id="10" /></Box><Box name="goto_rest" id="1" localization="8" tooltip="This box is empty (contains a single motion layer with no motor position&#x0A;defined in it) and should be used to create any animation you would like." x="376" y="448"><bitmap>media/images/box/movement/move.png</bitmap><script language="4"><content><![CDATA[]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Timeline enable="1" fps="25" start_frame="1" end_frame="-1" size="50"><BehaviorLayer name="behavior_layer1"><BehaviorKeyframe name="keyframe1" index="1"><Diagram /></BehaviorKeyframe></BehaviorLayer><ActuatorList model="juliette"><ActuatorCurve name="value" actuator="HeadPitch" mute="0" unit="0"><Key frame="50" value="-21.8848" /></ActuatorCurve><ActuatorCurve name="value" actuator="HeadYaw" mute="0" unit="0"><Key frame="50" value="0.175782" /></ActuatorCurve><ActuatorCurve name="value" actuator="HipPitch" mute="0" unit="0"><Key frame="50" value="-8.26171" /></ActuatorCurve><ActuatorCurve name="value" actuator="HipRoll" mute="0" unit="0"><Key frame="50" value="-0.615236" /></ActuatorCurve><ActuatorCurve name="value" actuator="KneePitch" mute="0" unit="0"><Key frame="50" value="-1.14258" /></ActuatorCurve><ActuatorCurve name="value" actuator="LElbowRoll" mute="0" unit="0"><Key frame="50" value="-5.18555" /></ActuatorCurve><ActuatorCurve name="value" actuator="LElbowYaw" mute="0" unit="0"><Key frame="50" value="-98.6133" /></ActuatorCurve><ActuatorCurve name="value" actuator="LHand" mute="0" unit="1"><Key frame="50" value="0.672232" /></ActuatorCurve><ActuatorCurve name="value" actuator="LShoulderPitch" mute="0" unit="0"><Key frame="50" value="84.1113" /></ActuatorCurve><ActuatorCurve name="value" actuator="LShoulderRoll" mute="0" unit="0"><Key frame="50" value="5.27344" /></ActuatorCurve><ActuatorCurve name="value" actuator="LWristYaw" mute="0" unit="0"><Key frame="50" value="5.79845" /></ActuatorCurve><ActuatorCurve name="value" actuator="RElbowRoll" mute="0" unit="0"><Key frame="50" value="11.7774" /></ActuatorCurve><ActuatorCurve name="value" actuator="RElbowYaw" mute="0" unit="0"><Key frame="50" value="96.3281" /></ActuatorCurve><ActuatorCurve name="value" actuator="RHand" mute="0" unit="1"><Key frame="50" value="0.650264" /></ActuatorCurve><ActuatorCurve name="value" actuator="RShoulderPitch" mute="0" unit="0"><Key frame="50" value="92.6367" /></ActuatorCurve><ActuatorCurve name="value" actuator="RShoulderRoll" mute="0" unit="0"><Key frame="50" value="-5.625" /></ActuatorCurve><ActuatorCurve name="value" actuator="RWristYaw" mute="0" unit="0"><Key frame="50" value="-6.24271" /></ActuatorCurve></ActuatorList></Timeline></Box><Box name="AutoArmsBreath (1)" id="2" localization="8" tooltip="Auto random arms moves (multi robot)&#x0A;v0.3" x="640" y="647"><bitmap>media/images/box/loop.png</bitmap><script language="4"><content><![CDATA[# RomeoArmsBreath
+# v0.3
+# todo: essayer de tirer un pitch et un yaw puis appliquer au prorata de la distance de l'epaule
+import random
+import time
+class MyClass(GeneratedClass):
+    """ insert here your comments about this class """
+    def __init__(self):
+        GeneratedClass.__init__(self);
+
+    def onLoad(self):
+        self.bMustStop = False;
+        self.bIsRunning = False;
+        self.motion = ALProxy( "ALMotion" );
+        self.id = -1;
+
+    def onUnload(self):
+        self.onInput_onStop(); # stop current loop execution
+
+    def onInput_onStart(self):
+        self.log( self.boxName + ": start - begin" );
+
+        if( self.bIsRunning ):
+            self.log( self.boxName + ": already started => nothing" );
+            return;
+
+        self.bIsRunning = True;
+        self.bMustStop = False;
+
+        rPeriod = self.getParameter( 'rPeriod' );
+        listJointsRef = self.motion.getJointNames( "Arms" );
+        listJointsPosRef = self.motion.getAngles( listJointsRef, True ); # store this position as a ref
+        print( "listJointsRef: %s" % listJointsRef );
+        print( "listJointsPosRef: %s" % listJointsRef );
+        self.id = -1;
+        while( not self.bMustStop ):
+            if( random.random() > 0 ):
+                # select some joints, and apply a small moves from the ref position
+                listJoints = [];
+                listJointsPos = [];
+                for idx, joint in enumerate(listJointsRef):
+                    if( random.random() > 0.5 ):
+                        listJoints.append( joint );
+                        if( "Hand" in joint ):
+                            if( random.random() > 0.5 ):
+                                rVal = 0.01;
+                            else:
+                                rVal = 0.95;
+                        else:
+                            rOffset = (random.random()-0.5)*0.2;
+                            if( "WristRoll" in joint ):
+                                rOffset *= 5.;
+                            elif( "Wrist" in joint ):
+                                rOffset *= 3.;
+                            elif( "Elbow" in joint ):
+                                rOffset *= 1.5;
+                            rVal = listJointsPosRef[idx] + rOffset;
+                        listJointsPos.append( rVal );
+                if( len(listJoints) > 0 ):
+                    print( "listJoints: %s" % listJoints );
+                    print( "listJointsPos: %s" % listJointsPos );
+                    nLoop = random.randint(1,3);
+                    for i in range(nLoop):
+                        self.id = self.motion.post.angleInterpolationWithSpeed( listJoints, listJointsPos, 0.02+random.random()/20 );
+                        self.motion.wait( self.id, 0 );
+                        if( self.bMustStop ):
+                            break;
+                        time.sleep( random.random() );
+                        if( self.bMustStop ):
+                            break;
+
+                        self.id = self.motion.post.angleInterpolationWithSpeed( listJointsRef, listJointsPosRef, 0.02+random.random()/20 );
+                        self.motion.wait( self.id, 0 );
+                        time.sleep( random.random() + 1. );
+                        if( self.bMustStop ):
+                            break;
+                    if( self.bMustStop ):
+                        break;
+                    self.id = self.motion.post.angleInterpolationWithSpeed( listJoints, listJointsPos, 0.02+random.random()/20 );
+                    self.motion.wait( self.id, 0 );
+
+            else:
+                # place all joint to the ref pos but some to other pose
+                listJoints = listJointsRef[:];
+                listJointsPos = listJointsPosRef[:];
+                for idx, joint in enumerate(listJointsRef):
+                    if( random.random() > 0.8 ):
+                        listJointsPos[idx] += (random.random()-0.5)*0.2;
+                if( len(listJoints) > 0 ):
+                    print( "listJoints: %s" % listJoints );
+                    print( "listJointsPos: %s" % listJointsPos );
+                    self.id = self.motion.post.angleInterpolationWithSpeed( listJoints, listJointsPos, 0.1 );
+                    self.motion.wait( self.id, 0 );
+            if( self.bMustStop ):
+                break;
+            time.sleep( rPeriod * random.random() + 1. );
+        # end while
+        if( self.id != -1 ):
+            try:
+                self.motion.stop( self.id );
+            except BaseException, err:
+                print( "err in stop: %s" % err );
+        self.bIsRunning = False;
+        self.onStopped();
+        self.log( self.boxName + ": start - end" );
+
+    def onInput_onStop(self):
+        self.bMustStop = True; # stop current loop execution
+        if( self.id != -1 ):
+            try:
+                self.motion.stop( self.id );
+            except BaseException, err:
+                print( "err in stop: %s" % err );
+
+# Template_White - end
+pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Parameter name="rPeriod" inherits_from_parent="0" content_type="2" value="1" default_value="1" min="0" max="100000" tooltip="period in seconds" id="5" /></Box><Box name="start/stop (1)" id="3" localization="8" tooltip="" x="488" y="560"><bitmap>media/images/box/box-python-script.png</bitmap><script language="4"><content><![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onLoad(self):
+        #put initialization code here
+        pass
+
+    def onUnload(self):
+        #put clean-up code here
+        pass
+
+    def onInput_onStart(self):
+        self.output_started() #activate the output of the box
+        pass
+
+    def onInput_onStop(self):
+        self.output_stopped() #activate the output of the box
+        pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="output_started" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Output name="output_stopped" type="1" type_size="1" nature="1" inner="0" tooltip="" id="5" /></Box><Box name="HeadRandomStoppable (1)" id="4" localization="8" tooltip="Random head behaviour - the robot move his head randomly, fully customisable.&#x0A;&#x0A;It&apos;s designed to stop very fast.&#x0A;&#x0A;v0.8" x="620" y="528"><bitmap>media/images/box/interaction/face.png</bitmap><script language="4"><content><![CDATA[# HeadRandomStoppable
+# v0.8
+import random
+import time
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+        self.chain = "Head"
+        self.duration = 0.8 # 1 second
+        self.motionProxy = ALProxy('ALMotion')
+        # Put adequate max
+        self.nMaxPitch = self.getParameter( 'rPitchRangeMax' );
+        self.nMaxYaw = self.getParameter( 'rYawRangeMax' );
+        self.nPitchOffset = self.getParameter( 'rPitchOffset' ); # direction of look
+        self.nSpeedMovement = self.getParameter( 'nSpeedMovement' ); # direction of look
+        self.bMustStop = False;
+        self.bIsRunning = False;
+        self.nCurrentMoveID = -1;
+        self.nCurrentSleepID = -1;
+
+    def onLoad(self):
+        self.bMustStop = False;
+        self.bIsRunning = False;
+
+    def onUnload(self):
+        self.onInput_onStop()
+
+    def waitStoppable( self, rDurationSec ):
+        timeBegin = time.time();
+        while( time.time() - timeBegin < rDurationSec and not self.bMustStop ):
+            time.sleep( 0.04 ); # this is the max stop reactivity: at worst, one thread remain occupied, but it's not a big deal (it's not a moving one)
+
+    def onInput_onStart(self):
+        self.log( "%s: on start - begin" % self.boxName );
+        if( self.bIsRunning ):
+            self.log( "%s: on start - already started" % self.boxName );
+            return;
+        self.bIsRunning = True;
+        self.bMustStop = False;
+        nMaxWait = self.getParameter( "nMaxWait" );
+        bRegularTiming = self.getParameter( "bRegularTiming" );
+        while not self.bMustStop:
+            nValPitch = random.uniform( -self.nMaxPitch , self.nMaxPitch  );
+            nValYaw = random.uniform( -self.nMaxYaw , self.nMaxYaw );
+            angles = [nValYaw,nValPitch+self.nPitchOffset] # add an offset on pitch
+            #if nValPitch*nValPitch + nValYaw*nValYaw > 0.04:
+            self.nCurrentMoveID = self.motionProxy.post.angleInterpolationWithSpeed(self.chain, angles, self.nSpeedMovement / 100. );
+            self.motionProxy.wait( self.nCurrentMoveID, 0 )
+            self.nCurrentMoveID = -1;
+            if( not self.bMustStop ):
+                nTimeToWaitMs = 500 + random.randint(0,nMaxWait);
+                if( bRegularTiming ):
+                    nTimeToWaitMs = nMaxWait;
+                self.waitStoppable( nTimeToWaitMs/1000. );
+            if( random.uniform( 0, 1.0 ) > 0.5 and not self.bMustStop ):
+                # often add a return to center
+                self.nCurrentMoveID = self.motionProxy.post.angleInterpolationWithSpeed( self.chain, [0,self.nPitchOffset], random.randint( 1, self.nSpeedMovement * 2 ) / 100. ); # la vitesse du return to center est aléatoire, et peut etre plus rapide
+                self.motionProxy.wait( self.nCurrentMoveID, 0 )
+                self.nCurrentMoveID = -1;
+                if( not self.bMustStop ):
+                    nTimeToWaitMs = 500 + random.randint(0,nMaxWait);
+                    if( bRegularTiming ):
+                        nTimeToWaitMs = nMaxWait;
+                    self.waitStoppable( nTimeToWaitMs/1000. );
+            # if random - end
+        # while - end
+        self.bIsRunning = False;
+        self.onStopped();
+        self.log( self.boxName + ": start - end" );
+    # onInput_onStart - end
+
+    def onInput_onStop(self):
+            if( self.bIsRunning ):
+                self.bMustStop = True;
+            if( self.nCurrentMoveID != -1 ):
+                try:
+                    self.motionProxy.stop( self.nCurrentMoveID );
+                except:
+                    pass # cas ou la méthode a fini entre le test et le stop
+                self.nCurrentMoveID = -1;
+# HeadRandomStoppable - end
+pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Parameter name="nMaxWait" inherits_from_parent="0" content_type="1" value="3000" default_value="3000" min="1" max="100000000" tooltip="Maximum milliseconds of wait between two movement" id="5" /><Parameter name="nSpeedMovement" inherits_from_parent="0" content_type="1" value="2" default_value="2" min="1" max="100" tooltip="speed movement in %" id="6" /><Parameter name="rPitchOffset" inherits_from_parent="0" content_type="2" value="-0.15" default_value="-0.2" min="-2" max="2" tooltip="Offset to add to the barycentre of all position (to look around top or ...)" id="7" /><Parameter name="rPitchRangeMax" inherits_from_parent="0" content_type="2" value="0.3" default_value="0.3" min="0" max="2" tooltip="max of movement range" id="8" /><Parameter name="rYawRangeMax" inherits_from_parent="0" content_type="2" value="1" default_value="1" min="0" max="2" tooltip="max of movement range" id="9" /><Parameter name="bRegularTiming" inherits_from_parent="0" content_type="0" value="1" default_value="0" tooltip="Enable this value to make a new movement at a regular timing (the maxwait parameter is then used as a regular time)" id="10" /></Box><Link inputowner="13" indexofinput="2" outputowner="14" indexofoutput="4" /><Link inputowner="13" indexofinput="3" outputowner="14" indexofoutput="5" /><Link inputowner="15" indexofinput="2" outputowner="14" indexofoutput="4" /><Link inputowner="15" indexofinput="3" outputowner="14" indexofoutput="5" /><Link inputowner="14" indexofinput="2" outputowner="31" indexofoutput="4" /><Link inputowner="14" indexofinput="2" outputowner="30" indexofoutput="4" /><Link inputowner="1" indexofinput="2" outputowner="0" indexofoutput="2" /><Link inputowner="2" indexofinput="2" outputowner="3" indexofoutput="4" /><Link inputowner="2" indexofinput="3" outputowner="3" indexofoutput="5" /><Link inputowner="4" indexofinput="2" outputowner="3" indexofoutput="4" /><Link inputowner="4" indexofinput="3" outputowner="3" indexofoutput="5" /><Link inputowner="3" indexofinput="2" outputowner="1" indexofoutput="4" /></Diagram></BehaviorKeyframe></BehaviorLayer></Timeline></Box><Link inputowner="21" indexofinput="2" outputowner="23" indexofoutput="3" /><Link inputowner="24" indexofinput="2" outputowner="23" indexofoutput="3" /><Link inputowner="22" indexofinput="2" outputowner="24" indexofoutput="4" /><Link inputowner="15" indexofinput="2" outputowner="13" indexofoutput="4" /><Link inputowner="15" indexofinput="2" outputowner="28" indexofoutput="4" /><Link inputowner="15" indexofinput="2" outputowner="5" indexofoutput="4" /></Diagram></BehaviorKeyframe></BehaviorLayer></Timeline></Box></ChoregrapheProject>

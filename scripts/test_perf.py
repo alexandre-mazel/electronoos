@@ -1057,8 +1057,8 @@ test_cpu_int2    : ####################   0.47s
 test_cpu_float2  : ####################   0.07s
 test_scipy_xxt   : ####################   0.96s (418.01x)
 test_orb4.5.2    : ####################   0.21s (466.26fps)
-test_orbcv imgs  : test_perf_vga_*.png: not found
-test_orbcv bis   : test_perf_vga_*.png: not found
+test_orbcv imgs  : ####################   0.87s (114.65fps)
+test_orbcv bis   : ####################   0.65s (154.20fps)
 disk_write    1KB: ####################   6.09s (164.19 Mo/s)
 disk_read     1KB: ####################   5.46s (183.12 Mo/s)
 disk_write 1024KB: ####################   1.64s (608.30 Mo/s)

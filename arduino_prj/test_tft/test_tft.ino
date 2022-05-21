@@ -22,6 +22,9 @@ MCUFRIEND_kbv tft;
 
 uint16_t version = MCUFRIEND_KBV_H_;
 
+long int nCptFrame = 0;
+unsigned long timeBegin = millis();
+float fps = 60.;
 void setup()
 {
     Serial.begin(9600);
@@ -92,48 +95,79 @@ void setup()
         Serial.println(F("Or post a link to a video (or photos)"));
         Serial.println(F(""));
         Serial.println(F("I rely on good information from remote users"));
+
+        tft.fillScreen(BLUE);
     }
 }
 
 void loop()
 {
     static uint8_t aspect = 0;
-    const char *aspectname[] = {
+    const char *aspectname[] = 
+    {
         "PORTRAIT test1", "LANDSCAPE", "PORTRAIT_REV", "LANDSCAPE_REV"
     };
     const char *colorname[] = { "BLUE", "GREEN", "RED", "GRAY" };
     uint16_t colormask[] = { BLUE, GREEN, RED, GRAY };
-    uint16_t ID = tft.readID(); //
-    tft.setRotation(aspect);
-    int width = tft.width();
-    int height = tft.height();
-    tft.fillScreen(colormask[aspect]);
-    tft.drawRect(0, 0, width, height, WHITE);
-    tft.drawRect(32, 32, width - 64, height - 64, WHITE);
+    if( 0 )
+    {
+      uint16_t ID = tft.readID(); //
+      tft.setRotation(aspect);
+      int width = tft.width();
+      int height = tft.height();
+      tft.fillScreen(colormask[aspect]);
+      tft.drawRect(0, 0, width, height, WHITE);
+      tft.drawRect(32, 32, width - 64, height - 64, WHITE);
+      tft.setTextSize(2);
+      tft.setTextColor(BLACK);
+      tft.setCursor(40, 40);
+      tft.print("ID=0x");
+      tft.print(ID, HEX);
+      if (ID == 0xD3D3) tft.print(" w/o");
+      tft.setCursor(40, 70);
+      tft.print(aspectname[aspect]);
+      tft.setCursor(40, 100);
+      tft.print(width);
+      tft.print(" x ");
+      tft.print(height);
+      tft.setTextColor(WHITE);
+      tft.setCursor(40, 130);
+      tft.print(colorname[aspect]);
+      tft.setCursor(40, 160);
+      tft.setTextSize(1);
+      tft.print("MCUFRIEND_KBV_H_ test alex= ");
+      tft.print(version);
+
+      tft.setCursor(40, 180);
+      tft.print("coucou petit");
+      tft.setCursor(0, 200);
+      tft.setTextSize(5);
+      tft.print("coucou grand");
+      if (++aspect > 3) aspect = 0;
+    }
+    else
+    {
+      tft.setTextColor(WHITE, BLACK); // instead of erasing all screen, just write with black background
+    }
+    tft.setCursor(0, 300);
     tft.setTextSize(2);
-    tft.setTextColor(BLACK);
-    tft.setCursor(40, 40);
-    tft.print("ID=0x");
-    tft.print(ID, HEX);
-    if (ID == 0xD3D3) tft.print(" w/o");
-    tft.setCursor(40, 70);
-    tft.print(aspectname[aspect]);
-    tft.setCursor(40, 100);
-    tft.print(width);
-    tft.print(" x ");
-    tft.print(height);
-    tft.setTextColor(WHITE);
-    tft.setCursor(40, 130);
-    tft.print(colorname[aspect]);
-    tft.setCursor(40, 160);
-    tft.setTextSize(1);
-    tft.print("MCUFRIEND_KBV_H_ test alex= ");
-    tft.print(version);
-    if (++aspect > 3) aspect = 0;
-    tft.setCursor(40, 180);
-    tft.print("coucou petit");
-    tft.setCursor(0, 200);
-    tft.setTextSize(5);
-    tft.print("coucou grand");
-    delay(5000);
+
+    tft.print(int(fps));
+
+    delay(1);
+
+    ++nCptFrame;
+    if( nCptFrame > 400)
+    {
+      // sur uno, avec loop delay 1 => 44fps, 43 avec un println
+      // avec text size 1 => 103fps // 188 si affiché en int
+      // avec text size 2 => 44fps // 71/103 si afficher en int
+      // avec text size 4 => 35fps
+      // avec text size 6 => 27fps
+      // avec text size 8 => 20fps // 49 si afficher en int (2 chars au lieu de 5)
+      fps = nCptFrame*1000 / (millis()-timeBegin);
+      nCptFrame = 0;
+      timeBegin = millis();
+      Serial.println(fps);
+    }
 }

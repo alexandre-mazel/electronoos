@@ -100,7 +100,13 @@ void setup()
     }
 }
 
-int render_screen(int nip, int db, int circ,int bLocked)
+int render_lock(int x,int y)
+{
+  // generated from electronoos\generate_img.py "C:\\Users\\alexa\\perso\\docs\\2022-05-20_-_blangle_tft\\just_lock.png"
+
+}
+
+int render_screen(int nip, int db, float circ,int bLocked)
 {
   static uint8_t bDrawed = 0;
   
@@ -114,6 +120,7 @@ int render_screen(int nip, int db, int circ,int bLocked)
   const int nAreaW = 182;
   const int nAreaH = 120;
   const int nNbrSettings = 8;
+  const int nLineH = 8;
 
   if( ! bDrawed )
   {
@@ -127,11 +134,34 @@ int render_screen(int nip, int db, int circ,int bLocked)
   }
   for( int i = 0; i < nNbrSettings; ++i)
   {
-    tft.setCursor(0, i*h/nNbrSettings);
+    tft.setCursor(10, 8+i*h/nNbrSettings);
     tft.setTextSize(3);
     tft.print(i+1);
   }
 
+  tft.setTextSize(5);
+  tft.setCursor(nMenuW+50, 26);
+  tft.print("NIP");
+  tft.setCursor(nMenuW+50, 26+nLineH*5);
+  tft.print(nip);
+  tft.print("cm");
+
+  tft.setCursor(nMenuW+nAreaW+50, 26);
+  tft.print("DB");
+  tft.setCursor(nMenuW+nAreaW+50, 26+nLineH*5);
+  tft.print(db);
+  tft.setCursor(tft.getCursorX(), 26+nLineH*5-nLineH+2);
+  tft.setTextSize(3);
+  tft.print("o");
+
+  tft.setTextSize(4);
+  tft.setCursor(nMenuW+20, nAreaH+48);
+  tft.print("C=");
+  tft.setCursor(tft.getCursorX()+8, tft.getCursorY()); // half space
+  tft.print(circ,1);
+  tft.print("mm");
+
+  render_lock(nMenuW+300, nAreaH+26);
 
 }
 
@@ -214,7 +244,7 @@ void loop()
     
     if( 1 )
     {
-      render_screen(20,23,5000.0,0);
+      render_screen(20,23,5550.5,0);
     }
 
     ++nCptFrame;

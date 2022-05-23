@@ -100,79 +100,122 @@ void setup()
     }
 }
 
+int render_screen(int nip, int db, int circ,int bLocked)
+{
+  static uint8_t bDrawed = 0;
+  
+  // dessine l'interface, ne redessinne que ce qui est utile
+  // la vraie interface 400x240
+  // barre a gauche de 36 de large puis 2 zones de 182, hauteur 120
+  const int w = 400;
+  const int h = 240;
+  const int nMenuW = 36;
+  const int nMenuH = 240;
+  const int nAreaW = 182;
+  const int nAreaH = 120;
+  const int nNbrSettings = 8;
+
+  if( ! bDrawed )
+  {
+    tft.setRotation(1);
+    //tft.fillScreen(BLACK);
+    tft.fillRect(0,0,nMenuW,nMenuH,GRAY);
+    tft.fillRect(nMenuW,0,nAreaW,nAreaH,BLUE);
+    tft.fillRect(nMenuW+nAreaW,0,nAreaW,nAreaH,RED);
+    tft.fillRect(nMenuW,nAreaH,nAreaW*2,nAreaH,BLACK);
+    bDrawed = 1;
+  }
+  for( int i = 0; i < nNbrSettings; ++i)
+  {
+    tft.setCursor(0, i*h/nNbrSettings);
+    tft.setTextSize(3);
+    tft.print(i+1);
+  }
+
+
+}
+
 void loop()
 {
     static uint8_t aspect = 0;
     int y = 0;
     int dy = 0;
-    const char *aspectname[] = 
-    {
-        "PORTRAIT test1", "LANDSCAPE", "PORTRAIT_REV", "LANDSCAPE_REV"
-    };
-    const char *colorname[] = { "BLUE", "GREEN", "RED", "GRAY" };
-    uint16_t colormask[] = { BLUE, GREEN, RED, GRAY };
+    if(0)
+    { // code de test/debug
+      const char *aspectname[] = 
+      {
+          "PORTRAIT test1", "LANDSCAPE", "PORTRAIT_REV", "LANDSCAPE_REV"
+      };
+      const char *colorname[] = { "BLUE", "GREEN", "RED", "GRAY" };
+      uint16_t colormask[] = { BLUE, GREEN, RED, GRAY };
+      if( 0 )
+      {
+        uint16_t ID = tft.readID(); //
+        tft.setRotation(aspect);
+        int width = tft.width();
+        int height = tft.height();
+        tft.fillScreen(colormask[aspect]);
+        tft.drawRect(0, 0, width, height, WHITE);
+        tft.drawRect(32, 32, width - 64, height - 64, WHITE);
+        tft.setTextSize(2);
+        tft.setTextColor(BLACK);
+        tft.setCursor(40, 40);
+        tft.print("ID=0x");
+        tft.print(ID, HEX);
+        if (ID == 0xD3D3) tft.print(" w/o");
+        tft.setCursor(40, 70);
+        tft.print(aspectname[aspect]);
+        tft.setCursor(40, 100);
+        tft.print(width);
+        tft.print(" x ");
+        tft.print(height);
+        tft.setTextColor(WHITE);
+        tft.setCursor(40, 130);
+        tft.print(colorname[aspect]);
+        tft.setCursor(40, 160);
+        tft.setTextSize(1);
+        tft.print("MCUFRIEND_KBV_H_ test alex= ");
+        tft.print(version);
+
+        tft.setCursor(40, 180);
+        tft.print("coucou petit");
+        tft.setCursor(0, 200);
+        tft.setTextSize(5);
+        tft.print("coucou grand");
+        if (++aspect > 3) aspect = 0;
+        delay(3000);
+      }
+      else
+      {
+        tft.setTextColor(WHITE, BLACK); // instead of erasing all screen, just write with black background
+      }
+
+      y = 300;
+      tft.setCursor(0, y);
+      tft.setTextSize(2); // 16 pixels de haut
+      dy = 16;
+
+      tft.print(int(fps)); y += dy;
+      if( 1 )
+      {
+        tft.print("\n");
+        //tft.setCursor(0, y);
+        tft.print(12.3); y += dy;
+        tft.print("\n"); 
+        //tft.setCursor(0, y);
+        tft.print(34.5); y += dy;
+        tft.print("\n");
+        //tft.setCursor(0, y);
+        tft.print(67.8); y += dy;
+      }
+
+      delay(1);
+    } // code de debug
+    
     if( 1 )
     {
-      uint16_t ID = tft.readID(); //
-      tft.setRotation(aspect);
-      int width = tft.width();
-      int height = tft.height();
-      tft.fillScreen(colormask[aspect]);
-      tft.drawRect(0, 0, width, height, WHITE);
-      tft.drawRect(32, 32, width - 64, height - 64, WHITE);
-      tft.setTextSize(2);
-      tft.setTextColor(BLACK);
-      tft.setCursor(40, 40);
-      tft.print("ID=0x");
-      tft.print(ID, HEX);
-      if (ID == 0xD3D3) tft.print(" w/o");
-      tft.setCursor(40, 70);
-      tft.print(aspectname[aspect]);
-      tft.setCursor(40, 100);
-      tft.print(width);
-      tft.print(" x ");
-      tft.print(height);
-      tft.setTextColor(WHITE);
-      tft.setCursor(40, 130);
-      tft.print(colorname[aspect]);
-      tft.setCursor(40, 160);
-      tft.setTextSize(1);
-      tft.print("MCUFRIEND_KBV_H_ test alex= ");
-      tft.print(version);
-
-      tft.setCursor(40, 180);
-      tft.print("coucou petit");
-      tft.setCursor(0, 200);
-      tft.setTextSize(5);
-      tft.print("coucou grand");
-      if (++aspect > 3) aspect = 0;
-      delay(3000);
+      render_screen(20,23,5000.0,0);
     }
-    else
-    {
-      tft.setTextColor(WHITE, BLACK); // instead of erasing all screen, just write with black background
-    }
-
-    y = 300;
-    tft.setCursor(0, y);
-    tft.setTextSize(2); // 16 pixels de haut
-    dy = 16;
-
-    tft.print(int(fps)); y += dy;
-    if( 1 )
-    {
-      tft.print("\n");
-      //tft.setCursor(0, y);
-      tft.print(12.3); y += dy;
-      tft.print("\n"); 
-      //tft.setCursor(0, y);
-      tft.print(34.5); y += dy;
-      tft.print("\n");
-      //tft.setCursor(0, y);
-      tft.print(67.8); y += dy;
-    }
-
-    delay(1);
 
     ++nCptFrame;
     if( nCptFrame > 400)

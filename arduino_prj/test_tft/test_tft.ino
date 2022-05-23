@@ -103,13 +103,15 @@ void setup()
 void loop()
 {
     static uint8_t aspect = 0;
+    int y = 0;
+    int dy = 0;
     const char *aspectname[] = 
     {
         "PORTRAIT test1", "LANDSCAPE", "PORTRAIT_REV", "LANDSCAPE_REV"
     };
     const char *colorname[] = { "BLUE", "GREEN", "RED", "GRAY" };
     uint16_t colormask[] = { BLUE, GREEN, RED, GRAY };
-    if( 0 )
+    if( 1 )
     {
       uint16_t ID = tft.readID(); //
       tft.setRotation(aspect);
@@ -144,15 +146,31 @@ void loop()
       tft.setTextSize(5);
       tft.print("coucou grand");
       if (++aspect > 3) aspect = 0;
+      delay(3000);
     }
     else
     {
       tft.setTextColor(WHITE, BLACK); // instead of erasing all screen, just write with black background
     }
-    tft.setCursor(0, 300);
-    tft.setTextSize(2);
 
-    tft.print(int(fps));
+    y = 300;
+    tft.setCursor(0, y);
+    tft.setTextSize(2); // 16 pixels de haut
+    dy = 16;
+
+    tft.print(int(fps)); y += dy;
+    if( 1 )
+    {
+      tft.print("\n");
+      //tft.setCursor(0, y);
+      tft.print(12.3); y += dy;
+      tft.print("\n"); 
+      //tft.setCursor(0, y);
+      tft.print(34.5); y += dy;
+      tft.print("\n");
+      //tft.setCursor(0, y);
+      tft.print(67.8); y += dy;
+    }
 
     delay(1);
 
@@ -165,7 +183,10 @@ void loop()
       // avec text size 4 => 35fps
       // avec text size 6 => 27fps
       // avec text size 8 => 20fps // 49 si afficher en int (2 chars au lieu de 5)
-      fps = nCptFrame*1000 / (millis()-timeBegin);
+      //
+      // 1 int et 3 float sur 5 chars => 13.34fps (avec des "\n" entre apres les nbr)
+      // 13.35 en mettant 4 setCursor au lieu de \n
+      fps = nCptFrame*1000. / (millis()-timeBegin);
       nCptFrame = 0;
       timeBegin = millis();
       Serial.println(fps);

@@ -7,6 +7,7 @@
 #include <UTFTGLUE.h>
 
 #include <MCUFRIEND_kbv.h>
+#include "imgs.h"
 MCUFRIEND_kbv tft;
 
 // Assign human-readable names to some common 16-bit color values:
@@ -102,8 +103,23 @@ void setup()
 
 int render_lock(int x,int y)
 {
-  // generated from electronoos\generate_img.py "C:\\Users\\alexa\\perso\\docs\\2022-05-20_-_blangle_tft\\just_lock.png"
-
+  // generated from electronoos\generate_img.py:
+  // python C:\Users\alexa\dev\git\electronoos\generate_img\generate_img.py "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\just_lock.png" 4
+  // copy \tmp\imgs.* C:\Users\alexa\dev\git\electronoos\arduino_prj\test_tft\ /Y
+  for(int j = 0; j < IMG_SIZE_Y; ++j)
+  {
+    for(int i = 0; i < IMG_SIZE_X; ++i)
+    {
+      // mode 4 bits
+      int idx = aImgs[(i/2)+j*IMG_SIZE_X];
+      idx = idx>>(4*(i%2));
+      int r = aPalette[idx];
+      int g = aPalette[idx];
+      int b = aPalette[idx];
+      unsigned int color = ((r>>3)<<10 ) | ((g>>3)<<5 ) | ((b>>3));
+      tft.drawPixel(x+i,y+j,aPalette[idx]);
+    }
+  }
 }
 
 int render_screen(int nip, int db, float circ,int bLocked)

@@ -113,11 +113,18 @@ int render_lock(int x,int y)
       // mode 4 bits
       int idx = aImgs[(i/2)+j*IMG_SIZE_X];
       idx = idx>>(4*(i%2));
-      int r = aPalette[idx];
-      int g = aPalette[idx];
-      int b = aPalette[idx];
-      unsigned int color = ((r>>3)<<10 ) | ((g>>3)<<5 ) | ((b>>3));
-      tft.drawPixel(x+i,y+j,aPalette[idx]);
+      int r = aPalette[idx*3];
+      int g = aPalette[idx*3+1];
+      int b = aPalette[idx*3+2];
+      uint16_t color = (uint16_t)( ((r>>3)<<10 ) | ((g>>3)<<5 ) | ((b>>3)) );
+
+      tft.drawPixel((int16_t)(x+i),(int16_t)(y+j),(uint16_t)color);
+      /*
+      Serial.print("idx:");
+      Serial.println(idx);
+      Serial.print("color:"); 
+      Serial.println(color);
+      */
     }
   }
 }

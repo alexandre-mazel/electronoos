@@ -103,28 +103,72 @@ void setup()
 
 int render_lock(int x,int y)
 {
+  // sur Uno quand l'image etait trop grosse il ne restait que 148 octets pour les variables locales et ca faisait nimp
+
   // generated from electronoos\generate_img.py:
-  // python C:\Users\alexa\dev\git\electronoos\generate_img\generate_img.py "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\just_lock.png" 4
-  // copy \tmp\imgs.* C:\Users\alexa\dev\git\electronoos\arduino_prj\test_tft\ /Y
+  // python C:\Users\alexa\dev\git\electronoos\generate_img\generate_img.py "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\just_lock.png" "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\just_arrow.png"4
+  // copy \tmp\imgs.* C:\Users\alexa\dev\git\electronoos\arduino_prj\blangle_tft\ /Y
+
+  const int bDebug = 0;
+
   for(int j = 0; j < IMG_SIZE_Y; ++j)
   {
     for(int i = 0; i < IMG_SIZE_X; ++i)
     {
-      // mode 4 bits
-      int idx = aImgs[(i/2)+j*IMG_SIZE_X];
-      idx = idx>>(4*(i%2));
-      int r = aPalette[idx*3];
-      int g = aPalette[idx*3+1];
-      int b = aPalette[idx*3+2];
-      uint16_t color = (uint16_t)( ((r>>3)<<10 ) | ((g>>3)<<5 ) | ((b>>3)) );
+      // mode 4 bits per pixel in palette
+      int idx = aImgs[(i/2)+(j*IMG_SIZE_X/2)];
 
-      tft.drawPixel((int16_t)(x+i),(int16_t)(y+j),(uint16_t)color);
-      /*
-      Serial.print("idx:");
-      Serial.println(idx);
-      Serial.print("color:"); 
-      Serial.println(color);
-      */
+      if( bDebug )
+      {
+        Serial.print("i: ");
+        Serial.println(i);
+        Serial.print("idx avant:");
+        Serial.println(idx);
+      }
+
+      idx = (idx>>(4*(i%2)))&0x0F;
+
+      if( bDebug )
+      {
+        Serial.print("idx apres:");
+        Serial.println(idx);
+      }
+
+      uint16_t b = (uint16_t)aPalette[idx*3+0];
+      uint16_t g = (uint16_t)aPalette[idx*3+1];
+      uint16_t r = (uint16_t)aPalette[idx*3+2];
+
+      if( bDebug )
+      {
+        Serial.print("r: 0x");
+        Serial.print(r,HEX);
+        Serial.print(", g: 0x");
+        Serial.print(g,HEX);
+        Serial.print(", b: 0x");
+        Serial.println(b,HEX);
+      }
+
+      // pixel format: 565
+
+      uint16_t color = (uint16_t)( ((r>>3)<<11 ) | ((g>>2)<<5 ) | ((b>>3)) );
+
+      if( bDebug )
+      {
+        Serial.print("color: 0x");
+        Serial.println(color,HEX);
+      }
+
+      if( color != 0 )
+      {
+        //color = 0xF800;
+        tft.drawPixel((int16_t)(x+i),(int16_t)(y+j),(uint16_t)color);
+      }
+      
+      if( bDebug )
+      {
+        Serial.print("color: 0x"); 
+        Serial.println(color, HEX);
+      }
     }
   }
 }
@@ -132,6 +176,7 @@ int render_lock(int x,int y)
 int render_screen(int nip, int db, float circ,int bLocked)
 {
   static uint8_t bDrawed = 0;
+  static uint8_t bPrevLocked = 2;
   
   // dessine l'interface, ne redessinne que ce qui est utile
   // la vraie interface 400x240
@@ -147,19 +192,20 @@ int render_screen(int nip, int db, float circ,int bLocked)
 
   if( ! bDrawed )
   {
+    bDrawed = 1;
     tft.setRotation(1);
     //tft.fillScreen(BLACK);
     tft.fillRect(0,0,nMenuW,nMenuH,GRAY);
     tft.fillRect(nMenuW,0,nAreaW,nAreaH,BLUE);
     tft.fillRect(nMenuW+nAreaW,0,nAreaW,nAreaH,RED);
     tft.fillRect(nMenuW,nAreaH,nAreaW*2,nAreaH,BLACK);
-    bDrawed = 1;
-  }
-  for( int i = 0; i < nNbrSettings; ++i)
-  {
-    tft.setCursor(10, 8+i*h/nNbrSettings);
-    tft.setTextSize(3);
-    tft.print(i+1);
+
+    for( int i = 0; i < nNbrSettings; ++i)
+    {
+      tft.setCursor(10, 8+i*h/nNbrSettings);
+      tft.setTextSize(3);
+      tft.print(i+1);
+    }
   }
 
   tft.setTextSize(5);
@@ -178,13 +224,17 @@ int render_screen(int nip, int db, float circ,int bLocked)
   tft.print("o");
 
   tft.setTextSize(4);
-  tft.setCursor(nMenuW+20, nAreaH+48);
+  tft.setCursor(nMenuW+22, nAreaH+48);
   tft.print("C=");
   tft.setCursor(tft.getCursorX()+8, tft.getCursorY()); // half space
   tft.print(circ,1);
   tft.print("mm");
 
-  render_lock(nMenuW+300, nAreaH+26);
+  if( bPrevLocked != bLocked )
+  {
+    bPrevLocked = bLocked;
+    render_lock(nMenuW+304, nAreaH+32);
+  }
 
 }
 
@@ -285,6 +335,7 @@ void loop()
       fps = nCptFrame*1000. / (millis()-timeBegin);
       nCptFrame = 0;
       timeBegin = millis();
+      Serial.print("fps: ");
       Serial.println(fps);
     }
 }

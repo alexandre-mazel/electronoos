@@ -1,9 +1,9 @@
 #ifndef IMGS_H
 #define IMGS_H
-extern const unsigned char aImgs[] PROGMEM; // putting unsigned type * generate an error: aImgs is set to 0
-extern const unsigned char aPalette[] PROGMEM;
-#define IMG_SIZE_X 44
-#define IMG_SIZE_Y 64
+extern unsigned char aImgs[]; // putting unsigned type * generate an error: aImgs is set to 0
+extern unsigned char aPalette[];
+#define IMG_SIZE_X 40
+#define IMG_SIZE_Y 52
 #define IMG_NBR_BITS 4
 #define IMG_NBR    1
 #endif // IMGS_H

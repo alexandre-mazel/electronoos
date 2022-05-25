@@ -52,7 +52,7 @@ def generateImg( aListImg, w=14, h=8, nNbrBits=24 ):
             for i in range(w):
                 val = img[j,i]
                 if nNbrBits == 24:
-                    strOut += "0x%02X, 0x%02X, 0x%02X,\n" % (val[0], val[1], val[2]);
+                    strOut += "0x%02X, 0x%02X, 0x%02X,\n" % (val[0], val[1], val[2]); # B, V, R
                     nNbrDataOutputted += 3
                 elif nNbrBits == 15:
                     col15 =  ((val[0]>>3)<<10 ) | ((val[1]>>3)<<5 ) | ((val[2]>>3))
@@ -65,9 +65,13 @@ def generateImg( aListImg, w=14, h=8, nNbrBits=24 ):
                     for numpix in range(2):
                         val = img[j,i*2+numpix]
                         # dither
+                        nDitherFactor = 5
                         val = list(val)
                         for chan in range(3):
-                            val[chan] = (val[chan]>>4)<<4
+                            b = (((val[chan]+1)>>nDitherFactor)<<nDitherFactor)-1
+                            if b < 0:
+                                b = 0
+                            val[chan] = b
                                 
                         # find color in palette
                         for k,v in enumerate(aPalette):
@@ -90,7 +94,7 @@ def generateImg( aListImg, w=14, h=8, nNbrBits=24 ):
 
     if len(aPalette)>0:
         strOut += "\n"
-        strOut += "unsigned char aPalette[%d] = {\n" % (len(aPalette)*3)
+        strOut += "unsigned char aPalette[%d] = {\n// B,  V,  R\n" % (len(aPalette)*3)
         for i in range(len(aPalette)):
             col = aPalette[i]
             strOut += "0x%02x,0x%02x,0x%02x, \t// idx %d\n" % (col[0],col[1],col[2],i)

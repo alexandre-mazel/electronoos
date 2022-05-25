@@ -240,7 +240,9 @@ def analyseFolder(folder):
     
     
     bRenderDebug = 1
-    #~ bRenderDebug = 0
+    bRenderDebug = 0
+    
+    print("INF: analyseFolder: bSpeedTest: %d, folder: '%s'" % ( bSpeedTest, folder ) )
     
     
     
@@ -348,7 +350,7 @@ def analyseFolder(folder):
     
     #######################    
     # img_pitie/2022_03_04_00h bien souriante ? (en fait c'est 11h15) (25)
-    if 1:
+    if 0:
         idx = 0
         idx = 500 # ff
         idx = 600 # bug de tracking qui commence sur un demi visage et reste coincé dessus - corrigé avec nCptFrameSinceRestartTracking
@@ -421,8 +423,15 @@ def analyseFolder(folder):
     """
     
 
+    if "2022_02_23_11h__13" in folder: 
+        idx = 0
+        idx = 0    # debut m1
+        #~ idx = 3430  # fin m1
+        #~ idx = 3714 # debut m2
+        #~ idx = 5814 # fin m2
     
-    
+    if "2022_02_23_14h__14" in folder: 
+        idx = 0
     if bSpeedTest: idx = 0
     if bSpeedTest: bRenderDebug = 0
     
@@ -535,6 +544,8 @@ if os.name == "nt":
     #~ strPath = "d:/img_pitie/2022_03_11_9h/"
     strPath = "d:/img_pitie/2022_03_04_00h/"
     #~ strPath = "d:/img_pitie/2022_03_25_9h/m2/"
+    strPath = "d:/img_pitie/2022_02_23_11h__13/"
+    strPath = "d:/img_pitie/2022_02_23_14h__14/"
 else:
     strPath = os.path.expanduser("~/pitie4/")
 analyseFolder(strPath)

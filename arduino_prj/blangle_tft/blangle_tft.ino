@@ -101,8 +101,9 @@ void setup()
     }
 }
 
-int render_img( const int x, const int y, const int w, const int h, const unsigned char* pImg, const unsigned char* pPalette)
+int render_img( const int x, const int y, const int w, const int h, const unsigned char* pImg, const unsigned char* pPalette, int flip=0)
 {
+  // flip: 0: none, 1: flip vertical
 
   const int bDebug = 0;
 
@@ -156,7 +157,10 @@ int render_img( const int x, const int y, const int w, const int h, const unsign
       if( color != 0 )
       {
         //color = 0xF800;
-        tft.drawPixel((int16_t)(x+i),(int16_t)(y+j),(uint16_t)color);
+        if( flip == 0 )
+          tft.drawPixel((int16_t)(x+i),(int16_t)(y+j),(uint16_t)color);
+        else
+          tft.drawPixel((int16_t)(x+i),(int16_t)((y+w-1-j)),(uint16_t)color);
       }
       
       if( bDebug )
@@ -179,7 +183,7 @@ int render_lock(int x,int y)
   render_img(x,y,IMG_1_SIZE_X,IMG_1_SIZE_Y,aImgs_1,aPalette_1);
 }
 
-int render_arrow(int x,int y)
+int render_arrow(int x,int y,int flip=0)
 {
   // sur Uno quand l'image etait trop grosse il ne restait que 148 octets pour les variables locales et ca faisait nimp
 
@@ -187,7 +191,7 @@ int render_arrow(int x,int y)
   // python C:\Users\alexa\dev\git\electronoos\generate_img\generate_img.py "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\just_lock.png" "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\just_arrow.png" 4
   // copy \tmp\imgs.* C:\Users\alexa\dev\git\electronoos\arduino_prj\blangle_tft\ /Y
 
-  render_img(x,y,IMG_2_SIZE_X,IMG_2_SIZE_Y,aImgs_2,aPalette_2);
+  render_img(x,y,IMG_2_SIZE_X,IMG_2_SIZE_Y,aImgs_2,aPalette_2,flip);
 }
 
 int render_screen(int nip, int db, float circ,int bLocked)
@@ -219,7 +223,7 @@ int render_screen(int nip, int db, float circ,int bLocked)
 
     for( int i = 0; i < nNbrSettings; ++i)
     {
-      tft.setCursor(10, 8+i*h/nNbrSettings);
+      tft.setCursor(10, 6+i*h/nNbrSettings);
       tft.setTextSize(3);
       tft.print(i+1);
     }
@@ -247,12 +251,13 @@ int render_screen(int nip, int db, float circ,int bLocked)
   tft.print(circ,1);
   tft.print("mm");
 
-  int x = nMenuW+71;
-  for( int i = 0; i <= 5; ++i )
+  int x = nMenuW+75;
+  for( int i = 0; i < 5; ++i )
   {
-    if( i == 4 ) x += 6;
-    render_arrow(x,nAreaH+26+i*5);
-    x += 10;
+    if( i == 4 ) x += 24;
+    render_arrow(x,nAreaH+22);
+    render_arrow(x,nAreaH+80, 1);
+    x += 24;
   }
 
   if( bPrevLocked != bLocked )

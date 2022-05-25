@@ -6,13 +6,17 @@ import sys
 
 def generateImg( aListImg, w=14, h=8, nNbrBits=24 ):
     """
-    Will generate a matric of BGR images.
+    Will generate a matrix of BGR images.
     - w: resize to width, if -1 => keep original size
     - nNbrBits: 
         - 24 => 1 byte per channel
         - 15 => 5 bits per channel
         - 4 => palette de 16 couleurs
     """
+    
+    bOneArrayPerImage = 1
+    bUseDifferentPaletteForEachImage = 1
+    
     
     print( "INF: generateImg: generating from image(s): %s" % str(aListImg) )
     
@@ -24,15 +28,29 @@ def generateImg( aListImg, w=14, h=8, nNbrBits=24 ):
         strDataType = "short int"
     if nNbrBits == 4:
         strDataType = "char"
-    strOut += "unsigned %s aImgs[] = {\n" % strDataType;
+    strOptionnalNumber = ""
+    if bOneArrayPerImage:
+        strOptionnalNumber = "_1"
+    strOut += "unsigned %s aImgs%s[] = {\n" % (strDataType,strOptionnalNumber);
     
     nNbrDataOutputted = 0;
+    
+    w_param = w
+    h_param = h
+    
+    strOutHeaderMultiArray = ""
 
 
     for nNumImage, strFilename in enumerate(aListImg):
-        print( "INF: opening %s" % strFilename );
+        print( "INF: opening '%s'" % strFilename );
         img = cv2.imread( strFilename );
+        if img is None:
+            print("ERR: opening '%s' has failed" % strFilename)
+            return False
     
+        w = w_param
+        h = h_param
+        
         if w == -1: w = img.shape[1]
         if h == -1: h = img.shape[0]
         
@@ -46,6 +64,9 @@ def generateImg( aListImg, w=14, h=8, nNbrBits=24 ):
         if( bRender ):
             cv2.imshow( "imdraw", img );
             cv2.waitKey(0);
+            
+        if bUseDifferentPaletteForEachImage:
+            aPalette = list();
             
         for j in range(h):
             strOut += "// img: %d, %s, line %d\n" % (nNumImage,strFilename, j);
@@ -88,11 +109,37 @@ def generateImg( aListImg, w=14, h=8, nNbrBits=24 ):
                     strOut += "0x%02X,\n" % (col4);  
                     nNbrDataOutputted += 1
             strOut += "\n";
+        # end one image
+        
+        if bOneArrayPerImage:
+            strOut += "};\n";
+            strOut += "// data outputted = %dB\n\n" % (nNbrDataOutputted);
+            nNbrDataOutputted = 0;
             
-    strOut += "};\n";
-    strOut += "// data outputted = %dB\n" % (nNbrDataOutputted);  
+            strOutHeaderMultiArray += "\n"
+            strOutHeaderMultiArray += "#define IMG_%d_SIZE_X %d\n" % (nNumImage+1,w);
+            strOutHeaderMultiArray += "#define IMG_%d_SIZE_Y %d\n" % (nNumImage+1,h);
+            strOutHeaderMultiArray += "extern unsigned %s aImgs_%d[];\n" % (strDataType,nNumImage+1);
+            if len(aPalette)>0:
+                strOutHeaderMultiArray += "extern unsigned char aPalette_%d[];\n" % (nNumImage+1)
+            
+        if len(aPalette)>0 and bUseDifferentPaletteForEachImage:
+            strOut += "\n"
+            strOut += "unsigned char aPalette_%d[%d] = {\n// B,  V,  R\n" % (nNumImage+1, len(aPalette)*3)
+            for i in range(len(aPalette)):
+                col = aPalette[i]
+                strOut += "0x%02x,0x%02x,0x%02x, \t// idx %d\n" % (col[0],col[1],col[2],i)
+            strOut += "};\n\n"; 
+            
+        if bOneArrayPerImage and nNumImage+1<len(aListImg):
+            strOut += "unsigned %s aImgs_%d[] = {\n" % (strDataType,nNumImage+2);
+    # end all images
+    
+    if not bOneArrayPerImage:
+        strOut += "};\n";
+        strOut += "// data outputted = %dB\n" % (nNbrDataOutputted);  
 
-    if len(aPalette)>0:
+    if len(aPalette)>0 and not bUseDifferentPaletteForEachImage:
         strOut += "\n"
         strOut += "unsigned char aPalette[%d] = {\n// B,  V,  R\n" % (len(aPalette)*3)
         for i in range(len(aPalette)):
@@ -111,13 +158,17 @@ def generateImg( aListImg, w=14, h=8, nNbrBits=24 ):
     strOut = "";
     strOut += "#ifndef IMGS_H\n"
     strOut += "#define IMGS_H\n";
-    strOut += "extern unsigned %s aImgs[]; // putting unsigned type * generate an error: aImgs is set to 0\n" % strDataType;
-    if len(aPalette)>0:
-        strOut += "extern unsigned char aPalette[];\n"
-    strOut += "#define IMG_SIZE_X %d\n" % w;
-    strOut += "#define IMG_SIZE_Y %d\n" % h;
     strOut += "#define IMG_NBR_BITS %d\n" % nNbrBits;
     strOut += "#define IMG_NBR    %d\n" % (nNumImage+1);
+    if not bOneArrayPerImage:
+        strOut += "#define IMG_SIZE_X %d\n" % w;
+        strOut += "#define IMG_SIZE_Y %d\n" % h;
+        strOut += "extern unsigned %s aImgs[]; // putting unsigned type * generate an error: aImgs is set to 0\n" % strDataType;
+        if len(aPalette)>0:
+            strOut += "extern unsigned char aPalette[];\n"
+    else:
+        strOut += strOutHeaderMultiArray + "\n"
+            
     strOut += "#endif // IMGS_H\n";
     file.write( strOut );
     file.close();
@@ -147,10 +198,14 @@ def generateBunchOfImages():
 if __name__ == "__main__":
     #~ generateBunchOfImages()
     if 1:
-        # syntaxe filename [nbr_bits per pix=24]
-        filename = sys.argv[1]
+        # syntaxe filename [filename2] [filename3] [nbr_bits per pix=24]
         nbr_bits = 24
-        if len(sys.argv)>2:
-            nbr_bits = int(sys.argv[2])
-        generateImg([filename],-1,-1,nbr_bits)
+        listFilename = []
+        for i in range(1,len(sys.argv)):
+            if len(sys.argv[i])<4:
+                nbr_bits = int(sys.argv[i])
+            else:
+                listFilename.append(sys.argv[i])
+                
+        generateImg(listFilename,-1,-1,nbr_bits)
 

@@ -240,7 +240,7 @@ def analyseFolder(folder):
     
     
     bRenderDebug = 1
-    bRenderDebug = 0
+    #~ bRenderDebug = 0
     
     
     
@@ -301,7 +301,7 @@ def analyseFolder(folder):
     """
     
     #######################    
-    # img_pitie/2022_03_11_9h - regard tout le temps en coin.
+    # img_pitie/2022_03_11_9h - regard tout le temps en coin. (31)
     # a partir de 0.35 inclus, c'est un sourire pour elle
 
     #~ idx = 504    # debut m1
@@ -347,7 +347,7 @@ def analyseFolder(folder):
     """
     
     #######################    
-    # img_pitie/2022_03_04_00h bien souriante ? (en fait c'est 11h15)
+    # img_pitie/2022_03_04_00h bien souriante ? (en fait c'est 11h15) (25)
     if 1:
         idx = 0
         idx = 500 # ff
@@ -393,7 +393,7 @@ def analyseFolder(folder):
     """
     
     #######################    
-    # img_pitie/2022_03_25_9h/m1 premiere comparaison avec annotation manuelle Clara
+    # img_pitie/2022_03_25_9h/m1 premiere comparaison avec annotation manuelle Clara (46)
     if 0:
         idx = 0
     
@@ -510,7 +510,17 @@ F 021RL 2/3 13h
 M 067EF 20/4 11h
 F 031BL 11/3 9h
 
-13,14,21,31,44,52,54,67
+13,14,21,31,  44,52,54,67
+
+13: 23/2 11h15
+14: 23/2 13h30
+21: 02/3 13h30
+31: 11/3 9h30
+
+44: 24/3 11h15
+52: 31/3 9h30 record en 11h
+54: 01/4 16h30 la deuxeme: teeshirt blanc chatain avec lunettes
+67: 20/4 11h15
 """
             
 

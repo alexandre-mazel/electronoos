@@ -101,22 +101,17 @@ void setup()
     }
 }
 
-int render_lock(int x,int y)
+int render_img( const int x, const int y, const int w, const int h, const unsigned char* pImg, const unsigned char* pPalette)
 {
-  // sur Uno quand l'image etait trop grosse il ne restait que 148 octets pour les variables locales et ca faisait nimp
-
-  // generated from electronoos\generate_img.py:
-  // python C:\Users\alexa\dev\git\electronoos\generate_img\generate_img.py "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\just_lock.png" "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\just_arrow.png"4
-  // copy \tmp\imgs.* C:\Users\alexa\dev\git\electronoos\arduino_prj\blangle_tft\ /Y
 
   const int bDebug = 0;
 
-  for(int j = 0; j < IMG_SIZE_Y; ++j)
+  for(int j = 0; j < h; ++j)
   {
-    for(int i = 0; i < IMG_SIZE_X; ++i)
+    for(int i = 0; i < w; ++i)
     {
       // mode 4 bits per pixel in palette
-      int idx = aImgs[(i/2)+(j*IMG_SIZE_X/2)];
+      int idx = pImg[(i/2)+(j*w/2)];
 
       if( bDebug )
       {
@@ -134,9 +129,9 @@ int render_lock(int x,int y)
         Serial.println(idx);
       }
 
-      uint16_t b = (uint16_t)aPalette[idx*3+0];
-      uint16_t g = (uint16_t)aPalette[idx*3+1];
-      uint16_t r = (uint16_t)aPalette[idx*3+2];
+      uint16_t b = (uint16_t)pPalette[idx*3+0];
+      uint16_t g = (uint16_t)pPalette[idx*3+1];
+      uint16_t r = (uint16_t)pPalette[idx*3+2];
 
       if( bDebug )
       {
@@ -170,7 +165,29 @@ int render_lock(int x,int y)
         Serial.println(color, HEX);
       }
     }
-  }
+  }  
+}
+
+int render_lock(int x,int y)
+{
+  // sur Uno quand l'image etait trop grosse il ne restait que 148 octets pour les variables locales et ca faisait nimp
+
+  // generated from electronoos\generate_img.py:
+  // python C:\Users\alexa\dev\git\electronoos\generate_img\generate_img.py "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\just_lock.png" "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\just_arrow.png" 4
+  // copy \tmp\imgs.* C:\Users\alexa\dev\git\electronoos\arduino_prj\blangle_tft\ /Y
+
+  render_img(x,y,IMG_1_SIZE_X,IMG_1_SIZE_Y,aImgs_1,aPalette_1);
+}
+
+int render_arrow(int x,int y)
+{
+  // sur Uno quand l'image etait trop grosse il ne restait que 148 octets pour les variables locales et ca faisait nimp
+
+  // generated from electronoos\generate_img.py:
+  // python C:\Users\alexa\dev\git\electronoos\generate_img\generate_img.py "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\just_lock.png" "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\just_arrow.png" 4
+  // copy \tmp\imgs.* C:\Users\alexa\dev\git\electronoos\arduino_prj\blangle_tft\ /Y
+
+  render_img(x,y,IMG_2_SIZE_X,IMG_2_SIZE_Y,aImgs_2,aPalette_2);
 }
 
 int render_screen(int nip, int db, float circ,int bLocked)
@@ -229,6 +246,14 @@ int render_screen(int nip, int db, float circ,int bLocked)
   tft.setCursor(tft.getCursorX()+8, tft.getCursorY()); // half space
   tft.print(circ,1);
   tft.print("mm");
+
+  int x = nMenuW+71;
+  for( int i = 0; i <= 5; ++i )
+  {
+    if( i == 4 ) x += 6;
+    render_arrow(x,nAreaH+26+i*5);
+    x += 10;
+  }
 
   if( bPrevLocked != bLocked )
   {

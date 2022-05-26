@@ -113,7 +113,7 @@ int std_getPressed(int * px, int * py, int * pz, bool bDebug )
   bool pressed, prev_pressed=0;
   while (count < 10) {
       readResistiveTouch();
-      pressed = tp.z < 1750;     //ADJUST THIS VALUE TO SUIT YOUR SCREEN e.g. 20 ... 250
+      pressed = tp.z < 1800;     //ADJUST THIS VALUE TO SUIT YOUR SCREEN e.g. 20 ... 250 // was 1750
       //Serial.println(tp.z);
       if( pressed == prev_pressed ) 
       {
@@ -147,9 +147,18 @@ int std_getPressed(int * px, int * py, int * pz, bool bDebug )
     if( y > ymax_calib) ymax_calib = y;
     if( y < ymin_calib) ymin_calib = y; 
 
-    x = (long)((x-xmin))*w/(xmax-xmin);
+    if( 0 )
+    {
+      x = (long)((x-xmin))*w/(xmax-xmin);
+      y = (long)((y-ymin))*h/(ymax-ymin);
+    }
+    else
+    {
+      x = (long)((x-xmin_calib))*w/(xmax_calib-xmin_calib);
+      y = (long)((y-ymin_calib))*h/(ymax_calib-ymin_calib);
+    }
+
     if( invert_x ) x = w-1-x;
-    y = (long)((y-ymin))*h/(ymax-ymin);
 
     *px = x;
     *py = y;

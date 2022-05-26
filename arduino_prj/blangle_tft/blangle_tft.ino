@@ -220,6 +220,7 @@ int render_screen(int nip, int db, float circ,int bLocked)
     bDrawed = 1;
     tft.setRotation(1);
     //tft.fillScreen(BLACK);
+    tft.setTextColor(WHITE);
     tft.fillRect(0,0,nMenuW,nMenuH,GRAY);
     tft.fillRect(nMenuW,0,nAreaW,nAreaH,BLUE);
     tft.fillRect(nMenuW+nAreaW,0,nAreaW,nAreaH,RED);
@@ -252,7 +253,9 @@ int render_screen(int nip, int db, float circ,int bLocked)
   tft.setCursor(nMenuW+22, nAreaH+48);
   tft.print("C=");
   tft.setCursor(tft.getCursorX()+8, tft.getCursorY()); // half space
+  tft.setTextColor(WHITE, BLACK);
   tft.print(circ,1);
+  tft.setTextColor(WHITE);
   tft.print("mm");
 
 
@@ -262,7 +265,7 @@ int render_screen(int nip, int db, float circ,int bLocked)
     render_lock(nMenuW+304, nAreaH+32);
     const int xArrow = nMenuW+75;
     const int yArrow = nAreaH+22;
-    const int yArrowBottom = nAreaH+80;
+    const int yArrowBottom = nAreaH+80+3;
     int x = xArrow;
     if( ! bLocked )
     {
@@ -282,8 +285,8 @@ int render_screen(int nip, int db, float circ,int bLocked)
     else
     {
       // cache les fleches
-      tft.fillRect(xArrow, yArrow,200,20,GREY);
-      tft.fillRect(xArrow, yArrowBottom,200,20,BLACK);
+      tft.fillRect( xArrow, yArrow,144,16,BLACK );
+      tft.fillRect( xArrow, yArrowBottom+8,144,16,BLACK );
     }
   }
 
@@ -293,6 +296,7 @@ void loop()
 {
     static uint8_t aspect = 0;
     static int nLocked = 1;
+    static float rCirc = 5550.5;
     int y = 0;
     int dy = 0;
     if(0)
@@ -375,11 +379,17 @@ void loop()
       {
         const int dw_arrow = 24;
         const int dh_arrow = 58;
-        short int listPos[] = {
+        short int listPos[2+5*2*4] = {
                     370,200, // lock
-                    125,110, // first arrow
+                    // 80,120, // first arrow
         };
-        for( int i = 0; i < 2; ++i )
+        // add 9 following arrows
+        for( int i = 0; i < 5; ++i )
+        {
+          listPos[2+i*2] = 80+i*dw_arrow;
+          listPos[2+i*2+1] = 120;//+i*dh_arrow;
+        }
+        for( int i = 0; i < 5; ++i )
         {
           int posx = listPos[i*2];
           int posy = listPos[i*2+1];
@@ -389,16 +399,25 @@ void loop()
           )
           {
             Serial.print("hit: ");
-            Serial.print(i);
+            Serial.println(i);
             if( i == 0 )
             {
               nLocked = ! nLocked;
             }
-          } 
+            else
+            {
+              rCirc += pow(10,4-i); // i = 1 => +1000 (pow 3), i = 4 => +1 (pow 0)
+            }
+            break; // no multi touch
+          }
+          if( i == 0 && nLocked )
+          {
+            break; // don't test if locked!
+          }
         }
         
       }
-      render_screen(20,23,5550.5,nLocked);
+      render_screen(20,23,rCirc,nLocked);
     }
 
     ++nCptFrame;

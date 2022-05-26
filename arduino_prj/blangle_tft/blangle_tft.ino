@@ -8,6 +8,8 @@
 
 #include <MCUFRIEND_kbv.h>
 #include "imgs.h"
+#include "simple_touch_detection.h"
+
 MCUFRIEND_kbv tft;
 
 // Assign human-readable names to some common 16-bit color values:
@@ -347,6 +349,9 @@ void loop()
     
     if( 1 )
     {
+      int x,y,z;
+      bool bPressed = getTactilePressed(&x,&y,&z);
+      Serial.println(bPressed);
       render_screen(20,23,5550.5,0);
     }
 

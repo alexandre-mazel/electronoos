@@ -379,21 +379,26 @@ void loop()
       {
         const int dw_arrow = 24;
         const int dh_arrow = 58;
-        short int listPos[2+5*2*4] = {
-                    370,200, // lock
+        short int listPos[(1+5*2)*2] = {
+                    360,182, // lock // 370/200
                     // 80,120, // first arrow
         };
-        // add 9 following arrows
+        // add 10 arrows
         for( int i = 0; i < 5; ++i )
         {
-          listPos[2+i*2] = 80+i*dw_arrow;
-          listPos[2+i*2+1] = 120;//+i*dh_arrow;
+          listPos[2+i*2+0] = 118+i*dw_arrow;
+          listPos[2+i*2+1] = 145;//+i*dh_arrow;
+
+          // fleches du bas
+          listPos[2+(i+5)*2+0] = listPos[2+(i+0)*2+0];
+          listPos[2+(i+5)*2+1] = listPos[2+(i+0)*2+1] + 61;
         }
-        for( int i = 0; i < 5; ++i )
+
+        for( int i = 0; i < 11; ++i )
         {
           int posx = listPos[i*2];
           int posy = listPos[i*2+1];
-          int nMargin = 16;
+          int nMargin = 20; // pb: au lieu de s'arreter au premier hit, on devrait chercher le plus proche.
           if(     posx - nMargin < x && posx + nMargin > x 
               &&  posy - nMargin < y && posy + nMargin > y
           )
@@ -406,7 +411,17 @@ void loop()
             }
             else
             {
-              rCirc += pow(10,4-i); // i = 1 => +1000 (pow 3), i = 4 => +1 (pow 0)
+              int nAdd;
+              // i = 1 to 5 pour fleches basses et 6 to 10 for low
+              if( i < 6 )
+              {
+                nAdd = pow(10,4-i); // i = 1 => +1000 (pow 3), i = 4 => +1 (pow 0)   
+              }
+              else
+              {
+                nAdd = -pow(10,4-(i-5));
+              }
+              rCirc += nAdd;
             }
             break; // no multi touch
           }

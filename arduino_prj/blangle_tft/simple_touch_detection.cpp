@@ -129,6 +129,7 @@ int std_getPressed(int * px, int * py, int * pz, bool bDebug )
   }
   if( pressed )
   {
+    // deja vu: 100/433 612/981
     int xmin = 121;
     int xmax = 559;
     int ymin = 460;

@@ -98,13 +98,17 @@ int std_init()
     }
 }
 
-int std_getPressed(int * x, int * y, int * z)
+int std_getPressed(int * px, int * py, int * pz, bool bDebug )
 {
   // return 1 if somethi is pressed, x,y,and z are then filled
   // fill x, y & z
   // .kbv was too sensitive !!
   // now touch has to be stable for 50ms
   // 
+  static int xmin_calib = 9999;
+  static int xmax_calib = 0;
+  static int ymin_calib = 9999;
+  static int ymax_calib = 0;
   int count = 0;
   bool pressed, prev_pressed=0;
   while (count < 10) {
@@ -125,9 +129,59 @@ int std_getPressed(int * x, int * y, int * z)
   }
   if( pressed )
   {
-    *x = tp.x;
-    *y = tp.y;
-    *z = tp.z;
+    int xmin = 121;
+    int xmax = 559;
+    int ymin = 460;
+    int ymax = 975;
+    int w = 400;
+    int h = 240;
+    int invert_x=1;
+
+    int x = tp.x;
+    int y = tp.y;
+    int xraw = x;
+    int yraw = y;
+
+    if( x > xmax_calib) xmax_calib = x;
+    if( x < xmin_calib) xmin_calib = x; 
+    if( y > ymax_calib) ymax_calib = y;
+    if( y < ymin_calib) ymin_calib = y; 
+
+    x = (long)((x-xmin))*w/(xmax-xmin);
+    if( invert_x ) x = w-1-x;
+    y = (long)((y-ymin))*h/(ymax-ymin);
+
+    *px = x;
+    *py = y;
+    *pz = tp.z;
+
+    if( bDebug )
+    {
+      Serial.print("touch, x: ");
+      Serial.print(x);
+      Serial.print(", y: ");
+      Serial.print(y);
+      Serial.print(", z: ");
+      Serial.print(*pz);
+
+      Serial.print(", x raw: ");
+      Serial.print(xraw);
+      Serial.print(", y raw: ");
+      Serial.print(yraw);
+
+      // print range:
+      Serial.print(", xr: ");
+      Serial.print(xmin_calib);
+      Serial.print(" / ");
+      Serial.print(xmax_calib);
+
+      Serial.print(", yr: ");
+      Serial.print(ymin_calib);
+      Serial.print(" / ");
+      Serial.print(ymax_calib);
+
+      Serial.println();
+    }
   }
   return pressed;
 }

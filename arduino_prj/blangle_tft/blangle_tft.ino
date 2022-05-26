@@ -255,19 +255,36 @@ int render_screen(int nip, int db, float circ,int bLocked)
   tft.print(circ,1);
   tft.print("mm");
 
-  int x = nMenuW+75;
-  for( int i = 0; i < 5; ++i )
-  {
-    if( i == 4 ) x += 24;
-    render_arrow(x,nAreaH+22);
-    render_arrow(x,nAreaH+80, 1);
-    x += 24;
-  }
 
   if( bPrevLocked != bLocked )
   {
     bPrevLocked = bLocked;
     render_lock(nMenuW+304, nAreaH+32);
+    const int xArrow = nMenuW+75;
+    const int yArrow = nAreaH+22;
+    const int yArrowBottom = nAreaH+80;
+    int x = xArrow;
+    if( ! bLocked )
+    {
+      // cache le haut du verrou
+      tft.fillRect(nMenuW+304, nAreaH+32,40,30,BLACK);
+
+      // affiche les fleches
+      
+      for( int i = 0; i < 5; ++i )
+      {
+        if( i == 4 ) x += 24;
+        render_arrow(x,yArrow);
+        render_arrow(x,yArrowBottom, 1);
+        x += 24;
+      }
+    }
+    else
+    {
+      // cache les fleches
+      tft.fillRect(xArrow, yArrow,200,20,GREY);
+      tft.fillRect(xArrow, yArrowBottom,200,20,BLACK);
+    }
   }
 
 }
@@ -275,6 +292,7 @@ int render_screen(int nip, int db, float circ,int bLocked)
 void loop()
 {
     static uint8_t aspect = 0;
+    static int nLocked = 1;
     int y = 0;
     int dy = 0;
     if(0)
@@ -353,8 +371,34 @@ void loop()
     {
       int x,y,z;
       bool bPressed = std_getPressed(&x,&y,&z);
-      Serial.println(bPressed);
-      render_screen(20,23,5550.5,0);
+      if( bPressed )
+      {
+        const int dw_arrow = 24;
+        const int dh_arrow = 58;
+        short int listPos[] = {
+                    370,200, // lock
+                    125,110, // first arrow
+        };
+        for( int i = 0; i < 2; ++i )
+        {
+          int posx = listPos[i*2];
+          int posy = listPos[i*2+1];
+          int nMargin = 16;
+          if(     posx - nMargin < x && posx + nMargin > x 
+              &&  posy - nMargin < y && posy + nMargin > y
+          )
+          {
+            Serial.print("hit: ");
+            Serial.print(i);
+            if( i == 0 )
+            {
+              nLocked = ! nLocked;
+            }
+          } 
+        }
+        
+      }
+      render_screen(20,23,5550.5,nLocked);
     }
 
     ++nCptFrame;

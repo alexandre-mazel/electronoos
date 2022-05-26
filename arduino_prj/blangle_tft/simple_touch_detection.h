@@ -7,6 +7,6 @@
 
 int std_init();
 //int std_start();
-int std_getPressed(int * x, int * y, int * z);
+int std_getPressed(int * px, int * py, int * pz, bool bDebug = 1);
 
 #endif // SIMPLE_TOUCH_DETECTION_H

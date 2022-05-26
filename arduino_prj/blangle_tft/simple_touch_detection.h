@@ -5,6 +5,8 @@
 #ifndef SIMPLE_TOUCH_DETECTION_H
 #define SIMPLE_TOUCH_DETECTION_H
 
-int getTactilePressed(int * x, int * y, int * z);
+int std_init();
+//int std_start();
+int std_getPressed(int * x, int * y, int * z);
 
 #endif // SIMPLE_TOUCH_DETECTION_H

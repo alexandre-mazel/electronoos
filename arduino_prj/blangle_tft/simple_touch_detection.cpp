@@ -10,7 +10,7 @@
 #define USE_LOCAL_KBV 1
 
 #define TOUCH_ORIENTATION  PORTRAIT
-//#define TOUCH_ORIENTATION  LANDSCAPE
+#define TOUCH_ORIENTATION  LANDSCAPE
 
 #if defined(USB_PID) && USB_PID == 0x804E // Arduino M0 Native
 #define Serial SerialUSB
@@ -21,7 +21,7 @@
 #define TITLE "TouchScreen.h GFX Calibration"
 #include <Adafruit_GFX.h>
 #include <MCUFRIEND_kbv.h>
-MCUFRIEND_kbv tft;
+extern MCUFRIEND_kbv tft;
 
 // MCUFRIEND UNO shield shares pins with the TFT.
 #if defined(ESP32)
@@ -68,7 +68,37 @@ uint16_t readID(void) {
 #define GRAY      BLUE     //idle cross-hair colour
 #define GRAY_DONE RED      //finished cross-hair
 
-int getTactilePressed(int * x, int * y, int * z)
+int std_init()
+{
+    char buf[40];
+    uint16_t ID = readID();
+    TFT_BEGIN();
+    tft.fillScreen(TFT_NAVY);
+    tft.println("Waiting for Serial");
+    delay(1000);
+    Serial.begin(9600);
+    while (!Serial);
+    tft.fillScreen(TFT_BLUE);
+    Serial.println(TITLE);
+    bool ret = true;
+#if USE_XPT2046 || defined(__arm__) || defined(ESP32)
+    Serial.println(F("Not possible to diagnose Touch pins on ARM or ESP32"));
+#else
+    //ret = diagnose_pins();  //destroys TFT pin modes
+    TFT_BEGIN();            //start again
+#endif
+    tft.setRotation(TOUCH_ORIENTATION);
+    //dispx = tft.width();
+    //dispy = tft.height();
+    //text_y_center = (dispy / 2) - 6;
+    sprintf(buf, "ID = 0x%04x", ID);
+    Serial.println(buf);
+    if (ret == false) {
+        Serial.println("ERR: std_init: Something is broken ?");
+    }
+}
+
+int std_getPressed(int * x, int * y, int * z)
 {
   // return 1 if somethi is pressed, x,y,and z are then filled
   // fill x, y & z
@@ -76,26 +106,28 @@ int getTactilePressed(int * x, int * y, int * z)
   // now touch has to be stable for 50ms
   // 
   int count = 0;
-  bool state, oldstate;
+  bool pressed, prev_pressed=0;
   while (count < 10) {
       readResistiveTouch();
-      state = tp.z > 200;     //ADJUST THIS VALUE TO SUIT YOUR SCREEN e.g. 20 ... 250
-      if (state == oldstate) 
+      pressed = tp.z < 1750;     //ADJUST THIS VALUE TO SUIT YOUR SCREEN e.g. 20 ... 250
+      //Serial.println(tp.z);
+      if( pressed == prev_pressed ) 
       {
         count++;
       }
       else 
       {
+        //Serial.println("stat diff oldstate");
         count = 0;
-        oldstate = state;
+        prev_pressed = pressed;
       }
       delay(5);
   }
-  if( oldstate )
+  if( pressed )
   {
     *x = tp.x;
     *y = tp.y;
     *z = tp.z;
   }
-  return oldstate;
+  return pressed;
 }

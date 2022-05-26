@@ -101,6 +101,8 @@ void setup()
 
         tft.fillScreen(BLUE);
     }
+  
+  std_init();
 }
 
 int render_img( const int x, const int y, const int w, const int h, const unsigned char* pImg, const unsigned char* pPalette, int flip=0)
@@ -350,7 +352,7 @@ void loop()
     if( 1 )
     {
       int x,y,z;
-      bool bPressed = getTactilePressed(&x,&y,&z);
+      bool bPressed = std_getPressed(&x,&y,&z);
       Serial.println(bPressed);
       render_screen(20,23,5550.5,0);
     }

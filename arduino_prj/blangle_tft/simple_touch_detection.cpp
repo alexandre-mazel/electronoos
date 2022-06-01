@@ -10,7 +10,7 @@
 #define USE_LOCAL_KBV 1
 
 #define TOUCH_ORIENTATION  PORTRAIT
-#define TOUCH_ORIENTATION  LANDSCAPE
+//#define TOUCH_ORIENTATION  LANDSCAPE
 
 #if defined(USB_PID) && USB_PID == 0x804E // Arduino M0 Native
 #define Serial SerialUSB
@@ -70,32 +70,46 @@ uint16_t readID(void) {
 
 int std_init()
 {
-    char buf[40];
-    uint16_t ID = readID();
-    TFT_BEGIN();
-    tft.fillScreen(TFT_NAVY);
-    tft.println("Waiting for Serial");
-    delay(1000);
-    Serial.begin(9600);
-    while (!Serial);
-    tft.fillScreen(TFT_BLUE);
-    Serial.println(TITLE);
-    bool ret = true;
+  return;
+  // la fonction n'amane pas grand chose
+  // le seul truc interessant pourrait etre ca:
+  /*
+  uint16_t ID = tft.readID();
+  Serial.print("TFT ID = 0x");
+  Serial.println(ID, HEX);
+  Serial.println("Calibrate for your Touch Panel");
+  if (ID == 0xD3D3) ID = 0x9486; // write-only shield
+  tft.begin(ID);
+  */
+  
+  char buf[40];
+  uint16_t ID = readID();
+  TFT_BEGIN();
+
+  
+  tft.fillScreen(TFT_NAVY);
+  tft.println("Waiting for Serial");
+  delay(1000);
+  Serial.begin(9600);
+  while (!Serial);
+  tft.fillScreen(TFT_BLUE);
+  Serial.println(TITLE);
+  bool ret = true;
 #if USE_XPT2046 || defined(__arm__) || defined(ESP32)
-    Serial.println(F("Not possible to diagnose Touch pins on ARM or ESP32"));
+  Serial.println(F("Not possible to diagnose Touch pins on ARM or ESP32"));
 #else
-    //ret = diagnose_pins();  //destroys TFT pin modes
-    TFT_BEGIN();            //start again
+  //ret = diagnose_pins();  //destroys TFT pin modes
+  TFT_BEGIN();            //start again
 #endif
-    tft.setRotation(TOUCH_ORIENTATION);
-    //dispx = tft.width();
-    //dispy = tft.height();
-    //text_y_center = (dispy / 2) - 6;
-    sprintf(buf, "ID = 0x%04x", ID);
-    Serial.println(buf);
-    if (ret == false) {
-        Serial.println("ERR: std_init: Something is broken ?");
-    }
+  tft.setRotation(TOUCH_ORIENTATION);
+  //dispx = tft.width();
+  //dispy = tft.height();
+  //text_y_center = (dispy / 2) - 6;
+  sprintf(buf, "ID = 0x%04x", ID);
+  Serial.println(buf);
+  if (ret == false) {
+      Serial.println("ERR: std_init: Something is broken ?");
+  }
 }
 
 int std_getPressed(int * px, int * py, int * pz, bool bDebug )
@@ -109,6 +123,10 @@ int std_getPressed(int * px, int * py, int * pz, bool bDebug )
   static int xmax_calib = 0;
   static int ymin_calib = 9999;
   static int ymax_calib = 0;
+
+  long int xraw = 0; // compute average of touch
+  long int yraw = 0;
+  
   int count = 0;
   bool pressed, prev_pressed=0;
   while (count < 10) {
@@ -118,43 +136,59 @@ int std_getPressed(int * px, int * py, int * pz, bool bDebug )
       if( pressed == prev_pressed ) 
       {
         count++;
+        if( pressed )
+        {
+          //Serial.println(tp.x);
+          xraw += tp.x;
+          yraw += tp.y;
+        }
       }
       else 
       {
         //Serial.println("stat diff oldstate");
         count = 0;
+        xraw = 0;
+        yraw = 0;
         prev_pressed = pressed;
       }
       delay(5);
   }
   if( pressed )
   {
-    // deja vu: 100/433 612/981
-    int xmin = 121;
-    int xmax = 559;
-    int ymin = 460;
-    int ymax = 975;
+    xraw /= count;
+    yraw /= count;
+
+    // deja vu dans le soft:
+    // 100/433 612/981
+    // 115/413 684/947
+    // 108/455 573/970
+
+    // d'apres soft de calib: 125/949 et 155/936
+    // autre calib: 124/954 et 143/930
+    int xmin = 100; // 121
+    int xmax = 450; // 559
+    int ymin = 580; // 460
+    int ymax = 980; // 975
     int w = 400;
     int h = 240;
     int invert_x=1;
 
-    int x = tp.x;
-    int y = tp.y;
-    int xraw = x;
-    int yraw = y;
+    int x = xraw;
+    int y = yraw;
 
     if( x > xmax_calib) xmax_calib = x;
     if( x < xmin_calib) xmin_calib = x; 
     if( y > ymax_calib) ymax_calib = y;
     if( y < ymin_calib) ymin_calib = y; 
 
-    if( 0 )
+    if( 1 )
     {
       x = (long)((x-xmin))*w/(xmax-xmin);
       y = (long)((y-ymin))*h/(ymax-ymin);
     }
     else
     {
+      // use calib on the fly
       x = (long)((x-xmin_calib))*w/(xmax_calib-xmin_calib);
       y = (long)((y-ymin_calib))*h/(ymax_calib-ymin_calib);
     }
@@ -165,7 +199,7 @@ int std_getPressed(int * px, int * py, int * pz, bool bDebug )
     *py = y;
     *pz = tp.z;
 
-    if( bDebug )
+    if( bDebug && 0)
     {
       Serial.print("touch, x: ");
       Serial.print(x);
@@ -191,6 +225,15 @@ int std_getPressed(int * px, int * py, int * pz, bool bDebug )
       Serial.print(ymax_calib);
 
       Serial.println();
+    }
+    if( 1 )
+    {
+      static int prevx = 0;
+      static int prevy = 0;
+      tft.drawPixel(prevx,prevy,BLACK);
+      tft.drawPixel(x,y,WHITE);
+      prevx = x;
+      prevy = y;
     }
   }
   return pressed;

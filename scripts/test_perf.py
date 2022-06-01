@@ -844,8 +844,8 @@ test_cpu_int2    : ####################   0.44s
 test_cpu_float2  : ####################   0.17s
 scipy.fftpack    : not found
 test_orb4.1.1    : ####################   0.32s (310.59fps)
-test_orbcv imgs  : test_perf_vga_*.png: not found
-test_orbcv bis   : test_perf_vga_*.png: not found
+test_orbcv imgs  : ####################   1.29s (77.45fps)
+test_orbcv bis   : ####################   1.22s (82.13fps)
 multiprocess x4 :  0.45s /  0.18s /  0.02s /  0.50s /  0.17s /  0.17s =>    1.50s
 multiprocess x8 :  0.48s /  0.21s /  0.03s /  0.54s /  0.20s /  0.19s =>    3.14s
 multiprocess x32:  1.90s /  0.83s /  0.09s /  2.04s /  0.72s /  0.68s =>    9.39s
@@ -859,8 +859,8 @@ test_cpu_int2    : ####################   0.66s
 test_cpu_float2  : ####################   0.19s
 test_scipy_xxt   : ####################   1.27s (315.92x)
 test_orb4.1.1    : ####################   0.33s (300.27fps)
-test_orbcv imgs  : test_perf_vga_*.png: not found
-test_orbcv bis   : test_perf_vga_*.png: not found
+test_orbcv imgs  : ####################   1.63s (61.32fps)
+test_orbcv bis   : ####################   1.35s (74.16fps)
 multiprocess x4 :  0.47s /  0.18s /  1.16s /  0.55s /  0.23s /  0.22s =>    2.83s
 multiprocess x8 :  0.49s /  0.20s /  1.79s /  0.57s /  0.24s /  0.24s =>    6.37s
 multiprocess x32:  1.94s /  0.68s /  7.15s /  2.24s /  0.88s /  0.86s =>   20.12s

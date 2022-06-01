@@ -30,19 +30,23 @@ class SoundPlayer:
         """
         preload file before playing them
         """
+        strErr = ""
         try:
             return self.listPreloadedSound[strFilename]
         except KeyError as err:
             try:
                 sound = pg.mixer.Sound(strFilename)
-            except:
+            except BaseException as err:
                 sound = None
-            if not sound: print("WRN: pygame_tools.loadFile: loading error: '%s'" % strFilename)
+                strErr = str(err)
+            if not sound: print("WRN: pygame_tools.loadFile: loading error: '%s' (err:%s)" % (strFilename,strErr))
             self.listPreloadedSound[strFilename] = sound
         return sound
         
-        
     def playFile( self, strFilename, bWaitEnd = True, rSoundVolume = 1. ):
+        if ".mp3" in strFilename.lower():
+            return self.playFileMp3(strFilename,bWaitEnd=bWaitEnd,rSoundVolume=rSoundVolume )
+            
         sound = self.loadFile( strFilename )
         if sound == None:
             print("WRN: pygame_tools.playFile: can't play this sound, as it hasn't been loaded: '%s'" % strFilename )
@@ -56,6 +60,14 @@ class SoundPlayer:
             while pg.mixer.get_busy():
                 clock.tick(frame_rate)
         return True
+        
+    def playFileMp3(self, strFilename, bWaitEnd = True, rSoundVolume = 1. ):
+        pg.mixer.music.load(strFilename)
+        pg.mixer.music.play()
+        if bWaitEnd:
+            clock = pg.time.Clock()
+            while pg.mixer.music.get_busy():
+                clock.tick(30)
         
     def stopAll( self ):
         pg.mixer.stop()

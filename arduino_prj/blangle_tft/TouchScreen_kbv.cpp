@@ -70,12 +70,12 @@ TSPoint_kbv TouchScreen_kbv::getPoint(void) {
     pinMode(_xp, INPUT);
     pinMode(_xm, INPUT);
     digitalWrite(_xp, LOW);
-    digitalWrite(_xm, LOW);     //.kbv for Due
+    //digitalWrite(_xm, LOW);     //.kbv for Due // Alma: was uncommented
 
     pinMode(_yp, OUTPUT);
     digitalWrite(_yp, HIGH);
     pinMode(_ym, OUTPUT);
-    digitalWrite(_ym, LOW);     //.kbv for Due
+    //digitalWrite(_ym, LOW);     //.kbv for Due // Alma: was uncommented
 
     for (i = 0; i < NUMSAMPLES; i++) {
         samples[i] = analogRead(_xm) ADC_ADJUST;

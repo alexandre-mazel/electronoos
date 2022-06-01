@@ -394,44 +394,57 @@ void loop()
           listPos[2+(i+5)*2+1] = listPos[2+(i+0)*2+1] + 61;
         }
 
+        int nDistMin = 999999;
+        int idx_element = -1;
         for( int i = 0; i < 11; ++i )
         {
+          // search hit, and choose nearest if many hits (enable overlap of area (when margin bigger than object))
           int posx = listPos[i*2];
           int posy = listPos[i*2+1];
-          int nMargin = 20; // pb: au lieu de s'arreter au premier hit, on devrait chercher le plus proche.
+          int nMargin = 30;
           if(     posx - nMargin < x && posx + nMargin > x 
               &&  posy - nMargin < y && posy + nMargin > y
           )
           {
-            Serial.print("hit: ");
-            Serial.println(i);
-            if( i == 0 )
+            int nDist = abs(x-posx) + abs(y-posy);
+            if( nDist < nDistMin )
             {
-              nLocked = ! nLocked;
+              nDistMin = nDist;
+              idx_element = i;
             }
-            else
-            {
-              int nAdd;
-              // i = 1 to 5 pour fleches basses et 6 to 10 for low
-              if( i < 6 )
-              {
-                nAdd = pow(10,4-i); // i = 1 => +1000 (pow 3), i = 4 => +1 (pow 0)   
-              }
-              else
-              {
-                nAdd = -pow(10,4-(i-5));
-              }
-              rCirc += nAdd;
-            }
-            break; // no multi touch
           }
           if( i == 0 && nLocked )
           {
             break; // don't test if locked!
           }
         }
+        if( idx_element != -1 )
+        {
+          int i = idx_element;
+          //Serial.print("hit: ");
+          //Serial.println(idx_element);
+          if( i == 0 )
+          {
+            nLocked = ! nLocked;
+          }
+          else
+          {
+            int nAdd;
+            // i = 1 to 5 pour fleches basses et 6 to 10 for low
+            if( i < 6 )
+            {
+              nAdd = pow(10,4-i); // i = 1 => +1000 (pow 3), i = 4 => +1 (pow 0)   
+            }
+            else
+            {
+              nAdd = -pow(10,4-(i-5));
+            }
+            rCirc += nAdd;
+          }
+        } // if idx_element != -1
         
-      }
+      } // if bPressed
+
       render_screen(20,23,rCirc,nLocked);
     }
 

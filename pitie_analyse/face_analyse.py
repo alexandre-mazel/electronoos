@@ -120,9 +120,14 @@ class FaceTracker:
                 # mais de pas réapprendre c'est dommage aussi.
                 if (confidence > 0.95 and self.nCptFrameSinceRestartTracking > 20):
                     print("DBG: forcing a tracker reset")
-                if confidence > 0.8: # ne surtout pas apprendre sur un visage pas completement sur
+                if confidence > 0.8 \
+                    and startX < im.shape[1] and startY < im.shape[0] \
+                    : 
+                    # ne surtout pas apprendre sur un visage pas completement sur
                     # reset tracking
                     bb = (startX, startY, endX-startX, endY-startY)
+                    print("bb: %s" % str(bb) )
+                    print("shape: %s" % str(im.shape) )
                     self.tracker.init(im,bb)
                     self.bTrackerRunning = True
                     self.nCptFrameSinceRestartTracking = 0
@@ -348,6 +353,8 @@ def analyseFolder(folder):
     
     """
     
+    idx = 0
+    
     #######################    
     # img_pitie/2022_03_04_00h bien souriante ? (en fait c'est 11h15) (25)
     if 0:
@@ -432,6 +439,10 @@ def analyseFolder(folder):
     
     if "2022_02_23_14h__14" in folder: 
         idx = 0
+
+    if "2022_03_02_13h__21" in folder: 
+        idx = 0        
+        
     if bSpeedTest: idx = 0
     if bSpeedTest: bRenderDebug = 0
     
@@ -546,6 +557,11 @@ if os.name == "nt":
     #~ strPath = "d:/img_pitie/2022_03_25_9h/m2/"
     strPath = "d:/img_pitie/2022_02_23_11h__13/"
     strPath = "d:/img_pitie/2022_02_23_14h__14/"
+    strPath = "d:/img_pitie/2022_03_02_13h__21/"
+    strPath = "d:/img_pitie/2022_03_24_11h__44/"
+    #~ strPath = "d:/img_pitie/2022_03_31_11h__52"
+    #~ strPath = "d:/img_pitie/2022_04_01_17h__54/"
+    #~ strPath = "d:/img_pitie/2022_04_20_11h__67/"
 else:
     strPath = os.path.expanduser("~/pitie4/")
 analyseFolder(strPath)

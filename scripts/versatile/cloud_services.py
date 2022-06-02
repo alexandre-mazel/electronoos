@@ -42,7 +42,7 @@ class CloudServices:
         if not bRet:
             return False # image not found...
         vi.addCommand( ["facerecognition", "dbtemp", "learn", strName] )
-        return self.v.sendValueGeneratingResults( vi )        
+        return self.v.sendValueGeneratingResults( vi )
         
     def imageReco_learnFromFile( self, strImageFile, strName ):
         print( "imageReco_learnFromFile: sending image to learn" )
@@ -70,6 +70,31 @@ class CloudServices:
         print( "imageReco_recogniseFromFile: sending image to recognise" )
         img = cv2.imread( strImageFile )
         return self.imageReco_recognise( img )
+        
+    def imageReco_continuousLearn( self, img ):
+        """
+        TODO: document me !!!
+        return: ?
+        """
+        print( "INF: imageReco_continuousLearn: sending image to recognise" )
+        if img is None or img.shape[0] < 0:
+            print( "ERR: imageReco_recognise: image is empty")
+            return False
+        vi = Versatile.VersatileImage()
+        vi.createFromCvImage( img, nFormat = Versatile.VersatileImage.Format.PNG)
+        vi.addCommand( ["facerecognition", "dbtemp", "continuous_learn"] )
+        return self.v.sendValueGeneratingResults( vi )  
+
+    def imageReco_continuousLearnFromFile( self, strImageFile ):
+        print( "INF: imageReco_continuousLearnFromFile: sending image to recognise" )
+        img = cv2.imread( strImageFile )
+        return self.imageReco_continuousLearn( img )
+        
+    def imageReco_clearDB( self, dbname ):
+        print( "imageReco_clearDB: entering" )
+        vi = Versatile.VersatileImage() # will create a buffer without images
+        vi.addCommand( ["facerecognition", dbname, "clear_db"] )
+        return self.v.sendValueGeneratingResults( vi )  
      
     def imageFaceDetect_analyse( self, strImageFile ):
         print( "imageFaceDetect_analyse: sending image to analyse" )
@@ -115,17 +140,36 @@ def getInstance():
 def autoTest():
     #cs = CloudServices( "robot-prog.com" )
     #cs = CloudServices( "10.0.160.60" )
-    cs = CloudServices( "robot-enhanced-education.org", 25340 )
+    cs = CloudServices( "localhost" )
+    #~ cs = CloudServices( "robot-enhanced-education.org", 25340 )
     cs.setVerbose( True )
+    cs.setClientID( "autotest" )
 
     if not cs.isRunning():
         exit( -1 )
-    bTestFaceDetect = True
+
+    bTestCreateClientID = False
+    #~ bTestCreateClientID = True
+    
+    if bTestCreateClientID:
+        # first time
+        id = cs.createClientID()
+        id2 = cs.createClientID()
+        assert( id2==id)
+        
+        print( "INF: Remember your client ID: %s" % id )
+        cs.setClientID( id )        
+        id = cs.getClientID()
+        assert( id2==id)
+        
+    
+    bTestFaceDetect = False
+    #~ bTestFaceDetect = True
+    
+    bTestFaceReco = False
     bTestFaceReco = True
     
     if bTestFaceDetect:
-        id = cs.createClientID()
-        cs.setClientID( id )
         retVal = cs.imageFaceDetect_analyse( "../../../face_tools/faces/0_alexandre0.jpg" )
         print("DBG: cloud return: retVal: %s" % str(retVal))
         #~ time.sleep(4.5)
@@ -137,25 +181,37 @@ def autoTest():
         
    
     if bTestFaceReco:
-        if 1:
-            print( "INF: first time: learning stuffs" )
-            # first time
-            id = cs.createClientID()
-            print( "INF: Remember your client ID: %s" % id )
-            cs.setClientID( id )
-            retVal = cs.imageReco_recogniseFromFile( "../../../face_tools/faces/0_alexandre0.jpg" ) # will be learned in the client db
-            print( "learn ret: %s\n\n" % str(retVal) )
-            retVal = cs.imageReco_recogniseFromFile( "../../../face_tools/faces/1_edouard0.jpg")
-            print( "learn ret: %s\n\n" % str(retVal) )
-        else:
-            print( "INF: reusing previously learned material" )
-            id = 354820859 # WRN: you need to change your id here!
+        
+        print( "INF: before learning: cleaning previous test" )
+        cs.imageReco_clearDB("test")
+        #~ exit(0)
+        
+        print( "INF: first pass: learning stuffs" )
 
-        # second time
-        # id = "enter it"
-        cs.setClientID( id )
-        retVal = cs.imageReco_recogniseFromFile( "../../face_tools/faces/0_alexandre1.jpg" )
+        retVal = cs.imageReco_continuousLearnFromFile( "../../../face_tools/faces/0_alexandre0.jpg" ) # will be learned in the client db
+        print( "learn ret: %s\n\n" % str(retVal) )
+        assert(retVal[1][0][1]==0)
+        retVal = cs.imageReco_continuousLearnFromFile( "../../../face_tools/faces/1_edouard0.jpg")
+        print( "learn ret: %s\n\n" % str(retVal) )
+        assert(retVal[1][0][1]==1)
+
+        print( "INF: second pass: recognizing stuffs" )
+
+        retVal = cs.imageReco_continuousLearnFromFile( "../../../face_tools/faces/0_alexandre4.jpg" )
         print( "reco ret: %s\n" % str(retVal) )
+        assert(retVal[1][0][1]==0)
+
+        if 1:
+            timeBegin = time.time()
+            nNbrCall = 6
+            for i in range(nNbrCall):
+                retVal = cs.imageReco_continuousLearnFromFile( "../../../face_tools/faces/0_alexandre4.jpg" )
+                print( "reco ret: %s\n" % str(retVal) )
+                assert(retVal[1][0][1]==0)
+            duration = time.time()-timeBegin
+            print("INF: duration per call: %.2fs" % (duration/nNbrCall))
+            # mstab7=>mstab7: 0.56
+            
     
 if( __name__ == "__main__" ):
     autoTest()

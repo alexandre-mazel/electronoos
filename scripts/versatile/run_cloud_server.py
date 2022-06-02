@@ -135,7 +135,7 @@ class CloudServicesServer( Versatile ):
             self.dictAlgo[id(client)].facereco.loadModels()        
             #~ self.dictAlgo[id(client)].facereco.load( self.strSavePath + self.dictClientID[id(client)] )
 
-        print("WRN: cloud_services.handleNewClientArrival: self.dictAlgo: %s, id(client): %s, self.dictAlgo[id(client)].facereco: %s" % (str(self.dictAlgo),id(client),self.dictAlgo[id(client)].facereco))
+        print("WRN: cloud_services.handleNewClientArrival:\n\tself.dictAlgo: %s,\n\tid(client): %s\n\tself.dictAlgo[id(client)].facereco: %s" % (str(self.dictAlgo),id(client),self.dictAlgo[id(client)].facereco))
                     
         return Versatile.handleNewClientArrival( self, client )
         
@@ -144,7 +144,9 @@ class CloudServicesServer( Versatile ):
         A client has identified, do what you want in inherited classes...
         """
         if self.dictAlgo[id(client)].facereco != None:
-            self.dictAlgo[id(client)].facereco.load( self.strSavePath + str(self.dictClientID[id(client)]) )
+            strPathDB = self.strSavePath + str(self.dictClientID[id(client)])
+            self.dictAlgo[id(client)].facereco.load( strPathDB )
+            self.dictAlgo[id(client)].facereco.setSavePath( strPathDB )
         return Versatile.handleClientIdentified( self, client )
         
     def handleClientRemoveIdentification( self, client ):
@@ -179,7 +181,7 @@ class CloudServicesServer( Versatile ):
         handleCommand specific to cloud command
         """
 
-            
+        print( "*"*10)
         print( "%s: INF: CloudServicesServer.handleCommand: %s" % (getTimeStamp(), command) )
         if command == Versatile.nCommandType_Value:
             print( type(command_parameters) )
@@ -217,7 +219,12 @@ class CloudServicesServer( Versatile ):
                     print("WRN: cloud_services.handleCommand: self.dictClientID: %s" % str(self.dictClientID))
                     if algo == None:
                         print("WRN: cloud_services.handleCommand: algo for client id '%s' is None" % id(client))
-                    
+
+                    if command == "clear_db":
+                        timeBeginLearn = time.time()
+                        retVal = algo.clear_db(dbname);
+                        return retVal
+                        
                     if command == "learn":
                         timeBeginLearn = time.time()
                         #retVal = algo.learn( cvim, params, id=-2 ) # force auto update
@@ -241,10 +248,14 @@ class CloudServicesServer( Versatile ):
 
                         
                     if command == "recognise":
+                        print( "DBG: recognise: currend DB path: %s" % (algo.getSavePath()) )
+                        if cvim == None:
+                            print("ERR: recognise: received an empty image!!!")
+                            return False
                         retVal = algo.recognise( cvim, bSpeedUp = False )
-                        print( "DBG: retVal: %s (db has %d peoples)" % (str(retVal),algo.getNbrKnownUsers()) )
+                        print( "DBG: recognise: retVal: %s (db has %d peoples)" % (str(retVal),algo.getNbrKnownUsers()) )
                         if algo.getNbrKnownUsers() < 1:
-                            print( "error: users all disappeared !!!" )
+                            print( "ERR: recognise: users all disappeared !?!" )
                             exit(-15)
                         strName = "none"
                         strDist = ""
@@ -257,6 +268,24 @@ class CloudServicesServer( Versatile ):
                         
                         
                         if self.bVerbose: print( "%s: INF: CloudServicesServer.handleCommand: recognise: returning: %s" % (getTimeStamp(), str(retVal) ) )
+                        return retVal
+                        
+                    if command == "continuous_learn":
+                        print( "DBG: continuous_learn: currend DB path: %s" % (algo.getSavePath()) )
+                        retVal = algo.continuousLearnFromImg( cvim )
+                        print( "DBG: continuous_learn: retVal: %s (db has %d peoples)" % (str(retVal),algo.getNbrKnownUsers()) )
+                        if algo.getNbrKnownUsers() < 1:
+                            print( "WRN/ERR: continuous_learn: users all disappeared !?! (if first time then ok)" )
+                        strName = "none"
+                        strDist = ""
+                        if len(retVal) > 0:
+                            status, nID, extra_info = retVal
+                            strName = str(nID)
+                                
+                        cv2.imwrite( self.getDebugFolderPath(client) + getFilenameFromTime() +"_" + strName + strDist + ".png", cvim)
+                        
+                        
+                        if self.bVerbose: print( "%s: INF: CloudServicesServer.handleCommand: continuous_learn: returning: %s" % (getTimeStamp(), str(retVal) ) )
                         return retVal
                         
                     if command == "get_status":

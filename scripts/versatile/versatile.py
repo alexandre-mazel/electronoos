@@ -184,6 +184,29 @@ class Versatile:
             or nNumCommand == Versatile.nCommandType_SetClientID \
             or nNumCommand == Versatile.nCommandType_SetClientParam
             
+            
+    @staticmethod
+    def  commandNumToLibelle( nNumCommand ):
+        listLibelle = [
+            "Ping",
+            "Value",
+            "Get",
+            "Set",
+            "CreateClientID",
+            "SetClientID",
+            "SetClientParam",
+            "GetClientParam",
+            "SubscribeCamera",
+            "UnsubscribeCamera",
+            "SubscribeSound",
+            "UnsubscribeSound",
+            "GetBroadcasted",
+        ]
+        if nNumCommand == -1:
+            return "EOC"
+        if nNumCommand >= len(listLibelle):
+            return "Unknown command"
+        return listLibelle[nNumCommand]
         
     class VersatileString:
         """
@@ -262,13 +285,13 @@ class Versatile:
         #~ print(dir(v))
         #~ print(hasattr(v,"bIsGrey"))
         #~ print("str: %s" % str(str(v)) )
-        if( hasattr(v,"bIsGrey") ): # CRADO !!!
+        if( hasattr(v,"bIsGrey") or hasattr(v,"aCommand") ): # CRADO, but only way to check it's a VersatileImage
             return 4
             
         if isinstance( v, list ) or isinstance( v, tuple ) :
             return 9
             
-        print( "ERR: Versatile.autodetectType: unable to detect type of '%s' (current type: %s)" % ( str(v), str(type(v)) ) )
+        print( "WRN: Versatile.autodetectType: unable to detect type of '%s' (current type: %s)" % ( str(v), str(type(v)) ) )
         return 0
             
     class VersatileValue:
@@ -418,6 +441,10 @@ class Versatile:
             self.aCommand = [] # you can add a list of parameters # see addCommand for doc
             self.bVerbose = bVerbose
             
+            self.bIsGrey = False
+            self.timeStamp = 0,0
+            self.data = ""
+            
         
         def createFromCvImage( self, img, timeStamp = None, nFormat = Format.JPG ):
             """
@@ -469,8 +496,15 @@ class Versatile:
                 except:
                     flag = cv2.IMREAD_COLOR # cv3 flag
             #~ print( "DBG: convertToCvImage: flag is %s" % flag )
+            #~ print( "DBG: convertToCvImage: type data: %s" % type(self.data) )
             #~ print( "DBG: convertToCvImage: len data: %s" % len(self.data) )
-            img = cv2.imdecode(np.fromstring(self.data, np.uint8), flag ) 
+            
+            if len(self.data) == 0:
+                # empty image for some specific command
+                print("WRN: convertToCvImage: received an empty image - possible for some command like clear_db...")
+                img = None
+            else:
+                img = cv2.imdecode(np.fromstring(self.data, np.uint8), flag ) 
             #print( "DBG: VersatileImage.convertToCvImage: decoded size: %s" % ( img.size ) )
             return img
             
@@ -480,7 +514,7 @@ class Versatile:
             The remote will send information related to this work
             eg:
                 - ["facedetection"] => list face and confidence as an answer
-                - ["facerecognition", "db_name", "learn", "some_name"] => True/False and confidence on learning (based on comparison on existing face
+                - ["facerecognition", "db_name", "learn", "some_name"] => True/False and confidence on learning (based on comparison on existing face)
                 - ["facerecognition", "db_name", "recognise"] => recognition result
                 - ["store"] => store this image on some disk
                 - ["show"] => show this image on screen
@@ -529,7 +563,7 @@ class Versatile:
             param, sizeParams = Versatile.VersatileValue.fromPacket(data[offset:])
             print( "DBG: Versatile Image: decoded params: ")
             for i in range( len(param) ):
-                print( "%s" % param[i])
+                print( "\t%s" % param[i])
             vi.aCommand = param
             offset += sizeParams
             print( "DBG: Versatile Image: decoded params - end")
@@ -871,7 +905,7 @@ class Versatile:
         nCommand = struct.unpack_from("B",p)[0]
         offset = 1
         
-        if bVerbose: print( "DBG: Versatile._waitPacket: receive command: %d" % (nCommand) )
+        if bVerbose: print( "DBG: Versatile._waitPacket: receive command: %d (%s)" % (nCommand,Versatile.commandNumToLibelle(nCommand)) )
 
         commandParameters = []        
         if Versatile.isCommandRequiringDataName( nCommand ):
@@ -913,7 +947,7 @@ class Versatile:
             - False on error, or (nCommand, command_parameters...) in case of returned value from complex command
         """
 
-        if self.bVerbose: print( "DBG: Versatile._send: sending command %s, dataname: %s, value: %s" %(nNumCommand,strDataName, value) )
+        if self.bVerbose: print( "DBG: Versatile._send: sending command %s (%s), dataname: %s, value: %s" %(nNumCommand,Versatile.commandNumToLibelle(nNumCommand),strDataName, value) )
 
         data = struct.pack('B', nNumCommand)
  

@@ -24,7 +24,7 @@ class CloudServices:
     def createClientID( self ):
         """
         Produce an id for this client
-        If he want to reuse one day previous learn, he will have to fullfill this client ID !!!
+        If you want to reuse one day previous learning, you will have to fullfill this client ID !!!
         """
         client = self.v.createClientID()[1]
         return client
@@ -38,7 +38,9 @@ class CloudServices:
     def imageReco_learn( self, img, strName ):
         print( "imageReco_learn: sending image to learn" )
         vi = Versatile.VersatileImage()
-        vi.createFromCvImage( img, nFormat = Versatile.VersatileImage.Format.PNG)
+        bRet = vi.createFromCvImage( img, nFormat = Versatile.VersatileImage.Format.PNG)
+        if not bRet:
+            return False # image not found...
         vi.addCommand( ["facerecognition", "dbtemp", "learn", strName] )
         return self.v.sendValueGeneratingResults( vi )        
         
@@ -118,13 +120,14 @@ def autoTest():
 
     if not cs.isRunning():
         exit( -1 )
-    bTestFaceReco = False
     bTestFaceDetect = True
+    bTestFaceReco = True
     
     if bTestFaceDetect:
         id = cs.createClientID()
         cs.setClientID( id )
-        retVal = cs.imageFaceDetect_analyse( "../../face_tools/faces/0_alexandre0.jpg" )
+        retVal = cs.imageFaceDetect_analyse( "../../../face_tools/faces/0_alexandre0.jpg" )
+        print("DBG: cloud return: retVal: %s" % str(retVal))
         #~ time.sleep(4.5)
         retVal = cs.imageFaceDetect_analyse( "D:/gaia_mask/IMG_0433.jpg" )
         #~ time.sleep(4.5)
@@ -134,22 +137,24 @@ def autoTest():
         
    
     if bTestFaceReco:
-        if 0:
+        if 1:
             print( "INF: first time: learning stuffs" )
             # first time
             id = cs.createClientID()
             print( "INF: Remember your client ID: %s" % id )
             cs.setClientID( id )
-            retVal = cs.imageReco_learn( "../../face_tools/faces/0_alexandre0.jpg", "alex" ) # will be learned in the client db
+            retVal = cs.imageReco_recogniseFromFile( "../../../face_tools/faces/0_alexandre0.jpg" ) # will be learned in the client db
+            print( "learn ret: %s\n\n" % str(retVal) )
+            retVal = cs.imageReco_recogniseFromFile( "../../../face_tools/faces/1_edouard0.jpg")
             print( "learn ret: %s\n\n" % str(retVal) )
         else:
             print( "INF: reusing previously learned material" )
-            id = 354820859
+            id = 354820859 # WRN: you need to change your id here!
 
         # second time
         # id = "enter it"
         cs.setClientID( id )
-        retVal = cs.imageReco_recognise( "../../face_tools/faces/0_alexandre1.jpg" )
+        retVal = cs.imageReco_recogniseFromFile( "../../face_tools/faces/0_alexandre1.jpg" )
         print( "reco ret: %s\n" % str(retVal) )
     
 if( __name__ == "__main__" ):

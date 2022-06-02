@@ -423,6 +423,9 @@ class Versatile:
             """
             create a VersatileImage from a cv2.buffer
             """
+            if img is None:
+                return False
+                
             # reducing image
             while img.shape[0]>1080:
                 print("WRN: versatile.createFromCvImage: reducing image..." )

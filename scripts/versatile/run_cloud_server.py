@@ -4,7 +4,7 @@ import datetime
 import os
 import sys
 import time
-sys.path.append("../../face_tools/" )
+sys.path.append("../../../face_tools/" )
 try: import facerecognition_dlib
 except BaseException as err: print( "WRN: no facerecognition algorithm found? or error while loading ERR: %s" % str(err))
 
@@ -129,11 +129,14 @@ class CloudServicesServer( Versatile ):
         except Exception as err:
             print( "WRN: handleNewClientArrival: while loading algorithm: %s" % str(err))
             fr = None
+
         self.dictAlgo[id(client)] = Algorithms(fr)
         if self.dictAlgo[id(client)].facereco != None:
             self.dictAlgo[id(client)].facereco.loadModels()        
             #~ self.dictAlgo[id(client)].facereco.load( self.strSavePath + self.dictClientID[id(client)] )
 
+        print("WRN: cloud_services.handleNewClientArrival: self.dictAlgo: %s, id(client): %s, self.dictAlgo[id(client)].facereco: %s" % (str(self.dictAlgo),id(client),self.dictAlgo[id(client)].facereco))
+                    
         return Versatile.handleNewClientArrival( self, client )
         
     def handleClientIdentified( self, client ):
@@ -210,6 +213,10 @@ class CloudServicesServer( Versatile ):
                     
                 if algoname == "facerecognition":
                     algo = self.dictAlgo[id(client)].facereco
+                    print("WRN: cloud_services.handleCommand: self.dictAlgo: %s" % str(self.dictAlgo))
+                    print("WRN: cloud_services.handleCommand: self.dictClientID: %s" % str(self.dictClientID))
+                    if algo == None:
+                        print("WRN: cloud_services.handleCommand: algo for client id '%s' is None" % id(client))
                     
                     if command == "learn":
                         timeBeginLearn = time.time()

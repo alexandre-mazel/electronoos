@@ -141,7 +141,7 @@ def autoTest():
     #cs = CloudServices( "robot-prog.com" )
     #cs = CloudServices( "10.0.160.60" )
     cs = CloudServices( "localhost" )
-    #~ cs = CloudServices( "robot-enhanced-education.org", 25340 )
+    cs = CloudServices( "robot-enhanced-education.org", 25340 )
     cs.setVerbose( True )
     cs.setClientID( "autotest" )
 

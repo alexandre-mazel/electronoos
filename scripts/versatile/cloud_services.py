@@ -211,7 +211,9 @@ def autoTest():
             duration = time.time()-timeBegin
             print("INF: duration per call: %.2fs" % (duration/nNbrCall))
             # mstab7=>mstab7: 0.56
-            
+            # mstab7=>xavier nvpmodel 0: 0.38
+            # mstab7=>xavier nvpmodel 1: 0.65-067            
+            # mstab7=>xavier nvpmodel 2: 0.65
     
 if( __name__ == "__main__" ):
     autoTest()

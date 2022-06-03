@@ -172,12 +172,16 @@ class Stater:
             "D0:F8:8C:A5:9D:82": "TabletCorto",
             "F4:CA:E5:5F:16:56": "FreeBox",
             "B8:27:EB:41:86:24": "RaspRee",
+            "DC:A6:32:A7:FE:E1": "RPi4",
             "BC:83:85:00:24:35": "TabPro4",
+            "E0:2B:E9:D7:DE:8A": "TabPro7",
             "B8:8A:EC:C7:73:14": "SwitchCorto",
             "48:4B:AA:68:E4:41": "IphoneAlex",
             "B8:FF:61:54:81:FA": "IpadAlex",
             "90:21:81:27:D5:58": "TabletGaia",
             "64:27:37:D3:31:67": "OrdiCorto", #E4:9E:12:26:39:E1
+            "AC:36:13:13:E2:60": "MobileCorto",
+            "5C:C3:07:8E:68:1F": "P10_Corto",
             "E4:9E:12:26:39:E1": "FreeBoxTV",
             "E4:9E:12:26:39:E0": "FreeBoxTV Eth",
             #:60: elsaphone
@@ -191,6 +195,7 @@ class Stater:
             "2C:F0:5D:9F:BF:DE": "XeniaDev",
             "A0:32:99:D1:52:CA": "LenovoYoga",
             "8A:E2:56:9A:7D:6A": "IphoneXAlex",
+            "72:1C:0D:52:39:39": "A52_Alex",
             
             
         }

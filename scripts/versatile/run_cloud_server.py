@@ -86,6 +86,16 @@ def getTimeStamp():
     t = time.time()
     strTimeStamp += "%03dms" % int( (t - int(t)) * 1000)
     return strTimeStamp
+    
+def getUserHome():
+    """
+    return a user root folder
+    """
+    if os.name == "nt":
+        ret = "c:/"
+    else:
+        ret = os.path.expanduser("~/")
+    return ret
   
 class Algorithms:
     def __init__( self, facereco, facedetect = None, objectreco = None ):
@@ -167,7 +177,7 @@ class CloudServicesServer( Versatile ):
         return Versatile.handleClientLeft( self, client )
 
     def getDebugFolderPath( self, client = None ):
-        strSaveDbgPath = "./imgs/"
+        strSaveDbgPath = getUserHome()+"./imgs/"
         if client != None:
             strSaveDbgPath += self.dictClientID[id(client)] + os.sep
         try:

@@ -41,14 +41,46 @@ def findCloser( listFaceResult, rect, confidence_treshold = 0.13 ):
         
     print("DBG: findCloser: returning: %s" % str(best) )
     return best
-        
-listRes = [
-(0,0,100,200,0.5),
-(25,35,40,60,0.6),
-]
+    
+if 0:
+    listRes = [
+    (0,0,100,200,0.5),
+    (25,35,40,60,0.6),
+    ]
 
-res = findCloser( listRes, (20,40,40,60) )
-print("findBestIntersection: %s" % str(res) )
+    res = findCloser( listRes, (20,40,40,60) )
+    print("findBestIntersection: %s" % str(res) )
+    
+def selectFace( faces_list, img_shape ):
+    """
+    select a list of face by returning the biggest and most centered
+    - faces_list: from detector
+    - img_shape: shape object (h,w,[layer]) from opencv image
+    """
+    if len(faces_list) < 1:
+        return []
+    h = img_shape[0]
+    w = img_shape[1]    
+    nMaxScore = -1024*1024*1024; # INT_MIN
+    nIdxBest = -1;
+    print(faces_list)
+    for i in range(len( faces_list ) ):
+        xt, yt, xb, yb,rConf = faces_list[i]
+        facew = xb-xt;
+        faceh = yb-yt;        
+        nScore = 0; # all distances are compared in square
+        nScore += facew*faceh*8; # *8: it's a parameter to make the size weight "more quite the same" compared to the distance
+        dx = ( w / 2 ) - ( xt + (facew/2) );
+        dy = ( h / 2 ) - ( yt + (faceh/2) );
+        nScore -= dx*dx+dy*dy;
+        print( "DBG: FaceDetectionNew_select_face: i:%d, score: %s" % (i,nScore) )
+        if( nScore > nMaxScore ):
+            nMaxScore = nScore;
+            nIdxBest = i;
+            
+    # now the best is in idx...
+    return faces_list[nIdxBest]
+# FaceDetectionNew_select_face - end
 
 class FaceDetector:
     """

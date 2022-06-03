@@ -33,12 +33,12 @@ def assert_greater(x,y):
         
 def getUserHome():
     """
-    return a temporary folder
+    return a user root folder
     """
     if os.name == "nt":
         ret = "c:/"
     else:
-        ret = "~/"
+        ret = os.path.expanduser("~/")
     return ret
 
 def getPathData():

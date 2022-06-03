@@ -180,6 +180,7 @@ class CloudServicesServer( Versatile ):
         strSaveDbgPath = getUserHome()+"./imgs/"
         if client != None:
             strSaveDbgPath += self.dictClientID[id(client)] + os.sep
+        print( "INF: CloudServicesServer.getDebugFolderPath: path: %s" % strSaveDbgPath )
         try:
             os.makedirs( strSaveDbgPath )
             print( "INF: CloudServicesServer.getDebugFolderPath: successfully created imgs storing place: %s" % (strSaveDbgPath) )

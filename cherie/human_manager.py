@@ -1,5 +1,9 @@
 """
 This file is part of CHERIE: Care Human Extended Real-life Interaction Experimentation.
+On AGX:
+cd ~/dev/git/electronoos/scripts/versatile
+nohup python3 run_cloud_server.py
+
 """
 import cv2
 import sys
@@ -31,8 +35,8 @@ class HumanManager:
             face = face_detector_cv3.selectFace(resDetect,img.shape)
             startX, startY, endX, endY, confidence = face
             # ajoute un peu autour du visage
-            nAddedOffsetY = int((endY-startY)*0.2)
-            nAddedOffsetX = int(nAddedOffsetY/2)
+            nAddedOffsetY = int((endY-startY)*0.25)
+            nAddedOffsetX = int(nAddedOffsetY*0.6)
             x1,y1,x2,y2=startX, startY, endX, endY
             x1 = max(x1-nAddedOffsetX,0)
             y1 = max(y1-nAddedOffsetY,0)
@@ -43,8 +47,9 @@ class HumanManager:
             timeBegin = time.time()
             retVal = self.cs.imageReco_continuousLearn(imgFace)
             print( "reco ret: %s, duration: %.2fs\n" % (str(retVal), time.time()-timeBegin ))
-            nHumanID = retVal[1][0][1]
-            cv2.putText(img,"%d"%nHumanID,(int((startX+endX)/2)-10, endY+5),cv2.FONT_HERSHEY_SIMPLEX, 0.8, color=(255,255,255), thickness = 2 )
+            if retVal != False:
+                nHumanID = retVal[1][0][1]
+                cv2.putText(img,"%d"%nHumanID,(int((startX+endX)/2)-10, endY+5),cv2.FONT_HERSHEY_SIMPLEX, 0.8, color=(255,255,255), thickness = 2 )
         
 # class HumanManager - end
 

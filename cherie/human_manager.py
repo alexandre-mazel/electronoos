@@ -32,25 +32,31 @@ class HumanManager:
             #~ return False
         resDetect = self.fdcv3.detect(img,bRenderBox=False,confidence_threshold=0.4) # ~0.06s on mstab7 on a VGA one face image
         if len(resDetect) > 0:
-            face = face_detector_cv3.selectFace(resDetect,img.shape)
-            startX, startY, endX, endY, confidence = face
-            # ajoute un peu autour du visage
-            nAddedOffsetY = int((endY-startY)*0.25)
-            nAddedOffsetX = int(nAddedOffsetY*0.6)
-            x1,y1,x2,y2=startX, startY, endX, endY
-            x1 = max(x1-nAddedOffsetX,0)
-            y1 = max(y1-nAddedOffsetY,0)
-            x2 = min(x2+nAddedOffsetX,img.shape[1])
-            y2 = min(y2+nAddedOffsetY,img.shape[0])
+            if 0:
+                # select only centered faces
+                faces = [face_detector_cv3.selectFace(resDetect,img.shape)]
+            else:
+                # all faces
+                faces = resDetect
+            for face in faces:
+                startX, startY, endX, endY, confidence = face
+                # ajoute un peu autour du visage
+                nAddedOffsetY = int((endY-startY)*0.25)
+                nAddedOffsetX = int(nAddedOffsetY*0.6)
+                x1,y1,x2,y2=startX, startY, endX, endY
+                x1 = max(x1-nAddedOffsetX,0)
+                y1 = max(y1-nAddedOffsetY,0)
+                x2 = min(x2+nAddedOffsetX,img.shape[1])
+                y2 = min(y2+nAddedOffsetY,img.shape[0])
+                
+                imgFace = img[y1:y2,x1:x2]
+                timeBegin = time.time()
+                retVal = self.cs.imageReco_continuousLearn(imgFace)
+                print( "reco ret: %s, duration: %.2fs\n" % (str(retVal), time.time()-timeBegin ))
+                if retVal != False:
+                    nHumanID = retVal[1][0][1]
+                    cv2.putText(img,"%d"%nHumanID,(int((startX+endX)/2)-10, endY+5),cv2.FONT_HERSHEY_SIMPLEX, 0.8, color=(255,255,255), thickness = 2 )
             
-            imgFace = img[y1:y2,x1:x2]
-            timeBegin = time.time()
-            retVal = self.cs.imageReco_continuousLearn(imgFace)
-            print( "reco ret: %s, duration: %.2fs\n" % (str(retVal), time.time()-timeBegin ))
-            if retVal != False:
-                nHumanID = retVal[1][0][1]
-                cv2.putText(img,"%d"%nHumanID,(int((startX+endX)/2)-10, endY+5),cv2.FONT_HERSHEY_SIMPLEX, 0.8, color=(255,255,255), thickness = 2 )
-        
 # class HumanManager - end
 
 

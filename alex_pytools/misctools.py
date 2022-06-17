@@ -30,6 +30,13 @@ def assert_greater(x,y):
     if x<y:
         assert(0)
         
+# FileNotFoundError definition for python 2.7
+# will be accessible as common.FileNotFoundError
+try:
+    FileNotFoundError = FileNotFoundError # create an object common.FileNotFoundError = (global.)FileNotFoundError
+except NameError:
+    FileNotFoundError = IOError
+        
         
 def getUserHome():
     """
@@ -72,7 +79,15 @@ def check(v1,v2):
     print( "BAD: %s != %s" % (str(v1),str(v2) ) )
     assert(v1==v2)
     return
-        
+    
+def is_string_as_integer(s):
+    try:
+        n=int(s)
+        return True
+    except ValueError:
+        pass
+    return False
+            
 
 def mse(imageA, imageB, bDenoise = False):
     # the 'Mean Squared Error' between the two images is the

@@ -6,6 +6,8 @@ nohup python3 run_cloud_server.py
 
 """
 import cv2
+import json
+import os
 import sys
 import time
 
@@ -15,6 +17,61 @@ import cloud_services
 
 sys.path.append("../../electronoos/alex_pytools")
 import face_detector_cv3
+import misctools
+
+from json import JSONEncoder
+from json import JSONDecoder
+
+def _defaultEncoder(self, obj):
+    return getattr(obj.__class__, "as_dict", _defaultEncoder.default)(obj)
+
+_defaultEncoder.default = JSONEncoder().default
+JSONEncoder.default = _defaultEncoder
+
+
+def _defaultDecoder(self, obj):
+    return getattr(obj.__class__, "from_dict", _defaultDecoder.default)(obj)
+
+print(dir(JSONDecoder()))
+_defaultDecoder.default = JSONDecoder().raw_decode
+JSONDecoder.default = _defaultDecoder
+
+
+class HumanKnowledge:
+    def __init__( self, nUID = -1):
+        self.nUID = nUID
+        self.nTotalSeen = 0
+        self.nSeenToday = 0
+        self.nDayStreak = 0
+        
+    def as_dict(self):
+        #~ strOut = json.dumps((self.nUID,self.nTotalSeen,self.nSeenToday,self.nDayStreak),indent=2,ensure_ascii =False)
+        #~ strOut = '{"HumanKnowledge": 1,"uid": %d, "totalseen": %d, "seentoday": %d, "daystreak": %d}' % (self.nUID,self.nTotalSeen,self.nSeenToday,self.nDayStreak)
+        #~ strOut =  json.dumps(self.__dict__)
+        #~ return strOut
+        return self.__dict__
+
+    def from_dict(self, dct: dict):
+        #~ print("DBG: from_dict: %s" % dct )       
+        self.nUID = dct['nUID']
+        self.nTotalSeen = dct['nTotalSeen']
+        self.nSeenToday = dct['nSeenToday']
+        self.nDayStreak = dct['nDayStreak']
+        return self
+        
+
+def decode_custom(dct):
+    #~ print("DBG: decode_custom: %s" % dct )
+    if "HumanKnowledge" in dct or "nTotalSeen" in dct.keys():
+        hk = HumanKnowledge().from_dict(dct)
+        return hk
+    if isinstance(dct, dict): # key as string => int
+        dictKeyAsInt = dict()
+        for k,v in dct.items():
+            if misctools.is_string_as_integer(k):
+                dictKeyAsInt[int(k)] = v
+        return dictKeyAsInt
+    return dct
 
 class HumanManager:
     def __init__( self ):
@@ -22,6 +79,40 @@ class HumanManager:
         self.cs.setVerbose( True )
         self.cs.setClientID( "test_on_the_fly" )
         self.fdcv3 = face_detector_cv3.facedetector
+        self.strSaveFilename = misctools.getUserHome() + "save/"
+        try:
+            os.makedirs(self.strSaveFilename)
+        except: pass
+        self.strSaveFilename += "cherie_human_manager.dat"
+        self.aHumanKnowledge = {} # uid => HumanKnowledge
+        self.load()
+        
+    def __del__(self):
+        self.save()
+        
+    def load( self ):
+        try:
+            f = open(self.strSaveFilename,"rt")
+        except misctools.FileNotFoundError:
+            print("WRN: HumanManager.load: file not found: '%s'" % self.strSaveFilename)
+            return 0
+        try:
+            self.aHumanKnowledge = json.load(f,object_hook=decode_custom)
+        except BaseException as err:
+            print("INF: HumanManager.load: potential error (or file empty): %s" % str(err) )
+            self.__del__ = lambda do_nothing: None
+            exit(1) # don't continue, as all historic will be erased
+        print("INF: HumanManager.load: loaded: %d humans" % ( len(self.aHumanKnowledge) ) )
+        f.close()
+        print(repr(self.aHumanKnowledge))
+        return 1
+        
+    def save( self ):
+        print("DBG: HumanManager.save: saving to '%s'" % str(self.strSaveFilename))
+        f = open(self.strSaveFilename,"wt")
+        ret = json.dump((self.aHumanKnowledge),f,indent=2,ensure_ascii =False)
+        f.close()
+        
 
 
     def updateImage( self, img, bAddDebug = False ):
@@ -39,6 +130,7 @@ class HumanManager:
                 # all faces
                 faces = resDetect
             for face in faces:
+                print("DBG: updateImage: face: %s" % str(face) )
                 startX, startY, endX, endY, confidence = face
                 # ajoute un peu autour du visage
                 nAddedOffsetY = int((endY-startY)*0.25)
@@ -55,8 +147,30 @@ class HumanManager:
                 print( "reco ret: %s, duration: %.2fs\n" % (str(retVal), time.time()-timeBegin ))
                 if retVal != False:
                     nHumanID = retVal[1][0][1]
-                    cv2.putText(img,"%d"%nHumanID,(int((startX+endX)/2)-10, endY+5),cv2.FONT_HERSHEY_SIMPLEX, 0.8, color=(255,255,255), thickness = 2 )
-            
+                    strTxt = "%d"%nHumanID
+                    strTxt2 = ""
+                    strTxt3 = ""
+                    strTxt4 = ""
+                    if nHumanID != -1:
+                        if nHumanID not in self.aHumanKnowledge.keys():
+                            self.aHumanKnowledge[nHumanID] = HumanKnowledge(nHumanID)
+                        self.aHumanKnowledge[nHumanID].nTotalSeen += 1
+                        strTxt2 += "TotalSeen: %d" % (self.aHumanKnowledge[nHumanID].nTotalSeen)
+                        strTxt3 += "nSeenToday: %d" % (self.aHumanKnowledge[nHumanID].nSeenToday)
+                        strTxt4 += "nDayStreak: %d" % (self.aHumanKnowledge[nHumanID].nDayStreak)
+                    y = endY+5
+                    dy = 22
+                    nFontId = cv2.FONT_HERSHEY_SIMPLEX
+                    rFontSize = 0.8
+                    nFontThick = 2
+                    colFont = (255,255,255)
+                    cv2.putText(img,strTxt,(int((startX+endX)/2)-10, y),nFontId, rFontSize, colFont, thickness = nFontThick );y+=dy
+                    
+                    cv2.putText(img,strTxt2,(int((startX+endX)/2)-10, y),nFontId, rFontSize, colFont, thickness = nFontThick );y+=dy
+                    cv2.putText(img,strTxt3,(int((startX+endX)/2)-10, y),nFontId, rFontSize, colFont, thickness = nFontThick );y+=dy
+                    cv2.putText(img,strTxt4,(int((startX+endX)/2)-10, y),nFontId, rFontSize, colFont, thickness = nFontThick );y+=dy
+                    
+                    
 # class HumanManager - end
 
 
@@ -78,6 +192,7 @@ def realLifeTestWebcam():
         
         if key == 27:
             break
+    hm = None # call to del and save
 
 
 

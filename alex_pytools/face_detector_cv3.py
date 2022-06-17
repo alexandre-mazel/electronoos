@@ -141,6 +141,8 @@ class FaceDetector:
             if confidence > confidence_threshold:
                 box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
                 (startX, startY, endX, endY) = box.astype("int")
+                if startX >= w-6 or startY >= h-6:
+                    continue # face is out of screen,(or very small), weird, let's remove it
                 res.append((startX, startY, endX, endY, confidence))
                 #~ print("DBG: box: %s" % str(box))
                 #~ print("DBG: x,y: %d,%d" % (startX, startY))

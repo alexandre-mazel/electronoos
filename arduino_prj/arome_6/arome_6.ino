@@ -11,7 +11,7 @@
  */
 
 #include <avr/pgmspace.h>
-const char pad[3] PROGMEM = { 0, 0, 0 };
+const char pad[3]  PROGMEM = { 0, 0, 0 };
 
 
 #include "tags.h"
@@ -21,8 +21,9 @@ const char pad[3] PROGMEM = { 0, 0, 0 };
 const int nNbrReader = 3;
 const int nLenCode = 12;
 
-const int nFirstLedPin = 42; // one led per reader
-const int nLedPinInc = 4;
+// attention les vins blancs sont en 50/1 et d'autres sembleraient etre en 42/4
+const int nFirstLedPin = 50; // one led per reader // 50 // 42
+const int nLedPinInc = 1; // 1 // 4
 const int nFirstPresencePin = 31; // one pin per reader // default: 40
 const int nPresencePinInc = 2; // increment to add to jump to next presence pin (default 1)
 
@@ -48,7 +49,10 @@ unsigned long timeMeLastGood3; // time in ms since I've finished 3 good
 unsigned long timeOtherLastGood3; // time when receiving a good3 from the other
 int nStatePinReceiveLastGood3 = 0; // store the state to detect a change
 
-int bRainbowMode = 0;
+#define SPECIFIC_MODE_RAINBOW    1
+#define SPECIFIC_MODE_WHITE         2
+
+int nSpecificMode = 0; // 1: rainbow, 2: white
 
 /*
 Led phase at ~200fps:
@@ -82,15 +86,38 @@ void animate_rainbow_mode()
   }
 }
 
+void animate_white_mode()
+{
+  static int static_nTime = 0;
+  //unsigned char color = (unsigned char)200+55*cos(static_nTime/100.);
+  unsigned char color = 255;
+  int i;
+  for( i = 0; i < nNbrReader; ++i )
+  {
+    aWs2811[i].setColor(color,color,color);
+  }
+  ++static_nTime;
+  if( static_nTime >= 30000 )
+  {
+    static_nTime = 0;
+  }
+}
+
 
 void animate_led()
 {
-  if( bRainbowMode )
+  if( nSpecificMode == SPECIFIC_MODE_RAINBOW )
   {
     animate_rainbow_mode();
-    
     return;
   }
+  if( nSpecificMode == SPECIFIC_MODE_WHITE )
+  {
+    animate_white_mode();
+    return;
+  }
+  
+  
 //  return;
   int i;
   for( i = 0; i < nNbrReader; ++i )
@@ -289,14 +316,21 @@ void setup()
   check_leds();
 
   
-  Serial.println( "\nArduino started: Table des Aromes v0.9b\n" );
+  Serial.println( "\nArduino started: Table des Aromes v0.9c\n" );
   
   Serial.print( "First presence pin: " );
   Serial.print( nFirstPresencePin, DEC );
   Serial.print( ", presence pin inc: " );
   Serial.println( nPresencePinInc, DEC );
   
-  bRainbowMode = load_eeprom(pTagsList, nNbrReader);
+  nSpecificMode = load_eeprom(pTagsList, nNbrReader);
+  Serial.print( "nSpecificMode: " );
+  Serial.println( nSpecificMode, DEC );
+  if( 0 )
+  {
+    Serial.print( "Forcing white mode" );
+    nSpecificMode = SPECIFIC_MODE_WHITE;
+  }
 }
 
 int check_code( const char * buf, int nReaderIdx )
@@ -416,22 +450,36 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
   int nRetCode = TagsList_isMagic( &buf[1] );
   if( nRetCode != 0 )
   {
-    if( nRetCode == 3 )
+    if( nRetCode == 3 || nRetCode == 4 )
     {
-      if( ! bRainbowMode )
+      if( nRetCode == 3 )
       {
-        bRainbowMode = 1;
-        Serial.println( "RAINBOW MODE ON" );
-        save_eeprom( pTagsList, nNbrReader, bRainbowMode );
-        return 0;
+          if( nSpecificMode != SPECIFIC_MODE_RAINBOW )
+          {
+            nSpecificMode = SPECIFIC_MODE_RAINBOW;
+            Serial.println( "RAINBOW MODE ON" );
+            save_eeprom( pTagsList, nNbrReader, nSpecificMode );
+            return 0;
+          }
+      }
+      else
+      {
+          if( nSpecificMode != SPECIFIC_MODE_WHITE )
+          {
+            nSpecificMode = SPECIFIC_MODE_WHITE;
+            Serial.println( "WHITE MODE ON" );
+            save_eeprom( pTagsList, nNbrReader, nSpecificMode );
+            return 0;
+          }
       }
       
     }
-    else if( bRainbowMode )
+    else if( nSpecificMode != 0 )
     {
-        bRainbowMode = 0;
-        Serial.println( "RAINBOW MODE OFF" );        
-        save_eeprom( pTagsList, nNbrReader, bRainbowMode );
+        // any other specific tag will exit the specific mode
+        nSpecificMode = 0;
+        Serial.println( "SPECIFIC MODE OFF" );        
+        save_eeprom( pTagsList, nNbrReader, nSpecificMode );
         return 0;
     }
     // not a rainbow mode nor an exit from a rainbow mode
@@ -445,7 +493,7 @@ int analyse_code( const char * buf, int *pnBufLen, int nReaderIdx )
     memorize_code( &buf[1], nReaderIdx, anState[nReaderIdx] == 4 );
     anState[nReaderIdx] = 0;
     anCptLedAnim[nReaderIdx] = 60000;
-    save_eeprom( pTagsList, nNbrReader, bRainbowMode );
+    save_eeprom( pTagsList, nNbrReader, nSpecificMode );
     return 0;
   }
   
@@ -639,3 +687,7 @@ void loop()
     // a simple analog read is running at 5413fps (184us per frame)
   }  
 }
+
+
+
+

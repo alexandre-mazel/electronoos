@@ -1,8 +1,16 @@
 """
 This file is part of CHERIE: Care Human Extended Real-life Interaction Experimentation.
-On AGX:
+
+Launch server On AGX:
 cd ~/dev/git/electronoos/scripts/versatile
 nohup python3 run_cloud_server.py
+
+# ou en local windows:
+cd C:\\Users\\alexa\\\dev\\git\\electronoos\\scripts\\versatile
+python run_cloud_server.py
+
+# in case of problem:
+# taskkill /F /im python.exe
 
 """
 import cv2
@@ -43,6 +51,7 @@ class HumanKnowledge:
         self.nTotalSeen = 0
         self.nSeenToday = 0
         self.nDayStreak = 0
+        self.strDayLastSeen = "1974_08_19" # string representing the last time seen
         
     def as_dict(self):
         #~ strOut = json.dumps((self.nUID,self.nTotalSeen,self.nSeenToday,self.nDayStreak),indent=2,ensure_ascii =False)
@@ -57,6 +66,7 @@ class HumanKnowledge:
         self.nTotalSeen = dct['nTotalSeen']
         self.nSeenToday = dct['nSeenToday']
         self.nDayStreak = dct['nDayStreak']
+        self.strDayLastSeen = dct['strDayLastSeen']
         return self
         
 
@@ -72,10 +82,13 @@ def decode_custom(dct):
                 dictKeyAsInt[int(k)] = v
         return dictKeyAsInt
     return dct
+    
+    
 
 class HumanManager:
     def __init__( self ):
-        self.cs = cloud_services.CloudServices( "robot-enhanced-education.org", 25340 )
+        #~ self.cs = cloud_services.CloudServices( "robot-enhanced-education.org", 25340 )
+        self.cs = cloud_services.CloudServices( "localhost", 13000 )
         self.cs.setVerbose( True )
         self.cs.setClientID( "test_on_the_fly" )
         self.fdcv3 = face_detector_cv3.facedetector
@@ -101,7 +114,7 @@ class HumanManager:
         except BaseException as err:
             print("INF: HumanManager.load: potential error (or file empty): %s" % str(err) )
             self.__del__ = lambda do_nothing: None
-            exit(1) # don't continue, as all historic will be erased
+            exit(1) # don't continue, as all historic will be erased #not working
         print("INF: HumanManager.load: loaded: %d humans" % ( len(self.aHumanKnowledge) ) )
         f.close()
         print(repr(self.aHumanKnowledge))
@@ -145,19 +158,37 @@ class HumanManager:
                 timeBegin = time.time()
                 retVal = self.cs.imageReco_continuousLearn(imgFace)
                 print( "reco ret: %s, duration: %.2fs\n" % (str(retVal), time.time()-timeBegin ))
+                # avec un perso (moi), depuis mon ordi.
+                # computation sur mstab7: 0.48s (locale)
+                # sur agx (plus long car network): 0.20 (mais no extra info)
                 if retVal != False:
                     nHumanID = retVal[1][0][1]
+                    listExtras = retVal[1][0][2]
                     strTxt = "%d"%nHumanID
                     strTxt2 = ""
                     strTxt3 = ""
                     strTxt4 = ""
+                    strTxt5 = ""
                     if nHumanID != -1:
                         if nHumanID not in self.aHumanKnowledge.keys():
                             self.aHumanKnowledge[nHumanID] = HumanKnowledge(nHumanID)
                         self.aHumanKnowledge[nHumanID].nTotalSeen += 1
+                        strCurrentDay = misctools.getDayStamp()
+                        if strCurrentDay != self.aHumanKnowledge[nHumanID].strDayLastSeen:
+                            self.aHumanKnowledge[nHumanID].nSeenToday = 1
+                            if misctools.getDiffTwoDateStamp(self.aHumanKnowledge[nHumanID].strDayLastSeen,strCurrentDay ) > 1:
+                                self.aHumanKnowledge[nHumanID].nDayStreak = 0
+                            else:
+                                self.aHumanKnowledge[nHumanID].nDayStreak = 0
+                            self.aHumanKnowledge[nHumanID].strDayLastSeen = strCurrentDay
+                        else:
+                            self.aHumanKnowledge[nHumanID].nSeenToday += 1
                         strTxt2 += "TotalSeen: %d" % (self.aHumanKnowledge[nHumanID].nTotalSeen)
                         strTxt3 += "nSeenToday: %d" % (self.aHumanKnowledge[nHumanID].nSeenToday)
                         strTxt4 += "nDayStreak: %d" % (self.aHumanKnowledge[nHumanID].nDayStreak)
+                        emo = misctools.findInNammedList(listExtras,"emotion")
+                        if emo != None:
+                            strTxt5 = str(emo)
                     y = endY+5
                     dy = 22
                     nFontId = cv2.FONT_HERSHEY_SIMPLEX
@@ -166,9 +197,13 @@ class HumanManager:
                     colFont = (255,255,255)
                     cv2.putText(img,strTxt,(int((startX+endX)/2)-10, y),nFontId, rFontSize, colFont, thickness = nFontThick );y+=dy
                     
+                    rFontSize /= 2
+                    dy //= 2
+                    nFontThick //= 2
                     cv2.putText(img,strTxt2,(int((startX+endX)/2)-10, y),nFontId, rFontSize, colFont, thickness = nFontThick );y+=dy
                     cv2.putText(img,strTxt3,(int((startX+endX)/2)-10, y),nFontId, rFontSize, colFont, thickness = nFontThick );y+=dy
                     cv2.putText(img,strTxt4,(int((startX+endX)/2)-10, y),nFontId, rFontSize, colFont, thickness = nFontThick );y+=dy
+                    cv2.putText(img,strTxt5,(int((startX+endX)/2)-10, y),nFontId, rFontSize, colFont, thickness = nFontThick );y+=dy
                     
                     
 # class HumanManager - end

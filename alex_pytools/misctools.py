@@ -148,11 +148,20 @@ def getTime():
     
 def getDayStamp():
     """
-    return (hour,min,second)
+    return a string representing the date "YYYY_MM_DD"
     """
     datetimeObject = datetime.datetime.now()
     return "%04d_%02d_%02d" % ( datetimeObject.year, datetimeObject.month,  datetimeObject.day )
 
+def getDiffTwoDateStamp(strDayStamp1,strDayStamp2):
+    """
+    return diff in day between day2 (represented as DayStamp "YYYY_MM_DD") and day1
+    """
+    strTimeStampFormat = "%Y_%m_%d"
+    datetime_object1 = datetime.datetime.strptime( strDayStamp1, strTimeStampFormat )
+    datetime_object2 = datetime.datetime.strptime( strDayStamp2, strTimeStampFormat )
+    return (datetime_object2-datetime_object1).days
+    
 def getTimeStamp():
     """
     
@@ -809,8 +818,19 @@ def getWebPage( strAddr ):
     mybytes = fp.read()
     mystr = mybytes.decode("utf8")
     fp.close()
-    return  mystr
+    return mystr
         
+        
+def findInNammedList( l, keyname, defaultValue = None ):
+    """
+    look in a list looking a bit like a dict [ ["toto", 1], ["tutu",1,2] ]
+    return keyname keyname => ["toto", 1]
+    """
+    keyname = keyname.lower()
+    for e in l:
+        if e[0].lower() == keyname:
+            return e
+    return defaultValue
      
     
 def autoTest():
@@ -834,6 +854,8 @@ def autoTest():
     print("getActionRequired: != False: %s" % (actionRequired != False) )
     print("isPauseRequired: %s" % isPauseRequired() )
     print("isExitRequired: %s" % isExitRequired() )
+    
+    check(getDiffTwoDateStamp("2022_01_18","2022_02_21"),34)
     
     
 if __name__ == "__main__":

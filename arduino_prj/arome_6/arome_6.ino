@@ -89,6 +89,7 @@ void animate_rainbow_mode()
 void animate_white_mode()
 {
   static int static_nTime = 0;
+  // essai de faire une animation un peu mouvante, mais pas fini de tester => on met du blanc static pour l'instant
   //unsigned char color = (unsigned char)200+55*cos(static_nTime/100.);
   unsigned char color = 255;
   int i;

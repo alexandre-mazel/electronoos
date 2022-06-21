@@ -61,6 +61,12 @@ def floatRepr( v, bReplacePointByComma = True, nNbrDecimalPoint=-1 ):
     sv = strFloatFormat % v
     sv = sv.replace('.',',')
     return sv
+    
+def ordinalToStr(num):
+    num = int(num)
+    if num == 1:
+        return "1er"
+    return "%dème" % num
 
 def outputCsv( dictValues, strFilename, aListLabels, key = None, reverse = False ):
     sep = ';'
@@ -840,6 +846,16 @@ class Cities:
             listAll.append([ k,v,cityAlt[4],cityAlt[5] ])
         return listAll
         
+    def zipToHumanised( self, zip ):
+        city = self.findByZip( zip )
+        strCity = city[3]
+        
+        if isBigCityZip(zip):
+            strOut = "dans le " + ordinalToStr(zip[-2:]) + " arrondissement de " + strCity
+        else:
+            strOut = "à " + strCity
+        return strOut
+        
 #class Cities - end
 
 # create Cities static method
@@ -1029,6 +1045,7 @@ def bigCityToZip( strCity ):
     return "-1"
     
 def isBigCityZip(zip):
+    zip = zip[:-2]+"00" # change 75008 to 75000
     for city,zipbig in bigCityZip:
         if zip == zipbig:
             return 1
@@ -1052,6 +1069,7 @@ def statByRegion(bOutputHtml=False):
     cnx.close()
     
     
+
 
 
 def autotest_cities():
@@ -1227,6 +1245,10 @@ def autotest_cities():
     
     assert_equal(isBigCityZip("67000"),1)
     assert_equal(isBigCityZip("34440"),0)
+    
+    assert_equal(cities.zipToHumanised("94270"),"à Le Kremlin-Bicêtre")
+    assert_equal(cities.zipToHumanised("34440"),"à Nissan-lez-Enserune")
+    assert_equal(cities.zipToHumanised("75008"),"dans le 8ème arrondissement de Paris")
     
 # autotest_cities - end
 

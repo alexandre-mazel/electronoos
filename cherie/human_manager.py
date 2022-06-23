@@ -26,6 +26,7 @@ import cloud_services
 sys.path.append("../../electronoos/alex_pytools")
 import face_detector_cv3
 import misctools
+import cv2_tools
 
 from json import JSONEncoder
 from json import JSONDecoder
@@ -169,7 +170,13 @@ class HumanManager:
                     strTxt3 = ""
                     strTxt4 = ""
                     strTxt5 = ""
+                    strTxt6 = ""
+                    bLookAt = 0
+                    bNear = 0
+                    bInteract = 0
                     if nHumanID != -1:
+                        hface = endY-startY
+                        bNear = hface>60
                         if nHumanID not in self.aHumanKnowledge.keys():
                             self.aHumanKnowledge[nHumanID] = HumanKnowledge(nHumanID)
                         self.aHumanKnowledge[nHumanID].nTotalSeen += 1
@@ -189,6 +196,17 @@ class HumanManager:
                         emo = misctools.findInNammedList(listExtras,"emotion")
                         if emo != None:
                             strTxt5 = str(emo)
+                        ori = misctools.findInNammedList(listExtras,"orientation")
+                        if ori != None:
+                            yaw,pitch,roll = ori[1]
+                            strTxt6 = "orient: %.2f,%.2f,%.2f"%(yaw,pitch,roll)
+                            bLookAt = abs(yaw)<0.55 and abs(pitch)<0.2
+                            if bLookAt: strTxt6 += " LOOKAT"
+                    if bNear:
+                        strTxt6 += " NEAR"
+                    if bLookAt and bNear:
+                        strTxt6 += " INTERACT"
+                        bInteract = 1
                     y = endY+5
                     dy = 22
                     nFontId = cv2.FONT_HERSHEY_SIMPLEX
@@ -200,12 +218,18 @@ class HumanManager:
                     rFontSize /= 2
                     dy //= 2
                     nFontThick //= 2
-                    cv2.putText(img,strTxt2,(int((startX+endX)/2)-10, y),nFontId, rFontSize, colFont, thickness = nFontThick );y+=dy
-                    cv2.putText(img,strTxt3,(int((startX+endX)/2)-10, y),nFontId, rFontSize, colFont, thickness = nFontThick );y+=dy
-                    cv2.putText(img,strTxt4,(int((startX+endX)/2)-10, y),nFontId, rFontSize, colFont, thickness = nFontThick );y+=dy
-                    cv2.putText(img,strTxt5,(int((startX+endX)/2)-10, y),nFontId, rFontSize, colFont, thickness = nFontThick );y+=dy
+                    cv2_tools.putTextCentered(img,strTxt2,(int((startX+endX)/2)-10, y),nFontId, rFontSize, colFont, thickness = nFontThick );y+=dy
+                    cv2_tools.putTextCentered(img,strTxt3,(int((startX+endX)/2)-10, y),nFontId, rFontSize, colFont, thickness = nFontThick );y+=dy
+                    cv2_tools.putTextCentered(img,strTxt4,(int((startX+endX)/2)-10, y),nFontId, rFontSize, colFont, thickness = nFontThick );y+=dy
+                    cv2_tools.putTextCentered(img,strTxt5,(int((startX+endX)/2)-10, y),nFontId, rFontSize, colFont, thickness = nFontThick );y+=dy
+                    cv2_tools.putTextCentered(img,strTxt6,(int((startX+endX)/2)-10, y),nFontId, rFontSize, colFont, thickness = nFontThick );y+=dy
                     
-                    
+                    if bLookAt:
+                        cv2.rectangle(img,(startX,startY),(endX, endY),(255,255,255))
+
+                    if bInteract:
+                        cv2.rectangle(img,(startX,startY),(endX, endY),(255,0,0))
+                        
 # class HumanManager - end
 
 
@@ -215,6 +239,8 @@ def realLifeTestWebcam():
     cap = cv2.VideoCapture(0) #ouvre la webcam
     while 1:
         ret, img = cap.read() # lis et stocke l'image dans frame
+        if img is None:
+            continue
         print(img.shape)
         
         #~ img = cv2.resize(img, None, fx=0.5,fy=0.5)

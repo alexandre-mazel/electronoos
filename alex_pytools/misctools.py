@@ -831,6 +831,20 @@ def findInNammedList( l, keyname, defaultValue = None ):
         if e[0].lower() == keyname:
             return e
     return defaultValue
+    
+def intToHashLike(n):
+    """
+    generate a hash looking like an hash from an int
+    """
+    codage = [chr(ord('A')+i) for i in range(26)]
+    s = ""
+    lencode = len(codage)
+    while n>=lencode:
+        r = n%26
+        s = codage[r] + s
+        n = n // 26
+    s = codage[n] + s
+    return s
      
     
 def autoTest():
@@ -857,6 +871,13 @@ def autoTest():
     
     check(getDiffTwoDateStamp("2022_01_18","2022_02_21"),34)
     
+    check(intToHashLike(0),'A')
+    check(intToHashLike(1),'B')
+    check(intToHashLike(26),'BA') # A is like a 0
+    check(intToHashLike(27),'BB')
+    check(intToHashLike(26*26*26-1),'ZZZ')
+    check(intToHashLike(26*26*26),'BAAA')
+    check(intToHashLike(26*26*26+1),'BAAB')
     
 if __name__ == "__main__":
     autoTest()

@@ -88,8 +88,8 @@ def decode_custom(dct):
 
 class HumanManager:
     def __init__( self ):
-        self.cs = cloud_services.CloudServices( "robot-enhanced-education.org", 25340 )
-        #~ self.cs = cloud_services.CloudServices( "localhost", 13000 )
+        #~ self.cs = cloud_services.CloudServices( "robot-enhanced-education.org", 25340 )
+        self.cs = cloud_services.CloudServices( "localhost", 13000 )
         self.cs.setVerbose( True )
         self.cs.setClientID( "test_on_the_fly" )
         self.fdcv3 = face_detector_cv3.facedetector
@@ -160,7 +160,7 @@ class HumanManager:
                 retVal = self.cs.imageReco_continuousLearn(imgFace)
                 print( "INF: reco ret: %s, duration: %.2fs\n" % (str(retVal), time.time()-timeBegin ))
                 # avec un perso (moi), depuis mon ordi.
-                # computation sur mstab7: 0.48s (locale)
+                # computation sur mstab7: 0.48s (locale) / 0.58s
                 # sur agx (plus long car network): 0.20 (mais no extra info); avec extra: 0.72
                 if retVal != False and retVal[0] != -1:
                     nHumanID = retVal[1][0][1]

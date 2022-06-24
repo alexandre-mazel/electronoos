@@ -47,10 +47,11 @@ class MyClass(GeneratedClass):
         rTimePause = 0.5
         rTimePause = 1.
         rTimePause = 1.5-0.1-0.1
-        rTimePause = 0.6
+        rTimePause = 0.6 # 0.6
 
         rMoveHip = 0.05*1.5*3
         rMoveHip *=1.2
+        rMoveHip *=0.9
         rTimeHip = 2.5
 
         if bHead: self.mot.post.angleInterpolation(["HeadPitch"],[-rHead],rTimeHip,False)

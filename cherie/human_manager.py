@@ -135,7 +135,9 @@ class HumanManager:
         """
         #~ if not self.cs.isRunning():
             #~ return False
-        resDetect = self.fdcv3.detect(img,bRenderBox=False,confidence_threshold=0.4) # ~0.06s on mstab7 on a VGA one face image
+        
+         # ~0.06s on mstab7 on a VGA one face image
+        resDetect = self.fdcv3.detect(img,bRenderBox=False,confidence_threshold=0.4)
         if len(resDetect) > 0:
             if 0:
                 # select only centered faces
@@ -160,11 +162,13 @@ class HumanManager:
                 retVal = self.cs.imageReco_continuousLearn(imgFace)
                 print( "INF: reco ret: %s, duration: %.2fs\n" % (str(retVal), time.time()-timeBegin ))
                 # avec un perso (moi), depuis mon ordi.
-                # computation sur mstab7: 0.48s (locale) / 0.58s
-                # sur agx (plus long car network): 0.20 (mais no extra info); avec extra: 0.72
+                # computation time:
+                # - sur mstab7: 0.48s (locale) / 0.55s / 0.58s avec tout -  (extras takes 0.03s, angle, smile and mood takes 0.07s
+                # - sur agx (plus long car network): 0.20 (mais no extra info); avec extra: 0.72
                 if retVal != False and retVal[0] != -1:
                     nHumanID = retVal[1][0][1]
-                    listExtras = retVal[1][0][2]
+                    facepos = retVal[1][0][2]
+                    listExtras = retVal[1][0][3]
                     strTxt = "%d"%nHumanID
                     strTxt2 = ""
                     strTxt3 = ""

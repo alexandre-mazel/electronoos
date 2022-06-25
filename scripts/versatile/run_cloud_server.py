@@ -290,7 +290,7 @@ class CloudServicesServer( Versatile ):
                         strName = "none"
                         strDist = ""
                         if len(retVal) > 0:
-                            status, nID, extra_info = retVal
+                            status, nID, faceshape, extra_info = retVal
                             strName = str(nID)
                                 
                         cv2.imwrite( self.getDebugFolderPath(client) + getFilenameFromTime() +"_" + strName + strDist + ".png", cvim)

@@ -1,5 +1,7 @@
+# -*- coding: cp1252 -*-
+
 """
-process big wav file, cut them...
+process big wav file,analyse text, cut them...
 """
 import wav
 import misctools
@@ -10,7 +12,7 @@ except: pass
 import os
 import time
 
-import speech_recognition #pip install speechrecognition
+import speech_recognition #pip install speechrecognition or alternative #pip install SpeechRecognition
 
 def cleanStringAnsi128( txt, bChangeSpaceAndQuote = True ):
     cleaned = ""
@@ -116,16 +118,39 @@ def cleanText2( txt ):
         print("DBG: cleanText2: txt2: %s" % txt )
     return txt
         
+        
+global_strDefaultAnsiLang = 'fr-FR'
 
-def getSpeechInWav( strSoundFilename ):
-    strAnsiLang = 'en-UK'
-    strAnsiLang = 'fr-FR'
+def changeDefaultLang(strAnsiLang):
+    global global_strDefaultAnsiLang
+    global_strDefaultAnsiLang = strAnsiLang
+    
+def getSpeechInWav( strSoundFilename, strAnsiLang = None ):
+    """
+    return a text corresponding to the text said in the sound filename
+    - strAnsiLang: if None: use default
+    """
+    if strAnsiLang == None:
+        global global_strDefaultAnsiLang
+        strAnsiLang = global_strDefaultAnsiLang
+
+    if strAnsiLang == 'en':
+        strAnsiLang = 'en-UK'
+        
+    if strAnsiLang == 'fr':
+        strAnsiLang = 'fr-FR'
+        
+    print("DBG: getSpeechInWav: using Lang: %s"  % strAnsiLang )
+        
     retVal = None
     
     if 1:
         # add silence before and after
         newname = misctools.getTempFilename() + ".wav"
         w = wav.Wav(strSoundFilename)
+        if w.getDuration() < 0.01:
+            print("WRN: getSpeechInWav: wav '%s' not found or empty" % strSoundFilename )
+            return ""
         w.ensureSilenceAtBegin(0.1)
         w.addSilence(0.1)
         w.write(newname)
@@ -265,9 +290,8 @@ def pasteSound( aListSoundFilenames, aListTimes, strOutfilename ):
     out.write(strOutfilename)
 # pasteSound - end
             
-    
-    
-if __name__ == "__main__":
+def processRavir():
+
     strPathRavir = "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut/"
     #~ strPathRavir = "d:/sounds/recordings/ravir"
     
@@ -308,3 +332,14 @@ if __name__ == "__main__":
         
     
     
+def autotest():
+    # ne pas s'amuser a faire des autotests tout le temps pour ne pas se faire ban de google speech!
+    txt = getSpeechInWav( "../data/salut_ca_va_bien.wav", "fr")
+    assert(txt in u"salut ça va bien")
+    txt = getSpeechInWav( "../data/hello_how_are_you.wav", "en")
+    assert(txt in "hello how are you")
+    
+    
+if __name__ == "__main__":
+    #~ processRavir()
+    autotest()

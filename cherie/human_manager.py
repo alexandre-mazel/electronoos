@@ -21,12 +21,24 @@ import time
 
 
 sys.path.append("../scripts/versatile")
-import cloud_services
+try:
+    import cloud_services
+except:
+    print("INF: Trying robot path")
+    sys.path.append("/home/nao/.local/lib/python2.7/site-packages/electronoos/scripts/versatile/")    
+    import cloud_services
 
-sys.path.append("../../electronoos/alex_pytools")
-import face_detector_cv3
-import misctools
-import cv2_tools
+try:
+    sys.path.append("../../electronoos/alex_pytools")
+    import face_detector_cv3
+    import misctools
+    import cv2_tools
+except:
+    print("INF: Trying robot path")
+    sys.path.append("/home/nao/.local/lib/python2.7/site-packages/electronoos/alex_pytools")    
+    import misctools
+    import cv2_tools
+
 
 from json import JSONEncoder
 from json import JSONDecoder
@@ -53,6 +65,10 @@ class HumanKnowledge:
         self.nSeenToday = 0
         self.nDayStreak = 0
         self.strDayLastSeen = "1974_08_19" # string representing the last time seen
+        # compute duration of current interaction (we just note time of last, if it's recent, we are still in interaction
+        self.rTimeLastInteraction = 0 # as time.time() info
+        self.rDurationInteraction = 0 # in sec
+        self.rTotalInteraction = 0 # in sec
         
     def as_dict(self):
         #~ strOut = json.dumps((self.nUID,self.nTotalSeen,self.nSeenToday,self.nDayStreak),indent=2,ensure_ascii =False)
@@ -61,7 +77,7 @@ class HumanKnowledge:
         #~ return strOut
         return self.__dict__
 
-    def from_dict(self, dct: dict):
+    def from_dict(self, dct):
         #~ print("DBG: from_dict: %s" % dct )       
         self.nUID = dct['nUID']
         self.nTotalSeen = dct['nTotalSeen']
@@ -88,18 +104,31 @@ def decode_custom(dct):
 
 class HumanManager:
     def __init__( self ):
-        #~ self.cs = cloud_services.CloudServices( "robot-enhanced-education.org", 25340 )
-        self.cs = cloud_services.CloudServices( "localhost", 13000 )
+        self.cs = cloud_services.CloudServices( "robot-enhanced-education.org", 25340 )
+        #~ self.cs = cloud_services.CloudServices( "localhost", 13000 )
         self.cs.setVerbose( True )
         self.cs.setClientID( "test_on_the_fly" )
-        self.fdcv3 = face_detector_cv3.facedetector
+        try:
+            self.fdcv3 = face_detector_cv3.facedetector
+        except:
+            print("WRN: face_detector_cv3: won't present")
+            
         self.strSaveFilename = misctools.getUserHome() + "save/"
         try:
             os.makedirs(self.strSaveFilename)
         except: pass
+        
         self.strSaveFilename += "cherie_human_manager.dat"
         self.aHumanKnowledge = {} # uid => HumanKnowledge
         self.load()
+        
+        self.bPepper = os.name != "nt"
+        if self.bPepper:
+            import naoqi
+            self.mem = naoqi.ALProxy( "ALMemory",  "localhost", 9559 );
+            import abcdk.extractortools
+            afd = naoqi.ALProxy("ALFaceDetection", "localhost", 9559)
+            afd.post._run() # explicit start (instead of registering to event)
         
     def __del__(self):
         self.save()
@@ -136,15 +165,32 @@ class HumanManager:
         #~ if not self.cs.isRunning():
             #~ return False
         
-         # ~0.06s on mstab7 on a VGA one face image
-        resDetect = self.fdcv3.detect(img,bRenderBox=False,confidence_threshold=0.4)
-        if len(resDetect) > 0:
+        # ~0.06s on mstab7 on a VGA one face image
+        if not self.bPepper:
+            faces = self.fdcv3.detect(img,bRenderBox=False,confidence_threshold=0.4)
+        else:
+            # pepper
+            import abcdk.extractortools
+            faces = []
+            datas = self.mem.getData("FaceDetection/FaceDetected")
+            print("datas: %s" % datas)
+            #~ datas = mem.getData("FaceDetected")
+            #~ print("datas: %s" % datas)
+            faceinfo = abcdk.extractortools.FaceDetectionNew_decodeInfos(datas)
+            if len(faceinfo.objects) > 0:
+                for face in faceinfo.objects:
+                    print("DBG: face: %s" % face )
+                    vertices = face.faceInfo.vertices
+                    posface = [vertices[0][0],vertices[0][1],vertices[1][0],vertices[2][1],face.faceInfo.rConfidence]
+                    faces.append(posface)
+            print("DBG: pepper, final faces: %s" % str(faces))
+        if len(faces) > 0:
             if 0:
                 # select only centered faces
-                faces = [face_detector_cv3.selectFace(resDetect,img.shape)]
+                faces = [face_detector_cv3.selectFace(faces,img.shape)]
             else:
                 # all faces
-                faces = resDetect
+                pass
             for face in faces:
                 print("DBG: updateImage: face: %s" % str(face) )
                 startX, startY, endX, endY, confidence = face
@@ -163,8 +209,12 @@ class HumanManager:
                 print( "INF: reco ret: %s, duration: %.2fs\n" % (str(retVal), time.time()-timeBegin ))
                 # avec un perso (moi), depuis mon ordi.
                 # computation time:
-                # - sur mstab7: 0.48s (locale) / 0.55s / 0.58s avec tout -  (extras takes 0.03s, angle, smile and mood takes 0.07s
-                # - sur agx (plus long car network): 0.20 (mais no extra info); avec extra: 0.72
+                # - sur mstab7: 0.48s (locale) / 0.55s / 0.58s avec tout -  (extras takes 0.03s, angle, smile and mood takes 0.07s)
+                #    apres optim avec angle smile mood: 0.45s
+                # - sur agx (plus long car network): 0.20 (mais no extra info); avec extra: 0.72 
+                #    apres optim avec angle smile mood: 0.37s (mode1) 
+                #    apres optim avec angle smile mood: 0.19s (mode0)
+                
                 if retVal != False and retVal[0] != -1:
                     nHumanID = retVal[1][0][1]
                     facepos = retVal[1][0][2]
@@ -175,6 +225,7 @@ class HumanManager:
                     strTxt4 = ""
                     strTxt5 = ""
                     strTxt6 = ""
+                    strTxt7 = ""
                     bLookAt = 0
                     bNear = 0
                     bInteract = 0
@@ -211,7 +262,18 @@ class HumanManager:
                     if bLookAt and bNear:
                         strTxt6 += " INTERACT"
                         bInteract = 1
-                    y = endY+5
+                        
+                    if bInteract:
+                        rTimeSinceLast = time.time() - self.aHumanKnowledge[nHumanID].rTimeLastInteraction
+                        if rTimeSinceLast < 5:
+                            # still in interaction
+                            self.aHumanKnowledge[nHumanID].rDurationInteraction += rTimeSinceLast
+                            self.aHumanKnowledge[nHumanID].rTotalInteraction += rTimeSinceLast
+                        else:
+                            self.aHumanKnowledge[nHumanID].rDurationInteraction = 0
+                        self.aHumanKnowledge[nHumanID].rTimeLastInteraction = time.time()
+                        strTxt7 += "time interact: %.2f" % self.aHumanKnowledge[nHumanID].rDurationInteraction
+                    y = endY-10
                     dy = 22
                     nFontId = cv2.FONT_HERSHEY_SIMPLEX
                     rFontSize = 0.8
@@ -227,6 +289,7 @@ class HumanManager:
                     cv2_tools.putTextCentered(img,strTxt4,(int((startX+endX)/2)-10, y),nFontId, rFontSize, colFont, thickness = nFontThick );y+=dy
                     cv2_tools.putTextCentered(img,strTxt5,(int((startX+endX)/2)-10, y),nFontId, rFontSize, colFont, thickness = nFontThick );y+=dy
                     cv2_tools.putTextCentered(img,strTxt6,(int((startX+endX)/2)-10, y),nFontId, rFontSize, colFont, thickness = nFontThick );y+=dy
+                    cv2_tools.putTextCentered(img,strTxt7,(int((startX+endX)/2)-10, y),nFontId, rFontSize, colFont, thickness = nFontThick );y+=dy
                     
                     if bLookAt:
                         cv2.rectangle(img,(startX,startY),(endX, endY),(255,255,255))
@@ -235,11 +298,12 @@ class HumanManager:
                         cv2.rectangle(img,(startX,startY),(endX, endY),(255,0,0))
                         
 # class HumanManager - end
-
+humanManager = HumanManager()
 
 
 def realLifeTestWebcam():
-    hm = HumanManager()
+    #~ hm = HumanManager()
+    hm = humanManager
     cap = cv2.VideoCapture(0) #ouvre la webcam
     while 1:
         ret, img = cap.read() # lis et stocke l'image dans frame

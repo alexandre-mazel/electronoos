@@ -160,10 +160,18 @@ class HumanManager:
 
     def updateImage( self, img, bAddDebug = False ):
         """
-        return False on server problem
+        return face detected, lookat, near, interact or None on image or server problem
         """
         #~ if not self.cs.isRunning():
-            #~ return False
+            #~ return None
+            
+        if img is None:
+            return None
+            
+        bSeenFaces = 0
+        bSomeoneLook = 0
+        bSomeoneNear = 0
+        bSomeoneInteract = 0
         
         # ~0.06s on mstab7 on a VGA one face image
         if not self.bPepper:
@@ -181,98 +189,117 @@ class HumanManager:
                 for face in faceinfo.objects:
                     print("DBG: face: %s" % face )
                     vertices = face.faceInfo.vertices
-                    posface = [vertices[0][0],vertices[0][1],vertices[1][0],vertices[2][1],face.faceInfo.rConfidence]
+                    coef = 2 # face detect return in QVGA and here were are in VGA
+                    margin = 50
+                    posface = [vertices[0][0]*coef,vertices[0][1]*coef,vertices[1][0]*coef,vertices[2][1]*coef,face.faceInfo.rConfidence]
+                    
+                    # cause we could have a time decay between analyse and grab
+                    posface[0] = max(0,posface[0]-margin)
+                    posface[1] = max(0,posface[1]-margin)
+                    posface[2] += margin
+                    posface[3] += margin
+                    
+                    #~ posface = [0,0,img.shape[1],img.shape[0],1] # send entire image containing faces
                     faces.append(posface)
             print("DBG: pepper, final faces: %s" % str(faces))
-        if len(faces) > 0:
-            if 0:
-                # select only centered faces
-                faces = [face_detector_cv3.selectFace(faces,img.shape)]
-            else:
-                # all faces
-                pass
-            for face in faces:
-                print("DBG: updateImage: face: %s" % str(face) )
-                startX, startY, endX, endY, confidence = face
-                # ajoute un peu autour du visage
-                nAddedOffsetY = int((endY-startY)*0.25)
-                nAddedOffsetX = int(nAddedOffsetY*0.6)
-                x1,y1,x2,y2=startX, startY, endX, endY
-                x1 = max(x1-nAddedOffsetX,0)
-                y1 = max(y1-nAddedOffsetY,0)
-                x2 = min(x2+nAddedOffsetX,img.shape[1])
-                y2 = min(y2+nAddedOffsetY,img.shape[0])
-                
-                imgFace = img[y1:y2,x1:x2]
-                timeBegin = time.time()
-                retVal = self.cs.imageReco_continuousLearn(imgFace)
-                print( "INF: reco ret: %s, duration: %.2fs\n" % (str(retVal), time.time()-timeBegin ))
-                # avec un perso (moi), depuis mon ordi.
-                # computation time:
-                # - sur mstab7: 0.48s (locale) / 0.55s / 0.58s avec tout -  (extras takes 0.03s, angle, smile and mood takes 0.07s)
-                #    apres optim avec angle smile mood: 0.45s
-                # - sur agx (plus long car network): 0.20 (mais no extra info); avec extra: 0.72 
-                #    apres optim avec angle smile mood: 0.37s (mode1) 
-                #    apres optim avec angle smile mood: 0.19s (mode0)
-                
-                if retVal != False and retVal[0] != -1:
-                    nHumanID = retVal[1][0][1]
-                    facepos = retVal[1][0][2]
-                    listExtras = retVal[1][0][3]
-                    strTxt = "%d"%nHumanID
-                    strTxt2 = ""
-                    strTxt3 = ""
-                    strTxt4 = ""
-                    strTxt5 = ""
-                    strTxt6 = ""
-                    strTxt7 = ""
-                    bLookAt = 0
-                    bNear = 0
-                    bInteract = 0
-                    if nHumanID != -1:
-                        hface = endY-startY
-                        bNear = hface>60
-                        if nHumanID not in self.aHumanKnowledge.keys():
-                            self.aHumanKnowledge[nHumanID] = HumanKnowledge(nHumanID)
-                        self.aHumanKnowledge[nHumanID].nTotalSeen += 1
-                        strCurrentDay = misctools.getDayStamp()
-                        if strCurrentDay != self.aHumanKnowledge[nHumanID].strDayLastSeen:
-                            self.aHumanKnowledge[nHumanID].nSeenToday = 1
-                            if misctools.getDiffTwoDateStamp(self.aHumanKnowledge[nHumanID].strDayLastSeen,strCurrentDay ) > 1:
-                                self.aHumanKnowledge[nHumanID].nDayStreak = 0
-                            else:
-                                self.aHumanKnowledge[nHumanID].nDayStreak = 0
-                            self.aHumanKnowledge[nHumanID].strDayLastSeen = strCurrentDay
+            
+        if len(faces) < 1:
+            return 0,0,0,0
+        
+        bSomeFace = 1
+        if 0:
+            # select only centered faces
+            faces = [face_detector_cv3.selectFace(faces,img.shape)]
+        else:
+            # all faces
+            pass
+        for face in faces:
+            print("DBG: updateImage: face: %s" % str(face) )
+            startX, startY, endX, endY, confidence = face
+            # ajoute un peu autour du visage
+            nAddedOffsetY = int((endY-startY)*0.25)
+            nAddedOffsetX = int(nAddedOffsetY*0.6)
+            x1,y1,x2,y2=startX, startY, endX, endY
+            x1 = max(x1-nAddedOffsetX,0)
+            y1 = max(y1-nAddedOffsetY,0)
+            x2 = min(x2+nAddedOffsetX,img.shape[1])
+            y2 = min(y2+nAddedOffsetY,img.shape[0])
+            
+            imgFace = img[y1:y2,x1:x2]
+            timeBegin = time.time()
+            retVal = self.cs.imageReco_continuousLearn(imgFace)
+            print( "INF: reco ret: %s, duration: %.2fs\n" % (str(retVal), time.time()-timeBegin ))
+            # avec un perso (moi), depuis mon ordi.
+            # computation time:
+            # - sur mstab7: 0.48s (locale) / 0.55s / 0.58s avec tout -  (extras takes 0.03s, angle, smile and mood takes 0.07s)
+            #    apres optim avec angle smile mood: 0.45s
+            # - sur agx (plus long car network): 0.20 (mais no extra info); avec extra: 0.72 
+            #    apres optim avec angle smile mood: 0.37s (mode1) 
+            #    apres optim avec angle smile mood: 0.19s (mode0)
+            
+            if retVal != False and retVal[0] != -1:
+                nHumanID = retVal[1][0][1]
+                facepos = retVal[1][0][2]
+                listExtras = retVal[1][0][3]
+                strTxt = "%d"%nHumanID
+                strTxt2 = ""
+                strTxt3 = ""
+                strTxt4 = ""
+                strTxt5 = ""
+                strTxt6 = ""
+                strTxt7 = ""
+                bLookAt = 0
+                bNear = 0
+                bInteract = 0
+                if nHumanID != -1:
+                    hface = endY-startY
+                    bNear = hface>60
+                    if nHumanID not in self.aHumanKnowledge.keys():
+                        self.aHumanKnowledge[nHumanID] = HumanKnowledge(nHumanID)
+                    self.aHumanKnowledge[nHumanID].nTotalSeen += 1
+                    strCurrentDay = misctools.getDayStamp()
+                    if strCurrentDay != self.aHumanKnowledge[nHumanID].strDayLastSeen:
+                        self.aHumanKnowledge[nHumanID].nSeenToday = 1
+                        if misctools.getDiffTwoDateStamp(self.aHumanKnowledge[nHumanID].strDayLastSeen,strCurrentDay ) > 1:
+                            self.aHumanKnowledge[nHumanID].nDayStreak = 0
                         else:
-                            self.aHumanKnowledge[nHumanID].nSeenToday += 1
-                        strTxt2 += "TotalSeen: %d" % (self.aHumanKnowledge[nHumanID].nTotalSeen)
-                        strTxt3 += "nSeenToday: %d" % (self.aHumanKnowledge[nHumanID].nSeenToday)
-                        strTxt4 += "nDayStreak: %d" % (self.aHumanKnowledge[nHumanID].nDayStreak)
-                        emo = misctools.findInNammedList(listExtras,"emotion")
-                        if emo != None:
-                            strTxt5 = str(emo)
-                        ori = misctools.findInNammedList(listExtras,"orientation")
-                        if ori != None:
-                            yaw,pitch,roll = ori[1]
-                            strTxt6 = "orient: %.2f,%.2f,%.2f"%(yaw,pitch,roll)
-                            bLookAt = abs(yaw)<0.55 and abs(pitch)<0.2
-                            if bLookAt: strTxt6 += " LOOKAT"
-                    if bNear:
-                        strTxt6 += " NEAR"
-                    if bLookAt and bNear:
-                        strTxt6 += " INTERACT"
-                        bInteract = 1
-                        
-                    if bInteract:
-                        rTimeSinceLast = time.time() - self.aHumanKnowledge[nHumanID].rTimeLastInteraction
-                        if rTimeSinceLast < 5:
-                            # still in interaction
-                            self.aHumanKnowledge[nHumanID].rDurationInteraction += rTimeSinceLast
-                            self.aHumanKnowledge[nHumanID].rTotalInteraction += rTimeSinceLast
-                        else:
-                            self.aHumanKnowledge[nHumanID].rDurationInteraction = 0
-                        self.aHumanKnowledge[nHumanID].rTimeLastInteraction = time.time()
-                        strTxt7 += "time interact: %.2f" % self.aHumanKnowledge[nHumanID].rDurationInteraction
+                            self.aHumanKnowledge[nHumanID].nDayStreak = 0
+                        self.aHumanKnowledge[nHumanID].strDayLastSeen = strCurrentDay
+                    else:
+                        self.aHumanKnowledge[nHumanID].nSeenToday += 1
+                    strTxt2 += "TotalSeen: %d" % (self.aHumanKnowledge[nHumanID].nTotalSeen)
+                    strTxt3 += "nSeenToday: %d" % (self.aHumanKnowledge[nHumanID].nSeenToday)
+                    strTxt4 += "nDayStreak: %d" % (self.aHumanKnowledge[nHumanID].nDayStreak)
+                    emo = misctools.findInNammedList(listExtras,"emotion")
+                    if emo != None:
+                        strTxt5 = str(emo)
+                    ori = misctools.findInNammedList(listExtras,"orientation")
+                    if ori != None:
+                        yaw,pitch,roll = ori[1]
+                        strTxt6 = "orient: %.2f,%.2f,%.2f"%(yaw,pitch,roll)
+                        bLookAt = abs(yaw)<0.55 and abs(pitch)<0.2
+                        if bLookAt: strTxt6 += " LOOKAT"
+                        bSomeoneLook = 1
+                if bNear:
+                    strTxt6 += " NEAR"
+                    bSomeoneNear = 1
+                if bLookAt and bNear:
+                    strTxt6 += " INTERACT"
+                    bInteract = 1
+                    bSomeoneInteract = 1
+                    
+                if bInteract:
+                    rTimeSinceLast = time.time() - self.aHumanKnowledge[nHumanID].rTimeLastInteraction
+                    if rTimeSinceLast < 5:
+                        # still in interaction
+                        self.aHumanKnowledge[nHumanID].rDurationInteraction += rTimeSinceLast
+                        self.aHumanKnowledge[nHumanID].rTotalInteraction += rTimeSinceLast
+                    else:
+                        self.aHumanKnowledge[nHumanID].rDurationInteraction = 0
+                    self.aHumanKnowledge[nHumanID].rTimeLastInteraction = time.time()
+                    strTxt7 += "time interact: %.2f" % self.aHumanKnowledge[nHumanID].rDurationInteraction
+                
+                if bAddDebug:
                     y = endY-10
                     dy = 22
                     nFontId = cv2.FONT_HERSHEY_SIMPLEX
@@ -296,6 +323,9 @@ class HumanManager:
 
                     if bInteract:
                         cv2.rectangle(img,(startX,startY),(endX, endY),(255,0,0))
+            # for face
+            
+        return bSomeFace, bSomeoneLook, bSomeoneNear, bSomeoneInteract
                         
 # class HumanManager - end
 humanManager = HumanManager()

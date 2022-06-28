@@ -198,30 +198,59 @@ def getSpeechInWav( strSoundFilename, strAnsiLang = None ):
     
     return retVal[0][0]
 
-def autocut(wavfile, rSilenceMinDuration = 0.3 ):
+def autocut(filename, rSilenceMinDuration = 0.3, bPlaySound = 0, bAutoRename = 0, bAlternativeManualInputted = 0,  bRemoveShortQuiet = 1, bNormalise = 0, bAddFadeInOut = 0, strDstPath = None ):
+    """
+    - bPlaySound: play each sound at the end
+    - bAutoRename: send the sound to the speech reco to rename it
+    - bAlternativeManualInputted: if nothing detected with speech reco, ask human to enter new filename
+    - bRemoveShortQuiet: delete looks not interesting one
+    - bNormalise: normalise each sound independently ?
+    - strDstPath: where to put generated sound ?
+    
+    """
+    """
     bPlaySound = 0
     bAutoRename = 1
     bAlternativeManualInputted = 1
     bRemoveShortQuiet = 1
     bNormalise = 0
     strDstPath = "c:/generated/"
+    """
     
-    print("INF: autocut, sound will be outputted to %s - no auto cleaning before!" % strDstPath )
+    strTemplateName = "s_"
+    if 1:
+        strTemplateName = os.path.splitext(os.path.basename(filename))[0]
+        strTemplateName += "__"
+    
+    if strDstPath == None:
+        if os.name == "nt":
+            strDstPath = "c:/generated/"
+        else:
+            strDstPath = "/tmp/"
+            
+    if bAlternativeManualInputted:
+        bPlaySound = 1
+        bAutoRename = 1
+    
+    print("INF: sound_processing: autocut, sound will be outputted to %s" % strDstPath )
     
     try: os.makedirs(strDstPath)
     except: pass
     
     nPeakRatioToKeep = 128 # 128 si respi a enlever, 16 sinon
     
-    w = wav.Wav(wavfile,bQuiet=False)
+    w = wav.Wav(filename,bQuiet=False)
     print(w)
     #~ w.write("/tmp/t.wav")
     seq = w.split(rSilenceTresholdPercent=0.6,rSilenceMinDuration=rSilenceMinDuration,nPeakRatioToKeep=nPeakRatioToKeep)
     print("INF: nbr part: %s" % len(seq) )
     for i,s in enumerate(seq):
         if bNormalise: s.normalise()
+        if bAddFadeInOut: 
+            s.fadeIn(min(1,s.getDuration()*0.15))
+            s.fadeOut(min(1,s.getDuration()*0.15))
         
-        name = "s_%04d.wav" % i 
+        name = strTemplateName+"%04d.wav" % i 
         s.write(strDstPath+name)
         if bPlaySound:
             print("playing: %s" % name )

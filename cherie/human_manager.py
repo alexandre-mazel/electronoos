@@ -3,7 +3,7 @@ This file is part of CHERIE: Care Human Extended Real-life Interaction Experimen
 
 Launch server On AGX:
 cd ~/dev/git/electronoos/scripts/versatile
-nohup python3 run_cloud_server.py
+nohup python3 run_cloud_server.py &
 
 # ou en local windows:
 cd C:\\Users\\alexa\\\dev\\git\\electronoos\\scripts\\versatile
@@ -58,6 +58,7 @@ _defaultDecoder.default = JSONDecoder().raw_decode
 JSONDecoder.default = _defaultDecoder
 
 
+
 class HumanKnowledge:
     def __init__( self, nUID = -1):
         self.nUID = nUID
@@ -70,6 +71,11 @@ class HumanKnowledge:
         self.rDurationInteraction = 0 # in sec
         self.rTotalInteraction = 0 # in sec
         
+        self.timeLastReactToFace = 0 # as time.time() info
+        self.timeLastReactToLook = 0
+        self.timeLastReactToNear = 0
+        self.timeLastReactToInteract = 0
+        
     def as_dict(self):
         #~ strOut = json.dumps((self.nUID,self.nTotalSeen,self.nSeenToday,self.nDayStreak),indent=2,ensure_ascii =False)
         #~ strOut = '{"HumanKnowledge": 1,"uid": %d, "totalseen": %d, "seentoday": %d, "daystreak": %d}' % (self.nUID,self.nTotalSeen,self.nSeenToday,self.nDayStreak)
@@ -79,11 +85,28 @@ class HumanKnowledge:
 
     def from_dict(self, dct):
         #~ print("DBG: from_dict: %s" % dct )       
-        self.nUID = dct['nUID']
-        self.nTotalSeen = dct['nTotalSeen']
-        self.nSeenToday = dct['nSeenToday']
-        self.nDayStreak = dct['nDayStreak']
-        self.strDayLastSeen = dct['strDayLastSeen']
+        try:
+            # when adding a new variable, add it at the end, so the data will be loaded 
+            # and new one will raise exceptions, but will be ok next time
+            self.nUID = dct['nUID']
+            self.nTotalSeen = dct['nTotalSeen']
+            self.nSeenToday = dct['nSeenToday']
+            self.nDayStreak = dct['nDayStreak']
+            self.strDayLastSeen = dct['strDayLastSeen']
+            
+            self.rTimeLastInteraction = dct['rTimeLastInteraction']
+            self.rDurationInteraction = dct['rDurationInteraction']
+            self.rTotalInteraction = dct['rTotalInteraction']
+            
+            self.timeLastReactToFace = dct['timeLastReactToFace']
+            self.timeLastReactToLook = dct['timeLastReactToLook']
+            self.timeLastReactToNear = dct['timeLastReactToNear']
+            self.timeLastReactToInteract = dct['timeLastReactToInteract']
+            
+        except KeyError as err:
+            print("WRN: HumanKnowledge.from_dict: first time exception after adding new attributes? : can't find %s" % err )
+            # the object will be partially inited, but it's ok
+            
         return self
         
 
@@ -107,7 +130,16 @@ class HumanManager:
         self.cs = cloud_services.CloudServices( "robot-enhanced-education.org", 25340 )
         #~ self.cs = cloud_services.CloudServices( "localhost", 13000 )
         self.cs.setVerbose( True )
-        self.cs.setClientID( "test_on_the_fly" )
+        strClientName = "test_on_the_fly" 
+        try:
+            import abcdk.system
+            if abcdk.system.isOnRobot():
+                strClientName = abcdk.system.getNickName()
+        except BaseException as err:
+            print("WRN: HumanManager.init: while getting client name err: %s" % str(err) )
+            
+        print("INF: HumanManager.init: using client name '%s'" % strClientName  )
+        self.cs.setClientID( strClientName )
         try:
             self.fdcv3 = face_detector_cv3.facedetector
         except:
@@ -129,6 +161,11 @@ class HumanManager:
             import abcdk.extractortools
             afd = naoqi.ALProxy("ALFaceDetection", "localhost", 9559)
             afd.post._run() # explicit start (instead of registering to event)
+            import agent_behavior
+            reload(agent_behavior)
+            self.ab = agent_behavior.agentBehavior
+        else:
+            self.ab = None
         
     def __del__(self):
         self.save()
@@ -277,8 +314,9 @@ class HumanManager:
                     if ori != None:
                         yaw,pitch,roll = ori[1]
                         strTxt6 = "orient: %.2f,%.2f,%.2f"%(yaw,pitch,roll)
-                        bLookAt = abs(yaw)<0.55 and abs(pitch)<0.2
-                        if bLookAt: strTxt6 += " LOOKAT"
+                        bLookAt = abs(yaw)<0.2 and abs(pitch)<0.2
+                        if bLookAt: 
+                            strTxt6 += " LOOKAT"
                         bSomeoneLook = 1
                 if bNear:
                     strTxt6 += " NEAR"
@@ -296,9 +334,17 @@ class HumanManager:
                         self.aHumanKnowledge[nHumanID].rTotalInteraction += rTimeSinceLast
                     else:
                         self.aHumanKnowledge[nHumanID].rDurationInteraction = 0
+                        if self.ab: self.ab.startInteraction( facepos,self.aHumanKnowledge[nHumanID] )
+                        print("start interaction")
                     self.aHumanKnowledge[nHumanID].rTimeLastInteraction = time.time()
                     strTxt7 += "time interact: %.2f" % self.aHumanKnowledge[nHumanID].rDurationInteraction
                 
+                if not bInteract:
+                    if bLookAt:
+                        if self.ab: self.ab.reactToLookAt(facepos,self.aHumanKnowledge[nHumanID])
+                    if bNear:
+                        if self.ab: self.ab.reactToNear(facepos,self.aHumanKnowledge[nHumanID])
+                        
                 if bAddDebug:
                     y = endY-10
                     dy = 22
@@ -332,7 +378,6 @@ humanManager = HumanManager()
 
 
 def realLifeTestWebcam():
-    #~ hm = HumanManager()
     hm = humanManager
     cap = cv2.VideoCapture(0) #ouvre la webcam
     while 1:
@@ -343,7 +388,10 @@ def realLifeTestWebcam():
         
         #~ img = cv2.resize(img, None, fx=0.5,fy=0.5)
         
-        hm.updateImage(img)
+        bAddDebug = 0
+        bAddDebug = os.name == "nt"
+        
+        hm.updateImage(img, bAddDebug=bAddDebug)
         
         # Display the output
         cv2.imshow('img', img)
@@ -352,7 +400,9 @@ def realLifeTestWebcam():
         if key == 27:
             break
     hm = None # call to del and save
-
+    humanManager.save() # now hm is the global object, it not saved anymore when Noning it!
+    
+# realLifeTestWebcam - end
 
 
 if __name__ == "__main__":

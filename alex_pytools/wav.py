@@ -863,6 +863,27 @@ class Wav:
         return True
     # normalise - end
     
+    def fadeIn(self, rDurationSec = 1.):
+        """
+        fade in a sound
+        WRN: calling twice in a row will generate a fade in to 50% of volume
+        """
+        nNbrSample = int( rDurationSec * self.nSamplingRate )
+        for nNumChannel in range( self.nNbrChannel ):
+            for nNumSample in range(nNbrSample):
+                self.data[(nNumSample*self.nNbrChannel)+nNumChannel] *= nNumSample/nNbrSample
+    
+    def fadeOut(self, rDurationSec = 1.):
+        """
+        fade out a sound
+        WRN: calling twice in a row will generate a fade in to 50% of volume
+        """
+        nNbrSample = int( rDurationSec * self.nSamplingRate )
+        for nNumChannel in range( self.nNbrChannel ):
+            for nNumSample in range(nNbrSample):
+                self.data[-( (nNumSample*self.nNbrChannel)+nNumChannel )] *= nNumSample/nNbrSample
+    
+    
     def isEqual( self, rhs ):
         if( not self.hasSameProperties( rhs ) ):
             return False

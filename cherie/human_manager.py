@@ -314,7 +314,7 @@ class HumanManager:
                     if ori != None:
                         yaw,pitch,roll = ori[1]
                         strTxt6 = "orient: %.2f,%.2f,%.2f"%(yaw,pitch,roll)
-                        bLookAt = abs(yaw)<0.2 and abs(pitch)<0.2
+                        bLookAt = abs(yaw)<0.1 and abs(pitch)<0.5 # le pitch n'est pas si important que ca!
                         if bLookAt: 
                             strTxt6 += " LOOKAT"
                         bSomeoneLook = 1

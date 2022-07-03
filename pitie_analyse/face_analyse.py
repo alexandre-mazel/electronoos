@@ -467,7 +467,9 @@ def analyseFolder(folder):
 
     if "2022_03_02_13h__21" in folder: 
         idx = 0        
-        
+
+    if "2022_03_11_9h__31" in folder: 
+        idx = 0            
         
         
     if bSpeedTest: idx = 0
@@ -608,7 +610,7 @@ if os.name == "nt":
     strPath = "d:/img_pitie/2022_02_23_11h__13/"
     strPath = "d:/img_pitie/2022_02_23_14h__14/"
     strPath = "d:/img_pitie/2022_03_02_13h__21/"
-    #~ strPath = "d:/img_pitie/2022_03_11_9h__31/"
+    strPath = "d:/img_pitie/2022_03_11_9h__31/"
     #~ strPath = "d:/img_pitie/2022_03_24_11h__44/"
     #~ strPath = "d:/img_pitie/2022_03_31_11h__52"
     #~ strPath = "d:/img_pitie/2022_04_01_17h__54/"

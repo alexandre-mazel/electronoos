@@ -57,7 +57,21 @@ def printSmart(v):
         v /= 1024
         idxUnit += 1
     return "%.2f%s" % (v,listUnit[idxUnit])
-        
+    
+def printSmartTime(ts):
+    """
+    take a time in sec and print it as it's best
+    """
+    if ts < 60:
+        return "%2ds" % ts
+    ts /= 60
+    if ts < 60:
+        return "%2dm" % ts     
+    ts /= 60
+    if ts < 24:
+        return "%.1fh" % ts      
+    ts /= 24
+    return "%.1fd" % ts
 
 def analyseBandwith():
     # un scp de 3 fichiers de 168M copie en local genere 1014M de donnees mesurees !?! 
@@ -65,6 +79,8 @@ def analyseBandwith():
     ar_1, as_1, at_1 = [],[],[] # store stat during last minute
     r_p,s_p,t_p = r_init, s_init, t_init # since last call
     nPeriodSec = 5
+    timeBegin = time.time()
+    cptLoop = 0
     while 1:
         r,s,t = getNetworkStat()
         # compute difference
@@ -96,9 +112,10 @@ def analyseBandwith():
                 strLine += " " * (nLenLineToEraseAboveStat-len(strLine))
             print(  strLine )
             
-        print("Total: Received: %s, Send: %s, Total: %s    LastMin: r: %s, s:%s, t:%s      \r" % (printSmart(rd),printSmart(sd),printSmart(td),printSmart(sum(ar_1)),printSmart(sum(as_1)),printSmart(sum(at_1)) ), end="" )
+        print("%s/%s Received: %s, Send: %s, Total: %s    LastMin: r: %s, s:%s, t:%s      \r" % (printSmartTime(cptLoop*nPeriodSec), printSmartTime(time.time()-timeBegin), printSmart(rd),printSmart(sd),printSmart(td),printSmart(sum(ar_1)),printSmart(sum(as_1)),printSmart(sum(at_1)) ), end="" )
         r_p,s_p,t_p = r,s,t
         time.sleep(nPeriodSec)
+        cptLoop += 1
         
 print("")
 analyseBandwith()

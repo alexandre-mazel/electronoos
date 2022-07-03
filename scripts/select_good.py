@@ -4,11 +4,14 @@ import os
 import sys
 import time
 
-sys.path.append("/Users/amazel/dev/git/protolab_group/face_tools/" )
+sys.path.append("../../face_tools/" )
 import face_detector
 
 # use the abcdk from git folder!
-sys.path.insert(0,"/Users/amazel/dev/git/protolab_group/abcdk/sdk" )
+sys.path.insert(0,"../../abcdk/sdk" )
+sys.path.insert(0,"c:/Users/alexa/dev/git/abcdk" )
+sys.path.insert(0,"c:/Users/alexa/dev/git/abcdk/sdk" )
+sys.path.insert(0,"c:/Users/alexa/dev/git/abcdk/sdk/abcdk" )
 import abcdk.image
 
 def filterOnExts( aFiles, astrExts = ["jpg"] ):
@@ -66,7 +69,7 @@ def selectInFolder( strPath ):
         if bReload:
             bReload = False
             bToDel = False
-            if im != None:
+            if not im is None:
                 # draw a computing sign
                 cv2.circle( im, (30,30),20, (255,0,0), -1 )
                 cv2.imshow("im", im )
@@ -82,7 +85,7 @@ def selectInFolder( strPath ):
             print("DBG: loading takes: %5.3fs (%dx%d)" % ((time.time()-timeBegin),photo.shape[1], photo.shape[0]) )
             while photo.shape[0] > renderSizeY:
                 print("INF: This is a big photo, resizing it" )
-                photo = cv2.resize(photo,(photo.shape[1]/2,photo.shape[0]/2))
+                photo = cv2.resize(photo,(photo.shape[1]//2,photo.shape[0]//2))
                 print("INF: newshape: %s" % str(photo.shape))
                 
             nRotate = 0
@@ -153,13 +156,13 @@ def selectInFolder( strPath ):
                 headSizeX /= len(faces)
             print("headSizeX: %d" % headSizeX )
             if headSizeX == 0:
-                headSizeX = renderSizeX*1/3
+                headSizeX = renderSizeX*1//3
                 headOffsetX = renderSizeX - headSizeX
 
             
             for (x,y,w,h) in faces:
                 face = photo[y:y+h,x:x+w]
-                headSizeY = (headSizeX*w)/h
+                headSizeY = (headSizeX*w)//h
                 #~ headSizeY/=2
                 face = cv2.resize( face, (headSizeX, headSizeY) )
                 rFaceSizeYInScreen = headSizeY
@@ -187,19 +190,19 @@ def selectInFolder( strPath ):
                 yc = 300
                 sizec=100
                 cv2.circle( im, (xc,yc),sizec, (0,0,255), -1 )
-                cv2.putText(im, "y?",(xc-sizec/2,yc),0,4,(255,255,255),4)
+                cv2.putText(im, "y?",(xc-sizec//2,yc),0,4,(255,255,255),4)
                 
         #~ cv2.rectangle( im, (0, 0), (1000, 1000), (255, 255, 255), 3 ) 
         #~ print(dir(cv2.cv))
         cv2.namedWindow( "im", cv2.WND_PROP_FULLSCREEN)
-        cv2.setWindowProperty( "im", cv2.WND_PROP_FULLSCREEN,cv2.cv.CV_WINDOW_FULLSCREEN)
+        cv2.setWindowProperty( "im", cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
         #~ return
         cv2.imshow("im", im )
         cv2.moveWindow( "im", 0,0 )
 
         key = cv2.waitKey(0)
         print( "key: %d" % key )
-        if key == 3014656:
+        if key == 3014656 or key == ord('d'):
             bToDel = True # ask to del, must press y to validate
         if key == ord('y'):
             if bToDel:
@@ -207,12 +210,12 @@ def selectInFolder( strPath ):
                 del files[nNumPhoto]
                 bReload = True
                 continue
-        if key == 2424832:
+        if key == 2424832  or key == ord('b'):
             # fleche gauche: prev
             nNumPhoto -= 1
             bReload = True
             continue
-        if key == 2555904:
+        if key == 2555904 or key == ord('n'):
             # fleche gauche: next
             nNumPhoto += 1
             bReload = True
@@ -248,6 +251,8 @@ def selectInFolder( strPath ):
             files[nNumPhoto]=newname
             
     
-strPath = "C:/Users/amazel/perso/photo18b/2018-07-01_-_CelineStGermain/"
+#~ strPath = "C:/Users/amazel/perso/photo18b/2018-07-01_-_CelineStGermain/"
 #~ strPath = "D:/temp_photo_pour_auto_montage/"
+strPath = "c:/photos22/2022-07-03_-_BookAwa/"
+
 selectInFolder( strPath )

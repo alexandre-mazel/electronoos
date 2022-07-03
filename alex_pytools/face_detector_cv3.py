@@ -123,6 +123,10 @@ class FaceDetector:
         return im
         
     def detect( self, im, bRenderBox = True,confidence_threshold = 0.5 ):
+        """
+        return a list of face: x_start, y_start, x_end, y_end
+        """
+        
         if len(im.shape)==2 or im.shape[2] == 1: 
             im = cv2.cvtColor(im, cv2.COLOR_GRAY2BGR)
         blob = cv2.dnn.blobFromImage( im, 1.0, (300, 300), (104.0, 177.0, 123.0) )

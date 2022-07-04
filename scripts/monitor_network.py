@@ -35,14 +35,18 @@ def getNetworkStat_psutil():
     """
     import psutil
     ret = psutil.net_io_counters(pernic=True)
+    #~ print(ret)
     
-    retWifi = ret["Wi-Fi"]
+    for k in ["Wi-Fi","eth0","wlan0"]:
+        if k in ret.keys():
+            retInterestingInterface = ret[k]
+            break
     if 0:
         print("")
-        print(retWifi )
+        print(retInterestingInterface )
 
-    r = retWifi.bytes_recv
-    s = retWifi.bytes_sent
+    r = retInterestingInterface.bytes_recv
+    s = retInterestingInterface.bytes_sent
     t = r+s
     return r, s, t
     

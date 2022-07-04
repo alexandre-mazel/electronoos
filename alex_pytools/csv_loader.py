@@ -51,9 +51,10 @@ def load_csv(filename, sepa = ';', bSkipFirstLine = 0, encoding =  'utf-8', bVer
         data.append(fields)
         
     # concatenate line with some " and unclosing " (eg a \n is in the text)
+    if bVerbose: print("DBG: load_csv: before \"\" matching, data: " + str(data))
     nNumLine = 0
     while 1:
-        #~ print("DBG: nNumLine: %s" % nNumLine )
+        if bVerbose: print("DBG: nNumLine: %s" % nNumLine )
         if nNumLine >= len(data):
             break
         if isinstance(data[nNumLine][-1], str) and (data[nNumLine][-1].count('"') %2)  == 1:
@@ -61,11 +62,17 @@ def load_csv(filename, sepa = ';', bSkipFirstLine = 0, encoding =  'utf-8', bVer
             numField = 0
             numLineInc = 1
             while 1:
+                if bVerbose: print("DBG: loop start, nNumLine: %d, numLineInc: %d, numField: %d, data: %s" % (nNumLine,numLineInc,numField,data) )
+                if nNumLine+numLineInc >= len (data):
+                    break
                 bContainsEnd = isinstance(data[nNumLine+numLineInc][numField], str) and (data[nNumLine+numLineInc][numField].count('"') %2)  == 1
                 data[nNumLine][-1] += "\n"+ data[nNumLine+numLineInc][numField]
+                if data[nNumLine][-1][0] == '"' and data[nNumLine][-1][-1] == '"':
+                    data[nNumLine][-1] = data[nNumLine][-1][1:-1]
                 del data[nNumLine+numLineInc][numField]
                 if len(data[nNumLine+numLineInc]) == 0:
                     del data[nNumLine+numLineInc]
+                    if bVerbose: print("del")
                     continue
                     
                 if bContainsEnd:
@@ -225,6 +232,13 @@ def autotest():
 
     datas = [ [12,"toto\ntutu\ntiti", 3.5], [13,"tutu", 0.0, ""] ] # ok
     datas = [ [12,"toto\ntutu\ntiti", 3.5], [13,"tutu", 0.0, ""], ['tutu\n\n\ntata', 'toto\ntonton', 3], [4] ] # ok now
+    save_csv("/tmp/tmp.dat", datas)
+    datas2 = load_csv("/tmp/tmp.dat",bVerbose=1)
+    print("DBG: datas : %s" % str(datas) )
+    print("DBG: datas2: %s" % str(datas2) )
+    assert(datas==datas2)
+
+    datas = [ ["Bonjour,\nComment Allez vous?\n\nAdieu"] ] # ok
     save_csv("/tmp/tmp.dat", datas)
     datas2 = load_csv("/tmp/tmp.dat",bVerbose=1)
     print("DBG: datas : %s" % str(datas) )

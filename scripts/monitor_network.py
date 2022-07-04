@@ -77,6 +77,7 @@ def analyseBandwith():
     # un scp de 3 fichiers de 168M copie en local genere 1014M de donnees mesurees !?! 
     r_init, s_init, t_init = getNetworkStat()
     ar_1, as_1, at_1 = [],[],[] # store stat during last minute
+    ar_h, as_h, at_h = [],[],[] # store stat during last hour
     r_p,s_p,t_p = r_init, s_init, t_init # since last call
     nPeriodSec = 5
     timeBegin = time.time()
@@ -90,11 +91,17 @@ def analyseBandwith():
         ar_1.append(r-r_p)
         as_1.append(s-s_p)
         at_1.append(t-t_p)
+        ar_h.append(r-r_p)
+        as_h.append(s-s_p)
+        at_h.append(t-t_p)
         if len(ar_1) > (60/nPeriodSec):
             del ar_1[0]
             del as_1[0]
             del at_1[0]
-            
+        if len(ar_h) > (60*60/nPeriodSec):
+            del ar_h[0]
+            del as_h[0]
+            del at_h[0]            
         if 1:
             # render bargraph in ascii
             nMB = (t-t_p)/(1024*1024)
@@ -107,12 +114,17 @@ def analyseBandwith():
                 nr = int(round((r-r_p)/(1024*1024)))
                 ns = int(round((s-s_p)/(1024*1024)))
                 strLine = "%4dMB " % nMB + "r"*nr + "s"*ns
-            nLenLineToEraseAboveStat = 110
+            nLenLineToEraseAboveStat = 160
             if len(strLine) < nLenLineToEraseAboveStat:
                 strLine += " " * (nLenLineToEraseAboveStat-len(strLine))
             print(  strLine )
             
-        print("%s/%s Received: %s, Send: %s, Total: %s    LastMin: r: %s, s:%s, t:%s      \r" % (printSmartTime(cptLoop*nPeriodSec), printSmartTime(time.time()-timeBegin), printSmart(rd),printSmart(sd),printSmart(td),printSmart(sum(ar_1)),printSmart(sum(as_1)),printSmart(sum(at_1)) ), end="" )
+        print("%s/%s Received: %s, Send: %s, Total: %s    LastHour: r: %s, s:%s, t:%s    LastMin: r: %s, s:%s, t:%s      \r" % (
+                                            printSmartTime(cptLoop*nPeriodSec), printSmartTime(time.time()-timeBegin), printSmart(rd),printSmart(sd),printSmart(td),
+                                            printSmart(sum(ar_h)),printSmart(sum(as_h)),printSmart(sum(at_h)), # WRN: generate huge computation ! should sum by minutes!
+                                            printSmart(sum(ar_1)),printSmart(sum(as_1)),printSmart(sum(at_1))
+                                            ),
+                                            end="" )
         r_p,s_p,t_p = r,s,t
         time.sleep(nPeriodSec)
         cptLoop += 1

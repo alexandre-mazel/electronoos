@@ -50,8 +50,8 @@ def load_datas_from_xlsx( filename, bVerbose = 0 ):
     """
     return a dict tab name then lines (without handling headers)
     """
-    import xlrd # pip install xlrd 
-    import openpyxl # pip install openpyxl 
+    #~ import xlrd # pip install xlrd 
+    #~ import openpyxl # pip install openpyxl 
     import pandas as pd
     import numpy as np
     df = pd.read_excel( filename, sheet_name=None, header=None )

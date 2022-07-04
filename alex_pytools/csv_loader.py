@@ -1,3 +1,5 @@
+import io
+import os
 import sys
 
 def openWithEncoding( filename, mode, encoding, errors = 'strict' ):
@@ -46,15 +48,59 @@ def load_csv(filename, sepa = ';',bSkipFirstLine = 0, bVerbose=0 ):
         data.append(fields)
     return data
     
+def load_datas_from_xlsx_exploded_for_python27( filename, bVerbose ):
+    dOut = dict()
+    fi = io.open(filename + "__index.csv","rt", encoding="cp1252")
+    while 1:
+        tabname = fi.readline().replace("\n","")
+        if len(tabname)<2:
+            break
+        print( "INF: load_datas_from_xlsx_exploded_for_python27: tabname: '%s'" % tabname )
+        f = io.open(filename+"__"+tabname+".csv", "rt", encoding="cp1252")
+        buf = f.read() # we could have decided to read line per line, but...
+        data = buf.split("\n")
+        for i in range(len(data)):
+            data[i]=data[i].split(";")
+            last = data[i][-1]
+            if last == "" or last == "\n":
+                del data[i][-1]
+        if data[i] == []:
+            del data[i]
+        f.close()
+        
+        # conversion
+        for i in range(len(data)):
+            for j in range(len(data[i])):
+                data[i][j] = data[i][j].encode("cp1252", 'replace')
+        dOut[tabname]=data
+    
+    fi.close()
+    print("DBG: load_datas_from_xlsx_exploded_for_python27: dOut: %s" % str(dOut) )
+    return dOut
+    
 def load_datas_from_xlsx( filename, bVerbose = 0 ):
     """
-    return a dict tab name then lines (without handling headers)
+    return a dict indexed by tab name then lines (without handling headers)
     """
+    ce qui fonctionne pas, c'est qu'en fait il faut chercher des ; avant les "\n"
     #~ import xlrd # pip install xlrd 
     #~ import openpyxl # pip install openpyxl 
-    import pandas as pd
-    import numpy as np
-    df = pd.read_excel( filename, sheet_name=None, header=None )
+    try: import pandas as pd
+    except: pass # on python2.7, it will be ok
+    try: import numpy as np
+    except: pass
+    if os.name == "nt":
+        df = pd.read_excel( filename, sheet_name=None, header=None)
+    else:
+        #~ import openpyxl # pip install openpyxl # to shout if missing
+        #~ df = pd.read_excel( filename, sheet_name=None, header=None, engine='openpyxl' ) # bug in 1.2.0, not in 1.1.5 # pip install pandas==1.1.5 (not existing in python2)
+        # rien ne fonctionne en python2.7
+        #~ df = pd.read_excel( filename, sheet_name=None, header=None )
+        if sys.version_info[0] < 3:
+            return load_datas_from_xlsx_exploded_for_python27(filename, bVerbose)
+
+        df = pd.read_excel( filename, sheet_name=None, header=None )
+    
     if bVerbose: print(len(df))
     if bVerbose: print(df)
     if bVerbose: print(df.keys())
@@ -84,6 +130,22 @@ def load_datas_from_xlsx( filename, bVerbose = 0 ):
                 print("")
                 for col in line:
                     print("   '%s'" % col)
+                    
+    if 1:
+        # generate one cvs per tab, so you can read them back with python2.7
+        fIndex = io.open(filename+"__index.csv", "wt", encoding="cp1252")
+        for k,content in dOut.items():
+            fn = filename+"__"+k+".csv"
+            print("INF: writing to independant csv: %s" % fn )
+            f = io.open(fn,"wt", encoding="cp1252")
+            for line in content:
+                for field in line:
+                    #~ print("field: %s" % field )
+                    f.write( str(field) + ";")
+                f.write("\n")
+            f.close()
+            fIndex.write(k+"\n")
+        fIndex.close()
     
     return dOut
     

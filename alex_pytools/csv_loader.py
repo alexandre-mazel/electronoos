@@ -71,6 +71,8 @@ def load_csv(filename, sepa = ';',bSkipFirstLine = 0, bVerbose=0 ):
                         data[nNumLine][-1] = data[nNumLine][-1][1:-1]
                     data[nNumLine].extend(data[nNumLine+numLineInc][numField:])
                     del data[nNumLine+numLineInc]
+                    # il faudra alors continuer depuis cette ligne car la suite contient peut etre des champs cut
+                    nNumLine -= 1
                     break
                 numField += 1
                 if numField >= len(data[nNumLine+numLineInc]):
@@ -210,7 +212,8 @@ def autotest():
     datas2 = load_csv("/tmp/tmp.dat")
     assert(datas==datas2)
 
-    datas = [ [12,"toto\ntutu\ntiti", 3.5], [13,"tutu", 0.0, ""] ]
+    datas = [ [12,"toto\ntutu\ntiti", 3.5], [13,"tutu", 0.0, ""] ] # ok
+    datas = [ [12,"toto\ntutu\ntiti", 3.5], [13,"tutu", 0.0, ""], ['tutu\ntata', 'toto\ntonton', 3], [4] ] # ok now
     save_csv("/tmp/tmp.dat", datas)
     datas2 = load_csv("/tmp/tmp.dat",bVerbose=1)
     print("DBG: datas : %s" % str(datas) )

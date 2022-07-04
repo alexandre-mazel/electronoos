@@ -16,6 +16,50 @@ def looksLikeNumber(s):
             return False
     return True
 
+def load_csv_multiline(filename, sepa = ';', bSkipFirstLine = 0, encoding =  'utf-8', bVerbose=0 ):
+    """
+    load a csv where some field can contain \n.
+    so a real end of record is marked as ";\n"
+    """
+    data = []
+    try:
+        file = openWithEncoding(filename, "rt", encoding = encoding)
+    except:
+        return data
+        
+    if bSkipFirstLine:
+        line = file.readline() # skip first line
+    buf = file.read()
+    file.close()
+    idx = 0
+    idx_start = 0
+    fields = []
+    while 1:
+        bMustQuit = idx >= len(buf)
+        if bVerbose: print("DBG: load_csv_multiline: idx_start: %d, idx: %d,  is_sepa: %d, bMustQuit: %d, char: '%s'" % (idx_start,idx,bMustQuit or buf[idx] == sepa,bMustQuit, bMustQuit or buf[idx]) )
+        if bMustQuit or buf[idx] == sepa:
+            s = buf[idx_start:idx]
+            if len(s)>1 and s[0] == '"' and s[-1] == '"':
+                s = s[1:-1]
+            elif looksLikeNumber(s):
+                # TODO: handle array
+                if '.' in s:
+                    s = float(s)
+                else:
+                    s = int(s)
+            fields.append(s)
+            idx_start = idx+1
+            if bMustQuit or buf[idx+1] == "\n":
+                idx += 1
+                idx_start += 1
+                if not bMustQuit or (len(fields)>0 and fields != ['']):
+                    data.append(fields)
+                fields = []
+        if bMustQuit:
+            break
+        idx += 1
+    return data
+    
 def load_csv(filename, sepa = ';', bSkipFirstLine = 0, encoding =  'utf-8', bVerbose=0 ):
 
     data = []
@@ -34,6 +78,8 @@ def load_csv(filename, sepa = ';', bSkipFirstLine = 0, encoding =  'utf-8', bVer
         if bVerbose: print("DBG: load_csv: line: '%s'" % line )
         if line[-1] == '\n': line = line[:-1] # erase last \n
         fields = line.split(sepa)
+        if fields[-1] == "":
+            del fields[-1]
         for i in range(len(fields)):
             if sys.version_info[0]<3 and isinstance(fields[i],unicode):
                 fields[i] = fields[i].encode(encoding, 'replace')
@@ -65,6 +111,9 @@ def load_csv(filename, sepa = ';', bSkipFirstLine = 0, encoding =  'utf-8', bVer
                 if bVerbose: print("DBG: loop start, nNumLine: %d, numLineInc: %d, numField: %d, data: %s" % (nNumLine,numLineInc,numField,data) )
                 if nNumLine+numLineInc >= len (data):
                     break
+                if numField >= len(data[nNumLine+numLineInc]):
+                    numLineInc += 1
+                    continue
                 bContainsEnd = isinstance(data[nNumLine+numLineInc][numField], str) and (data[nNumLine+numLineInc][numField].count('"') %2)  == 1
                 data[nNumLine][-1] += "\n"+ data[nNumLine+numLineInc][numField]
                 if data[nNumLine][-1][0] == '"' and data[nNumLine][-1][-1] == '"':
@@ -108,7 +157,8 @@ def load_datas_from_xlsx_exploded_for_python27( filename, encoding = 'utf-8', bV
         print( "INF: load_datas_from_xlsx_exploded_for_python27: tabname: '%s'" % tabname )
         fntab = filename+"__"+tabname+".csv"
         if 1:
-            data = load_csv( fntab, encoding=encoding )
+            #~ data = load_csv( fntab, encoding=encoding )
+            data = load_csv_multiline( fntab, encoding=encoding )
         else:
             f = io.open( fntab, "rt", encoding=encoding)
             buf = f.read() # we could have decided to read line per line, but...
@@ -199,7 +249,8 @@ def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
                 for nfield,field in enumerate(line):
                     #~ print("field: %s" % field )
                     f.write( str(field))
-                    if nfield+1 < len(line):
+                    # change: we always want to finish a line with a ; so a ;\n is a real end of record
+                    if nfield+1 < len(line) or 1:
                         f.write(";")
                 f.write("\n")
             f.close()
@@ -210,40 +261,49 @@ def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
     
 #~ load_datas_from_xlsx( r"C:\Users\alexa\dev\git\obo\www\chatbot\OBO_Recruitement_dialog.xlsx")
     
-def save_csv(filename, data):
+def save_csv(filename, data, bForceEndingBySeparator=True):
+    sepa = ';'
     file = open(filename, "wt")
     for fields in data:
         s = ""
         for i in range(len(fields)):
-            if i != 0: s += ";"
+            if i != 0 and not bForceEndingBySeparator: s += sepa
             if type(fields[i]) == type('s'):
                 s += '"%s"' % fields[i]
             else:
                 s+= '%s' % fields[i]
+            if bForceEndingBySeparator:
+                s += sepa
         file.write(s+"\n")
     file.close()
     
     
 def autotest():
-    datas = [ [12,"toto", 3.5], [13,"tutu", 0.0, ""] ]
-    save_csv("/tmp/tmp.dat", datas)
-    datas2 = load_csv("/tmp/tmp.dat")
-    assert(datas==datas2)
+    loadmethods = [load_csv,load_csv_multiline]
+    loadmethods = [load_csv_multiline]
+    for loadmethod in loadmethods:
+        print("\nINF: Testing method: %s" % loadmethod )
+        datas = [ [12,"toto", 3.5], [13,"tutu", 0.0, ""] ]
+        save_csv("/tmp/tmp.dat", datas)
+        datas2 = loadmethod("/tmp/tmp.dat")
+        print("DBG: datas : %s" % str(datas) )
+        print("DBG: datas2: %s" % str(datas2) )
+        assert(datas==datas2)
 
-    datas = [ [12,"toto\ntutu\ntiti", 3.5], [13,"tutu", 0.0, ""] ] # ok
-    datas = [ [12,"toto\ntutu\ntiti", 3.5], [13,"tutu", 0.0, ""], ['tutu\n\n\ntata', 'toto\ntonton', 3], [4] ] # ok now
-    save_csv("/tmp/tmp.dat", datas)
-    datas2 = load_csv("/tmp/tmp.dat",bVerbose=1)
-    print("DBG: datas : %s" % str(datas) )
-    print("DBG: datas2: %s" % str(datas2) )
-    assert(datas==datas2)
+        datas = [ [12,"toto\ntutu\ntiti", 3.5], [13,"tutu", 0.0, ""] ] # ok
+        datas = [ [12,"toto\ntutu\ntiti", 3.5], [13,"tutu", 0.0, ""], ['tutu\n\n\ntata', 'toto\ntonton', 3], [4] ] # ok now
+        save_csv("/tmp/tmp.dat", datas)
+        datas2 = loadmethod("/tmp/tmp.dat",bVerbose=1)
+        print("DBG: datas : %s" % str(datas) )
+        print("DBG: datas2: %s" % str(datas2) )
+        assert(datas==datas2)
 
-    datas = [ ["Bonjour,\nComment Allez vous?\n\nAdieu"] ] # ok
-    save_csv("/tmp/tmp.dat", datas)
-    datas2 = load_csv("/tmp/tmp.dat",bVerbose=1)
-    print("DBG: datas : %s" % str(datas) )
-    print("DBG: datas2: %s" % str(datas2) )
-    assert(datas==datas2)
+        datas = [ ["Bonjour,\nComment Allez vous?\n\nAdieu"] ] # ok
+        save_csv("/tmp/tmp.dat", datas)
+        datas2 = loadmethod("/tmp/tmp.dat",bVerbose=1)
+        print("DBG: datas : %s" % str(datas) )
+        print("DBG: datas2: %s" % str(datas2) )
+        assert(datas==datas2)
     
     print("INF: autotest passed [GOOD]")
     

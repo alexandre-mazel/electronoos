@@ -5,7 +5,6 @@ some classic handy classes
 import datetime
 try: import cv2 # made with cv 3.2.0-dev
 except: pass
-import numpy as np
 import os
 import platform
 import select

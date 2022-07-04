@@ -852,9 +852,9 @@ class Cities:
         
         if isBigCityZip(zip):
             arrt = ordinalToStr(zip[-2:])
-            if isinstance(arrt,unicode):
+            if sys.version_info[0]<3 and isinstance(arrt,unicode):
                 arrt = arrt.encode("cp1252", 'replace')
-            if isinstance(strCity,unicode):
+            if sys.version_info[0]<3 and isinstance(strCity,unicode):
                 strCity = strCity.encode("cp1252", 'replace')
             strOut = "dans le " + arrt + " arrondissement de " + strCity
         else:

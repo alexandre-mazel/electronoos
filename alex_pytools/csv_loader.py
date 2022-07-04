@@ -9,6 +9,8 @@ def openWithEncoding( filename, mode, encoding, errors = 'strict' ):
     return open( filename, mode, encoding=encoding, errors=errors )
     
 def looksLikeNumber(s):
+    if s == "":
+        return False
     for c in s:
         if not c.isdigit() and c != '.':
             return False
@@ -91,7 +93,7 @@ def load_csv(filename, sepa = ';', bSkipFirstLine = 0, encoding =  'utf-8', bVer
     
 def load_datas_from_xlsx_exploded_for_python27( filename, encoding = 'utf-8', bVerbose = 0 ):
     dOut = dict()
-    fi = io.open(filename + "__index.csv","rt", encoding="cp1252")
+    fi = io.open(filename + "__index.csv","rt", encoding=encoding)
     while 1:
         tabname = fi.readline().replace("\n","")
         if len(tabname)<2:
@@ -117,7 +119,8 @@ def load_datas_from_xlsx_exploded_for_python27( filename, encoding = 'utf-8', bV
         # conversion
         for i in range(len(data)):
             for j in range(len(data[i])):
-                data[i][j] = data[i][j].encode("cp1252", 'replace')
+                if sys.version_info[0]<3 and isinstance(data[i][j],unicode):
+                    data[i][j] = data[i][j].encode(encoding, 'replace')
         dOut[tabname]=data
     
     fi.close()
@@ -144,7 +147,7 @@ def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
         # rien ne fonctionne en python2.7
         #~ df = pd.read_excel( filename, sheet_name=None, header=None )
         if sys.version_info[0] < 3:
-            return load_datas_from_xlsx_exploded_for_python27(filename, bVerbose,encoding=encoding)
+            return load_datas_from_xlsx_exploded_for_python27(filename, encoding=encoding)
 
         df = pd.read_excel( filename, sheet_name=None, header=None )
     
@@ -186,9 +189,11 @@ def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
             print("INF: writing to independant csv: %s" % fn )
             f = io.open(fn,"wt", encoding=encoding)
             for line in content:
-                for field in line:
+                for nfield,field in enumerate(line):
                     #~ print("field: %s" % field )
-                    f.write( str(field) + ";")
+                    f.write( str(field))
+                    if nfield+1 < len(line):
+                        f.write(";")
                 f.write("\n")
             f.close()
             fIndex.write(k+"\n")

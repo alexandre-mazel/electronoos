@@ -14,12 +14,11 @@ def looksLikeNumber(s):
             return False
     return True
 
-def load_csv(filename, sepa = ';',bSkipFirstLine = 0, bVerbose=0 ):
+def load_csv(filename, sepa = ';',bSkipFirstLine = 0, bVerbose=0, encoding =  'utf-8' ):
 
     data = []
-    enc = 'utf-8'    
     try:
-        file = openWithEncoding(filename, "rt", encoding = enc)
+        file = openWithEncoding(filename, "rt", encoding = encoding)
     except:
         return data
         
@@ -50,7 +49,7 @@ def load_csv(filename, sepa = ';',bSkipFirstLine = 0, bVerbose=0 ):
     # concatenate line with some " and unclosing " (eg a \n is in the text)
     nNumLine = 0
     while 1:
-        print("DBG: nNumLine: %s" % nNumLine )
+        #~ print("DBG: nNumLine: %s" % nNumLine )
         if nNumLine >= len(data):
             break
         if isinstance(data[nNumLine][-1], str) and (data[nNumLine][-1].count('"') %2)  == 1:
@@ -66,7 +65,7 @@ def load_csv(filename, sepa = ';',bSkipFirstLine = 0, bVerbose=0 ):
                     continue
                     
                 if bContainsEnd:
-                    print("DBG: contains end, nNumLine: %d, numLineInc: %d, numField: %d" % (nNumLine,numLineInc,numField) )
+                    #~ print("DBG: contains end, nNumLine: %d, numLineInc: %d, numField: %d" % (nNumLine,numLineInc,numField) )
                     if data[nNumLine][-1][0] == '"' and data[nNumLine][-1][-1] == '"':
                         data[nNumLine][-1] = data[nNumLine][-1][1:-1]
                     data[nNumLine].extend(data[nNumLine+numLineInc][numField:])
@@ -96,17 +95,22 @@ def load_datas_from_xlsx_exploded_for_python27( filename, bVerbose ):
         if len(tabname)<2:
             break
         print( "INF: load_datas_from_xlsx_exploded_for_python27: tabname: '%s'" % tabname )
-        f = io.open(filename+"__"+tabname+".csv", "rt", encoding="cp1252")
-        buf = f.read() # we could have decided to read line per line, but...
-        data = buf.split("\n")
-        for i in range(len(data)):
-            data[i]=data[i].split(";")
-            last = data[i][-1]
-            if last == "" or last == "\n":
-                del data[i][-1]
-        if data[i] == []:
-            del data[i]
-        f.close()
+        fntab = filename+"__"+tabname+".csv"
+        if 1:
+            data = load_csv( fntab )
+        else:
+            f = io.open( fntab, "rt", encoding="cp1252")
+            buf = f.read() # we could have decided to read line per line, but...
+            data = buf.split("\n")
+            for i in range(len(data)):
+                data[i]=data[i].split(";")
+                last = data[i][-1]
+                if last == "" or last == "\n":
+                    del data[i][-1]
+            if data[i] == []:
+                del data[i]
+            f.close()
+        
         
         # conversion
         for i in range(len(data)):

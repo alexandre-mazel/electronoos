@@ -226,6 +226,8 @@ def autotest():
     print("DBG: datas2: %s" % str(datas2) )
     assert(datas==datas2)
     
+    print("INF: autotest passed [GOOD]")
+    
 if __name__ == "__main__":
     autotest()
             

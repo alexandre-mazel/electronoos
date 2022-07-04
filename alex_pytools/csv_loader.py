@@ -46,6 +46,44 @@ def load_csv(filename, sepa = ';',bSkipFirstLine = 0, bVerbose=0 ):
                 else:
                     fields[i] = int(fields[i])
         data.append(fields)
+        
+    # concatenate line with some " and unclosing " (eg a \n is in the text)
+    nNumLine = 0
+    while 1:
+        print("DBG: nNumLine: %s" % nNumLine )
+        if nNumLine >= len(data):
+            break
+        if isinstance(data[nNumLine][-1], str) and (data[nNumLine][-1].count('"') %2)  == 1:
+            # looks like this string continued on next line:
+            numField = 0
+            numLineInc = 1
+            while 1:
+                bContainsEnd = isinstance(data[nNumLine+numLineInc][numField], str) and (data[nNumLine+numLineInc][numField].count('"') %2)  == 1
+                data[nNumLine][-1] += "\n"+ data[nNumLine+numLineInc][numField]
+                del data[nNumLine+numLineInc][numField]
+                if len(data[nNumLine+numLineInc]) == 0:
+                    del data[nNumLine+numLineInc]
+                    continue
+                    
+                if bContainsEnd:
+                    print("DBG: contains end, nNumLine: %d, numLineInc: %d, numField: %d" % (nNumLine,numLineInc,numField) )
+                    if data[nNumLine][-1][0] == '"' and data[nNumLine][-1][-1] == '"':
+                        data[nNumLine][-1] = data[nNumLine][-1][1:-1]
+                    data[nNumLine].extend(data[nNumLine+numLineInc][numField:])
+                    del data[nNumLine+numLineInc]
+                    break
+                numField += 1
+                if numField >= len(data[nNumLine+numLineInc]):
+                    numField = 0
+                    numLineInc += 1
+                if nNumLine+numLineInc >= len(data):
+                    print("WRN: load_csv: unfinished opened double quote, something wrong...")
+                    break
+            nNumLine += numLineInc
+        else:
+            nNumLine += 1
+            
+        
     return data
     
 def load_datas_from_xlsx_exploded_for_python27( filename, bVerbose ):
@@ -82,7 +120,8 @@ def load_datas_from_xlsx( filename, bVerbose = 0 ):
     """
     return a dict indexed by tab name then lines (without handling headers)
     """
-    ce qui fonctionne pas, c'est qu'en fait il faut chercher des ; avant les "\n"
+    # ce qui fonctionne pas, c'est qu'en fait il faut chercher des ; avant les "\n"
+    
     #~ import xlrd # pip install xlrd 
     #~ import openpyxl # pip install openpyxl 
     try: import pandas as pd
@@ -169,6 +208,13 @@ def autotest():
     datas = [ [12,"toto", 3.5], [13,"tutu", 0.0, ""] ]
     save_csv("/tmp/tmp.dat", datas)
     datas2 = load_csv("/tmp/tmp.dat")
+    assert(datas==datas2)
+
+    datas = [ [12,"toto\ntutu\ntiti", 3.5], [13,"tutu", 0.0, ""] ]
+    save_csv("/tmp/tmp.dat", datas)
+    datas2 = load_csv("/tmp/tmp.dat",bVerbose=1)
+    print("DBG: datas : %s" % str(datas) )
+    print("DBG: datas2: %s" % str(datas2) )
     assert(datas==datas2)
     
 if __name__ == "__main__":

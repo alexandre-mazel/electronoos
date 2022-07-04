@@ -224,7 +224,7 @@ def autotest():
     assert(datas==datas2)
 
     datas = [ [12,"toto\ntutu\ntiti", 3.5], [13,"tutu", 0.0, ""] ] # ok
-    datas = [ [12,"toto\ntutu\ntiti", 3.5], [13,"tutu", 0.0, ""], ['tutu\ntata', 'toto\ntonton', 3], [4] ] # ok now
+    datas = [ [12,"toto\ntutu\ntiti", 3.5], [13,"tutu", 0.0, ""], ['tutu\n\n\ntata', 'toto\ntonton', 3], [4] ] # ok now
     save_csv("/tmp/tmp.dat", datas)
     datas2 = load_csv("/tmp/tmp.dat",bVerbose=1)
     print("DBG: datas : %s" % str(datas) )

@@ -14,7 +14,7 @@ def looksLikeNumber(s):
             return False
     return True
 
-def load_csv(filename, sepa = ';',bSkipFirstLine = 0, bVerbose=0, encoding =  'utf-8' ):
+def load_csv(filename, sepa = ';', bSkipFirstLine = 0, encoding =  'utf-8', bVerbose=0 ):
 
     data = []
     try:
@@ -33,6 +33,8 @@ def load_csv(filename, sepa = ';',bSkipFirstLine = 0, bVerbose=0, encoding =  'u
         if line[-1] == '\n': line = line[:-1] # erase last \n
         fields = line.split(sepa)
         for i in range(len(fields)):
+            if sys.version_info[0]<3 and isinstance(fields[i],unicode):
+                fields[i] = fields[i].encode(encoding, 'replace')
             if bVerbose: print("DBG: load_csv: fields[%d]: '%s'" % (i,fields[i]) )
             if bVerbose: print("DBG: load_csv: field %d: '%s',type: %s" % (i, fields[i],type(fields[i]) ) )
             if len(fields[i])>1 and fields[i][0] == '"' and fields[i][-1] == '"':
@@ -87,7 +89,7 @@ def load_csv(filename, sepa = ';',bSkipFirstLine = 0, bVerbose=0, encoding =  'u
         
     return data
     
-def load_datas_from_xlsx_exploded_for_python27( filename, bVerbose ):
+def load_datas_from_xlsx_exploded_for_python27( filename, encoding = 'utf-8', bVerbose = 0 ):
     dOut = dict()
     fi = io.open(filename + "__index.csv","rt", encoding="cp1252")
     while 1:
@@ -97,9 +99,9 @@ def load_datas_from_xlsx_exploded_for_python27( filename, bVerbose ):
         print( "INF: load_datas_from_xlsx_exploded_for_python27: tabname: '%s'" % tabname )
         fntab = filename+"__"+tabname+".csv"
         if 1:
-            data = load_csv( fntab )
+            data = load_csv( fntab, encoding=encoding )
         else:
-            f = io.open( fntab, "rt", encoding="cp1252")
+            f = io.open( fntab, "rt", encoding=encoding)
             buf = f.read() # we could have decided to read line per line, but...
             data = buf.split("\n")
             for i in range(len(data)):
@@ -122,7 +124,7 @@ def load_datas_from_xlsx_exploded_for_python27( filename, bVerbose ):
     print("DBG: load_datas_from_xlsx_exploded_for_python27: dOut: %s" % str(dOut) )
     return dOut
     
-def load_datas_from_xlsx( filename, bVerbose = 0 ):
+def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
     """
     return a dict indexed by tab name then lines (without handling headers)
     """
@@ -142,7 +144,7 @@ def load_datas_from_xlsx( filename, bVerbose = 0 ):
         # rien ne fonctionne en python2.7
         #~ df = pd.read_excel( filename, sheet_name=None, header=None )
         if sys.version_info[0] < 3:
-            return load_datas_from_xlsx_exploded_for_python27(filename, bVerbose)
+            return load_datas_from_xlsx_exploded_for_python27(filename, bVerbose,encoding=encoding)
 
         df = pd.read_excel( filename, sheet_name=None, header=None )
     
@@ -182,7 +184,7 @@ def load_datas_from_xlsx( filename, bVerbose = 0 ):
         for k,content in dOut.items():
             fn = filename+"__"+k+".csv"
             print("INF: writing to independant csv: %s" % fn )
-            f = io.open(fn,"wt", encoding="cp1252")
+            f = io.open(fn,"wt", encoding=encoding)
             for line in content:
                 for field in line:
                     #~ print("field: %s" % field )

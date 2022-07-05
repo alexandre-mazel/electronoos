@@ -7,6 +7,7 @@ try: import cv2 # made with cv 3.2.0-dev
 except: pass
 import os
 import platform
+import random
 import select
 import time
 import sys
@@ -818,6 +819,16 @@ def getWebPage( strAddr ):
     mystr = mybytes.decode("utf8")
     fp.close()
     return mystr
+    
+def find( list, element ):
+    """
+    return idx of an element in a list or -1 if not found
+    """
+    try:
+        return list.index(element)
+    except ValueError as err:
+        pass
+    return -1
         
         
 def findInNammedList( l, keyname, defaultValue = None ):
@@ -830,6 +841,22 @@ def findInNammedList( l, keyname, defaultValue = None ):
         if e[0].lower() == keyname:
             return e
     return defaultValue
+    
+def shuffle( aList, n = 1 ):
+    """
+    choose randomly n element in list, prevent double!
+    """
+    assert(n<=len(aList))
+    aList = aList[:] # copy
+    out = []
+    while 1:
+        if len(out) == n:
+            break
+        idx = random.randint(0,len(aList)-1)
+        out.append(aList[idx])
+        del aList[idx]
+    return out
+    
     
 def intToHashLike(n):
     """
@@ -877,6 +904,21 @@ def autoTest():
     check(intToHashLike(26*26*26-1),'ZZZ')
     check(intToHashLike(26*26*26),'BAAA')
     check(intToHashLike(26*26*26+1),'BAAB')
+    
+    check(find("ab","z"),-1)
+    check(find("abezee","z"),3)
+    check(find("abezee","zee"),3)
+    check(find([1,2,3],3),2)
+    check(find([1,2,3],None),-1)
+    check(find([],"a"),-1)
+    
+    ret = shuffle(["a","b","c"],0)
+    print("ret shuffle 0: " + str(ret))
+    check(len(ret),0)
+    
+    ret = shuffle(["a","b","c"],2)
+    print("ret shuffle 1: " + str(ret))
+    check(len(ret),2)
     
 if __name__ == "__main__":
     autoTest()

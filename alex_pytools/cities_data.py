@@ -836,7 +836,14 @@ class Cities:
         listAll = []
         if self.bEnableHash:
             for k,v in self.cityPerSlug.items():
-                listAll.append([ v[3],v[1],v[4],v[5] ])       
+                listAll.append([ v[3],v[1],v[4],v[5] ]) 
+            # add paris 2 to 20
+            for i in range(2,21):
+                zip = "750"+("%02d"%i)
+                ret = getLongLatParis(zip)
+                #~ print(ret)
+                long,lat = ret
+                listAll.append( ["Paris", zip, long, lat ] )
             return listAll
 
         for k,v in self.dictCities.items():

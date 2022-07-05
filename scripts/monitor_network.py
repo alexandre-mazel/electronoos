@@ -98,7 +98,7 @@ def analyseBandwith():
         ar_h.append(r-r_p)
         as_h.append(s-s_p)
         at_h.append(t-t_p)
-        if len(ar_1) > (60/nPeriodSec):
+        if len(ar_1) > (3*60/nPeriodSec):
             del ar_1[0]
             del as_1[0]
             del at_1[0]
@@ -123,7 +123,7 @@ def analyseBandwith():
                 strLine += " " * (nLenLineToEraseAboveStat-len(strLine))
             print(  strLine )
             
-        print("%s/%s Received: %s, Send: %s, Total: %s    LastHour: r: %s, s:%s, t:%s    LastMin: r: %s, s:%s, t:%s      \r" % (
+        print("%s/%s Received: %s, Send: %s, Total: %s    LastHour: r: %s, s:%s, t:%s    Last3Min: r: %s, s:%s, t:%s      \r" % (
                                             printSmartTime(cptLoop*nPeriodSec), printSmartTime(time.time()-timeBegin), printSmart(rd),printSmart(sd),printSmart(td),
                                             printSmart(sum(ar_h)),printSmart(sum(as_h)),printSmart(sum(at_h)), # WRN: generate huge computation ! should sum by minutes!
                                             printSmart(sum(ar_1)),printSmart(sum(as_1)),printSmart(sum(at_1))

@@ -238,7 +238,7 @@ def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
                 for col in line:
                     print("   '%s'" % col)
                     
-    if 1:
+    if  sys.version_info[0] >= 3 and os.name != "nt":
         # generate one cvs per tab, so you can read them back with python2.7
         fIndex = io.open(filename+"__index.csv", "wt", encoding="cp1252")
         for k,content in dOut.items():

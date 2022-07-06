@@ -115,9 +115,12 @@ def accentToHtml(s):
     
     
 def removeAccent( c ):
+    """
+    receive a char more than 127 and handle it
+    """
     bVerbose = 1
     bVerbose = 0
-    #~ if bVerbose: print("INF: stringtools.removeAccent: entering with a char len: %d, starting with ord: %d" % (len(c),ord(c[0])))
+    if bVerbose: print("INF: stringtools.removeAccent: entering with a char len: %d, starting with ord: %d, char: %s" % (len(c),ord(c[0]),c))
     try:
         
         if sys.version_info[0] < 3:
@@ -127,12 +130,16 @@ def removeAccent( c ):
                     print("    ord: %d" % ord(i))
                 if ord(c[0]) == 195:
                     # some are same in python3
+                    if bVerbose: print("DBG: stringtools.removeAccent: recurse")
                     ret = removeAccent(c[1])
                     if ret != "":
                         return ret
                 
                 # handle current first ord
                 tabconvPerKey0 = {
+                            130: [
+                                        (172, "euros"),
+                            ],
                             195: [
                                         (143, "I"), # I trema en python2.7
                                         (134, "AE"),
@@ -332,13 +339,21 @@ def removeAccent( c ):
                 if bVerbose: print("DBG: stringtools.removeAccent: not found: %c (%s)" % (c,ord(c) ))
             except BaseException as err:
                 print("DBG: stringtools.removeAccent: catch else: ord: %s, err: %s" % (ord(c),err) )
-            c="" # it should remains only invisible char like the square before "oe"
+            c = "" # it could remains only invisible char like the square before "oe"
         return c
     except KeyError as err:
         print("DBG: stringtools.removeAccent: type error: '%s' char:%s, returning '_'" % (c,str(err)) )
     return "_"
+# removeAccent - end
 
-    
+def removeAccentString( s ):
+    out = ""
+    for c in s:
+        if ord(c)>127:
+            c = removeAccent(c) # WARNING: in python2.7 this method will cut extra char in two char, and so they won't be detected correctly
+            print("DBG: removeAccentString: received '%s'" % c )
+        out += c
+    return out
 
 
 if __name__ == "__main__":
@@ -351,6 +366,7 @@ if __name__ == "__main__":
     assert_equal(accentToHtml("Un élève épatant à Noël"), "Un &eacute;l&egrave;ve &eacute;patant &agrave; No&euml;l")
 
     
+    #~ assert_equal(removeAccent("a"),"a") # normal case: no: removeAccent work only on accentuated accent
     assert_equal(removeAccent("é"),"e")
     assert_equal(removeAccent("Ï"),"I")
     assert_equal(removeAccent("€"),"euros")
@@ -358,5 +374,12 @@ if __name__ == "__main__":
     assert_equal(removeAccent("Æ"),"AE")
     assert_equal(removeAccent("œ"),"oe")
     assert_equal(removeAccent("Œ"),"OE")
+    assert_equal(removeAccentString("Jean-Pierre"),"Jean-Pierre")
+    assert_equal(removeAccentString("Frédéric"),"Frederic")
+    if sys.version_info[0] < 3:
+        assert_equal(removeAccentString(u"100€"),"100euros")
+    else:
+        assert_equal(removeAccentString("100€"),"100euros")
+        
     
     print("INF: autotest passed [GOOD]")

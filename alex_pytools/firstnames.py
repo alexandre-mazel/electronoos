@@ -105,6 +105,7 @@ class Firstnames:
             line = file.readline()
             if len(line)<1:
                 break
+            
             if bVerbose: print("DBG: Regions.load: line: %s" % str(line) )
             line = line.replace('"','')
             fields = line.split(';')
@@ -123,10 +124,11 @@ class Firstnames:
             rOccurence = float(strOccurence)
             #~ print(strFirstname)
             k = simpleString(strFirstname)
-            if k in self.dictFirstname.keys():
+            #~ if k in self.dictFirstname.keys(): # this line is very bad: it construct a list for keys then do a list search in it
+            if k in self.dictFirstname: # this one is great: it looks in dict's key using hash
                 if bVerbose: print("WRN: Firstnames.load: forgetting dubbled %s (perhaps due to various accent simplified)" % (k) )
             else:
-                self.dictFirstname[k] = (strFirstname, bFemale, tuple(listCountries), rOccurence)
+                self.dictFirstname[k] = (strFirstname, bFemale, tuple(listCountries), rOccurence) # this line takes 99% of times on python2.7 (moreover in rpi)
             
     def get( self, strFirstname ):
         """
@@ -177,6 +179,11 @@ print("Loading takes: %.2fs" % (time.time()-timeBegin))
 #  mstab7_2.7 : 2.01s
 #  mstab7_3.9 : 0.04s
 # RPI4_2.7      : 12.93s
+# RPI4_3.7      :  0.2s
+# after removing the k in d.keys():
+#  mstab7_2.7 : 2.01s
+#  mstab7_3.9 : 0.04s
+# RPI4_2.7      : 0.24s
 # RPI4_3.7      :  0.2s
 
 def autotest():

@@ -1118,9 +1118,9 @@ def autotest_cities():
         duration = time.time() - timeBegin
         print("INF: 2: 500 tests: %.1fs (%.1fms/recherche)" % (duration,duration/0.5 ) )
         # mstab7: 500 tests: 4.9s (9.8ms/recherche)
-        # mstab7: passage au slugToZip
-        # 500 tests: 0.7s (1.3ms/recherche)
-        # mstab7: 500 tests: 0.0s (0.0ms/recherche)
+        # mstab7: passage au slugToZip:
+        #  mstab7_2.7: 500 tests: 4.9s (9.8ms/recherche)
+        #  mstab7_3.9: 500 tests: 0.7s (1.5ms/recherche)
         # RPI4_2.7: 500 tests: 0.0s (0.0ms/recherche)
         # RPI4_3.7: 500 tests: 0.0s (0.0ms/recherche)
     
@@ -1164,10 +1164,11 @@ def autotest_cities():
         retVal = cities.findByZip("94270")
         
     duration = time.time() - timeBegin
-    print("INF: 2: 500 tests: %.1fs (%.1fms/recherche)" % (duration,duration/0.5 ) )
+    print("INF: 3: 500 tests: %.1fs (%.1fms/recherche)" % (duration,duration/0.5 ) )
     # mstab7: 500 tests: 0.0s (0.0ms/recherche)
     # mstab7: passage au slugToZip (vaguement moins avantageux car on perd la recherche dans un dico en direct) (indirection)
-    # 500 tests: 0.0s (0.0ms/recherche)
+    #  mstab7_2.7: 500 tests: 0.0s (0.0ms/recherche)
+    #  mstab7_3.9: 500 tests: 0.0s (0.0ms/recherche)
     # RPI4_2.7: 500 tests: 23.8s (47.7ms/recherche)
     # RPI4_3.7: 500 tests: 0.0s (0.0ms/recherche)
     

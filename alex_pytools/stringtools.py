@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import sys
+
 """
 some classic handy classes to work on string
 (c) 2010-2022 A. Mazel
@@ -114,7 +116,59 @@ def accentToHtml(s):
     
 def removeAccent( c ):
     bVerbose = 1
+    bVerbose = 0
+    #~ if bVerbose: print("INF: stringtools.removeAccent: entering with a char len: %d, starting with ord: %d" % (len(c),ord(c[0])))
     try:
+        
+        if sys.version_info[0] < 3:
+            if len(c)>1:
+                print("DBG: stringtools.removeAccent: received many chars:")
+                for i in c:
+                    print("    ord: %d" % ord(i))
+                if ord(c[0]) == 195:
+                    # some are same in python3
+                    ret = removeAccent(c[1])
+                    if ret != "":
+                        return ret
+                
+                # handle current first ord
+                tabconvPerKey0 = {
+                            195: [
+                                        (143, "I"), # I trema en python2.7
+                                        (134, "AE"),
+                                        (166, "ae"),
+                            ],
+                            197: [
+                                        (146, "OE"),
+                                        (147, "oe"),
+                            ],
+                    }
+                o = ord(c[0])
+                try:
+                    tabconv = tabconvPerKey0[o]
+                    o = ord(c[1])
+                    for conv in tabconv:
+                        if conv[0] == o:
+                            return conv[1]
+                except KeyError as err:
+                    pass
+                    
+
+                # handle flavoured combination
+                tabconv = [
+                                ((226,130,172), "euros")
+                        ]
+                listOrd = []
+                for i in c:
+                    listOrd.append(ord(i))
+                listOrd=tuple(listOrd)
+                for conv in tabconv:
+                    if conv[0] == listOrd:
+                        return conv[1]
+                print("DBG: stringtools.removeAccent: unhandled symbol:")
+                print("%s" % c)
+                return ""
+            
         acc="ÁÉÈÎÍÓÖÙâàáãäåçéêëèîïíìñôóòðöøõûüùúŷÿ" # TODO A avec accent
         noacc="AEEIIOOUaaaaaaceeeeiiiinooooooouuuuyy"
         #~ idx=acc.find(c) # in python 2.7: UnicodeDecodeError: 'ascii' codec can't decode byte 0xc3 in position 0: ordinal not in range(128) // ord(value) was 233
@@ -220,16 +274,23 @@ def removeAccent( c ):
         for i in range(len(acc_ord_ovh)):
             if ord(c) == acc_ord_ovh[i]:
                 return noacc[i]      
+        
+        if sys.version_info[0] >= 3:
+            bFound = True
+            if c == "æ" or ord(c)==230:
+                c = "ae"
+            elif c == "Æ" or ord(c)==198:
+                c = "AE"
+            elif c == "œ" or ord(c)==339:
+                c = "oe"
+            elif c == "Œ" or ord(c)==338:
+                c = "OE"
+            else:
+                bFound = False
+            if bFound:
+                return c
                 
-        if c == "æ" or ord(c)==230:
-            c = "ae"
-        elif c == "Æ" or ord(c)==198:
-            c = "AE"
-        elif c == "œ" or ord(c)==339:
-            c = "oe"
-        elif c == "Œ" or ord(c)==338:
-            c = "OE"
-        elif ord(c) == 194: # A circ
+        if ord(c) == 194: # A circ
             c = "A"
         elif ord(c) == 199: # C cedile
             c = "C"
@@ -273,7 +334,7 @@ def removeAccent( c ):
                 print("DBG: stringtools.removeAccent: catch else: ord: %s, err: %s" % (ord(c),err) )
             c="" # it should remains only invisible char like the square before "oe"
         return c
-    except TypeError as err:
+    except KeyError as err:
         print("DBG: stringtools.removeAccent: type error: '%s' char:%s, returning '_'" % (c,str(err)) )
     return "_"
 
@@ -293,3 +354,9 @@ if __name__ == "__main__":
     assert_equal(removeAccent("é"),"e")
     assert_equal(removeAccent("Ï"),"I")
     assert_equal(removeAccent("€"),"euros")
+    assert_equal(removeAccent("æ"),"ae")
+    assert_equal(removeAccent("Æ"),"AE")
+    assert_equal(removeAccent("œ"),"oe")
+    assert_equal(removeAccent("Œ"),"OE")
+    
+    print("INF: autotest passed [GOOD]")

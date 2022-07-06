@@ -12,9 +12,20 @@ import stringtools
 def assert_equal(a,b):
     if a == b:
         print("(%s==%s) => ok" % (a,b))
-    else:
-        print("(%s==%s) => NOT ok (type:%s and %s)" % (a,b,type(a),type(b)))
-        assert(0)
+        return
+    if sys.version_info[0]<3:
+        if isinstance(a,unicode):
+            a = a.encode("utf-8", 'replace')
+
+        if isinstance(b,unicode):
+            b = b.encode("utf-8", 'replace')
+        
+        if a == b:
+            print("(%s==%s) => ok (but unicode_encoded)" % (a,b))
+            return
+            
+    print("(%s==%s) => NOT ok (type:%s and %s)" % (a,b,type(a),type(b)))
+    assert(0)
 
 def assert_diff(a,b,diff=0.1):
     if abs(a-b)<diff:
@@ -758,12 +769,17 @@ class Cities:
         if isBigCityZip(zip):
             arrt = ordinalToStr(zip[-2:])
             if sys.version_info[0]<3 and isinstance(arrt,unicode):
-                arrt = arrt.encode("cp1252", 'replace')
+                arrt = arrt.encode("utf-8", 'replace')
             if sys.version_info[0]<3 and isinstance(strCity,unicode):
-                strCity = strCity.encode("cp1252", 'replace')
+                strCity = strCity.encode("utf-8", 'replace')
             strOut = "dans le " + arrt + " arrondissement de " + strCity
         else:
-            strOut = "à " + strCity
+            if sys.version_info[0]<3:
+                if isinstance(strCity,unicode):
+                    strCity = strCity.encode("utf-8", 'replace')
+                strOut = u"à ".encode("utf-8", 'replace') + strCity
+            else:
+                strOut = "à " + strCity
         return strOut
         
 #class Cities - end
@@ -1089,22 +1105,24 @@ def autotest_cities():
     # mstab7: passage au slugToZip:
     # 500 tests: 0.0s (0.0ms/recherche)
     
-    timeBegin = time.time()
-    for i in range(100):
-        # en mettre plusieurs différent permet de zapper le cache
-        cities.findByRealName("oza", bPartOf=1) # le premier
-        cities.findByRealName("st-pierre-et-", bPartOf=1) # le dernier
-        cities.findByRealName("pari", bPartOf=1)
-        cities.findByRealName("marseill", bPartOf=1)
-        cities.findByRealName("zanzibar" , bPartOf=1) # inconnu
-    duration = time.time() - timeBegin
-    print("INF: 2: 500 tests: %.1fs (%.1fms/recherche)" % (duration,duration/0.5 ) )
-    # mstab7: 500 tests: 4.9s (9.8ms/recherche)
-    # mstab7: passage au slugToZip
-    # 500 tests: 0.7s (1.3ms/recherche)
-    # mstab7: 500 tests: 0.0s (0.0ms/recherche)
-    # RPI4_2.7: 500 tests: 0.0s (0.0ms/recherche)
-    # RPI4_3.7: 500 tests: 0.0s (0.0ms/recherche)
+    if 1:
+        # this test takes time in python2.7
+        timeBegin = time.time()
+        for i in range(100):
+            # en mettre plusieurs différent permet de zapper le cache
+            cities.findByRealName("oza", bPartOf=1) # le premier
+            cities.findByRealName("st-pierre-et-", bPartOf=1) # le dernier
+            cities.findByRealName("pari", bPartOf=1)
+            cities.findByRealName("marseill", bPartOf=1)
+            cities.findByRealName("zanzibar" , bPartOf=1) # inconnu
+        duration = time.time() - timeBegin
+        print("INF: 2: 500 tests: %.1fs (%.1fms/recherche)" % (duration,duration/0.5 ) )
+        # mstab7: 500 tests: 4.9s (9.8ms/recherche)
+        # mstab7: passage au slugToZip
+        # 500 tests: 0.7s (1.3ms/recherche)
+        # mstab7: 500 tests: 0.0s (0.0ms/recherche)
+        # RPI4_2.7: 500 tests: 0.0s (0.0ms/recherche)
+        # RPI4_3.7: 500 tests: 0.0s (0.0ms/recherche)
     
     retVal = cities.findByZip("06000")
     assert_equal(retVal[1],"06001")
@@ -1191,6 +1209,7 @@ if __name__ == "__main__":
     if 1:
         autotest_cities()
         autotest_region()
+        print("INF: autotest passed [GOOD]")
     if 0:        
         """
         Syntaxe:

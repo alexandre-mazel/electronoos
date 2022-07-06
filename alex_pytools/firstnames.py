@@ -10,7 +10,18 @@ def assert_equal(a,b):
     if a == b:
         print("(%s==%s) => ok" % (a,b))
         return
+            
+    if sys.version_info[0]<3:
+        if isinstance(a,unicode):
+            a = a.encode("utf-8", 'replace')
 
+        if isinstance(b,unicode):
+            b = b.encode("utf-8", 'replace')
+        
+        if a == b:
+            print("(%s==%s) => ok (but unicode_encoded)" % (a,b))
+            return
+    
     if type(a)==type(b):
         if isinstance(a,tuple):
             print("sametupe")
@@ -19,6 +30,13 @@ def assert_equal(a,b):
                 return
             
     print("(%s==%s) => NOT ok (type:%s and %s)\ndetail:\n%s\n%s" % (a,b,type(a),type(b), a,b))
+    if 1:
+        print("1st value:")
+        for c in a:
+            print(ord(c))
+        print("2nd value:")
+        for c in b:
+            print(ord(c))
     assert(0)
 
 def assert_diff(a,b,diff=0.1):
@@ -155,6 +173,8 @@ firstnames.load()
 #~ firstnames.printListByOcc()
 
 def autotest():
+    # in python2, type that in the shell before:
+    # set PYTHONIOENCODING=UTF-8
     val = firstnames.get( "Alexandre" )
     assert_equal( val[0], "Alexandre" )
     assert_equal( val[1], False )
@@ -213,6 +233,8 @@ def autotest():
     for w in line.split():
         ret = firstnames.getCompound(w)
         assert( ret is None )
+    
+    print("INF: autotest passed [GOOD]")
     
 # autotest- end
     

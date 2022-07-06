@@ -181,7 +181,7 @@ print("Loading takes: %.2fs" % (time.time()-timeBegin))
 # RPI4_2.7      : 12.93s
 # RPI4_3.7      :  0.2s
 # after removing the k in d.keys():
-#  mstab7_2.7 : 2.01s
+#  mstab7_2.7 : 0.06s
 #  mstab7_3.9 : 0.04s
 # RPI4_2.7      : 0.24s
 # RPI4_3.7      :  0.2s

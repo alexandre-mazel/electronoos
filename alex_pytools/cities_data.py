@@ -451,7 +451,7 @@ class Cities:
                     self.dupZipPerZip[z] = strNewZip
                 strZip = strNewZip
                 
-            if strZip in self.dictCities.keys():
+            if strZip in self.dictCities:
                 if bVerbose: print("WRN: Cities.load: storing (%s,%s,%s); on: %s" % (strDept,strZip,strCitySlug, str(self.dictCities[strZip])) )
                 self.dupCityPerZip[self.dictCities[strZip][2]] = strZip
                 pass
@@ -620,7 +620,7 @@ class Cities:
                     if bVerbose: print("WRN: findByRealName: found, but with different '-'" )
                     return k
         #~ print("DBG: findByRealName: self.dupCityPerZip: %s" % self.dupCityPerZip.keys())
-        if strNormalisedCityName in self.dupCityPerZip.keys(): # here bug: comparing real name and slug!
+        if strNormalisedCityName in self.dupCityPerZip: # here bug: comparing real name and slug!
             out = self.dupCityPerZip[strNormalisedCityName]
             self.cacheLastFindByRealName = (strCityName,bPartOf,out)
             if bVerbose: print("DBG: findByRealName: MATCH 2: %s" % out)
@@ -876,7 +876,7 @@ def generateStatHousing( cnx, bOutputHtml ):
             cptError +=1
         else:
             zip_code = int(zip_code)
-            if zip_code not in dictCode.keys():
+            if zip_code not in dictCode:
                 dictCode[zip_code] = 0
             dictCode[zip_code] += 1
             
@@ -886,7 +886,7 @@ def generateStatHousing( cnx, bOutputHtml ):
                 continue
             strUniv, rDist = retVal
             if bVerbose: print("Find Nearest: %s => %s, %s" % ( zip_code, strUniv, rDist ) )
-            if strUniv not in dictByUniv.keys():
+            if strUniv not in dictByUniv:
                 dictByUniv[strUniv] = (0,0)
             dictByUniv[strUniv] = (dictByUniv[strUniv][0]+1,dictByUniv[strUniv][1]+rDist)
             
@@ -1002,13 +1002,16 @@ def autotest_cities():
     bUseHash = 1 # deactivate some test not working in previous version
     
     cities = Cities()
-    timeBegin = time.time()
     cities.load()
-    print("Loading takes: %.2fs" % (time.time()-timeBegin))
     #  mstab7_2.7 : 2.30s
     #  mstab7_3.9 : 0.27s
     # RPI4_2.7      : 11.42s
     # RPI4_3.7      :  1.17s
+    # optim keys():
+    #  mstab7_2.7 : 0.39s
+    #  mstab7_3.9 : 0.24s
+    # RPI4_2.7      : 11.42s
+    # RPI4_3.7      :  1.17s    
     
     assert_equal( cities.findByRealName("Besançon"), "25000" )
     assert_equal( cities.findByRealName("Besancon"), "25000" )

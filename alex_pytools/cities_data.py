@@ -1005,7 +1005,7 @@ def autotest_cities():
     timeBegin = time.time()
     cities.load()
     print("Loading takes: %.2fs" % (time.time()-timeBegin))
-    #  mstab7_2.7 : 2.63s
+    #  mstab7_2.7 : 2.30s
     #  mstab7_3.9 : 0.27s
     # RPI4_2.7      : 11.42s
     # RPI4_3.7      :  1.17s

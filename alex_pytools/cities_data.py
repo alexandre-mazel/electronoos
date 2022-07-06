@@ -1002,7 +1002,13 @@ def autotest_cities():
     bUseHash = 1 # deactivate some test not working in previous version
     
     cities = Cities()
+    timeBegin = time.time()
     cities.load()
+    print("Loading takes: %.2fs" % (time.time()-timeBegin))
+    #  mstab7_2.7 : 2.63s
+    #  mstab7_3.9 : 0.27s
+    # RPI4_2.7      : 11.42s
+    # RPI4_3.7      :  1.17s
     
     assert_equal( cities.findByRealName("Besançon"), "25000" )
     assert_equal( cities.findByRealName("Besancon"), "25000" )
@@ -1121,8 +1127,8 @@ def autotest_cities():
         # mstab7: passage au slugToZip:
         #  mstab7_2.7: 500 tests: 4.9s (9.8ms/recherche)
         #  mstab7_3.9: 500 tests: 0.7s (1.5ms/recherche)
-        # RPI4_2.7: 500 tests: 0.0s (0.0ms/recherche)
-        # RPI4_3.7: 500 tests: 0.0s (0.0ms/recherche)
+        # RPI4_2.7: 500 tests: 23.7s (47.3ms/recherche)
+        # RPI4_3.7: 500 tests: 1.8s (3.6ms/recherche)
     
     retVal = cities.findByZip("06000")
     assert_equal(retVal[1],"06001")
@@ -1169,7 +1175,7 @@ def autotest_cities():
     # mstab7: passage au slugToZip (vaguement moins avantageux car on perd la recherche dans un dico en direct) (indirection)
     #  mstab7_2.7: 500 tests: 0.0s (0.0ms/recherche)
     #  mstab7_3.9: 500 tests: 0.0s (0.0ms/recherche)
-    # RPI4_2.7: 500 tests: 23.8s (47.7ms/recherche)
+    # RPI4_2.7: 500 tests:  0.0s (0.0ms/recherche)
     # RPI4_3.7: 500 tests: 0.0s (0.0ms/recherche)
     
     assert_equal(isBigCityZip("67000"),1)

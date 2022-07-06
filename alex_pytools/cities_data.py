@@ -341,13 +341,15 @@ def removeAccent( c ):
             c = "..."
         else:
             try:
-                print("DBG: removeAccent: not found: %c (%s)" % (c,ord(c) ))
+                print("DBG: cities.data: removeAccent: not found: %c (%s)" % (c,ord(c) ))
+                assert(0)
             except BaseException as err:
-                print("DBG: removeAccent: catch else: ord: %s, err: %s" % (ord(c),err) )
+                print("DBG: cities.data: removeAccent: catch else: ord: %s, err: %s" % (ord(c),err) )
             c="" # it should remains only invisible char like the square before "oe"
         return c
     except TypeError as err:
-        print("DBG: removeAccent:type error: %s, returning '_'" % str(err) )
+        print("DBG: cities.data: removeAccent: type error: %s, returning '_'" % str(err) )
+        assert(0)
     return "_"
         
     

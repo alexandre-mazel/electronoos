@@ -7,6 +7,8 @@ import shutil
 import sys
 import time
 
+import stringtools
+
 def assert_equal(a,b):
     if a == b:
         print("(%s==%s) => ok" % (a,b))
@@ -245,112 +247,6 @@ def getLongLatParis(zip):
         pass
     return None
     
-
-def removeAccent( c ):
-    try:
-        acc="ÉÈÎâàçéêëèîïôûüùŷÿ" # TODO A avec accent
-        noacc="EEIaaceeeeiiouuuyy"
-        #~ idx=acc.find(c) # in python 2.7: UnicodeDecodeError: 'ascii' codec can't decode byte 0xc3 in position 0: ordinal not in range(128) // ord(value) was 233
-        #~ if idx != -1:
-            #~ return noacc[idx]
-        #~ for i in range(len(acc)):
-            #~ if c == acc[i]:
-                #~ return noacc[i]
-        if 0:
-            # generate acc_ord code value
-            for c in acc:
-                print("%s," % ord(c) )
-                
-        acc_ord = [
-            201,
-            200,
-            206,
-            226,
-            224,
-            231,
-            233,
-            234,
-            235,
-            232,
-            238,
-            239,
-            244,
-            251,
-            252,
-            249,
-            375,
-            255
-            ]
-
-        # same chars at ovh (preceded by a 195 or 197 in front of 183)
-        acc_ord_ovh = [
-            137,
-            136,
-            142,
-            162,
-            160,
-            167,
-            169,
-            170,
-            171,
-            168,
-            174,
-            175,
-            180,
-            187,
-            188,
-            185,
-            183,
-            191
-        ]
-
-        #~ assert_equal( len(acc_ord),len(noacc) )
-        for i in range(len(acc_ord)):
-            if ord(c) == acc_ord[i]:
-                return noacc[i]        
-
-        #~ assert_equal( len(acc_ord),len(acc_ord_ovh) )
-        for i in range(len(acc_ord_ovh)):
-            if ord(c) == acc_ord_ovh[i]:
-                return noacc[i]      
-                
-        if c == "æ" or ord(c)==230:
-            c = "ae"
-        if c == "œ" or ord(c)==339:
-            c = "oe"
-        elif c == "Œ" or ord(c)==338:
-            c = "OE"
-        elif ord(c) == 231: # c cedile not detected previously
-            c = "c"
-        elif ord(c) == 156 or ord(c) == 140:
-            # second part of oe, don't complain (minuscule then majuscule)
-            c = ""
-        elif ord(c) == 195 or ord(c) == 197:
-            # mark of char on two chars at ovh, don't complain
-            c = ""
-        elif ord(c) == 8211 or ord(c) == 8212:
-            # custom hyphen
-            c = "-"
-        elif ord(c) == 8216 or ord(c) == 8217:
-            # type de '
-            c = "'"
-        elif ord(c) == 8220:
-            # type de 
-            c = '"'
-        elif ord(c) == 8230:
-            c = "..."
-        else:
-            try:
-                print("DBG: cities.data: removeAccent: not found: %c (%s)" % (c,ord(c) ))
-                assert(0)
-            except BaseException as err:
-                print("DBG: cities.data: removeAccent: catch else: ord: %s, err: %s" % (ord(c),err) )
-            c="" # it should remains only invisible char like the square before "oe"
-        return c
-    except TypeError as err:
-        print("DBG: cities.data: removeAccent: type error: %s, returning '_'" % str(err) )
-        assert(0)
-    return "_"
         
     
 def cleanString( s ):
@@ -362,7 +258,7 @@ def cleanString( s ):
     for c in s:
         if ord(c)>127:
             #~ print("in %s: %c" % (s,c) )
-            c = removeAccent(c)
+            c = stringtools.removeAccent(c)
             #~ print("=> %c" % c )
             bPrintResultForDebug = 1
         c=c.lower()
@@ -379,7 +275,7 @@ def simpleString( s ):
     for c in s:
         if ord(c)>127:
             #~ print("in %s: %c" % (s,c) )
-            c = removeAccent(c)
+            c = stringtools.removeAccent(c)
             #~ print("=> %c" % c )
             bPrintResultForDebug = 1
         elif c == '-':

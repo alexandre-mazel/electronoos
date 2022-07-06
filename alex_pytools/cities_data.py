@@ -1010,8 +1010,8 @@ def autotest_cities():
     # optim keys():
     #  mstab7_2.7 : 0.39s
     #  mstab7_3.9 : 0.24s
-    # RPI4_2.7      : 11.42s
-    # RPI4_3.7      :  1.17s    
+    # RPI4_2.7      : 1.63s
+    # RPI4_3.7      :  1.15s    
     
     assert_equal( cities.findByRealName("Besançon"), "25000" )
     assert_equal( cities.findByRealName("Besancon"), "25000" )

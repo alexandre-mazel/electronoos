@@ -75,6 +75,7 @@ class HumanKnowledge:
         self.timeLastReactToLook = 0
         self.timeLastReactToNear = 0
         self.timeLastReactToInteract = 0
+
         
     def as_dict(self):
         #~ strOut = json.dumps((self.nUID,self.nTotalSeen,self.nSeenToday,self.nDayStreak),indent=2,ensure_ascii =False)
@@ -166,6 +167,11 @@ class HumanManager:
             self.ab = agent_behavior.agentBehavior
         else:
             self.ab = None
+            
+        # state info
+        self.rTimeGlobalLastInteraction = time.time()-1000
+        self.bWasInteracting = 0
+        self.timeNoFace = time.time()
         
     def __del__(self):
         self.save()
@@ -209,6 +215,7 @@ class HumanManager:
         bSomeoneLook = 0
         bSomeoneNear = 0
         bSomeoneInteract = 0
+        rTimeSinceLastInteraction = time.time()-1000
         
         # ~0.06s on mstab7 on a VGA one face image
         if not self.bPepper:
@@ -241,9 +248,25 @@ class HumanManager:
             print("DBG: pepper, final faces: %s" % str(faces))
             
         if len(faces) < 1:
+            if time.time() - self.timeNoFace > 10.:
+                self.timeNoFace = time.time()
+                if self.ab: self.ab.resetHead()
+                
+
+            rTimeSinceGlobalLastInteraction = time.time() - self.rTimeGlobalLastInteraction
+            print("rTimeSinceGlobalLastInteraction: %s" % rTimeSinceGlobalLastInteraction )
+            if rTimeSinceGlobalLastInteraction < 5:
+                if self.ab: self.ab.showInteraction( None,None )
+                self.bWasInteracting = 1
+            else:
+                if self.bWasInteracting:
+                    self.bWasInteracting = 0
+                    if self.ab: self.ab.stopInteraction()
+                        
             return 0,0,0,0
         
         bSomeFace = 1
+        self.timeNoFace = time.time()
         if 0:
             # select only centered faces
             faces = [face_detector_cv3.selectFace(faces,img.shape)]
@@ -276,7 +299,7 @@ class HumanManager:
             
             if retVal != False and retVal[0] != -1:
                 nHumanID = retVal[1][0][1]
-                facepos = retVal[1][0][2]
+                faceposrelativeaucrop = retVal[1][0][2]  # attention: la pos du  visage  est dans l'image croppe donc pas la bonne position !
                 listExtras = retVal[1][0][3]
                 strTxt = "%d"%nHumanID
                 strTxt2 = ""
@@ -290,12 +313,17 @@ class HumanManager:
                 bInteract = 0
                 if nHumanID != -1:
                     hface = endY-startY
-                    bNear = hface>60
+                    bNear = hface>150 # was 60
+                    print("hface: %s" % hface )
                     if nHumanID not in self.aHumanKnowledge.keys():
                         self.aHumanKnowledge[nHumanID] = HumanKnowledge(nHumanID)
                     self.aHumanKnowledge[nHumanID].nTotalSeen += 1
                     strCurrentDay = misctools.getDayStamp()
                     if strCurrentDay != self.aHumanKnowledge[nHumanID].strDayLastSeen:
+                        # premiere fois du jour
+                        if self.aHumanKnowledge[nHumanID].nTotalSeen>100:
+                            if self.ab: self.ab.showHappy( face,self.aHumanKnowledge[nHumanID],self.aHumanKnowledge[nHumanID].nTotalSeen/100 )
+                        
                         self.aHumanKnowledge[nHumanID].nSeenToday = 1
                         if misctools.getDiffTwoDateStamp(self.aHumanKnowledge[nHumanID].strDayLastSeen,strCurrentDay ) > 1:
                             self.aHumanKnowledge[nHumanID].nDayStreak = 0
@@ -318,6 +346,7 @@ class HumanManager:
                         if bLookAt: 
                             strTxt6 += " LOOKAT"
                         bSomeoneLook = 1
+                    rTimeSinceLastInteraction = time.time() - self.aHumanKnowledge[nHumanID].rTimeLastInteraction
                 if bNear:
                     strTxt6 += " NEAR"
                     bSomeoneNear = 1
@@ -325,25 +354,34 @@ class HumanManager:
                     strTxt6 += " INTERACT"
                     bInteract = 1
                     bSomeoneInteract = 1
-                    
+
+                print("rTimeSinceLastInteraction: %s" % rTimeSinceLastInteraction )                    
                 if bInteract:
-                    rTimeSinceLast = time.time() - self.aHumanKnowledge[nHumanID].rTimeLastInteraction
-                    if rTimeSinceLast < 5:
-                        # still in interaction
-                        self.aHumanKnowledge[nHumanID].rDurationInteraction += rTimeSinceLast
-                        self.aHumanKnowledge[nHumanID].rTotalInteraction += rTimeSinceLast
+                    self.rTimeGlobalLastInteraction = time.time()
+                    self.bWasInteracting = bInteract
+
+                    if rTimeSinceLastInteraction < 5:
+                        # we were in interaction
+                        self.aHumanKnowledge[nHumanID].rDurationInteraction += rTimeSinceLastInteraction
+                        self.aHumanKnowledge[nHumanID].rTotalInteraction += rTimeSinceLastInteraction
+                        if self.ab: self.ab.showInteraction( face,self.aHumanKnowledge[nHumanID] )
                     else:
+                        # it's a new interaction
                         self.aHumanKnowledge[nHumanID].rDurationInteraction = 0
-                        if self.ab: self.ab.startInteraction( facepos,self.aHumanKnowledge[nHumanID] )
+                        if self.ab: self.ab.startInteraction( face,self.aHumanKnowledge[nHumanID] )
                         print("start interaction")
                     self.aHumanKnowledge[nHumanID].rTimeLastInteraction = time.time()
                     strTxt7 += "time interact: %.2f" % self.aHumanKnowledge[nHumanID].rDurationInteraction
                 
                 if not bInteract:
+                    if rTimeSinceLastInteraction >= 5:
+                        if self.bWasInteracting:
+                            self.bWasInteracting = False
+                            if self.ab: self.ab.stopInteraction()
                     if bLookAt:
-                        if self.ab: self.ab.reactToLookAt(facepos,self.aHumanKnowledge[nHumanID])
+                        if self.ab: self.ab.reactToLookAt(face,self.aHumanKnowledge[nHumanID])
                     if bNear:
-                        if self.ab: self.ab.reactToNear(facepos,self.aHumanKnowledge[nHumanID])
+                        if self.ab: self.ab.reactToNear(face,self.aHumanKnowledge[nHumanID])
                         
                 if bAddDebug:
                     y = endY-10
@@ -370,7 +408,7 @@ class HumanManager:
                     if bInteract:
                         cv2.rectangle(img,(startX,startY),(endX, endY),(255,0,0))
             # for face
-            
+
         return bSomeFace, bSomeoneLook, bSomeoneNear, bSomeoneInteract
                         
 # class HumanManager - end

@@ -63,7 +63,7 @@ class AgentBehavior:
         sound_player.soundPlayer.playFile(listSound[idx], bWaitEnd=False, rSoundVolume=rSoundVolume)
     
     def playTic( self ):
-        if time.time() - self.timeLastTic < 10:
+        if time.time() - bself.timeLastTic < 10:
             return
         self.timeLastTic = time.time()
         print("playTic")

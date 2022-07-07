@@ -128,8 +128,14 @@ def decode_custom(dct):
 
 class HumanManager:
     def __init__( self ):
-        self.cs = cloud_services.CloudServices( "robot-enhanced-education.org", 25340 )
-        #~ self.cs = cloud_services.CloudServices( "localhost", 13000 )
+        
+        self.bPepper = os.name != "nt"
+        
+        if self.bPepper:
+            self.cs = cloud_services.CloudServices( "robot-enhanced-education.org", 25340 )
+        else:
+            self.cs = cloud_services.CloudServices( "localhost", 13000 )
+            
         self.cs.setVerbose( True )
         strClientName = "test_on_the_fly" 
         try:
@@ -155,7 +161,6 @@ class HumanManager:
         self.aHumanKnowledge = {} # uid => HumanKnowledge
         self.load()
         
-        self.bPepper = os.name != "nt"
         if self.bPepper:
             import naoqi
             self.mem = naoqi.ALProxy( "ALMemory",  "localhost", 9559 );

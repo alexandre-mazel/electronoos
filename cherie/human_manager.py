@@ -86,9 +86,6 @@ def computerSay( txt ):
     tts.tts.load()
     tts.tts.say(txt)
 
-
-computerSay("demarrage")
-
 class HumanKnowledge:
     def __init__( self, nUID = -1):
         self.nUID = nUID
@@ -163,10 +160,12 @@ class HumanManager:
         
         self.bPepper = os.name != "nt"
         
-        if self.bPepper:
+        if self.bPepper or 0:
             self.cs = cloud_services.CloudServices( "robot-enhanced-education.org", 25340 )
         else:
+            computerSay("demarrage")
             self.cs = cloud_services.CloudServices( "localhost", 13000 )
+            
             
         self.cs.setVerbose( True )
         strClientName = "test_on_the_fly" 
@@ -391,7 +390,7 @@ class HumanManager:
                     if ori != None:
                         yaw,pitch,roll = ori[1]
                         strTxt6 = "orient: %.2f,%.2f,%.2f"%(yaw,pitch,roll)
-                        bLookAt = abs(yaw)<0.1 and abs(pitch)<0.5 # le pitch n'est pas si important que ca!
+                        bLookAt = abs(yaw)<0.18 and abs(pitch)<0.5 # le pitch n'est pas si important que ca!
                         if bLookAt: 
                             strTxt6 += " LOOKAT"
                         bSomeoneLook = 1
@@ -430,6 +429,7 @@ class HumanManager:
                         self.aHumanKnowledge[nHumanID].rDurationInteraction = 0
                         if self.ab: self.ab.startInteraction( face,self.aHumanKnowledge[nHumanID] )
                         print("start interaction")
+                        self.saySomething()
                     self.aHumanKnowledge[nHumanID].rTimeLastInteraction = time.time()
                     strTxt7 += "time interact: %.2f" % self.aHumanKnowledge[nHumanID].rDurationInteraction
                 
@@ -464,11 +464,8 @@ class HumanManager:
                     cv2_tools.putTextCentered(img,strTxtInfo,(int((startX+endX)/2)-10, y),nFontId, rFontSize, colFont, thickness = nFontThick );y+=dy
                     
                     if strSay != "":
-                        print('#'*40 + " SAY " + '#'*40)
-                        print("DBG: Saying: '%s'" % strSay )
                         cv2_tools.putTextCentered(img,strSay,(wImg//2, 100),nFontId, rFontSize*2, colFont, thickness = nFontThick );y+=dy
-                        if self.ab: self.ab.say(strSay)
-                        else: computerSay(strSay)
+                        self.say(strSay)
                     
                     if bLookAt:
                         cv2.rectangle(img,(startX,startY),(endX, endY),(255,255,255))
@@ -479,6 +476,24 @@ class HumanManager:
 
         return bSomeFace, bSomeoneLook, bSomeoneNear, bSomeoneInteract
                         
+                        
+    def say(self, txt):
+        print('#'*40 + " SAY " + '#'*40)
+        print("DBG: Saying: '%s'" % txt )
+        if self.ab: 
+            self.ab.say(txt)
+        else: 
+            computerSay(txt)
+            
+    def saySomething( self ):
+        """
+        ici il faudrait trouver un truc a dire.
+        """
+        print("DBG: saySomething: ICI il faudrait dire un truc")
+        if 1:
+            self.say("Ho, il fait pas chaud!")
+        
+        
 # class HumanManager - end
 humanManager = HumanManager()
 

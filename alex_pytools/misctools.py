@@ -707,6 +707,8 @@ def getPhoneticComparison( s1, s2 ):
     import metaphone
     #~ print metaphone.dm( unicode(s1) )
     #~ print metaphone.dm( unicode(s2) )
+    #~ print( metaphone.dm( s1 ) )
+    #~ print( metaphone.dm( s2 ) )
     try:
         meta1 = metaphone.dm( s1 )[0]
         meta2 = metaphone.dm( s2 )[0]
@@ -732,7 +734,13 @@ def testPhoneticComparison():
     assert_greater( getPhoneticComparison("du pain", "Dupain"), 1. )
     assert_greater( getPhoneticComparison("du pain", "Dublin"), 0.5 )
     assert_greater( getPhoneticComparison("checkin please", "chicken please"), 0.99 ) # should be less than 1. !!!
-
+    
+if 0:
+    testPhoneticComparison()
+    print( getPhoneticComparison("Hello", "Ho il") ) # ca devrait pas etre 1., c'est abuse !
+    print( getPhoneticComparison("Hello", "Hoil") ) # ca devrait pas etre 1., c'est abuse !
+    exit()
+    
 def getKeystrokeNotBlocking():
     """
     return 0 if not keyboard keys are waiting in the buffer, else return the key

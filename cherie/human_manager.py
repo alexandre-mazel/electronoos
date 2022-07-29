@@ -9,6 +9,17 @@ nohup python3 run_cloud_server.py &
 cd C:\\Users\\alexa\\\dev\\git\\electronoos\\scripts\\versatile
 python run_cloud_server.py
 
+# mettre a jour le robot:
+pscp -pw nao -P 55022 C:/Users/alexa/dev/git/electronoos/cherie/*.py nao@engrenage.studio:/home/nao/.local/lib/python2.7/site-packages/electronoos/cherie
+
+# voir des stats:
+sur agx:
+df . -h
+/dev/mmcblk0p1   28G   22G  5,0G  81% /
+ls /home/am/imgs/Jarc/* | wc
+  24568   24568 1350378
+
+
 # in case of problem:
 # taskkill /F /im python.exe
 
@@ -57,11 +68,31 @@ print(dir(JSONDecoder()))
 _defaultDecoder.default = JSONDecoder().raw_decode
 JSONDecoder.default = _defaultDecoder
 
+def getTitleFromGenderAge(listExtras):
+    astr = [
+                    ["jeune homme", "Monsieur"],
+                    ["jeune femme", "Madame"],
+                    ["jeune humain", "Humain"],
+    ]
+    gender = misctools.findInNammedListAndReturnFirstValue(listExtras,"gender",2) # no value => 2
+    age = misctools.findInNammedListAndReturnFirstValue(listExtras,"age",100)
+    idxAge = 0
+    if age >= 20:
+        idxAge = 1
+    return astr[gender][idxAge]
+    
+def computerSay( txt ):
+    import tts
+    tts.tts.load()
+    tts.tts.say(txt)
 
+
+computerSay("demarrage")
 
 class HumanKnowledge:
     def __init__( self, nUID = -1):
         self.nUID = nUID
+        self.strFirstName = ""
         self.nTotalSeen = 0
         self.nSeenToday = 0
         self.nDayStreak = 0
@@ -103,6 +134,7 @@ class HumanKnowledge:
             self.timeLastReactToLook = dct['timeLastReactToLook']
             self.timeLastReactToNear = dct['timeLastReactToNear']
             self.timeLastReactToInteract = dct['timeLastReactToInteract']
+            self.strFirstName = dct['strFirstName']
             
         except KeyError as err:
             print("WRN: HumanKnowledge.from_dict: first time exception after adding new attributes? : can't find %s" % err )
@@ -195,7 +227,7 @@ class HumanManager:
             exit(1) # don't continue, as all historic will be erased #not working
         print("INF: HumanManager.load: loaded: %d humans" % ( len(self.aHumanKnowledge) ) )
         f.close()
-        print(repr(self.aHumanKnowledge))
+        print(str(self.aHumanKnowledge))
         return 1
         
     def save( self ):
@@ -215,6 +247,9 @@ class HumanManager:
             
         if img is None:
             return None
+            
+            
+        wImg = img.shape[1]
             
         bSeenFaces = 0
         bSomeoneLook = 0
@@ -306,13 +341,15 @@ class HumanManager:
                 nHumanID = retVal[1][0][1]
                 faceposrelativeaucrop = retVal[1][0][2]  # attention: la pos du  visage  est dans l'image croppe donc pas la bonne position !
                 listExtras = retVal[1][0][3]
-                strTxt = "%d"%nHumanID
+                strTxt = "%d" % nHumanID
                 strTxt2 = ""
                 strTxt3 = ""
                 strTxt4 = ""
                 strTxt5 = ""
                 strTxt6 = ""
                 strTxt7 = ""
+                strTxtInfo = ""
+                strSay = ""
                 bLookAt = 0
                 bNear = 0
                 bInteract = 0
@@ -327,6 +364,10 @@ class HumanManager:
                     if strCurrentDay != self.aHumanKnowledge[nHumanID].strDayLastSeen:
                         # premiere fois du jour
                         if self.aHumanKnowledge[nHumanID].nTotalSeen>100:
+                            if self.aHumanKnowledge[nHumanID].nTotalSeen>1000:
+                                strSay = "Bonjour %s !" % self.aHumanKnowledge[nHumanID].strFirstName
+                            else:
+                                strSay = "Bonjour %s !" % getTitleFromGenderAge(listExtras)
                             if self.ab: self.ab.showHappy( face,self.aHumanKnowledge[nHumanID],self.aHumanKnowledge[nHumanID].nTotalSeen/100 )
                         
                         self.aHumanKnowledge[nHumanID].nSeenToday = 1
@@ -335,8 +376,11 @@ class HumanManager:
                         else:
                             self.aHumanKnowledge[nHumanID].nDayStreak = 0
                         self.aHumanKnowledge[nHumanID].strDayLastSeen = strCurrentDay
+                        self.save()
                     else:
                         self.aHumanKnowledge[nHumanID].nSeenToday += 1
+                        if self.aHumanKnowledge[nHumanID].nSeenToday % 200 == 0:
+                            self.save()
                     strTxt2 += "TotalSeen: %d" % (self.aHumanKnowledge[nHumanID].nTotalSeen)
                     strTxt3 += "nSeenToday: %d" % (self.aHumanKnowledge[nHumanID].nSeenToday)
                     strTxt4 += "nDayStreak: %d" % (self.aHumanKnowledge[nHumanID].nDayStreak)
@@ -351,7 +395,18 @@ class HumanManager:
                         if bLookAt: 
                             strTxt6 += " LOOKAT"
                         bSomeoneLook = 1
+
                     rTimeSinceLastInteraction = time.time() - self.aHumanKnowledge[nHumanID].rTimeLastInteraction
+                
+                    if bAddDebug:
+                        nGender = misctools.findInNammedList(listExtras,"gender")
+                        if nGender != None:
+                            strTxtInfo += "gender: %s, "%(nGender[1])
+                        nAge = misctools.findInNammedList(listExtras,"age")
+                        if nAge != None:
+                            strTxtInfo += "age: %s, "%(nAge[1])
+                # end user == -1
+                
                 if bNear:
                     strTxt6 += " NEAR"
                     bSomeoneNear = 1
@@ -406,6 +461,14 @@ class HumanManager:
                     cv2_tools.putTextCentered(img,strTxt5,(int((startX+endX)/2)-10, y),nFontId, rFontSize, colFont, thickness = nFontThick );y+=dy
                     cv2_tools.putTextCentered(img,strTxt6,(int((startX+endX)/2)-10, y),nFontId, rFontSize, colFont, thickness = nFontThick );y+=dy
                     cv2_tools.putTextCentered(img,strTxt7,(int((startX+endX)/2)-10, y),nFontId, rFontSize, colFont, thickness = nFontThick );y+=dy
+                    cv2_tools.putTextCentered(img,strTxtInfo,(int((startX+endX)/2)-10, y),nFontId, rFontSize, colFont, thickness = nFontThick );y+=dy
+                    
+                    if strSay != "":
+                        print('#'*40 + " SAY " + '#'*40)
+                        print("DBG: Saying: '%s'" % strSay )
+                        cv2_tools.putTextCentered(img,strSay,(wImg//2, 100),nFontId, rFontSize*2, colFont, thickness = nFontThick );y+=dy
+                        if self.ab: self.ab.say(strSay)
+                        else: computerSay(strSay)
                     
                     if bLookAt:
                         cv2.rectangle(img,(startX,startY),(endX, endY),(255,255,255))

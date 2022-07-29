@@ -13,7 +13,7 @@ loading encoding                    cp         utf                  cp          
 python 2 - literal                    0            ~cp                0               ~utf-8
 python 2 - literal avec u           0             1                     0             0
 python 2 - literal *u                 0
-python 2 - literal *c                  0
+python 2 - literal *c                  0            1
 python 2 - literal avec u+u       ~c         ~u
 python 2 - literal avec u+c       0          ~c
 

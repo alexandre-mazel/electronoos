@@ -139,7 +139,7 @@ def viewImg( strFilename, bAnalyse = False, bAnalyseAlt = False ):
             # goto last
             nChangeImageOffset = -999999999 # so it's less than 0 and it cycle to last
         elif (key == ord('f') and not bInRenamming):
-            # goto last
+            # goto first
             nChangeImageOffset = 999999999 # so it's more  than 0 and it cycle to first
 
             

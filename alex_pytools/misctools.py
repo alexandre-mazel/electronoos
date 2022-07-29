@@ -842,6 +842,17 @@ def findInNammedList( l, keyname, defaultValue = None ):
             return e
     return defaultValue
     
+def findInNammedListAndReturnFirstValue( l, keyname, defaultValue = None ):
+    """
+    look in a list looking a bit like a dict [ ["toto", 1], ["tutu",1,2] ]
+    return keyname keyname => ["toto", 1]
+    """
+    keyname = keyname.lower()
+    for e in l:
+        if e[0].lower() == keyname:
+            return e[1]
+    return defaultValue
+    
 def shuffle( aList, n = 1 ):
     """
     choose randomly n element in list, prevent double!

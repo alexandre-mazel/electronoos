@@ -22,10 +22,13 @@ class Tts:
         
         
     def load( self, strPath = None ):
+        if self.bLoaded: return
         if strPath == None:
             strPath = misctools.getUserHome() + "tts_alexandre/"
         self.strPath = strPath
         for f in sorted(  os.listdir(strPath) ):
+            if not os.path.isfile(strPath+f):
+                continue
             words = f.split(".")[0].split("__")
             if len(words)>1:
                 strWord = words[-1]
@@ -34,7 +37,7 @@ class Tts:
                 self.dWord[strWord].append(f)
                 #~ print("INF: '%s' => '%s'" % (strWord, self.dWord[strWord] ) )
             else:
-                print("WRN: '%s' no keyword found" % f )
+                print("WRN: '%s' no keyword found in this name" % f )
         self.bLoaded = True
         print("INF: load finished")
         
@@ -87,12 +90,12 @@ class Tts:
                     if words[0] in separators :
                         if words[0] in [ "," , ";", ":"]:
                             # insert silence 
-                            for i in range(1):
+                            for i in range(2):
                                 listSound.append(self.strPath+"silence_100ms.wav")
                                 
                         if words[0] in [ ".", "!", "?"]:
                             # insert silence 
-                            for i in range(2):
+                            for i in range(3):
                                 listSound.append(self.strPath+"silence_100ms.wav")
                                 
                         words = words[1:]
@@ -154,6 +157,7 @@ class Tts:
         
     def manque( self ):
         """
+        recorded in long_texte_part*
         etre, avoir, vouloir, manger, dormir, lire, jouer, ecouter, faire la sieste, creer, cuisiner, tricoter,
         faire dodo, dormir, calin, caliner, copier, recopier, pleurer, heureux, triste, sauter,
         danser, gouter, dejeuner, diner, souper, petit dejeuner, grand, grosse, fin, maigre,
@@ -185,6 +189,16 @@ class Tts:
         
         
 # class Tts - end
+
+# pour generer des sons, prendre un son avec pleins de mots entouré de blanc et faire:
+if 0:
+    import sound_processing
+    txt = "bonjour_monsieur_madame_.wav"
+    txt = "long_texte_part1.wav"
+    txt = "long_texte_part2.wav"
+    txt = "serie_courte_monsieur.wav"
+    sound_processing.autocut("c:/tts_alexandre/rough/"+txt,bAutoRename=1,bAlternativeManualInputted=1)
+    exit()
         
 tts = Tts()
 
@@ -194,7 +208,9 @@ def autoTest():
     #~ tts.say("je aimer toi")
     #~ tts.say("je aimer toi, toi aimer moi.")
     #~ tts.say("Je aimer toi, toi aimer moi. Moi gentil.")
-    tts.say("toi vouloir manger chocolat puis medicament?")
+    #~ tts.say("toi vouloir manger chocolat puis medicament?")
+    #~ tts.say("Bonjour Monsieur !")
+    tts.say("L'autre jour, j'ai vu un chien, un chat et une pizza. Et toi ?")
     #~ tts.say("c'est la phrase dites initialement par Tarzan.")
     #~ tts.say("je etre gentil, et toi? Moi ca va !") # manque etre et avoir !!!
     #~ tts.say("toi faim?")

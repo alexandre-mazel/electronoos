@@ -46,6 +46,7 @@ class AgentBehavior:
     def __init__( self ):
         self.motion = naoqi.ALProxy( "ALMotion", "localhost", 9559 )
         self.leds = naoqi.ALProxy( "ALLeds", "localhost", 9559 )
+        self.tts = naoqi.ALProxy( "ALTextToSpeech", "localhost", 9559 )
         self.listInterestedSounds = []
         for i in range(10):
             self.listInterestedSounds.append("/home/nao/sounds/interested_sound__%04d.wav" % i)
@@ -140,6 +141,10 @@ class AgentBehavior:
             self.playSmallSounds(self.listHappySounds)
             self.motion.angleInterpolation( strJoint, [rIncMove,-rIncMove,0], [rTimeMove,rTimeMove*2,rTimeMove*3], True)
             time.sleep(0.2)
+            
+    def say( self, txt ):
+        self.tts.post.say(txt)
+        
 
 # class AgentBehavior - end
 

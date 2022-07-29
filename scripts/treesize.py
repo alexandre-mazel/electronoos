@@ -108,7 +108,9 @@ def treesize(root, alldirs, allfiles, counts):
             trace('file:', path)
             counts[1] += 1
             filesize = os.path.getsize(path)
-            allfiles.append((path, filesize))
+            # Alma 2021-07-29: don't store file smaller than 1MB
+            if filesize > 1024*1024:
+                allfiles.append((path, filesize))
             sizehere += filesize
             
         elif os.path.isdir(path):
@@ -140,7 +142,9 @@ def genreport(toproot, totsize, alldirs, allfiles, counts):
         
         maxsize = max(len('{:,}'.format(size)) for (path, size) in allitems)
         for (path, size) in allitems:
-            report('{:,}'.format(size).rjust(maxsize), '=>', path)
+            # Alma 2021-07-29: don't store file smaller than 1MB
+            if size >= 1024*1024:
+                report('{:,}'.format(size).rjust(maxsize), '=>', path)
 
     report('\n[End]')
     reportfile.close()   # flush output now
@@ -173,7 +177,7 @@ if __name__ == '__main__':
     alldirs, allfiles = [], []
     counts = [1, 0]
     totsize = treesize(toproot, alldirs, allfiles, counts)
-    assert counts[0] == len(alldirs) and counts[1] == len(allfiles) 
+    #~ assert counts[0] == len(alldirs) and counts[1] == len(allfiles)  # remove assert as skip small stuffs
 
     # report results
     reportname = 'treesize-report-%s.txt' % reportsuffix

@@ -46,6 +46,8 @@ class Tts:
         for f in sorted(  os.listdir(strPath) ):
             if not os.path.isfile(strPath+f):
                 continue
+            if not ".wav" in f:
+                continue
             words = f.split(".")[0].split("__")
             if len(words)>1:
                 strWord = words[-1]

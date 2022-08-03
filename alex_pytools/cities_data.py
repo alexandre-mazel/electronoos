@@ -466,6 +466,22 @@ class Cities:
         if bVerbose: 
             print("DBG: self.dupZipPerZip: %s" % str(self.dupZipPerZip))
             print("DBG: self.dupCityPerZip: %s" % str(self.dupCityPerZip))
+            
+        # manual addings:
+        
+        #~ Monaco 98000         
+        listManual = [
+                                # (strDept,[strZips],strCitySimple,strCityReal,rLong,rLat)
+                                (98,[98000],"monaco","Monaco", 7.423792587441905,43.738345122573804)
+                        ]
+        for strDept,listZips,strCitySimple,strCityReal,rLong,rLat in listManual:
+            strCitySlug = strCitySimple+"__manual"
+            self.cityPerSlug[strCitySlug] = (strDept,listZips,strCitySimple,strCityReal,rLong,rLat)
+            for z in listZips:
+                appendToDict(self.zipToSlug, str(z),strCitySlug)
+            appendToDict(self.realNameToSlug, strCityReal,strCitySlug)
+            appendToDict(self.simpleNameToSlug, strCitySimple,strCitySlug)
+                
         print("INF: Cities: loading city data - end duration: %.2fs" % (time.time()-timeBegin) )
         # mstab7: 0.27s
         # rpi4 2.7: 11.8s
@@ -1187,6 +1203,13 @@ def autotest_cities():
     assert_equal(cities.zipToHumanised("94270"),"à Le Kremlin-Bicêtre")
     assert_equal(cities.zipToHumanised("34440"),"à Nissan-lez-Enserune")
     assert_equal(cities.zipToHumanised("75008"),"dans le 8ème arrondissement de Paris")
+    
+    retVal = cities.findByZip("98000")
+    print("DBG: autotest: get monaco: %s" % str(retVal) )
+    
+    dist = cities.distTwoZip("98000","06500",bVerbose=True) # Menton et Monaco
+    assert_diff(dist,11,4)
+    
     
 # autotest_cities - end
 

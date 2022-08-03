@@ -7,7 +7,7 @@ some classic handy classes to work on string
 (c) 2010-2022 A. Mazel
 """        
 def assert_equal( a, b ):
-    print( "%s != %s ?" % (str(a),str(b)) )
+    print( "%s == %s ?" % (str(a),str(b)) )
     if a!=b:
         assert(0)
 
@@ -110,7 +110,7 @@ def accentToHtml(s):
         s = s.replace(acc,"&"+norm+";")
         #s = s.replace(acc.decode('cp1252').encode('utf-8'),norm) # as this source ile is ascii encoded
         
-    #~ print("killAccent: return: %s" % s )
+    #~ print("accentToHtml: return: %s" % s )
     return s
     
     

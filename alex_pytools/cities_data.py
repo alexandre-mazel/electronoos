@@ -780,6 +780,10 @@ class Cities:
         
     def zipToHumanised( self, zip ):
         city = self.findByZip( zip )
+        if city == None:
+            print("zip is none: %s" % zip )
+        if city == None:
+            return ""
         strCity = city[3]
         
         if isBigCityZip(zip):

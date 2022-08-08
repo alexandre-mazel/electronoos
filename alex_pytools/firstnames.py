@@ -56,7 +56,7 @@ def openWithEncoding( filename, mode, encoding, errors = 'strict' ):
     
 def simpleString( s ):
     """
-    change a string to lower case without accent and no hypen
+    change a string to lower case without accent and no hyphen
     """
     bPrintResultForDebug = 0
     o = ""
@@ -247,6 +247,16 @@ def autotest():
     for w in line.split():
         ret = firstnames.getCompound(w)
         assert( ret is None )
+    
+    
+    # time computeGender
+    timeBeginStuff = time.time()
+    for i in range(100000):
+        firstnames.getCompound( "notexistant" )
+        firstnames.getCompound( "Jean René" )
+    duration = time.time()-timeBeginStuff
+    print("time ComputeGender: %.3fs" % (duration) )
+    assert(duration<1.2)
     
     print("INF: autotest passed [GOOD]")
     

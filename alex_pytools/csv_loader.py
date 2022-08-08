@@ -192,12 +192,19 @@ def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
     
     #~ import xlrd # pip install xlrd 
     #~ import openpyxl # pip install openpyxl 
-    try: import pandas as pd
-    except: pass # on python2.7, it will be ok
+    try: import pandas as pd # pip install pandas
+    except: print("WRN: no pandas found...") # on python2.7, it will be ok
     try: import numpy as np
     except: pass
     if os.name == "nt":
-        df = pd.read_excel( filename, sheet_name=None, header=None)
+        try:
+            df = pd.read_excel( filename, sheet_name=None, header=None)
+        except UnboundLocalError:
+            # if doesn't work with python2,  so relying on loading exploded too
+            # on my windows: python2 -m pip install pandas => LookupError: unknown encoding: cp65001
+            # mais en fait mon terminal etait messed up, so j'ai fait: set PYTHONIOENCODING=UTF-8
+            return load_datas_from_xlsx_exploded_for_python27(filename, encoding=encoding)
+
     else:
         #~ import openpyxl # pip install openpyxl # to shout if missing
         #~ df = pd.read_excel( filename, sheet_name=None, header=None, engine='openpyxl' ) # bug in 1.2.0, not in 1.1.5 # pip install pandas==1.1.5 (not existing in python2)

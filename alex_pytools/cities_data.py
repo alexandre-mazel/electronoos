@@ -781,8 +781,7 @@ class Cities:
     def zipToHumanised( self, zip ):
         city = self.findByZip( zip )
         if city == None:
-            print("zip is none: %s" % zip )
-        if city == None:
+            print("WRN: zipToHumanised city is None for zip '%s'" % zip )
             return ""
         strCity = city[3]
         

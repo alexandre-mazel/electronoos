@@ -380,7 +380,7 @@ class Cities:
     """
     Uses:
     1: Autocomplete, eg on a website: enter start of city, it completes with "full name (zip)"
-        FindByRealName( city, bPartOf = True )
+        findByRealName( city, bPartOf = True )
          
     2: Adress detection: give a zip and a city, it will validate it's really an adress, and can correct it.
         isValidAdress( zip, city ), return (zip,city,confidence) confidence of the right correction.
@@ -996,6 +996,65 @@ def isBigCityZip(zip):
             return 1
     return 0
     
+def getTop50():
+    """
+    src: https://www.linternaute.com/ville/classement/villes/population on 9 aout 2022
+    """
+    return [
+                "Paris",
+                "Marseille",
+                "Lyon",
+                "Toulouse",
+                "Nice",
+                "Nantes",
+                "Montpellier",
+                "Strasbourg",
+                "Bordeaux",
+                "Lille",
+                "Rennes",
+                "Reims",
+                "Toulon",
+                "Saint-Étienne",
+                "Le Havre",
+                "Grenoble",
+                "Dijon",
+                "Angers",
+                "Villeurbanne",
+                "Saint-Denis",
+                "Nîmes",
+                "Clermont-Ferrand",
+                "Le Mans",
+                "Aix-en-Provence",
+                "Brest",
+                "Tours",
+                "Amiens",
+                "Limoges",
+                "Annecy",
+                "Boulogne-Billancourt",
+                "Perpignan",
+                "Besançon",
+                "Metz",
+                "Orléans",
+                "Saint-Denis",
+                "Rouen",
+                "Argenteuil",
+                "Montreuil",
+                "Mulhouse",
+                "Caen",
+                "Nancy",
+                "Saint-Paul",
+                "Roubaix",
+                "Tourcoing",
+                "Nanterre",
+                "Vitry-sur-Seine",
+                "Créteil",
+                "Avignon",
+                "Poitiers",
+                "Aubervilliers",
+        ]
+
+# getTop50 - end
+    
 if 0:
     cities = Cities()
     cities.load()
@@ -1014,6 +1073,7 @@ def statByRegion(bOutputHtml=False):
     cnx.close()
     
     
+
 
 
 
@@ -1059,6 +1119,10 @@ def autotest_cities():
 
     retVal = cities.findByZip("94440")
     assert_equal( retVal[1], "94440" )
+
+    retVal = cities.findByZip("35001")
+    assert_equal( retVal[1], "35001" )    
+    
     
     
     for city in ["Nissan", "Colombiers","Paris"]:

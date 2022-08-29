@@ -233,6 +233,11 @@ def getCpuModel(bShort=False):
     """
     return a tuple marketing name, core name
     - bShort: if set, return only the core name
+    
+    # hint: have a look at cpuinfo (cache size, model, flags)
+    # import cpuinfo # pip install py-cpuinfo
+    # cpuinfo.get_cpu_info()
+    # can be tested with: python -m cpuinfo
     """
     
     if platform.system() == "Windows":

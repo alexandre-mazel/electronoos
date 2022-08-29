@@ -1089,7 +1089,7 @@ disk_write 1024KB: ####################   4.08s (244.82 Mo/s)
 disk_read  1024KB: ####################   0.34s (2911.05 Mo/s)
 
 
-*** Dell Corto/Elsa:
+*** Dell kakashi Corto/Elsa:
 windows disk size 5000
 python version   : 3.10.4 (64bits) (16 core(s))
 cpu              :  11th Gen Intel(R) Core(TM) i7-11800H CPU @ 2.30GHz

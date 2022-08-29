@@ -229,6 +229,11 @@ def getSystemCallReturn( strCommand ):
     return str(data)
 
 def getCpuModel(bShort=False):
+    """
+    return a tuple marketing name, core name
+    - bShort: if set, return only the core name
+    """
+    
     if platform.system() == "Windows":
         name1 = platform.processor()
         name2 = getSystemCallReturn( "wmic cpu get name" ).split("\n")[-3]
@@ -236,6 +241,8 @@ def getCpuModel(bShort=False):
         name1, name2 =  "TODO:getCpuModel", "todo"
     if bShort: return name2
     return name1, name2
+    
+print(getCpuModel())
 
 def is_available_resolution(cam,x,y):
     cam.set(cv2.CAP_PROP_FRAME_WIDTH, int(x))

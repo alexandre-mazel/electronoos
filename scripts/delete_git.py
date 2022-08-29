@@ -29,5 +29,8 @@ def eraseAllGit(strPath = "./"):
 
 
 if __name__ == "__main__":
+    print("WRN: it will erase all .git subfolder from current forlder !")
+    print("- press enter to continue -")
+    input()
     n = eraseAllGit()
     print("INF: nNbrDeletedFolder: %d" % n )

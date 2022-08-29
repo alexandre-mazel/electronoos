@@ -9,6 +9,7 @@ import os
 import platform
 import random
 import select
+import subprocess
 import time
 import sys
 try: import v4l2capture  # can be found here : https://github.com/gebart/python-v4l2capture
@@ -237,13 +238,31 @@ def getCpuModel(bShort=False):
     if platform.system() == "Windows":
         name1 = platform.processor()
         name2 = getSystemCallReturn( "wmic cpu get name" ).split("\n")[-3]
+    elif platform.system() == "Darwin":
+        os.environ['PATH'] = os.environ['PATH'] + os.pathsep + '/usr/sbin'
+        command ="sysctl -n machdep.cpu.brand_string"
+        name1 = subprocess.check_output(command).strip()
+        name2 = name1
+        
+    elif platform.system() == "Linux":
+        command = "cat /proc/cpuinfo"
+        all_info = subprocess.check_output(command, shell=True).decode().strip()
+        for line in all_info.split("\n"):
+            #~ print("DBG: line: '%s'" % line )
+            strLineToSearch = "model name"
+            idx = line.find(strLineToSearch)
+            if idx != -1:
+                name1 = line[idx+len(strLineToSearch)+1:].strip()
+                if name1[0] == ':':
+                    name1 = name1[1:]
+                    name1 = name1.strip()
+                break
+        name2 = name1
     else:
         name1, name2 =  "TODO:getCpuModel", "todo"
     if bShort: return name2
     return name1, name2
     
-print(getCpuModel())
-
 def is_available_resolution(cam,x,y):
     cam.set(cv2.CAP_PROP_FRAME_WIDTH, int(x))
     cam.set(cv2.CAP_PROP_FRAME_HEIGHT, int(y))

@@ -232,8 +232,8 @@ def getLongLatParis(zip):
     dMairieByArrt = {
     "75001": (48.860229481701275, 2.341144718898233),
     "75002": (48.86691549409705, 2.3405526632345692),
-    "75003": (45.760454328146665, 4.849619942213573),
-    "75004": (45.77439665631134, 4.827901461166257),
+    "75003": (48.864025116, 2.36146998405),
+    "75004": (48.856803894, 2.35105609894),
     "75005": (48.84728895451373, 2.3444269031033427),
     "75006": (48.85186486570257, 2.332323906701487),
     "75007": (48.857964521292004, 2.3203047419951717),
@@ -536,7 +536,7 @@ class Cities:
                     return None
                 
             if len(listSlug)>1:
-                self.warn("WRN: findByZip: this zip belongs to different cities: %s" % (listSlug) )
+                self.warn("WRN: findByZip: this zip '%s' belongs to different cities: %s" % (zip,listSlug) )
             k = listSlug[0]
             return self.cityPerSlug[k]
             
@@ -1175,7 +1175,12 @@ def autotest_cities():
     
     dist = cities.distTwoZip("75008","75017",bVerbose=True)
     assert_diff(dist,0.82,0.3)
+    
+    dist = cities.distTwoZip("69001","75001",bVerbose=True)
+    assert_diff(dist,400,20)
 
+    dist = cities.distTwoZip("69001","75004",bVerbose=True)
+    assert_diff(dist,400,20)
     
     assert_diff(cities.isValidAdress( "34440","colombier")[2],0.95)
     assert_diff(cities.isValidAdress( "34440","colom")[2],0.67)

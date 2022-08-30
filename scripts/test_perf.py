@@ -968,7 +968,7 @@ disk_read  1024KB: ####################   9.90s (64.64 Mo/s)
 
 # Champion1
 python version   : 3.8.10 (64bits) (8 core(s))
-cpu              : todo
+cpu              : Intel(R) Core(TM) i7-9700K CPU @ 3.60GHz
 test_cpu_int2    : ####################   0.23s
 test_cpu_float2  : ####################   0.05s
 test_scipy_xxt   : ####################   0.63s (638.44x)

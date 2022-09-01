@@ -1104,5 +1104,32 @@ disk_read     1KB: ####################   17.74s (281 Mo/s)
 disk_write 1024KB: ####################   3.31s (1375 Mo/s)
 disk_read  1024KB: ####################   1.23s (4078 Mo/s)
 
+*** don de concept: gros
+C:\dev\git\electronoos\scripts>python test_perf.py
+python version   : 3.10.6 (64bits) (2 core(s))
+cpu              : Intel(R) Pentium(R) CPU G4400 @ 3.30GHz
+test_cpu_int2    : ####################   0.52s
+test_cpu_float2  : ####################   0.08s
+test_scipy_xxt   : ####################   2.17s (184.08x)
+test_orb4.6.0    : ####################   0.29s (350.74fps)
+test_orbcv imgs  : ####################   1.62s (61.63fps)
+test_orbcv bis   : ####################   0.90s (110.84fps)
+disk_write    1KB: ####################  39.08s (25.59 Mo/s)
+disk_read     1KB: ####################   5.57s (179.69 Mo/s)
+disk_write 1024KB: ####################  19.08s (52.41 Mo/s)
+disk_read  1024KB: ####################   0.41s (2446.89 Mo/s)
 
+*** don de concept: petit
+python version   : 3.10.6 (64bits) (2 core(s))
+cpu              : Intel(R) Pentium(R) CPU G4400 @ 3.30GHz
+test_cpu_int2    : ####################   0.50s
+test_cpu_float2  : ####################   0.09s
+test_scipy_xxt   : ####################   1.58s (253.52x)
+test_orb4.6.0    : ####################   0.23s (426.77fps)
+test_orbcv imgs  : ####################   0.84s (118.55fps)
+test_orbcv bis   : ####################   0.84s (118.55fps)
+disk_write    1KB: ####################  24.98s (40.03 Mo/s)
+disk_read     1KB: ####################   8.25s (121.24 Mo/s)
+disk_write 1024KB: ####################  17.95s (55.71 Mo/s)
+disk_read  1024KB: ####################   0.33s (3049.87 Mo/s)
 """

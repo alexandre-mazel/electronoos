@@ -82,7 +82,7 @@ class FaceTracker:
         if facelandmark != []:
             yaw, pitch,roll = facerecognition_dlib.getFaceOrientation(facelandmark)
             print("yaw: %5.2f, pitch: %5.2f,roll: %5.2f" % (yaw, pitch,roll) )
-            bLookAt = abs(yaw)<0.1 and abs(pitch)<0.4 # was 0.55 and 0.2, change due to enhancement of getFaceOrientation
+            bLookAt = abs(yaw)<0.18 and abs(pitch)<0.5 # was 0.55 and 0.2, change due to enhancement of getFaceOrientation
             #~ todo recompute a subject and have a look at the result
             rSmile, rRatioSmile = facerecognition_dlib.getSmileAmount(facelandmark)
             print("rSmile: %.2f (ratio: %.2f)" % (rSmile,rRatioSmile) )
@@ -94,7 +94,7 @@ class FaceTracker:
             if bRenderDebug: emotion_detector.renderEmotion(im,detectedEmotions,40)
             nEmoID = detectedEmotions[0][1]
             rConfEmo = detectedEmotions[0][2]
-            if nEmoID == 1 and rConfEmo > 0.6:
+            if nEmoID == 1 and rConfEmo > 0.5:
                 bHappy = 1
         
             
@@ -370,7 +370,7 @@ def analyseFolder(folder):
         #~ idx = 6100 # fin m2
     
     #~ idx = 0
-    idx_end = 6100
+    #~ idx_end = 6100
     
     # result on all images:
     """
@@ -447,7 +447,6 @@ def analyseFolder(folder):
     nImageLookingAt: 221 (  5.8%) (  6.8%)
     nImageSmile    : 677 ( 17.7%) ( 21.0%)
     nImageHappy    : 492 ( 12.9%) ( 15.2%)
-
     """
     
     
@@ -456,20 +455,93 @@ def analyseFolder(folder):
     ################################
 
     if "2022_02_23_11h__13" in folder: 
-        idx = 0
         idx = 0    # debut m1
-        #~ idx = 3430  # fin m1
-        #~ idx = 3714 # debut m2
-        #~ idx = 5814 # fin m2
+        idx = 3430  # fin m1
+        idx = 3717 # debut m2
+        idx = 5814 # fin m2
+        """
+        # 2022/08/31: autre reglage face orientation
+        # m1
+        nImageAnalysed : 3431
+        nImageWithFace : 1834 ( 53.5%)
+        nImageLookingAt: 1087 ( 31.7%) ( 59.3%)
+        nImageSmile    : 1252 ( 36.5%) ( 68.3%)
+        nImageHappy    : 933 ( 27.2%) ( 50.9%)
+
+        #m2
+        nImageAnalysed : 2098
+        nImageWithFace : 1512 ( 72.1%)
+        nImageLookingAt: 789 ( 37.6%) ( 52.2%)
+        nImageSmile    : 674 ( 32.1%) ( 44.6%)
+        nImageHappy    : 302 ( 14.4%) ( 20.0%)
+        """
     
     if "2022_02_23_14h__14" in folder: 
-        idx = 0
+        idx = 0    # debut m1
+        idx = 3735  # fin m1
+        idx = 3970 # debut m2
+        idx = 6803 # fin m2
+        """
+        # m1
+        nImageAnalysed : 3736
+        nImageWithFace : 3213 ( 86.0%)
+        nImageLookingAt: 400 ( 10.7%) ( 12.4%)
+        nImageSmile    : 109 (  2.9%) (  3.4%)
+        nImageHappy    : 146 (  3.9%) (  4.5%)
+
+        #m2
+        nImageAnalysed : 2834
+        nImageWithFace : 2555 ( 90.2%)
+        nImageLookingAt: 307 ( 10.8%) ( 12.0%)
+        nImageSmile    : 67 (  2.4%) (  2.6%)
+        nImageHappy    : 70 (  2.5%) (  2.7%)
+        """
 
     if "2022_03_02_13h__21" in folder: 
-        idx = 0        
+        idx = 0    # debut m1
+        idx = 2820  # fin m1
+        idx = 3164 # debut m2
+        idx = 5054 # fin m2  
+        """
+        # m1
+        nImageAnalysed : 2821
+        nImageWithFace : 2136 ( 75.7%)
+        nImageLookingAt: 670 ( 23.8%) ( 31.4%)
+        nImageSmile    : 313 ( 11.1%) ( 14.7%)
+        nImageHappy    : 269 (  9.5%) ( 12.6%)
+
+        #m2
+        nImageAnalysed : 1891
+        nImageWithFace : 1278 ( 67.6%)
+        nImageLookingAt: 544 ( 28.8%) ( 42.6%)
+        nImageSmile    : 439 ( 23.2%) ( 34.4%)
+        nImageHappy    : 318 ( 16.8%) ( 24.9%)
+        """
 
     if "2022_03_11_9h__31" in folder: 
-        idx = 0            
+        idx = 504    # debut m1
+        #~ idx = 2410  # fin m1
+        #~ idx = 2632 # debut m2
+        #~ idx = 4888 # fin m2  
+        
+        """
+        # m1
+        nImageAnalysed : 1907
+        nImageWithFace : 1210 ( 63.5%)
+        nImageLookingAt: 626 ( 32.8%) ( 51.7%)
+        nImageSmile    : 187 (  9.8%) ( 15.5%)
+        nImageHappy    : 143 (  7.5%) ( 11.8%)
+
+        #m2
+        nImageAnalysed : 2257
+        nImageWithFace : 1277 ( 56.6%)
+        nImageLookingAt: 296 ( 13.1%) ( 23.2%)
+        nImageSmile    : 83 (  3.7%) (  6.5%)
+        nImageHappy    : 136 (  6.0%) ( 10.6%)
+        """
+
+    idx = 2632
+    idx_end = 4888
         
         
     if bSpeedTest: idx = 0

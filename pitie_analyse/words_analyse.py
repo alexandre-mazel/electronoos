@@ -2,24 +2,70 @@
 
 
 listFiles = ["cj1","cj2","cm1","cm2","rj1","rj2","rm1","rm2"]
+txt_sample = "euh bah y a un temps de repos qui est nécessaire dans la vie euh on va dire biologique et même machinique je pense euh c'est bien d'avoir un temps de repos après une journée bien remplie et donc parfois on s'ennuit  mais c'est parfois du bon ennui et je pense que c'est nécessaire pour être en pleine forme et pour reprendre une bonne journée après avec ce qu'on a à faire et ce qu'on veut faire surtout voila"
 
 
+def count_substring(s,sub):
+    """
+    count how much time are sub in s
+    """
+    if 0:
+        n = 0
+        while 1:
+            i = s.find(sub)
+            if i == -1:
+                return n
+            n += 1
+            s = s[i+len(sub):]
+        return -1
+    return s.count(sub)  # faster ? (i guess)
 
 def getPerso(txt):
     """
     return ratio perso / genéralité
     """
-    perso = ["je","tu"]
-    general = ["on", "nous", "vous", "ils"]
+    bVerbose = 1
+    bVerbose = 0
+    txt = txt.lower()
+    perso = ["je","tu", "moi", "j'ai", "j'aime"]
+    general = ["on", "nous", "vous", "ils"] # pb: Sophie dit que "je pense" c'est du générique
+    general_sub = ["je pense"]
     words = txt.split()
     nPerso = nGene = 0
     for w in words:
         #~ print(w)
-        if w.lower() in perso:
+        if w in perso:
+            if bVerbose: print("perso: " + w)
             nPerso += 1
-        if w.lower() in general:
+        if w in general:
+            if bVerbose: print("gene: " + w)
             nGene += 1
+            
+    if 1:
+        # add substring
+        for sub in general_sub:
+            nGene += count_substring(txt,sub)
     return nPerso/nGene
+
+print("perso sample: %s" % getPerso(txt_sample))
+#~ exit()
+
+def getRespirationLexiqueRatio(txt):
+    bVerbose = 1
+    bVerbose = 0
+    txt = txt.lower()
+    #~ respi_list = ["respi", "inspi", "souffle", "étouff", "air", "oxyg", "etouff"]
+    respi_list = ["différence", "diff", "différent", "toi", "moi"] # indique la différence
+    n = 0
+    for sub in respi_list:
+        n += count_substring(txt,sub)
+    return n*100/len(txt) # 2 possibl: nbr lettre or nbr word ?
+    #~ return n*100/len(txt.split()) # 2 possibl: nbr lettre or nbr word ?
+            
+    
+print("respi sample: %s%%" % getRespirationLexiqueRatio(txt_sample))
+#~ exit()
+
 
 
 def analyse():
@@ -30,7 +76,8 @@ def analyse():
     for i,f in enumerate(listFiles):
         file = open(f+".txt","rt",encoding="cp1252")
         txt = file.read()
-        perso = getPerso(txt)
+        file.close()
+        perso = getRespirationLexiqueRatio(txt)
         bControl = i < 4
         bJour = (i % 4) < 2
         bQuestion1 = (i % 2) < 1
@@ -50,17 +97,45 @@ def analyse():
             perso_2 += perso  
             
         print("%s: %.2f" % (f,perso) )
-        file.close()
+        
+        if 1:
+            print("\n%s: words:" % f)
+            # 3 mots les plus fréquents
+            from collections import Counter
+            cnt = Counter(txt.lower().split())
+            n = 0
+            #~ print(cnt)
+            for word, freq in sorted(cnt.items(),key=lambda x: x[1],reverse=True):
+                if len(word)<4:
+                    continue
+                if word in ["c'est","donc","mais","pour", "parce", "dans", "alors", "voila", "voilà", "quand"]:
+                    continue
+                print("  %s:%s" % (word,freq))
+                n += 1
+                if n > 10:
+                    break
+            print("")
     
-    print("control perso: %.2f" % (perso_c) )
-    print("respira perso: %.2f" % (perso_r) )    
+    print()
+    
+    print("control: %.2f" % (perso_c) )
+    print("respira: %.2f" % (perso_r) )    
+    print("ratio: %.2f" % (perso_c/perso_r))
+    print()
+    
+    print("jour: %.2f" % (perso_j) )
+    print("masque: %.2f" % (perso_m) )   
+    print("ratio: %.2f" % (perso_j/perso_m))
+    print()    
 
-    print("jour perso: %.2f" % (perso_c) )
-    print("masque perso: %.2f" % (perso_r) )    
-
-    print("q1 perso: %.2f" % (perso_1) )
-    print("q2 perso: %.2f" % (perso_2) )
+    print("q1: %.2f" % (perso_1) )
+    print("q2: %.2f" % (perso_2) )
+    print("ratio: %.2f" % (perso_1/perso_2))
+    print()    
     
 # analyse - end
+
+# todo: polarité. stat des 3 mots les plus courants
+
     
 analyse()

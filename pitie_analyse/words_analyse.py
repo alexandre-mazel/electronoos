@@ -5,20 +5,40 @@ listFiles = ["cj1","cj2","cm1","cm2","rj1","rj2","rm1","rm2"]
 txt_sample = "euh bah y a un temps de repos qui est nécessaire dans la vie euh on va dire biologique et même machinique je pense euh c'est bien d'avoir un temps de repos après une journée bien remplie et donc parfois on s'ennuit  mais c'est parfois du bon ennui et je pense que c'est nécessaire pour être en pleine forme et pour reprendre une bonne journée après avec ce qu'on a à faire et ce qu'on veut faire surtout voila"
 
 
-def count_substring(s,sub):
+def count_substring(s,sub, bSeparated=False):
     """
     count how much time are sub in s
     """
-    if 0:
+    if 1:
+        bVerbose=1
+        #~ bVerbose=0
         n = 0
         while 1:
             i = s.find(sub)
             if i == -1:
                 return n
-            n += 1
+
+            bOk = False
+            if not bSeparated:
+                bOk = True
+            else:
+                sepa = [" ", ",", ".", ";", "'","-","\n"]
+                if      ( i==0 or s[i-1] in sepa ) \
+                    and ( i+len(sub)>=len(s) or s[i+len(sub)] in sepa ) \
+                :
+                    bOk = True
+                else:
+                    if bVerbose: 
+                        start = max(0,i-10)
+                        print("DBG: count_substring: '%s' and '%s'   <= pas separated" % (sub, s[start:i+len(sub)+10].replace("\n","N")) )
+            if bOk:
+                n += 1
+                if bVerbose: 
+                    start = max(0,i-10)
+                    print("DBG: count_substring: '%s' and '%s'" % (sub,s[start:i+len(sub)+10].replace("\n","N")) )
             s = s[i+len(sub):]
         return -1
-    return s.count(sub)  # faster ? (i guess)
+    return s.count(sub)  # faster ? (i guess) mais pas autant de maitrise
 
 def getPerso(txt):
     """
@@ -54,7 +74,7 @@ def getAdresse(txt):
     bVerbose = 1
     bVerbose = 0
     txt = txt.lower()
-    perso = ["tu", "toi","pepper"]
+    perso = ["tu", "toi","pepper"] # et te ?
     words = txt.split()
     nCount = nGene = 0
     for w in words:
@@ -64,7 +84,7 @@ def getAdresse(txt):
             nCount += 1
     return nCount/len(txt)
 
-print("perso sample: %s" % getPerso(txt_sample))
+#~ print("perso sample: %s" % getPerso(txt_sample))
 # perso sample: 0.5
 
 #~ exit()
@@ -73,17 +93,21 @@ def getRespirationLexiqueRatio(txt,nChangeDict=0):
     bVerbose = 1
     bVerbose = 0
     txt = txt.lower()
-    respi_list = ["respi", "inspi", "souffle", "étouff", "air", "oxyg", "etouff"]
+    bSeparated = True
+    #~ respi_list = ["respi", "inspi", "souffle", "étouff", "air", "oxyg", "etouff"] # avec not separated, mais choppe faire quand air, bad!
+    respi_list = ["respire", "respires", "respiratoire", "respiratoires", "respirer", "inspi", "souffle", "étouffer", "air", "oxyg", "etouff"] # avec not separated, mais choppe faire quand air, bad!
     if nChangeDict == 1:
-        respi_list = ["différence", "diff", "différent", "toi", "moi"] # indique la différence
+        bSeparated = True
+        respi_list = ["différence", "different", "differente", "différent", "différents","différente", "différentes", "toi", "moi", "contrairement à toi"] # indique la différence mais va compter: on n'est pas différent comme 1, args!
+        #on a chopper par erreur: moins, moitié, respiratoire, obligatoire => ajout de l'option separated
     n = 0
     for sub in respi_list:
-        n += count_substring(txt,sub)
+        n += count_substring(txt,sub,bSeparated)
     return n*100/len(txt) # 2 possibles: nbr lettre or nbr word ?
     #~ return n*100/len(txt.split())
             
     
-print("respi sample: %s%%" % getRespirationLexiqueRatio(txt_sample))
+#~ print("respi sample: %s%%" % getRespirationLexiqueRatio(txt_sample))
 #respi sample: 0.9779951100244498%
 #~ exit()
 
@@ -104,13 +128,13 @@ def analyse():
         
         #~ ratio = getPerso(txt) # change on jour/masque: 1.26 et q1/q2: 1.65
         
-        ratio = getRespirationLexiqueRatio(txt)
-        # sur concept de respiration: control/respi: 0.66, jour/masque: 0.68,  q1/q2: 1.31
+        #~ ratio = getRespirationLexiqueRatio(txt)
+        # sur concept de respiration: control/respi: 0.33,  jour/masque: 0.04,  q1/q2: 1.09
         
         #~ ratio = getRespirationLexiqueRatio(txt,1)
-        # sur concept de difference: control/respi: 1.14
+        # sur concept de difference: control/respi: 1.10
         
-        #~ ratio = getAdresse(txt) # no change but on q1/q2: 0.81
+        ratio = getAdresse(txt) # no change but on q1/q2: 0.81
         
         
         bControl = i < 4
@@ -133,7 +157,7 @@ def analyse():
             
         print("%s: %.2f" % (f,ratio) )
         
-        if 1:
+        if 0:
             print("\n%s: words:" % f)
             # 3 mots les plus fréquents
             from collections import Counter

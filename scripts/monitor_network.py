@@ -1,8 +1,11 @@
 
-
 import os 
 import subprocess
+import sys
 import time
+
+sys.path.append( "../alex_pytools/")
+import misctools
 
 def getNetworkStat_netstat():
     """
@@ -82,11 +85,12 @@ def analyseBandwith():
     r_init, s_init, t_init = getNetworkStat()
     ar_1, as_1, at_1 = [],[],[] # store stat during last minute
     ar_h, as_h, at_h = [],[],[] # store stat during last hour
-    ar_t, as_t, at_t = [],[],[] # store stat today
+    r_t, s_t, t_t = 0,0,0 # store stat today (non glissant)
     r_p,s_p,t_p = r_init, s_init, t_init # since last call
     nPeriodSec = 5
     timeBegin = time.time()
     cptLoop = 0
+    nPrevDay = -1
     while 1:
         r,s,t = getNetworkStat()
         # compute difference
@@ -101,17 +105,27 @@ def analyseBandwith():
         as_h.append(s-s_p)
         at_h.append(t-t_p)
         
-        ar_t.append(r-r_p)
-        as_t.append(s-s_p)
-        at_t.append(t-t_p)
-        if len(ar_1) > (3*60/nPeriodSec):
+        r_t += r-r_p
+        s_t += s-s_p
+        t_t += t-t_p
+        
+        if len(ar_1) > (5*60/nPeriodSec):
             del ar_1[0]
             del as_1[0]
             del at_1[0]
         if len(ar_h) > (60*60/nPeriodSec):
             del ar_h[0]
             del as_h[0]
-            del at_h[0]            
+            del at_h[0]
+
+        dummy1,dummy2,d = misctools.getDay()
+        if nPrevDay != d:
+            nPrevDay = d
+            r_t = 0
+            s_t = 0
+            t_t = 0
+
+            
         if 1:
             # render bargraph in ascii
             nMB = (t-t_p)/(1024*1024)
@@ -124,13 +138,14 @@ def analyseBandwith():
                 nr = int(round((r-r_p)/(1024*1024)))
                 ns = int(round((s-s_p)/(1024*1024)))
                 strLine = "%4dMB " % nMB + "r"*nr + "s"*ns
-            nLenLineToEraseAboveStat = 160
+            nLenLineToEraseAboveStat = 170
             if len(strLine) < nLenLineToEraseAboveStat:
                 strLine += " " * (nLenLineToEraseAboveStat-len(strLine))
             print(  strLine )
             
-        print("%s/%s Received: %s, Send: %s, Total: %s    LastHour: r: %s, s:%s, t:%s    Last3Min: r: %s, s:%s, t:%s      \r" % (
+        print("%s/%s Received: %s, Send: %s, Total: %s   day: r: %s, s:%s, t:%s   Hour: r: %s, s:%s, t:%s   Last5Min: r: %s, s:%s, t:%s      \r" % (
                                             printSmartTime(cptLoop*nPeriodSec), printSmartTime(time.time()-timeBegin), printSmart(rd),printSmart(sd),printSmart(td),
+                                            printSmart(r_t),printSmart(s_t),printSmart(t_t),
                                             printSmart(sum(ar_h)),printSmart(sum(as_h)),printSmart(sum(at_h)), # WRN: generate huge computation ! should sum by minutes!
                                             printSmart(sum(ar_1)),printSmart(sum(as_1)),printSmart(sum(at_1))
                                             ),

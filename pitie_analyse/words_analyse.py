@@ -28,8 +28,8 @@ def getPerso(txt):
     bVerbose = 0
     txt = txt.lower()
     perso = ["je","tu", "moi", "j'ai", "j'aime"]
-    general = ["on", "nous", "vous", "ils"] # pb: Sophie dit que "je pense" c'est du générique
-    general_sub = ["je pense"]
+    general = ["on", "nous", "vous", "ils"]
+    general_sub = ["je pense"] # pb: Sophie dit que "je pense" c'est du générique
     words = txt.split()
     nPerso = nGene = 0
     for w in words:
@@ -46,8 +46,27 @@ def getPerso(txt):
         for sub in general_sub:
             nGene += count_substring(txt,sub)
     return nPerso/nGene
+    
+def getAdresse(txt):
+    """
+    return percentage of adressage a la personne en face
+    """
+    bVerbose = 1
+    bVerbose = 0
+    txt = txt.lower()
+    perso = ["tu", "toi","pepper"]
+    words = txt.split()
+    nCount = nGene = 0
+    for w in words:
+        #~ print(w)
+        if w in perso:
+            if bVerbose: print("addresse: " + w)
+            nCount += 1
+    return nCount/len(txt)
 
 print("perso sample: %s" % getPerso(txt_sample))
+# perso sample: 0.5
+
 #~ exit()
 
 def getRespirationLexiqueRatio(txt):
@@ -59,11 +78,12 @@ def getRespirationLexiqueRatio(txt):
     n = 0
     for sub in respi_list:
         n += count_substring(txt,sub)
-    return n*100/len(txt) # 2 possibl: nbr lettre or nbr word ?
-    #~ return n*100/len(txt.split()) # 2 possibl: nbr lettre or nbr word ?
+    return n*100/len(txt) # 2 possibles: nbr lettre or nbr word ?
+    #~ return n*100/len(txt.split())
             
     
 print("respi sample: %s%%" % getRespirationLexiqueRatio(txt_sample))
+#respi sample: 0.9779951100244498%
 #~ exit()
 
 
@@ -77,26 +97,28 @@ def analyse():
         file = open(f+".txt","rt",encoding="cp1252")
         txt = file.read()
         file.close()
-        perso = getRespirationLexiqueRatio(txt)
+        #~ ratio = getPerso(txt) # change on jour/masque: 1.26 et q1/q2: 1.65
+        ratio = getRespirationLexiqueRatio(txt)
+        #~ ratio = getAdresse(txt) # no change but on q1/q2: 0.81
         bControl = i < 4
         bJour = (i % 4) < 2
         bQuestion1 = (i % 2) < 1
         if bControl:
-            perso_c += perso
+            perso_c += ratio
         else:
-            perso_r += perso         
+            perso_r += ratio         
             
         if bJour:
-            perso_j += perso
+            perso_j += ratio
         else:
-            perso_m += perso  
+            perso_m += ratio  
             
         if bQuestion1:
-            perso_1 += perso
+            perso_1 += ratio
         else:
-            perso_2 += perso  
+            perso_2 += ratio  
             
-        print("%s: %.2f" % (f,perso) )
+        print("%s: %.2f" % (f,ratio) )
         
         if 1:
             print("\n%s: words:" % f)

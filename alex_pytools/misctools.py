@@ -146,6 +146,13 @@ def getTime():
     """
     datetimeObject = datetime.datetime.now()
     return datetimeObject.hour, datetimeObject.minute, datetimeObject.second 
+
+def getDay():
+    """
+    return (year, month, day)
+    """
+    datetimeObject = datetime.datetime.now()
+    return datetimeObject.year, datetimeObject.month, datetimeObject.day 
     
 def getDayStamp():
     """

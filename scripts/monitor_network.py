@@ -60,7 +60,7 @@ def printSmart(v):
     while v > 1024:
         v /= 1024
         idxUnit += 1
-    return "%.2f%s" % (v,listUnit[idxUnit])
+    return "%.1f%s" % (v,listUnit[idxUnit])
     
 def printSmartTime(ts):
     """
@@ -82,6 +82,7 @@ def analyseBandwith():
     r_init, s_init, t_init = getNetworkStat()
     ar_1, as_1, at_1 = [],[],[] # store stat during last minute
     ar_h, as_h, at_h = [],[],[] # store stat during last hour
+    ar_t, as_t, at_t = [],[],[] # store stat today
     r_p,s_p,t_p = r_init, s_init, t_init # since last call
     nPeriodSec = 5
     timeBegin = time.time()
@@ -95,9 +96,14 @@ def analyseBandwith():
         ar_1.append(r-r_p)
         as_1.append(s-s_p)
         at_1.append(t-t_p)
+        
         ar_h.append(r-r_p)
         as_h.append(s-s_p)
         at_h.append(t-t_p)
+        
+        ar_t.append(r-r_p)
+        as_t.append(s-s_p)
+        at_t.append(t-t_p)
         if len(ar_1) > (3*60/nPeriodSec):
             del ar_1[0]
             del as_1[0]

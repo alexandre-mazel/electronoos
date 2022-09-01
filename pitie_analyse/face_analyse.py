@@ -542,7 +542,31 @@ def analyseFolder(folder):
 
     idx = 2632
     idx_end = 4888
-        
+    
+
+"""
+annotation temps total temp regard, sourire_clara, sourire_alexandre:
+13: 
+    S1: 690.6 200.46 177.41 197.5
+    S2: 552.8  152.2 81.9 80.8
+    
+14:
+    S1: 790.5 114.3 67.25 42.6
+    S2: 704.8 76.6 54.5 43.9
+    
+21:
+    S1: 556.8 139.9 78.027 77.1
+    S2: 550.6 132.1 51.5 50.3
+    
+31:
+    S1: 615.4 178.2 24.8 25.8
+    S2: 579.8 150.2 26.5 25.5
+    
+44:
+    S1: 
+    S2: 
+"""
+
         
     if bSpeedTest: idx = 0
     if bSpeedTest: bRenderDebug = 0
@@ -643,27 +667,6 @@ F 031BL 11/3 9h
 54: 01/4 16h30 la deuxeme: teeshirt blanc chatain avec lunettes
 67: 20/4 11h15
 
-
-annotation temps total temp regard, sourire_clara, sourire_alexandre:
-13: 
-    S1: 690.6 200.46 177.41 197.5
-    S2: 552.8  152.2 81.9 80.8
-    
-14:
-    S1: 790.5 114.3 67.25 42.6
-    S2: 704.8 76.6 54.5 43.9
-    
-21:
-    S1: 556.8 139.9 78.027 77.1
-    S2: 550.6 132.1 51.5 50.3
-    
-31:
-    S1: 615.4 178.2 24.8 25.8
-    S2: 579.8 150.2 26.5 25.5
-    
-44:
-    S1: 
-    S2: 
     
 """
             

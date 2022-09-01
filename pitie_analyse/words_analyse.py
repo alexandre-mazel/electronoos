@@ -69,12 +69,13 @@ print("perso sample: %s" % getPerso(txt_sample))
 
 #~ exit()
 
-def getRespirationLexiqueRatio(txt):
+def getRespirationLexiqueRatio(txt,nChangeDict=0):
     bVerbose = 1
     bVerbose = 0
     txt = txt.lower()
-    #~ respi_list = ["respi", "inspi", "souffle", "étouff", "air", "oxyg", "etouff"]
-    respi_list = ["différence", "diff", "différent", "toi", "moi"] # indique la différence
+    respi_list = ["respi", "inspi", "souffle", "étouff", "air", "oxyg", "etouff"]
+    if nChangeDict == 1:
+        respi_list = ["différence", "diff", "différent", "toi", "moi"] # indique la différence
     n = 0
     for sub in respi_list:
         n += count_substring(txt,sub)
@@ -97,9 +98,21 @@ def analyse():
         file = open(f+".txt","rt",encoding="cp1252")
         txt = file.read()
         file.close()
+        
+        nbrLine = len(txt.split("\n"))
+        #~ print("%s: %d lines" % (f,nbrLine)) #tout le temps 20 lignes
+        
         #~ ratio = getPerso(txt) # change on jour/masque: 1.26 et q1/q2: 1.65
+        
         ratio = getRespirationLexiqueRatio(txt)
+        # sur concept de respiration: control/respi: 0.66, jour/masque: 0.68,  q1/q2: 1.31
+        
+        #~ ratio = getRespirationLexiqueRatio(txt,1)
+        # sur concept de difference: control/respi: 1.14
+        
         #~ ratio = getAdresse(txt) # no change but on q1/q2: 0.81
+        
+        
         bControl = i < 4
         bJour = (i % 4) < 2
         bQuestion1 = (i % 2) < 1

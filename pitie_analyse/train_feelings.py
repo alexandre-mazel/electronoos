@@ -70,8 +70,8 @@ testPola = [
     "si il s'agissait d'un concours du plus nul, il gagnerait", -1,
 ]
 
-if 0:
-#~ if 1:
+#~ if 0:
+if 1:
     # simple and balanced
     testPola = testPola[:6]
 
@@ -182,8 +182,10 @@ def train():
             if (i % 100)==0:
                 print("%d/%d" % (i,len(reviews)) )
             if 1:
-                #~ if i > 5000:
-                if i > 500:
+                if i > 5000:
+                #~ if i > 2000:
+                #~ if i > 500:
+                #~ if i > 400:
                     break
         
     classifierPola = sklearn.svm.SVC(gamma='scale', kernel='rbf', C=17, class_weight='balanced', probability=False)
@@ -192,6 +194,7 @@ def train():
     joblib.dump(classifierPola, 'models/clf_pola.pkl')
     
 def test():
+    print("INF: test: start")
     classifierPola = joblib.load('models/clf_pola.pkl')
     listTest = [
                 ["c'est bien",0.6],
@@ -209,6 +212,21 @@ def test():
                 ["jean-pierre est nul",-0.6],
                 ["je suis pas content c'est trop nul",-1.],
                 ["j'ai passé un super moment c'était top",1.],
+                ["ohlala cette chose est trop incroyable",0.7],
+                ["c'est incroyable",0.7],
+                ["c'est de la merde",-1.],
+                ["c'est éclaté au sol",-1.],
+                ["j'ai aimé",0.7],
+                ["je n'ai pas aimé",-0.7],
+                ["c'est ni bien ni mal",0.],
+                ["c'est ni mal ni bien",0.],
+                ["j'y met du mien",0.5],
+                ["tu n'y met pas du tien",-0.5],
+                ["j'aime",0.8],
+                ["j'aime pas",-0.8],
+                ["je n'aime pas",-0.8],
+                ["je n'aime pas du tout",-1.],
+                
             ]
     rSumDiff = 0
     nNbrPolaOk = 0
@@ -241,6 +259,7 @@ def test():
         nCpt += 1
     print("rAvgDiff: %.3f" % (rSumDiff/nCpt ) )
     print("pola_ok: %.3f" % (nNbrPolaOk/nCpt) )
+
         
         
 """
@@ -349,10 +368,16 @@ jean-pierre est super => [1], 1.00, diff:0.00, bPolaOk:1
 jean-pierre est nul => [1], 1.00, diff:2.00, bPolaOk:0
 je suis pas content c'est trop nul => [0], 0.00, diff:0.00, bPolaOk:1
 j'ai passé un super moment c'était top => [1], 1.00, diff:0.00, bPolaOk:1
-rAvgDiff: 0.133
-pola_ok: 0.933
+ohlala cette chose est trop incroyable => [1], 1.00, diff:0.00, bPolaOk:1
+c'est incroyable => [1], 1.00, diff:0.00, bPolaOk:1
+c'est de la merde => [0], 0.00, diff:0.00, bPolaOk:1
+c'est éclaté au sol => [1], 1.00, diff:2.00, bPolaOk:0
+j'ai aimé => [1], 1.00, diff:0.00, bPolaOk:1
+je n'ai pas aimé => [1], 1.00, diff:2.00, bPolaOk:0
+rAvgDiff: 0.286
+pola_ok: 0.857
 
-500 C17
+500 C17 (C10 meme resultat)
 c'est bien => [1], 1.00, diff:0.00, bPolaOk:1
 c'est très bien => [1], 1.00, diff:0.00, bPolaOk:1
 c'est pas bien => [0], 0.00, diff:0.00, bPolaOk:1
@@ -368,16 +393,22 @@ jean-pierre est super => [1], 1.00, diff:0.00, bPolaOk:1
 jean-pierre est nul => [0], 0.00, diff:0.00, bPolaOk:1
 je suis pas content c'est trop nul => [0], 0.00, diff:0.00, bPolaOk:1
 j'ai passé un super moment c'était top => [1], 1.00, diff:0.00, bPolaOk:1
-rAvgDiff: 0.400
-pola_ok: 0.800
+ohlala cette chose est trop incroyable => [1], 1.00, diff:0.00, bPolaOk:1
+c'est incroyable => [1], 1.00, diff:0.00, bPolaOk:1
+c'est de la merde => [0], 0.00, diff:0.00, bPolaOk:1
+c'est éclaté au sol => [1], 1.00, diff:2.00, bPolaOk:0
+j'ai aimé => [1], 1.00, diff:0.00, bPolaOk:1
+je n'ai pas aimé => [0], 0.00, diff:0.00, bPolaOk:1
+rAvgDiff: 0.381
+pola_ok: 0.810
 
-500 C10
+2000 C17
 c'est bien => [1], 1.00, diff:0.00, bPolaOk:1
 c'est très bien => [1], 1.00, diff:0.00, bPolaOk:1
 c'est pas bien => [0], 0.00, diff:0.00, bPolaOk:1
 c'est nul => [0], 0.00, diff:0.00, bPolaOk:1
 c'est très nul => [1], 1.00, diff:2.00, bPolaOk:0
-c'est pas nul => [1], 1.00, diff:0.00, bPolaOk:1
+c'est pas nul => [0], 0.00, diff:2.00, bPolaOk:0
 le cinéma c'est super => [0], 0.00, diff:2.00, bPolaOk:0
 le cinéma c'est top => [0], 0.00, diff:2.00, bPolaOk:0
 le cinéma c'est nul => [0], 0.00, diff:0.00, bPolaOk:1
@@ -387,12 +418,28 @@ jean-pierre est super => [1], 1.00, diff:0.00, bPolaOk:1
 jean-pierre est nul => [0], 0.00, diff:0.00, bPolaOk:1
 je suis pas content c'est trop nul => [0], 0.00, diff:0.00, bPolaOk:1
 j'ai passé un super moment c'était top => [1], 1.00, diff:0.00, bPolaOk:1
-rAvgDiff: 0.400
-pola_ok: 0.800
+ohlala cette chose est trop incroyable => [1], 1.00, diff:0.00, bPolaOk:1
+c'est incroyable => [1], 1.00, diff:0.00, bPolaOk:1
+c'est de la merde => [0], 0.00, diff:0.00, bPolaOk:1
+c'est éclaté au sol => [0], 0.00, diff:0.00, bPolaOk:1
+j'ai aimé => [1], 1.00, diff:0.00, bPolaOk:1
+je n'ai pas aimé => [0], 0.00, diff:0.00, bPolaOk:1
+rAvgDiff: 0.381
+pola_ok: 0.810
 
 
 """
+
+def interactive():
+    print("INF: Entering interactive word")
+    classifierPola = joblib.load('models/clf_pola.pkl')
+    while 1:
+        txt = input("your sentence:\n")
+        feats = txtToFeats(txt)
+        predicted = classifierPola.predict([feats])
+        print("'%s' => %s" % (txt,predicted) ) 
     
 #~ explore()
 train()
 test()
+interactive()

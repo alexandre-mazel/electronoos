@@ -182,9 +182,9 @@ def train():
             if (i % 100)==0:
                 print("%d/%d" % (i,len(reviews)) )
             if 1:
-                if i > 5000:
+                #~ if i > 5000:
                 #~ if i > 2000:
-                #~ if i > 500:
+                if i > 500:
                 #~ if i > 400:
                     break
         
@@ -374,8 +374,16 @@ c'est de la merde => [0], 0.00, diff:0.00, bPolaOk:1
 c'est éclaté au sol => [1], 1.00, diff:2.00, bPolaOk:0
 j'ai aimé => [1], 1.00, diff:0.00, bPolaOk:1
 je n'ai pas aimé => [1], 1.00, diff:2.00, bPolaOk:0
-rAvgDiff: 0.286
-pola_ok: 0.857
+c'est ni bien ni mal => [1], 1.00, diff:0.00, bPolaOk:1
+c'est ni mal ni bien => [0], 0.00, diff:2.00, bPolaOk:0
+j'y met du mien => [1], 1.00, diff:0.00, bPolaOk:1
+tu n'y met pas du tien => [0], 0.00, diff:0.00, bPolaOk:1
+j'aime => [1], 1.00, diff:0.00, bPolaOk:1
+j'aime pas => [1], 1.00, diff:2.00, bPolaOk:0
+je n'aime pas => [1], 1.00, diff:2.00, bPolaOk:0
+je n'aime pas du tout => [0], 0.00, diff:0.00, bPolaOk:1
+rAvgDiff: 0.414
+pola_ok: 0.793
 
 500 C17 (C10 meme resultat)
 c'est bien => [1], 1.00, diff:0.00, bPolaOk:1
@@ -424,8 +432,21 @@ c'est de la merde => [0], 0.00, diff:0.00, bPolaOk:1
 c'est éclaté au sol => [0], 0.00, diff:0.00, bPolaOk:1
 j'ai aimé => [1], 1.00, diff:0.00, bPolaOk:1
 je n'ai pas aimé => [0], 0.00, diff:0.00, bPolaOk:1
-rAvgDiff: 0.381
-pola_ok: 0.810
+c'est ni bien ni mal => [1], 1.00, diff:0.00, bPolaOk:1
+c'est ni mal ni bien => [1], 1.00, diff:0.00, bPolaOk:1
+j'y met du mien => [1], 1.00, diff:0.00, bPolaOk:1
+tu n'y met pas du tien => [0], 0.00, diff:0.00, bPolaOk:1
+j'aime => [1], 1.00, diff:0.00, bPolaOk:1
+j'aime pas => [0], 0.00, diff:0.00, bPolaOk:1
+je n'aime pas => [0], 0.00, diff:0.00, bPolaOk:1
+je n'aime pas du tout => [0], 0.00, diff:0.00, bPolaOk:1
+rAvgDiff: 0.276
+pola_ok: 0.862
+
+5000 C17 (sur kakashi):
+rAvgDiff: 0.414
+pola_ok: 0.793
+
 
 
 """
@@ -442,4 +463,4 @@ def interactive():
 #~ explore()
 train()
 test()
-interactive()
+#~ interactive()

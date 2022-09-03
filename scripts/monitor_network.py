@@ -138,12 +138,12 @@ def analyseBandwith():
                 nr = int(round((r-r_p)/(1024*1024)))
                 ns = int(round((s-s_p)/(1024*1024)))
                 strLine = "%4dMB " % nMB + "r"*nr + "s"*ns
-            nLenLineToEraseAboveStat = 170
+            nLenLineToEraseAboveStat = 175
             if len(strLine) < nLenLineToEraseAboveStat:
                 strLine += " " * (nLenLineToEraseAboveStat-len(strLine))
             print(  strLine )
             
-        print("%s/%s Received: %s, Send: %s, Total: %s   day: r: %s, s:%s, t:%s   Hour: r: %s, s:%s, t:%s   Last5Min: r: %s, s:%s, t:%s      \r" % (
+        print("%s/%s Received: %s, Send: %s, Total: %s   day: r: %s, s:%s, t:%s   Hour: r: %s, s:%s, t:%s   Last5Min: %s %s %s      \r" % (
                                             printSmartTime(cptLoop*nPeriodSec), printSmartTime(time.time()-timeBegin), printSmart(rd),printSmart(sd),printSmart(td),
                                             printSmart(r_t),printSmart(s_t),printSmart(t_t),
                                             printSmart(sum(ar_h)),printSmart(sum(as_h)),printSmart(sum(at_h)), # WRN: generate huge computation ! should sum by minutes!

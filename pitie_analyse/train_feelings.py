@@ -5,7 +5,7 @@ import transformers # pip install transformers==2.8.0
 import os
 import json
 import time
-import torch
+import torch # si erreur Numpy not available => pip install numpy --upgrade
 import datetime
 import numpy as np
 import pandas as pd
@@ -184,11 +184,17 @@ def train():
             if 1:
                 #~ if i > 5000:
                 #~ if i > 2000:
-                if i > 500:
+                #~ if i > 500:
                 #~ if i > 400:
+                if i > 100:
                     break
         
     classifierPola = sklearn.svm.SVC(gamma='scale', kernel='rbf', C=17, class_weight='balanced', probability=False)
+    classifierPola = sklearn.linear_model.Lasso(alpha=0.1)
+    classifierPola = sklearn.linear_model.MultiTaskLasso()
+    classifierPola = sklearn.linear_model.RidgeCV(alphas=np.logspace(-6, 6, 13))
+    classifierPola = sklearn.svm.SVR(kernel='rbf')
+    
     print("INF: train: learning...")
     classifierPola.fit(listFeats, listPolas)
     joblib.dump(classifierPola, 'models/clf_pola.pkl')

@@ -70,7 +70,8 @@ testPola = [
     "si il s'agissait d'un concours du plus nul, il gagnerait", -1,
 ]
 
-if 1:
+if 0:
+#~ if 1:
     # simple and balanced
     testPola = testPola[:6]
 
@@ -79,6 +80,10 @@ if 1:
 import torch
 camembert = torch.hub.load('pytorch/fairseq', 'camembert')
 camembert.eval()  # disable dropout (or leave in train mode to finetune)
+
+
+bUseAllocine = 0
+bUseAllocine = 1
 
 def explore():
     aLine= [
@@ -152,7 +157,7 @@ def train():
     listFeats = []
     listPolas = []
     
-    if 1:
+    if not bUseAllocine:
         # small base
         i = 0
         while i < len(testPola):
@@ -177,7 +182,8 @@ def train():
             if (i % 100)==0:
                 print("%d/%d" % (i,len(reviews)) )
             if 1:
-                if i > 5000:
+                #~ if i > 5000:
+                if i > 500:
                     break
         
     classifierPola = sklearn.svm.SVC(gamma='scale', kernel='rbf', C=17, class_weight='balanced', probability=False)
@@ -205,16 +211,36 @@ def test():
                 ["j'ai passé un super moment c'était top",1.],
             ]
     rSumDiff = 0
+    nNbrPolaOk = 0
     nCpt = 0
     for txt, theo in listTest:
         feats = txtToFeats(txt)
         predicted = classifierPola.predict([feats])
-        rNote = (predicted[0]/100.)-1
-        rDiff = abs(rNote-theo)
-        print("%s => %s, %.2f, diff:%.2f" % (txt,predicted,rNote,rDiff))
+        
+        if bUseAllocine:
+            nNote= predicted[0]
+            rDiff = 2
+            bPolaOk = 0
+            if nNote == 1 and theo>=0:
+                rDiff = 0
+                bPolaOk = 1
+            elif nNote == 0 and theo<0:
+                rDiff = 0
+                bPolaOk = 1
+            rNote = nNote
+        else:
+            rNote = (predicted[0]/100.)-1
+            rDiff = abs(rNote-theo)
+            bPolaOk = ( rNote > 0 and theo>0) \
+                            or ( rNote == 0 and theo==0) \
+                            or ( rNote < 0 and theo<0)
+        if bPolaOk:
+            nNbrPolaOk += 1
+        print("%s => %s, %.2f, diff:%.2f, bPolaOk:%d" % (txt,predicted,rNote,rDiff,int(bPolaOk)) )
         rSumDiff += rDiff
         nCpt += 1
-    print("rAvgDiff: %.3f" % (rSumDiff/nCpt) )
+    print("rAvgDiff: %.3f" % (rSumDiff/nCpt ) )
+    print("pola_ok: %.3f" % (nNbrPolaOk/nCpt) )
         
         
 """
@@ -263,63 +289,107 @@ jean-pierre est nul => [40], -0.60, diff:0.00
 rAvgDiff: 0.844
 
 # last feature layer 20 words padded
-c'est bien => [160], 0.60, diff:0.00
-c'est très bien => [180], 0.80, diff:0.00
-c'est pas bien => [80], -0.20, diff:0.00
-c'est nul => [40], -0.60, diff:0.00
-c'est très nul => [19], -0.81, diff:0.01
-c'est pas nul => [120], 0.20, diff:0.00
-le cinéma c'est super => [19], -0.81, diff:1.81
-le cinéma c'est top => [19], -0.81, diff:1.81
-le cinéma c'est nul => [9], -0.91, diff:0.31
-alexandre est super => [19], -0.81, diff:1.81
-alexandre est nul => [40], -0.60, diff:0.00
-jean-pierre est super => [180], 0.80, diff:0.20
-jean-pierre est nul => [19], -0.81, diff:0.21
-je suis pas content c'est trop nul => [40], -0.60, diff:0.40
-j'ai passé un super moment c'était top => [40], -0.60, diff:1.60
+c'est bien => [160], 0.60, diff:0.00, bPolaOk:1
+c'est très bien => [180], 0.80, diff:0.00, bPolaOk:1
+c'est pas bien => [80], -0.20, diff:0.00, bPolaOk:1
+c'est nul => [40], -0.60, diff:0.00, bPolaOk:1
+c'est très nul => [19], -0.81, diff:0.01, bPolaOk:1
+c'est pas nul => [120], 0.20, diff:0.00, bPolaOk:1
+le cinéma c'est super => [19], -0.81, diff:1.81, bPolaOk:0
+le cinéma c'est top => [19], -0.81, diff:1.81, bPolaOk:0
+le cinéma c'est nul => [9], -0.91, diff:0.31, bPolaOk:1
+alexandre est super => [19], -0.81, diff:1.81, bPolaOk:0
+alexandre est nul => [40], -0.60, diff:0.00, bPolaOk:1
+jean-pierre est super => [180], 0.80, diff:0.20, bPolaOk:1
+jean-pierre est nul => [19], -0.81, diff:0.21, bPolaOk:1
+je suis pas content c'est trop nul => [40], -0.60, diff:0.40, bPolaOk:1
+j'ai passé un super moment c'était top => [40], -0.60, diff:1.60, bPolaOk:0
 rAvgDiff: 0.544
+pola_ok: 0.733
 
 # last feature layer 20 words padded - simple learning
-c'est bien => [160], 0.60, diff:0.00
-c'est très bien => [180], 0.80, diff:0.00
-c'est pas bien => [180], 0.80, diff:1.00
-c'est nul => [40], -0.60, diff:0.00
-c'est très nul => [180], 0.80, diff:1.60
-c'est pas nul => [180], 0.80, diff:0.60
-le cinéma c'est super => [180], 0.80, diff:0.20
-le cinéma c'est top => [180], 0.80, diff:0.20
-le cinéma c'est nul => [180], 0.80, diff:1.40
-alexandre est super => [180], 0.80, diff:0.20
-alexandre est nul => [40], -0.60, diff:0.00
-jean-pierre est super => [180], 0.80, diff:0.20
-jean-pierre est nul => [40], -0.60, diff:0.00
-je suis pas content c'est trop nul => [180], 0.80, diff:1.80
-j'ai passé un super moment c'était top => [180], 0.80, diff:0.20
+c'est bien => [160], 0.60, diff:0.00, bPolaOk:1
+c'est très bien => [180], 0.80, diff:0.00, bPolaOk:1
+c'est pas bien => [180], 0.80, diff:1.00, bPolaOk:0
+c'est nul => [40], -0.60, diff:0.00, bPolaOk:1
+c'est très nul => [180], 0.80, diff:1.60, bPolaOk:0
+c'est pas nul => [180], 0.80, diff:0.60, bPolaOk:1
+le cinéma c'est super => [180], 0.80, diff:0.20, bPolaOk:1
+le cinéma c'est top => [180], 0.80, diff:0.20, bPolaOk:1
+le cinéma c'est nul => [180], 0.80, diff:1.40, bPolaOk:0
+alexandre est super => [180], 0.80, diff:0.20, bPolaOk:1
+alexandre est nul => [40], -0.60, diff:0.00, bPolaOk:1
+jean-pierre est super => [180], 0.80, diff:0.20, bPolaOk:1
+jean-pierre est nul => [40], -0.60, diff:0.00, bPolaOk:1
+je suis pas content c'est trop nul => [180], 0.80, diff:1.80, bPolaOk:0
+j'ai passé un super moment c'était top => [180], 0.80, diff:0.20, bPolaOk:1
 rAvgDiff: 0.493
+pola_ok: 0.733
 
 
 
 
-### allocine (old base)
 
-# allocine 200
-alexandre est super => [1], -0.99
-alexandre est nul => [0], -1.00
-jean-pierre est super => [1], -0.99
-jean-pierre est nul => [1], -0.99
-le cinéma c'est super => [0], -1.00
-le cinéma c'est top => [0], -1.00
-le cinéma c'est nul => [0], -1.00
+### allocine - last feature layer 20 words padded - simple learning
 
-# allocine 5000
-alexandre est super => [1], -0.99
-alexandre est nul => [0], -1.00
-jean-pierre est super => [1], -0.99
-jean-pierre est nul => [0], -1.00
-le cinéma c'est super => [1], -0.99
-le cinéma c'est top => [1], -0.99
-le cinéma c'est nul => [0], -1.00
+# allocine 500
+400 C17
+c'est bien => [1], 1.00, diff:0.00, bPolaOk:1
+c'est très bien => [1], 1.00, diff:0.00, bPolaOk:1
+c'est pas bien => [0], 0.00, diff:0.00, bPolaOk:1
+c'est nul => [0], 0.00, diff:0.00, bPolaOk:1
+c'est très nul => [0], 0.00, diff:0.00, bPolaOk:1
+c'est pas nul => [1], 1.00, diff:0.00, bPolaOk:1
+le cinéma c'est super => [1], 1.00, diff:0.00, bPolaOk:1
+le cinéma c'est top => [1], 1.00, diff:0.00, bPolaOk:1
+le cinéma c'est nul => [0], 0.00, diff:0.00, bPolaOk:1
+alexandre est super => [1], 1.00, diff:0.00, bPolaOk:1
+alexandre est nul => [0], 0.00, diff:0.00, bPolaOk:1
+jean-pierre est super => [1], 1.00, diff:0.00, bPolaOk:1
+jean-pierre est nul => [1], 1.00, diff:2.00, bPolaOk:0
+je suis pas content c'est trop nul => [0], 0.00, diff:0.00, bPolaOk:1
+j'ai passé un super moment c'était top => [1], 1.00, diff:0.00, bPolaOk:1
+rAvgDiff: 0.133
+pola_ok: 0.933
+
+500 C17
+c'est bien => [1], 1.00, diff:0.00, bPolaOk:1
+c'est très bien => [1], 1.00, diff:0.00, bPolaOk:1
+c'est pas bien => [0], 0.00, diff:0.00, bPolaOk:1
+c'est nul => [0], 0.00, diff:0.00, bPolaOk:1
+c'est très nul => [1], 1.00, diff:2.00, bPolaOk:0
+c'est pas nul => [1], 1.00, diff:0.00, bPolaOk:1
+le cinéma c'est super => [0], 0.00, diff:2.00, bPolaOk:0
+le cinéma c'est top => [0], 0.00, diff:2.00, bPolaOk:0
+le cinéma c'est nul => [0], 0.00, diff:0.00, bPolaOk:1
+alexandre est super => [1], 1.00, diff:0.00, bPolaOk:1
+alexandre est nul => [0], 0.00, diff:0.00, bPolaOk:1
+jean-pierre est super => [1], 1.00, diff:0.00, bPolaOk:1
+jean-pierre est nul => [0], 0.00, diff:0.00, bPolaOk:1
+je suis pas content c'est trop nul => [0], 0.00, diff:0.00, bPolaOk:1
+j'ai passé un super moment c'était top => [1], 1.00, diff:0.00, bPolaOk:1
+rAvgDiff: 0.400
+pola_ok: 0.800
+
+500 C10
+c'est bien => [1], 1.00, diff:0.00, bPolaOk:1
+c'est très bien => [1], 1.00, diff:0.00, bPolaOk:1
+c'est pas bien => [0], 0.00, diff:0.00, bPolaOk:1
+c'est nul => [0], 0.00, diff:0.00, bPolaOk:1
+c'est très nul => [1], 1.00, diff:2.00, bPolaOk:0
+c'est pas nul => [1], 1.00, diff:0.00, bPolaOk:1
+le cinéma c'est super => [0], 0.00, diff:2.00, bPolaOk:0
+le cinéma c'est top => [0], 0.00, diff:2.00, bPolaOk:0
+le cinéma c'est nul => [0], 0.00, diff:0.00, bPolaOk:1
+alexandre est super => [1], 1.00, diff:0.00, bPolaOk:1
+alexandre est nul => [0], 0.00, diff:0.00, bPolaOk:1
+jean-pierre est super => [1], 1.00, diff:0.00, bPolaOk:1
+jean-pierre est nul => [0], 0.00, diff:0.00, bPolaOk:1
+je suis pas content c'est trop nul => [0], 0.00, diff:0.00, bPolaOk:1
+j'ai passé un super moment c'était top => [1], 1.00, diff:0.00, bPolaOk:1
+rAvgDiff: 0.400
+pola_ok: 0.800
+
 
 """
     

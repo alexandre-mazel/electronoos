@@ -83,7 +83,7 @@ camembert.eval()  # disable dropout (or leave in train mode to finetune)
 
 
 bUseAllocine = 0
-#~ bUseAllocine = 1
+bUseAllocine = 1
 
 strModelForTestAndInteractive = "d:/models/clf_pola_40000.pkl"
 #~ strModelForTestAndInteractive = "models/clf_pola.pkl"
@@ -188,8 +188,8 @@ def train():
                 #~ if i > 5000:
                 #~ if i > 2000:
                 #~ if i > 500:
-                #~ if i > 400:
-                if i > 100:
+                if i > 400:
+                #~ if i > 100:
                     break
         
     classifierPola = sklearn.svm.SVC(gamma='scale', kernel='rbf', C=17, class_weight='balanced', probability=False)
@@ -204,6 +204,7 @@ def train():
     
 def test():
     print("INF: test: start")
+    print("INF: test: loading: " + strModelForTestAndInteractive)
     classifierPola = joblib.load(strModelForTestAndInteractive)
     listTest = [
                 ["c'est bien",0.6],
@@ -502,14 +503,12 @@ pola_ok: 0.862
 
 5000 C17 (sur kakashi):
 rAvgDiff: 0.414
-pola_ok: 0.793
+pola_ok: 0.793 ?!?
 
-40000 C17 (sur kakashi, ca a pris des jours!):
+40000 C17 (sur kakashi, ca a pris des jours!) 
+(warning de version au rechargement sur ma tablette, mais resultat identique)
 rAvgDiff: 0.207
 pola_ok: 0.897
-#pb: ne recharge sur mon ordi pas a cause d'un probleme de version:
-UserWarning: Trying to unpickle estimator SVC from version 1.0.2 when using version 0.24.2. This might lead to breaking code or invalid results. Use at your own risk.
-
 
 """
 

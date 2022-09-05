@@ -70,8 +70,8 @@ testPola = [
     "si il s'agissait d'un concours du plus nul, il gagnerait", -1,
 ]
 
-#~ if 0:
-if 1:
+if 0:
+#~ if 1:
     # simple and balanced
     testPola = testPola[:6]
 
@@ -83,7 +83,10 @@ camembert.eval()  # disable dropout (or leave in train mode to finetune)
 
 
 bUseAllocine = 0
-bUseAllocine = 1
+#~ bUseAllocine = 1
+
+strModelForTestAndInteractive = "d:/models/clf_pola_40000.pkl"
+#~ strModelForTestAndInteractive = "models/clf_pola.pkl"
 
 def explore():
     aLine= [
@@ -190,10 +193,10 @@ def train():
                     break
         
     classifierPola = sklearn.svm.SVC(gamma='scale', kernel='rbf', C=17, class_weight='balanced', probability=False)
-    classifierPola = sklearn.linear_model.Lasso(alpha=0.1)
-    classifierPola = sklearn.linear_model.MultiTaskLasso()
-    classifierPola = sklearn.linear_model.RidgeCV(alphas=np.logspace(-6, 6, 13))
-    classifierPola = sklearn.svm.SVR(kernel='rbf')
+    #~ classifierPola = sklearn.linear_model.Lasso(alpha=0.1)
+    #~ classifierPola = sklearn.linear_model.MultiTaskLasso()
+    #~ classifierPola = sklearn.linear_model.RidgeCV(alphas=np.logspace(-6, 6, 13))
+    #~ classifierPola = sklearn.svm.SVR(kernel='rbf')
     
     print("INF: train: learning...")
     classifierPola.fit(listFeats, listPolas)
@@ -201,7 +204,7 @@ def train():
     
 def test():
     print("INF: test: start")
-    classifierPola = joblib.load('models/clf_pola.pkl')
+    classifierPola = joblib.load(strModelForTestAndInteractive)
     listTest = [
                 ["c'est bien",0.6],
                 ["c'est très bien",0.8],
@@ -329,8 +332,22 @@ jean-pierre est super => [180], 0.80, diff:0.20, bPolaOk:1
 jean-pierre est nul => [19], -0.81, diff:0.21, bPolaOk:1
 je suis pas content c'est trop nul => [40], -0.60, diff:0.40, bPolaOk:1
 j'ai passé un super moment c'était top => [40], -0.60, diff:1.60, bPolaOk:0
-rAvgDiff: 0.544
-pola_ok: 0.733
+ohlala cette chose est trop incroyable => [9], -0.91, diff:1.61, bPolaOk:0
+c'est incroyable => [200], 1.00, diff:0.30, bPolaOk:1
+c'est de la merde => [9], -0.91, diff:0.09, bPolaOk:1
+c'est éclaté au sol => [9], -0.91, diff:0.09, bPolaOk:1
+j'ai aimé => [40], -0.60, diff:1.30, bPolaOk:0
+je n'ai pas aimé => [19], -0.81, diff:0.11, bPolaOk:1
+c'est ni bien ni mal => [9], -0.91, diff:0.91, bPolaOk:0
+c'est ni mal ni bien => [40], -0.60, diff:0.60, bPolaOk:0
+j'y met du mien => [9], -0.91, diff:1.41, bPolaOk:0
+tu n'y met pas du tien => [40], -0.60, diff:0.10, bPolaOk:1
+j'aime => [100], 0.00, diff:0.80, bPolaOk:0
+j'aime pas => [40], -0.60, diff:0.20, bPolaOk:1
+je n'aime pas => [0], -1.00, diff:0.20, bPolaOk:1
+je n'aime pas du tout => [40], -0.60, diff:0.40, bPolaOk:1
+rAvgDiff: 0.561
+pola_ok: 0.655
 
 # last feature layer 20 words padded - simple learning
 c'est bien => [160], 0.60, diff:0.00, bPolaOk:1
@@ -350,6 +367,40 @@ je suis pas content c'est trop nul => [180], 0.80, diff:1.80, bPolaOk:0
 j'ai passé un super moment c'était top => [180], 0.80, diff:0.20, bPolaOk:1
 rAvgDiff: 0.493
 pola_ok: 0.733
+
+# last feature layer 20 words padded - SVR
+
+c'est bien => [60.22860662], -0.40, diff:1.00, bPolaOk:0
+c'est très bien => [60.24649683], -0.40, diff:1.20, bPolaOk:0
+c'est pas bien => [59.16962068], -0.41, diff:0.21, bPolaOk:1
+c'est nul => [59.18262478], -0.41, diff:0.19, bPolaOk:1
+c'est très nul => [59.04874439], -0.41, diff:0.39, bPolaOk:1
+c'est pas nul => [59.76281369], -0.40, diff:0.60, bPolaOk:0
+le cinéma c'est super => [58.22129869], -0.42, diff:1.42, bPolaOk:0
+le cinéma c'est top => [58.20454265], -0.42, diff:1.42, bPolaOk:0
+le cinéma c'est nul => [58.21548349], -0.42, diff:0.18, bPolaOk:1
+alexandre est super => [58.89106564], -0.41, diff:1.41, bPolaOk:0
+alexandre est nul => [58.70206212], -0.41, diff:0.19, bPolaOk:1
+jean-pierre est super => [59.58547654], -0.40, diff:1.40, bPolaOk:0
+jean-pierre est nul => [58.67957146], -0.41, diff:0.19, bPolaOk:1
+je suis pas content c'est trop nul => [59.14597673], -0.41, diff:0.59, bPolaOk:1
+j'ai passé un super moment c'était top => [59.13188842], -0.41, diff:1.41, bPolaOk:0
+ohlala cette chose est trop incroyable => [59.04052944], -0.41, diff:1.11, bPolaOk:0
+c'est incroyable => [61.44778201], -0.39, diff:1.09, bPolaOk:0
+c'est de la merde => [58.23149365], -0.42, diff:0.58, bPolaOk:1
+c'est éclaté au sol => [59.13501132], -0.41, diff:0.59, bPolaOk:1
+j'ai aimé => [59.58333237], -0.40, diff:1.10, bPolaOk:0
+je n'ai pas aimé => [58.74738948], -0.41, diff:0.29, bPolaOk:1
+c'est ni bien ni mal => [59.55836001], -0.40, diff:0.40, bPolaOk:0
+c'est ni mal ni bien => [59.37246284], -0.41, diff:0.41, bPolaOk:0
+j'y met du mien => [59.28236341], -0.41, diff:0.91, bPolaOk:0
+tu n'y met pas du tien => [59.14185103], -0.41, diff:0.09, bPolaOk:1
+j'aime => [60.8817587], -0.39, diff:1.19, bPolaOk:0
+j'aime pas => [59.75157066], -0.40, diff:0.40, bPolaOk:1
+je n'aime pas => [58.60361988], -0.41, diff:0.39, bPolaOk:1
+je n'aime pas du tout => [59.23731524], -0.41, diff:0.59, bPolaOk:1
+rAvgDiff: 0.722
+pola_ok: 0.483
 
 
 
@@ -453,13 +504,18 @@ pola_ok: 0.862
 rAvgDiff: 0.414
 pola_ok: 0.793
 
+40000 C17 (sur kakashi, ca a pris des jours!):
+rAvgDiff: 0.207
+pola_ok: 0.897
+#pb: ne recharge sur mon ordi pas a cause d'un probleme de version:
+UserWarning: Trying to unpickle estimator SVC from version 1.0.2 when using version 0.24.2. This might lead to breaking code or invalid results. Use at your own risk.
 
 
 """
 
 def interactive():
     print("INF: Entering interactive word")
-    classifierPola = joblib.load('models/clf_pola.pkl')
+    classifierPola = joblib.load(strModelForTestAndInteractive)
     while 1:
         txt = input("your sentence:\n")
         feats = txtToFeats(txt)
@@ -467,6 +523,6 @@ def interactive():
         print("'%s' => %s" % (txt,predicted) ) 
     
 #~ explore()
-train()
+#~ train()
 test()
 #~ interactive()

@@ -23,6 +23,12 @@ python 3 - literal avec u       0            1                      0           
 
 """
 
+"""
+# TODO: tester ce module a l'occasion:
+import codecs
+f = codecs.open('out.txt', mode="w", encoding="iso-8859-1")
+"""
+
 def assert_equal(a,b):
     bPrintParam = 0
     #~ bPrintParam = 1

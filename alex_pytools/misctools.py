@@ -929,6 +929,15 @@ def intToHashLike(n):
     s = codage[n] + s
     return s
      
+def dictToString(d):
+    o = ""
+    print("%d items:" % len(d))
+    for k,v in sorted(d.items()):
+        o += "  %s: %s\n" % (str(k),str(v))
+    return o
+        
+print(dictToString({'2022/09/06': 14, '2022/09/07': 43, '2022/09/08': 54, '2022/09/09': 64, '2022/09/12': 91, '2022/09/13': 131}))
+
     
 def autoTest():
     print("cpu: %s" % str(getCpuModel()) )

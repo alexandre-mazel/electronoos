@@ -40,6 +40,8 @@ def getNetworkStat_psutil():
     ret = psutil.net_io_counters(pernic=True)
     #~ print(ret)
     
+    retInterestingInterface = None
+    
     for k in ["Wi-Fi","eth0","wlan0"]:
         if k in ret.keys():
             retInterestingInterface = ret[k]
@@ -47,6 +49,10 @@ def getNetworkStat_psutil():
     if 0:
         print("")
         print(retInterestingInterface )
+        
+    if retInterestingInterface == None:
+        print("ERR: getNetworkStat_psutil: io_counters: %s (len:%s)" % (str(ret),len(ret)) )
+        return 0,0,0
 
     r = retInterestingInterface.bytes_recv
     s = retInterestingInterface.bytes_sent
@@ -63,6 +69,8 @@ def printSmart(v):
     while v > 1024:
         v /= 1024
         idxUnit += 1
+    if idxUnit == 0:
+        return "%d%s" % (v,listUnit[idxUnit])
     return "%.1f%s" % (v,listUnit[idxUnit])
     
 def printSmartTime(ts):
@@ -91,6 +99,7 @@ def analyseBandwith():
     timeBegin = time.time()
     cptLoop = 0
     nPrevDay = -1
+    nPrevHour = -1
     while 1:
         r,s,t = getNetworkStat()
         # compute difference
@@ -124,7 +133,11 @@ def analyseBandwith():
             r_t = 0
             s_t = 0
             t_t = 0
-
+            
+        h,dummy1,dummy2 = misctools.getTime()
+        if nPrevHour != h:
+            nPrevHour = h
+            print("%2dh" % h )
             
         if 1:
             # render bargraph in ascii
@@ -143,7 +156,7 @@ def analyseBandwith():
                 strLine += " " * (nLenLineToEraseAboveStat-len(strLine))
             print(  strLine )
             
-        print("%s/%s Received: %s, Send: %s, Total: %s   day: r: %s, s:%s, t:%s   Hour: r: %s, s:%s, t:%s   Last5Min: %s %s %s      \r" % (
+        print("%s/%s Received: %s, Send: %s, Total: %s   Day: %s  %s  %s   Hour: %s  %s  %s   Last5Min: %s  %s  %s      \r" % (
                                             printSmartTime(cptLoop*nPeriodSec), printSmartTime(time.time()-timeBegin), printSmart(rd),printSmart(sd),printSmart(td),
                                             printSmart(r_t),printSmart(s_t),printSmart(t_t),
                                             printSmart(sum(ar_h)),printSmart(sum(as_h)),printSmart(sum(at_h)), # WRN: generate huge computation ! should sum by minutes!

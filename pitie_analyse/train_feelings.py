@@ -85,8 +85,9 @@ camembert.eval()  # disable dropout (or leave in train mode to finetune)
 bUseAllocine = 0
 bUseAllocine = 1
 
+strModelForTestAndInteractive = "models/clf_pola.pkl"
 strModelForTestAndInteractive = "d:/models/clf_pola_40000.pkl"
-#~ strModelForTestAndInteractive = "models/clf_pola.pkl"
+
 
 def explore():
     aLine= [
@@ -507,6 +508,35 @@ pola_ok: 0.793 ?!?
 
 40000 C17 (sur kakashi, ca a pris des jours!) 
 (warning de version au rechargement sur ma tablette, mais resultat identique)
+c'est bien => [1], 1.00, diff:0.00, bPolaOk:1
+c'est très bien => [1], 1.00, diff:0.00, bPolaOk:1
+c'est pas bien => [0], 0.00, diff:0.00, bPolaOk:1
+c'est nul => [0], 0.00, diff:0.00, bPolaOk:1
+c'est très nul => [0], 0.00, diff:0.00, bPolaOk:1
+c'est pas nul => [0], 0.00, diff:2.00, bPolaOk:0
+le cinéma c'est super => [1], 1.00, diff:0.00, bPolaOk:1
+le cinéma c'est top => [0], 0.00, diff:2.00, bPolaOk:0
+le cinéma c'est nul => [0], 0.00, diff:0.00, bPolaOk:1
+alexandre est super => [1], 1.00, diff:0.00, bPolaOk:1
+alexandre est nul => [0], 0.00, diff:0.00, bPolaOk:1
+jean-pierre est super => [1], 1.00, diff:0.00, bPolaOk:1
+jean-pierre est nul => [0], 0.00, diff:0.00, bPolaOk:1
+je suis pas content c'est trop nul => [0], 0.00, diff:0.00, bPolaOk:1
+j'ai passé un super moment c'était top => [1], 1.00, diff:0.00, bPolaOk:1
+ohlala cette chose est trop incroyable => [1], 1.00, diff:0.00, bPolaOk:1
+c'est incroyable => [1], 1.00, diff:0.00, bPolaOk:1
+c'est de la merde => [0], 0.00, diff:0.00, bPolaOk:1
+c'est éclaté au sol => [0], 0.00, diff:0.00, bPolaOk:1
+j'ai aimé => [1], 1.00, diff:0.00, bPolaOk:1
+je n'ai pas aimé => [0], 0.00, diff:0.00, bPolaOk:1
+c'est ni bien ni mal => [1], 1.00, diff:0.00, bPolaOk:1
+c'est ni mal ni bien => [1], 1.00, diff:0.00, bPolaOk:1
+j'y met du mien => [1], 1.00, diff:0.00, bPolaOk:1
+tu n'y met pas du tien => [0], 0.00, diff:0.00, bPolaOk:1
+j'aime => [1], 1.00, diff:0.00, bPolaOk:1
+j'aime pas => [1], 1.00, diff:2.00, bPolaOk:0
+je n'aime pas => [0], 0.00, diff:0.00, bPolaOk:1
+je n'aime pas du tout => [0], 0.00, diff:0.00, bPolaOk:1
 rAvgDiff: 0.207
 pola_ok: 0.897
 
@@ -521,7 +551,24 @@ def interactive():
         predicted = classifierPola.predict([feats])
         print("'%s' => %s" % (txt,predicted) ) 
     
-#~ explore()
-#~ train()
-test()
-#~ interactive()
+global_classifierPola = None           
+def classify(txt):
+    """
+    return a note between -1 and 1
+    """
+    global global_classifierPola
+    if global_classifierPola == None:
+        print("INF: train_feelings.classify: loading '%s'" % strModelForTestAndInteractive )
+        global_classifierPola = joblib.load(strModelForTestAndInteractive)
+    feats = txtToFeats(txt)
+    predicted = global_classifierPola.predict([feats])
+    print("INF: classify: '%s' => %s" % (txt,predicted) )   
+    if bUseAllocine:
+        return predicted[0]*2-1 # 0 => -1 1=>1
+    return (predicted[0]/100.)-1
+    
+if __name__ == "__main__":
+    #~ explore()
+    #~ train()
+    test()
+    #~ interactive()

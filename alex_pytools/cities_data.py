@@ -471,14 +471,13 @@ class Cities:
         
         #~ Monaco 98000         
         listManual = [
-                                # (strDept,[strZips],strCitySimple,strCityReal,rLong,rLat)
-                                (98,[98000],"monaco","Monaco", 7.423792587441905,43.738345122573804)
+                                # (strDept,strZip,strCitySimple,strCityReal,rLong,rLat)
+                                (98,"98000","monaco","Monaco", 7.423792587441905,43.738345122573804)
                         ]
-        for strDept,listZips,strCitySimple,strCityReal,rLong,rLat in listManual:
+        for strDept,strZip,strCitySimple,strCityReal,rLong,rLat in listManual:
             strCitySlug = strCitySimple+"__manual"
-            self.cityPerSlug[strCitySlug] = (strDept,listZips,strCitySimple,strCityReal,rLong,rLat)
-            for z in listZips:
-                appendToDict(self.zipToSlug, str(z),strCitySlug)
+            self.cityPerSlug[strCitySlug] = (strDept,strZip,strCitySimple,strCityReal,rLong,rLat)
+            appendToDict(self.zipToSlug, strZip,strCitySlug)
             appendToDict(self.realNameToSlug, strCityReal,strCitySlug)
             appendToDict(self.simpleNameToSlug, strCitySimple,strCitySlug)
                 
@@ -1275,12 +1274,20 @@ def autotest_cities():
     assert_equal(cities.zipToHumanised("94270"),"à Le Kremlin-Bicêtre")
     assert_equal(cities.zipToHumanised("34440"),"à Nissan-lez-Enserune")
     assert_equal(cities.zipToHumanised("75008"),"dans le 8ème arrondissement de Paris")
+
+    retVal = cities.findByZip("75001")
+    print("DBG: autotest: get paris: %s" % str(retVal) )
+    
+    retVal = cities.findByZip("34440")
+    print("DBG: autotest: get nissan: %s" % str(retVal) )
     
     retVal = cities.findByZip("98000")
     print("DBG: autotest: get monaco: %s" % str(retVal) )
+    assert_equal(retVal[1],"98000")
     
     dist = cities.distTwoZip("98000","06500",bVerbose=True) # Menton et Monaco
     assert_diff(dist,11,4)
+    exit()
     
     
 # autotest_cities - end

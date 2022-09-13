@@ -934,7 +934,7 @@ def dictToString(d,sortByValue=False):
     strPlural = ""
     if len(d)>1:
         strPlural = 's'
-    print("%d item%s:" % (len(d),strPlural))
+    o +="%d item%s:\n" % (len(d),strPlural)
     funcSort = None
     if sortByValue:
         funcSort = lambda x: x[1]

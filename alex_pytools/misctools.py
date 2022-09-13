@@ -929,14 +929,20 @@ def intToHashLike(n):
     s = codage[n] + s
     return s
      
-def dictToString(d):
+def dictToString(d,sortByValue=False):
     o = ""
-    print("%d items:" % len(d))
-    for k,v in sorted(d.items()):
+    strPlural = ""
+    if len(d)>1:
+        strPlural = 's'
+    print("%d item%s:" % (len(d),strPlural))
+    funcSort = None
+    if sortByValue:
+        funcSort = lambda x: x[1]
+    for k,v in sorted(d.items(),key=funcSort):
         o += "  %s: %s\n" % (str(k),str(v))
     return o
         
-#~ print(dictToString({'2022/09/06': 14, '2022/09/07': 43, '2022/09/08': 54, '2022/09/09': 64, '2022/09/12': 91, '2022/09/13': 131}))
+#~ print(dictToString({'2022/09/06': 120, '2022/09/07': 43, '2022/09/08': 54, '2022/09/09': 64, '2022/09/12': 91, '2022/09/13': 131},True))
 
     
 def autoTest():

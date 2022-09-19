@@ -180,7 +180,7 @@ if __name__ == '__main__':
     #~ assert counts[0] == len(alldirs) and counts[1] == len(allfiles)  # remove assert as skip small stuffs
 
     # report results
-    reportname = 'treesize-report-%s.txt' % reportsuffix
+    reportname = 'treesize-report-%s_%s.txt' % (reportsuffix,toproot[0])
     reportfile = open(reportname, mode='w', encoding='utf8')
     genreport(toproot, totsize, alldirs, allfiles, counts)
 

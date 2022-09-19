@@ -944,6 +944,18 @@ def dictToString(d,sortByValue=False):
         
 #~ print(dictToString({'2022/09/06': 120, '2022/09/07': 43, '2022/09/08': 54, '2022/09/09': 64, '2022/09/12': 91, '2022/09/13': 131},True))
 
+def backupFile( filename ):
+    """
+    make a backup of a file, erase backuo first.
+    backup have same name than file, but a with an added .bak
+    """
+    if not os.path.isfile( filename ):
+        # nothing to do
+        return
+    filenamebak = filename + ".bak"
+    if os.path.isfile(filenamebak):
+        os.remove(filenamebak)
+    os.rename(filename,filenamebak)
     
 def autoTest():
     print("cpu: %s" % str(getCpuModel()) )

@@ -1,6 +1,7 @@
 try:
     from fpdf import FPDF # pip3 install fpdf
     import fitz # pip install fitz PyMuPDF # https://pypi.org/project/PyMuPDF/#files # rpi: try first: sudo apt-get install mupdf libmupdf-dev
+    # sur rpi: sudo apt-get install libxml2 python-lxml
 except BaseException as err:
     print("WRN: pdf_tools: can't load library: %s" % str(err))
 from copy import deepcopy

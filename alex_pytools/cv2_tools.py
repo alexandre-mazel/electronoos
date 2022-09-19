@@ -5,6 +5,7 @@
 import cv2
 print("INF: cv2_tools: using CV2 version: %s" % cv2. __version__ )
 import numpy as np
+import os
 
 def drawHighligthedText(im,txt, position, fontface=cv2.FONT_HERSHEY_SIMPLEX, fontscale = 1,color = (255,255,255), thickness = 1, color_back=(127,127,127)):
     """
@@ -50,6 +51,31 @@ def putTextCentered( image, text, bottomCenteredPosition, fontface=cv2.FONT_HERS
     cv2.putText( image, text, (xd,yd), fontface, fontscale, color, thickness )
         
     return xd,yd
+    
+def saveImage_JpgWithSpecificSize( filename, img, nSizeMaxKo, nSizeMinKo = 0, nQualityStart = 80 ): 
+    """
+    return -1 if on error, or size in ko of saved file
+    """
+    print("DBG: saveImage_JpgWithSpecificSize: saving to '%s'" % filename)
+    nQuality = nQualityStart
+    while 1:
+        print("DBG: saveImage_JpgWithSpecificSize: trying with quality: %s" % nQuality)
+        bRet = cv2.imwrite(filename,img,[int(cv2.IMWRITE_JPEG_QUALITY), nQuality])
+        if not bRet:
+            return -1
+        nSize = os.path.getsize(filename) // 1024
+        print("DBG: saveImage_JpgWithSpecificSize: nSize: %dkB" % nSize )
+        if nSize > nSizeMaxKo:
+            if nQuality <= 10:
+                return nSize # don't want to do worse
+            nQuality -= 5
+        elif nSize < nSizeMinKo:
+            nQuality += 2
+        else:
+            # it's ok
+            return nSize
+# saveImage_JpgWithSpecificSize - end
+    
     
 def autoTest():
     im = np.zeros((600,800,3),dtype=np.uint8)

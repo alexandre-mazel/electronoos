@@ -248,6 +248,14 @@ class HumanManager:
             return None
             
             
+        # reglage selon la machine:
+        if os.name == "nt":
+            hFaceTreshold = 74
+        else:
+            hFaceTreshold = 150
+        
+            
+            
         wImg = img.shape[1]
             
         bSeenFaces = 0
@@ -354,7 +362,7 @@ class HumanManager:
                 bInteract = 0
                 if nHumanID != -1:
                     hface = endY-startY
-                    bNear = hface>150 # was 60
+                    bNear = hface>hFaceTreshold # was 60
                     print("hface: %s" % hface )
                     if nHumanID not in self.aHumanKnowledge.keys():
                         self.aHumanKnowledge[nHumanID] = HumanKnowledge(nHumanID)
@@ -500,7 +508,7 @@ humanManager = HumanManager()
 
 def realLifeTestWebcam():
     hm = humanManager
-    cap = cv2.VideoCapture(0) #ouvre la webcam
+    cap = cv2.VideoCapture(1) #ouvre la webcam
     while 1:
         ret, img = cap.read() # lis et stocke l'image dans frame
         if img is None:
@@ -509,8 +517,10 @@ def realLifeTestWebcam():
         
         #~ img = cv2.resize(img, None, fx=0.5,fy=0.5)
         
+        bAddDebug = 1
         bAddDebug = 0
         bAddDebug = os.name == "nt"
+        bAddDebug = 1
         
         hm.updateImage(img, bAddDebug=bAddDebug)
         

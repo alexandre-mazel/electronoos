@@ -1,7 +1,22 @@
-from fpdf import FPDF # pip3 install fpdf
-import fitz # pip install fitz PyMuPDF # https://pypi.org/project/PyMuPDF/#files # rpi: try first: sudo apt-get install mupdf libmupdf-dev
+try:
+    from fpdf import FPDF # pip3 install fpdf
+    import fitz # pip install fitz PyMuPDF # https://pypi.org/project/PyMuPDF/#files # rpi: try first: sudo apt-get install mupdf libmupdf-dev
+except BaseException as err:
+    print("WRN: pdf_tools: can't load library: %s" % str(err))
 from copy import deepcopy
 import os
+
+def createEmptyPdf(filename,bSaveIt=True):
+    """
+    create an empty pdf, return the open document
+    """
+    doc = fitz.open()
+    page = doc.new_page() # default is a4
+    where = fitz.Point(50, 100)
+    #~ page.insert_text(where, "PDF created with PyMuPDF", fontsize=50)
+    print("INF: createEmptyPdf: writting to '%s'" % (filename) )
+    if bSaveIt: doc.save(filename)
+    return doc
 
 class PdfMod:
     
@@ -65,7 +80,7 @@ class PdfMod:
         
     def addText( self, text, pos, fontsize, colorText = (1,1,1), bShadow=0 ):
         """
-        pos: x, and y in percent in page, from top of letter
+        pos: x, and y in ratio in page (0..1), from top of letter
         NB: sur certains cv les textes arrivent plus bas que les rectangle associees...
         """
         try:

@@ -360,11 +360,11 @@ def test_multithreading():
             sys.stdout.write("%6.2fs" % rDuration)
             sys.stdout.flush()
             rTotalDuration += rDuration
-        print(" => %7.2fs" % rTotalDuration )
+        print(" => %7.2fs (per thread:%.2fs)" % (rTotalDuration,rTotalDuration/nNbrProcessInParalell ) )
     return rTotalDuration
     
 
-def test_perf(nDiskTestSizeMB=200):
+def test_perf(nDiskTestSizeMB=200,bTestMultiThreading=True):
     print_version()
     print_cpu()
     rTotalTime = 0;
@@ -374,7 +374,7 @@ def test_perf(nDiskTestSizeMB=200):
     rTotalTime += test_opencv_orb();
     rTotalTime += test_opencv_orb_realcase();
     rTotalTime += test_opencv_orb_realcase(); # because on some computer the previous one takes time initialise stuffs
-    if 1:
+    if bTestMultiThreading:
         # multithreading
         rTotalTime += test_multithreading();
             
@@ -387,16 +387,24 @@ def test_perf(nDiskTestSizeMB=200):
     os.unlink( "temp.tmp" );
 # test_perf - end
     
-nDiskTestSizeMB = 1000;    
+"""
+Syntaxe: <script_name> [size of disk test in MB] [no_multithreading]
+"""
+nDiskTestSizeMB = 1000;
+bMultitreading = True
 if( len(sys.argv)> 1 ):
-    nDiskTestSizeMB=int(sys.argv[1]);
-    print( "INF: Changing disk test size to %d MB" % nDiskTestSizeMB );
+    for i in range( 1, len(sys.argv)):
+        if sys.argv[i].isdigit():
+            nDiskTestSizeMB=int(sys.argv[i]);
+            print( "INF: Changing disk test size to %d MB" % nDiskTestSizeMB );
+        elif "multi" in sys.argv[i].lower() or "thread" in sys.argv[i].lower(): 
+            bMultitreading = False
     
 if getFreeDiskSpace() /(1024*1024) < nDiskTestSizeMB:
     nDiskTestSizeMB = int( (getFreeDiskSpace()*0.9)/(1024*1024) )
     print( "INF: Due to low empty disk space, reducing disk test size to %d MB" % nDiskTestSizeMB );
     
-test_perf(nDiskTestSizeMB=nDiskTestSizeMB);
+test_perf(nDiskTestSizeMB=nDiskTestSizeMB,bTestMultiThreading=bMultitreading);
 
 #####################################
 """

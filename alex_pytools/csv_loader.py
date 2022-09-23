@@ -1,3 +1,4 @@
+# -*- coding: cp1252 -*-
 import io
 import os
 import sys
@@ -37,7 +38,7 @@ def load_csv_multiline(filename, sepa = ';', bSkipFirstLine = 0, encoding =  'ut
     fields = []
     while 1:
         bMustQuit = idx >= len(buf)
-        # next line raise an error in mstab7 py2.7: LookupError: unknown encoding: cp65001
+        # next line raise an error in mstab7 py2.7: LookupError: unknown encoding: cp65001 (le terminal etait casse)
         if bVerbose: print("DBG: load_csv_multiline: idx_start: %d, idx: %d,  is_sepa: %d, bMustQuit: %d, char: '%s'" % (idx_start,idx,bMustQuit or buf[idx] == sepa,bMustQuit, bMustQuit or buf[idx]) )
         if bMustQuit or buf[idx] == sepa:
             s = buf[idx_start:idx]
@@ -198,8 +199,12 @@ def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
     except: pass
     
     filename_with_index_out = filename + "__index.csv"
+    bNoNeedToGenerateFile = os.path.isfile(filename_with_index_out) and os.path.getmtime(filename_with_index_out) > os.path.getmtime(filename)
         
     if os.name == "nt":
+        if bNoNeedToGenerateFile:
+            # faster even in python3 # 0.145 instead of 1.8s (on autotest_datas)
+            return load_datas_from_xlsx_exploded_for_python27(filename, encoding=encoding)
         try:
             try: import pandas as pd # pip install pandas
             except: print("WRN: no pandas found...") # on python2.7, it will be ok
@@ -215,7 +220,6 @@ def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
         #~ df = pd.read_excel( filename, sheet_name=None, header=None, engine='openpyxl' ) # bug in 1.2.0, not in 1.1.5 # pip install pandas==1.1.5 (not existing in python2)
         # rien ne fonctionne en python2.7
         #~ df = pd.read_excel( filename, sheet_name=None, header=None )
-        bNoNeedToGenerateFile = os.path.isfile(filename_with_index_out) and os.path.getmtime(filename_with_index_out) > os.path.getmtime(filename)
         
         if sys.version_info[0] < 3 or bNoNeedToGenerateFile: # we prefere to read from csv as it's faster!
             return load_datas_from_xlsx_exploded_for_python27(filename, encoding=encoding)
@@ -255,7 +259,8 @@ def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
                 for col in line:
                     print("   '%s'" % col)
                     
-    if  sys.version_info[0] >= 3 and os.name != "nt":
+    #~ if  sys.version_info[0] >= 3 and os.name != "nt":
+    if  sys.version_info[0] >= 3: # usefull in windows also as it's faster to reload
         # generate one cvs per tab, so you can read them back with python2.7
         if not bNoNeedToGenerateFile:
             fIndex = io.open( filename_with_index_out, "wt", encoding="cp1252" )
@@ -295,6 +300,16 @@ def save_csv(filename, data, bForceEndingBySeparator=True):
         file.write(s+"\n")
     file.close()
     
+def autotestXlsx():
+    timeBeginXls = time.time()
+    # autotest_xlsx
+    # on linux rpi, launch once in python3 then in python2 as file will be created during python3 for python2 compatibility
+    datas = load_datas_from_xlsx("autotest_data/autotest.xlsx")
+    #~ print(datas)
+    assert(datas["intro_spont"][0][0]=="GOODDAY SALUTATION_FRIENDLY, bienvenue chez Obo World.")
+    assert(datas["interim"][-1][-3]=="Acceptez vous la mission au salaire horaire brut de PAY_PER_HOUR ?")
+    print("duration autotest xlsx: %.3fs" % (time.time()-timeBeginXls) ) # optim rpi en python3 si on passe du xlsx au reloadage de csv: 4.5 => 0.86 puis 0.32 en enlevant le import de pandas!
+
     
 def autotest():
     loadmethods = [load_csv,load_csv_multiline]
@@ -323,15 +338,7 @@ def autotest():
         print("DBG: datas2: %s" % str(datas2) )
         assert(datas==datas2)
     
-    if 1:
-        timeBeginXls = time.time()
-        # autotest_xlsx
-        # on linux rpi, launch once in python3 then in python2 as file will be created during python3 for python2 compatibility
-        datas = load_datas_from_xlsx("autotest_data/autotest.xlsx")
-        #~ print(datas)
-        assert(datas["intro_spont"][0][0]=="GOODDAY SALUTATION_FRIENDLY, bienvenue chez Obo World.")
-        assert(datas["interim"][-1][-3]=="Acceptez vous la mission au salaire horaire brut de PAY_PER_HOUR ?")
-        print("duration autotest xlsx: %.3fs" % (time.time()-timeBeginXls) ) # optim rpi en python3 si on passe du xlsx au reloadage de csv: 4.5 => 0.86 puis 0.32 en enlevant le import de pandas!
+    autotestXlsx()
     
     
     print("INF: autotest passed [GOOD]")

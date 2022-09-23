@@ -354,6 +354,32 @@ def removeAccentString( s ):
             print("DBG: removeAccentString: received '%s'" % c )
         out += c
     return out
+    
+        
+def sizeToStr(v):
+    listUnit = ['B','KB', 'MB', 'GB', 'TB']
+    idxUnit = 0
+    while v > 1024:
+        v /= 1024
+        idxUnit += 1
+    if idxUnit == 0:
+        return "%d%s" % (v,listUnit[idxUnit])
+    return "%.1f%s" % (v,listUnit[idxUnit])
+    
+def timeToStr(ts):
+    """
+    take a time in sec and print it as it's best
+    """
+    if ts < 60:
+        return "%2ds" % ts
+    ts /= 60
+    if ts < 60:
+        return "%2dm" % ts     
+    ts /= 60
+    if ts < 24:
+        return "%.1fh" % ts      
+    ts /= 24
+    return "%.1fd" % ts
 
 
 if __name__ == "__main__":

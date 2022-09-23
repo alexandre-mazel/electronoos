@@ -6,6 +6,7 @@ import time
 
 sys.path.append( "../alex_pytools/")
 import misctools
+from stringtools import timeToStr, sizeToStr
 
 def getNetworkStat_netstat():
     """
@@ -61,32 +62,6 @@ def getNetworkStat_psutil():
     
 def getNetworkStat():
     return getNetworkStat_psutil()
-        
-        
-def printSmart(v):
-    listUnit = ['B','KB', 'MB', 'GB', 'TB']
-    idxUnit = 0
-    while v > 1024:
-        v /= 1024
-        idxUnit += 1
-    if idxUnit == 0:
-        return "%d%s" % (v,listUnit[idxUnit])
-    return "%.1f%s" % (v,listUnit[idxUnit])
-    
-def printSmartTime(ts):
-    """
-    take a time in sec and print it as it's best
-    """
-    if ts < 60:
-        return "%2ds" % ts
-    ts /= 60
-    if ts < 60:
-        return "%2dm" % ts     
-    ts /= 60
-    if ts < 24:
-        return "%.1fh" % ts      
-    ts /= 24
-    return "%.1fd" % ts
 
 def analyseBandwith():
     # un scp de 3 fichiers de 168M copie en local genere 1014M de donnees mesurees !?! 
@@ -157,10 +132,10 @@ def analyseBandwith():
             print(  strLine )
             
         print("%s/%s Received: %s, Send: %s, Total: %s   Day: %s  %s  %s   Hour: %s  %s  %s   Last5Min: %s  %s  %s      \r" % (
-                                            printSmartTime(cptLoop*nPeriodSec), printSmartTime(time.time()-timeBegin), printSmart(rd),printSmart(sd),printSmart(td),
-                                            printSmart(r_t),printSmart(s_t),printSmart(t_t),
-                                            printSmart(sum(ar_h)),printSmart(sum(as_h)),printSmart(sum(at_h)), # WRN: generate huge computation ! should sum by minutes!
-                                            printSmart(sum(ar_1)),printSmart(sum(as_1)),printSmart(sum(at_1))
+                                            timeToStr(cptLoop*nPeriodSec), timeToStr(time.time()-timeBegin), sizeToStr(rd),sizeToStr(sd),sizeToStr(td),
+                                            sizeToStr(r_t),sizeToStr(s_t),sizeToStr(t_t),
+                                            sizeToStr(sum(ar_h)),sizeToStr(sum(as_h)),sizeToStr(sum(at_h)), # WRN: generate huge computation ! should sum by minutes!
+                                            sizeToStr(sum(ar_1)),sizeToStr(sum(as_1)),sizeToStr(sum(at_1))
                                             ),
                                             end="" )
         r_p,s_p,t_p = r,s,t

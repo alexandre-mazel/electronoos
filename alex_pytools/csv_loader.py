@@ -1,6 +1,7 @@
 import io
 import os
 import sys
+import time
 
 def openWithEncoding( filename, mode, encoding, errors = 'strict' ):
     if sys.version_info[0] < 3:
@@ -182,7 +183,7 @@ def load_datas_from_xlsx_exploded_for_python27( filename, encoding = 'utf-8', bV
         dOut[tabname]=data
     
     fi.close()
-    print("DBG: load_datas_from_xlsx_exploded_for_python27: dOut: %s" % str(dOut) )
+    #~ print("DBG: load_datas_from_xlsx_exploded_for_python27: dOut: %s" % str(dOut) )
     return dOut
     
 def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
@@ -193,12 +194,15 @@ def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
     
     #~ import xlrd # pip install xlrd 
     #~ import openpyxl # pip install openpyxl 
-    try: import pandas as pd # pip install pandas
-    except: print("WRN: no pandas found...") # on python2.7, it will be ok
     try: import numpy as np
     except: pass
+    
+    filename_with_index_out = filename + "__index.csv"
+        
     if os.name == "nt":
         try:
+            try: import pandas as pd # pip install pandas
+            except: print("WRN: no pandas found...") # on python2.7, it will be ok
             df = pd.read_excel( filename, sheet_name=None, header=None)
         except UnboundLocalError:
             # if doesn't work with python2,  so relying on loading exploded too
@@ -211,9 +215,14 @@ def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
         #~ df = pd.read_excel( filename, sheet_name=None, header=None, engine='openpyxl' ) # bug in 1.2.0, not in 1.1.5 # pip install pandas==1.1.5 (not existing in python2)
         # rien ne fonctionne en python2.7
         #~ df = pd.read_excel( filename, sheet_name=None, header=None )
-        if sys.version_info[0] < 3:
+        bNoNeedToGenerateFile = os.path.isfile(filename_with_index_out) and os.path.getmtime(filename_with_index_out) > os.path.getmtime(filename)
+        
+        if sys.version_info[0] < 3 or bNoNeedToGenerateFile: # we prefere to read from csv as it's faster!
             return load_datas_from_xlsx_exploded_for_python27(filename, encoding=encoding)
 
+        try: import pandas as pd # pip install pandas
+        except: print("WRN: no pandas found...") # on python2.7, it will be ok
+        
         df = pd.read_excel( filename, sheet_name=None, header=None )
     
     if bVerbose: print(len(df))
@@ -248,22 +257,23 @@ def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
                     
     if  sys.version_info[0] >= 3 and os.name != "nt":
         # generate one cvs per tab, so you can read them back with python2.7
-        fIndex = io.open(filename+"__index.csv", "wt", encoding="cp1252")
-        for k,content in dOut.items():
-            fn = filename+"__"+k+".csv"
-            print("INF: writing to independant csv: %s" % fn )
-            f = io.open(fn,"wt", encoding=encoding)
-            for line in content:
-                for nfield,field in enumerate(line):
-                    #~ print("field: %s" % field )
-                    f.write( str(field))
-                    # change: we always want to finish a line with a ; so a ;\n is a real end of record
-                    if nfield+1 < len(line) or 1:
-                        f.write(";")
-                f.write("\n")
-            f.close()
-            fIndex.write(k+"\n")
-        fIndex.close()
+        if not bNoNeedToGenerateFile:
+            fIndex = io.open( filename_with_index_out, "wt", encoding="cp1252" )
+            for k,content in dOut.items():
+                fn = filename+"__"+k+".csv"
+                print("INF: writing to independant csv: %s" % fn )
+                f = io.open(fn,"wt", encoding=encoding)
+                for line in content:
+                    for nfield,field in enumerate(line):
+                        #~ print("field: %s" % field )
+                        f.write( str(field))
+                        # change: we always want to finish a line with a ; so a ;\n is a real end of record
+                        if nfield+1 < len(line) or 1:
+                            f.write(";")
+                    f.write("\n")
+                f.close()
+                fIndex.write(k+"\n")
+            fIndex.close()
     
     return dOut
     
@@ -314,11 +324,14 @@ def autotest():
         assert(datas==datas2)
     
     if 1:
+        timeBeginXls = time.time()
         # autotest_xlsx
+        # on linux rpi, launch once in python3 then in python2 as file will be created during python3 for python2 compatibility
         datas = load_datas_from_xlsx("autotest_data/autotest.xlsx")
-        print(datas)
+        #~ print(datas)
         assert(datas["intro_spont"][0][0]=="GOODDAY SALUTATION_FRIENDLY, bienvenue chez Obo World.")
         assert(datas["interim"][-1][-3]=="Acceptez vous la mission au salaire horaire brut de PAY_PER_HOUR ?")
+        print("duration autotest xlsx: %.3fs" % (time.time()-timeBeginXls) ) # optim rpi en python3 si on passe du xlsx au reloadage de csv: 4.5 => 0.86 puis 0.32 en enlevant le import de pandas!
     
     
     print("INF: autotest passed [GOOD]")

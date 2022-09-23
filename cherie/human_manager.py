@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 This file is part of CHERIE: Care Human Extended Real-life Interaction Experimentation.
 
@@ -11,6 +13,15 @@ python run_cloud_server.py
 
 # mettre a jour le robot:
 pscp -pw nao -P 55022 C:/Users/alexa/dev/git/electronoos/cherie/*.py nao@engrenage.studio:/home/nao/.local/lib/python2.7/site-packages/electronoos/cherie
+
+# NB: le misctools.py a utiliser est celui de /home/nao/.local/lib/python2.7/site-packages/electronoos/alex_pytools
+
+# lancer le soundrecorder sur le robot:
+killall python2.7; nohup python -c "import abcdk.sound_analyser; abcdk.sound_analyser.launchSoundReceiverFromShell('localhost',False)"&
+
+
+# mise a jour du robot chez brice:
+pscp -pw nao C:/Users/alexa/dev/git/electronoos/cherie/*.py nao@87.90.82.139:/home/nao/.local/lib/python2.7/site-packages/electronoos/cherie & pscp -pw nao C:/Users/alexa/dev/git/abcdk/sdk/abcdk/sound_a*.py nao@87.90.82.139:/home/nao/.local/lib/python2.7/site-packages/abcdk/
 
 # voir des stats:
 sur agx:
@@ -28,6 +39,7 @@ import cv2
 import json
 import os
 import sys
+import random
 import time
 
 
@@ -209,6 +221,8 @@ class HumanManager:
         self.bWasInteracting = 0
         self.timeNoFace = time.time()
         
+        self.lastTimeSaySomething = time.time()-1000
+        
     def __del__(self):
         self.save()
         
@@ -252,7 +266,7 @@ class HumanManager:
         if os.name == "nt":
             hFaceTreshold = 74
         else:
-            hFaceTreshold = 150
+            hFaceTreshold = 130
         
             
             
@@ -422,7 +436,7 @@ class HumanManager:
                     bInteract = 1
                     bSomeoneInteract = 1
 
-                print("rTimeSinceLastInteraction: %s" % rTimeSinceLastInteraction )                    
+                print("rTimeSinceLastInteraction: %s, strTxt6: %s" % (rTimeSinceLastInteraction,strTxt6) )                    
                 if bInteract:
                     self.rTimeGlobalLastInteraction = time.time()
                     self.bWasInteracting = bInteract
@@ -498,8 +512,31 @@ class HumanManager:
         ici il faudrait trouver un truc a dire.
         """
         print("DBG: saySomething: ICI il faudrait dire un truc")
-        if 1:
-            self.say("Ho, il fait pas chaud!")
+        
+        if time.time() - self.lastTimeSaySomething > 5*60:
+            self.lastTimeSaySomething = time.time()
+            listTxt = [
+                            "Ca va ?",
+                            "Tu fais quoi ?",
+                            "Que va tu faire maintenant?",
+                            "C'est le bon moment pour une pause!",
+                            "C'est le bon moment pour une sieste!",
+                            "C'est le bon moment pour appeller un ami!",
+                            "C'est le bon moment pour souffler!",
+                            "C'est le bon moment pour boire un verre d'eau!",
+                            'Et au fait "aime tu les haricots verts" ?',
+                            "Tu es vraiment super!",
+                            "Je t'adore en tant qu'humain",
+                            "Heureusement que tu es la!",
+                            "Quand tu n'es pas la, je m'ennuie.",
+                            "Penses a te reposer!",
+                            "Tu devrais faire une pause!",
+                            "Une journée sans rire, c'est une journée ou on ne rigole pas!",
+                            "Aujourd'hui c'est un bon jour pour prendre une bonne raisolution de vie.",
+                            ]
+
+            idx = random.randint(0,len(listTxt)-1)
+            self.say(listTxt[idx])
         
         
 # class HumanManager - end

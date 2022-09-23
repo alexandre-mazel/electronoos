@@ -36,6 +36,7 @@ def load_csv_multiline(filename, sepa = ';', bSkipFirstLine = 0, encoding =  'ut
     fields = []
     while 1:
         bMustQuit = idx >= len(buf)
+        # next line raise an error in mstab7 py2.7: LookupError: unknown encoding: cp65001
         if bVerbose: print("DBG: load_csv_multiline: idx_start: %d, idx: %d,  is_sepa: %d, bMustQuit: %d, char: '%s'" % (idx_start,idx,bMustQuit or buf[idx] == sepa,bMustQuit, bMustQuit or buf[idx]) )
         if bMustQuit or buf[idx] == sepa:
             s = buf[idx_start:idx]
@@ -311,6 +312,14 @@ def autotest():
         print("DBG: datas : %s" % str(datas) )
         print("DBG: datas2: %s" % str(datas2) )
         assert(datas==datas2)
+    
+    if 1:
+        # autotest_xlsx
+        datas = load_datas_from_xlsx("autotest_data/autotest.xlsx")
+        print(datas)
+        assert(datas["intro_spont"][0][0]=="GOODDAY SALUTATION_FRIENDLY, bienvenue chez Obo World.")
+        assert(datas["interim"][-1][-3]=="Acceptez vous la mission au salaire horaire brut de PAY_PER_HOUR ?")
+    
     
     print("INF: autotest passed [GOOD]")
     

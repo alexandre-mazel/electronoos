@@ -47,6 +47,7 @@ class AgentBehavior:
         self.motion = naoqi.ALProxy( "ALMotion", "localhost", 9559 )
         self.leds = naoqi.ALProxy( "ALLeds", "localhost", 9559 )
         self.tts = naoqi.ALProxy( "ALTextToSpeech", "localhost", 9559 )
+        self.mem = naoqi.ALProxy( "ALMemory", "localhost", 9559 )
         self.listInterestedSounds = []
         for i in range(10):
             self.listInterestedSounds.append("/home/nao/sounds/interested_sound__%04d.wav" % i)
@@ -57,6 +58,13 @@ class AgentBehavior:
         self.resetHead()
         self.bInInteraction = 0
         self.timeLastTic = time.time()-1000 # patch pourrie car stopinteraction n'arrive pas au bon moment
+        
+        
+    def startRecordSound(self,bNewState):
+        if bNewState:
+            self.mem.raiseMicroEvent("sound_receiver_pause", 0 )
+        else:
+            self.mem.raiseMicroEvent("sound_receiver_pause", 1 )
             
     def playSmallSounds(self,listSound):
         rSoundVolume = 0.2
@@ -64,7 +72,7 @@ class AgentBehavior:
         sound_player.soundPlayer.playFile(listSound[idx], bWaitEnd=False, rSoundVolume=rSoundVolume)
     
     def playTic( self ):
-        if time.time() - bself.timeLastTic < 10:
+        if time.time() - self.timeLastTic < 10:
             return
         self.timeLastTic = time.time()
         print("playTic")
@@ -100,7 +108,7 @@ class AgentBehavior:
         
         
     def resetHead( self ):
-        self.motion.post.angleInterpolation( self.strHead, [0.,-0.3], 2.5, True )
+        self.motion.post.angleInterpolation( self.strHead, [0.,-0.22], 2.5, True )
         
     def reactToLookAt( self, facepose,humaninfo ):
         self.lookAtFace( facepose )
@@ -114,11 +122,13 @@ class AgentBehavior:
     def startInteraction( self, facepose,humaninfo ):
         self.bInInteraction = 1
         self.playTic()
+        self.startRecordSound(1)
         return self.showInteraction( facepose,humaninfo )
         
     def stopInteraction( self ):
         self.bInInteraction = 0
         self.playTic()
+        self.startRecordSound(0)
 
     def showInteraction( self, facepose,humaninfo ):
         # warning: facepose,humaninfo could be none if we haven't seen face, but we know we are interacting

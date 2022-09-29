@@ -4,11 +4,24 @@ import os
 import sys
 import time
 
+import stringtools
+
 def assert_equal(a,b):
     if a == b:
         print("(%s==%s) => ok" % (a,b))
         return
+            
+    if sys.version_info[0]<3:
+        if isinstance(a,unicode):
+            a = a.encode("utf-8", 'replace')
 
+        if isinstance(b,unicode):
+            b = b.encode("utf-8", 'replace')
+        
+        if a == b:
+            print("(%s==%s) => ok (but unicode_encoded)" % (a,b))
+            return
+    
     if type(a)==type(b):
         if isinstance(a,tuple):
             print("sametupe")
@@ -17,6 +30,13 @@ def assert_equal(a,b):
                 return
             
     print("(%s==%s) => NOT ok (type:%s and %s)\ndetail:\n%s\n%s" % (a,b,type(a),type(b), a,b))
+    if 1:
+        print("1st value:")
+        for c in a:
+            print(ord(c))
+        print("2nd value:")
+        for c in b:
+            print(ord(c))
     assert(0)
 
 def assert_diff(a,b,diff=0.1):
@@ -32,167 +52,18 @@ def openWithEncoding( filename, mode, encoding, errors = 'strict' ):
         return io.open( filename, mode, encoding=encoding, errors=errors )
     return open( filename, mode, encoding=encoding, errors=errors )
         
-def removeAccent( c ):
-    bVerbose = 1
-    try:
-        acc="ÁÉÈÎÍÓÖÙâàáãäåçéêëèîïíìñôóòðöøõûüùúŷÿ" # TODO A avec accent
-        noacc="AEEIIOOUaaaaaaceeeeiiiinooooooouuuuyy"
-        #~ idx=acc.find(c) # in python 2.7: UnicodeDecodeError: 'ascii' codec can't decode byte 0xc3 in position 0: ordinal not in range(128) // ord(value) was 233
-        #~ if idx != -1:
-            #~ return noacc[idx]
-        #~ for i in range(len(acc)):
-            #~ if c == acc[i]:
-                #~ return noacc[i]
-        if 0:
-            # generate acc_ord code value
-            for c in acc:
-                print("%s," % ord(c) )
-                
-        acc_ord = [
-            193, # A
-            201,
-            200,
-            206, # premier I
-            205,
-            211, # premier O
-            214,
-            217, # premier U
-            226,
-            224,
-            225,
-            227,
-            228,
-            229, #dernier a
-            
-            231,
-            233,
-            234,
-            235,
-            232,
-            238,
-            239,
-            237,
-            236, # dernier i
-            241,
-            244,
-            243,
-            242,
-            240,
-            246,
-            248,
-            245, #dernier o
-            251,
-            252,
-            249,
-            250, # dernier u
-            375,
-            255,
-            ]
-
-        # same chars at ovh (preceded by a 195 or 197 in front of 183)
-        acc_ord_ovh = [
-            129, # A untested
-            137,
-            136,
-            142, # premier I
-            141,
-            147, # premier O
-            150,
-            153, # premier U
-            162,
-            160,
-            161,
-            163,
-            164,
-            165, #dernier a
-            
-            167,
-            169,
-            170,
-            171,
-            168,
-            174,
-            175,
-            173,
-            172, #dernier i
-            177,
-            180,
-            179,
-            178,
-            176,
-            182,
-            184,
-            181, # dernier o
-            187,
-            188,
-            185,
-            186, #dernier u
-            183,
-            191,
-        ]
-
-        #~ assert_equal( len(acc_ord),len(noacc) )
-        for i in range(len(acc_ord)):
-            if ord(c) == acc_ord[i]:
-                return noacc[i]        
-
-        #~ assert_equal( len(acc_ord),len(acc_ord_ovh) )
-        for i in range(len(acc_ord_ovh)):
-            if ord(c) == acc_ord_ovh[i]:
-                return noacc[i]      
-                
-        if c == "æ" or ord(c)==230:
-            c = "ae"
-        if c == "Æ" or ord(c)==198:
-            c = "AE"
-        if c == "œ" or ord(c)==339:
-            c = "oe"
-        elif c == "Œ" or ord(c)==338:
-            c = "OE"
-        elif ord(c) == 231: # c cedile not detected previously
-            c = "c"
-        elif ord(c) == 156 or ord(c) == 140:
-            # second part of oe, don't complain (minuscule then majuscule)
-            c = ""
-        elif ord(c) == 195 or ord(c) == 197:
-            # mark of char on two chars at ovh, don't complain
-            c = ""
-        elif ord(c) == 222 or ord(c) == 254:
-            # truc bizarre qui ressemble a une barre avec un demi cercle dessus
-            c = ""
-        elif ord(c) == 8211 or ord(c) == 8212:
-            # custom hyphen
-            c = "-"
-        elif ord(c) == 8216 or ord(c) == 8217:
-            # type de '
-            c = "'"
-        elif ord(c) == 8220:
-            # type de 
-            c = '"'
-        elif ord(c) == 8230:
-            c = "..."
-        else:
-            try:
-                if bVerbose: print("DBG: removeAccent: not found: %c (%s)" % (c,ord(c) ))
-            except BaseException as err:
-                print("DBG: removeAccent: catch else: ord: %s, err: %s" % (ord(c),err) )
-            c="" # it should remains only invisible char like the square before "oe"
-        return c
-    except TypeError as err:
-        print("DBG: removeAccent:type error: %s, returning '_'" % str(err) )
-    return "_"
 
     
 def simpleString( s ):
     """
-    change a string to lower case without accent and no hypen
+    change a string to lower case without accent and no hyphen
     """
     bPrintResultForDebug = 0
     o = ""
     for c in s:
         if ord(c)>127:
             #~ print("in %s: %c" % (s,c) )
-            c = removeAccent(c)
+            c = stringtools.removeAccent(c)
             #~ print("=> %c" % c )
             bPrintResultForDebug = 1
         elif c == '-':
@@ -234,6 +105,7 @@ class Firstnames:
             line = file.readline()
             if len(line)<1:
                 break
+            
             if bVerbose: print("DBG: Regions.load: line: %s" % str(line) )
             line = line.replace('"','')
             fields = line.split(';')
@@ -252,10 +124,11 @@ class Firstnames:
             rOccurence = float(strOccurence)
             #~ print(strFirstname)
             k = simpleString(strFirstname)
-            if k in self.dictFirstname.keys():
+            #~ if k in self.dictFirstname.keys(): # this line is very bad: it construct a list for keys then do a list search in it
+            if k in self.dictFirstname: # this one is great: it looks in dict's key using hash
                 if bVerbose: print("WRN: Firstnames.load: forgetting dubbled %s (perhaps due to various accent simplified)" % (k) )
             else:
-                self.dictFirstname[k] = (strFirstname, bFemale, tuple(listCountries), rOccurence)
+                self.dictFirstname[k] = (strFirstname, bFemale, tuple(listCountries), rOccurence) # this line takes 99% of times on python2.7 (moreover in rpi)
             
     def get( self, strFirstname ):
         """
@@ -298,10 +171,24 @@ class Firstnames:
 
 # class Firstnames - end
 firstnames = Firstnames()
+timeBegin = time.time()
 firstnames.load()
 #~ firstnames.printListByOcc()
 
+print("Loading takes: %.2fs" % (time.time()-timeBegin))
+#  mstab7_2.7 : 2.01s
+#  mstab7_3.9 : 0.04s
+# RPI4_2.7      : 12.93s
+# RPI4_3.7      :  0.2s
+# after removing the k in d.keys():
+#  mstab7_2.7 : 0.06s
+#  mstab7_3.9 : 0.04s
+# RPI4_2.7      : 0.24s
+# RPI4_3.7      :  0.2s
+
 def autotest():
+    # in python2, type that in the shell before:
+    # set PYTHONIOENCODING=UTF-8
     val = firstnames.get( "Alexandre" )
     assert_equal( val[0], "Alexandre" )
     assert_equal( val[1], False )
@@ -360,6 +247,18 @@ def autotest():
     for w in line.split():
         ret = firstnames.getCompound(w)
         assert( ret is None )
+    
+    
+    # time computeGender
+    timeBeginStuff = time.time()
+    for i in range(100000):
+        firstnames.getCompound( "notexistant" )
+        firstnames.getCompound( "Jean René" )
+    duration = time.time()-timeBeginStuff
+    print("time ComputeGender: %.3fs" % (duration) )
+    assert(duration<1.2)
+    
+    print("INF: autotest passed [GOOD]")
     
 # autotest- end
     

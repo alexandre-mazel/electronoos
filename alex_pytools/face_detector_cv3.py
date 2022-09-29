@@ -41,14 +41,46 @@ def findCloser( listFaceResult, rect, confidence_treshold = 0.13 ):
         
     print("DBG: findCloser: returning: %s" % str(best) )
     return best
-        
-listRes = [
-(0,0,100,200,0.5),
-(25,35,40,60,0.6),
-]
+    
+if 0:
+    listRes = [
+    (0,0,100,200,0.5),
+    (25,35,40,60,0.6),
+    ]
 
-res = findCloser( listRes, (20,40,40,60) )
-print("findBestIntersection: %s" % str(res) )
+    res = findCloser( listRes, (20,40,40,60) )
+    print("findBestIntersection: %s" % str(res) )
+    
+def selectFace( faces_list, img_shape ):
+    """
+    select a list of face by returning the biggest and most centered
+    - faces_list: from detector
+    - img_shape: shape object (h,w,[layer]) from opencv image
+    """
+    if len(faces_list) < 1:
+        return []
+    h = img_shape[0]
+    w = img_shape[1]    
+    nMaxScore = -1024*1024*1024; # INT_MIN
+    nIdxBest = -1;
+    print(faces_list)
+    for i in range(len( faces_list ) ):
+        xt, yt, xb, yb,rConf = faces_list[i]
+        facew = xb-xt;
+        faceh = yb-yt;        
+        nScore = 0; # all distances are compared in square
+        nScore += facew*faceh*8; # *8: it's a parameter to make the size weight "more quite the same" compared to the distance
+        dx = ( w / 2 ) - ( xt + (facew/2) );
+        dy = ( h / 2 ) - ( yt + (faceh/2) );
+        nScore -= dx*dx+dy*dy;
+        print( "DBG: FaceDetectionNew_select_face: i:%d, score: %s" % (i,nScore) )
+        if( nScore > nMaxScore ):
+            nMaxScore = nScore;
+            nIdxBest = i;
+            
+    # now the best is in idx...
+    return faces_list[nIdxBest]
+# FaceDetectionNew_select_face - end
 
 class FaceDetector:
     """
@@ -91,6 +123,10 @@ class FaceDetector:
         return im
         
     def detect( self, im, bRenderBox = True,confidence_threshold = 0.5 ):
+        """
+        return a list of face: x_start, y_start, x_end, y_end
+        """
+        
         if len(im.shape)==2 or im.shape[2] == 1: 
             im = cv2.cvtColor(im, cv2.COLOR_GRAY2BGR)
         blob = cv2.dnn.blobFromImage( im, 1.0, (300, 300), (104.0, 177.0, 123.0) )
@@ -109,6 +145,8 @@ class FaceDetector:
             if confidence > confidence_threshold:
                 box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
                 (startX, startY, endX, endY) = box.astype("int")
+                if startX >= w-6 or startY >= h-6:
+                    continue # face is out of screen,(or very small), weird, let's remove it
                 res.append((startX, startY, endX, endY, confidence))
                 #~ print("DBG: box: %s" % str(box))
                 #~ print("DBG: x,y: %d,%d" % (startX, startY))

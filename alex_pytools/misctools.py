@@ -5,10 +5,11 @@ some classic handy classes
 import datetime
 try: import cv2 # made with cv 3.2.0-dev
 except: pass
-import numpy as np
 import os
 import platform
+import random
 import select
+import subprocess
 import time
 import sys
 try: import v4l2capture  # can be found here : https://github.com/gebart/python-v4l2capture
@@ -30,15 +31,22 @@ def assert_greater(x,y):
     if x<y:
         assert(0)
         
+# FileNotFoundError definition for python 2.7
+# will be accessible as common.FileNotFoundError
+try:
+    FileNotFoundError = FileNotFoundError # create an object common.FileNotFoundError = (global.)FileNotFoundError
+except NameError:
+    FileNotFoundError = IOError
+        
         
 def getUserHome():
     """
-    return a temporary folder
+    return a user root folder
     """
     if os.name == "nt":
         ret = "c:/"
     else:
-        ret = "~/"
+        ret = os.path.expanduser("~/")
     return ret
 
 def getPathData():
@@ -72,7 +80,15 @@ def check(v1,v2):
     print( "BAD: %s != %s" % (str(v1),str(v2) ) )
     assert(v1==v2)
     return
-        
+    
+def is_string_as_integer(s):
+    try:
+        n=int(s)
+        return True
+    except ValueError:
+        pass
+    return False
+            
 
 def mse(imageA, imageB, bDenoise = False):
     # the 'Mean Squared Error' between the two images is the
@@ -130,14 +146,30 @@ def getTime():
     """
     datetimeObject = datetime.datetime.now()
     return datetimeObject.hour, datetimeObject.minute, datetimeObject.second 
+
+def getDay():
+    """
+    return (year, month, day)
+    """
+    datetimeObject = datetime.datetime.now()
+    return datetimeObject.year, datetimeObject.month, datetimeObject.day 
     
 def getDayStamp():
     """
-    return (hour,min,second)
+    return a string representing the date "YYYY_MM_DD"
     """
     datetimeObject = datetime.datetime.now()
     return "%04d_%02d_%02d" % ( datetimeObject.year, datetimeObject.month,  datetimeObject.day )
 
+def getDiffTwoDateStamp(strDayStamp1,strDayStamp2):
+    """
+    return diff in day between day2 (represented as DayStamp "YYYY_MM_DD") and day1
+    """
+    strTimeStampFormat = "%Y_%m_%d"
+    datetime_object1 = datetime.datetime.strptime( strDayStamp1, strTimeStampFormat )
+    datetime_object2 = datetime.datetime.strptime( strDayStamp2, strTimeStampFormat )
+    return (datetime_object2-datetime_object1).days
+    
 def getTimeStamp():
     """
     
@@ -205,14 +237,44 @@ def getSystemCallReturn( strCommand ):
     return str(data)
 
 def getCpuModel(bShort=False):
+    """
+    return a tuple marketing name, core name
+    - bShort: if set, return only the core name
+    
+    # hint: have a look at cpuinfo (cache size, model, flags)
+    # import cpuinfo # pip install py-cpuinfo
+    # cpuinfo.get_cpu_info()
+    # can be tested with: python -m cpuinfo
+    """
+    
     if platform.system() == "Windows":
         name1 = platform.processor()
         name2 = getSystemCallReturn( "wmic cpu get name" ).split("\n")[-3]
+    elif platform.system() == "Darwin":
+        os.environ['PATH'] = os.environ['PATH'] + os.pathsep + '/usr/sbin'
+        command ="sysctl -n machdep.cpu.brand_string"
+        name1 = subprocess.check_output(command).strip()
+        name2 = name1
+        
+    elif platform.system() == "Linux":
+        command = "cat /proc/cpuinfo"
+        all_info = subprocess.check_output(command, shell=True).decode().strip()
+        for line in all_info.split("\n"):
+            #~ print("DBG: line: '%s'" % line )
+            strLineToSearch = "model name"
+            idx = line.find(strLineToSearch)
+            if idx != -1:
+                name1 = line[idx+len(strLineToSearch)+1:].strip()
+                if name1[0] == ':':
+                    name1 = name1[1:]
+                    name1 = name1.strip()
+                break
+        name2 = name1
     else:
         name1, name2 =  "TODO:getCpuModel", "todo"
     if bShort: return name2
     return name1, name2
-
+    
 def is_available_resolution(cam,x,y):
     cam.set(cv2.CAP_PROP_FRAME_WIDTH, int(x))
     cam.set(cv2.CAP_PROP_FRAME_HEIGHT, int(y))
@@ -683,6 +745,8 @@ def getPhoneticComparison( s1, s2 ):
     import metaphone
     #~ print metaphone.dm( unicode(s1) )
     #~ print metaphone.dm( unicode(s2) )
+    #~ print( metaphone.dm( s1 ) )
+    #~ print( metaphone.dm( s2 ) )
     try:
         meta1 = metaphone.dm( s1 )[0]
         meta2 = metaphone.dm( s2 )[0]
@@ -708,7 +772,13 @@ def testPhoneticComparison():
     assert_greater( getPhoneticComparison("du pain", "Dupain"), 1. )
     assert_greater( getPhoneticComparison("du pain", "Dublin"), 0.5 )
     assert_greater( getPhoneticComparison("checkin please", "chicken please"), 0.99 ) # should be less than 1. !!!
-
+    
+if 0:
+    testPhoneticComparison()
+    print( getPhoneticComparison("Hello", "Ho il") ) # ca devrait pas etre 1., c'est abuse !
+    print( getPhoneticComparison("Hello", "Hoil") ) # ca devrait pas etre 1., c'est abuse !
+    exit()
+    
 def getKeystrokeNotBlocking():
     """
     return 0 if not keyboard keys are waiting in the buffer, else return the key
@@ -794,9 +864,98 @@ def getWebPage( strAddr ):
     mybytes = fp.read()
     mystr = mybytes.decode("utf8")
     fp.close()
-    return  mystr
+    return mystr
+    
+def find( list, element ):
+    """
+    return idx of an element in a list or -1 if not found
+    """
+    try:
+        return list.index(element)
+    except ValueError as err:
+        pass
+    return -1
         
+        
+def findInNammedList( l, keyname, defaultValue = None ):
+    """
+    look in a list looking a bit like a dict [ ["toto", 1], ["tutu",1,2] ]
+    return keyname keyname => ["toto", 1]
+    """
+    keyname = keyname.lower()
+    for e in l:
+        if e[0].lower() == keyname:
+            return e
+    return defaultValue
+    
+def findInNammedListAndGetFirst( l, keyname, defaultValue = None ):
+    """
+    look in a list looking a bit like a dict [ ["toto", 1], ["tutu",1,2] ]
+    return keyname keyname => ["toto", 1]
+    """
+    keyname = keyname.lower()
+    for e in l:
+        if e[0].lower() == keyname:
+            return e[1]
+    return defaultValue
+    
+def shuffle( aList, n = 1 ):
+    """
+    choose randomly n element in list, prevent double!
+    """
+    assert(n<=len(aList))
+    aList = aList[:] # copy
+    out = []
+    while 1:
+        if len(out) == n:
+            break
+        idx = random.randint(0,len(aList)-1)
+        out.append(aList[idx])
+        del aList[idx]
+    return out
+    
+    
+def intToHashLike(n):
+    """
+    generate a hash looking like an hash from an int
+    """
+    codage = [chr(ord('A')+i) for i in range(26)]
+    s = ""
+    lencode = len(codage)
+    while n>=lencode:
+        r = n%26
+        s = codage[r] + s
+        n = n // 26
+    s = codage[n] + s
+    return s
      
+def dictToString(d,sortByValue=False):
+    o = ""
+    strPlural = ""
+    if len(d)>1:
+        strPlural = 's'
+    o +="%d item%s:\n" % (len(d),strPlural)
+    funcSort = None
+    if sortByValue:
+        funcSort = lambda x: x[1]
+    for k,v in sorted(d.items(),key=funcSort):
+        o += "  %s: %s\n" % (str(k),str(v))
+    return o
+        
+#~ print(dictToString({'2022/09/06': 120, '2022/09/07': 43, '2022/09/08': 54, '2022/09/09': 64, '2022/09/12': 91, '2022/09/13': 131},True))
+
+def backupFile( filename ):
+    """
+    make a backup of a file, erase backuo first.
+    backup have same name than file, but a with an added .bak
+    """
+    if not os.path.isfile( filename ):
+        # nothing to do
+        return
+    filenamebak = filename + ".bak"
+    if os.path.isfile(filenamebak):
+        os.remove(filenamebak)
+    os.rename(filename,filenamebak)
     
 def autoTest():
     print("cpu: %s" % str(getCpuModel()) )
@@ -820,6 +979,30 @@ def autoTest():
     print("isPauseRequired: %s" % isPauseRequired() )
     print("isExitRequired: %s" % isExitRequired() )
     
+    check(getDiffTwoDateStamp("2022_01_18","2022_02_21"),34)
+    
+    check(intToHashLike(0),'A')
+    check(intToHashLike(1),'B')
+    check(intToHashLike(26),'BA') # A is like a 0
+    check(intToHashLike(27),'BB')
+    check(intToHashLike(26*26*26-1),'ZZZ')
+    check(intToHashLike(26*26*26),'BAAA')
+    check(intToHashLike(26*26*26+1),'BAAB')
+    
+    check(find("ab","z"),-1)
+    check(find("abezee","z"),3)
+    check(find("abezee","zee"),3)
+    check(find([1,2,3],3),2)
+    check(find([1,2,3],None),-1)
+    check(find([],"a"),-1)
+    
+    ret = shuffle(["a","b","c"],0)
+    print("ret shuffle 0: " + str(ret))
+    check(len(ret),0)
+    
+    ret = shuffle(["a","b","c"],2)
+    print("ret shuffle 1: " + str(ret))
+    check(len(ret),2)
     
 if __name__ == "__main__":
     autoTest()

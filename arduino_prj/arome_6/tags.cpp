@@ -50,6 +50,17 @@ char aMagicTagList_Rainbow[NBR_MAGIC_TAG_DIFFERENT][TAG_LEN] =
   {0x30, 0x36, 0x30, 0x30, 0x36, 0x45, 0x37, 0x41, 0x30, 0x38, 0x31, 0x41,},  
 };
 
+char aMagicTagList_White[NBR_MAGIC_TAG_DIFFERENT][TAG_LEN] = 
+{
+  {0x30, 0x36, 0x30, 0x30, 0x36, 0x45, 0x43, 0x35, 0x37, 0x32, 0x44, 0x46,}, // NDEV: todo: put good one
+  {0x30, 0x36, 0x30, 0x30, 0x36, 0x46, 0x37, 0x41, 0x37, 0x36, 0x36, 0x35,},
+  {0x30, 0x36, 0x30, 0x30, 0x36, 0x45, 0x37, 0x41, 0x30, 0x38, 0x31, 0x41,},
+  // next are copy pasted (empty spaces for more)
+  {0x30, 0x36, 0x30, 0x30, 0x36, 0x45, 0x43, 0x35, 0x37, 0x32, 0x44, 0x46,},
+  {0x30, 0x36, 0x30, 0x30, 0x36, 0x46, 0x37, 0x41, 0x37, 0x36, 0x36, 0x35,},
+  {0x30, 0x36, 0x30, 0x30, 0x36, 0x45, 0x37, 0x41, 0x30, 0x38, 0x31, 0x41,},  
+};
+
 
 
 
@@ -146,6 +157,8 @@ int TagsList_isMagic( const char * buf )
   // 1: memorize
   // 2: forget
   // 3: rainbow
+  // 4: white
+
   
   for( int i = 0; i < NBR_MAGIC_TAG_DIFFERENT; ++i )
   {
@@ -163,7 +176,12 @@ int TagsList_isMagic( const char * buf )
     {
       Serial.println( "TagsList_isMagic: Rainbow!" );
       return 3;
-    }        
+    }
+    if( memcmp( buf, &(aMagicTagList_White[i][0]), TAG_LEN ) == 0 )
+    {
+      Serial.println( "TagsList_isMagic: White!" );
+      return 4;
+    }     
   }
   return 0;
 }
@@ -189,7 +207,7 @@ int load_eeprom(TagsList * pTagsList, int nNbrReader)
   return (int)brm;
 }
 
-void save_eeprom(TagsList * pTagsList, int nNbrReader, int bRainbowMode )
+void save_eeprom(TagsList * pTagsList, int nNbrReader, int nSpecificMode )
 {
   Serial.println( "Saving eeprom..." );
   EEPROM.write( 0, nEepromVersion );
@@ -198,6 +216,6 @@ void save_eeprom(TagsList * pTagsList, int nNbrReader, int bRainbowMode )
   {
     nOffset += TagsList_writeToEprom( &pTagsList[i], nOffset );
   }
-  byte brm = (byte)bRainbowMode;
+  byte brm = (byte)nSpecificMode;
   EEPROM.write( nOffset, brm );  
 }

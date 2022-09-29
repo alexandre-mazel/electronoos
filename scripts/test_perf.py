@@ -360,11 +360,11 @@ def test_multithreading():
             sys.stdout.write("%6.2fs" % rDuration)
             sys.stdout.flush()
             rTotalDuration += rDuration
-        print(" => %7.2fs" % rTotalDuration )
+        print(" => %7.2fs (per thread:%.2fs)" % (rTotalDuration,rTotalDuration/nNbrProcessInParalell ) )
     return rTotalDuration
     
 
-def test_perf(nDiskTestSizeMB=200):
+def test_perf(nDiskTestSizeMB=200,bTestMultiThreading=True):
     print_version()
     print_cpu()
     rTotalTime = 0;
@@ -374,7 +374,7 @@ def test_perf(nDiskTestSizeMB=200):
     rTotalTime += test_opencv_orb();
     rTotalTime += test_opencv_orb_realcase();
     rTotalTime += test_opencv_orb_realcase(); # because on some computer the previous one takes time initialise stuffs
-    if 1:
+    if bTestMultiThreading:
         # multithreading
         rTotalTime += test_multithreading();
             
@@ -387,16 +387,24 @@ def test_perf(nDiskTestSizeMB=200):
     os.unlink( "temp.tmp" );
 # test_perf - end
     
-nDiskTestSizeMB = 1000;    
+"""
+Syntaxe: <script_name> [size of disk test in MB] [no_multithreading]
+"""
+nDiskTestSizeMB = 1000;
+bMultitreading = True
 if( len(sys.argv)> 1 ):
-    nDiskTestSizeMB=int(sys.argv[1]);
-    print( "INF: Changing disk test size to %d MB" % nDiskTestSizeMB );
+    for i in range( 1, len(sys.argv)):
+        if sys.argv[i].isdigit():
+            nDiskTestSizeMB=int(sys.argv[i]);
+            print( "INF: Changing disk test size to %d MB" % nDiskTestSizeMB );
+        elif "multi" in sys.argv[i].lower() or "thread" in sys.argv[i].lower(): 
+            bMultitreading = False
     
 if getFreeDiskSpace() /(1024*1024) < nDiskTestSizeMB:
     nDiskTestSizeMB = int( (getFreeDiskSpace()*0.9)/(1024*1024) )
     print( "INF: Due to low empty disk space, reducing disk test size to %d MB" % nDiskTestSizeMB );
     
-test_perf(nDiskTestSizeMB=nDiskTestSizeMB);
+test_perf(nDiskTestSizeMB=nDiskTestSizeMB,bTestMultiThreading=bMultitreading);
 
 #####################################
 """
@@ -800,9 +808,90 @@ disk_read     1KB: ####################  24.33s (41.10 Mo/s)
 disk_write 1024KB: ####################  36.37s (27.49 Mo/s)
 disk_read  1024KB: ####################  22.96s (43.55 Mo/s)
 
+disk_write    1KB: #################### 443.24s ( 2.26 Mo/s)
+disk_read     1KB: ####################  27.89s (35.86 Mo/s)
+disk_write 1024KB: #################### 481.10s ( 2.08 Mo/s)
+disk_read  1024KB: ####################  27.08s (36.93 Mo/s)
+
+
 therm_test (blob detection et threshold) sur images_thermal_from_sbre_accueil:
 INF: detectHuman total: 2274 file(s), duration:  4.85s, im/sec: 468.76
 INF: detectHuman total: 2274 file(s), duration:  4.46s, im/sec: 509.36 (output > tutu)
+
+
+
+
+RPI4-thenardier/obo (avec le site obo qui tourne derriere):
+python version   : 3.7.3 (32bits) (4 core(s))
+cpu              : ARMv7 Processor rev 3 (v7l)
+test_cpu_int2    : ####################   1.73s
+test_cpu_float2  : ####################   0.26s
+test_scipy_xxt   : ####################   7.41s (53.96x)
+test_orb4.6.0    : ####################   1.60s (62.38fps)
+test_orbcv imgs  : ####################   6.03s (16.57fps)
+test_orbcv bis   : ####################   6.01s (16.64fps)
+multiprocess x1 :  1.75s /  0.28s /  7.40s /  2.50s /  7.48s /  7.45s =>   26.87s (per thread:26.87s)
+multiprocess x4 :  1.80s /  0.31s / 17.64s /  2.68s /  7.84s /  7.86s =>   64.99s (per thread:16.25s)
+multiprocess x8 :  3.56s /  0.62s / 35.13s /  5.43s / 15.63s / 15.65s =>  141.01s (per thread:17.63s)
+multiprocess x32: 14.38s /  2.49s /140.56s / 21.47s / 69.00s / 73.29s =>  462.20s (per thread:14.44s)
+disk_write    1KB: #################### 298.61s ( 3.35 Mo/s)
+disk_read     1KB: ####################  28.25s (35.40 Mo/s)
+disk_write 1024KB: #################### 289.99s ( 3.45 Mo/s)
+disk_read  1024KB: ####################  26.61s (37.59 Mo/s)
+
+avec 50MB:
+disk_write    1KB: ####################  12.97s ( 3.86 Mo/s)
+disk_read     1KB: ####################   1.18s (42.39 Mo/s)
+disk_write 1024KB: ####################  12.89s ( 3.10 Mo/s)
+disk_read  1024KB: ####################   3.69s (10.85 Mo/s)
+
+pen drive sur port usb3 avec 50MB (plus assez de places disk):
+disk_write    1KB: ####################   2.96s (16.87 Mo/s)
+disk_read     1KB: ####################   0.79s (63.29 Mo/s)
+disk_write 1024KB: ####################  26.20s ( 1.53 Mo/s)
+disk_read  1024KB: ####################   0.61s (65.22 Mo/s)
+
+disk_write    1KB: ####################  27.24s ( 1.84 Mo/s)
+disk_read     1KB: ####################   0.77s (64.84 Mo/s)
+disk_write 1024KB: ####################  27.45s ( 1.46 Mo/s)
+disk_read  1024KB: ####################   0.67s (59.79 Mo/s)
+
+au boot avec juste apache2:
+
+python version   : 2.7.16 (32bits) (4 core(s))
+cpu              : ARMv7 Processor rev 3 (v7l)
+test_cpu_int2    : ####################   1.72s
+test_cpu_float2  : ####################   0.28s
+test_scipy_xxt   : ####################   6.96s (57.50x)
+opencv (orb)      : not found
+opencv (orb)    : not found
+opencv (orb)    : not found
+multiprocess x1 :  1.74s /  0.29s /  6.88s /  0.01s /  0.01s /  0.01s =>    8.96s (per thread:8.96s)
+multiprocess x4 :  1.78s /  0.46s / 21.31s /  0.03s /  0.03s /  0.03s =>   32.59s (per thread:8.15s)
+multiprocess x8 :  3.55s /  0.75s / 42.69s /  0.05s /  0.05s /  0.05s =>   79.73s (per thread:9.97s)
+multiprocess x32: 14.40s /  3.04s /170.88s /  0.17s /  0.17s /  0.17s =>  268.55s (per thread:8.39s)
+disk_write    1KB: #################### 137.62s ( 7.27 Mo/s)
+disk_read     1KB: ####################  24.53s (40.76 Mo/s)
+disk_write 1024KB: #################### 259.54s ( 3.85 Mo/s)
+disk_read  1024KB: ####################  23.03s (43.42 Mo/s)
+pi@thenardier:~/dev/git/electronoos/scripts $ python3 test_perf.py
+python version   : 3.7.3 (32bits) (4 core(s))
+cpu              : ARMv7 Processor rev 3 (v7l)
+test_cpu_int2    : ####################   1.72s
+test_cpu_float2  : ####################   0.26s
+test_scipy_xxt   : ####################   7.76s (51.56x)
+test_orb4.6.0    : ####################   1.67s (59.92fps)
+test_orbcv imgs  : ####################   6.10s (16.40fps)
+test_orbcv bis   : ####################   6.05s (16.52fps)
+multiprocess x1 :  1.75s /  0.28s /  7.79s /  2.49s /  7.49s /  7.50s =>   27.30s (per thread:27.30s)
+multiprocess x4 :  1.79s /  0.30s / 20.52s /  2.79s /  7.84s /  7.90s =>   68.44s (per thread:17.11s)
+multiprocess x8 :  3.57s /  0.62s / 41.34s /  5.39s / 15.81s / 15.83s =>  151.00s (per thread:18.88s)
+multiprocess x32: 14.41s /  2.36s /165.75s / 21.55s / 64.19s / 69.25s =>  488.52s (per thread:15.27s)
+disk_write    1KB: #################### 297.09s ( 3.37 Mo/s)
+disk_read     1KB: ####################  28.29s (35.35 Mo/s)
+disk_write 1024KB: #################### 305.95s ( 3.27 Mo/s)
+disk_read  1024KB: ####################  22.97s (43.54 Mo/s)
+pi@thenardier:~/dev/git/electronoos/scripts $
 
 
 
@@ -968,7 +1057,7 @@ disk_read  1024KB: ####################   9.90s (64.64 Mo/s)
 
 # Champion1
 python version   : 3.8.10 (64bits) (8 core(s))
-cpu              : todo
+cpu              : Intel(R) Core(TM) i7-9700K CPU @ 3.60GHz
 test_cpu_int2    : ####################   0.23s
 test_cpu_float2  : ####################   0.05s
 test_scipy_xxt   : ####################   0.63s (638.44x)
@@ -1089,7 +1178,7 @@ disk_write 1024KB: ####################   4.08s (244.82 Mo/s)
 disk_read  1024KB: ####################   0.34s (2911.05 Mo/s)
 
 
-*** Dell Corto/Elsa:
+*** Dell kakashi Corto/Elsa (si sur batterie, mettre sur mode perf elevée):
 windows disk size 5000
 python version   : 3.10.4 (64bits) (16 core(s))
 cpu              :  11th Gen Intel(R) Core(TM) i7-11800H CPU @ 2.30GHz
@@ -1104,5 +1193,32 @@ disk_read     1KB: ####################   17.74s (281 Mo/s)
 disk_write 1024KB: ####################   3.31s (1375 Mo/s)
 disk_read  1024KB: ####################   1.23s (4078 Mo/s)
 
+*** don de concept: gros
+C:\dev\git\electronoos\scripts>python test_perf.py
+python version   : 3.10.6 (64bits) (2 core(s))
+cpu              : Intel(R) Pentium(R) CPU G4400 @ 3.30GHz
+test_cpu_int2    : ####################   0.52s
+test_cpu_float2  : ####################   0.08s
+test_scipy_xxt   : ####################   2.17s (184.08x)
+test_orb4.6.0    : ####################   0.29s (350.74fps)
+test_orbcv imgs  : ####################   1.62s (61.63fps)
+test_orbcv bis   : ####################   0.90s (110.84fps)
+disk_write    1KB: ####################  39.08s (25.59 Mo/s)
+disk_read     1KB: ####################   5.57s (179.69 Mo/s)
+disk_write 1024KB: ####################  19.08s (52.41 Mo/s)
+disk_read  1024KB: ####################   0.41s (2446.89 Mo/s)
 
+*** don de concept: petit
+python version   : 3.10.6 (64bits) (2 core(s))
+cpu              : Intel(R) Pentium(R) CPU G4400 @ 3.30GHz
+test_cpu_int2    : ####################   0.50s
+test_cpu_float2  : ####################   0.09s
+test_scipy_xxt   : ####################   1.58s (253.52x)
+test_orb4.6.0    : ####################   0.23s (426.77fps)
+test_orbcv imgs  : ####################   0.84s (118.55fps)
+test_orbcv bis   : ####################   0.84s (118.55fps)
+disk_write    1KB: ####################  24.98s (40.03 Mo/s)
+disk_read     1KB: ####################   8.25s (121.24 Mo/s)
+disk_write 1024KB: ####################  17.95s (55.71 Mo/s)
+disk_read  1024KB: ####################   0.33s (3049.87 Mo/s)
 """

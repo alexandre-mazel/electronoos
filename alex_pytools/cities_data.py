@@ -7,12 +7,25 @@ import shutil
 import sys
 import time
 
+import stringtools
+
 def assert_equal(a,b):
     if a == b:
         print("(%s==%s) => ok" % (a,b))
-    else:
-        print("(%s==%s) => NOT ok (type:%s and %s)" % (a,b,type(a),type(b)))
-        assert(0)
+        return
+    if sys.version_info[0]<3:
+        if isinstance(a,unicode):
+            a = a.encode("utf-8", 'replace')
+
+        if isinstance(b,unicode):
+            b = b.encode("utf-8", 'replace')
+        
+        if a == b:
+            print("(%s==%s) => ok (but unicode_encoded)" % (a,b))
+            return
+            
+    print("(%s==%s) => NOT ok (type:%s and %s)" % (a,b,type(a),type(b)))
+    assert(0)
 
 def assert_diff(a,b,diff=0.1):
     if abs(a-b)<diff:
@@ -61,6 +74,12 @@ def floatRepr( v, bReplacePointByComma = True, nNbrDecimalPoint=-1 ):
     sv = strFloatFormat % v
     sv = sv.replace('.',',')
     return sv
+    
+def ordinalToStr(num):
+    num = int(num)
+    if num == 1:
+        return "1er"
+    return "%dème" % num
 
 def outputCsv( dictValues, strFilename, aListLabels, key = None, reverse = False ):
     sep = ';'
@@ -213,8 +232,8 @@ def getLongLatParis(zip):
     dMairieByArrt = {
     "75001": (48.860229481701275, 2.341144718898233),
     "75002": (48.86691549409705, 2.3405526632345692),
-    "75003": (45.760454328146665, 4.849619942213573),
-    "75004": (45.77439665631134, 4.827901461166257),
+    "75003": (48.864025116, 2.36146998405),
+    "75004": (48.856803894, 2.35105609894),
     "75005": (48.84728895451373, 2.3444269031033427),
     "75006": (48.85186486570257, 2.332323906701487),
     "75007": (48.857964521292004, 2.3203047419951717),
@@ -239,110 +258,6 @@ def getLongLatParis(zip):
         pass
     return None
     
-
-def removeAccent( c ):
-    try:
-        acc="ÉÈÎâàçéêëèîïôûüùŷÿ" # TODO A avec accent
-        noacc="EEIaaceeeeiiouuuyy"
-        #~ idx=acc.find(c) # in python 2.7: UnicodeDecodeError: 'ascii' codec can't decode byte 0xc3 in position 0: ordinal not in range(128) // ord(value) was 233
-        #~ if idx != -1:
-            #~ return noacc[idx]
-        #~ for i in range(len(acc)):
-            #~ if c == acc[i]:
-                #~ return noacc[i]
-        if 0:
-            # generate acc_ord code value
-            for c in acc:
-                print("%s," % ord(c) )
-                
-        acc_ord = [
-            201,
-            200,
-            206,
-            226,
-            224,
-            231,
-            233,
-            234,
-            235,
-            232,
-            238,
-            239,
-            244,
-            251,
-            252,
-            249,
-            375,
-            255
-            ]
-
-        # same chars at ovh (preceded by a 195 or 197 in front of 183)
-        acc_ord_ovh = [
-            137,
-            136,
-            142,
-            162,
-            160,
-            167,
-            169,
-            170,
-            171,
-            168,
-            174,
-            175,
-            180,
-            187,
-            188,
-            185,
-            183,
-            191
-        ]
-
-        #~ assert_equal( len(acc_ord),len(noacc) )
-        for i in range(len(acc_ord)):
-            if ord(c) == acc_ord[i]:
-                return noacc[i]        
-
-        #~ assert_equal( len(acc_ord),len(acc_ord_ovh) )
-        for i in range(len(acc_ord_ovh)):
-            if ord(c) == acc_ord_ovh[i]:
-                return noacc[i]      
-                
-        if c == "æ" or ord(c)==230:
-            c = "ae"
-        if c == "œ" or ord(c)==339:
-            c = "oe"
-        elif c == "Œ" or ord(c)==338:
-            c = "OE"
-        elif ord(c) == 231: # c cedile not detected previously
-            c = "c"
-        elif ord(c) == 156 or ord(c) == 140:
-            # second part of oe, don't complain (minuscule then majuscule)
-            c = ""
-        elif ord(c) == 195 or ord(c) == 197:
-            # mark of char on two chars at ovh, don't complain
-            c = ""
-        elif ord(c) == 8211 or ord(c) == 8212:
-            # custom hyphen
-            c = "-"
-        elif ord(c) == 8216 or ord(c) == 8217:
-            # type de '
-            c = "'"
-        elif ord(c) == 8220:
-            # type de 
-            c = '"'
-        elif ord(c) == 8230:
-            c = "..."
-        else:
-            try:
-                print("DBG: removeAccent: not found: %c (%s)" % (c,ord(c) ))
-            except BaseException as err:
-                print("DBG: removeAccent: catch else: ord: %s, err: %s" % (ord(c),err) )
-            c="" # it should remains only invisible char like the square before "oe"
-        return c
-    except TypeError as err:
-        print("DBG: removeAccent:type error: %s, returning '_'" % str(err) )
-    return "_"
         
     
 def cleanString( s ):
@@ -354,7 +269,7 @@ def cleanString( s ):
     for c in s:
         if ord(c)>127:
             #~ print("in %s: %c" % (s,c) )
-            c = removeAccent(c)
+            c = stringtools.removeAccent(c)
             #~ print("=> %c" % c )
             bPrintResultForDebug = 1
         c=c.lower()
@@ -371,7 +286,7 @@ def simpleString( s ):
     for c in s:
         if ord(c)>127:
             #~ print("in %s: %c" % (s,c) )
-            c = removeAccent(c)
+            c = stringtools.removeAccent(c)
             #~ print("=> %c" % c )
             bPrintResultForDebug = 1
         elif c == '-':
@@ -465,7 +380,7 @@ class Cities:
     """
     Uses:
     1: Autocomplete, eg on a website: enter start of city, it completes with "full name (zip)"
-        FindByRealName( city, bPartOf = True )
+        findByRealName( city, bPartOf = True )
          
     2: Adress detection: give a zip and a city, it will validate it's really an adress, and can correct it.
         isValidAdress( zip, city ), return (zip,city,confidence) confidence of the right correction.
@@ -536,7 +451,7 @@ class Cities:
                     self.dupZipPerZip[z] = strNewZip
                 strZip = strNewZip
                 
-            if strZip in self.dictCities.keys():
+            if strZip in self.dictCities:
                 if bVerbose: print("WRN: Cities.load: storing (%s,%s,%s); on: %s" % (strDept,strZip,strCitySlug, str(self.dictCities[strZip])) )
                 self.dupCityPerZip[self.dictCities[strZip][2]] = strZip
                 pass
@@ -551,6 +466,21 @@ class Cities:
         if bVerbose: 
             print("DBG: self.dupZipPerZip: %s" % str(self.dupZipPerZip))
             print("DBG: self.dupCityPerZip: %s" % str(self.dupCityPerZip))
+            
+        # manual addings:
+        
+        #~ Monaco 98000         
+        listManual = [
+                                # (strDept,strZip,strCitySimple,strCityReal,rLong,rLat)
+                                (98,"98000","monaco","Monaco", 7.423792587441905,43.738345122573804)
+                        ]
+        for strDept,strZip,strCitySimple,strCityReal,rLong,rLat in listManual:
+            strCitySlug = strCitySimple+"__manual"
+            self.cityPerSlug[strCitySlug] = (strDept,strZip,strCitySimple,strCityReal,rLong,rLat)
+            appendToDict(self.zipToSlug, strZip,strCitySlug)
+            appendToDict(self.realNameToSlug, strCityReal,strCitySlug)
+            appendToDict(self.simpleNameToSlug, strCitySimple,strCitySlug)
+                
         print("INF: Cities: loading city data - end duration: %.2fs" % (time.time()-timeBegin) )
         # mstab7: 0.27s
         # rpi4 2.7: 11.8s
@@ -605,7 +535,7 @@ class Cities:
                     return None
                 
             if len(listSlug)>1:
-                self.warn("WRN: findByZip: this zip belongs to different cities: %s" % (listSlug) )
+                self.warn("WRN: findByZip: this zip '%s' belongs to different cities: %s" % (zip,listSlug) )
             k = listSlug[0]
             return self.cityPerSlug[k]
             
@@ -705,7 +635,7 @@ class Cities:
                     if bVerbose: print("WRN: findByRealName: found, but with different '-'" )
                     return k
         #~ print("DBG: findByRealName: self.dupCityPerZip: %s" % self.dupCityPerZip.keys())
-        if strNormalisedCityName in self.dupCityPerZip.keys(): # here bug: comparing real name and slug!
+        if strNormalisedCityName in self.dupCityPerZip: # here bug: comparing real name and slug!
             out = self.dupCityPerZip[strNormalisedCityName]
             self.cacheLastFindByRealName = (strCityName,bPartOf,out)
             if bVerbose: print("DBG: findByRealName: MATCH 2: %s" % out)
@@ -830,7 +760,14 @@ class Cities:
         listAll = []
         if self.bEnableHash:
             for k,v in self.cityPerSlug.items():
-                listAll.append([ v[3],v[1],v[4],v[5] ])       
+                listAll.append([ v[3],v[1],v[4],v[5] ]) 
+            # add paris 2 to 20
+            for i in range(2,21):
+                zip = "750"+("%02d"%i)
+                ret = getLongLatParis(zip)
+                #~ print(ret)
+                long,lat = ret
+                listAll.append( ["Paris", zip, long, lat ] )
             return listAll
 
         for k,v in self.dictCities.items():
@@ -839,6 +776,29 @@ class Cities:
             cityAlt = self.findByZip(v)
             listAll.append([ k,v,cityAlt[4],cityAlt[5] ])
         return listAll
+        
+    def zipToHumanised( self, zip ):
+        city = self.findByZip( zip )
+        if city == None:
+            print("WRN: zipToHumanised city is None for zip '%s'" % zip )
+            return ""
+        strCity = city[3]
+        
+        if isBigCityZip(zip):
+            arrt = ordinalToStr(zip[-2:])
+            if sys.version_info[0]<3 and isinstance(arrt,unicode):
+                arrt = arrt.encode("utf-8", 'replace')
+            if sys.version_info[0]<3 and isinstance(strCity,unicode):
+                strCity = strCity.encode("utf-8", 'replace')
+            strOut = "dans le " + arrt + " arrondissement de " + strCity
+        else:
+            if sys.version_info[0]<3:
+                if isinstance(strCity,unicode):
+                    strCity = strCity.encode("utf-8", 'replace')
+                strOut = u"à ".encode("utf-8", 'replace') + strCity
+            else:
+                strOut = "à " + strCity
+        return strOut
         
 #class Cities - end
 
@@ -934,7 +894,7 @@ def generateStatHousing( cnx, bOutputHtml ):
             cptError +=1
         else:
             zip_code = int(zip_code)
-            if zip_code not in dictCode.keys():
+            if zip_code not in dictCode:
                 dictCode[zip_code] = 0
             dictCode[zip_code] += 1
             
@@ -944,7 +904,7 @@ def generateStatHousing( cnx, bOutputHtml ):
                 continue
             strUniv, rDist = retVal
             if bVerbose: print("Find Nearest: %s => %s, %s" % ( zip_code, strUniv, rDist ) )
-            if strUniv not in dictByUniv.keys():
+            if strUniv not in dictByUniv:
                 dictByUniv[strUniv] = (0,0)
             dictByUniv[strUniv] = (dictByUniv[strUniv][0]+1,dictByUniv[strUniv][1]+rDist)
             
@@ -1029,10 +989,70 @@ def bigCityToZip( strCity ):
     return "-1"
     
 def isBigCityZip(zip):
+    zip = zip[:-2]+"00" # change 75008 to 75000
     for city,zipbig in bigCityZip:
         if zip == zipbig:
             return 1
     return 0
+    
+def getTop50():
+    """
+    src: https://www.linternaute.com/ville/classement/villes/population on 9 aout 2022
+    """
+    return [
+                "Paris",
+                "Marseille",
+                "Lyon",
+                "Toulouse",
+                "Nice",
+                "Nantes",
+                "Montpellier",
+                "Strasbourg",
+                "Bordeaux",
+                "Lille",
+                "Rennes",
+                "Reims",
+                "Toulon",
+                "Saint-Étienne",
+                "Le Havre",
+                "Grenoble",
+                "Dijon",
+                "Angers",
+                "Villeurbanne",
+                "Saint-Denis",
+                "Nîmes",
+                "Clermont-Ferrand",
+                "Le Mans",
+                "Aix-en-Provence",
+                "Brest",
+                "Tours",
+                "Amiens",
+                "Limoges",
+                "Annecy",
+                "Boulogne-Billancourt",
+                "Perpignan",
+                "Besançon",
+                "Metz",
+                "Orléans",
+                "Saint-Denis",
+                "Rouen",
+                "Argenteuil",
+                "Montreuil",
+                "Mulhouse",
+                "Caen",
+                "Nancy",
+                "Saint-Paul",
+                "Roubaix",
+                "Tourcoing",
+                "Nanterre",
+                "Vitry-sur-Seine",
+                "Créteil",
+                "Avignon",
+                "Poitiers",
+                "Aubervilliers",
+        ]
+
+# getTop50 - end
     
 if 0:
     cities = Cities()
@@ -1054,11 +1074,22 @@ def statByRegion(bOutputHtml=False):
     
 
 
+
+
 def autotest_cities():
     bUseHash = 1 # deactivate some test not working in previous version
     
     cities = Cities()
     cities.load()
+    #  mstab7_2.7 : 2.30s
+    #  mstab7_3.9 : 0.27s
+    # RPI4_2.7      : 11.42s
+    # RPI4_3.7      :  1.17s
+    # optim keys():
+    #  mstab7_2.7 : 0.39s
+    #  mstab7_3.9 : 0.24s
+    # RPI4_2.7      : 1.63s
+    # RPI4_3.7      :  1.15s    
     
     assert_equal( cities.findByRealName("Besançon"), "25000" )
     assert_equal( cities.findByRealName("Besancon"), "25000" )
@@ -1087,6 +1118,10 @@ def autotest_cities():
 
     retVal = cities.findByZip("94440")
     assert_equal( retVal[1], "94440" )
+
+    retVal = cities.findByZip("35001")
+    assert_equal( retVal[1], "35001" )    
+    
     
     
     for city in ["Nissan", "Colombiers","Paris"]:
@@ -1139,7 +1174,12 @@ def autotest_cities():
     
     dist = cities.distTwoZip("75008","75017",bVerbose=True)
     assert_diff(dist,0.82,0.3)
+    
+    dist = cities.distTwoZip("69001","75001",bVerbose=True)
+    assert_diff(dist,400,20)
 
+    dist = cities.distTwoZip("69001","75004",bVerbose=True)
+    assert_diff(dist,400,20)
     
     assert_diff(cities.isValidAdress( "34440","colombier")[2],0.95)
     assert_diff(cities.isValidAdress( "34440","colom")[2],0.67)
@@ -1161,22 +1201,24 @@ def autotest_cities():
     # mstab7: passage au slugToZip:
     # 500 tests: 0.0s (0.0ms/recherche)
     
-    timeBegin = time.time()
-    for i in range(100):
-        # en mettre plusieurs différent permet de zapper le cache
-        cities.findByRealName("oza", bPartOf=1) # le premier
-        cities.findByRealName("st-pierre-et-", bPartOf=1) # le dernier
-        cities.findByRealName("pari", bPartOf=1)
-        cities.findByRealName("marseill", bPartOf=1)
-        cities.findByRealName("zanzibar" , bPartOf=1) # inconnu
-    duration = time.time() - timeBegin
-    print("INF: 2: 500 tests: %.1fs (%.1fms/recherche)" % (duration,duration/0.5 ) )
-    # mstab7: 500 tests: 4.9s (9.8ms/recherche)
-    # mstab7: passage au slugToZip
-    # 500 tests: 0.7s (1.3ms/recherche)
-    # mstab7: 500 tests: 0.0s (0.0ms/recherche)
-    # RPI4_2.7: 500 tests: 0.0s (0.0ms/recherche)
-    # RPI4_3.7: 500 tests: 0.0s (0.0ms/recherche)
+    if 1:
+        # this test takes time in python2.7
+        timeBegin = time.time()
+        for i in range(100):
+            # en mettre plusieurs différent permet de zapper le cache
+            cities.findByRealName("oza", bPartOf=1) # le premier
+            cities.findByRealName("st-pierre-et-", bPartOf=1) # le dernier
+            cities.findByRealName("pari", bPartOf=1)
+            cities.findByRealName("marseill", bPartOf=1)
+            cities.findByRealName("zanzibar" , bPartOf=1) # inconnu
+        duration = time.time() - timeBegin
+        print("INF: 2: 500 tests: %.1fs (%.1fms/recherche)" % (duration,duration/0.5 ) )
+        # mstab7: 500 tests: 4.9s (9.8ms/recherche)
+        # mstab7: passage au slugToZip:
+        #  mstab7_2.7: 500 tests: 4.9s (9.8ms/recherche)
+        #  mstab7_3.9: 500 tests: 0.7s (1.5ms/recherche)
+        # RPI4_2.7: 500 tests: 23.7s (47.3ms/recherche)
+        # RPI4_3.7: 500 tests: 1.8s (3.6ms/recherche)
     
     retVal = cities.findByZip("06000")
     assert_equal(retVal[1],"06001")
@@ -1218,15 +1260,35 @@ def autotest_cities():
         retVal = cities.findByZip("94270")
         
     duration = time.time() - timeBegin
-    print("INF: 2: 500 tests: %.1fs (%.1fms/recherche)" % (duration,duration/0.5 ) )
+    print("INF: 3: 500 tests: %.1fs (%.1fms/recherche)" % (duration,duration/0.5 ) )
     # mstab7: 500 tests: 0.0s (0.0ms/recherche)
     # mstab7: passage au slugToZip (vaguement moins avantageux car on perd la recherche dans un dico en direct) (indirection)
-    # 500 tests: 0.0s (0.0ms/recherche)
-    # RPI4_2.7: 500 tests: 23.8s (47.7ms/recherche)
+    #  mstab7_2.7: 500 tests: 0.0s (0.0ms/recherche)
+    #  mstab7_3.9: 500 tests: 0.0s (0.0ms/recherche)
+    # RPI4_2.7: 500 tests:  0.0s (0.0ms/recherche)
     # RPI4_3.7: 500 tests: 0.0s (0.0ms/recherche)
     
     assert_equal(isBigCityZip("67000"),1)
     assert_equal(isBigCityZip("34440"),0)
+    
+    assert_equal(cities.zipToHumanised("94270"),"à Le Kremlin-Bicêtre")
+    assert_equal(cities.zipToHumanised("34440"),"à Nissan-lez-Enserune")
+    assert_equal(cities.zipToHumanised("75008"),"dans le 8ème arrondissement de Paris")
+
+    retVal = cities.findByZip("75001")
+    print("DBG: autotest: get paris: %s" % str(retVal) )
+    
+    retVal = cities.findByZip("34440")
+    print("DBG: autotest: get nissan: %s" % str(retVal) )
+    
+    retVal = cities.findByZip("98000")
+    print("DBG: autotest: get monaco: %s" % str(retVal) )
+    assert_equal(retVal[1],"98000")
+    
+    dist = cities.distTwoZip("98000","06500",bVerbose=True) # Menton et Monaco
+    assert_diff(dist,11,4)
+    exit()
+    
     
 # autotest_cities - end
 
@@ -1259,6 +1321,7 @@ if __name__ == "__main__":
     if 1:
         autotest_cities()
         autotest_region()
+        print("INF: autotest passed [GOOD]")
     if 0:        
         """
         Syntaxe:

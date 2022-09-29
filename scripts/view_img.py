@@ -135,6 +135,13 @@ def viewImg( strFilename, bAnalyse = False, bAnalyseAlt = False ):
             nChangeImageOffset = -100
         elif key == 217: # u with accent
             nChangeImageOffset = +100
+        elif (key == ord('l') and not bInRenamming):
+            # goto last
+            nChangeImageOffset = -999999999 # so it's less than 0 and it cycle to last
+        elif (key == ord('f') and not bInRenamming):
+            # goto first
+            nChangeImageOffset = 999999999 # so it's more  than 0 and it cycle to first
+
             
         elif key == ord('s'):
             # render only file matching a string defined somewhere

@@ -1,5 +1,7 @@
+# -*- coding: cp1252 -*-
+
 """
-process big wav file, cut them...
+process big wav file,analyse text, cut them...
 """
 import wav
 import misctools
@@ -10,7 +12,7 @@ except: pass
 import os
 import time
 
-import speech_recognition #pip install speechrecognition
+import speech_recognition #pip install speechrecognition or alternative #pip install SpeechRecognition
 
 def cleanStringAnsi128( txt, bChangeSpaceAndQuote = True ):
     cleaned = ""
@@ -116,16 +118,39 @@ def cleanText2( txt ):
         print("DBG: cleanText2: txt2: %s" % txt )
     return txt
         
+        
+global_strDefaultAnsiLang = 'fr-FR'
 
-def getSpeechInWav( strSoundFilename ):
-    strAnsiLang = 'en-UK'
-    strAnsiLang = 'fr-FR'
+def changeDefaultLang(strAnsiLang):
+    global global_strDefaultAnsiLang
+    global_strDefaultAnsiLang = strAnsiLang
+    
+def getSpeechInWav( strSoundFilename, strAnsiLang = None ):
+    """
+    return a text corresponding to the text said in the sound filename
+    - strAnsiLang: if None: use default
+    """
+    if strAnsiLang == None:
+        global global_strDefaultAnsiLang
+        strAnsiLang = global_strDefaultAnsiLang
+
+    if strAnsiLang == 'en':
+        strAnsiLang = 'en-UK'
+        
+    if strAnsiLang == 'fr':
+        strAnsiLang = 'fr-FR'
+        
+    print("DBG: getSpeechInWav: using Lang: %s"  % strAnsiLang )
+        
     retVal = None
     
     if 1:
         # add silence before and after
         newname = misctools.getTempFilename() + ".wav"
         w = wav.Wav(strSoundFilename)
+        if w.getDuration() < 0.01:
+            print("WRN: getSpeechInWav: wav '%s' not found or empty" % strSoundFilename )
+            return ""
         w.ensureSilenceAtBegin(0.1)
         w.addSilence(0.1)
         w.write(newname)
@@ -173,30 +198,59 @@ def getSpeechInWav( strSoundFilename ):
     
     return retVal[0][0]
 
-def autocut(wavfile, rSilenceMinDuration = 0.3 ):
+def autocut(filename, rSilenceMinDuration = 0.3, bPlaySound = 0, bAutoRename = 0, bAlternativeManualInputted = 0,  bRemoveShortQuiet = 1, bNormalise = 0, bAddFadeInOut = 0, strDstPath = None ):
+    """
+    - bPlaySound: play each sound at the end
+    - bAutoRename: send the sound to the speech reco to rename it
+    - bAlternativeManualInputted: if nothing detected with speech reco, ask human to enter new filename
+    - bRemoveShortQuiet: delete looks not interesting one
+    - bNormalise: normalise each sound independently ?
+    - strDstPath: where to put generated sound ?
+    
+    """
+    """
     bPlaySound = 0
     bAutoRename = 1
     bAlternativeManualInputted = 1
     bRemoveShortQuiet = 1
     bNormalise = 0
     strDstPath = "c:/generated/"
+    """
     
-    print("INF: autocut, sound will be outputted to %s - no auto cleaning before!" % strDstPath )
+    strTemplateName = "s_"
+    if 1:
+        strTemplateName = os.path.splitext(os.path.basename(filename))[0]
+        strTemplateName += "__"
+    
+    if strDstPath == None:
+        if os.name == "nt":
+            strDstPath = "c:/generated/"
+        else:
+            strDstPath = "/tmp/"
+            
+    if bAlternativeManualInputted:
+        bPlaySound = 1
+        bAutoRename = 1
+    
+    print("INF: sound_processing: autocut, sound will be outputted to %s" % strDstPath )
     
     try: os.makedirs(strDstPath)
     except: pass
     
     nPeakRatioToKeep = 128 # 128 si respi a enlever, 16 sinon
     
-    w = wav.Wav(wavfile,bQuiet=False)
+    w = wav.Wav(filename,bQuiet=False)
     print(w)
     #~ w.write("/tmp/t.wav")
     seq = w.split(rSilenceTresholdPercent=0.6,rSilenceMinDuration=rSilenceMinDuration,nPeakRatioToKeep=nPeakRatioToKeep)
     print("INF: nbr part: %s" % len(seq) )
     for i,s in enumerate(seq):
         if bNormalise: s.normalise()
+        if bAddFadeInOut: 
+            s.fadeIn(min(1,s.getDuration()*0.15))
+            s.fadeOut(min(1,s.getDuration()*0.15))
         
-        name = "s_%04d.wav" % i 
+        name = strTemplateName+"%04d.wav" % i 
         s.write(strDstPath+name)
         if bPlaySound:
             print("playing: %s" % name )
@@ -265,9 +319,8 @@ def pasteSound( aListSoundFilenames, aListTimes, strOutfilename ):
     out.write(strOutfilename)
 # pasteSound - end
             
-    
-    
-if __name__ == "__main__":
+def processRavir():
+
     strPathRavir = "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut/"
     #~ strPathRavir = "d:/sounds/recordings/ravir"
     
@@ -308,3 +361,14 @@ if __name__ == "__main__":
         
     
     
+def autotest():
+    # ne pas s'amuser a faire des autotests tout le temps pour ne pas se faire ban de google speech!
+    txt = getSpeechInWav( "../data/salut_ca_va_bien.wav", "fr")
+    assert(txt in u"salut ça va bien")
+    txt = getSpeechInWav( "../data/hello_how_are_you.wav", "en")
+    assert(txt in "hello how are you")
+    
+    
+if __name__ == "__main__":
+    #~ processRavir()
+    autotest()

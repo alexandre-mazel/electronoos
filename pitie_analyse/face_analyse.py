@@ -82,7 +82,8 @@ class FaceTracker:
         if facelandmark != []:
             yaw, pitch,roll = facerecognition_dlib.getFaceOrientation(facelandmark)
             print("yaw: %5.2f, pitch: %5.2f,roll: %5.2f" % (yaw, pitch,roll) )
-            bLookAt = abs(yaw)<0.55 and abs(pitch)<0.2
+            bLookAt = abs(yaw)<0.18 and abs(pitch)<0.5 # was 0.55 and 0.2, change due to enhancement of getFaceOrientation
+            #~ todo recompute a subject and have a look at the result
             rSmile, rRatioSmile = facerecognition_dlib.getSmileAmount(facelandmark)
             print("rSmile: %.2f (ratio: %.2f)" % (rSmile,rRatioSmile) )
             if rSmile > 0.34: bSmile = 1
@@ -93,7 +94,7 @@ class FaceTracker:
             if bRenderDebug: emotion_detector.renderEmotion(im,detectedEmotions,40)
             nEmoID = detectedEmotions[0][1]
             rConfEmo = detectedEmotions[0][2]
-            if nEmoID == 1 and rConfEmo > 0.6:
+            if nEmoID == 1 and rConfEmo > 0.5:
                 bHappy = 1
         
             
@@ -369,7 +370,7 @@ def analyseFolder(folder):
         #~ idx = 6100 # fin m2
     
     #~ idx = 0
-    idx_end = 6100
+    #~ idx_end = 6100
     
     # result on all images:
     """
@@ -403,9 +404,13 @@ def analyseFolder(folder):
     
     #######################    
     # img_pitie/2022_03_25_9h/m1 premiere comparaison avec annotation manuelle Clara (46)
-    if 0:
+    if "2022_03_25_9h/m1" in folder: 
         idx = 0
-    
+
+    if "2022_03_25_9h/m2" in folder: 
+        idx = 0
+        
+        
     """
     # computed on 2022/03/23:
     # m1:
@@ -427,21 +432,141 @@ def analyseFolder(folder):
     clara: 55s/712s => 7.7% - 0.897 du premier
     
     Le calcul happy en ratio / totale est approchante de la méthode de Clara.
+    
+    # 2022/06/28: revision du getFaceOrientation et recomputage
+    # m1
+    nImageAnalysed : 2993
+    nImageWithFace : 2128 ( 71.1%)
+    nImageLookingAt: 101 (  3.4%) (  4.7%)
+    nImageSmile    : 871 ( 29.1%) ( 40.9%)
+    nImageHappy    : 399 ( 13.3%) ( 18.8%)
+    
+    #m2
+    nImageAnalysed : 3817
+    nImageWithFace : 3229 ( 84.6%)
+    nImageLookingAt: 221 (  5.8%) (  6.8%)
+    nImageSmile    : 677 ( 17.7%) ( 21.0%)
+    nImageHappy    : 492 ( 12.9%) ( 15.2%)
     """
     
+    
+    ################################
+    # Comparaison avec annotation humaine
+    ################################
 
     if "2022_02_23_11h__13" in folder: 
-        idx = 0
         idx = 0    # debut m1
-        #~ idx = 3430  # fin m1
-        #~ idx = 3714 # debut m2
-        #~ idx = 5814 # fin m2
+        idx = 3430  # fin m1
+        idx = 3717 # debut m2
+        idx = 5814 # fin m2
+        """
+        # 2022/08/31: autre reglage face orientation
+        # m1
+        nImageAnalysed : 3431
+        nImageWithFace : 1834 ( 53.5%)
+        nImageLookingAt: 1087 ( 31.7%) ( 59.3%)
+        nImageSmile    : 1252 ( 36.5%) ( 68.3%)
+        nImageHappy    : 933 ( 27.2%) ( 50.9%)
+
+        #m2
+        nImageAnalysed : 2098
+        nImageWithFace : 1512 ( 72.1%)
+        nImageLookingAt: 789 ( 37.6%) ( 52.2%)
+        nImageSmile    : 674 ( 32.1%) ( 44.6%)
+        nImageHappy    : 302 ( 14.4%) ( 20.0%)
+        """
     
     if "2022_02_23_14h__14" in folder: 
-        idx = 0
+        idx = 0    # debut m1
+        idx = 3735  # fin m1
+        idx = 3970 # debut m2
+        idx = 6803 # fin m2
+        """
+        # m1
+        nImageAnalysed : 3736
+        nImageWithFace : 3213 ( 86.0%)
+        nImageLookingAt: 400 ( 10.7%) ( 12.4%)
+        nImageSmile    : 109 (  2.9%) (  3.4%)
+        nImageHappy    : 146 (  3.9%) (  4.5%)
+
+        #m2
+        nImageAnalysed : 2834
+        nImageWithFace : 2555 ( 90.2%)
+        nImageLookingAt: 307 ( 10.8%) ( 12.0%)
+        nImageSmile    : 67 (  2.4%) (  2.6%)
+        nImageHappy    : 70 (  2.5%) (  2.7%)
+        """
 
     if "2022_03_02_13h__21" in folder: 
-        idx = 0        
+        idx = 0    # debut m1
+        idx = 2820  # fin m1
+        idx = 3164 # debut m2
+        idx = 5054 # fin m2  
+        """
+        # m1
+        nImageAnalysed : 2821
+        nImageWithFace : 2136 ( 75.7%)
+        nImageLookingAt: 670 ( 23.8%) ( 31.4%)
+        nImageSmile    : 313 ( 11.1%) ( 14.7%)
+        nImageHappy    : 269 (  9.5%) ( 12.6%)
+
+        #m2
+        nImageAnalysed : 1891
+        nImageWithFace : 1278 ( 67.6%)
+        nImageLookingAt: 544 ( 28.8%) ( 42.6%)
+        nImageSmile    : 439 ( 23.2%) ( 34.4%)
+        nImageHappy    : 318 ( 16.8%) ( 24.9%)
+        """
+
+    if "2022_03_11_9h__31" in folder: 
+        idx = 504    # debut m1
+        #~ idx = 2410  # fin m1
+        #~ idx = 2632 # debut m2
+        #~ idx = 4888 # fin m2  
+        
+        """
+        # m1
+        nImageAnalysed : 1907
+        nImageWithFace : 1210 ( 63.5%)
+        nImageLookingAt: 626 ( 32.8%) ( 51.7%)
+        nImageSmile    : 187 (  9.8%) ( 15.5%)
+        nImageHappy    : 143 (  7.5%) ( 11.8%)
+
+        #m2
+        nImageAnalysed : 2257
+        nImageWithFace : 1277 ( 56.6%)
+        nImageLookingAt: 296 ( 13.1%) ( 23.2%)
+        nImageSmile    : 83 (  3.7%) (  6.5%)
+        nImageHappy    : 136 (  6.0%) ( 10.6%)
+        """
+
+    idx = 2632
+    idx_end = 4888
+    
+
+"""
+annotation temps total temp regard, sourire_clara, sourire_alexandre:
+13: 
+    S1: 690.6 200.46 177.41 197.5
+    S2: 552.8  152.2 81.9 80.8
+    
+14:
+    S1: 790.5 114.3 67.25 42.6
+    S2: 704.8 76.6 54.5 43.9
+    
+21:
+    S1: 556.8 139.9 78.027 77.1
+    S2: 550.6 132.1 51.5 50.3
+    
+31:
+    S1: 615.4 178.2 24.8 25.8
+    S2: 579.8 150.2 26.5 25.5
+    
+44:
+    S1: 
+    S2: 
+"""
+
         
     if bSpeedTest: idx = 0
     if bSpeedTest: bRenderDebug = 0
@@ -541,6 +666,8 @@ F 031BL 11/3 9h
 52: 31/3 9h30 record en 11h
 54: 01/4 16h30 la deuxeme: teeshirt blanc chatain avec lunettes
 67: 20/4 11h15
+
+    
 """
             
 
@@ -552,13 +679,14 @@ def analyseMovie():
     
 if os.name == "nt":
     strPath = "d:/pitie5/"
-    #~ strPath = "d:/img_pitie/2022_03_11_9h/"
     strPath = "d:/img_pitie/2022_03_04_00h/"
-    #~ strPath = "d:/img_pitie/2022_03_25_9h/m2/"
+    strPath = "d:/img_pitie/2022_03_25_9h/m1/" # 46
+    strPath = "d:/img_pitie/2022_03_25_9h/m2/"
     strPath = "d:/img_pitie/2022_02_23_11h__13/"
     strPath = "d:/img_pitie/2022_02_23_14h__14/"
     strPath = "d:/img_pitie/2022_03_02_13h__21/"
-    strPath = "d:/img_pitie/2022_03_24_11h__44/"
+    strPath = "d:/img_pitie/2022_03_11_9h__31/"
+    #~ strPath = "d:/img_pitie/2022_03_24_11h__44/"
     #~ strPath = "d:/img_pitie/2022_03_31_11h__52"
     #~ strPath = "d:/img_pitie/2022_04_01_17h__54/"
     #~ strPath = "d:/img_pitie/2022_04_20_11h__67/"

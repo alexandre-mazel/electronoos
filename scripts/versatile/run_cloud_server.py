@@ -86,6 +86,16 @@ def getTimeStamp():
     t = time.time()
     strTimeStamp += "%03dms" % int( (t - int(t)) * 1000)
     return strTimeStamp
+    
+def getUserHome():
+    """
+    return a user root folder
+    """
+    if os.name == "nt":
+        ret = "c:/"
+    else:
+        ret = os.path.expanduser("~/")
+    return ret
   
 class Algorithms:
     def __init__( self, facereco, facedetect = None, objectreco = None ):
@@ -167,9 +177,10 @@ class CloudServicesServer( Versatile ):
         return Versatile.handleClientLeft( self, client )
 
     def getDebugFolderPath( self, client = None ):
-        strSaveDbgPath = "./imgs/"
+        strSaveDbgPath = getUserHome()+"./imgs/"
         if client != None:
             strSaveDbgPath += self.dictClientID[id(client)] + os.sep
+        print( "INF: CloudServicesServer.getDebugFolderPath: path: %s" % strSaveDbgPath )
         try:
             os.makedirs( strSaveDbgPath )
             print( "INF: CloudServicesServer.getDebugFolderPath: successfully created imgs storing place: %s" % (strSaveDbgPath) )
@@ -279,7 +290,7 @@ class CloudServicesServer( Versatile ):
                         strName = "none"
                         strDist = ""
                         if len(retVal) > 0:
-                            status, nID, extra_info = retVal
+                            status, nID, faceshape, extra_info = retVal
                             strName = str(nID)
                                 
                         cv2.imwrite( self.getDebugFolderPath(client) + getFilenameFromTime() +"_" + strName + strDist + ".png", cvim)

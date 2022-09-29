@@ -59,6 +59,10 @@ class AgentBehavior:
         self.bInInteraction = 0
         self.timeLastTic = time.time()-1000 # patch pourrie car stopinteraction n'arrive pas au bon moment
         
+        self.bHumanIsSpeaking = False
+        self.lastTimeSayEndDialog = time.time()-1000
+        self.mem.raiseMicroEvent("Audio/SpeechDetected",0)
+        
         
     def startRecordSound(self,bNewState):
         if bNewState:
@@ -118,6 +122,42 @@ class AgentBehavior:
         if time.time()-humaninfo.timeLastReactToNear>10:
             humaninfo.timeLastReactToNear = time.time()
             self.moveHands()
+            
+    def updateSpeechDetectionBehavior( self ):
+        bSpeech = self.mem.getData("Audio/SpeechDetected")
+        print("DBG: updateSpeechDetectionBehavior: self.bHumanIsSpeaking: %s, bSpeech: %s" % (self.bHumanIsSpeaking,bSpeech) )
+        if not bSpeech and self.bHumanIsSpeaking:
+            self.reactToEndOfDialog()
+        self.bHumanIsSpeaking = bSpeech
+        
+    def reactToEndOfDialog( self ):
+        """
+        repond qqchose a l'humain
+        """
+        print("DBG: reactToEndOfDialog: saying something...")
+        
+        if time.time() - self.lastTimeSayEndDialog > 2:
+            self.lastTimeSayEndDialog = time.time()
+            listTxt = [
+                            "Je suis content de savoir cela!",
+                            "Ok!",
+                            "Hum",
+                            "oh",
+                            "ah",
+                            "uh",
+                            "eh",
+                            "eh oui",
+                            "tout a fait",
+                            "tant qu'il y a de la vie!",
+                            "moi aussi des fois",
+                            "tout a fait.",
+                            "Je prend note de ceci!",
+                            "grave!",
+                            "d'accord",
+                            ]
+
+            idx = random.randint(0,len(listTxt)-1)
+            self.say(listTxt[idx])
         
     def startInteraction( self, facepose,humaninfo ):
         self.bInInteraction = 1
@@ -129,6 +169,7 @@ class AgentBehavior:
         self.bInInteraction = 0
         self.playTic()
         self.startRecordSound(0)
+        self.updateSpeechDetectionBehavior()
 
     def showInteraction( self, facepose,humaninfo ):
         # warning: facepose,humaninfo could be none if we haven't seen face, but we know we are interacting
@@ -140,6 +181,8 @@ class AgentBehavior:
         self.leds.rotateEyes(0xFF, 1., 2.)
         self.leds.post.fadeRGB("EarLeds",0xFF,0.3)
         self.leds.post.fadeRGB("EarLeds",0x202020,0.3)
+        self.updateSpeechDetectionBehavior()
+
         
     def showHappy( self, facepose,humaninfo, nHappiness ):
         if nHappiness > 10:

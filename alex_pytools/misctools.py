@@ -888,7 +888,7 @@ def findInNammedList( l, keyname, defaultValue = None ):
             return e
     return defaultValue
     
-def findInNammedListAndReturnFirstValue( l, keyname, defaultValue = None ):
+def findInNammedListAndGetFirst( l, keyname, defaultValue = None ):
     """
     look in a list looking a bit like a dict [ ["toto", 1], ["tutu",1,2] ]
     return keyname keyname => ["toto", 1]

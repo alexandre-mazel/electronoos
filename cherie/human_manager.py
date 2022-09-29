@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: cp1252 -*-
 
 """
 This file is part of CHERIE: Care Human Extended Real-life Interaction Experimentation.
@@ -16,12 +16,12 @@ pscp -pw nao -P 55022 C:/Users/alexa/dev/git/electronoos/cherie/*.py nao@engrena
 
 # NB: le misctools.py a utiliser est celui de /home/nao/.local/lib/python2.7/site-packages/electronoos/alex_pytools
 
-# lancer le soundrecorder sur le robot:
+# lancer le soundrecorder sur le robot (maintenant lancer automatiquement depuis /home/nao/run_cherie.sh, call depuis /etc/profile)
 killall python2.7; nohup python -c "import abcdk.sound_analyser; abcdk.sound_analyser.launchSoundReceiverFromShell('localhost',False)"&
 
 
 # mise a jour du robot chez brice:
-pscp -pw nao C:/Users/alexa/dev/git/electronoos/cherie/*.py nao@87.90.82.139:/home/nao/.local/lib/python2.7/site-packages/electronoos/cherie & pscp -pw nao C:/Users/alexa/dev/git/abcdk/sdk/abcdk/sound_a*.py nao@87.90.82.139:/home/nao/.local/lib/python2.7/site-packages/abcdk/
+pscp -pw naonao C:/Users/alexa/dev/git/electronoos/cherie/*.py nao@87.90.82.139:/home/nao/.local/lib/python2.7/site-packages/electronoos/cherie & pscp -pw naonao C:/Users/alexa/dev/git/abcdk/sdk/abcdk/sound_a*.py nao@87.90.82.139:/home/nao/.local/lib/python2.7/site-packages/abcdk/ & pscp -pw naonao C:/Users/alexa/dev/git/electronoos/alex_pytools/misc*.py nao@87.90.82.139:/home/nao/.local/lib/python2.7/site-packages/electronoos/alex_pytools/ &
 
 # voir des stats:
 sur agx:
@@ -35,6 +35,7 @@ ls /home/am/imgs/Jarc/* | wc
 # taskkill /F /im python.exe
 
 """
+
 import cv2
 import json
 import os
@@ -86,8 +87,8 @@ def getTitleFromGenderAge(listExtras):
                     ["jeune femme", "Madame"],
                     ["jeune humain", "Humain"],
     ]
-    gender = misctools.findInNammedListAndReturnFirstValue(listExtras,"gender",2) # no value => 2
-    age = misctools.findInNammedListAndReturnFirstValue(listExtras,"age",100)
+    gender = misctools.findInNammedListAndGetFirst(listExtras,"gender",2) # no value => 2
+    age = misctools.findInNammedListAndGetFirst(listExtras,"age",100)
     idxAge = 0
     if age >= 20:
         idxAge = 1
@@ -172,7 +173,7 @@ class HumanManager:
         
         self.bPepper = os.name != "nt"
         
-        if self.bPepper or 0:
+        if self.bPepper or 1:
             self.cs = cloud_services.CloudServices( "robot-enhanced-education.org", 25340 )
         else:
             computerSay("demarrage")
@@ -545,7 +546,7 @@ humanManager = HumanManager()
 
 def realLifeTestWebcam():
     hm = humanManager
-    cap = cv2.VideoCapture(1) #ouvre la webcam
+    cap = cv2.VideoCapture(0) #ouvre la webcam (0 for front or 1 for back)
     while 1:
         ret, img = cap.read() # lis et stocke l'image dans frame
         if img is None:

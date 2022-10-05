@@ -1,3 +1,4 @@
+# -*- coding: cp1252 -*-
 import random
 import sys
 import time
@@ -136,7 +137,7 @@ time_begin = time.time()
 game(nMode,nbr_question)
 duration = time.time() - time_begin
 rTime = duration/nbr_question
-print("\nTemps par multiplication: %.3fs" % ( rTime ) )
+print("\nTemps par opération: %.3fs" % ( rTime ) )
 
 best_time, best_name = get_best()[:2]
 if best_time > rTime:

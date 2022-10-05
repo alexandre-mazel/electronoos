@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?><ChoregrapheProject xmlns="http://www.aldebaran-robotics.com/schema/choregraphe/project.xsd" xar_version="3"><Box name="root" id="-1" localization="8" tooltip="Root box of Choregraphe&apos;s behavior. Highest level possible." x="0" y="0"><bitmap>media/images/box/root.png</bitmap><script language="4"><content><![CDATA[]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Timeline enable="0"><BehaviorLayer name="behavior_layer1"><BehaviorKeyframe name="keyframe1" index="1"><Diagram><Box name="BalanceLeg" id="2" localization="8" tooltip="Our template for the boxes using a while loop in their start method.&#x0A;*** ref box in: ./4_localize/Templates/TemplateWhile/ExampleTemplateWhile.xar ***&#x0A;*** last modification date(git):   Thu Oct 15 16:26:21 2009 +0200 ***" x="359" y="477"><bitmap>media/images/box/loop.png</bitmap><script language="4"><content><![CDATA[# Template_White
+# v1.0
+
+
+import misctools
+import time
+
+class MyClass(GeneratedClass):
+    """ insert here your comments about this class """
+    def __init__(self):
+        GeneratedClass.__init__(self);
+
+    def onLoad(self):
+        self.bMustStop = False;
+        self.bIsRunning = False;
+        self.motion = ALProxy("ALMotion")
+        self.mem = ALProxy("ALMemory")
+        self.prevHipCurrent, self.prevKneeCurrent = 0.8,0.8 # average consumption
+        self.dx = 0.01
+        self.bJustMove = False
+        self.nCptTooBigSinceLastChange = 0
+
+    def getCurrent( self ):
+        h = self.mem.getData("Device/SubDeviceList/HipPitch/ElectricCurrent/Sensor/Value")
+        k = self.mem.getData("Device/SubDeviceList/KneePitch/ElectricCurrent/Sensor/Value")
+        self.logger.info("\nh: %.3f, k: %.3f" % (h,k))
+        return h,k
+
+    def onUnload(self):
+        self.onInput_onStop(); # stop current loop execution
+
+    def onInput_onStart(self):
+        self.logger.info( self.boxName + ": start - begin" );
+
+        if( self.bIsRunning ):
+            self.logger.info( self.boxName + ": already started => nothing" );
+            return;
+
+        self.bIsRunning = True;
+        self.bMustStop = False;
+
+        rPeriod = self.getParameter( 'rPeriod' );
+        while( not self.bMustStop ):
+
+            h,k = self.getCurrent()
+            if h < 1.1 and k < 1.:
+                self.logger.info("not forcing...")
+                self.bJustMove = False
+            else:
+                if self.bJustMove:
+                    self.logger.info("are we moving in the good direction?")
+                    self.logger.info("prev h: %.3f, prev k: %.3f" % (self.prevHipCurrent,self.prevKneeCurrent))
+
+                    rSumDiff = (h - self.prevHipCurrent) + (k - self.prevKneeCurrent)
+                    self.logger.info("nCptTooBigSinceLastChange: %.1f, rSumDiff: %.4f" % (self.nCptTooBigSinceLastChange,rSumDiff))
+                    if rSumDiff > 0.4:
+                        if self.nCptTooBigSinceLastChange > 3:
+                            self.logger.info("not the good direction")
+                            self.nCptTooBigSinceLastChange = 0
+                            self.dx = -self.dx
+                            self.logger.info("changing dx: %.2f" % self.dx)
+                            self.prevHipCurrent, self.prevKneeCurrent = h,k
+                        else:
+                            self.nCptTooBigSinceLastChange += 1
+                    else:
+                        if self.nCptTooBigSinceLastChange > 0:
+                            self.nCptTooBigSinceLastChange -= 0.5
+
+
+                # currently forcing, trying to reduce
+                rHipAngle = self.motion.getAngles(["HipPitch"], True)[0]
+                if (rHipAngle > 0.4 and dx > 0) or (rHipAngle < -0.4 and dx < 0):
+                    self.logger.info("hip is too high to change")
+                else:
+                    self.motion.angleInterpolation(["HipPitch"],self.dx,1., False) # add in relatif
+                    self.bJustMove = True
+
+            time.sleep( rPeriod );
+        # end while
+        self.bIsRunning = False;
+        self.onStopped();
+        self.logger.info( self.boxName + ": start - end" );
+
+    def onInput_onStop(self):
+        self.bMustStop = True; # stop current loop execution
+
+# Template_White - end
+pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Output name="output_gotobed" type="1" type_size="1" nature="2" inner="0" tooltip="" id="5" /><Parameter name="rPeriod" inherits_from_parent="0" content_type="2" value="3" default_value="1" min="0" max="100000" tooltip="period in seconds" id="6" /></Box><Link inputowner="2" indexofinput="2" outputowner="0" indexofoutput="2" /></Diagram></BehaviorKeyframe></BehaviorLayer></Timeline></Box></ChoregrapheProject>

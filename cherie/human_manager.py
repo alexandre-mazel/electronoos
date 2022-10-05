@@ -313,6 +313,7 @@ class HumanManager:
             if time.time() - self.timeNoFace > 10.:
                 self.timeNoFace = time.time()
                 if self.ab: self.ab.resetHead()
+            if self.ab: self.ab.updateIdle()
                 
 
             rTimeSinceGlobalLastInteraction = time.time() - self.rTimeGlobalLastInteraction
@@ -437,7 +438,7 @@ class HumanManager:
                     bInteract = 1
                     bSomeoneInteract = 1
 
-                print("rTimeSinceLastInteraction: %s, strTxt6: %s" % (rTimeSinceLastInteraction,strTxt6) )                    
+                print("rTimeSinceLastInteraction: %s, strTxt6: %s\n" % (rTimeSinceLastInteraction,strTxt6) )                    
                 if bInteract:
                     self.rTimeGlobalLastInteraction = time.time()
                     self.bWasInteracting = bInteract
@@ -512,9 +513,11 @@ class HumanManager:
         """
         ici il faudrait trouver un truc a dire.
         """
-        print("DBG: saySomething: ICI il faudrait dire un truc")
+        print("DBG: saySomething: ICI il faudrait dire un truc si l'humain ne parle pas.")
         
         if time.time() - self.lastTimeSaySomething > 5*60:
+            if self.ab and self.ab.isHumanSpeaking():
+                return
             self.lastTimeSaySomething = time.time()
             listTxt = [
                             "Ca va ?",
@@ -525,7 +528,7 @@ class HumanManager:
                             "C'est le bon moment pour appeller un ami!",
                             "C'est le bon moment pour souffler!",
                             "C'est le bon moment pour boire un verre d'eau!",
-                            'Et au fait "aime tu les haricots verts" ?',
+                            'Et au faite aime tu les haricots verts ?',
                             "Tu es vraiment super!",
                             "Je t'adore en tant qu'humain",
                             "Heureusement que tu es la!",

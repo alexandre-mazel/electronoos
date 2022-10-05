@@ -59,9 +59,12 @@ class AgentBehavior:
         self.bInInteraction = 0
         self.timeLastTic = time.time()-1000 # patch pourrie car stopinteraction n'arrive pas au bon moment
         
-        self.bHumanIsSpeaking = False
+        self.bHumanWasSpeaking = False
         self.lastTimeSayEndDialog = time.time()-1000
         self.mem.raiseMicroEvent("Audio/SpeechDetected",0)
+        self.startRecordSound(0)
+        
+        self.lastTimeUpdateIdle = time.time()-1000
         
         
     def startRecordSound(self,bNewState):
@@ -125,10 +128,10 @@ class AgentBehavior:
             
     def updateSpeechDetectionBehavior( self ):
         bSpeech = self.mem.getData("Audio/SpeechDetected")
-        print("DBG: updateSpeechDetectionBehavior: self.bHumanIsSpeaking: %s, bSpeech: %s" % (self.bHumanIsSpeaking,bSpeech) )
-        if not bSpeech and self.bHumanIsSpeaking:
+        print("DBG: updateSpeechDetectionBehavior: self.bHumanWasSpeaking: %s, bSpeech: %s" % (self.bHumanWasSpeaking,bSpeech) )
+        if not bSpeech and self.bHumanWasSpeaking:
             self.reactToEndOfDialog()
-        self.bHumanIsSpeaking = bSpeech
+        self.bHumanWasSpeaking = bSpeech
         
     def reactToEndOfDialog( self ):
         """
@@ -197,6 +200,15 @@ class AgentBehavior:
             
     def say( self, txt ):
         self.tts.post.say(txt)
+        
+    def isHumanSpeaking( self ):
+        return self.mem.getData("Audio/SpeechDetected")
+        
+    def updateIdle( self ):
+        if time.time()-self.lastTimeUpdateIdle > 1.5:
+            lastTimeUpdateIdle = time.time()
+            self.updateSpeechDetectionBehavior()
+        
         
 
 # class AgentBehavior - end

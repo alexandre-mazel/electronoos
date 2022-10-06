@@ -16,7 +16,7 @@ class MyClass(GeneratedClass):
         self.motion = ALProxy("ALMotion")
         self.mem = ALProxy("ALMemory")
         self.prevHipCurrent, self.prevKneeCurrent = 0.8,0.8 # average consumption
-        self.dx = 0.01
+        self.dx = 0.008
         self.bJustMove = False
         self.nCptTooBigSinceLastChange = 0
 
@@ -69,8 +69,9 @@ class MyClass(GeneratedClass):
 
                 # currently forcing, trying to reduce
                 rHipAngle = self.motion.getAngles(["HipPitch"], True)[0]
-                if (rHipAngle > 0.4 and dx > 0) or (rHipAngle < -0.4 and dx < 0):
-                    self.logger.info("hip is too high to change")
+                if (rHipAngle > 0.4 and self.dx > 0) or (rHipAngle < -0.4 and self.dx < 0):
+                    self.logger.info("hip is too high to change:%.3f, dx:%.2f" % (rHipAngle,self.dx) )
+                    #self.bJustMove = True # too check if we really are moving in the good direction?
                 else:
                     self.motion.angleInterpolation(["HipPitch"],self.dx,1., False) # add in relatif
                     self.bJustMove = True

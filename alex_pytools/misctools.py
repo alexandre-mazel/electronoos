@@ -957,6 +957,149 @@ def backupFile( filename ):
         os.remove(filenamebak)
     os.rename(filename,filenamebak)
     
+def eraseFiles( listFiles, strPath = "" ):
+    """
+    Delete all file content in a list
+    the list can contain absolute filename or relative filename then the path to use is strPath
+    """
+    print("INF: eraseFiles: erasing %d file(s)" % len(listFiles) )
+    if strPath != "" and  strPath[-1] != os.sep:
+        strPath += os.sep
+    for f in listFiles:
+        os.unlink(strPath+f)
+    
+def isFileHasSameContent( fn1,fn2 ):
+    """
+    return True if content are same
+    """
+    # not always usefull, but can save some time
+    #~ print("INF: isFileHasSameContent: comparing '%s' and '%s'" % (fn1,fn2) )
+    s1 = os.path.getsize(fn1)
+    s2 = os.path.getsize(fn2)
+    if s1 != s2:
+        return False
+        
+    strEncoding = "utf-8"
+    strAltEncoding = "cp1252"
+    strAltEncoding2 = "Latin-1"
+        
+    f1 = open(fn1,"r", encoding=strEncoding)
+    try:
+        b1 = f1.read()
+    except UnicodeDecodeError as err:
+        #~ print("WRN: isFileHasSameContent: got encoding error, trying another encoding.\nErr was: %s" % str(err) ) 
+        f1.close()
+        strEncoding = strAltEncoding
+        f1 = open(fn1,"r", encoding=strEncoding)
+        try:
+            b1 = f1.read()
+        except UnicodeDecodeError as err:
+            #~ print("WRN: isFileHasSameContent: got encoding error (2), trying another encoding.\nErr was: %s" % str(err) ) 
+            f1.close()
+            strEncoding = strAltEncoding2
+            f1 = open(fn1,"r", encoding=strEncoding)
+            b1 = f1.read()
+        
+    f1.close()
+    f2 = open(fn2,"r", encoding=strEncoding)
+    try:
+        b2 = f2.read() # if we got an encoding error, then the file are not the same !
+    except UnicodeDecodeError as err:
+        f2.close()
+        return False
+        
+    f2.close()  
+    return b1==b2    
+    
+def findDuplicate( strPath ):
+    """
+    find duplicate file in a folder
+    - same size
+    - same content
+    Return the list of duplicate file (longest name of two)
+    """
+    if strPath[-1] != os.sep:
+        strPath += os.sep
+        
+    out = []
+    listFiles = os.listdir(strPath)
+    listFiles = sorted(listFiles, key=lambda f: os.path.getsize(strPath+f),reverse=True)
+    nSizePrev = -1
+    nCountSameSize = 0
+    nNumFile = 0
+    while nNumFile < len(listFiles):
+        f = listFiles[nNumFile]
+        nSize = os.path.getsize(strPath+f)
+        # NB: we can have many file same size, but some are equal and some aren't
+        if nSize == nSizePrev:
+            nCountSameSize += 1
+            #~ print("DBG: findDuplicate: file num: %s has same size than previous: nCountSameSize: %d" % (nNumFile,nCountSameSize ))
+            for i in range(nCountSameSize):
+                strPrevName = listFiles[nNumFile-i-1]
+                if isFileHasSameContent(strPath+f,strPath+strPrevName):
+                    strDup = f
+                    nToDel = nNumFile
+                    if len(f)<len(strPrevName) or (len(f) == len(strPrevName) and f < strPrevName ):
+                        strDup = strPrevName
+                        nToDel = nNumFile - i - 1
+
+                    print("INF: findDuplicate: find a dup: %s" % strDup )
+                    out.append( strDup )
+                    # remove this one from the list, helping future comparisons
+                    del listFiles[nToDel]
+                    nNumFile -= 1
+                    nCountSameSize -= 1
+
+                    break #stop comparing with others
+        else:
+            nCountSameSize = 0
+            nSizePrev = nSize
+            
+        nNumFile += 1
+    # while - end
+        
+        
+    print("INF: findDuplicate: duplicate in '%s': %d file(s)" % (strPath, len(out) ) )
+    return out
+    
+def guessExtention( filename ):
+    """
+    mainly image, but not only
+    """
+    import imghdr
+    strExt = imghdr.what(filename)
+    if strExt == "jpeg":
+        strExt = "jpg"
+    return strExt
+    
+def  correctExtention( strPath ):
+    """
+    correct wrong file extention in strPath
+    """
+    if strPath[-1] != os.sep:
+        strPath += os.sep
+        
+    out = []
+    listFiles = os.listdir(strPath)
+    cpt = 0
+    for f in listFiles:
+        strExtDetected = guessExtention(strPath+f)
+        if strExtDetected != None:
+            name,ext = os.path.splitext(f)
+            ext = ext.replace(".","")
+            if strExtDetected != ext:
+                print("INF: correcExtention: correcting %s => %s" % (f, strExtDetected) )
+                newf = name+'.'+strExtDetected
+                os.rename(strPath+f,strPath+newf)
+                cpt += 1
+    print("INF: correctExtention: corrected %d extention(s) on %d file(s)" % (cpt,len(listFiles)) ) 
+if 1:
+    strTestPath = "C:\\Users\\alexa\\Downloads\\cv_new"
+    listDup = findDuplicate(strTestPath)
+    eraseFiles(listDup, strTestPath)
+    correctExtention(strTestPath)
+    exit(0)
+    
 def autoTest():
     print("cpu: %s" % str(getCpuModel()) )
     check(smoothstep(0),0)
@@ -1003,6 +1146,10 @@ def autoTest():
     ret = shuffle(["a","b","c"],2)
     print("ret shuffle 1: " + str(ret))
     check(len(ret),2)
+    
+    strTestPath = "./autotest_data"
+    listDup = findDuplicate(strTestPath)
+    assert(len(listDup)==7)
     
 if __name__ == "__main__":
     autoTest()

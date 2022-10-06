@@ -152,11 +152,16 @@ class AgentBehavior:
                             "eh oui",
                             "tout a fait",
                             "tant qu'il y a de la vie!",
+                            "tant qu'il y a de la vie, il y a de l'espoir",
                             "moi aussi des fois",
                             "tout a fait.",
                             "Je prend note de ceci!",
                             "grave!",
-                            "d'accord",
+                            "Je kiffe grave ce que tu viens de dire",
+                            "d'accord!",
+                            "quoi que?",
+                            "pas toujours mais souvent!",
+                            "on dirait bien!",
                             ]
 
             idx = random.randint(0,len(listTxt)-1)
@@ -206,7 +211,7 @@ class AgentBehavior:
         
     def updateIdle( self ):
         if time.time()-self.lastTimeUpdateIdle > 1.5:
-            lastTimeUpdateIdle = time.time()
+            self.lastTimeUpdateIdle = time.time()
             self.updateSpeechDetectionBehavior()
         
         

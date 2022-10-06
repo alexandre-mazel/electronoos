@@ -1093,7 +1093,7 @@ def  correctExtention( strPath ):
                 os.rename(strPath+f,strPath+newf)
                 cpt += 1
     print("INF: correctExtention: corrected %d extention(s) on %d file(s)" % (cpt,len(listFiles)) ) 
-if 1:
+if 0:
     strTestPath = "C:\\Users\\alexa\\Downloads\\cv_new"
     listDup = findDuplicate(strTestPath)
     eraseFiles(listDup, strTestPath)

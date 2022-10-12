@@ -1037,13 +1037,15 @@ def findDuplicate( strPath ):
             for i in range(nCountSameSize):
                 strPrevName = listFiles[nNumFile-i-1]
                 if isFileHasSameContent(strPath+f,strPath+strPrevName):
+                    strOrig = strPrevName
                     strDup = f
                     nToDel = nNumFile
                     if len(f)<len(strPrevName) or (len(f) == len(strPrevName) and f < strPrevName ):
                         strDup = strPrevName
+                        strOrig = f
                         nToDel = nNumFile - i - 1
 
-                    print("INF: findDuplicate: find a dup: %s" % strDup )
+                    print("INF: findDuplicate: find a dup: %s - orig: %s" % (strDup, strOrig ) )
                     out.append( strDup )
                     # remove this one from the list, helping future comparisons
                     del listFiles[nToDel]
@@ -1062,7 +1064,7 @@ def findDuplicate( strPath ):
     print("INF: findDuplicate: duplicate in '%s': %d file(s)" % (strPath, len(out) ) )
     return out
     
-def guessExtention( filename ):
+def guessExtension( filename ):
     """
     mainly image, but not only
     """
@@ -1072,9 +1074,9 @@ def guessExtention( filename ):
         strExt = "jpg"
     return strExt
     
-def  correctExtention( strPath ):
+def  correctExtension( strPath ):
     """
-    correct wrong file extention in strPath
+    correct wrong file extension in strPath
     """
     if strPath[-1] != os.sep:
         strPath += os.sep
@@ -1083,21 +1085,22 @@ def  correctExtention( strPath ):
     listFiles = os.listdir(strPath)
     cpt = 0
     for f in listFiles:
-        strExtDetected = guessExtention(strPath+f)
+        strExtDetected = guessExtension(strPath+f)
         if strExtDetected != None:
             name,ext = os.path.splitext(f)
             ext = ext.replace(".","")
             if strExtDetected != ext:
-                print("INF: correcExtention: correcting %s => %s" % (f, strExtDetected) )
+                print("INF: correcExtension: correcting %s => %s" % (f, strExtDetected) )
                 newf = name+'.'+strExtDetected
                 os.rename(strPath+f,strPath+newf)
                 cpt += 1
-    print("INF: correctExtention: corrected %d extention(s) on %d file(s)" % (cpt,len(listFiles)) ) 
+    print("INF: correctExtension: corrected %d extension(s) on %d file(s)" % (cpt,len(listFiles)) ) 
+    
 if 0:
     strTestPath = "C:\\Users\\alexa\\Downloads\\cv_new"
     listDup = findDuplicate(strTestPath)
     eraseFiles(listDup, strTestPath)
-    correctExtention(strTestPath)
+    correctExtension(strTestPath)
     exit(0)
     
 def autoTest():

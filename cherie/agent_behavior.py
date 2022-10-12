@@ -20,6 +20,7 @@ pscp -pw nao C:/Users/alexa/dev/git/electronoos/cherie/*.py nao@192.168.0.15:/ho
 
 """
 
+import datetime
 import os
 import random
 import sys
@@ -38,22 +39,52 @@ try: import naoqi
 except: pass
 import sound_player
 
+def getTimeStamp():
+    """
+    
+    # REM: linux command:
+    # timedatectl list-timezones: list all timezones
+    # sudo timedatectl set-timezone Europe/Paris => set paris
+    """
+    datetimeObject = datetime.datetime.now()
+    strTimeStamp = datetimeObject.strftime( "%Y/%m/%d: %Hh%Mm%Ss" )
+    return strTimeStamp
+    
+def getLogPath():
+    if os.name == "nt":
+        strPath = "/tmp/"
+    else:
+        strPath = "/home/nao/"
+    return strPath
+    
+def log(s):
+    f = open( getLogPath() + "agent_behavior_cherie.log","at") # need to create empty file (touch) as root and put rights to 777
+    f.write(getTimeStamp() + ": " + str(s) + "\n")
+    f.close()
+
+    
+
+
 class AgentBehavior:
     """
     human_manager stores cold facts, here we will play with them
     """
     
     def __init__( self ):
+        log("initing...")
         self.motion = naoqi.ALProxy( "ALMotion", "localhost", 9559 )
         self.leds = naoqi.ALProxy( "ALLeds", "localhost", 9559 )
         self.tts = naoqi.ALProxy( "ALTextToSpeech", "localhost", 9559 )
         self.mem = naoqi.ALProxy( "ALMemory", "localhost", 9559 )
+        
         self.listInterestedSounds = []
         for i in range(10):
             self.listInterestedSounds.append("/home/nao/sounds/interested_sound__%04d.wav" % i)
+            
         self.listHappySounds = []
         for i in range(11):
-            self.listHappySounds.append("/home/nao/sounds/happy_sound__%04d.wav" % i)    
+            self.listHappySounds.append("/home/nao/sounds/happy_sound__%04d.wav" % i)
+            
         self.strHead = ["HeadYaw","HeadPitch"]
         self.resetHead()
         self.bInInteraction = 0
@@ -168,12 +199,14 @@ class AgentBehavior:
             self.say(listTxt[idx])
         
     def startInteraction( self, facepose,humaninfo ):
+        log( "INF: startInteraction: humaninfo: %s" % (str(humaninfo)) )
         self.bInInteraction = 1
         self.playTic()
         self.startRecordSound(1)
         return self.showInteraction( facepose,humaninfo )
         
     def stopInteraction( self ):
+        log( "INF: stopInteraction")
         self.bInInteraction = 0
         self.playTic()
         self.startRecordSound(0)
@@ -193,6 +226,7 @@ class AgentBehavior:
 
         
     def showHappy( self, facepose,humaninfo, nHappiness ):
+        log( "INF: showHappy: humaninfo: %s, nHappiness: %d" % (str(humaninfo),nHappiness) )
         if nHappiness > 10:
             nHappiness = 10
         strJoint = "HipRoll"
@@ -204,6 +238,7 @@ class AgentBehavior:
             time.sleep(0.2)
             
     def say( self, txt ):
+        log( "INF: say: '%s'" % txt )
         self.tts.post.say(txt)
         
     def isHumanSpeaking( self ):

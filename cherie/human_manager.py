@@ -18,6 +18,9 @@ pscp -pw nao -P 55022 C:/Users/alexa/dev/git/electronoos/cherie/*.py nao@engrena
 
 # lancer le soundrecorder sur le robot (maintenant lancer automatiquement depuis /home/nao/run_cherie.sh, call depuis /etc/profile)
 killall python2.7; nohup python -c "import abcdk.sound_analyser; abcdk.sound_analyser.launchSoundReceiverFromShell('localhost',False)"&
+# launching two of them will fail "already registered", that's fine !
+# voir si il est lancé (devrait etre 2)
+ps eax | grep sound_analyser | wc
 
 
 # mise a jour du robot chez brice:
@@ -29,6 +32,11 @@ df . -h
 /dev/mmcblk0p1   28G   22G  5,0G  81% /
 ls /home/am/imgs/Jarc/* | wc
   24568   24568 1350378
+  
+# monitor sur le robot:
+cd ./.local/lib/python2.7/site-packages/electronoos/cherie/
+python monitor_pepper.py
+
 
 
 # in case of problem:
@@ -350,7 +358,11 @@ class HumanManager:
             
             imgFace = img[y1:y2,x1:x2]
             timeBegin = time.time()
-            retVal = self.cs.imageReco_continuousLearn(imgFace)
+            try:
+                retVal = self.cs.imageReco_continuousLearn(imgFace)
+            except BaseException as err:
+                print("ERR: updateImage: while imagereco: %s" % (str(err)))
+                break # quit faces analyse
             print( "INF: reco ret: %s, duration: %.2fs\n" % (str(retVal), time.time()-timeBegin ))
             # avec un perso (moi), depuis mon ordi.
             # computation time:
@@ -386,7 +398,7 @@ class HumanManager:
                     strCurrentDay = misctools.getDayStamp()
                     if strCurrentDay != self.aHumanKnowledge[nHumanID].strDayLastSeen:
                         # premiere fois du jour
-                        if self.aHumanKnowledge[nHumanID].nTotalSeen>100:
+                        if self.aHumanKnowledge[nHumanID].nTotalSeen>10:
                             if self.aHumanKnowledge[nHumanID].nTotalSeen>1000:
                                 strSay = "Bonjour %s !" % self.aHumanKnowledge[nHumanID].strFirstName
                             else:

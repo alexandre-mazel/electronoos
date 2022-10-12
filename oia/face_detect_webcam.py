@@ -109,7 +109,7 @@ class Bumper:
 # Load the cascade
 face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
-cap = cv2.VideoCapture(0) #ouvre la webcam
+cap = cv2.VideoCapture(3) #ouvre la webcam
 
 bumper = Bumper(radius=9)
 
@@ -156,7 +156,7 @@ while 1:
             img[y1:y1+h1,x1:x1+w1] = f2r
             img[y2:y2+h2,x2:x2+w2] = f1r
             
-    if 1:
+    if 0:
         if len(faces) > 0:
             # bump
             #~ img = bumper.applyBump(img,100,100)

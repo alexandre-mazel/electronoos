@@ -81,6 +81,8 @@ import human_manager
 if 1:
     reload(abcdk.camera)
     reload(human_manager)
+    import agent_behavior
+    reload(agent_behavior)
 
 class MyClass(GeneratedClass):
     """ insert here your comments about this class """
@@ -444,7 +446,7 @@ class MyClass(GeneratedClass):
         self.bMustStop = True; # stop current loop execution
 
 # Template_White - end
-pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Output name="output_gotobed" type="1" type_size="1" nature="2" inner="0" tooltip="" id="5" /><Parameter name="rPeriod" inherits_from_parent="0" content_type="2" value="10" default_value="1" min="0" max="100000" tooltip="period in seconds" id="6" /></Box><Box name="Say Text" id="7" localization="8" tooltip="Say the text received on its input." x="474" y="64"><bitmap>media/images/box/interaction/say.png</bitmap><script language="4"><content><![CDATA[import time
+pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Output name="output_gotobed" type="1" type_size="1" nature="2" inner="0" tooltip="" id="5" /><Parameter name="rPeriod" inherits_from_parent="0" content_type="2" value="3" default_value="1" min="0" max="100000" tooltip="period in seconds" id="6" /></Box><Box name="Say Text" id="7" localization="8" tooltip="Say the text received on its input." x="474" y="64"><bitmap>media/images/box/interaction/say.png</bitmap><script language="4"><content><![CDATA[import time
 
 class MyClass(GeneratedClass):
     def __init__(self):

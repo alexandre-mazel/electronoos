@@ -130,6 +130,23 @@ class Firstnames:
             else:
                 self.dictFirstname[k] = (strFirstname, bFemale, tuple(listCountries), rOccurence) # this line takes 99% of times on python2.7 (moreover in rpi)
             
+        # ajout de certains prénoms normaux, mais oublié
+        rDefaultOcc = 3
+        listForgot = [
+                            ("Karine", True, ["fr"]),
+                        ]
+        
+        for data in listForgot:
+            strFirstname, bFemale, listCountries = data[:3]
+            
+            if len(data)>3:
+                rOccurence = data[3]
+            else:
+                rOccurence = rDefaultOcc
+            k = simpleString(strFirstname)
+            self.dictFirstname[k] = (strFirstname, bFemale, tuple(listCountries), rOccurence)
+                
+            
     def get( self, strFirstname ):
         """
         return (strFirstname, bFemale, tupleCountries, rOccurence) 
@@ -223,6 +240,10 @@ def autotest():
 
     val = firstnames.get( "Íde" )
     assert_equal( val[0], "Íde" )    
+    
+    val = firstnames.get( "Karine" )
+    assert_equal( val[0], "Karine" )
+    assert_equal( val[1], True )
     
 
     val = firstnames.getCompound( "Jean-Bernard" )

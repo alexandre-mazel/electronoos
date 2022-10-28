@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import random
+import time
 
 def sierpin(im, p1,p2,p3,color=(255,255,255)):
     #~ print("sierpin %s, %s, %s" % (str(p1),str(p2),str(p3)))
@@ -16,7 +17,8 @@ def sierpin(im, p1,p2,p3,color=(255,255,255)):
         cv2.circle(im,((p1c[0]*2+p2c[0]+p3c[0])//4,(p1c[1]*2+p2c[1]+p3c[1])//4), abs(p1c[0]-p2c[0])//12, (0,0,0), -1)
         cv2.circle(im,((p1c[0]+p2c[0]*2+p3c[0])//4,(p1c[1]*2+p2c[1]+p3c[1])//4), abs(p1c[0]-p2c[0])//12, (0,0,0), -1)
     
-    if p1[0]%8==0:
+    if p1[0]%4==0 and 0:
+        #~ time.sleep(0.1)
         cv2.imshow("painting", im)
         k = cv2.waitKey(1)
         if k == 27:

@@ -534,7 +534,7 @@ class Cities:
                 except KeyError:
                     return None
                 
-            if len(listSlug)>1:
+            if not bQuiet and len(listSlug)>1:
                 self.warn("WRN: findByZip: this zip '%s' belongs to different cities: %s" % (zip,listSlug) )
             k = listSlug[0]
             return self.cityPerSlug[k]
@@ -677,7 +677,7 @@ class Cities:
         c1 = getLongLatParis(zip1)
         if c1 is None:
 
-            c1 = self.findByZip(zip1)
+            c1 = self.findByZip(zip1,bQuiet=not bVerbose)
             if c1 == None:
                 print("WRN: distTwoZip: zip1 '%s' not found" % zip1)
                 assert(0)
@@ -688,7 +688,7 @@ class Cities:
             
         c2 = getLongLatParis(zip2)
         if c2 is None:
-            c2 = self.findByZip(zip2)
+            c2 = self.findByZip(zip2,bQuiet=not bVerbose)
             if c2 == None:
                 print("WRN: distTwoZip: zip2 '%s' not found" % zip2)
                 assert(0)

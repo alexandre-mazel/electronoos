@@ -1,3 +1,5 @@
+# -*- coding: cp1252 -*-
+
 """
 This file is part of CHERIE: Care Human Extended Real-life Interaction Experimentation.
 
@@ -59,10 +61,10 @@ def getLogPath():
     
 def log(s):
     f = open( getLogPath() + "agent_behavior_cherie.log","at") # need to create empty file (touch) as root and put rights to 777
-    f.write(getTimeStamp() + ": " + str(s) + "\n")
+    s = getTimeStamp() + ": " + str(s)
+    print("LOG: " + s )
+    f.write(s + "\n")
     f.close()
-
-    
 
 
 class AgentBehavior:
@@ -91,6 +93,7 @@ class AgentBehavior:
         self.timeLastTic = time.time()-1000 # patch pourrie car stopinteraction n'arrive pas au bon moment
         
         self.bHumanWasSpeaking = False
+        self.rHumanStartSpeaking = 0
         self.lastTimeSayEndDialog = time.time()-1000
         self.mem.raiseMicroEvent("Audio/SpeechDetected",0)
         self.startRecordSound(0)
@@ -159,49 +162,79 @@ class AgentBehavior:
             
     def updateSpeechDetectionBehavior( self ):
         bSpeech = self.mem.getData("Audio/SpeechDetected")
-        print("DBG: updateSpeechDetectionBehavior: self.bHumanWasSpeaking: %s, bSpeech: %s" % (self.bHumanWasSpeaking,bSpeech) )
+        if self.bHumanWasSpeaking != bSpeech:
+            if bSpeech:
+                self.rHumanStartSpeaking = time.time()
+            log("INF: updateSpeechDetectionBehavior: self.bHumanWasSpeaking: %s, bSpeech: %s" % (self.bHumanWasSpeaking,bSpeech) )
         if not bSpeech and self.bHumanWasSpeaking:
             self.reactToEndOfDialog()
         self.bHumanWasSpeaking = bSpeech
+
+    def motivationalMorning( self ):
+        """
+        a dire le matin de temps en temps
+        """
+        listTxt = [
+                        "Je m'aime et je suis courageux.",
+                        "Oooh comme je m'aime!",
+                        "Je crois que nous allons passer une belle journée!",
+                        "Quelle chance j'ai d'être vivant!",
+                        "Je suis la, avec toi, proche de toi.",
+                        "Même si tu le crois, tu n'es pas seul, je suis avec toi.",
+                    ]
         
     def reactToEndOfDialog( self ):
         """
         repond qqchose a l'humain
         """
-        print("DBG: reactToEndOfDialog: saying something...")
+        durationSinceHumanStartSpeak = time.time()-self.rHumanStartSpeaking
+        log("INF: reactToEndOfDialog: saying something... (t:%.1fs, last:%.1fs,diff:%.1fs, startSpeaking: %.1fs, duration: %.1fs)" % (time.time(), self.lastTimeSayEndDialog, time.time() - self.lastTimeSayEndDialog,self.rHumanStartSpeaking,durationSinceHumanStartSpeak) )
         
-        if time.time() - self.lastTimeSayEndDialog > 2:
+        if time.time() - self.lastTimeSayEndDialog > 1:
             self.lastTimeSayEndDialog = time.time()
-            listTxt = [
-                            "Je suis content de savoir cela!",
+            listShortTxt = [
                             "Ok!",
-                            "Hum",
-                            "oh",
-                            "ah",
-                            "uh",
-                            "eh",
+                            #~ "Hum",
+                            #~ "oh",
+                            #~ "ah",
+                            #~ "uh",
+                            #~ "eh",
                             "eh oui",
                             "tout a fait",
-                            "tant qu'il y a de la vie!",
-                            "tant qu'il y a de la vie, il y a de l'espoir",
-                            "moi aussi des fois",
+                            "moi aussi parfois",
                             "tout a fait.",
                             "Je prend note de ceci!",
                             "grave!",
-                            "Je kiffe grave ce que tu viens de dire",
                             "d'accord!",
                             "quoi que?",
                             "pas toujours mais souvent!",
+                            ]
+                            
+            listLongTxt = [
+                            "Je suis content de savoir cela!",
+                            "tout a fait",
+                            "tant qu'il y a de la vie!",
+                            "tant qu'il y a de la vie, il y a de l'espoir",
+                            "moi aussi de temps en temps je pense à cela.",
+                            "tout a fait.",
+                            "Je prend note de ceci!",
+                            "Je kiffe grave ce que tu viens de dire",
+                            "pas toujours mais souvent!",
                             "on dirait bien!",
                             ]
+
+            listTxt = listShortTxt
+            if durationSinceHumanStartSpeak > 10:
+                listTxt = listLongTxt
 
             idx = random.randint(0,len(listTxt)-1)
             self.say(listTxt[idx])
         
     def startInteraction( self, facepose,humaninfo ):
-        log( "INF: startInteraction: humaninfo: %s" % (str(humaninfo)) )
+        log( "INF: startInteraction: humaninfo: uid: %s, totseen: %s, seentoday: %s, daystreak: %s" % (humaninfo.nUID,humaninfo.nTotalSeen,humaninfo.nSeenToday,humaninfo.nDayStreak) )
         self.bInInteraction = 1
         self.playTic()
+        self.bHumanWasSpeaking = False # force to reset, we should have missed the end of the previous interaction
         self.startRecordSound(1)
         return self.showInteraction( facepose,humaninfo )
         
@@ -226,7 +259,7 @@ class AgentBehavior:
 
         
     def showHappy( self, facepose,humaninfo, nHappiness ):
-        log( "INF: showHappy: humaninfo: %s, nHappiness: %d" % (str(humaninfo),nHappiness) )
+        log( "INF: showHappy: humaninfo: uid: %s, nHappiness: %d" % (str(humaninfo.nUID),nHappiness) )
         if nHappiness > 10:
             nHappiness = 10
         strJoint = "HipRoll"

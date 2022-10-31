@@ -1095,13 +1095,43 @@ def  correctExtension( strPath ):
                 os.rename(strPath+f,strPath+newf)
                 cpt += 1
     print("INF: correctExtension: corrected %d extension(s) on %d file(s)" % (cpt,len(listFiles)) ) 
-    
+  
 if 0:
     strTestPath = "C:\\Users\\alexa\\Downloads\\cv_new"
     listDup = findDuplicate(strTestPath)
     eraseFiles(listDup, strTestPath)
     correctExtension(strTestPath)
+    exit(0)      
+    
+def getCallStackStr():
+    import traceback
+    #~ print("DBG: getCallStackStr: stack: " + str(sys.exc_info()[2]) )
+    #~ print("DBG: getCallStackStr: trace: " + str(traceback.format_exc()) )
+    #~ print("DBG: getCallStackStr: trace: " + str(''.join(traceback.format_stack()) ))
+    #~ print(sys.exc_info())
+    #~ print(sys.exc_info()[2])
+    return traceback.format_stack()
+    
+def printCallStackStr():
+    a = getCallStackStr()
+    print("printCallStackStr:")
+    for e in a[:-2]:
+        print("\t%s" % e )
+    
+
+if 1:
+    # test getCallStack
+    def dummy1():
+        def dummy2():
+            printCallStackStr()
+        return dummy2()
+            
+    def dummyParent():
+        dummy1()
+    dummyParent()
     exit(0)
+    
+
     
 def autoTest():
     print("cpu: %s" % str(getCpuModel()) )

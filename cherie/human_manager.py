@@ -37,10 +37,16 @@ ls /home/am/imgs/Jarc/* | wc
 cd ./.local/lib/python2.7/site-packages/electronoos/cherie/
 python monitor_pepper.py
 
+# voir sur les images sur le serveur
+./dev/git/electronoos/scripts/view_img.py ~/imgs/Jarc/
+
 
 
 # in case of problem:
 # taskkill /F /im python.exe
+
+# continuer a tester la speech reco
+.\Lib\site-packages\speech_recognition\__init__.py
 
 """
 

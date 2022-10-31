@@ -1115,7 +1115,7 @@ def getCallStackStr():
 def printCallStack():
     a = getCallStackStr()
     print("\n*** printCallStack:")
-    for i,e in enumerate(a[:-2]):
+    for i,e in enumerate(a[:-2]): # -2 to prevent printing printCallStack itself
         print("%s" % e )
     print()
     

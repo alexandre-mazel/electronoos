@@ -1120,7 +1120,7 @@ def printCallStack():
     print()
     
 
-if 1:
+if 0:
     # test getCallStack
     def dummy1():
         def dummy2():

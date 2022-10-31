@@ -1112,18 +1112,19 @@ def getCallStackStr():
     #~ print(sys.exc_info()[2])
     return traceback.format_stack()
     
-def printCallStackStr():
+def printCallStack():
     a = getCallStackStr()
-    print("printCallStackStr:")
-    for e in a[:-2]:
-        print("\t%s" % e )
+    print("\n*** printCallStack:")
+    for i,e in enumerate(a[:-2]):
+        print("%s" % e )
+    print()
     
 
 if 1:
     # test getCallStack
     def dummy1():
         def dummy2():
-            printCallStackStr()
+            printCallStack()
         return dummy2()
             
     def dummyParent():

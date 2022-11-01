@@ -3,6 +3,7 @@ Guitar tuner script based on the Harmonic Product Spectrum (HPS)
 
 MIT License
 Copyright (c) 2021 chciken
++ (c) 2022 A.Mazel
 '''
 
 import copy
@@ -41,6 +42,48 @@ def find_closest_note(pitch):
   closest_pitch = CONCERT_PITCH*2**(i/12)
   return closest_note, closest_pitch
 
+
+guitar_notes_freqs = { # for each notes the number of the string and the frequency
+            "E2": (1, 82.41),
+            "A2": (2, 110),
+            "D3": (3, 146.83),
+            "G3": (4, 196),
+            "B3": (5, 246.94),
+            "E4": (6, 329.63),
+}
+
+def printGuitarTunerStyle(max_freq,closest_note,closest_pitch):
+    """
+    print infos like a guitar tuner
+    """
+    rDiff = max_freq-closest_pitch
+    strSymbol = '?'
+    strStringNum = '? '
+    rGoodThreshold = 0.4
+    rPerfectThreshold = 0.2
+    
+    if abs(rDiff) < rPerfectThreshold:
+        strSymbol = "=="
+    else:
+        if abs(rDiff) < rGoodThreshold: 
+            strSymbol = '='
+        else:
+            strSymbol = ' '
+        if rDiff > 0.:
+            strSymbol += "^"
+        else:
+            strSymbol += "v"
+    
+    if closest_note in guitar_notes_freqs:
+        strStringNum = str(guitar_notes_freqs[closest_note][0])
+    else:
+        pass
+    print("%s: str%s %s (%.1fHz / %.1fHz)" % (closest_note, strStringNum, strSymbol,max_freq,closest_pitch))
+
+        
+    
+    
+
 HANN_WINDOW = np.hanning(WINDOW_SIZE)
 def callback(indata, frames, time, status):
   """
@@ -63,8 +106,8 @@ def callback(indata, frames, time, status):
     # skip if signal power is too low
     signal_power = (np.linalg.norm(callback.window_samples, ord=2)**2) / len(callback.window_samples)
     if signal_power < POWER_THRESH:
-      os.system('cls' if os.name=='nt' else 'clear')
-      print("Closest note: ...")
+      #~ os.system('cls' if os.name=='nt' else 'clear')
+      print("no noise...")
       return
 
     # avoid spectral leakage by multiplying the signal with a hann window
@@ -110,11 +153,15 @@ def callback(indata, frames, time, status):
     callback.noteBuffer.insert(0, closest_note) # note that this is a ringbuffer
     callback.noteBuffer.pop()
 
-    os.system('cls' if os.name=='nt' else 'clear')
+    #~ os.system('cls' if os.name=='nt' else 'clear')
+    bOriginalPrint = False
     if callback.noteBuffer.count(callback.noteBuffer[0]) == len(callback.noteBuffer):
-      print(f"Closest note: {closest_note} {max_freq}/{closest_pitch}")
+        if bOriginalPrint:
+            print("Closest note: {closest_note} {max_freq}/{closest_pitch}")
+        else:
+            printGuitarTunerStyle(max_freq,closest_note,closest_pitch)
     else:
-      print(f"Closest note: ...")
+        print("Closest note: ...")
 
   else:
     print('no input')

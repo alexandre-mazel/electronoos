@@ -45,8 +45,14 @@ python monitor_pepper.py
 # in case of problem:
 # taskkill /F /im python.exe
 
-# continuer a tester la speech reco
-.\Lib\site-packages\speech_recognition\__init__.py
+# continuer a tester la speech reco speech_reco_test dans le dossier scripts
+
+# copier les sons depuis le robot:
+pscp -pw naonao nao@87.90.82.139:/home/nao/recorded/rawWavs/* d:\cherie_sound_record\
+
+# rsync -rv --size-only nao@87.90.82.139:/home/nao/recorded/rawWavs/ /mnt/d/cherie_sound_record/ # d n'est pas monté!
+
+
 
 """
 

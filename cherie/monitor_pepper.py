@@ -10,6 +10,7 @@ prev_speech_detected = -1
 prev_sound_receiver_pause = -1
 rPrevTempKneePitch = -1
 rPrevTempHipPitch = -1
+strPrevRecognizedWords = ""
 
 while 1:
     speech_detected = mem.getData("Audio/SpeechDetected")
@@ -21,6 +22,11 @@ while 1:
     if sound_receiver_pause != prev_sound_receiver_pause:
         print("%s: sound_receiver_pause: %s" % (misctools.getTimeStamp(),sound_receiver_pause) )
         prev_sound_receiver_pause = sound_receiver_pause
+        
+    strRecognizedWords = mem.getData("Audio/RecognizedWords")
+    if strRecognizedWords != strPrevRecognizedWords:
+        print("%s: strRecognizedWords: %s" % (misctools.getTimeStamp(),strRecognizedWords) )
+        strPrevRecognizedWords = strRecognizedWords        
         
     rTempKneePitch = mem.getData("Device/SubDeviceList/KneePitch/Temperature/Sensor/Value")
     if rTempKneePitch != rPrevTempKneePitch:

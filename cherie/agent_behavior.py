@@ -190,8 +190,36 @@ class AgentBehavior:
         durationSinceHumanStartSpeak = time.time()-self.rHumanStartSpeaking
         log("INF: reactToEndOfDialog: saying something... (t:%.1fs, last:%.1fs,diff:%.1fs, startSpeaking: %.1fs, duration: %.1fs)" % (time.time(), self.lastTimeSayEndDialog, time.time() - self.lastTimeSayEndDialog,self.rHumanStartSpeaking,durationSinceHumanStartSpeak) )
         
+        
         if time.time() - self.lastTimeSayEndDialog > 1:
             self.lastTimeSayEndDialog = time.time()
+            
+                    
+            strText = self.mem.getData("Audio/RecognizedWords")
+            if "aiquitation" in strText:
+                self.say("j'aime aussi les chevaux")
+                return
+                
+            if "chier" in strText or "encul" in strText :
+                self.say("moi je chie jamais!")
+                return
+                
+            if "politique" in strText or "de gauche" in strText:
+                self.say("j'aime pas trop la politique")
+                return
+                
+            if "j'aime" in strText:
+                self.say("moi j'aime un peu aussi!")
+                return
+                
+            if "je vais te parler" in strText:
+                self.say("alors je t'aicoute!")
+                return
+                
+            if "profond" in strText:
+                self.say("la profondeur des uns, c'est la largeur des autres!")
+                return
+                
             listShortTxt = [
                             "Ok!",
                             #~ "Hum",

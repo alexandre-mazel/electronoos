@@ -174,6 +174,13 @@ def recognizeFromFolder(strPath):
     for f in listFiles:
         strSoundFilename = strPath+f
         sound_player.soundPlayer.playFile(strSoundFilename,bWaitEnd=0)
+        
+        if 1:
+            # just play them in a raw
+            print(f)
+            sound_player.soundPlayer.waitAll()
+            continue
+        
         recognized = recognizeFromFile(strSoundFilename,strAnsiLang)
         print("%s: %s" % (f,recognized))
         
@@ -182,5 +189,6 @@ def recognizeFromFolder(strPath):
             if bUseTts: say(recognized[0])
         
 #~ recognizeFromFile( strSoundFilename, strAnsiLang )
+strPath = "D:/cherie_sound_classified/bruit/"
 strPath = "D:/cherie_sound_classified/voix/"
 recognizeFromFolder(strPath)

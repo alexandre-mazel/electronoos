@@ -1,0 +1,7 @@
+*** Mon A52s 5G:
+android version: 11
+kernel: 5.4.86
+6.5 pouces, 16M couleurs
+1080 x 2400 pixels
+Super AMOLED, 90Hz
+ratio 20:9

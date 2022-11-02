@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<package uuid="subtilelife-076882">
+ <names>
+  <name lang="en_US">SubtileLife</name>
+ </names>
+ <descriptions>
+  <description lang="en_US">la vie autonome du pauvre</description>
+ </descriptions>
+ <supportedLanguages>
+  <language>en_US</language>
+  <language>fr_FR</language>
+ </supportedLanguages>
+ <descriptionLanguages>
+  <language>en_US</language>
+  <language>fr_FR</language>
+ </descriptionLanguages>
+ <contents>
+  <behaviorContent path="behavior_1">
+   <nature>interactive</nature>
+   <triggerSentences>
+    <sentence lang="en_US">run subtile life</sentence>
+    <sentence lang="fr_FR">lance la vie du pauvre</sentence>
+   </triggerSentences>
+   <loadingResponses/>
+   <autonomous/>
+   <permissions/>
+  </behaviorContent>
+ </contents>
+</package>

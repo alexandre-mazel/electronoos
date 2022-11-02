@@ -1,0 +1,21 @@
+    Département : numéro du département.
+    Slug : identifiant unique en minuscule, sans accent et sans espace. Peut servir pour faire les URLs d’un site web.
+    Nom : nom en majuscule et sans accent.
+    Nom simple : nom en minuscule, sans accent et avec les tirets remplacés par des espaces. Peut être utilisé pour faire une recherche lorsqu’on ne sait pas si le nom de ville possède un tiret ou des espaces (ex : “Saint-Étienne” possède un tiret comme séparateur, tandis que “Le Havre” possède un espace comme séparateur)
+    Nom reel : nom correct avec les accents
+    Nom soundex : soundex du nom de la ville (permet de trouver des villes qui se prononcent presque pareil) [ajouté le 31/10/2013]
+    Nom metaphone : metaphone du nom de la ville (même utilité que le soundex) [ajouté le 31/10/2013]
+    Code postal : code postal de la ville. Si la ville possède plusieurs code postaux, ils sont tous listés et séparés par un tiret [ajouté le 31/10/2013]
+    Numéro de commune : numéro de la commune dans le département. Combiné avec le numéro de département, il permet de créer le code INSEE sous 5 caractères.
+    Code commune (ou code INSEE) : identifiant unique sous 5 caractères
+    Arrondissement : arrondissement de la ville
+    Canton : canton de la ville
+    Population en 2010 : nombre d’habitants lors du recensement de 2010
+    Population en 1999 : nombre d’habitants lors du recensement de 1999
+    Population en 2012 (approximatif) : valeur exprimée en centaine
+    Densité en 2010 : nombre d’habitants au kilomètre carré arrondie à l’entier. Calculé à partir du nombre d’habitant et de la surface de la ville [corrigé le 02/07/2014]
+    Surface / superficie : surface de la ville en kilomètre carrée [corrigé le 02/07/2014]
+    Longitude/latitude en degré : géolocalisation du centre de la ville. Permet de localiser la ville sur une carte (exemple : carte Google Maps) [ajouté le 31/10/2013, corrigé le 07/11/2013]
+    Longitude/latitude en GRD : géolocalisation exprimée en GRD
+    Longitude/latitude en DMS (Degré Minute Seconde) : géolocalisation exprimée en Degré Minute Seconde
+    Altitude minimale/maximale : hauteur minimum et maximum de la ville par rapport au niveau de l’eau

@@ -175,7 +175,7 @@ def recognizeFromFolder(strPath):
         strSoundFilename = strPath+f
         sound_player.soundPlayer.playFile(strSoundFilename,bWaitEnd=0)
         
-        if 1:
+        if 0:
             # just play them in a raw
             print(f)
             sound_player.soundPlayer.waitAll()

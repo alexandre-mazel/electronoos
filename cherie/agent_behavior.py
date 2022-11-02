@@ -220,6 +220,10 @@ class AgentBehavior:
                 self.say("la profondeur des uns, c'est la largeur des autres!")
                 return
                 
+            if " vie " in strText:
+                self.say("vous parlez souvent de la vie, vous les humains, mais je ne sais même pas ce que c'est.")
+                return
+                
             listShortTxt = [
                             "Ok!",
                             #~ "Hum",

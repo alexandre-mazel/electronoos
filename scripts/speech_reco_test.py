@@ -1,6 +1,7 @@
 # -*- coding: cp1252 -*-
-import speech_recognition
+import os
 import pocketsphinx
+import speech_recognition
 import time
 
 # install fr
@@ -45,11 +46,11 @@ if 0:
     for phrase in LiveSpeech(): # language = strAnsiLang
         print(phrase)
     
+import sys
+sys.path.append("../alex_pytools/")
+import sound_player
 if 0:
     # play it:
-    import sys
-    sys.path.append("../alex_pytools/")
-    import sound_player
     sound_player.soundPlayer.playFile(strSoundFilename,bWaitEnd=1)
     
 keyword_entries = None
@@ -74,71 +75,112 @@ if 0:
         ]
 
 r = speech_recognition.Recognizer()
-print(dir(r))
+#~ print(dir(r))
 
-retVal = None
+def recognizeFromFile(filename,language = "en-US"):
+    """
+    return recognised_sentence,score,proba
+    """
+    bVerbose=0
+    retVal = None
 
-with speech_recognition.WavFile(strSoundFilename) as source:
-    audio = r.record(source) # read the entire WAV file
-# recognize speech using  Speech Recognition
-try:
-    # for testing purposes, we're just using the default API key
-    timeBegin = time.time()
-    bShowAll = 0
-    bShowAll = 1
-    retFromReco =r.recognize_sphinx(audio, language = strAnsiLang, keyword_entries=keyword_entries, show_all = bShowAll )
-    print("Duration: %.3fs" % (time.time()-timeBegin))
-    print( "retFromReco: %s" % str(retFromReco) )
-    
-    if bShowAll:
-        print( "retFromReco: dir %s" % str(dir(retFromReco.hyp()) ))
-        print( "retFromReco3: prob: %s" % str(retFromReco.hyp().prob ) )
-        print( "retFromReco3: score: %s" % str(retFromReco.hyp().score ) )
-        print( "retFromReco3: best_score: %s" % str(retFromReco.hyp().best_score ) )
-        print( "retFromReco3: hypstr: %s" % str(retFromReco.hyp().hypstr ) )
+    with speech_recognition.WavFile(filename) as source:
+        audio = r.record(source) # read the entire WAV file
+    # recognize speech using  Speech Recognition
+    try:
+        # for testing purposes, we're just using the default API key
+        timeBegin = time.time()
+        bShowAll = 0
+        bShowAll = 1
+        retFromReco =r.recognize_sphinx(audio, language = strAnsiLang, keyword_entries=keyword_entries, show_all = bShowAll )
+        if bVerbose: print("Duration: %.3fs" % (time.time()-timeBegin))
+        if bVerbose: print( "retFromReco: %s" % str(retFromReco) )
         
-        """
-        A propos de la confidence:
+        if bShowAll:
+            if bVerbose: print( "retFromReco: dir %s" % str(dir(retFromReco.hyp()) ))
+            if bVerbose: print( "retFromReco3: prob: %s" % str(retFromReco.hyp().prob ) )
+            if bVerbose: print( "retFromReco3: score: %s" % str(retFromReco.hyp().score ) )
+            if bVerbose: print( "retFromReco3: best_score: %s" % str(retFromReco.hyp().best_score ) )
+            if bVerbose: print( "retFromReco3: hypstr: %s" % str(retFromReco.hyp().hypstr ) )
+            
+            if retFromReco != None and retFromReco.hyp() != None:
+                retVal = retFromReco.hyp().hypstr,retFromReco.hyp().best_score,retFromReco.hyp().prob
+            
+            """
+            A propos de la confidence:
 
-    Confidence result is not returned by the current version of speech-recognition. If you look at the implementation:
+        Confidence result is not returned by the current version of speech-recognition. If you look at the implementation:
 
-def recognize_sphinx(...):
-   ...
-   # return results
-   hypothesis = decoder.hyp()
-   if hypothesis is not None: return hypothesis.hypstr
-   raise UnknownValueError()  # no transcriptions available
+    def recognize_sphinx(...):
+       ...
+       # return results
+       hypothesis = decoder.hyp()
+       if hypothesis is not None: return hypothesis.hypstr
+       raise UnknownValueError()  # no transcriptions available
 
+    what about overloading the recognize_sphinx method in your project: 
+    you define your own flavour of the method then you do a r.recognize_sphinx = my_own_private_method() 
 
-what about overloading the recognize_sphinx method in your project: 
-you define your own flavour of the method then you do a r.recognize_sphinx = my_own_private_method() 
+            """
+            
+        if retFromReco != [] and 0:
+            
+            alt = retFromReco['alternative']
+            strTxt = alt[0]['transcript']
 
-        """
+            # when reco does not return a confidence, use -1 as an error code
+            if 'confidence' in alt[0]:
+                rConf = alt[0]['confidence']
+            else:
+                log.debug('no confidence returned')
+                rConf = -1.0
         
-    if retFromReco != []:
+            #~ strTxt = self.cleanText2( strTxt )
+            print("Speech Recognition thinks you said: '%s' (conf:%5.2f)\n" % (strTxt, rConf) )
+            retVal = [ [strTxt,rConf] ]
         
-        alt = retFromReco['alternative']
-        strTxt = alt[0]['transcript']
 
-        # when reco does not return a confidence, use -1 as an error code
-        if 'confidence' in alt[0]:
-            rConf = alt[0]['confidence']
-        else:
-            log.debug('no confidence returned')
-            rConf = -1.0
-    
-        #~ strTxt = self.cleanText2( strTxt )
-        print("Speech Recognition thinks you said: '%s' (conf:%5.2f)\n" % (strTxt, rConf) )
-        retVal = [ [strTxt,rConf] ]
-    
-    
+    except speech_recognition.UnknownValueError:
+        pass
+        
+    except speech_recognition.RequestError as e:
+        print("Could not request results from Speech Recognition service; {0}".format(e))
+        
+    if retVal == None: 
+        if bVerbose: print("Speech Recognition could not understand audio\n")
 
-except speech_recognition.UnknownValueError:
-    pass
+    if bVerbose: print("DBG: retVal: %s" % str(retVal) )
+    return retVal
     
-except speech_recognition.RequestError as e:
-    print("Could not request results from Speech Recognition service; {0}".format(e))
-    
-if retVal == None: print("Speech Recognition could not understand audio\n")
+global_tts = None
+def say(txt):
+    global global_tts
+    if global_tts == None:
+        import pyttsx3
+        global_tts = pyttsx3.init()
+    global_tts.say(txt)
+    global_tts.runAndWait()
+        
+def recognizeFromFolder(strPath):
+    bUseTts = 1
+        
+    strAnsiLang = "fr-FR"
+    listFiles = os.listdir(strPath)
+    listFiles = sorted(listFiles)
 
-print("DBG: retVal: %s" % str(retVal) )
+    #~ if bUseTts: say("coucou")
+
+        
+    for f in listFiles:
+        strSoundFilename = strPath+f
+        sound_player.soundPlayer.playFile(strSoundFilename,bWaitEnd=0)
+        recognized = recognizeFromFile(strSoundFilename,strAnsiLang)
+        print("%s: %s" % (f,recognized))
+        
+        sound_player.soundPlayer.waitAll() # attend de finir le son pour lire le suivant
+        if recognized != None:
+            if bUseTts: say(recognized[0])
+        
+#~ recognizeFromFile( strSoundFilename, strAnsiLang )
+strPath = "D:/cherie_sound_classified/voix/"
+recognizeFromFolder(strPath)

@@ -71,6 +71,10 @@ class SoundPlayer:
         
     def stopAll( self ):
         pg.mixer.stop()
+    
+    def waitAll( self ):
+        while pg.mixer.get_busy():
+            pg.time.Clock().tick(30)
         
 # class SoundPlayer - end
         

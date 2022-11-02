@@ -87,6 +87,8 @@ class SoundPlayer:
             except BaseException as err:
                 print("ERR: SoundPlayer.playFile: err: %s" % str(err) )
 
+    def waitAll( self ):
+        if self.player: return self.player.waitAll()
         
     def stopAll( self ):
         if self.player: return self.player.stopAll()

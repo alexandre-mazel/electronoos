@@ -784,7 +784,8 @@ class Cities:
             return ""
         strCity = city[3]
         
-        if isBigCityZip(zip):
+        #~ if isBigCityZip(zip): #c'est debile de dire dans le premier arrt de Nice!
+        if zip[:2] in ['75','13','69'] and isBigCityZip(zip):
             arrt = ordinalToStr(zip[-2:])
             if sys.version_info[0]<3 and isinstance(arrt,unicode):
                 arrt = arrt.encode("utf-8", 'replace')
@@ -1274,6 +1275,7 @@ def autotest_cities():
     assert_equal(cities.zipToHumanised("94270"),"à Le Kremlin-Bicêtre")
     assert_equal(cities.zipToHumanised("34440"),"à Nissan-lez-Enserune")
     assert_equal(cities.zipToHumanised("75008"),"dans le 8ème arrondissement de Paris")
+    assert_equal(cities.zipToHumanised("06001"),"à Nice")
 
     retVal = cities.findByZip("75001")
     print("DBG: autotest: get paris: %s" % str(retVal) )

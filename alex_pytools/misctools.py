@@ -963,10 +963,14 @@ def eraseFiles( listFiles, strPath = "" ):
     the list can contain absolute filename or relative filename then the path to use is strPath
     """
     print("INF: eraseFiles: erasing %d file(s)" % len(listFiles) )
+    if len(listFiles) < 1:
+        return
+    time.sleep(4) # time for people to kill the process
     if strPath != "" and  strPath[-1] != os.sep:
         strPath += os.sep
     for f in listFiles:
         os.unlink(strPath+f)
+    print("INF: eraseFiles: erasing %d file(s) - done" % len(listFiles) )
     
 def isFileHasSameContent( fn1,fn2 ):
     """

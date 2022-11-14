@@ -14,14 +14,15 @@ def assert_equal( a, b ):
 def findSubString( buf, strBefore, strAfter= "", nOccurence = 1, bQuiet=False ):
     """
     return the first string between strBefore and strAfter
-    nOccurence: return the nth found
+    nOccurence: return the nth found (require nth-1 strAfter to be found before)
     """
     idx = 0
     count = 0
     while 1:
-        idx = buf[idx:].find(strBefore)
-        if idx == -1:
+        idxFind = buf[idx:].find(strBefore)
+        if idxFind == -1:
             break
+        idx = idxFind+idx # because it was relative to idx:
         count += 1
         idx = idx+len(strBefore)
         if count == nOccurence:
@@ -33,7 +34,14 @@ def findSubString( buf, strBefore, strAfter= "", nOccurence = 1, bQuiet=False ):
                 s = buf[idx:]
             else:
                 s = buf[idx:idx+idxEnd]
-        return s
+            return s
+        if strAfter != "":
+            idxEnd = buf[idx:].find(strAfter)
+            if idxEnd == -1:
+                break # we have finished
+            idx = idx+idxEnd+len(strAfter)
+            #~ print("DBG: findSubString: apres count, new substring: %s..." % (buf[idx:idx+40]))
+            
     if not bQuiet: print("DBG: findSubString: looking for '%s' in '%s...' return nothing (idx:%s) (before:'%s'), (after:'%s')" % (strBefore,buf[:40],idx,strBefore,strAfter) )
     return ""
     
@@ -387,6 +395,14 @@ if __name__ == "__main__":
     
     assert_equal(findSubString("Alexandre est content oui", "Alexandre ", " content"), "est")
     assert_equal(findSubString("Alexandre est content oui", "content ", "blabla"), "oui")
+    assert_equal(findSubString("Alexandre est content et il est super et il est jaune et il est bleu.", "est ", " et",1), "content")
+    assert_equal(findSubString("Alexandre est content et il est super et il est jaune et il est bleu.", "est ", " et",2), "super")
+    assert_equal(findSubString("Alexandre est content et il est super et il est jaune et il est bleu.", "est ", " et",3), "jaune")
+    assert_equal(findSubString("Alexandre est content et il est super et il est jaune et il est bleu.", "est ", " et",4), "bleu.") #fin not found => jusqu'a la fin de la phrase
+    assert_equal(findSubString("Alexandre est content et il est super et il est jaune et il est bleu.", "est ", " et",5), "")
+    
+    assert_equal(findSubString("Alexandre est content, et super et jaune et bleu.", "est ", " et",2), "")
+    assert_equal(findSubString("Alexandre est content, et super et jaune et bleu.", "et ", "",2), "jaune et bleu") # discutable
 
     assert_equal(findSubString("Alexandre est content", "Alexandre "), "est content")
     assert_equal(accentToHtml("Un élève épatant à Noël"), "Un &eacute;l&egrave;ve &eacute;patant &agrave; No&euml;l")

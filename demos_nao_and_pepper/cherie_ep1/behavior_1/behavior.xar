@@ -370,6 +370,7 @@ class MyClass(GeneratedClass):
     def __init__(self):
         GeneratedClass.__init__(self);
         self.dx = 0.008
+        self.dx = -self.dx
 
     def onLoad(self):
         self.bMustStop = False;
@@ -383,8 +384,20 @@ class MyClass(GeneratedClass):
     def getCurrent( self ):
         h = self.mem.getData("Device/SubDeviceList/HipPitch/ElectricCurrent/Sensor/Value")
         k = self.mem.getData("Device/SubDeviceList/KneePitch/ElectricCurrent/Sensor/Value")
-        self.logger.info("\nh: %.3f, k: %.3f" % (h,k))
+        self.logger.info("\nhcur: %.3f, kcur: %.3f" % (h,k))
         return h,k
+
+    def isMovingLeg( self ):
+        """
+        is the leg still moving ?
+        """
+        for s in ["HipPitch","KneePitch"]:
+            v1 = self.mem.getData("Device/SubDeviceList/%s/Position/Sensor/Value" % s)
+            v2 = self.mem.getData("Device/SubDeviceList/%s/Position/Actuator/Value" % s)
+            self.logger.info("%s: v1: %s, v2: %s, v1-v2: %s" %(s,v1,v2,v1-v2))
+            if abs(v1-v2) > 0.02:
+                return True
+        return False
 
     def onUnload(self):
         self.onInput_onStop(); # stop current loop execution
@@ -402,8 +415,13 @@ class MyClass(GeneratedClass):
         rPeriod = self.getParameter( 'rPeriod' );
         while( not self.bMustStop ):
 
+            if self.isMovingLeg():
+                self.logger.info("Leg is moving, waiting...")
+                time.sleep(1.)
+                continue
+
             h,k = self.getCurrent()
-            if h < 1.1 and k < 1.:
+            if h < 1.1 and k < 1.2:
                 self.logger.info("not forcing...")
                 self.bJustMove = False
             else:
@@ -429,12 +447,19 @@ class MyClass(GeneratedClass):
 
                 # currently forcing, trying to reduce
                 rHipAngle = self.motion.getAngles(["HipPitch"], True)[0]
+                self.logger.info("rHipAngle: %.2f" % rHipAngle )
                 if (rHipAngle > 0.4 and self.dx > 0) or (rHipAngle < -0.4 and self.dx < 0):
                     self.logger.info("hip is too high to change:%.3f, dx:%.2f" % (rHipAngle,self.dx) )
                     #self.bJustMove = True # too check if we really are moving in the good direction?
                 else:
                     self.motion.angleInterpolation(["HipPitch"],self.dx,1., False) # add in relatif
                     self.bJustMove = True
+
+                # saving extreme case!
+                if (rHipAngle > 0.2 and self.dx > 0) or (rHipAngle < -0.3 and self.dx < 0):
+                    self.logger.info("hip is too extreme:%.3f, dx:%.2f inverting" % (rHipAngle,self.dx) )
+                    self.nCptTooBigSinceLastChange = 10 # will force a change!
+                    #self.dx = -self.dx
 
             time.sleep( rPeriod );
         # end while

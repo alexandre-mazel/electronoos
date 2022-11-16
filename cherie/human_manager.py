@@ -40,6 +40,9 @@ python monitor_pepper.py
 # voir sur les images sur le serveur
 ./dev/git/electronoos/scripts/view_img.py ~/imgs/Jarc/
 
+# log interessant:
+
+
 
 
 # in case of problem:

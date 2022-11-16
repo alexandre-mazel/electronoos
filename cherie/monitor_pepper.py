@@ -23,11 +23,14 @@ while 1:
         print("%s: sound_receiver_pause: %s" % (misctools.getTimeStamp(),sound_receiver_pause) )
         prev_sound_receiver_pause = sound_receiver_pause
         
-    strRecognizedWords = mem.getData("Audio/RecognizedWords")
-    if strRecognizedWords != strPrevRecognizedWords:
-        print("%s: strRecognizedWords: %s" % (misctools.getTimeStamp(),strRecognizedWords) )
-        strPrevRecognizedWords = strRecognizedWords        
-        
+    try:
+        strRecognizedWords = mem.getData("Audio/RecognizedWords")
+        if strRecognizedWords != strPrevRecognizedWords:
+            print("%s: strRecognizedWords: %s" % (misctools.getTimeStamp(),strRecognizedWords) )
+            strPrevRecognizedWords = strRecognizedWords
+    except RuntimeError:
+        pass
+            
     rTempKneePitch = mem.getData("Device/SubDeviceList/KneePitch/Temperature/Sensor/Value")
     if rTempKneePitch != rPrevTempKneePitch:
         print("%s: \t\trTempKneePitch: %s" % (misctools.getTimeStamp(),rTempKneePitch) )

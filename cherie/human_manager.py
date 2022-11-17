@@ -41,7 +41,7 @@ python monitor_pepper.py
 ./dev/git/electronoos/scripts/view_img.py ~/imgs/Jarc/
 
 # log interessant:
-
+cat /home/nao/agent_behavior_cherie.log
 
 
 
@@ -413,6 +413,7 @@ class HumanManager:
                     strCurrentDay = misctools.getDayStamp()
                     if strCurrentDay != self.aHumanKnowledge[nHumanID].strDayLastSeen:
                         # premiere fois du jour
+                        # TODO: décorreller le comptage de la reaction qui dit bonjour: dire que si seentoday < petit il faut parler actuellement si = 0
                         if self.aHumanKnowledge[nHumanID].nTotalSeen>10:
                             if self.aHumanKnowledge[nHumanID].nTotalSeen>1000:
                                 strSay = "Bonjour %s !" % self.aHumanKnowledge[nHumanID].strFirstName

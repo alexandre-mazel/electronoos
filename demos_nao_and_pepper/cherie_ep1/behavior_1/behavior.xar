@@ -394,8 +394,8 @@ class MyClass(GeneratedClass):
         for s in ["HipPitch","KneePitch"]:
             v1 = self.mem.getData("Device/SubDeviceList/%s/Position/Sensor/Value" % s)
             v2 = self.mem.getData("Device/SubDeviceList/%s/Position/Actuator/Value" % s)
-            #self.logger.info("%s: v1: %s, v2: %s, v1-v2: %s" %(s,v1,v2,v1-v2))
-            if abs(v1-v2) > 0.02:
+            self.logger.info("%s: v1: %s, v2: %s, v1-v2: %s" %(s,v1,v2,v1-v2))
+            if abs(v1-v2) > 0.03:
                 return True
         return False
 
@@ -459,7 +459,9 @@ class MyClass(GeneratedClass):
                 if (rHipAngle > 0.2 and self.dx > 0) or (rHipAngle < -0.3 and self.dx < 0):
                     self.logger.info("hip is too extreme:%.3f, dx:%.2f inverting" % (rHipAngle,self.dx) )
                     self.nCptTooBigSinceLastChange = 10 # will force a change!
-                    #self.dx = -self.dx
+                    #self.dx = -self.dx # will be done later
+                    self.bJustMove = True # simulate we need to change
+                    self.prevHipCurrent = -100 # beurk
 
             time.sleep( rPeriod );
         # end while

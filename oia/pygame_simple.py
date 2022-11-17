@@ -22,6 +22,9 @@ class Game:
         self.keypressed={}
     
     def update(self):
+        """
+        return True if user want to quit
+        """
         self.clock.tick(self.fps)
         
         self.square_pos[0] += 1
@@ -29,6 +32,7 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return True
+                
             if event.type == pygame.KEYDOWN:
                 
                 """
@@ -50,8 +54,8 @@ class Game:
                         self.square_pos[1] += 1
                     elif key == pygame.K_q:
                         self.square_pos[1] -= 1
-                    elif key == pygame.K_ESC:
-                        self.square_pos[1] -= 1
+                    elif key == pygame.K_ESCAPE:
+                        return True
                     
         return False
 

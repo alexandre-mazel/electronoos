@@ -80,6 +80,7 @@ class Game:
         self.numframe += 1
         
         if self.numframe % 50 == 0 and not self.bPause:
+            # n'update pas la vie a chaque fois pour qu'on ai le temps de voir ce qu'il se passe
             self.updateLife()
         
         self.clock.tick(self.fps)

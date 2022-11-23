@@ -1031,6 +1031,7 @@ def findDuplicate( strPath ):
     nSizePrev = -1
     nCountSameSize = 0
     nNumFile = 0
+    nNumTotalFile = len(listFiles)
     while nNumFile < len(listFiles):
         f = listFiles[nNumFile]
         nSize = os.path.getsize(strPath+f)
@@ -1065,7 +1066,7 @@ def findDuplicate( strPath ):
     # while - end
         
         
-    print("INF: findDuplicate: duplicate in '%s': %d file(s)" % (strPath, len(out) ) )
+    print("INF: findDuplicate: duplicate in '%s': %d file(s) / %d" % (strPath, len(out), nNumTotalFile ) )
     return out
     
 def guessExtension( filename ):

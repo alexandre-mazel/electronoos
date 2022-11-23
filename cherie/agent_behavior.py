@@ -196,16 +196,26 @@ class AgentBehavior:
             
                     
             strText = self.mem.getData("Audio/RecognizedWords")
-            if "aiquitation" in strText:
+            # a ce moment la strText contient [] or [['je suis en train', 0.9381448030471802]]'
+            if len(strText) > 0:
+                strText = strText[0][0]
+                
+            log("INF: reactToEndOfDialog: RecognizedWords: '%s'" % str(strText))
+            
+            if "aiquitation" in strText or "quitation" in strText:
                 self.say("j'aime aussi les chevaux")
                 return
                 
-            if "chier" in strText or "encul" in strText :
+            if "chier" in strText or "encul" in strText or "merde" in strText :
                 self.say("moi je chie jamais!")
                 return
                 
             if "politique" in strText or "de gauche" in strText:
                 self.say("j'aime pas trop la politique")
+                return
+                
+            if "religion" in strText:
+                self.say("Il ne faut jamais parler de religion avec les gens, sauf si c'est avec des personnes intelligentes. Mais je ne suis pas sur d'en faire partie.")
                 return
                 
             if "j'aime" in strText:

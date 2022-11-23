@@ -48,6 +48,9 @@ def findInFile( filename, strToMatch, bVerbose = True ):
                 bFirstTime = False
                 print( "\n***** %s:" % filename )
                 line=line.replace(chr(13),"")
+            lenLineMax = 200
+            if len(line)>lenLineMax:
+                line = line[:lenLineMax-3]+ "..."
             print( "%5d: %s" % (nCptLine,line) ), # , because each line already finished by a \n, so removing the print eol
             nNbrMatch += 1
         nCptLine += 1

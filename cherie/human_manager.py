@@ -292,7 +292,15 @@ class HumanManager:
         else:
             hFaceTreshold = 130
         
+        if self.bPepper:
+            try:
+                aHeard = self.mem.getData("Audio/RecognizedWords")
+                if aHeard != []:
+                    if self.ab: self.ab.justHeardThat(aHeard)
+            except BaseException as err:
+                print("ERR: retrieve Audio/RecognizedWords: %s" % str(err))
             
+        
             
         wImg = img.shape[1]
             

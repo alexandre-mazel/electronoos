@@ -95,6 +95,8 @@ class AgentBehavior:
         self.bHumanWasSpeaking = False
         self.rHumanStartSpeaking = 0
         self.lastTimeSayEndDialog = time.time()-1000
+        self.lastHeard = None
+        self.strConcatenatedHeard = ""
         self.mem.raiseMicroEvent("Audio/SpeechDetected",0)
         self.startRecordSound(0)
         
@@ -182,6 +184,17 @@ class AgentBehavior:
                         "Je suis la, avec toi, proche de toi.",
                         "Même si tu le crois, tu n'es pas seul, je suis avec toi.",
                     ]
+                    
+    def justHeardThat( self, aHeard ):
+        if self.lastHeard == aHeard:
+            return
+            
+        self.lastHeard = aHeard
+        # a ce moment la strText contient [] or [['je suis en train', 0.9381448030471802]]'
+        log("INF: justHeardThat: RecognizedWords: %s" % str(aHeard))
+        if len(aHeard) > 0:
+            s = aHeard[0][0].lower()
+            self.strConcatenatedHeard += s + ". "
         
     def reactToEndOfDialog( self ):
         """
@@ -194,13 +207,9 @@ class AgentBehavior:
         if time.time() - self.lastTimeSayEndDialog > 1:
             self.lastTimeSayEndDialog = time.time()
             
-                    
-            strText = self.mem.getData("Audio/RecognizedWords")
-            # a ce moment la strText contient [] or [['je suis en train', 0.9381448030471802]]'
-            if len(strText) > 0:
-                strText = strText[0][0]
-                
-            log("INF: reactToEndOfDialog: RecognizedWords: '%s'" % str(strText))
+            log("INF: reactToEndOfDialog: strConcatenatedHeard: '%s'" % str(self.strConcatenatedHeard))
+            strText = self.strConcatenatedHeard[:]
+            self.strConcatenatedHeard = "" # clean it for next time!
             
             if "aiquitation" in strText or "quitation" in strText:
                 self.say("j'aime aussi les chevaux")
@@ -216,6 +225,10 @@ class AgentBehavior:
                 
             if "religion" in strText:
                 self.say("Il ne faut jamais parler de religion avec les gens, sauf si c'est avec des personnes intelligentes. Mais je ne suis pas sur d'en faire partie.")
+                return
+                
+            if "alexandre" in strText:
+                self.say("Tu connais Alexandre? c'est mon parrain!")
                 return
                 
             if "j'aime" in strText:

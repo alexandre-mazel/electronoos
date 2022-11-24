@@ -5,10 +5,15 @@ Sophie et Marie-Cécile.
 
 Breath engine for RAVIR project
 # copy manually all breathing to Pepper:
-scp -r C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/breath* nao@192.168.0.:/home/nao/
-scp -r C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut* nao@192.168.0.:/home/nao/
+scp -r C:/Users/alexa/perso/docs/2020-10-10_-_Ravir/breath* nao@192.168.0.:/home/nao/
+scp -r C:/Users/alexa/perso/docs/2020-10-10_-_Ravir/cut* nao@192.168.0.:/home/nao/
+scp C:/Users/alexa/perso/docs/2020-10-10_-_Ravir/t*.wav nao@192.168.0.:/home/nao/noises/ # need to create folder before
 scp d:/Python38-32/Lib/site-packages/opensimplex/*.py nao@192.168.0.:/home/nao/.local/lib/python2.7/site-packages/
+or
+scp C:\Python38-32_dont_use\Lib/site-packages/opensimplex/*.py nao@192.168.0.:/home/nao/.local/lib/python2.7/site-packages/
 
+
+# update la demo
 scp C:/Users/alexa/dev/git/electronoos/scripts/rav*.py nao@192.168.1.211:/home/nao/dev/git/electronoos/scripts/
 
 Currently I'm inserting a silence at the beginning of each breath:
@@ -23,7 +28,7 @@ So we wait a bit for the body motion reaction.
 
 * About voice generation:
 # original in
-C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut/
+C:/Users/alexa/perso/docs/2020-10-10_-_Ravir/cut/
 
 - recorded in the studio
 - autocut and rename from sound_processing.py
@@ -38,10 +43,42 @@ cd ~/dev/git/protolab_group/scripts
 nohup python nao_camera_viewer.py
 
 # copy le script depuis l'ordi:
-scp C:\Users\alexa\dev\git\electronoos\demos_nao_and_pepper\nao_camera_viewer.py nao@192.168.1.211:/home/nao/dev/git/protolab_group/scripts/
+scp C:\Users\alexa\dev\git\electronoos\demos_nao_and_pepper\nao_camera_viewer_for_ravir_new.py nao@192.168.1.211:/home/nao/dev/git/protolab_group/scripts/nao_camera_viewer.py
 
 # backup le script nao_camera_viewer sur mon ordi:
 scp nao@192.168.1.211:/home/nao/dev/git/protolab_group/scripts/nao_camera_viewer.py C:\Users\alexa\dev\git\electronoos\demos_nao_and_pepper\
+
+##################
+# install notes:
+desactiver les reflexs: http://192.168.1.227/advanced/#/settings
+
+#ajouter alex_pytools
+scp -r C:/Users/alexa/dev/git/electronoos/alex* nao@192.168.1.211:/home/nao/dev/git/electronoos/
+
+scp C:/Users/alexa/dev/git/electronoos/scripts/nex*.py nao@192.168.1.211:/home/nao/dev/git/electronoos/scripts/
+
+# ajouter abcdk
+cd C:\Users\alexa\dev\git\abcdk\sdk
+python sendsdk.py 192.168.1.
+# faire avant sur le robot: mkdir -p /home/nao/.local/lib/python2.7/site-packages/abcdk/
+
+
+## + ajouter a la main:
+Jboot [0] ~ $ cat start_record_images.sh
+cd ~/dev/git/protolab_group/scripts
+python nao_camera_viewer.py
+
+Jboot [0] ~ $ nano launch.sh
+cd /home/nao/dev/git/electronoos/scripts
+python ravir.py $*
+
+Jboot [0] ~ $ nano next.sh
+cd /home/nao/dev/git/electronoos/scripts
+python next_step.py $*
+
+
+mkdir -p /home/nao/recorded_images/
+
 """
 
 import os
@@ -849,16 +886,16 @@ def init():
     load, return talkpath,mem
     """
     if os.name == "nt":
-        breather.loadBreathIn( "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/breath/selected_intake/")
-        breather.loadBreathOut( "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/breath/selected_outtake/")
-        strTalkPath = "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut/rec4/" #rec2, for demos ou rec3
-        strNoisePath = "C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/"
+        breather.loadBreathIn( "C:/Users/alexa/perso/docs/2020-10-10_-_Ravir/breath/selected_intake/")
+        breather.loadBreathOut( "C:/Users/alexa/perso/docs/2020-10-10_-_Ravir/breath/selected_outtake/")
+        strTalkPath = "C:/Users/alexa/perso/docs/2020-10-10_-_Ravir/cut/rec4/" #rec2, for demos ou rec3
+        strNoisePath = "C:/Users/alexa/perso/docs/2020-10-10_-_Ravir/"
         mem = None
     else:
         breather.loadBreathIn( "/home/nao/breath/selected_intake/")
         breather.loadBreathOut( "/home/nao/breath/selected_outtake/")
         strTalkPath = "/home/nao/cut/rec4/"
-        strNoisePath = "/home/nao/"
+        strNoisePath = "/home/nao/noises/"
         import naoqi
         mem = naoqi.ALProxy("ALMemory", "localhost", 9559)
         
@@ -911,7 +948,7 @@ def loadDialogsExpeRec3():
     """
     
     # just one time to generate above lines
-    #~ generateDialogCodeFromFolder("C:/Users/amazel/perso/docs/2020-10-10_-_Ravir/cut/rec3/relance/")
+    #~ generateDialogCodeFromFolder("C:/Users/alexa/perso/docs/2020-10-10_-_Ravir/cut/rec3/relance/")
 
     #~ msgs1.append("dial1/s_0005__je_vais_a_mon_tour_te_raconter_un_probleme_personnel")
     #~ msgs1.append("dial1/s_0006__j_aimerais_savoir_ce_que_tu_en_penses")

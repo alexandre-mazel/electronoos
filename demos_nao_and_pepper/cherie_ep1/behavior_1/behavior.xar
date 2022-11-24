@@ -395,7 +395,7 @@ class MyClass(GeneratedClass):
             v1 = self.mem.getData("Device/SubDeviceList/%s/Position/Sensor/Value" % s)
             v2 = self.mem.getData("Device/SubDeviceList/%s/Position/Actuator/Value" % s)
             self.logger.info("%s: v1: %s, v2: %s, v1-v2: %s" %(s,v1,v2,v1-v2))
-            if abs(v1-v2) > 0.03:
+            if abs(v1-v2) > 0.04:
                 return True
         return False
 

@@ -134,6 +134,7 @@ class Firstnames:
         rDefaultOcc = 3
         listForgot = [
                             ("Karine", True, ["fr"]),
+                            ("Nadège", True, ["fr"]),
                         ]
         
         for data in listForgot:

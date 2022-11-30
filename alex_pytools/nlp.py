@@ -123,7 +123,7 @@ Conseil maquillage, soin et parfum
 Conseillère beauté
 Sephora 2019
 """
-txtDog2_fr = txtCv1_fr
+#~ txtDog2_fr = txtCv1_fr
 #~ txtDog2_fr = txtCv2_fr
 
 listEGFrEn = {
@@ -230,6 +230,7 @@ def explore2():
 
     result = cp.parse(txtDogPosEn[0])
     print(result)
+    print("explore2: sent to parse: " + str(txtDogPosFr[0]))
     result = cp.parse(txtDogPosFr[0])
     print(result)
     #~ result.draw()
@@ -259,19 +260,24 @@ class FrenchAnalyser:
         self.nlp_token_class = pipeline('ner', model=model, tokenizer=tokenizer, grouped_entities=True)
 
         
-        grammar = """
-        NP: {<PRP\$>*<DT|PP\$>?<JJ>*<NN><JJ>*}
-        NP:  {<NNP>+}
+        #~ grammar = """
+        #~ NP: {<PRP\$>*<DT|PP\$>?<JJ>*<NN><JJ>*}
+        #~ NP:  {<NNP>+}
 
+        #~ """
+        #~ # was:
+        #~ """
+        #~ NP: {<DT>?<JJ>+<NN><JJ>+}
+        #~ NP: {<DT>?<JJ>+<NN>}
+        #~ NP: {<DT>?<NN>+<JJ>}
+        #~ NP: {<DT>?<NN>}
+        #~ """
+        
+        grammar_french = """
+        NP: {<PRP\$>*<DET|PP\$>?<ADJ>*<NC><ADJ>*}
+        NP:  {<NPP>+}
         """
-        # was:
-        """
-        NP: {<DT>?<JJ>+<NN><JJ>+}
-        NP: {<DT>?<JJ>+<NN>}
-        NP: {<DT>?<NN>+<JJ>}
-        NP: {<DT>?<NN>}
-        """
-        self.parser = nltk.RegexpParser(grammar)
+        self.parser = nltk.RegexpParser(grammar_french)
     
     def _preprocessText(self,s):
         sentences_pos = self.nlp_token_class(s)
@@ -279,10 +285,10 @@ class FrenchAnalyser:
         # convert to classical nltk postag
         sentences_pos_en = []
         for info in sentences_pos:
-            print(info)
+            #~ print(info)
             word = info['word']
             eg = info['entity_group']
-            eg=convertEG_fr_to_en(eg)
+            #~ eg=convertEG_fr_to_en(eg) # don't translate them anymore, just write the grammar directly in french !
             sentences_pos_en.append((word,eg))
             
         print("DBG: _preprocessText: 1: " + str(sentences_pos_en) )
@@ -290,8 +296,9 @@ class FrenchAnalyser:
     
     def analyseSentence(self, s):
         listPos = self._preprocessText(s)
+        print("DBG: analyseSentence: listPos: " + str(listPos) )
         result = self.parser.parse(listPos)
-        print("DBG: analyseSentence: res: " % result )
+        print("DBG: analyseSentence: res: " + str(result) )
         
 # classFrenchAnalyser  - end
     
@@ -303,6 +310,6 @@ def testFrenchAnalysing():
     for s in listTxt:
         fa.analyseSentence(s)
     
-explore2()
+#~ explore2()
 testFrenchAnalysing()
 

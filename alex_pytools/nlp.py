@@ -123,6 +123,65 @@ Conseil maquillage, soin et parfum
 Conseillère beauté
 Sephora 2019
 """
+
+
+txtCv2_fr_sorted = """
+COMPÉTENCES
+Maquillage
+Soin
+Parfum
+cosmétiques
+Science des
+cosmétiques
+Science des
+PASSIONS
+Dao
+Woringer
+Dao
+Woringer
+CONSEILLÈRE BEAUTÉ
+Je suis une passionnée de la science des
+cosmétiques et aime également l'animation
+et le conseil personnalisé. Conseiller et
+satisfaire sont mes valeurs et ma devise.
+EXPERIENCES
+FORMATION ET DIPLOME
+0650005779
+woringercamille@gmail.com
+95100, Argenteuil
+3 rue des Allobroges
+Maquillage et soin
+Voyages
+Sport extrème
+Voyages
+Sport extrème
+Conseillère beauté
+(Maquillage, soin et parfum)
+KS BEAUTÉ ET ALADINOO Depuis 2019
+Makeup artist
+Conseil maquillage, soin et parfum
+Pratique de soin institut Guerlain
+Conseillère beauté
+Sephora 2019
+Conseil et vente
+Marchandising
+Réception de colis
+Formations marques de cosmétique
+Hôtesse événementielle
+États-Unis et Japon 2017-2018
+Accueil clients et placement
+Prise de réservation
+CFA AFFIDA
+Baccalauréat Professionnel de Commerce
+Gestion, animation et vente
+"""
+
+txtCv2_fr_sorted_ext = """Je suis une passionnée de la science des
+cosmétiques et aime également l'animation
+et le conseil personnalisé. Conseiller et
+satisfaire sont mes valeurs et ma devise.
+"""
+
 #~ txtDog2_fr = txtCv1_fr
 #~ txtDog2_fr = txtCv2_fr
 
@@ -273,10 +332,13 @@ class FrenchAnalyser:
         #~ NP: {<DT>?<NN>}
         #~ """
         
-        grammar_french = """
-        NP: {<PRP\$>*<DET|PP\$>?<ADJ>*<NC><ADJ>*}
-        NP:  {<NPP>+}
-        """
+        grammar_french = ""
+        grammar_french += "NP: {<PRP\$>*<DET|PP\$>?<ADJ>*<NC|U><ADJ>*}\n"
+        grammar_french += "NP:  {<NPP>+}\n"
+        grammar_french += "NPS:  {<NP><P+D><NP>}\n"
+        grammar_french += "PHRASE: {<CLS><V><NP>}\n"
+        grammar_french += "PHRASE: {<NP><V><P>*<NP>}\n"
+
         self.parser = nltk.RegexpParser(grammar_french)
     
     def _preprocessText(self,s):
@@ -298,7 +360,9 @@ class FrenchAnalyser:
         listPos = self._preprocessText(s)
         print("DBG: analyseSentence: listPos: " + str(listPos) )
         result = self.parser.parse(listPos)
-        print("DBG: analyseSentence: res: " + str(result) )
+        print("#"*20)
+        print("DBG: analyseSentence: res:\n" + str(result) )
+        print()
         
 # classFrenchAnalyser  - end
     
@@ -306,7 +370,7 @@ def testFrenchAnalysing():
     fa = FrenchAnalyser()
     fa.load()
     
-    listTxt = (txtDog1_fr, txtDog2_fr, txtCv1_fr, txtCv2_fr)
+    listTxt = (txtDog1_fr, txtDog2_fr, txtCv1_fr, txtCv2_fr,txtCv2_fr_sorted,txtCv2_fr_sorted_ext)
     for s in listTxt:
         fa.analyseSentence(s)
     

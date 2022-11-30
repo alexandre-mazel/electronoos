@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: cp1252 -*-
 import nltk
 if 0:
     nltk.download('averaged_perceptron_tagger')
@@ -51,20 +51,93 @@ WP: Possessive wh-pronoun
 WRB: Wh-adverb
 """
 
+"""
+tag Category 	Extra Info
+ADJ 	adjectif 	
+ADJWH 	adjectif 	
+ADV 	adverbe 	
+ADVWH 	adverbe 	
+CC 	conjonction de coordination 	
+CLO 	pronom 	obj
+CLR 	pronom 	refl
+CLS 	pronom 	suj
+CS 	conjonction de subordination 	
+DET 	déterminant 	
+DETWH 	déterminant 	
+ET 	mot étranger 	
+I 	interjection 	
+NC 	nom commun 	
+NPP 	nom propre 	
+P 	préposition 	
+P+D 	préposition + déterminant 	
+PONCT 	signe de ponctuation 	
+PREF 	préfixe 	
+PRO 	autres pronoms 	
+PROREL 	autres pronoms 	rel
+PROWH 	autres pronoms 	int
+U 	? 	
+V 	verbe 	
+VIMP 	verbe imperatif 	
+VINF 	verbe infinitif 	
+VPP 	participe passé 	
+VPR 	participe présent 	
+VS 	subjonctif
+"""
+
 txtBiz = "The fourth Wells account moving to another agency is the packaged paper-products division of Georgia-Pacific Corp., which arrived at Wells only last fall. Like Hertz and the History Channel, it is also leaving for an Omnicom-owned agency, the BBDO South unit of BBDO Worldwide. BBDO South in Atlanta, which handles corporate advertising for Georgia-Pacific, will assume additional duties for brands like Angel Soft toilet tissue and Sparkle paper towels, said Ken Haldin, a spokesman for Georgia-Pacific in Atlanta."
+txtBiz_fr = "Le quatrième compte de Wells à changer d'agence est la division des produits en papier emballé de Georgia-Pacific Corp, qui n'est arrivée chez Wells qu'à l'automne dernier. Comme Hertz et History Channel, elle part également pour une agence appartenant à Omnicom, l'unité BBDO South de BBDO Worldwide. BBDO South à Atlanta, qui s'occupe de la publicité d'entreprise pour Georgia-Pacific, assumera des tâches supplémentaires pour des marques telles que le papier hygiénique Angel Soft et les essuie-tout Sparkle, a déclaré Ken Haldin, un porte-parole de Georgia-Pacific à Atlanta."
 txtDog = "We saw the yellow dog"
 txtDog2 = "the little yellow dog barked at the cat"
 txtDog2 = "the little yellow dog barked at the funny girl"
-txtDog2_fr = "le petit chien jaune aboie sur la fille rieuse"
+#~ txtDog2 = "Rapunzel let down her long golden hair"
+txtDog1_fr = "le petit chien jaune aboie sur la fille rieuse"
+txtDog2_fr = "Rapunzel décida de laisser détaché ses longs cheveux dorés"
+
+txtCv1_fr = "cosmetiques et aime egalement lanimation"
+txtCv2_fr = """Dao
+Woringer
+
+C O N S E I L L È R E   B E A U T É
+
+Je  suis  une  passionnée  de  la  science  des
+
+cosmétiques  et  aime  également  l'animation
+
+et  le  conseil  personnalisé.    Conseiller  et
+
+satisfaire sont mes valeurs et ma devise. 
+
+EXPERIENCES
+
+Conseillère beauté
+(Maquillage, soin et parfum)
+
+KS BEAUTÉ ET ALADINOO Depuis 2019
+
+Makeup artist
+
+Conseil maquillage, soin et parfum
+
+ Pratique de soin institut Guerlain
+
+Conseillère beauté
+Sephora 2019
+"""
+txtDog2_fr = txtCv1_fr
+#~ txtDog2_fr = txtCv2_fr
 
 listEGFrEn = {
     "ADJ": "JJ",
     "DET": "DT",
-    "V": "VBD",
-    "U": "NN",
     "NC": "NN",
+    "NPP": "NNP",
     "P": "IN",
+    "U": "NN",
+    "V": "VBD", # verbe conjugué
+    "VINF": "VBG", # infinitve
+    "VPP": "VBN", # participe passé
 }
+
 def convertEG_fr_to_en(eg):
     return listEGFrEn[eg]
 
@@ -95,26 +168,7 @@ def text_preprocess_fr(document):
         
     print("text_preprocess_fr: out: " + str(sentences_pos_en) )
     return  [sentences_pos_en]
-
-# grammar try to match starting from beginning,
-# NP: {<DT>?<JJ>*<NN>} will override later NP: {<DT>?<JJ>*<NN>} 
-grammar = """
-NP: {<DT>?<JJ>+<NN>}
-NP: {<DT>?<NN>+<JJ>}
-NP: {<DT>?<NN>}
-"""
-cp = nltk.RegexpParser(grammar)
-
-txtDogPosEn = text_preprocess_en(txtDog2)
-txtDogPosFr = text_preprocess_en(txtDog2_fr)
-txtDogPosFr = text_preprocess_fr(txtDog2_fr)
-#~ txtDogPos = [("the", "DT"), ("little", "JJ"), ("yellow", "JJ"), ("dog", "NN"), ("barked", "VBD"), ("at", "IN"),  ("the", "DT"), ("cat", "NN")]
-#~ print("txtDogPos: " + str(txtDogPos) )
-
-result = cp.parse(txtDogPosEn[0])
-print(result)
-result = cp.parse(txtDogPosFr[0])
-print(result)
+    
 
 def explore():
         
@@ -150,6 +204,36 @@ def explore():
     answer = [s for s in answer if s]
     q = ' '.join(answer)
     print(q)
+    
+def explore2():
+    # grammar try to match starting from beginning,
+    # NP: {<DT>?<JJ>*<NN>} will override later NP: {<DT>?<JJ>*<NN>} 
+    grammar = """
+    NP: {<PRP\$>*<DT|PP\$>?<JJ>*<NN><JJ>*}
+    NP:  {<NNP>+}
+
+    """
+    # was:
+    """
+    NP: {<DT>?<JJ>+<NN><JJ>+}
+    NP: {<DT>?<JJ>+<NN>}
+    NP: {<DT>?<NN>+<JJ>}
+    NP: {<DT>?<NN>}
+    """
+    cp = nltk.RegexpParser(grammar)
+
+    txtDogPosEn = text_preprocess_en(txtDog2)
+    txtDogPosFr = text_preprocess_en(txtDog2_fr)
+    txtDogPosFr = text_preprocess_fr(txtDog2_fr)
+    #~ txtDogPos = [("the", "DT"), ("little", "JJ"), ("yellow", "JJ"), ("dog", "NN"), ("barked", "VBD"), ("at", "IN"),  ("the", "DT"), ("cat", "NN")]
+    #~ print("txtDogPos: " + str(txtDogPos) )
+
+    result = cp.parse(txtDogPosEn[0])
+    print(result)
+    result = cp.parse(txtDogPosFr[0])
+    print(result)
+    #~ result.draw()
+
     print(nltk.boolean_ops())
 
         
@@ -161,3 +245,64 @@ def explore():
         R = read_expr('SnF -> -FnS')
         prover = nltk.Prover9()
         prover.prove(NotFnS, [SnF, R])
+
+class FrenchAnalyser:
+    def __init__( self ):
+        pass
+        
+    def load(self):
+        from transformers import AutoTokenizer, AutoModelForTokenClassification
+
+        tokenizer = AutoTokenizer.from_pretrained("gilf/french-camembert-postag-model")
+        model = AutoModelForTokenClassification.from_pretrained("gilf/french-camembert-postag-model")
+        from transformers import pipeline
+        self.nlp_token_class = pipeline('ner', model=model, tokenizer=tokenizer, grouped_entities=True)
+
+        
+        grammar = """
+        NP: {<PRP\$>*<DT|PP\$>?<JJ>*<NN><JJ>*}
+        NP:  {<NNP>+}
+
+        """
+        # was:
+        """
+        NP: {<DT>?<JJ>+<NN><JJ>+}
+        NP: {<DT>?<JJ>+<NN>}
+        NP: {<DT>?<NN>+<JJ>}
+        NP: {<DT>?<NN>}
+        """
+        self.parser = nltk.RegexpParser(grammar)
+    
+    def _preprocessText(self,s):
+        sentences_pos = self.nlp_token_class(s)
+        print("DBG: _preprocessText: 1: " + str(sentences_pos) )
+        # convert to classical nltk postag
+        sentences_pos_en = []
+        for info in sentences_pos:
+            print(info)
+            word = info['word']
+            eg = info['entity_group']
+            eg=convertEG_fr_to_en(eg)
+            sentences_pos_en.append((word,eg))
+            
+        print("DBG: _preprocessText: 1: " + str(sentences_pos_en) )
+        return  sentences_pos_en
+    
+    def analyseSentence(self, s):
+        listPos = self._preprocessText(s)
+        result = self.parser.parse(listPos)
+        print("DBG: analyseSentence: res: " % result )
+        
+# classFrenchAnalyser  - end
+    
+def testFrenchAnalysing():
+    fa = FrenchAnalyser()
+    fa.load()
+    
+    listTxt = (txtDog1_fr, txtDog2_fr, txtCv1_fr, txtCv2_fr)
+    for s in listTxt:
+        fa.analyseSentence(s)
+    
+explore2()
+testFrenchAnalysing()
+

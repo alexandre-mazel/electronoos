@@ -332,12 +332,21 @@ class FrenchAnalyser:
         #~ NP: {<DT>?<NN>}
         #~ """
         
+        # *: 0..n
+        # +: 1..n
+        # |: or
+        
+        
         grammar_french = ""
         grammar_french += "NP: {<PRP\$>*<DET|PP\$>?<ADJ>*<NC|U><ADJ>*}\n"
         grammar_french += "NP:  {<NPP>+}\n"
-        grammar_french += "NPS:  {<NP><P+D><NP>}\n"
+        #~ grammar_french += "NPS:  {<NP><P>*<D>*<P+D>*<NP>}\n" # celle ci ne marche pas
+        #~ grammar_french += "NPS:  {<NP><P+D>*<NP>}\n" # celle ci ne marche pas
+        grammar_french += "NPS:  {<NP><PetD>*<NP>}\n" # patch P+D en PetD to help grammar
+        grammar_french += "NP+:  {<NP><CC><NP>}\n"
         grammar_french += "PHRASE: {<CLS><V><NP>}\n"
         grammar_french += "PHRASE: {<NP><V><P>*<NP>}\n"
+        grammar_french += "TESTO: {<CLS><V><DET>}\n"
 
         self.parser = nltk.RegexpParser(grammar_french)
     
@@ -351,13 +360,14 @@ class FrenchAnalyser:
             word = info['word']
             eg = info['entity_group']
             #~ eg=convertEG_fr_to_en(eg) # don't translate them anymore, just write the grammar directly in french !
+            eg=eg.replace("P+D", "PetD") # patch P+D en PetD to help grammar
             sentences_pos_en.append((word,eg))
             
         print("DBG: _preprocessText: 1: " + str(sentences_pos_en) )
         return  sentences_pos_en
     
     def analyseSentence(self, s):
-        listPos = self._preprocessText(s)
+        listPos = self._preprocessText(s.split('.')[0]) # tempo: a gerer: plusieurs phrases a la suite
         print("DBG: analyseSentence: listPos: " + str(listPos) )
         result = self.parser.parse(listPos)
         print("#"*20)

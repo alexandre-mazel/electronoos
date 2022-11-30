@@ -9,6 +9,7 @@ if 0:
     
     
 """
+English:
 CC: Coordinating conjunction
 CD: Cardinal number
 DT: Determiner
@@ -52,6 +53,7 @@ WRB: Wh-adverb
 """
 
 """
+French:
 tag Category 	Extra Info
 ADJ 	adjectif 	
 ADJWH 	adjectif 	
@@ -181,6 +183,11 @@ cosmétiques et aime également l'animation
 et le conseil personnalisé. Conseiller et
 satisfaire sont mes valeurs et ma devise.
 """
+
+txtLike = "Alexandre aime les haricots verts, mais n'aime pas le caca."
+txtLikeShort = "Alexandre aime les haricots verts, mais pas le caca."
+txtLikeSimpleCompound = "Alexandre aime les haricots verts et aussi les tortues."
+txtLikeSimple = "Alexandre aime les haricots verts."
 
 #~ txtDog2_fr = txtCv1_fr
 #~ txtDog2_fr = txtCv2_fr
@@ -331,11 +338,12 @@ class FrenchAnalyser:
         #~ NP: {<DT>?<NN>+<JJ>}
         #~ NP: {<DT>?<NN>}
         #~ """
-        
+
+        # ?: 0..1        
         # *: 0..n
         # +: 1..n
         # |: or
-        
+        # seems no line must refer to symbol coming after?
         
         grammar_french = ""
         grammar_french += "NP: {<PRP\$>*<DET|PP\$>?<ADJ>*<NC|U><ADJ>*}\n"
@@ -343,14 +351,19 @@ class FrenchAnalyser:
         #~ grammar_french += "NPS:  {<NP><P>*<D>*<P+D>*<NP>}\n" # celle ci ne marche pas
         #~ grammar_french += "NPS:  {<NP><P+D>*<NP>}\n" # celle ci ne marche pas
         grammar_french += "NPS:  {<NP><PetD>*<NP>}\n" # patch P+D en PetD to help grammar
-        grammar_french += "NP+:  {<NP><CC><NP>}\n"
-        grammar_french += "PHRASE: {<CLS><V><NP>}\n"
-        grammar_french += "PHRASE: {<NP><V><P>*<NP>}\n"
-        grammar_french += "TESTO: {<CLS><V><DET>}\n"
-
+        grammar_french += "NPS:  {<ADV>*<NP><CC><ADV>*<NP>}\n"
+        grammar_french += "NPSS:  {<DET>*<ADJ><P><NP|NPS>}\n"
+        grammar_french += "MODV: {<ADV>+<V><ADV>+}\n"
+        grammar_french += "MODV: {<ADV>+<V>}\n"
+        grammar_french += "MODV: {<V><ADV>+}\n"
+        grammar_french += "PHRASE: {<CC>*<NP|NPP|CLS>?<V|MODV><P>*<NP|NPS|NPSS>}\n"
+        grammar_french += "PHRASE_ELID: {<CC><ADV>*<NP|NPS|NPSS>}\n"
+        grammar_french += "COMBI: {<PHRASE><CC><PHRASE>}\n"
+        
         self.parser = nltk.RegexpParser(grammar_french)
     
     def _preprocessText(self,s):
+        s = s.replace(" n'", " ne " )
         sentences_pos = self.nlp_token_class(s)
         print("DBG: _preprocessText: 1: " + str(sentences_pos) )
         # convert to classical nltk postag
@@ -366,7 +379,12 @@ class FrenchAnalyser:
         print("DBG: _preprocessText: 1: " + str(sentences_pos_en) )
         return  sentences_pos_en
     
-    def analyseSentence(self, s):
+    def analyseText(self, txt):
+        """
+        receive a long text and return a list of analysed sentence
+        """
+        sentences = 
+        for s in sentences:
         listPos = self._preprocessText(s.split('.')[0]) # tempo: a gerer: plusieurs phrases a la suite
         print("DBG: analyseSentence: listPos: " + str(listPos) )
         result = self.parser.parse(listPos)
@@ -380,9 +398,9 @@ def testFrenchAnalysing():
     fa = FrenchAnalyser()
     fa.load()
     
-    listTxt = (txtDog1_fr, txtDog2_fr, txtCv1_fr, txtCv2_fr,txtCv2_fr_sorted,txtCv2_fr_sorted_ext)
+    listTxt = (txtDog1_fr, txtDog2_fr, txtCv1_fr, txtCv2_fr,txtCv2_fr_sorted,txtCv2_fr_sorted_ext,txtLike,txtLikeShort,txtLikeSimpleCompound, txtLikeSimple)
     for s in listTxt:
-        fa.analyseSentence(s)
+        fa.analyseText(s)
     
 #~ explore2()
 testFrenchAnalysing()

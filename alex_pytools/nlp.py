@@ -647,7 +647,7 @@ def autotest_FrenchAnalysis():
     (NPS (NP les/DET tortue/NC s/ADJ) (NP ./NC))))""")]))
 
     assert_equal(treesListToStr(frenchAnalyser.analyseText(txtLike)), treesListToStr([nltk.tree.Tree.fromstring("""
-(S
+    (S
   (PHRASE
     (NP Alexandre/NPP)
     aime/V
@@ -656,13 +656,24 @@ def autotest_FrenchAnalysis():
   (PHRASE mais/CC (MODV ne/ADV aime/V pas/ADV) (NP le/DET caca./NC)))""")]))
 
     assert_equal(treesListToStr(frenchAnalyser.analyseText(txtLikeShort)), treesListToStr([nltk.tree.Tree.fromstring("""
-(S
+    (S
   (PHRASE
     (NP Alexandre/NPP)
     aime/V
     (NP les/DET haricots/NC verts/ADJ))
   ,/PONCT
   (PHRASE_ELID mais/CC pas/ADV (NP le/DET pipi./NC)))""")]))
+  
+    strAdage = """Conseiller  et
+
+satisfaire sont mes valeurs et ma devise. """
+
+    assert_equal(treesListToStr(frenchAnalyser.analyseText(strAdage)), treesListToStr([nltk.tree.Tree.fromstring("""
+    (S
+  (PHRASE
+    (NPS (NP Conseiller/NC) et/CC (NP satisfaire/VINF))
+    sont/V
+    (NPS (NP mes/DET valeurs/NC) et/CC (NP ma/DET devise./NC))))""")]))
 
    
 #~ explore2()

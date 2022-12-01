@@ -614,16 +614,56 @@ def autotest_FrenchAnalysis():
     txt1_fr = "le petit chien jaune aboie sur la fille rieuse"
     txt2_fr = "Rapunzel décida de laisser détaché ses longs cheveux dorés"
     assert_equal(treesListToStr(frenchAnalyser.analyseText(txt1_fr)), treesListToStr([nltk.tree.Tree.fromstring("""(S
-  (PHRASE
+    (PHRASE
     (NP le/DET petit/ADJ chien/U jaune/ADJ)
     aboie/V
     sur/P
     (NP la/DET fille/NC rieuse/ADJ)))""")]))
     assert_equal(treesListToStr(frenchAnalyser.analyseText(txt2_fr)), treesListToStr([nltk.tree.Tree.fromstring("""(S
-  (PHRASE
+    (PHRASE
     (NP Rapunzel/NPP)
     (MODV décida/V de/P laisser/VINF détaché/VPP)
-    (NP ses/DET longs/ADJ cheveux/NC dorés/ADJ)))""")])) # avant ca fonctionner, argh !
+    (NP ses/DET longs/ADJ cheveux/NC dorés/ADJ)))""")]))
+
+    txtDouble = "Alexandre est content. Cynthia est belle."
+    
+    trees = frenchAnalyser.analyseText(txtDouble)
+    assert_equal(treeToStr(trees[0]), treeToStr(nltk.tree.Tree.fromstring("(S (NP Alexandre/NPP) est/V content/ADJ)")) )
+    assert_equal(treeToStr(trees[1]), treeToStr(nltk.tree.Tree.fromstring("(S (PHRASE (NP Cynthia/NPP) est/V (NP belle/ADJ ./NC)))")) )
+    
+    txtLikeSimpleCompound = "Alexandre aime les haricots verts et aussi les tortues."    
+    txtLike = "Alexandre aime les haricots verts, mais n'aime pas le caca."
+    txtLikeShort = "Alexandre aime les haricots verts, mais pas le pipi."
+    
+    assert_equal(treesListToStr(frenchAnalyser.analyseText(txtLikeSimpleCompound)), treesListToStr([nltk.tree.Tree.fromstring("""
+    (S
+  (PHRASE
+    (NP Alexandre/NPP)
+    aime/V
+    (NP les/DET haricots/NC verts/ADJ))
+  (PHRASE_ELID
+    et/CC
+    aussi/ADV
+    (NPS (NP les/DET tortue/NC s/ADJ) (NP ./NC))))""")]))
+
+    assert_equal(treesListToStr(frenchAnalyser.analyseText(txtLike)), treesListToStr([nltk.tree.Tree.fromstring("""
+(S
+  (PHRASE
+    (NP Alexandre/NPP)
+    aime/V
+    (NP les/DET haricots/NC verts/ADJ))
+  ,/PONCT
+  (PHRASE mais/CC (MODV ne/ADV aime/V pas/ADV) (NP le/DET caca./NC)))""")]))
+
+    assert_equal(treesListToStr(frenchAnalyser.analyseText(txtLikeShort)), treesListToStr([nltk.tree.Tree.fromstring("""
+(S
+  (PHRASE
+    (NP Alexandre/NPP)
+    aime/V
+    (NP les/DET haricots/NC verts/ADJ))
+  ,/PONCT
+  (PHRASE_ELID mais/CC pas/ADV (NP le/DET pipi./NC)))""")]))
+
    
 #~ explore2()
 exploreTrees()

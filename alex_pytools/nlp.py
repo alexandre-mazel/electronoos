@@ -210,11 +210,11 @@ def _treeToStrInner(tree):
     o = ""
     for subtree in tree:
         if type(subtree) == nltk.tree.Tree:
-            o += subtree.label() + "(" + _treeToStrInner(subtree) + ")"
+            o += subtree.label() + "(" + _treeToStrInner(subtree) + ") "
         elif type(subtree) == tuple:
-            o += subtree[0] + '/' + subtree[1]
+            o += subtree[0] + '/' + subtree[1] + ' '
         elif type(subtree) == str:
-            o += str(subtree) # prevent having ' ' around str
+            o += str(subtree) + ' ' # prevent having ' ' around str
         else:
             o += repr(subtree)
             assert(0)

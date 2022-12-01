@@ -11,7 +11,7 @@ if 0:
     
 
 def assert_equal(a,b):
-    print( "%s == %s ?" % (str(a),str(b)) )
+    print( "%s\n == %s ?" % (str(a),str(b)) )
     if (a)!=(b):
         if type(b) != int:
             print("%s\n!=\n%s"%(a,b))
@@ -206,6 +206,19 @@ txtLikeSimple = "Alexandre aime les haricots verts."
 #~ txtDog2_fr = txtCv2_fr
 
         
+def _treeToStrInner(tree):
+    o = ""
+    for subtree in tree:
+        if type(subtree) == nltk.tree.Tree:
+            o += subtree.label() + "(" + _treeToStrInner(subtree) + ")"
+        elif type(subtree) == tuple:
+            o += subtree[0] + '/' + subtree[1]
+        elif type(subtree) == str:
+            o += str(subtree) # prevent having ' ' around str
+        else:
+            o += repr(subtree)
+            assert(0)
+    return o
         
 def treeToStr(tree):
     """
@@ -226,8 +239,9 @@ def treeToStr(tree):
             #~ print("DBG: getAllPhrases unhandled case!")
             #~ assert(0)
     #~ return o
-    o += "-----"
-    o +=  repr(tree)
+    o += "-----\n"
+    o +=  _treeToStrInner(tree) 
+    o += "\n"
     return o
     
 def treesListToStr( listTrees ):
@@ -236,6 +250,7 @@ def treesListToStr( listTrees ):
     for t in listTrees:
         o += (treeToStr(t))
     o += "]\n"
+    return o
     
 
 listEGFrEn = {
@@ -420,7 +435,7 @@ def exploreTrees():
     for p in phrases:
         print(p)
         
-    treesListToStr
+    print(treesListToStr([tree]))
 # exploreTrees - end
 
     
@@ -461,7 +476,16 @@ class FrenchAnalyser:
         # |: or
         # seems no line must refer to symbol coming after?
         
+        # "NOUNS: {<N.*>{4,}}"
+        
         grammar_french = ""
+        
+        # on commence par chopper la structure d'action
+        grammar_french += "MODV: {<ADV>+<V><ADV>+}\n"
+        grammar_french += "MODV: {<ADV>+<V>}\n"
+        grammar_french += "MODV: {<V><ADV>+}\n"
+        grammar_french += "MODV: {<V><P><VINF><VPP>}\n" # capture le décida de laisser détaché
+        
         grammar_french += "NP: {<PRP\$>*<DET|PP\$>?<ADJ>*<NC|U|VINF><ADJ>*}\n"
         grammar_french += "NP:  {<NPP>+}\n" # usefull ? not working ?
         #~ grammar_french += "NPS:  {<NP><P>*<D>*<P+D>*<NP>}\n" # celle ci ne marche pas
@@ -471,9 +495,7 @@ class FrenchAnalyser:
         grammar_french += "NPS:  {<NP><CC><NPS>}\n"
         grammar_french += "NPS:  {<NPS><CC><NP>}\n"
         grammar_french += "NPSS:  {<DET>*<ADJ><P><NP|NPS>}\n"
-        grammar_french += "MODV: {<ADV>+<V><ADV>+}\n"
-        grammar_french += "MODV: {<ADV>+<V>}\n"
-        grammar_french += "MODV: {<V><ADV>+}\n"
+
         grammar_french += "PHRASE: {<CC>*<NP|NPS|NPSS|NPP|CLS>?<V|MODV><P>*<NP|NPS|NPSS|NPP>}\n"
         grammar_french += "PHRASE_ELID: {<CC><ADV>*<NP|NPS|NPSS|NPP>}\n"
         grammar_french += "COMBI: {<PHRASE><CC><PHRASE>}\n"
@@ -597,11 +619,15 @@ def autotest_FrenchAnalysis():
     aboie/V
     sur/P
     (NP la/DET fille/NC rieuse/ADJ)))""")]))
-    #~ assert_equal(treesListToStr(frenchAnalyser.analyseText(txt2_fr)), treesListToStr([nltk.tree.Tree.fromstring("")]))
-    
+    assert_equal(treesListToStr(frenchAnalyser.analyseText(txt2_fr)), treesListToStr([nltk.tree.Tree.fromstring("""(S
+  (PHRASE
+    (NP Rapunzel/NPP)
+    (MODV décida/V de/P laisser/VINF détaché/VPP)
+    (NP ses/DET longs/ADJ cheveux/NC dorés/ADJ)))""")])) # avant ca fonctionner, argh !
+   
 #~ explore2()
 exploreTrees()
-testFrenchAnalysis()
+#~ testFrenchAnalysis()
 autotest_FrenchAnalysis()
 
 

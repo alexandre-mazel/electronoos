@@ -8,6 +8,19 @@ if 0:
     nltk.download('book_grammars')
     
     
+    
+
+def assert_equal(a,b):
+    print( "%s == %s ?" % (str(a),str(b)) )
+    if (a)!=(b):
+        if type(b) != int:
+            print("%s\n!=\n%s"%(a,b))
+        else:
+            print("%s != %s"%(a,b))
+        print("assert_equal: assert error")
+        
+        assert(0)
+    
 """
 English:
 CC: Coordinating conjunction
@@ -192,6 +205,39 @@ txtLikeSimple = "Alexandre aime les haricots verts."
 #~ txtDog2_fr = txtCv1_fr
 #~ txtDog2_fr = txtCv2_fr
 
+        
+        
+def treeToStr(tree):
+    """
+    transform a tree to a unique compact representation
+    """
+    #~ print("DBG: treeToStr %s" % tree )
+    o = ""
+    #~ for subtree in tree:
+        #~ if type(subtree) == str or type(subtree) == tuple:
+            #~ continue
+        #~ print("DBG: getAllPhrases subtrees: type: %s, %s" % (type(subtree),subtree ) )
+        #~ if type(subtree) == nltk.tree.Tree:
+            #~ if subtree.label() == "PHRASE" or subtree.label() == "PHRASE_ELID" :
+                #~ o.append(subtree)
+            #~ else:
+                #~ o.extend( self.getAllPhrasesFromTree(subtree) )
+        #~ else:
+            #~ print("DBG: getAllPhrases unhandled case!")
+            #~ assert(0)
+    #~ return o
+    o += "-----"
+    o +=  repr(tree)
+    return o
+    
+def treesListToStr( listTrees ):
+    o = ""
+    o += "[\n"
+    for t in listTrees:
+        o += (treeToStr(t))
+    o += "]\n"
+    
+
 listEGFrEn = {
     "ADJ": "JJ",
     "DET": "DT",
@@ -312,12 +358,82 @@ def explore2():
         R = read_expr('SnF -> -FnS')
         prover = nltk.Prover9()
         prover.prove(NotFnS, [SnF, R])
+        
+
+def exploreTrees():
+    s = '(ROOT (S (NP (NNP Europe)) (VP (VBZ is) (PP (IN in) (NP (DT the) (JJ same) (NNS trends)))) (. .)))'
+    s = """(S
+  (PHRASE
+    (NP Alexandre/NPP)
+    aime/V
+    (NPS (NP les/DET haricots/NC verts/ADJ) (NP ./NC))))"""
+    
+    s = """(S
+  (NPS (NP COMPÉTENCES Maquillage/NC) (NP So/U in/ADJ))
+  (NPS (NP Parfum/U cosmétiques/ADJ) (NP Science/NC))
+  des/PetD
+  (NPS (NP cosmétiques Science/NC) des/PetD (NP PASSIONS/NC))
+  (PHRASE
+    (NP Dao Woringer Dao Woringer/NPP)
+    CONSEIL/V
+    (NP L/DET ÈRE/ADJ BEAUTÉ/NC))
+  (PHRASE
+    Je/CLS
+    suis/V
+    (NPSS
+      une/DET
+      passionnée/ADJ
+      de/P
+      (NPS (NP la/DET science/NC) des/PetD (NP cosmétiques/NC))))
+  (PHRASE
+    et/CC
+    aime/V
+    (NPS
+      également/ADV
+      (NP l/DET 'animation/NC)
+      et/CC
+      (NP le/DET conseil/NC personnalisé/ADJ))))
+    """
+    tree = nltk.tree.Tree.fromstring(s)
+    def traverse_tree(tree):
+        print("tree:", tree)
+        for subtree in tree:
+            if type(subtree) == nltk.tree.Tree:
+                traverse_tree(subtree)
+    #~ traverse_tree(tree)
+    #~ print(tree[0])
+    #~ print(tree[0].label())
+    #~ print(dir(tree[0]))
+    def getAllPhrases(tree):
+        print("DBG: getAllPhrases %s" % tree )
+        o = []
+        for subtree in tree:
+            if type(subtree) != str and subtree.label() == "PHRASE":
+                o.append(subtree)
+            else:
+                if type(subtree) == nltk.tree.Tree:
+                    o.extend( getAllPhrases(subtree) )
+        return o
+                
+    phrases = getAllPhrases(tree)
+    print("Result of getAllPhrases:")
+    for p in phrases:
+        print(p)
+        
+    treesListToStr
+# exploreTrees - end
+
+    
+    
 
 class FrenchAnalyser:
     def __init__( self ):
-        pass
+        self.parser = None
         
     def load(self):
+        if self.parser != None:
+            return # already loaded
+            
         from transformers import AutoTokenizer, AutoModelForTokenClassification
 
         tokenizer = AutoTokenizer.from_pretrained("gilf/french-camembert-postag-model")
@@ -346,18 +462,20 @@ class FrenchAnalyser:
         # seems no line must refer to symbol coming after?
         
         grammar_french = ""
-        grammar_french += "NP: {<PRP\$>*<DET|PP\$>?<ADJ>*<NC|U><ADJ>*}\n"
-        grammar_french += "NP:  {<NPP>+}\n"
+        grammar_french += "NP: {<PRP\$>*<DET|PP\$>?<ADJ>*<NC|U|VINF><ADJ>*}\n"
+        grammar_french += "NP:  {<NPP>+}\n" # usefull ? not working ?
         #~ grammar_french += "NPS:  {<NP><P>*<D>*<P+D>*<NP>}\n" # celle ci ne marche pas
         #~ grammar_french += "NPS:  {<NP><P+D>*<NP>}\n" # celle ci ne marche pas
         grammar_french += "NPS:  {<NP><PetD>*<NP>}\n" # patch P+D en PetD to help grammar
         grammar_french += "NPS:  {<ADV>*<NP><CC><ADV>*<NP>}\n"
+        grammar_french += "NPS:  {<NP><CC><NPS>}\n"
+        grammar_french += "NPS:  {<NPS><CC><NP>}\n"
         grammar_french += "NPSS:  {<DET>*<ADJ><P><NP|NPS>}\n"
         grammar_french += "MODV: {<ADV>+<V><ADV>+}\n"
         grammar_french += "MODV: {<ADV>+<V>}\n"
         grammar_french += "MODV: {<V><ADV>+}\n"
-        grammar_french += "PHRASE: {<CC>*<NP|NPP|CLS>?<V|MODV><P>*<NP|NPS|NPSS>}\n"
-        grammar_french += "PHRASE_ELID: {<CC><ADV>*<NP|NPS|NPSS>}\n"
+        grammar_french += "PHRASE: {<CC>*<NP|NPS|NPSS|NPP|CLS>?<V|MODV><P>*<NP|NPS|NPSS|NPP>}\n"
+        grammar_french += "PHRASE_ELID: {<CC><ADV>*<NP|NPS|NPSS|NPP>}\n"
         grammar_french += "COMBI: {<PHRASE><CC><PHRASE>}\n"
         
         self.parser = nltk.RegexpParser(grammar_french)
@@ -381,27 +499,110 @@ class FrenchAnalyser:
     
     def analyseText(self, txt):
         """
-        receive a long text and return a list of analysed sentence
+        receive a long text and return a list of analysed sentence as a list of trees
         """
-        sentences = 
+        # bourrin:
+        for i in range(4):
+            txt = txt.replace("  ", " ")
+            txt = txt.replace(" \n", "\n")
+            txt = txt.strip()
+            
+        print("-"*40)
+        print("DBG: analyseText: received:\n%s" % txt )
+        print("-"*40)
+        sentences = []
+        i = 0
+        start = 0
+        while i < len(txt):
+            if i == len(txt)-1 or  \
+                ( txt[i] == '.' and (txt[i+1].isupper() or txt[i+1] == '\n' or (txt[i+1] == ' ' and txt[i+2].isupper() ) ) ) \
+                :
+                if i == len(txt)-1:
+                    i += 1
+                s = txt[start:i]
+                start = i+1
+                print("DBG: analyseText: sentence cut:\n%s" % s )
+                sentences.append(s)
+            i += 1
+            
+        listSentenceTrees = []
         for s in sentences:
-        listPos = self._preprocessText(s.split('.')[0]) # tempo: a gerer: plusieurs phrases a la suite
-        print("DBG: analyseSentence: listPos: " + str(listPos) )
-        result = self.parser.parse(listPos)
-        print("#"*20)
-        print("DBG: analyseSentence: res:\n" + str(result) )
-        print()
+            print("DBG: analyseText: sentence analysed:\n%s" % s )
+            listPos = self._preprocessText(s)
+            print("DBG: analyseSentence: listPos: " + str(listPos) )
+            result = self.parser.parse(listPos)
+            print("#"*20)
+            print("DBG: analyseText: res:\n" + str(result) )
+            print()
+            listSentenceTrees.append(result)
+        return listSentenceTrees
+            
+    def getAllPhrasesFromTree(self, tree):
+        print("DBG: getAllPhrases %s" % tree )
+        o = []
+        for subtree in tree:
+            if type(subtree) == str or type(subtree) == tuple:
+                continue
+            print("DBG: getAllPhrases subtrees: type: %s, %s" % (type(subtree),subtree ) )
+            if type(subtree) == nltk.tree.Tree:
+                if subtree.label() == "PHRASE" or subtree.label() == "PHRASE_ELID" :
+                    o.append(subtree)
+                else:
+                    o.extend( self.getAllPhrasesFromTree(subtree) )
+            else:
+                print("DBG: getAllPhrases unhandled case!")
+                assert(0)
+        return o
+        
+    def getAllPhrasesFromListTrees(self, listTrees):
+        o = []
+        for tree in listTrees:
+            o.extend(self.getAllPhrasesFromTree(tree))
+        return o
         
 # classFrenchAnalyser  - end
+
+frenchAnalyser = FrenchAnalyser()
     
-def testFrenchAnalysing():
-    fa = FrenchAnalyser()
-    fa.load()
+def testFrenchAnalysis():
+    frenchAnalyser.load()
     
     listTxt = (txtDog1_fr, txtDog2_fr, txtCv1_fr, txtCv2_fr,txtCv2_fr_sorted,txtCv2_fr_sorted_ext,txtLike,txtLikeShort,txtLikeSimpleCompound, txtLikeSimple)
+    listTxt = (txtDog1_fr, txtDog2_fr)
+    interestingTreesAll = []
     for s in listTxt:
-        fa.analyseText(s)
+        listTrees = frenchAnalyser.analyseText(s)
+        interestingTrees = frenchAnalyser.getAllPhrasesFromListTrees(listTrees)
+        print("="*60)
+        print("INF: testFrenchAnalysis: Interesting Trees:")
+        for t in interestingTrees:
+            print(t)
+        interestingTreesAll.extend(interestingTrees)
+        
+    print("="*60)
+    print("="*60)
+    print("="*60)
+    print("INF: testFrenchAnalysis: Interesting Trees:")
+    for t in interestingTreesAll:
+        print(t)
+        
+
+def autotest_FrenchAnalysis():
+    frenchAnalyser.load()
+    txt1_fr = "le petit chien jaune aboie sur la fille rieuse"
+    txt2_fr = "Rapunzel décida de laisser détaché ses longs cheveux dorés"
+    assert_equal(treesListToStr(frenchAnalyser.analyseText(txt1_fr)), treesListToStr([nltk.tree.Tree.fromstring("""(S
+  (PHRASE
+    (NP le/DET petit/ADJ chien/U jaune/ADJ)
+    aboie/V
+    sur/P
+    (NP la/DET fille/NC rieuse/ADJ)))""")]))
+    #~ assert_equal(treesListToStr(frenchAnalyser.analyseText(txt2_fr)), treesListToStr([nltk.tree.Tree.fromstring("")]))
     
 #~ explore2()
-testFrenchAnalysing()
+exploreTrees()
+testFrenchAnalysis()
+autotest_FrenchAnalysis()
+
+
 

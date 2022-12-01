@@ -6,6 +6,7 @@ if 0:
     nltk.download('words')
     nltk.download('treebank')
     nltk.download('book_grammars')
+    nltk.download('conll2000')
     
     
     
@@ -469,6 +470,20 @@ class FrenchAnalyser:
         #~ NP: {<DT>?<NN>+<JJ>}
         #~ NP: {<DT>?<NN>}
         #~ """
+        
+        # chunk and chink:
+        """
+        grammar = 
+            NP:
+            {<.*>+}          # Chunk everything
+            }<VBD|IN>+{      # Chink sequences of VBD and IN
+        =>
+         (S
+           (NP the/DT little/JJ yellow/JJ dog/NN)
+           barked/VBD
+           at/IN
+           (NP the/DT cat/NN))
+        """
 
         # ?: 0..1        
         # *: 0..n
@@ -675,11 +690,116 @@ satisfaire sont mes valeurs et ma devise. """
     sont/V
     (NPS (NP mes/DET valeurs/NC) et/CC (NP ma/DET devise./NC))))""")]))
 
+  	
+
+class UnigramChunker(nltk.ChunkParserI):
+    def __init__(self, train_sents):
+        train_data = [[(t,c) for w,t,c in nltk.chunk.tree2conlltags(sent)]
+                      for sent in train_sents]
+        self.tagger = nltk.UnigramTagger(train_data)
+
+    def parse(self, sentence):
+        pos_tags = [pos for (word,pos) in sentence]
+        tagged_pos_tags = self.tagger.tag(pos_tags)
+        chunktags = [chunktag for (pos, chunktag) in tagged_pos_tags]
+        conlltags = [(word, pos, chunktag) for ((word,pos),chunktag)
+                     in zip(sentence, chunktags)]
+        return nltk.chunk.conlltags2tree(conlltags)
+        
+class BigramChunker(nltk.ChunkParserI):
+    def __init__(self, train_sents):
+        train_data = [[(t,c) for w,t,c in nltk.chunk.tree2conlltags(sent)]
+                      for sent in train_sents]
+        self.tagger = nltk.BigramTagger(train_data)
+
+    def parse(self, sentence):
+        pos_tags = [pos for (word,pos) in sentence]
+        tagged_pos_tags = self.tagger.tag(pos_tags)
+        chunktags = [chunktag for (pos, chunktag) in tagged_pos_tags]
+        conlltags = [(word, pos, chunktag) for ((word,pos),chunktag)
+                     in zip(sentence, chunktags)]
+        return nltk.chunk.conlltags2tree(conlltags)
+        
+def explore3():
+    # excplore chunker
+    # cf https://www.nltk.org/book/ch07.html#code-unigram-chunker
+    from nltk.corpus import conll2000
+    grammar = r""
+    grammar = r"NP: {<[CDJNP].*>+}"
+    cp = nltk.RegexpParser(grammar)
+    test_sents = conll2000.chunked_sents('test.txt', chunk_types=['NP'])
+    print(cp.evaluate(test_sents))
+    """
+    ChunkParse score:
+    grammar: "" # find nothing
+    IOB Accuracy:  43.4%% => 43% are zero tagged
+    Precision:      0.0%%
+    Recall:         0.0%%
+    F-Measure:      0.0%%
+    
+    grammar: "NP: {<[CDJNP].*>+}"
+    IOB Accuracy:  87.7%%
+    Precision:     70.6%%
+    Recall:        67.8%%
+    F-Measure:     69.2%%
+    """
+    
+    
+    test_sents = conll2000.chunked_sents('test.txt', chunk_types=['NP'])
+    train_sents = conll2000.chunked_sents('train.txt', chunk_types=['NP'])
+    
+    # test unigram chunker
+    unigram_chunker = UnigramChunker(train_sents)
+    print(unigram_chunker.evaluate(test_sents))
+    """
+    ChunkParse score:
+    IOB Accuracy:  92.9%%
+    Precision:     79.9%%
+    Recall:        86.8%%
+    F-Measure:     83.2%%
+    """
+    
+    postags = sorted(set(pos for sent in train_sents  for (word,pos) in sent.leaves()))
+    print(unigram_chunker.tagger.tag(postags))
+    """
+    [('#', 'B-NP'), ('$', 'B-NP'), ("''", 'O'), ('(', 'O'), (')', 'O'), (',', 'O'), ('.', 'O'), (':', 'O'), 
+    ('CC', 'O'), ('CD', 'I-NP'), ('DT', 'B-NP'), ('EX', 'B-NP'), ('FW', 'I-NP'), ('IN', 'O'), ('JJ', 'I-NP'),
+    ('JJR', 'B-NP'), ('JJS', 'I-NP'), ('MD', 'O'), ('NN', 'I-NP'), ('NNP', 'I-NP'), ('NNPS', 'I-NP'), 
+    ('NNS', 'I-NP'), ('PDT', 'B-NP'), ('POS', 'B-NP'), ('PRP', 'B-NP'), ('PRP$', 'B-NP'), ('RB', 'O'), 
+    ('RBR', 'O'), ('RBS', 'B-NP'), ('RP', 'O'), ('SYM', 'O'), ('TO', 'O'), ('UH', 'O'), ('VB', 'O'), ('VBD', 'O'), 
+    ('VBG', 'O'), ('VBN', 'O'), ('VBP', 'O'), ('VBZ', 'O'), ('WDT', 'B-NP'), ('WP', 'B-NP'), ('WP$', 'B-NP'), ('WRB', 'O'), ('``', 'O')]
+    """
+
+
+    # test bigram chunker
+    bigram_chunker = BigramChunker(train_sents)
+    print(bigram_chunker.evaluate(test_sents))
+    """
+    ChunkParse score:
+    IOB Accuracy:  93.3%%
+    Precision:     82.3%%
+    Recall:        86.8%%
+    F-Measure:     84.5%%
+    """
+
+    postags = sorted(set(pos for sent in train_sents for (word,pos) in sent.leaves()))
+    print(bigram_chunker.tagger.tag(postags))
+    """
+    [('#', 'B-NP'), ('$', 'I-NP'), ("''", 'O'), ('(', 'O'), (')', 'O'), (',', 'O'), ('.', 'O'), (':', 'O'), ('CC', 'O'), 
+    ('CD', 'B-NP'), ('DT', 'I-NP'), ('EX', 'B-NP'), ('FW', 'I-NP'), ('IN', 'O'), ('JJ', 'B-NP'), ('JJR', 'I-NP'), 
+    ('JJS', 'I-NP'), ('MD', 'O'), ('NN', 'B-NP'), ('NNP', 'I-NP'), ('NNPS', 'I-NP'), ('NNS', 'I-NP'), ('PDT', 'I-NP'), 
+    ('POS', 'B-NP'), ('PRP', 'B-NP'), ('PRP$', 'I-NP'), ('RB', 'O'), ('RBR', 'O'), ('RBS', 'B-NP'), ('RP', None),
+    ('SYM', None), ('TO', None), ('UH', None), ('VB', None), ('VBD', None), ('VBG', None), ('VBN', None),
+    ('VBP', None), ('VBZ', None), ('WDT', None), ('WP', None), ('WP$', None), ('WRB', None), ('``', None)]
+    """
+
+
    
 #~ explore2()
-exploreTrees()
+#~ exploreTrees()
 #~ testFrenchAnalysis()
-autotest_FrenchAnalysis()
+#~ autotest_FrenchAnalysis()
 
+explore3()
 
 

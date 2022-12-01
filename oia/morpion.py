@@ -75,7 +75,7 @@ class Game:
     def getWinner(self):
         win = self._getWinnerInternal()
         if win != 0 and self.cpuManager != None:
-            self.cpuManager.updateStat(win)
+            self.cpuManager.updateStats(win)
 
         return win
 
@@ -116,8 +116,8 @@ def runGame():
     g = Game()
     if 1:
         import ai_cpu
-        ai_cpu.newCpu("toto")
-        g.registerCpu(ai_cpu)
+        ai = ai_cpu.AiCpu("toto")
+        g.registerCpu(ai)
     g.drawBoard()
     while 1:
         while 1:

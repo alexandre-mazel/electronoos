@@ -31,6 +31,17 @@ def assert_greater(x,y):
     if x<y:
         assert(0)
         
+def assert_equal(a,b):
+    print( "%s == %s ?" % (str(a),str(b)) )
+    if (a)!=(b):
+        if type(b) != int:
+            print("%s\n!=\n%s"%(a,b))
+        else:
+            print("%s != %s"%(a,b))
+        print("assert_equal: assert error")
+        
+        assert(0)
+        
 # FileNotFoundError definition for python 2.7
 # will be accessible as common.FileNotFoundError
 try:
@@ -1137,7 +1148,13 @@ if 0:
     dummyParent()
     exit(0)
     
-
+def isVoyelle(c):
+    return c.lower() in "aeiouy"
+    
+def elision( strFirstWord, strSecondWord ):
+    if strFirstWord[-1] == 'e' and isVoyelle(strSecondWord[0]):
+        return strFirstWord[:-1] + "'" + strSecondWord
+    return strFirstWord + " " + strSecondWord
     
 def autoTest():
     print("cpu: %s" % str(getCpuModel()) )
@@ -1189,6 +1206,10 @@ def autoTest():
     strTestPath = "./autotest_data"
     listDup = findDuplicate(strTestPath)
     assert(len(listDup)==7)
+    
+    assert_equal(elision("de", "Alice"), "d'Alice")
+    assert_equal(elision("de", "Jean-Pierre"), "de Jean-Pierre")
+    assert_equal(elision("je", "aime"), "j'aime")
     
 if __name__ == "__main__":
     autoTest()

@@ -479,7 +479,7 @@ def timeToString( rTimeSec ):
     nDividend = 60*60*24*30; # 30 day per month as an average!
     if( rTimeSec >= nDividend and nCptValue < 2 ):
         nVal = int( rTimeSec / nDividend );
-        strOut += "%d min " % nVal;
+        strOut += "%d mon " % nVal;
         rTimeSec -= nVal * nDividend;
         nCptValue += 1;
 

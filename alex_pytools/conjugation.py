@@ -53,6 +53,12 @@ class Conjugator:
                                     ["suis", "es", "est", "sommes", "êtes", "sont"],
                                     ["serai", "seras", "sera", "serons", "serez", "seront"],
                             ],
+            "avoir":      [
+                                    ["eus", "eus", "eut", "eûmes", "eûtes", "eurent"],
+                                    ["avais", "avais", "avait", "avions", "aviez", "avaient"],
+                                    ["ai", "as", "a", "avons", "avez", "ont"],
+                                    ["aurai", "auras", "aura", "aurons", "aurez", "auront"],
+                            ],
         }
         
         self.aaParticularTrois = {
@@ -75,7 +81,7 @@ class Conjugator:
             if strInf != "aller":
                 return 1
             return 3
-        if strInf[-3:] in ['dre','tre'] :
+        if strInf[-3:] in ['dre','tre','oir'] :
             return 3
         if strInf[-4:] in ['oire']:
             return 3
@@ -86,6 +92,9 @@ class Conjugator:
         - nPers: 1: je, 2: tu, 3: il,elle, 4: nous, 5: vous, 6: ils
         - bOnlyVerb: when set => don't return subject: "aimes" instead of "tu aimes"
         """
+        bVerbose = 1
+        bVerbose = 0
+        
         nPers -= 1
         group = self.detectGroup(strInf)
 
@@ -105,6 +114,7 @@ class Conjugator:
                     end = self.aaParticularTrois['oitre'][nTense-kTenseFirst][nPers]
                 elif len(strInf)>4:
                     radical = strInf[:-5]
+            if bVerbose: print("DBG: conjugate: radical: '%s'" % radical )
             lastLeter = radical[-1]
             if lastLeter == 'g' and end[0] not in['e','é', 'è','i']:
                 radical += 'e'
@@ -124,6 +134,9 @@ class Conjugator:
             
         - nPers: if set, will look for this persona
         """
+        bVerbose = 1
+        bVerbose = 0
+            
         group = 1 # TODO: autodetect, mais comment?
         
         nPersFound = 0
@@ -138,13 +151,13 @@ class Conjugator:
                 terms = self.aaastrTerminationByTense[group-1][numTense]
                 if bFound: break
                 for i,term in enumerate(terms):
-                    print("DBG: findInf: nPers: %s, i+1: %s" % (nPers,i+1))
+                    if bVerbose: print("DBG: findInf: nPers: %s, i+1: %s" % (nPers,i+1))
                     if nPers != -1 and nPers != i+1:
                         continue
                     end = strVerb[-len(term):]
-                    print("DBG: findInf: comparing '%s' and '%s'" % (term,end) )
+                    if bVerbose: print("DBG: findInf: comparing '%s' and '%s'" % (term,end) )
                     if term == end:
-                        print("DBG: findInf: hit")
+                        if bVerbose: print("DBG: findInf: hit")
                         nPersFound = i+1
                         infinitive = strVerb[:-len(term)]
                         if infinitive[-1] != 'e':
@@ -213,6 +226,7 @@ def autotest():
     assert_equal(conjugator.detectGroup("croître"),3)
     assert_equal(conjugator.detectGroup("croitre"),3)
     assert_equal(conjugator.detectGroup("être"),3)
+    assert_equal(conjugator.detectGroup("avoir"),3)
     
     assert_equal(conjugator.conjugate("prendre"),"je prends")
     assert_equal(conjugator.conjugate("prendre", 2),"tu prends")
@@ -245,15 +259,33 @@ def autotest():
     assert_equal(conjugator.conjugate("être", 4),"nous sommes")
     assert_equal(conjugator.conjugate("être", 5),"vous êtes")
     assert_equal(conjugator.conjugate("être", 6),"ils sont")
+    assert_equal(conjugator.conjugate("être", 1,kTenseFuture),"je serai")
+    assert_equal(conjugator.conjugate("être", 1,kTensePast),"je fus")
+    assert_equal(conjugator.conjugate("être", 1,kTenseImperfect),"j'étais")
+    
+    assert_equal(conjugator.conjugate("avoir"),"j'ai")
+    assert_equal(conjugator.conjugate("avoir", 2),"tu as")
+    assert_equal(conjugator.conjugate("avoir", 3),"il a")
+    assert_equal(conjugator.conjugate("avoir", 4),"nous avons")
+    assert_equal(conjugator.conjugate("avoir", 5),"vous avez")
+    assert_equal(conjugator.conjugate("avoir", 6),"ils ont")
+    assert_equal(conjugator.conjugate("avoir", 1,kTenseFuture),"j'aurai")
+    assert_equal(conjugator.conjugate("avoir", 1,kTensePast),"j'eus")
+    assert_equal(conjugator.conjugate("avoir", 1,kTenseImperfect),"j'avais")
+    assert_equal(conjugator.conjugate("avoir", 4,kTenseFuture),"nous aurons")
+    assert_equal(conjugator.conjugate("avoir", 4,kTensePast),"nous eûmes")
+    assert_equal(conjugator.conjugate("avoir", 4,kTenseImperfect),"nous avions")
     
     print("")
     conjugator.printAllConjugaison("aimer")
     conjugator.printAllConjugaison("manger")
     conjugator.printAllConjugaison("finir")
     conjugator.printAllConjugaison("prendre")
-    conjugator.printAllConjugaison("être")
     conjugator.printAllConjugaison("croire")
     conjugator.printAllConjugaison("croître")
+
+    conjugator.printAllConjugaison("être")
+    conjugator.printAllConjugaison("avoir")
     
 if __name__ == "__main__":
     autotest()

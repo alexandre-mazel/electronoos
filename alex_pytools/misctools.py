@@ -1,3 +1,4 @@
+# -*- coding: cp1252 -*-
 """
 some classic handy classes
 (c) 2010-2022 A. Mazel
@@ -1155,7 +1156,7 @@ if 0:
     exit(0)
     
 def isVoyelle(c):
-    return c.lower() in "aeiouy"
+    return c.lower() in "aeiouyéèê"
     
 def elision( strFirstWord, strSecondWord ):
     if strFirstWord[-1] == 'e' and isVoyelle(strSecondWord[0]):

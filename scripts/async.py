@@ -3,7 +3,17 @@ import shutil
 import sys
 import time
 
-sys.path.append( "../alex_pytools/")
+def getThisModulePath():
+        try:
+            strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
+        except KeyError as err:
+            strLocalPath = ""
+        if strLocalPath == "": strLocalPath = "."
+        if strLocalPath[-1] != os.sep:
+            strLocalPath += os.sep
+        return strLocalPath
+
+sys.path.append( getThisModulePath()+"../alex_pytools/")
 from stringtools import timeToStr, sizeToStr
 
 def isDirMark(c):
@@ -17,6 +27,17 @@ def get_last_folder(path):
     idx2 = path[:-1].find('\\')
     return path[max(idx1,idx2):].replace('/','').replace('\\','')
 
+def isInWindir(path):
+    windir = os.getenv("windir").replace(os.sep,'/').lower()
+    path = os.path.abspath(path).replace(os.sep,'/').lower()
+    #~ print("DBG: isInWindir: windir: '%s'" % windir)
+    #~ print("DBG: isInWindir: path: '%s'" % path)
+    ret = path[:len(windir)]==windir
+    #~ print("DBG: isInWindir: ret: '%s'" % ret)
+    #~ if "c:\windows" in path:
+        #~ exit(0)
+    return ret
+    
 def _sync(src,dst):
     """
     synchronise 2 folders: 
@@ -31,6 +52,7 @@ def _sync(src,dst):
     bVerbose = 0
     if not isDirMark(src[-1]): src += os.sep
     if not isDirMark(dst[-1]): dst += os.sep
+    
         
     nbr, size, nbr_folder_created, nbr_copied, nbr_abs, nbr_old, size_copied = 0,0,0,0,0,0,0
     
@@ -41,22 +63,26 @@ def _sync(src,dst):
         
     last_folder = get_last_folder(src)
     if bVerbose: print("DBG: sync: last_folder:'%s'\n\n" % last_folder)
-    if last_folder == "$RECYCLE.BIN":
-        print("WRN: skipping: '%s'" % src)
-        return nbr, size, nbr_folder_created, nbr_copied, nbr_abs, nbr_old, size_copied        
     
+    #~ (isInWindir(src) and last_folder.lower() in ["security",  "system32", "cache_data", "windowsapps","boot","temp"] )
+    if last_folder == "$RECYCLE.BIN" or \
+        (isInWindir(src)) \
+        :
+        print("WRN: skipping folder: '%s'" % src)
+        return nbr, size, nbr_folder_created, nbr_copied, nbr_abs, nbr_old, size_copied
+        
     try:
         listSrc = os.listdir(src)
     except PermissionError as err:
-        print("WRN: access error skipping folder    : '%s'" % src)
+        print("ERR: access error skipping folder : '%s'" % src)
         return nbr, size, nbr_folder_created, nbr_copied, nbr_abs, nbr_old, size_copied
     listSrc = sorted(listSrc)
     for f in listSrc:
-        if (nbr & 47)==0: # un nombre premier sympa
+        if (nbr % 47)==0: # un nombre premier sympa
             out_src = src
             if len(out_src)>40:
                 out_src = "..." + out_src[-40:]
-            print('processed files: %s: %9d(%d)'%(out_src,nbr,nbr_copied) + " "*20, end="\r")
+            print('processed files: %s: %9d (%d)'%(out_src,nbr,nbr_copied) + " "*20, end="\r")
         absf = src + f
         absf2 = dst + f
         if os.path.isdir(absf):
@@ -74,6 +100,15 @@ def _sync(src,dst):
             size_copied += size_copied2
             continue
         nbr += 1
+        bLongFile = 0
+        if len(absf)>255:
+            # cf https://stackoverflow.com/questions/36219317/pathname-too-long-to-open
+            print("\nWRN: File src is long, converting to NT namming:\n'%s'" % absf)
+            absf = "\\\\?\\" + absf.replace('/','\\')
+            bLongFile = 1
+        if len(absf2)>255:
+            print("\nWRN: File dst is long, converting to NT namming:\n'%s'" % absf)
+            absf2 = "\\\\?\\" + absf2.replace('/','\\')
         sizeSrc = os.path.getsize(absf)
         size += sizeSrc
         bMustCopy = 0
@@ -95,9 +130,9 @@ def _sync(src,dst):
                 nbr_copied += 1
                 size_copied += sizeSrc
             except PermissionError as err:
-                print("WRN: file copy permission error skipping: '%s'" % absf)
+                print("ERR: file copy permission error skipping: '%s'" % absf)
             except OSError as err:
-                print("WRN: file copy os error skipping: '%s'" % absf)
+                print("ERR: file copy os error skipping: '%s'" % absf)
         if bVerbose: 
             print("DBG: sync: f: %s" % f )
             print("DBG: sync: bMustCopy: %s" % bMustCopy )

@@ -26,19 +26,25 @@ cd python-v4l2capture/
 sudo ./setup.py install
 """
 
+global_assert_count = 0
+
 def assert_greater(x,y):
-    print( "%s >= %s ?" % (str(x),str(y)) )
+    global global_assert_count
+    global_assert_count += 1
+    print( "%d: %s >= %s ?" % (global_assert_count,str(x),str(y)) )
     if x<y:
         assert(0)
         
 def assert_equal(a,b):
-    print( "%s == %s ?" % (str(a),str(b)) )
+    global global_assert_count
+    global_assert_count += 1
+    print( "%d: %s == %s ?" % (global_assert_count,str(a),str(b)) )
     if (a)!=(b):
         if type(b) != int:
             print("%s\n!=\n%s"%(a,b))
         else:
             print("%s != %s"%(a,b))
-        print("assert_equal: assert error")
+        print("%d: assert_equal: assert error" % global_assert_count )
         
         assert(0)
         

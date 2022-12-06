@@ -46,9 +46,10 @@ def retrieveTemp():
 # retrieveTemp - end
 
 def loop(nTimeLoopMin=15):
-    retrieveTemp()
-    print("sleeping %d min..." % nTimeLoopMin)
-    time.sleep(nTimeLoopMin*60)
+    while 1:
+        retrieveTemp()
+        print("sleeping %d min..." % nTimeLoopMin)
+        time.sleep(nTimeLoopMin*60)
 
 #~ retrieveTemp()
 loop()

@@ -62,6 +62,12 @@ class Conjugator:
         }
         
         self.aaParticularTrois = {
+            "aire":      [
+                                    ["is", "is", "it", "îmes", "îtes", "irent"],
+                                    ["aisais", "aisais", "aisait", "aisions", "aisiez", "aisaient"],
+                                    ["ais", "ais", "ait", "aisons", "aites", "ont"],
+                                    ["erai", "eras", "era", "erons", "erez", "eront"],
+                            ],
             "oire":      [
                                     ["us", "us", "ut", "ûmes", "ûtes", "urent"],
                                     ["oyais", "oyais", "oyait", "oyions", "oyiez", "oyaient"],
@@ -83,7 +89,7 @@ class Conjugator:
             return 3
         if strInf[-3:] in ['dre','tre','oir'] :
             return 3
-        if strInf[-4:] in ['oire']:
+        if strInf[-4:] in ['oire','aire']:
             return 3
         return 2
         
@@ -104,7 +110,7 @@ class Conjugator:
             radical = strInf[:-2]
             end = self.aaastrTerminationByTense[group-1][nTense-kTenseFirst][nPers]
             if group == 3:
-                bOire = strInf[-4:] in ['oire'] # croire style
+                bOire = strInf[-4:] in ['oire','aire'] # croire style
                 bOitre = strInf[-5:] in ['oitre','oître'] # croitre style
                 if bOire:
                     radical = strInf[:-4]
@@ -168,12 +174,12 @@ class Conjugator:
                         break
         return infinitive, nPersFound,kTense+kTenseFirst
         
-    def printAllConjugaison(self,verb):
+    def printAllConjugaison(self,verb, strComplement=""):
         print("*** Conjugaison du verbe %s ***" % verb)
         for tense in range(kTenseFirst,kTenseMax):
             print("%s:" % tenseToStr(tense))
             for i,subject in enumerate(self.aSubject):
-                print("    " + self.conjugate(verb,i+1,tense))
+                print("    " + self.conjugate(verb,i+1,tense) + strComplement)
             print("")
         
 # class Conjugator - end
@@ -227,6 +233,7 @@ def autotest():
     assert_equal(conjugator.detectGroup("croitre"),3)
     assert_equal(conjugator.detectGroup("être"),3)
     assert_equal(conjugator.detectGroup("avoir"),3)
+    assert_equal(conjugator.detectGroup("faire"),3)
     
     assert_equal(conjugator.conjugate("prendre"),"je prends")
     assert_equal(conjugator.conjugate("prendre", 2),"tu prends")
@@ -252,6 +259,21 @@ def autotest():
     assert_equal(conjugator.conjugate("croître", 1,kTenseFuture),"je croîtrai")
     assert_equal(conjugator.conjugate("croître", 1,kTensePast),"je crûs")
     assert_equal(conjugator.conjugate("croître", 1,kTenseImperfect),"je croissais")
+    
+    
+    assert_equal(conjugator.conjugate("faire"),"je fais")
+    assert_equal(conjugator.conjugate("faire", 2),"tu fais")
+    assert_equal(conjugator.conjugate("faire", 3),"il fait")
+    assert_equal(conjugator.conjugate("faire", 4),"nous faisons")
+    assert_equal(conjugator.conjugate("faire", 5),"vous faites")
+    assert_equal(conjugator.conjugate("faire", 6),"ils font")
+    assert_equal(conjugator.conjugate("faire", 1,kTenseFuture),"je ferai")
+    assert_equal(conjugator.conjugate("faire", 1,kTensePast),"je fis")
+    assert_equal(conjugator.conjugate("faire", 1,kTenseImperfect),"je faisais")
+    assert_equal(conjugator.conjugate("faire", 4,kTenseFuture),"nous ferons")
+    assert_equal(conjugator.conjugate("faire", 4,kTensePast),"nous fîmes")
+    assert_equal(conjugator.conjugate("faire", 4,kTenseImperfect),"nous faisions")
+    
     
     assert_equal(conjugator.conjugate("être"),"je suis")
     assert_equal(conjugator.conjugate("être", 2),"tu es")
@@ -283,9 +305,25 @@ def autotest():
     conjugator.printAllConjugaison("prendre")
     conjugator.printAllConjugaison("croire")
     conjugator.printAllConjugaison("croître")
+    conjugator.printAllConjugaison("défaire")
+    conjugator.printAllConjugaison("symboliser")
 
     conjugator.printAllConjugaison("être")
     conjugator.printAllConjugaison("avoir")
+    
+    conjugator.printAllConjugaison("spaghettiser")
+    conjugator.printAllConjugaison("gaïattiser")
+    conjugator.printAllConjugaison("gaïa")
+    conjugator.printAllConjugaison("corto")
+    conjugator.printAllConjugaison("alexandre")
+    conjugator.printAllConjugaison("elsa")
+    conjugator.printAllConjugaison("carvalho")
+    conjugator.printAllConjugaison("carvalho", " elsa")
+    conjugator.printAllConjugaison("mazel")
+    conjugator.printAllConjugaison("lounis")
+    conjugator.printAllConjugaison("boufraine")
+    conjugator.printAllConjugaison("minecraft")
+    conjugator.printAllConjugaison("regarder", " l'écran")
     
 if __name__ == "__main__":
     autotest()

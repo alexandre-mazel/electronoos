@@ -7,6 +7,21 @@ Launch server On AGX:
 cd ~/dev/git/electronoos/scripts/versatile
 nohup python3 run_cloud_server.py &
 
+# bug a voir:
+ader.cc:48] Successfully opened dynamic library libnvinfer_plugin.so.7
+am@am-desktop:~/dev/git/electronoos/scripts/versatile$ tail nohup.out
+DBG: detectEmotion: ssd detect takes 0.000s
+DBG: detectEmotion: preprocess takes 0.000s
+DBG: detectEmotion: net takes 0.150s
+INF: detectEmotion: detected:
+[[(110, 96, 129, 129), 0, 0.9584208130836487, 'Neutral']]
+INF: detectEmotion total processing: 0.151s
+DBG: continuousLearnFrom: detectedEmotions: [[(110, 96, 129, 129), 0, 0.9584208130836487, 'Neutral']]
+DBG: continuousLearnFromImg: angle, smile and mood takes 0.17s
+DBG: continuous_learn: retVal: (1, 2, [110, 96, 239, 225], (('orientation', [0.0, -0.13906162699743954, -0.010869137177270227], 666), ('smile', -0.49528985507246376, 0.4166666666666667), ('emotion', 'Neutral', 0.9584208130836487), ('gender', 0, 0.6), ('age', 58, 0.6))) (db has 0 peoples)
+WRN/ERR: continuous_learn: users all disappeared !?! (if first time then ok)am@am-desktop:~/dev/git/electronoos/scripts/versatile$
+
+
 # ou en local windows:
 cd C:\\Users\\alexa\\\dev\\git\\electronoos\\scripts\\versatile
 python run_cloud_server.py

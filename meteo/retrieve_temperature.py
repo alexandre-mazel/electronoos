@@ -1,7 +1,10 @@
 # -*- coding: cp1252 -*-
 
 import io
+import os
 import sys
+import time
+
 sys.path.append("../alex_pytools/")
 import misctools
 import nettools
@@ -9,7 +12,12 @@ import stringtools
 
 def store(city,temp):
     timestamp = misctools.getTimeStamp()
-    f = open("c:/save/temperature.txt","a")
+    if os.name == "nt":
+        dest = "c:/save/temperature.txt"
+    else:
+        dest = "/home/pi/save/temperature.txt"
+    
+    f = open(dest,"a")
     f.write("%s: %s: %s\n" % (timestamp,city,temp) )
     f.close()
 
@@ -39,6 +47,7 @@ def retrieveTemp():
 
 def loop(nTimeLoopMin=15):
     retrieveTemp()
+    print("sleeping %d min..." % nTimeLoopMin)
     time.sleep(nTimeLoopMin*60)
 
 #~ retrieveTemp()

@@ -1153,11 +1153,47 @@ disk_read     1KB: ####################   5.46s (183.12 Mo/s)
 disk_write 1024KB: ####################   1.64s (608.30 Mo/s)
 disk_read  1024KB: ####################   0.31s (3219.90 Mo/s)
 
-microsd sandisk extreme 256 (celle de ms tab) dans slot microsd:
+microsd Sandisk Extreme 256 (celle de ms tab) dans slot microsd:
 disk_write    1KB: ####################  17.16s (58.26 Mo/s)
 disk_read     1KB: ####################   2.91s (343.35 Mo/s)
 disk_write 1024KB: ####################  15.15s (66.01 Mo/s)
 disk_read  1024KB: ####################   0.30s (3330.45 Mo/s)
+sur 4000MB:
+disk_write    1KB: ####################  61.57s (64.96 Mo/s)
+disk_read     1KB: ####################  12.43s (321.69 Mo/s)
+disk_write 1024KB: ####################  62.84s (63.65 Mo/s)
+disk_read  1024KB: ####################   1.42s (2822.87 Mo/s)
+sur 4000MB (2nd run):
+disk_write    1KB: ####################  58.17s (68.76 Mo/s)
+disk_read     1KB: ####################  12.23s (327.03 Mo/s)
+disk_write 1024KB: ####################  60.98s (65.59 Mo/s)
+disk_read  1024KB: ####################   1.47s (2718.76 Mo/s)
+
+
+Sandisk Ultra 1To sur lecteur USB
+sur 4000MB:
+disk_write    1KB: #################### 122.75s (32.59 Mo/s)
+disk_read     1KB: ####################  12.52s (319.53 Mo/s)
+disk_write 1024KB: #################### 127.24s (31.44 Mo/s)
+disk_read  1024KB: ####################   1.45s (2749.29 Mo/s)
+sur 4000MB (2nd run):
+disk_write    1KB: #################### 125.20s (31.95 Mo/s)
+disk_read     1KB: ####################  12.54s (319.09 Mo/s)
+disk_write 1024KB: #################### 126.44s (31.64 Mo/s)
+disk_read  1024KB: ####################   1.37s (2910.23 Mo/s)
+
+Sandisk Ultra 1To lecteur USB dans slot microsd:
+sur 4000MB:
+disk_write    1KB: #################### 125.60s (31.85 Mo/s)
+disk_read     1KB: ####################  12.51s (319.78 Mo/s)
+disk_write 1024KB: #################### 125.24s (31.94 Mo/s)
+disk_read  1024KB: ####################   1.36s (2938.42 Mo/s)
+sur 4000MB (2nd run):
+disk_write    1KB: #################### 126.72s (31.56 Mo/s)
+disk_read     1KB: ####################  12.56s (318.41 Mo/s)
+disk_write 1024KB: #################### 126.53s (31.61 Mo/s)
+disk_read  1024KB: ####################   1.44s (2776.79 Mo/s)
+
 
 new sandisk fit mini usb 128Go sur port usb:
 disk_write    1KB: ####################  25.82s (38.73 Mo/s)
@@ -1171,11 +1207,24 @@ disk_read     1KB: ####################   3.04s (328.93 Mo/s)
 disk_write 1024KB: ####################  21.22s (47.13 Mo/s)
 disk_read  1024KB: ####################   0.46s (2181.99 Mo/s)
 
-new SSD samsgun 1To sur Sabrent (usb):
+new SSD samung 1To sur Sabrent (usb):
 disk_write    1KB: ####################  11.53s (86.76 Mo/s)
 disk_read     1KB: ####################   5.57s (179.62 Mo/s)
 disk_write 1024KB: ####################   4.08s (244.82 Mo/s)
 disk_read  1024KB: ####################   0.34s (2911.05 Mo/s)
+
+new SSD crucial 1To sur Sabrent (usb):
+sur 4000MB:
+disk_write    1KB: ####################  28.94s (138.20 Mo/s)
+disk_read     1KB: ####################  12.55s (318.67 Mo/s)
+disk_write 1024KB: ####################  17.25s (231.93 Mo/s)
+disk_read  1024KB: ####################   1.39s (2879.66 Mo/s)
+sur 4000MB (2nd run):
+disk_write    1KB: ####################  33.55s (119.22 Mo/s)
+disk_read     1KB: ####################  12.20s (327.94 Mo/s)
+disk_write 1024KB: ####################  17.15s (233.25 Mo/s)
+disk_read  1024KB: ####################   1.36s (2951.93 Mo/s)
+
 
 
 *** Dell kakashi Corto/Elsa (si sur batterie, mettre sur mode perf elevée):

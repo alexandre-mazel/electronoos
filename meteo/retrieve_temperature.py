@@ -37,5 +37,10 @@ def retrieveTemp():
             
 # retrieveTemp - end
 
-retrieveTemp()
+def loop(nTimeLoopMin=15):
+    retrieveTemp()
+    time.sleep(nTimeLoopMin*60)
+
+#~ retrieveTemp()
+loop()
 

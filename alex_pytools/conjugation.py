@@ -323,6 +323,7 @@ def autotest():
     conjugator.printAllConjugaison("lounis")
     conjugator.printAllConjugaison("boufraine")
     conjugator.printAllConjugaison("minecraft")
+    conjugator.printAllConjugaison("écran")
     conjugator.printAllConjugaison("regarder", " l'écran")
     
 if __name__ == "__main__":

@@ -15,7 +15,7 @@ def store(city,temp,cond):
     if os.name == "nt":
         dest = "c:/save/temperature.txt"
     else:
-        dest = "/home/pi/save/temperature.txt"
+        dest = os.path.expanduser("~/save/temperature.txt")
     
     f = open(dest,"a")
     f.write("%s: %s: %s: %s\n" % (timestamp,city,temp,cond) )

@@ -1,5 +1,7 @@
 # -*- coding: cp1252 -*-
+
 import io
+import time
 
 import stringtools
 
@@ -7,6 +9,7 @@ class Apho:
     def __init__( self ):
         self.thous = [] # list of pair (sentence, author)
         self.aCountSaid = [] # for each sentence, number of said time
+        self.aLastSaid = [] # time of last said
         
     def load( self ):
         """
@@ -32,6 +35,7 @@ Antoine de Saint-Exupery
                     auth = blob[-1]
                     self.thous.append( (citation,auth) )
                     self.aCountSaid.append(0)
+                    self.aLastSaid.append(0)
                 blob = []
             else:
                 blob.append(line)
@@ -83,6 +87,8 @@ Antoine de Saint-Exupery
         for idx in index_order[1:]:
             if match[idx]<1:
                 break
+            if time.time()-self.aLastSaid[idx]<5*60:
+                continue
             if self.aCountSaid[less_said_idx] > self.aCountSaid[idx]:
                 less_said_idx = idx
         print("less_said_idx: %d" % less_said_idx )
@@ -93,8 +99,13 @@ Antoine de Saint-Exupery
         if self.aCountSaid[less_said_idx] > 0 and 0:
             # decide to say already said or not ?
             return None
+            
+        # first sentence of the list can be selected by default
+        if time.time()-self.aLastSaid[less_said_idx]<5*60:
+            return None
         
         self.aCountSaid[less_said_idx] += 1
+        self.aLastSaid[less_said_idx] = time.time()
         return self.thous[less_said_idx]
         
 # class Apho - end
@@ -167,4 +178,5 @@ def autoTest():
     print(apho.getThoughts("Il me faudrait du courage"))
     print(apho.getThoughts("Il me faudrait du courage"))
     
+#~ autoTest()
 test_loop_asr()

@@ -20,10 +20,10 @@ class SoundAnalyser:
         self.rEnergyThreshold = 30;
         self.rWaitSilenceBeforeEnding = 0.35
         self.rLengthInterestingSound = 0.4
-        self.rMaxDurationPerSend = 20.; # in second
+        self.rMaxDurationPerSend = 30.; # in second
         self.bSendToSpeechReco = True     
         self.bSpeechRecoUseSphinx = 0 # google
-        self.bSpeechRecoUseSphinx = 1 # sphinx
+        #~ self.bSpeechRecoUseSphinx = 1 # sphinx
         
         print("INF: SoundAnalyser: bSpeechRecoUseSphinx: %s" % self.bSpeechRecoUseSphinx )
         
@@ -83,15 +83,15 @@ class SoundAnalyser:
             self.aStoredSoundData = np.concatenate( (self.aStoredSoundData, aSoundData) )
             #~ rSampleDuration = float(nbrOfSamplesByChannel) / self.nSampleRate;
             rCurrentDuration = len(self.aStoredSoundData) / (nSampleRate*nbOfChannels);
-            if( rCurrentDuration > self.rMaxDurationPerSend ):
-                # remove 1 sec from beginning #todo: remove the real length
+            if( rCurrentDuration > self.rMaxDurationPerSend and 0):
+                # remove 1 sec from beginning #todo: remove the real length #todo: store all but send only the end.
                 rTimeToRemove = 1.;
                 self.aStoredSoundData = self.aStoredSoundData[int(nSampleRate*nbOfChannels*rTimeToRemove):]
                 rCurrentDuration -= rTimeToRemove;
-                self.rTimeDurationLastSend -= rTimeToRemove;
+                # self.rTimeDurationLastSend -= rTimeToRemove; # why !?
             # TODO: check that condition !!!
             #~ if( rCurrentDuration > self.rTimeDurationLastSend + self.rSegmentDurationForANewIncompleteCall or (bEndOfSound and self.rTimeDurationLastSend == 0. ) ):
-            if bEndOfSound:
+            if bEndOfSound and rCurrentDuration < self.rMaxDurationPerSend :
                 bSendFile = True;
             
             

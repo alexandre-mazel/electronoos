@@ -10,6 +10,12 @@ def assert_equal( a, b ):
     print( "%s == %s ?" % (str(a),str(b)) )
     if a!=b:
         assert(0)
+        
+def lowerList( l ):
+    o = []
+    for s in l:
+        o.append(s.lower())
+    return o
 
 def findSubString( buf, strBefore, strAfter= "", nOccurence = 1, bQuiet=False ):
     """

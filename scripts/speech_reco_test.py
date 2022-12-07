@@ -112,6 +112,8 @@ def recognizeFromFile(filename,language = "en-US"):
         bShowAll = 1
         
         bUseSphinx = 0
+        bUseSphinx = 1
+        
         if not bUseSphinx:
             #~ import sound_processing
             #~ retFromReco = sound_processing.getSpeechInWav(filename)

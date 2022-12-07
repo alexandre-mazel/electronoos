@@ -21,6 +21,7 @@ def store(city,temp,cond):
     f.write("%s: %s: %s: %s\n" % (timestamp,city,temp,cond) )
     f.close()
 
+# from https://weather.com
 def retrieveTemp():
     startbase = '<span data-testid="TemperatureValue" class="CurrentConditions--tempValue--MHmYY">'
     stopbase = "°</span>"

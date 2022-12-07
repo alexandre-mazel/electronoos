@@ -1,0 +1,1 @@
+nohup pyt3 retrieve_temperature.py&

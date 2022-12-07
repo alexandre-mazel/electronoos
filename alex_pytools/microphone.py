@@ -76,7 +76,9 @@ def analyse_sound_just_peek(buffer,rate,width,channels,timestamp):
         #~ print("DBG: analyse_sound: buffer len: %s" % len(buffer))
     
     nEnergy = sound_processing.computeEnergyBestNumpy(aSoundData);
-    if nEnergy > 20:
+    if nEnergy > 1:
+        # 4-6: jardinier dans le jardin arriere:
+        # 3-4: ventilo
         print( "nEnergy: %s" % nEnergy )
 # analyse_sound - end
 
@@ -90,5 +92,5 @@ def loopProcess(wordsCallback):
     loop_getsound(analyse_sound_total)
     
 if __name__ == "__main__":
-    #~ loop_getsound(analyse_sound_just_peek)
-    loop_getsound(analyse_sound_total)
+    loop_getsound(analyse_sound_just_peek)
+    #~ loop_getsound(analyse_sound_total)

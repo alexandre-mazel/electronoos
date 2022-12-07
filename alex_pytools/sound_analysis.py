@@ -22,7 +22,11 @@ class SoundAnalyser:
         self.rLengthInterestingSound = 0.4
         self.rMaxDurationPerSend = 20.; # in second
         self.bSendToSpeechReco = True     
-        self.bSpeechRecoUseSphinx = 1 # else it's google
+        self.bSpeechRecoUseSphinx = 0 # google
+        self.bSpeechRecoUseSphinx = 1 # sphinx
+        
+        print("INF: SoundAnalyser: bSpeechRecoUseSphinx: %s" % self.bSpeechRecoUseSphinx )
+        
         
         self.strCurrentFilename = None;
 
@@ -114,7 +118,8 @@ class SoundAnalyser:
                         txt = reco[0]
                         conf = reco[1]
                         txtclean = txt.replace(" ", "_")
-                        strFilenameNew = strFilename.replace(".wav", "__"+txtclean+".wav")
+                        txtclean = txtclean[:100]
+                        strFilenameNew = strFilename.replace(".wav", "__"+str(int(self.bSpeechRecoUseSphinx))+"__"+txtclean+".wav")
                         os.rename(strFilename,strFilenameNew)
                         if self.wordsHeardCallback: self.wordsHeardCallback(txt,conf)
 

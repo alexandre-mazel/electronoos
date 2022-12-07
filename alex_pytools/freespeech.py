@@ -1,10 +1,30 @@
 # -*- coding: cp1252 -*-
+import io
 import os
 import pocketsphinx
 import speech_recognition
 import time
 
-r = speech_recognition.Recognizer()
+import misctools
+
+recognizer = speech_recognition.Recognizer()
+
+#~ self.strDstPath = "/tmp/";
+if os.name == "nt":
+    strVerbatimPath = "c:/save/"
+else:
+    strVerbatimPath = os.path.expanduser("~/save/")
+    
+try:
+    os.makedirs( strVerbatimPath )
+except: pass
+strVerbatimFilename = strVerbatimPath+"verbatim.txt"
+
+def storeVerbatim(recognized):
+    timestamp = misctools.getTimeStamp()
+    f = io.open(strVerbatimFilename,"a",encoding="cp1252")
+    f.write("%s: %s\n" % (timestamp,str(recognized)) )
+    f.close()
 
 def recognizeFromFile( filename, language = "en-US", bUseSphinx = 1):
     """
@@ -15,7 +35,7 @@ def recognizeFromFile( filename, language = "en-US", bUseSphinx = 1):
     retVal = None
 
     with speech_recognition.WavFile(filename) as source:
-        audio = r.record(source) # read the entire WAV file
+        audio = recognizer.record(source) # read the entire WAV file
     # recognize speech using  Speech Recognition
     
     try:
@@ -26,13 +46,13 @@ def recognizeFromFile( filename, language = "en-US", bUseSphinx = 1):
         if not bUseSphinx:
             #~ import sound_processing
             #~ retFromReco = sound_processing.getSpeechInWav(filename)
-            retFromReco = r.recognize_google(audio, language = language, show_all = bShowAll)
+            retFromReco = recognizer.recognize_google(audio, language = language, show_all = bShowAll)
             
             if bVerbose: print( "retFromReco: %s" % str(retFromReco) )
 
         else:
             keyword_entries = None
-            retFromReco = r.recognize_sphinx(audio, language = language, keyword_entries=keyword_entries, show_all = bShowAll )
+            retFromReco = recognizer.recognize_sphinx(audio, language = language, keyword_entries=keyword_entries, show_all = bShowAll )
             if bVerbose: print("Duration: %.3fs" % (time.time()-timeBegin))
             if bVerbose: print( "retFromReco: %s" % str(retFromReco) )
             
@@ -74,6 +94,10 @@ def recognizeFromFile( filename, language = "en-US", bUseSphinx = 1):
         if bVerbose: print("Speech Recognition could not understand audio\n")
 
     if bVerbose: print("DBG: retVal: %s" % str(retVal) )
+    if retVal != None: 
+        # store a verbatim of the conversation
+        storeVerbatim(retVal)
+
     return retVal
     
 # recognizeFromFile - end

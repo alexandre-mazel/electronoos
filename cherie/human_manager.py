@@ -41,6 +41,11 @@ ps eax | grep sound_analyser | wc
 # mise a jour du robot chez brice:
 pscp -pw naonao C:/Users/alexa/dev/git/electronoos/cherie/*.py nao@87.90.82.139:/home/nao/.local/lib/python2.7/site-packages/electronoos/cherie & pscp -pw naonao C:/Users/alexa/dev/git/abcdk/sdk/abcdk/sound_a*.py nao@87.90.82.139:/home/nao/.local/lib/python2.7/site-packages/abcdk/ & pscp -pw naonao C:/Users/alexa/dev/git/electronoos/alex_pytools/misc*.py nao@87.90.82.139:/home/nao/.local/lib/python2.7/site-packages/electronoos/alex_pytools/ &
 
+# tout abcdk:
+pscp -r -pw naonao C:/Users/alexa/dev/git/electronoos/* nao@87.90.82.139:/home/nao/.local/lib/python2.7/site-packages/electronoos/
+# que alextools
+pscp -r -pw naonao C:/Users/alexa/dev/git/electronoos/alex_pytools/* nao@87.90.82.139:/home/nao/.local/lib/python2.7/site-packages/electronoos/alex_pytools/
+
 # voir des stats:
 sur agx:
 df . -h

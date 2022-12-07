@@ -41,6 +41,9 @@ try: import naoqi
 except: pass
 import sound_player
 
+import apho
+import stringtools
+    
 def getTimeStamp():
     """
     
@@ -61,7 +64,8 @@ def getLogPath():
     
 def log(s):
     f = open( getLogPath() + "agent_behavior_cherie.log","at") # need to create empty file (touch) as root and put rights to 777
-    s = getTimeStamp() + ": " + str(s)
+    s = getTimeStamp() + ": " + str(stringtools.cp1252ToHtml(s))
+    s = s.replace("%20", " ").replace("&#39;","'")
     print("LOG: " + s )
     f.write(s + "\n")
     f.close()
@@ -247,6 +251,12 @@ class AgentBehavior:
                 self.say("vous parlez souvent de la vie, vous les humains, mais je ne sais même pas ce que c'est.")
                 return
                 
+            a = apho.apho.getThoughts(strText)
+            if a != None:
+                self.say(a[0])
+                self.say(a[1])
+                return
+                
             listShortTxt = [
                             "Ok!",
                             #~ "Hum",
@@ -326,8 +336,8 @@ class AgentBehavior:
             time.sleep(0.2)
             
     def say( self, txt ):
-        log( "INF: say: '%s'" % txt )
-        self.tts.post.say(txt)
+        log( "INF: say: '%s'" % txt)
+        self.tts.say( stringtools.transformAccentToUtf8(txt) )
         
     def isHumanSpeaking( self ):
         return self.mem.getData("Audio/SpeechDetected")

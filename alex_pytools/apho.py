@@ -1,9 +1,13 @@
 # -*- coding: cp1252 -*-
 
 import io
+import os
+import sys
 import time
 
+import misctools
 import stringtools
+
 
 class Apho:
     def __init__( self ):
@@ -21,7 +25,7 @@ Anne Frank
 Fais de ta vie un rêve et d’un rêve une réalité.
 Antoine de Saint-Exupery
         """
-        f = io.open("datas/pensee.txt","r",encoding='cp1252')
+        f = io.open(misctools.getThisFilePath()+"datas/pensee.txt","r",encoding='cp1252')
         blob = [] # un bloc de ligne de texte séparé par une ligne vide
         while 1:
             line = f.readline()
@@ -46,8 +50,20 @@ Antoine de Saint-Exupery
         find a thoughts not said a lot, relative to sentence.
         return a pair, (thought,author) or None if none
         """
+        bVerbose = 1
+        bVerbose = 0
+        
+        sentence = sentence.replace('.', ' ').replace(',', ' ')
         words = sentence.split()
         words = stringtools.lowerList(words)
+        # add also words without '
+        i = 0
+        while i < len(words):
+            if "'" in words[i]:
+                words.extend(words[i].split("'"))
+            i += 1
+        if bVerbose: print("DBG: getThoughts: words: %s" % words)
+        
         # find radical style
         i = 0
         while i < len(words):
@@ -66,13 +82,13 @@ Antoine de Saint-Exupery
             n = 0
             for w in words:
                 if w in cit:
-                    print("match: '%s' in '%s'" % (w,cit))
+                    if bVerbose or 0: print( "match: '%s' in '%s'" % (w,cit) )
                     #~ n += 1
                     n += len(w) # count more point if word is long!
                 if len(w)>5:
                     ws = w[:-3]
                     if ws in cit:
-                        print("match short: '%s' in '%s'" % (ws,cit))
+                        if bVerbose: print( "match short: '%s' in '%s'" % (ws,cit) )
                         n += len(ws)
                     
             match.append(n)
@@ -169,14 +185,31 @@ def autoTest():
     print(apho.getThoughts("j'aime pas travailler"))
     print(apho.getThoughts("j'aime pas travailler"))
     print("")
-    print(apho.getThoughts("j'ai la volonté de t'aider"))
-    print(apho.getThoughts("j'ai la volonté de t'aider"))
-    print(apho.getThoughts("j'ai la volonté de t'aider"))
-    print(apho.getThoughts("j'ai la volonté de t'aider"))
-    print(apho.getThoughts("j'ai la volonté de t'aider"))
+    #~ print(apho.getThoughts("j'ai la volonté de t'aider"))
+    #~ print(apho.getThoughts("j'ai la volonté de t'aider"))
+    #~ print(apho.getThoughts("j'ai la volonté de t'aider"))
+    #~ print(apho.getThoughts("j'ai la volonté de t'aider"))
+    #~ print(apho.getThoughts("j'ai la volonté de t'aider"))
     print("")
     print(apho.getThoughts("Il me faudrait du courage"))
     print(apho.getThoughts("Il me faudrait du courage"))
+    print(apho.getThoughts("J'aime le ChamPagne."))
+    print(apho.getThoughts("J'aime le vin."))
+    print(apho.getThoughts("d'attendre la pluie"))
+    if 0:
+        # test sur python 2.7
+        print(stringtools.accentToHtml("un élève"))
+        for i,a in enumerate(apho.thous):
+            print(i)
+            #~ print(stringtools.accentToHtml(a[0]))
+            s1 = stringtools.cp1252ToHtml(a[0])
+            s2 = stringtools.cp1252ToHtml(a[0])
+            print(s1)
+            print(s2)
+            #~ if i>80:
+                #~ break
+        
     
-#~ autoTest()
-test_loop_asr()
+if __name__ == "__main__":
+    autoTest()
+#~ test_loop_asr()

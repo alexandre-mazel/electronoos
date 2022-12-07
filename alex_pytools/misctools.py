@@ -66,6 +66,19 @@ def getUserHome():
     else:
         ret = os.path.expanduser("~/")
     return ret
+    
+def getThisFilePath(strModuleName = __name__):
+    """
+    call me with
+    - strModuleName: __name__
+    """
+    strLocalPath = os.path.dirname( sys.modules[__name__].__file__ )
+    print( "DBG: misctools.getThisFilePath: file: %s: strLocalPath: %s" % (__name__,strLocalPath) )
+    if strLocalPath == "":
+        strLocalPath = "."
+    if strLocalPath[-1] != '/' and strLocalPath[-1] != '\\':
+        strLocalPath += os.sep
+    return strLocalPath
 
 def getPathData():
     """

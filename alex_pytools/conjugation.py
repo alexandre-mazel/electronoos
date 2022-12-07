@@ -211,7 +211,7 @@ def autotest():
     assert_equal(conjugator.findInf("mangerons"),("manger",4,kTenseFuture)) # ne fonctionne pas: verbe mangerer !?!
     assert_equal(conjugator.findInf("porterons"),("porter",4,kTenseFuture)) # ne fonctionne pas: verbe porterer !?!
     
-    # 2iemegroupe
+    # 2ieme groupe
     assert_equal(conjugator.detectGroup("finir"),2)
     assert_equal(conjugator.conjugate("finir"),"je finis")
     assert_equal(conjugator.conjugate("finir", 2),"tu finis")
@@ -225,7 +225,7 @@ def autotest():
     assert_equal(conjugator.conjugate("finir", 5,kTensePast),"vous finîtes")
     assert_equal(conjugator.conjugate("finir", 6,kTensePast),"ils finirent")
     
-    # 3iemegroupe
+    # 3ieme groupe
     assert_equal(conjugator.detectGroup("prendre"),3)
     assert_equal(conjugator.detectGroup("croire"),3)
     assert_equal(conjugator.detectGroup("croitre"),3)

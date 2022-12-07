@@ -84,6 +84,10 @@ def analyse_sound_total(buffer,rate,width,channels,timestamp):
     import sound_analysis
     sound_analysis.soundAnalyser.processBuffer(buffer,rate,width,channels,timestamp)
     
+def loopProcess(wordsCallback):
+    import sound_analysis
+    sound_analysis.soundAnalyser.setWordsHeardCallback(wordsCallback)
+    loop_getsound(analyse_sound_total)
     
 if __name__ == "__main__":
     #~ loop_getsound(analyse_sound_just_peek)

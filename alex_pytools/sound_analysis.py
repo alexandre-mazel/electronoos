@@ -11,6 +11,7 @@ import time
 import sound_processing
 import misctools
 import wav
+import freespeech
 
 class SoundAnalyser:
     def __init__( self ):
@@ -36,6 +37,8 @@ class SoundAnalyser:
         self.bStoring = False; # are we currently storing ?
         self.timeLastEnergy = time.time() - 100
         
+        self.wordsHeardCallback = None
+        
         #~ self.strDstPath = "/tmp/";
         if os.name == "nt":
             self.strDstPath = "c:/recorded_sound/"
@@ -51,16 +54,18 @@ class SoundAnalyser:
         """
         This is THE method that receives all the sound buffers from the "ALAudioDevice" module
         """
+        bVerbose=0
+        
         ts = "%.2f" % timeStamp
         aSoundData = np.fromstring( buffer, dtype = np.int16 )
         nEnergy = sound_processing.computeEnergyBestNumpy(aSoundData)
         if nEnergy > 20:
-            print( "%s: INF: processBuffer: energy: %s" % (ts,nEnergy) )
+            if bVerbose: print( "%s: INF: processBuffer: energy: %s" % (ts,nEnergy) )
         
         bSendFile = False;
         bEndOfSound = False;
         if( nEnergy > self.rEnergyThreshold ):
-            print( "%s: DBG: processBuffer: High energy: %s" % (ts,nEnergy) )
+            if bVerbose: print( "%s: DBG: processBuffer: High energy: %s" % (ts,nEnergy) )
             self.timeLastEnergy = time.time();
             self.bStoring = True;
         else:
@@ -70,7 +75,7 @@ class SoundAnalyser:
                 
                 
         if( self.bStoring ):
-            print( "%s: INF: processBuffer: bStoring: %s" % (ts,self.bStoring) )
+            if bVerbose: print( "%s: INF: processBuffer: bStoring: %s" % (ts,self.bStoring) )
             self.aStoredSoundData = np.concatenate( (self.aStoredSoundData, aSoundData) )
             #~ rSampleDuration = float(nbrOfSamplesByChannel) / self.nSampleRate;
             rCurrentDuration = len(self.aStoredSoundData) / (nSampleRate*nbOfChannels);
@@ -87,9 +92,9 @@ class SoundAnalyser:
             
             
         if( bSendFile ):
-            print( "%s: INF: processBuffer: sending file ! (bSendFile: %s, bEndOfSound:%s)" % (ts,bSendFile,bEndOfSound) );
+            if bVerbose: print( "%s: INF: processBuffer: sending file ! (bSendFile: %s, bEndOfSound:%s)" % (ts,bSendFile,bEndOfSound) );
             if rCurrentDuration < self.rWaitSilenceBeforeEnding+self.rLengthInterestingSound:
-                print( "%s: INF: processBuffer: file is too short: duration: %.3fs" % (ts,rCurrentDuration) )
+                if bVerbose: print( "%s: INF: processBuffer: file is too short: duration: %.3fs" % (ts,rCurrentDuration) )
             else:
                 self.rTimeDurationLastSend = rCurrentDuration;
                 strOpionnalId = ""
@@ -103,16 +108,30 @@ class SoundAnalyser:
                 wavTemp.write( strFilename );
                 
                 if self.bSendToSpeechReco:
-                    if self.bSpeechRecoUseSphinx:
-                    
+                    reco = freespeech.recognizeFromFile(strFilename, "fr-FR", self.bSpeechRecoUseSphinx)
+                    if reco != None:
+                        print( "%s: INF: recognized: %s" % (ts,reco) );
+                        txt = reco[0]
+                        conf = reco[1]
+                        txtclean = txt.replace(" ", "_")
+                        strFilenameNew = strFilename.replace(".wav", "__"+txtclean+".wav")
+                        os.rename(strFilename,strFilenameNew)
+                        if self.wordsHeardCallback: self.wordsHeardCallback(txt,conf)
 
         if( bEndOfSound ):
-            print( "%s: INF: processBuffer: bEndOfSound: new buffer" %(ts));
+            if bVerbose: print( "%s: INF: processBuffer: bEndOfSound: new buffer" %(ts));
             self.aStoredSoundData = np.array( [], dtype=np.int16 );
             self.bStoring = False;
             self.rTimeDurationLastSend = 0;
                 
     # processRemote - end
+    
+    def setWordsHeardCallback( self, callback ):
+        """
+        set a callback to call when words are heard
+        - callback: a function with parameters: (words, confidence)
+        """
+        self.wordsHeardCallback = callback
         
         
         

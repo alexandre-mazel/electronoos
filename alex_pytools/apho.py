@@ -90,7 +90,7 @@ Antoine de Saint-Exupery
         if match[less_said_idx] < 1:
             return None
             
-        if self.aCountSaid[less_said_idx] > 0:
+        if self.aCountSaid[less_said_idx] > 0 and 0:
             # decide to say already said or not ?
             return None
         
@@ -108,31 +108,42 @@ def say(txt):
     if global_tts == None:
         import pyttsx3
         global_tts = pyttsx3.init()
+    if 1:
+        txt = txt.replace("Gaia", "Gaïa")
     print("INF: say: '%s'" % txt)
     global_tts.say(txt)
     global_tts.runAndWait()
     
+def wordsCallback(words,confidence):
+    print("INF: heard: '%s'" % words)
+    #~ say(phrase)
+    ret = apho.getThoughts(words)
+    if ret != None:
+        say(ret[0])
+        say(ret[1])
+        
 def test_loop_asr():
 
-    from pocketsphinx import LiveSpeech, get_model_path
-    import os
-    model_path = get_model_path()
-    print("model_path: %s" % model_path )
-    # good model path:
-    model_path = "C:\\Python39\\Lib\\site-packages\\speech_recognition\\pocketsphinx-data\\"
-    strAnsiLang = "fr-FR"
-    for phrase in LiveSpeech(
-        hmm=(os.path.join(model_path, strAnsiLang)+"\\acoustic-model\\"),
-        lm=os.path.join(model_path, strAnsiLang+'\\language-model.lm.bin'),
-        dic=os.path.join(model_path, strAnsiLang+'\\pronounciation-dictionary.dict')
-    ):
-        phrase = str(phrase)
-        print("INF: heard: '%s'" % phrase)
-        #~ say(phrase)
-        ret = apho.getThoughts(phrase)
-        if ret != None:
-            say(ret[0])
-            say(ret[1])
+    if 0:
+        from pocketsphinx import LiveSpeech, get_model_path
+        import os
+        model_path = get_model_path()
+        print("model_path: %s" % model_path )
+        # good model path:
+        model_path = "C:\\Python39\\Lib\\site-packages\\speech_recognition\\pocketsphinx-data\\"
+        strAnsiLang = "fr-FR"
+        for phrase in LiveSpeech(
+            hmm=(os.path.join(model_path, strAnsiLang)+"\\acoustic-model\\"),
+            lm=os.path.join(model_path, strAnsiLang+'\\language-model.lm.bin'),
+            dic=os.path.join(model_path, strAnsiLang+'\\pronounciation-dictionary.dict')
+        ):
+            phrase = str(phrase)
+            wordsCallback( phrase, 0.5)
+
+    else:
+        # my own one
+        import microphone
+        microphone.loopProcess(wordsCallback)
             
     
     

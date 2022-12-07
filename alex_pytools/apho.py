@@ -115,6 +115,10 @@ def say(txt):
     global_tts.runAndWait()
     
 def wordsCallback(words,confidence):
+    if confidence<0.6:
+        return
+    if len(words)<4:
+        return
     print("INF: heard: '%s'" % words)
     #~ say(phrase)
     ret = apho.getThoughts(words)

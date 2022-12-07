@@ -254,7 +254,8 @@ class AgentBehavior:
             a = apho.apho.getThoughts(strText)
             if a != None:
                 self.say(str(stringtools.transformAccentToUtf8(a[0])))
-                self.say(str(stringtools.transformAccentToUtf8(a[1])))
+                author = stringtools.transformAccentToUtf8(a[1]).replace("Gaia", "Gaya")
+                self.say(str(author))
                 return
                 
             listShortTxt = [

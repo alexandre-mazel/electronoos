@@ -136,7 +136,7 @@ def say(txt):
         import pyttsx3
         global_tts = pyttsx3.init()
     if 1:
-        txt = txt.replace("Gaia", "Gaya") # le i trema ne passe pas sur le robot
+        txt = txt.replace("Gaia", "Gaïa")
     print("INF: say: '%s'" % txt)
     global_tts.say(txt)
     global_tts.runAndWait()
@@ -176,9 +176,24 @@ def test_loop_asr():
         import microphone
         microphone.loopProcess(wordsCallback)
             
-    
-    
-    
+
+"""
+# probleme actuel, les mots banals hits trop:
++ mettre malus sur longueur de la phrase!
+
+INF: heard: 'c'est cool'
+less_said_idx: 3
+INF: say: 'Le plus difficile, ce n'est pas de sortir de Polytechnique, c'est de sortir de l'ordinaire.'
+
+INF: heard: 'je suis bien d'accord'
+less_said_idx: 115
+INF: say: 'Je ne comprends pas qu'on achète du vin sans l'avoir goûté au préalable. Il ne viendrait à personne l'idée d'acheter un pantalon sans l'essayer avant. Alors, Dieu me tire-bouchonne, ne refusez pas à votre bouche ce que vous accordez à vos fesses.'
+
+INF: heard: 'un bon petit vin rouge'
+less_said_idx: 8
+INF: say: 'Le bonheur est une petite chose que l'on grignote, assis par terre, au soleil.'
+"""
+
 def autoTest():
     print(apho.getThoughts("j'aime pas travailler"))
     print(apho.getThoughts("j'aime pas travailler"))
@@ -213,5 +228,5 @@ def autoTest():
         
     
 if __name__ == "__main__":
-    autoTest()
-#~ test_loop_asr()
+    #~ autoTest()
+    test_loop_asr()

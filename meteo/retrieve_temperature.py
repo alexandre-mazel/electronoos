@@ -50,6 +50,7 @@ def loop(nTimeLoopMin=15):
         retrieveTemp()
         print("sleeping %d min..." % nTimeLoopMin)
         time.sleep(nTimeLoopMin*60)
+        #~ use misctools.isQuarterHour ?
 
 #~ retrieveTemp()
 loop()

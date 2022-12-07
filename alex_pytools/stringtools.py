@@ -537,9 +537,9 @@ def transformAccentToUtf8( s ):
     s = cp1252ToHtml(s)
     # this file is encoded in utf8, so the accent in real will be ok
     # todo: better! avec une table utf8
-    s = s.replace("&eacute;","é")
-    s = s.replace("&egrave;","è")
-    s = s.replace("&ecirc;","ê")
+    s = s.replace("&eacute;","ai")
+    s = s.replace("&egrave;","ai")
+    s = s.replace("&ecirc;","ai")
     s = s.replace("%20"," ")
     s = s.replace("&#39;","'")
     s = s.replace("&agrave;","a")

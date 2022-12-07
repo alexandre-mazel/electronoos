@@ -203,9 +203,11 @@ def autoTest():
             print(i)
             #~ print(stringtools.accentToHtml(a[0]))
             s1 = stringtools.cp1252ToHtml(a[0])
-            s2 = stringtools.cp1252ToHtml(a[0])
+            s2 = stringtools.cp1252ToHtml(a[1])
             print(s1)
             print(s2)
+            print(stringtools.transformAccentToUtf8(a[0]))
+            print(stringtools.transformAccentToUtf8(a[1]))
             #~ if i>80:
                 #~ break
         

@@ -253,8 +253,8 @@ class AgentBehavior:
                 
             a = apho.apho.getThoughts(strText)
             if a != None:
-                self.say(a[0])
-                self.say(a[1])
+                self.say(str(stringtools.transformAccentToUtf8(a[0])))
+                self.say(str(stringtools.transformAccentToUtf8(a[1])))
                 return
                 
             listShortTxt = [
@@ -337,7 +337,7 @@ class AgentBehavior:
             
     def say( self, txt ):
         log( "INF: say: '%s'" % txt)
-        self.tts.say( stringtools.transformAccentToUtf8(txt) )
+        self.tts.say( txt )
         
     def isHumanSpeaking( self ):
         return self.mem.getData("Audio/SpeechDetected")

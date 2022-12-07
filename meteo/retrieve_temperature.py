@@ -27,8 +27,10 @@ def retrieveTemp():
     stopbase = "°</span>"
     astrDatas = [
             ["Paris", "https://weather.com/fr-FR/temps/aujour/l/48.86,2.35?par=google",startbase,stopbase],
+            ["Le Kremlin-Bicetre", "https://weather.com/fr-FR/temps/aujour/l/ccb7b6dc48e255339753562e6a8ea1b48b796d68cc275ef58b3d8fe4c9b75fa7",startbase,stopbase],
             ["Beziers", "https://weather.com/fr-FR/temps/aujour/l/48dfaf8b4db3509a7e858c54a0ec35164fa8baccc73b35f6b9e0cd04b7544ea5",startbase,stopbase],
             ["Bort-les-Orgues", "https://weather.com/fr-FR/temps/aujour/l/14e53d3cef725e41222474317acf1d27951992d718300074c36ded62883afdd5",startbase,stopbase],
+            ["Saint-bonnet-pret-bort", "https://weather.com/fr-FR/temps/aujour/l/356a10c392837b0bd6f3e7ddd33acb4d385701ddf07ebae91c8ed2fa8b7c803c",startbase,stopbase],
             ["Annecy", "https://weather.com/fr-FR/temps/aujour/l/dca69ee3f92301838c6a8f09e67796bf14fe8684fb90ed81dc4cbfb732668169",startbase,stopbase],
     ]
     

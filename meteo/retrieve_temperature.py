@@ -10,7 +10,7 @@ import misctools
 import nettools
 import stringtools
 
-def store(city,temp):
+def store(city,temp,cond):
     timestamp = misctools.getTimeStamp()
     if os.name == "nt":
         dest = "c:/save/temperature.txt"
@@ -18,7 +18,7 @@ def store(city,temp):
         dest = "/home/pi/save/temperature.txt"
     
     f = open(dest,"a")
-    f.write("%s: %s: %s\n" % (timestamp,city,temp) )
+    f.write("%s: %s: %s: %s\n" % (timestamp,city,temp,cond) )
     f.close()
 
 def retrieveTemp():
@@ -31,17 +31,25 @@ def retrieveTemp():
             ["Annecy", "https://weather.com/fr-FR/temps/aujour/l/dca69ee3f92301838c6a8f09e67796bf14fe8684fb90ed81dc4cbfb732668169",startbase,stopbase],
     ]
     
+    start_cond = '<div data-testid="wxPhrase" class="CurrentConditions--phraseValue--mZC_p">'
+    stop_cond = '</div><div class="CurrentConditions--tempHiLoValue--3T1DG">'
+    
     for city,link,txt_start,txt_end in astrDatas:
-        dst = "/tmp/temp.html"
+        dst = "/tmp/meteo_temp.html"
         nettools.download(link,dst,bForceDownload=1)
         f = io.open(dst,"r",encoding='utf-8')
         buf = f.read()
         f.close()
-        txt = stringtools.findSubString(buf,txt_start,txt_end)
-        print("DBG: retrieveTemp: %s: txt: '%s'" % (city,txt) )
-        if len(txt) < 3:
-            temp = int(txt)
-            store(city,txt)
+        temp = stringtools.findSubString(buf,txt_start,txt_end)
+        cond = stringtools.findSubString(buf,start_cond,stop_cond)
+        # beau: soleil avec un peu de nuage
+        # ensoleillé: plein soleil
+        print("DBG: retrieveTemp: %s: temp: '%s' cond: '%s'" % (city,temp,cond) )
+        if len(temp) < 3:
+            temp = int(temp)
+            cond = cond.replace("é","e")
+            store(city,temp,cond)
+        #~ break
             
 # retrieveTemp - end
 

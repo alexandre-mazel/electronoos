@@ -50,8 +50,9 @@ Antoine de Saint-Exupery
             if len(words[i])<4:
                 del words[i]
                 continue
-            if len(words[i])>5:
-                words[i] = words[i][:-3] # travailler => travail
+            # on le fera plus tard pour essayer de matcher sur le mot reel
+            #~ if len(words[i])>5:
+                #~ words[i] = words[i][:-3] # travailler => travail
             i += 1
             
         match = []
@@ -62,7 +63,14 @@ Antoine de Saint-Exupery
             for w in words:
                 if w in cit:
                     print("match: '%s' in '%s'" % (w,cit))
-                    n += 1
+                    #~ n += 1
+                    n += len(w) # count more point if word is long!
+                if len(w)>5:
+                    ws = w[:-3]
+                    if ws in cit:
+                        print("match short: '%s' in '%s'" % (ws,cit))
+                        n += len(ws)
+                    
             match.append(n)
         #~ print("match: %s" % match)
         #~ [x for _, x in sorted(zip(Y, X))]
@@ -78,6 +86,10 @@ Antoine de Saint-Exupery
             if self.aCountSaid[less_said_idx] > self.aCountSaid[idx]:
                 less_said_idx = idx
         print("less_said_idx: %d" % less_said_idx )
+        
+        if match[less_said_idx] < 1:
+            return None
+            
         if self.aCountSaid[less_said_idx] > 0:
             # decide to say already said or not ?
             return None
@@ -96,6 +108,7 @@ def say(txt):
     if global_tts == None:
         import pyttsx3
         global_tts = pyttsx3.init()
+    print("INF: say: '%s'" % txt)
     global_tts.say(txt)
     global_tts.runAndWait()
     
@@ -114,7 +127,7 @@ def test_loop_asr():
         dic=os.path.join(model_path, strAnsiLang+'\\pronounciation-dictionary.dict')
     ):
         phrase = str(phrase)
-        print("heard: '%s'" % phrase)
+        print("INF: heard: '%s'" % phrase)
         #~ say(phrase)
         ret = apho.getThoughts(phrase)
         if ret != None:

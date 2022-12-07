@@ -53,7 +53,7 @@ def loop_getsound(callback=None):
     cpt = 0
     while 1:
         data = stream.read(CHUNK)  # read audio stream (chunk = nbr sample)
-        if callback != None: callback(data,RATE,WIDTH,CHANNELS)
+        if callback != None: callback(data,RATE,WIDTH,CHANNELS,time.time())
         cpt += 1
         if (cpt%(5*RATE//CHUNK))==0:
             print("%.2f: received buffers: %d" % (time.time(),cpt))
@@ -66,7 +66,7 @@ def loop_getsound(callback=None):
     p.terminate()
 # loop_getsound - end
 
-def analyse_sound_just_peek(buffer,rate,width,channels):
+def analyse_sound_just_peek(buffer,rate,width,channels,timestamp):
     # monotise le son
     #~ print("DBG: analyse_sound: rate: %s, width: %s, channels: %s, buffer len: %s" % (rate,width,channels,len(buffer)))
     aSoundData = np.fromstring( buffer, dtype = np.int16 )
@@ -79,7 +79,12 @@ def analyse_sound_just_peek(buffer,rate,width,channels):
     if nEnergy > 20:
         print( "nEnergy: %s" % nEnergy )
 # analyse_sound - end
+
+def analyse_sound_total(buffer,rate,width,channels,timestamp):
+    import sound_analysis
+    sound_analysis.soundAnalyser.processBuffer(buffer,rate,width,channels,timestamp)
     
     
 if __name__ == "__main__":
-    loop_getsound(analyse_sound_just_peek)
+    #~ loop_getsound(analyse_sound_just_peek)
+    loop_getsound(analyse_sound_total)

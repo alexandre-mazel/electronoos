@@ -136,7 +136,7 @@ def say(txt):
         import pyttsx3
         global_tts = pyttsx3.init()
     if 1:
-        txt = txt.replace("Gaia", "Gaïa")
+        txt = txt.replace("Gaia", "Gaya") # le i trema ne passe pas sur le robot
     print("INF: say: '%s'" % txt)
     global_tts.say(txt)
     global_tts.runAndWait()

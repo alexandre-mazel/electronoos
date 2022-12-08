@@ -96,7 +96,7 @@ class Conjugator:
     def conjugate( self, strInf, nPers = 1, nTense = kTensePresent, bOnlyVerb = False ):
         """
         - nPers: 1: je, 2: tu, 3: il,elle, 4: nous, 5: vous, 6: ils
-        - bOnlyVerb: when set => don't return subject: "aimes" instead of "tu aimes"
+        - bOnlyVerb: when set => omit subject:  return "aimes" instead of "tu aimes"
         """
         bVerbose = 1
         bVerbose = 0
@@ -126,6 +126,9 @@ class Conjugator:
                 radical += 'e'
             verb = radical + end
         
+        if bOnlyVerb:
+            return verb
+        
         o = misctools.elision(self.aSubject[nPers], verb)
 
         return o
@@ -137,22 +140,42 @@ class Conjugator:
             infinitive: infinitive form of a conjugate verb
             pers: the pers 1..6
             tense: a tense in kTenseEnums
+        return ("",0,0) if not found
             
         - nPers: if set, will look for this persona
         """
+        
+        # N'aurait on pas presque plus vite fait de generer tout les verbes du monde et de faire un lookup ?
+        # ca fait peut etre un peu beaucoup quand meme...
+        
         bVerbose = 1
-        bVerbose = 0
+        #~ bVerbose = 0
             
         group = 1 # TODO: autodetect, mais comment?
         
         nPersFound = 0
-        infinitive = "??"
+        infinitive = ""
         kTense = kTenseUnknown
         
+        # range(self.aaastrTerminationByTense): # probleme pour différencier futur et present, donc on commence par le futur
+        listTense = [kTenseFuture,kTenseImperfect,kTensePast,kTensePresent] # not optimal in sense of frequency but works better in this order               
+        
+        # look for peculiar
+        for infi,tenses in self.aaParticular.items():             
+            for numTense,forms in enumerate(tenses):
+                for pers in range(1,7):
+                    if nPers != -1 and pers != nPers:
+                        continue
+                    if bVerbose: print("DBG: findInf: aaParticular: comparing %s and %s" % (strVerb,forms[pers-1]) )
+                    if strVerb == forms[pers-1]:
+                        return infi,pers,numTense+kTenseFirst
+
+        
         bFound = 0
-        if group == 1:
-            #~ for numTense,terms in enumerate(self.aaastrTerminationByTense): # probleme pour différencier futur et present, donc on commence par le futur
-            for numTense in [kTenseFuture,kTenseImperfect,kTensePast,kTensePresent]: # not optimal in sense of frequency but works better in this order               
+        for group in range(3,0,-1): # start by longer and more specific one
+            if bFound: break
+            if bVerbose: print("DBG: findInf: * group: %d" % group )
+            for numTense in listTense:
                 numTense -=kTenseFirst
                 terms = self.aaastrTerminationByTense[group-1][numTense]
                 if bFound: break
@@ -161,18 +184,62 @@ class Conjugator:
                     if nPers != -1 and nPers != i+1:
                         continue
                     end = strVerb[-len(term):]
-                    if bVerbose: print("DBG: findInf: comparing '%s' and '%s'" % (term,end) )
+                    if bVerbose: print("DBG: findInf: comparing '%s' and '%s'" % (end,term) )
                     if term == end:
                         if bVerbose: print("DBG: findInf: hit")
-                        nPersFound = i+1
-                        infinitive = strVerb[:-len(term)]
-                        if infinitive[-1] != 'e':
-                            infinitive += 'e'
-                        infinitive += 'r'
+                        nPersToCheck = i+1
+                        infi = strVerb[:-len(term)]
+                        if bVerbose: print("DBG: findInf: look for infinitive group %d using '%s'" % (group,infi) )
+                        if group == 1:
+                            if infi[-1] == 'y' or infi[-2] == 'y':
+                                # peu probable!
+                                continue
+                            if infi[-1] != 'e':
+                                infi += 'e'
+                            infi += 'r'
+                        elif group == 2:
+                            if infi[-1] != 'i':
+                                infi += 'i'
+                            infi += 'r'
+                        else:
+                            if infi[-1] == 'a':
+                                infi = infi[:-1] + 'e'
+                            else:
+                                #trop de cas particulier à venir...
+                                if infi[-1] == 'r':
+                                    infi += "endre"
+                                else:
+                                    infi += "aire"
+                        
+                        check = self.conjugate(infi,nPersToCheck,numTense+kTenseFirst,bOnlyVerb=True)
+                        if check != strVerb:
+                            if bVerbose: print("DBG: findInf: check for verb '%s', fail: %s != %s" % (infi,strVerb,check) )
+                            continue
+                        infinitive = infi
+                        nPersFound = nPersToCheck
                         kTense = numTense
                         bFound = 1
                         break
-        return infinitive, nPersFound,kTense+kTenseFirst
+                        
+        # look for peculiar in 3rd (a faire apres les verbes du premier groupe
+        # car sinon quand on cherche mangerons, on a le verbe mangaire qui donne aussi mangerons
+        if not bFound:
+            for infi,tenses in self.aaParticularTrois.items():             
+                for numTense,forms in enumerate(tenses):
+                    for pers in range(1,7):
+                        if nPers != -1 and pers != nPers:
+                            continue
+                        term = forms[pers-1]
+                        end = strVerb[-len(term):]
+                        if bVerbose: print("DBG: findInf: aaParticularTrois: comparing %s and %s" % (end,term) )
+                        if end == term:
+                            infitest = strVerb[:-len(term)]+infi
+                            print(self.conjugate(infitest,pers,numTense+kTenseFirst))
+                            return infitest,pers,numTense+kTenseFirst
+                            
+        if kTense != kTenseUnknown:
+            kTense+=kTenseFirst
+        return infinitive, nPersFound,kTense
         
     def printAllConjugaison(self,verb, strComplement=""):
         print("*** Conjugaison du verbe %s ***" % verb)
@@ -195,6 +262,7 @@ def autotest():
     assert_equal(conjugator.detectGroup("aimer"),1)
     assert_equal(conjugator.conjugate("aimer"),"j'aime")
     assert_equal(conjugator.conjugate("manger", 2),"tu manges")
+    assert_equal(conjugator.conjugate("manger", 4,kTenseFuture),"nous mangerons")
     assert_equal(conjugator.conjugate("manger", 5,kTenseFuture),"vous mangerez")
     assert_equal(conjugator.conjugate("manger", 1,kTenseImperfect),"je mangeais")
     assert_equal(conjugator.conjugate("manger", 1,kTensePast),"je mangeai")
@@ -311,20 +379,32 @@ def autotest():
     conjugator.printAllConjugaison("être")
     conjugator.printAllConjugaison("avoir")
     
-    conjugator.printAllConjugaison("spaghettiser")
-    conjugator.printAllConjugaison("gaïattiser")
-    conjugator.printAllConjugaison("gaïa")
-    conjugator.printAllConjugaison("corto")
-    conjugator.printAllConjugaison("alexandre")
-    conjugator.printAllConjugaison("elsa")
-    conjugator.printAllConjugaison("carvalho")
-    conjugator.printAllConjugaison("carvalho", " elsa")
-    conjugator.printAllConjugaison("mazel")
-    conjugator.printAllConjugaison("lounis")
-    conjugator.printAllConjugaison("boufraine")
-    conjugator.printAllConjugaison("minecraft")
-    conjugator.printAllConjugaison("écran")
-    conjugator.printAllConjugaison("regarder", " l'écran")
+    assert_equal(conjugator.findInf("suis"),("être",1,kTensePresent))
+    assert_equal(conjugator.findInf("sommes"),("être",4,kTensePresent))
+    assert_equal(conjugator.findInf("aurai"),("avoir",1,kTenseFuture))
+    assert_equal(conjugator.findInf("fîmes"),("faire",4,kTensePast))
+    assert_equal(conjugator.findInf("finirez"),("finir",5,kTenseFuture))
+    assert_equal(conjugator.findInf("prendrai"),("prendre",1,kTenseFuture))
+    assert_equal(conjugator.findInf("croyiez"),("croire",5,kTenseImperfect))
+    assert_equal(conjugator.findInf("imposibilisator"),("",0,kTenseUnknown))
+    
+    
+    bHaveFun = 0
+    if bHaveFun:    
+        conjugator.printAllConjugaison("spaghettiser")
+        conjugator.printAllConjugaison("gaïattiser")
+        conjugator.printAllConjugaison("gaïa")
+        conjugator.printAllConjugaison("corto")
+        conjugator.printAllConjugaison("alexandre")
+        conjugator.printAllConjugaison("elsa")
+        conjugator.printAllConjugaison("carvalho")
+        conjugator.printAllConjugaison("carvalho", " elsa")
+        conjugator.printAllConjugaison("mazel")
+        conjugator.printAllConjugaison("lounis")
+        conjugator.printAllConjugaison("boufraine")
+        conjugator.printAllConjugaison("minecraft")
+        conjugator.printAllConjugaison("écran")
+        conjugator.printAllConjugaison("regarder", " l'écran")
     
 if __name__ == "__main__":
     autotest()

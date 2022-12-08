@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import re
 import sys
 
 """
@@ -530,6 +531,41 @@ def encodeAllToNumbered(s):
 
 #~ print(encodeAllToNumbered("élève"))
 
+def cutSentenceToWords( s ):
+    """
+    return a list of words in sentence, removing all punctuation
+    c'est bien => ["c", "est", "bien"]
+    """
+    #~ if 0:
+        #~ return re.split('\W+',s)
+        
+    words = []
+    i = 0
+    ibegin = 0
+    lens = len(s)
+    while i < lens:
+        c = s[i]
+        if c in " ,:;.'\"":
+            words.append(s[ibegin:i])
+            ibegin = i+1
+        i += 1
+    if ibegin < i:
+        words.append(s[ibegin:i])
+    return words
+
+if __name__ == "__main__":
+    if 0:
+        # measure perf
+        s = "c'est bien"
+        import time
+        timeBegin = time.time()
+        for i in range(1000000):
+            cutSentenceToWords(s) # best 1.108 (si cut que sur ' ' best: 1.044)
+            #~ re.split('\W+',s) # best: 1.146
+            #~ s.split() # best: 0.127 ' mais ne coupe que les espaces
+        print("duration: %.3f" % (time.time()-timeBegin) )
+        exit(0)
+    
 def transformAccentToUtf8( s ):
     """
     transform a string from cp1252 to utf8
@@ -580,5 +616,8 @@ if __name__ == "__main__":
     else:
         assert_equal(removeAccentString("100€"),"100euros")
         
+
+    s = cutSentenceToWords("c'est bien")
+    assert_equal( s, ["c", "est", "bien"])
     
     print("INF: autotest passed [GOOD]")

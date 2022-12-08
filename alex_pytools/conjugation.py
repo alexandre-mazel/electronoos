@@ -149,7 +149,7 @@ class Conjugator:
         # ca fait peut etre un peu beaucoup quand meme...
         
         bVerbose = 1
-        #~ bVerbose = 0
+        bVerbose = 0
             
         group = 1 # TODO: autodetect, mais comment?
         
@@ -191,7 +191,7 @@ class Conjugator:
                         infi = strVerb[:-len(term)]
                         if bVerbose: print("DBG: findInf: look for infinitive group %d using '%s'" % (group,infi) )
                         if group == 1:
-                            if infi[-1] == 'y' or infi[-2] == 'y':
+                            if (len(infi)> 0 and infi[-1] == 'y' ) or (len(infi)> 1 and infi[-2] == 'y'):
                                 # peu probable!
                                 continue
                             if infi[-1] != 'e':
@@ -254,6 +254,7 @@ class Conjugator:
         
         
 conjugator = Conjugator()
+conjugator.load()
 
 def autotest():
     conjugator.load()

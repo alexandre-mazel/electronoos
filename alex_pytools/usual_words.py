@@ -1,8 +1,9 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf8 -*-
 
 import io
 import json
 
+from misctools import assert_equal
 import stringtools
 
 class UsualWords:
@@ -13,7 +14,7 @@ class UsualWords:
         self.nThresholdBanal = 2000
         
     def load( self ):
-        with io.open('datas/words_frequency_fr.json', encoding="cp1252") as dataFile:
+        with io.open('datas/words_frequency_fr.json', encoding="utf8") as dataFile:
             data = dataFile.read()
             #~ obj = data[data.find('{') : data.rfind('}')+1]
             jsonObj = json.loads(data)
@@ -30,15 +31,19 @@ class UsualWords:
         w = w.lower()
         bBanal = False
         try:
-            if bLookForVerb:
-                import conjugation
-                conjugation.conjugator.
             occ = self.words[w]
             print("DBG: isWordBanal: %s: %s" % (w,occ))
             if occ > self.nThresholdBanal:
                 bBanal = True
         except KeyError:
             print("DBG: isWordBanal: %s: not found" % (w))
+        if not bBanal:
+            if bLookForVerb:
+                import conjugation
+                infi = conjugation.conjugator.findInf(w)[0]
+                print("DBG: isWordBanal: found infinitive: '%s' => '%s'" % (w,infi) )
+                if infi != "" and self.isWordBanal(infi):
+                    return True
         return bBanal
                     
     def filter_words( self, words ):
@@ -63,14 +68,25 @@ class UsualWords:
 
 usualWords = UsualWords()
 usualWords.load()
+
+def autoTest():
+    assert_equal( usualWords.isWordBanal("je"),1)
+    assert_equal( usualWords.isWordBanal("jE"),1)
+    assert_equal( usualWords.isWordBanal("Avoir"),1)
+    assert_equal( usualWords.isWordBanal("être"),1)
+    assert_equal( usualWords.isWordBanal("suis"),1)
+    assert_equal( usualWords.isWordBanal("Alexandre"),0)
+
+autoTest()
+
 s = "je suis bien d'accord"
 r = usualWords.filter_sentences(s)
-print("filter_sentences: %s" % r)
+print("filter_sentences: '%s' => %s" % (s,r))
 
 s = "c'est cool"
 r = usualWords.filter_sentences(s)
-print("filter_sentences: %s" % r)
+print("filter_sentences: '%s' => %s" % (s,r))
 
 s = "un bon petit vin rouge"
 r = usualWords.filter_sentences(s)
-print("filter_sentences: %s" % r)
+print("filter_sentences: '%s' => %s" % (s,r))

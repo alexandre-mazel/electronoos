@@ -3,15 +3,13 @@
 import re
 import sys
 
+from misctools import assert_equal
+
 """
 some classic handy classes to work on string
 (c) 2010-2022 A. Mazel
 """        
-def assert_equal( a, b ):
-    print( "%s == %s ?" % (str(a),str(b)) )
-    if a!=b:
-        assert(0)
-        
+
 def lowerList( l ):
     o = []
     for s in l:
@@ -536,8 +534,8 @@ def cutSentenceToWords( s ):
     return a list of words in sentence, removing all punctuation
     c'est bien => ["c", "est", "bien"]
     """
-    #~ if 0:
-        #~ return re.split('\W+',s)
+    #~ if 1:
+        #~ return re.split('\W+',s) # to add other char: \W+|_ ( a tester)
         
     words = []
     i = 0
@@ -545,8 +543,9 @@ def cutSentenceToWords( s ):
     lens = len(s)
     while i < lens:
         c = s[i]
-        if c in " ,:;.'\"":
-            words.append(s[ibegin:i])
+        if c in " ,:;.'\"!?":
+            if i-ibegin>0:
+                words.append(s[ibegin:i])
             ibegin = i+1
         i += 1
     if ibegin < i:
@@ -558,11 +557,14 @@ if __name__ == "__main__":
         # measure perf
         s = "c'est bien"
         import time
+        pattern = re.compile('\W+')
         timeBegin = time.time()
         for i in range(1000000):
-            cutSentenceToWords(s) # best 1.108 (si cut que sur ' ' best: 1.044)
-            #~ re.split('\W+',s) # best: 1.146
             #~ s.split() # best: 0.127 ' mais ne coupe que les espaces
+            cutSentenceToWords(s) # best: 1.173 avant ajout '!?': best 1.108 (si cut que sur ' ' best: 1.044)
+            #~ re.split('\W+',s) # best: 1.146 avg ~ 1.28
+            #~ pattern.split(s) # best: 0.720
+            
         print("duration: %.3f" % (time.time()-timeBegin) )
         exit(0)
     
@@ -619,5 +621,7 @@ if __name__ == "__main__":
 
     s = cutSentenceToWords("c'est bien")
     assert_equal( s, ["c", "est", "bien"])
+    s = cutSentenceToWords("Le petit chien, dit 'ouah ouah'!")
+    assert_equal( s, ['Le', 'petit', 'chien', 'dit', 'ouah', 'ouah'])
     
     print("INF: autotest passed [GOOD]")

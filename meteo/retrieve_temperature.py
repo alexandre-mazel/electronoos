@@ -1,7 +1,9 @@
 # -*- coding: cp1252 -*-
 
+
 import io
 import os
+import random
 import sys
 import time
 
@@ -32,6 +34,10 @@ def retrieveTemp():
             ["Bort-les-Orgues", "https://weather.com/fr-FR/temps/aujour/l/14e53d3cef725e41222474317acf1d27951992d718300074c36ded62883afdd5",startbase,stopbase],
             ["Saint-bonnet-pret-bort", "https://weather.com/fr-FR/temps/aujour/l/356a10c392837b0bd6f3e7ddd33acb4d385701ddf07ebae91c8ed2fa8b7c803c",startbase,stopbase],
             ["Annecy", "https://weather.com/fr-FR/temps/aujour/l/dca69ee3f92301838c6a8f09e67796bf14fe8684fb90ed81dc4cbfb732668169",startbase,stopbase],
+            ["Biarritz", "https://weather.com/fr-FR/temps/aujour/l/ad456d1b2d0a43d1e8940f2f0f6956ff227ebe4f5faf3f0af67e22f17242a9a2",startbase,stopbase],
+            ["Vacheres", "https://weather.com/fr-FR/temps/aujour/l/0e75f3a11bcabc16a92fe0d2e9924db5630544cf77e2aa76c11cfe7069313825",startbase,stopbase],
+            ["St Malo", "https://weather.com/fr-FR/temps/aujour/l/a1baaf192d861ad1bed879b83a55048b51283588728dfbcf6dc28281d5ce8f4f",startbase,stopbase],
+            ["Bordeaux", "https://weather.com/fr-FR/temps/aujour/l/12fae739549c2bb1e6693bdb14c062671c7c87d40051273a05a4eaf5848064fe",startbase,stopbase],
     ]
     
     start_cond = '<div data-testid="wxPhrase" class="CurrentConditions--phraseValue--mZC_p">'
@@ -52,6 +58,8 @@ def retrieveTemp():
             temp = int(temp)
             cond = cond.replace("é","e")
             store(city,temp,cond)
+        time.sleep(random.random()*10)
+        time.sleep(8)
         #~ break
             
 # retrieveTemp - end

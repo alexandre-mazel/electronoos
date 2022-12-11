@@ -38,6 +38,7 @@ def retrieveTemp():
             ["Vacheres", "https://weather.com/fr-FR/temps/aujour/l/0e75f3a11bcabc16a92fe0d2e9924db5630544cf77e2aa76c11cfe7069313825",startbase,stopbase],
             ["St Malo", "https://weather.com/fr-FR/temps/aujour/l/a1baaf192d861ad1bed879b83a55048b51283588728dfbcf6dc28281d5ce8f4f",startbase,stopbase],
             ["Bordeaux", "https://weather.com/fr-FR/temps/aujour/l/12fae739549c2bb1e6693bdb14c062671c7c87d40051273a05a4eaf5848064fe",startbase,stopbase],
+            ["Tavira", "https://weather.com/fr-FR/temps/aujour/l/efa3db97660e2aaaa3efc076350dd00386e0453da1547361cd68e78a412f2fb8",startbase,stopbase],
     ]
     
     start_cond = '<div data-testid="wxPhrase" class="CurrentConditions--phraseValue--mZC_p">'

@@ -4,7 +4,7 @@
 #define IMG_NBR    2
 
 #define IMG_1_SIZE_X 40
-#define IMG_1_SIZE_Y 25
+#define IMG_1_SIZE_Y 46
 extern unsigned char aImgs_1[];
 extern unsigned char aPalette_1[];
 

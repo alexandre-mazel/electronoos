@@ -7,7 +7,7 @@
 #include <UTFTGLUE.h>
 
 #include <MCUFRIEND_kbv.h>
-#include "imgs.h"
+#include "imgs.h" // cf comments in render_lock
 #include "simple_touch_detection.h"
 
 MCUFRIEND_kbv tft;
@@ -32,6 +32,10 @@ void setup()
 {
     Serial.begin(9600);
     if (!Serial) delay(5000);           //allow some time for Leonardo
+#if 1
+  tft.begin(0x7793);
+#else
+  // autotdetect version (prend plus de ram)
     uint16_t ID = tft.readID(); //
     Serial.println(F("Diagnose whether this controller is supported"));
     Serial.println(F("There are FAQs in extras/mcufriend_how_to.txt"));
@@ -39,11 +43,11 @@ void setup()
     Serial.print(F("tft.readID() finds: ID = 0x"));
     Serial.println(ID, HEX);
     Serial.println(F(""));
-	Serial.print(F("MCUFRIEND_kbv version: "));
+	  Serial.print(F("MCUFRIEND_kbv version: "));
     Serial.print(version/100);
-	Serial.print(F("."));
+	  Serial.print(F("."));
     Serial.print((version / 10) % 10);
-	Serial.print(F("."));
+	  Serial.print(F("."));
     Serial.println(version % 10);
     Serial.println(F(""));
     if (ID == 0x0404) {
@@ -101,6 +105,8 @@ void setup()
 
         tft.fillScreen(BLUE);
     }
+
+#endif
   
   std_init();
 }
@@ -189,12 +195,6 @@ int render_lock(int x,int y)
 
 int render_arrow(int x,int y,int flip=0)
 {
-  // sur Uno quand l'image etait trop grosse il ne restait que 148 octets pour les variables locales et ca faisait nimp
-
-  // generated from electronoos\generate_img.py:
-  // python C:\Users\alexa\dev\git\electronoos\generate_img\generate_img.py "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\just_lock.png" "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\just_arrow.png" 4
-  // copy \tmp\imgs.* C:\Users\alexa\dev\git\electronoos\arduino_prj\blangle_tft\ /Y
-
   render_img(x,y,IMG_2_SIZE_X,IMG_2_SIZE_Y,aImgs_2,aPalette_2,flip);
 }
 
@@ -229,7 +229,7 @@ int render_screen(int nip, int db, float circ,int bLocked)
   if( ! bDrawed )
   {
     bDrawed = 1;
-    tft.setRotation(1);
+    tft.setRotation(LANDSCAPE);
     //tft.fillScreen(BLACK);
     tft.setTextColor(WHITE);
     tft.fillRect(0,0,nMenuW,nMenuH,GRAY);

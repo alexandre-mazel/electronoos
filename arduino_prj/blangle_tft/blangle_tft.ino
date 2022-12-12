@@ -215,6 +215,17 @@ int render_screen(int nip, int db, float circ,int bLocked)
   const int nNbrSettings = 8;
   const int nLineH = 8;
 
+  if( 0 )
+  {
+    if( ! bDrawed )
+    {
+      bDrawed = 1;
+      // just gray
+      tft.fillRect(0,0,640,640,GRAY);
+    }
+    return;
+  }
+
   if( ! bDrawed )
   {
     bDrawed = 1;
@@ -233,6 +244,7 @@ int render_screen(int nip, int db, float circ,int bLocked)
       tft.print(i+1);
     }
   }
+
 
   tft.setTextSize(5);
   tft.setCursor(nMenuW+50, 26);

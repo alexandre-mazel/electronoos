@@ -519,9 +519,13 @@ class FrenchAnalyser:
         grammar_french += "MODV: {<V><ADV>+}\n"
         grammar_french += "MODV: {<V><P><VINF><VPP>}\n" # capture le décida de laisser détaché
         
-        grammar_french += "PHRASE: {<VINF><NP|NPS|NPSS>}\n" # Rédiger des offres ... (marche pas)
+        #~ grammar_french += "PHRASE: {<VINF><NP|NPS|NPSS>}\n" # Rédiger des offres ... (marche pas)
                 
-        grammar_french += "NP: {<PRP\$>*<DET|PP\$>?<ADJ>*<P>*<NC|U|VINF><ADJ>*}\n"
+        grammar_french += "NP: {<PRP\$>*<DET|PP\$>?<ADJ>*<P>*<NC|U|VINF><ADJ>*}\n" # trop large, choppe trop!
+        #  essaye d'eviter de bouffer vinf en np direct mais ne fonctionne pas pour Rédiger des offres 
+        #~ grammar_french += "NP: {<PRP\$>*<DET|PP\$>?<ADJ>*<P>*<NC|U><ADJ>*}\n"
+        #~ grammar_french += "NP: {<PRP\$>*<DET|PP\$>?<ADJ>*<P>*<NC|U|VINF><ADJ>*}\n"
+        
         grammar_french += "NP:  {<NPP>+}\n" # usefull ? not working ?
         #~ grammar_french += "NPS:  {<NP><P>*<D>*<P+D>*<NP>}\n" # celle ci ne marche pas
         #~ grammar_french += "NPS:  {<NP><P+D>*<NP>}\n" # celle ci ne marche pas
@@ -613,7 +617,7 @@ class FrenchAnalyser:
                         import conjugation
                         infi = conjugation.conjugator.findInf(verb)[0]
                         if infi != "": verb = infi
-                    return verb,actions[0][-1]
+                    return verb.lower(),actions[0][-1].lower()
         return "",""
             
         
@@ -624,10 +628,26 @@ class FrenchAnalyser:
         return a list of [subject,action,cod]
         """
         print("DBG: cutTreeByActions: enter with %s" % treeToStr(tree))
+        # special case: cas ou on a aucune phrase: NPS(NP(Rédiger/VINF ) NP(des/DET rapports/NC ) )
+        print("DBG: cutTreeByActions: tree.label: " + tree.label())
+        try:
+            print("DBG: cutTreeByActions: tree[0].label: " + tree[0].label())
+            subtree = tree[0]
+            if subtree.label() == "NPS":
+                print("DBG: cutTreeByActions: quick test: first: " + str(treeToStr(subtree[0])))
+                if "/VINF" in treeToStr(subtree[0]):
+                    o = treeToStr(subtree[0],0),treeToStr(subtree[1],0)
+                    print("DBG: cutTreeByActions: quick exit with %s" % str(o))
+                    return [o]
+                    
+        except AttributeError: pass
+        
         o = []
         listPhrases = self.getAllPhrasesFromTree(tree)
         
         for phrase in listPhrases:
+            print("DBG: cutTreeByActions: phrase: " + str(phrase))
+            
             #~ sub, action, cod = None,None,None
             #~ nextpart = 0 # 0: subject, 1: action, 2: cod => len(part)
             part = []
@@ -705,85 +725,6 @@ def testFrenchAnalysis():
     for t in interestingTreesAll:
         print(t)
         
-
-def autotest_FrenchAnalysis():
-    frenchAnalyser.load()
-    txt1_fr = "le petit chien jaune aboie sur la fille rieuse"
-    txt2_fr = "Rapunzel décida de laisser détaché ses longs cheveux dorés"
-    assert_equal(treesListToStr(frenchAnalyser.analyseText(txt1_fr)), treesListToStr([nltk.tree.Tree.fromstring("""(S
-    (PHRASE
-    (NP le/DET petit/ADJ chien/U jaune/ADJ)
-    aboie/V
-    sur/P
-    (NP la/DET fille/NC rieuse/ADJ)))""")]))
-    assert_equal(treesListToStr(frenchAnalyser.analyseText(txt2_fr)), treesListToStr([nltk.tree.Tree.fromstring("""(S
-    (PHRASE
-    (NP Rapunzel/NPP)
-    (MODV décida/V de/P laisser/VINF détaché/VPP)
-    (NP ses/DET longs/ADJ cheveux/NC dorés/ADJ)))""")]))
-
-    txtDouble = "Alexandre est content. Cynthia est belle."
-    
-    trees = frenchAnalyser.analyseText(txtDouble)
-    assert_equal(treeToStr(trees[0]), treeToStr(nltk.tree.Tree.fromstring("(S (NP Alexandre/NPP) est/V content/ADJ)")) )
-    assert_equal(treeToStr(trees[1]), treeToStr(nltk.tree.Tree.fromstring("(S (PHRASE (NP Cynthia/NPP) est/V (NP belle/ADJ ./NC)))")) )
-    
-    txtLikeSimpleCompound = "Alexandre aime les haricots verts et aussi les tortues."    
-    txtLike = "Alexandre aime les haricots verts, mais n'aime pas le caca."
-    txtLikeShort = "Alexandre aime les haricots verts, mais pas le pipi."
-    
-    assert_equal(treesListToStr(frenchAnalyser.analyseText(txtLikeSimpleCompound)), treesListToStr([nltk.tree.Tree.fromstring("""
-    (S
-  (PHRASE
-    (NP Alexandre/NPP)
-    aime/V
-    (NP les/DET haricots/NC verts/ADJ))
-  (PHRASE_ELID
-    et/CC
-    aussi/ADV
-    (NPS (NP les/DET tortue/NC s/ADJ) (NP ./NC))))""")]))
-
-    assert_equal(treesListToStr(frenchAnalyser.analyseText(txtLike)), treesListToStr([nltk.tree.Tree.fromstring("""
-    (S
-  (PHRASE
-    (NP Alexandre/NPP)
-    aime/V
-    (NP les/DET haricots/NC verts/ADJ))
-  ,/PONCT
-  (PHRASE mais/CC (MODV ne/ADV aime/V pas/ADV) (NP le/DET caca./NC)))""")]))
-
-    assert_equal(treesListToStr(frenchAnalyser.analyseText(txtLikeShort)), treesListToStr([nltk.tree.Tree.fromstring("""
-    (S
-  (PHRASE
-    (NP Alexandre/NPP)
-    aime/V
-    (NP les/DET haricots/NC verts/ADJ))
-  ,/PONCT
-  (PHRASE_ELID mais/CC pas/ADV (NP le/DET pipi./NC)))""")]))
-  
-    strAdage = """Conseiller  et
-
-satisfaire sont mes valeurs et ma devise. """
-
-    assert_equal(treesListToStr(frenchAnalyser.analyseText(strAdage)), treesListToStr([nltk.tree.Tree.fromstring("""
-    (S
-  (PHRASE
-    (NPS (NP Conseiller/NC) et/CC (NP satisfaire/VINF))
-    sont/V
-    (NPS (NP mes/DET valeurs/NC) et/CC (NP ma/DET devise./NC))))""")]))
-    
-
-    assert_equal(frenchAnalyser.getActions("Le chat mange la souris"), ("manger", "la souris") )
-
-    s = "j'ai rédiger des publications scientifiques."
-    assert_equal(frenchAnalyser.getActions(s), ("avoir", "rédiger des publications scientifiques"))
-
-    s = "Rédiger des offres d'emplois pour les ressources humaines"
-    assert_equal(frenchAnalyser.getActions(s), ("rédiger", "des offres d'emplois pour les ressources humaines"))
-    
-    s = "Rédiger des publications sur les violations des droits de l'homme et  sur la discrimination à l'égard des Roms; Aider le Policy Officer à rédiger des recommandations à l'intention de la présidence slovaque de l'UE; Aider à l'organisation d'une conférence européenne sur la participation politique et à la tenue d'une table ronde de sensibilisation : Rédiger les rapports ; Effectuer des recherches sur les questions roms; Contribuer à une campagne d'affichage en ligne sur la participation politique des Roms; Assister aux projets européens (comme être en charge de préparer le plan de diffusion et d'exploitation d'un projet ERIO); Assister à des réunions organisées par la Commission européenne, le Parlement européen et la société civile;Etudier les politiques européennes et nationales en ce qui concerne les questions relatives aux Roms et dans les domaines de la lutte contre la discrimination et de l'inclusion sociale;Traductions (EN -> FR); Gérer le compte Facebook de l'organisation"
-    assert_equal(frenchAnalyser.getActions(s), ("manger", "la souris"))
-
   	
 
 class UnigramChunker(nltk.ChunkParserI):
@@ -886,6 +827,90 @@ def explore3():
     ('SYM', None), ('TO', None), ('UH', None), ('VB', None), ('VBD', None), ('VBG', None), ('VBN', None),
     ('VBP', None), ('VBZ', None), ('WDT', None), ('WP', None), ('WP$', None), ('WRB', None), ('``', None)]
     """
+# explore3 - end
+
+def autotest_FrenchAnalysis():
+    frenchAnalyser.load()
+    txt1_fr = "le petit chien jaune aboie sur la fille rieuse"
+    txt2_fr = "Rapunzel décida de laisser détaché ses longs cheveux dorés"
+    assert_equal(treesListToStr(frenchAnalyser.analyseText(txt1_fr)), treesListToStr([nltk.tree.Tree.fromstring("""(S
+    (PHRASE
+    (NP le/DET petit/ADJ chien/U jaune/ADJ)
+    aboie/V
+    sur/P
+    (NP la/DET fille/NC rieuse/ADJ)))""")]))
+    assert_equal(treesListToStr(frenchAnalyser.analyseText(txt2_fr)), treesListToStr([nltk.tree.Tree.fromstring("""(S
+    (PHRASE
+    (NP Rapunzel/NPP)
+    (MODV décida/V de/P laisser/VINF détaché/VPP)
+    (NP ses/DET longs/ADJ cheveux/NC dorés/ADJ)))""")]))
+
+    txtDouble = "Alexandre est content. Cynthia est belle."
+    
+    trees = frenchAnalyser.analyseText(txtDouble)
+    assert_equal(treeToStr(trees[0]), treeToStr(nltk.tree.Tree.fromstring("(S (NP Alexandre/NPP) est/V content/ADJ)")) )
+    assert_equal(treeToStr(trees[1]), treeToStr(nltk.tree.Tree.fromstring("(S (PHRASE (NP Cynthia/NPP) est/V (NP belle/ADJ ./NC)))")) )
+    
+    txtLikeSimpleCompound = "Alexandre aime les haricots verts et aussi les tortues."    
+    txtLike = "Alexandre aime les haricots verts, mais n'aime pas le caca."
+    txtLikeShort = "Alexandre aime les haricots verts, mais pas le pipi."
+    
+    assert_equal(treesListToStr(frenchAnalyser.analyseText(txtLikeSimpleCompound)), treesListToStr([nltk.tree.Tree.fromstring("""
+    (S
+  (PHRASE
+    (NP Alexandre/NPP)
+    aime/V
+    (NP les/DET haricots/NC verts/ADJ))
+  (PHRASE_ELID
+    et/CC
+    aussi/ADV
+    (NPS (NP les/DET tortue/NC s/ADJ) (NP ./NC))))""")]))
+
+    assert_equal(treesListToStr(frenchAnalyser.analyseText(txtLike)), treesListToStr([nltk.tree.Tree.fromstring("""
+    (S
+  (PHRASE
+    (NP Alexandre/NPP)
+    aime/V
+    (NP les/DET haricots/NC verts/ADJ))
+  ,/PONCT
+  (PHRASE mais/CC (MODV ne/ADV aime/V pas/ADV) (NP le/DET caca./NC)))""")]))
+
+    assert_equal(treesListToStr(frenchAnalyser.analyseText(txtLikeShort)), treesListToStr([nltk.tree.Tree.fromstring("""
+    (S
+  (PHRASE
+    (NP Alexandre/NPP)
+    aime/V
+    (NP les/DET haricots/NC verts/ADJ))
+  ,/PONCT
+  (PHRASE_ELID mais/CC pas/ADV (NP le/DET pipi./NC)))""")]))
+  
+    strAdage = """Conseiller  et
+
+satisfaire sont mes valeurs et ma devise. """
+
+    assert_equal(treesListToStr(frenchAnalyser.analyseText(strAdage)), treesListToStr([nltk.tree.Tree.fromstring("""
+    (S
+  (PHRASE
+    (NPS (NP Conseiller/NC) et/CC (NP satisfaire/VINF))
+    sont/V
+    (NPS (NP mes/DET valeurs/NC) et/CC (NP ma/DET devise./NC))))""")]))
+    
+
+    assert_equal(frenchAnalyser.getActions("Le chat mange la souris"), ("manger", "la souris") )
+
+    s = "j'ai rédiger des publications scientifiques."
+    assert_equal(frenchAnalyser.getActions(s), ("avoir", "rédiger des publications scientifiques"))
+
+    s = "Rédiger des rapports"
+    assert_equal(frenchAnalyser.getActions(s), ("rédiger", "des rapports"))
+    
+    
+    # a partir de la, ca ne fonctionne pas.
+    s = "Rédiger des offres d'emplois pour les ressources humaines"
+    assert_equal(frenchAnalyser.getActions(s), ("rédiger", "des offres d'emplois pour les ressources humaines"))
+    
+    s = "Rédiger des publications sur les violations des droits de l'homme et  sur la discrimination à l'égard des Roms; Aider le Policy Officer à rédiger des recommandations à l'intention de la présidence slovaque de l'UE; Aider à l'organisation d'une conférence européenne sur la participation politique et à la tenue d'une table ronde de sensibilisation : Rédiger les rapports ; Effectuer des recherches sur les questions roms; Contribuer à une campagne d'affichage en ligne sur la participation politique des Roms; Assister aux projets européens (comme être en charge de préparer le plan de diffusion et d'exploitation d'un projet ERIO); Assister à des réunions organisées par la Commission européenne, le Parlement européen et la société civile;Etudier les politiques européennes et nationales en ce qui concerne les questions relatives aux Roms et dans les domaines de la lutte contre la discrimination et de l'inclusion sociale;Traductions (EN -> FR); Gérer le compte Facebook de l'organisation"
+    assert_equal(frenchAnalyser.getActions(s), ("manger", "la souris"))
 
 
    

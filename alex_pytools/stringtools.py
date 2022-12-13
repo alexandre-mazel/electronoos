@@ -534,8 +534,8 @@ def cutSentenceToWords( s ):
     return a list of words in sentence, removing all punctuation
     c'est bien => ["c", "est", "bien"]
     """
-    #~ if 1:
-        #~ return re.split('\W+',s) # to add other char: \W+|_ ( a tester)
+    if 1:
+        return re.split('\W+',s) # to add other char: \W+|_ ( a tester)
         
     words = []
     i = 0
@@ -543,7 +543,7 @@ def cutSentenceToWords( s ):
     lens = len(s)
     while i < lens:
         c = s[i]
-        if c in " ,:;.'\"!?":
+        if c in " ,:;.'\"!?-()":
             if i-ibegin>0:
                 words.append(s[ibegin:i])
             ibegin = i+1

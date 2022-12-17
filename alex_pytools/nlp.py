@@ -1,5 +1,13 @@
 # -*- coding: cp1252 -*-
 
+"""
+A lire:
+https://kavita-ganesan.com/tfidftransformer-tfidfvectorizer-usage-differences/#.Y5hO632ZNeU
+https://www.nltk.org/book/ch07.html#code-unigram-chunker
+https://www.nltk.org/book/ch10.html#chap-semantics
+https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html
+"""
+
 from misctools import assert_equal
 
 import nltk

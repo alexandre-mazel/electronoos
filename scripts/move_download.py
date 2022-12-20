@@ -9,6 +9,9 @@ global_strPassword = misctools.getEnv("PUBLAC_PWD")
 
 def transfer( path, filename ):
     global global_strPassword
+    if not os.path.isfile("c:\exe\pscp.exe"):
+        print("ERR: pscp not present")
+        return False
     src = path + filename
     ret = os.system("c:\exe\pscp -pw %s \"%s\" publac@robot-enhanced-education.org:/home/publac/received/" % (global_strPassword,src))
     return ret==0

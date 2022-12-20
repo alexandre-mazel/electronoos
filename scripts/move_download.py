@@ -13,7 +13,7 @@ def transfer( path, filename ):
         print("ERR: pscp not present")
         return False
     src = path + filename
-    ret = os.system("c:\exe\pscp -pw %s \"%s\" publac@robot-enhanced-education.org:/home/publac/received/" % (global_strPassword,src))
+    ret = os.system("echo y | c:\exe\pscp -pw %s \"%s\" publac@robot-enhanced-education.org:/home/publac/received/" % (global_strPassword,src))
     return ret==0
 
 def move_download(strPath = ""):

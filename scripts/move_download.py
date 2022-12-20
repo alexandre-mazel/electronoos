@@ -1,12 +1,74 @@
 import os
+import sys
+import time
 
-def move_download():
+sys.path.append("../alex_pytools/")
+import misctools
+
+global_strPassword = misctools.getEnv("PUBLAC_PWD")
+
+def transfer( path, filename ):
+    global global_strPassword
+    src = path + filename
+    ret = os.system("c:\exe\pscp -pw %s \"%s\" publac@robot-enhanced-education.org:/home/publac/received/" % (global_strPassword,src))
+    return ret==0
+
+def move_download(strPath = ""):
+    """
+    move all files from download folder to another computer.
+    """
+    bVerbose = 1
+    bVerbose = 0
+    
+    if strPath == "":
+        #~ strPath = os.getlogin()
+        strPath = os.environ['USERPROFILE']
+        strPath += os.sep + "Downloads" + os.sep
+        
+    print("INF: move_download: strPath: '%s'" % strPath )
+    
+    listFiles = os.listdir(strPath)    
+    listFiles = sorted(listFiles, key=lambda x: os.path.getmtime(strPath+x),reverse=True)
+    
+    for f in listFiles:
+        hash,ext = os.path.splitext(f)
+        if ext not in [".pdf", ".doc", ".docx", ".jpg"]:
+            continue
+        absf = strPath + f
+        modtime = os.path.getmtime(absf)
+        age = time.time() - modtime
+        if age < 60:
+            # this file was modified less than 1 min
+            if bVerbose or 1: print("DBG: move_download: %s: skipping: too young (%.1fs)" % (ascii(f),age) )
+            continue
+            
+        if age > 60*60*24*7:
+            # this file was modified more than 1 week
+            if bVerbose: print("DBG: move_download: %s: skipping: too old (%.1f jour(s))" % (ascii(f),age/60/60/24) )
+            continue
+            
+        print("INF: move_download: moving age %.1fs: '%s'" % (age,ascii(f)))
+        bSuccess = transfer(strPath,f)
+        print("INF: success: %s" % bSuccess )
+        if bSuccess:
+            dst = strPath + os.sep + "moved_files" + os.sep
+            try: os.makedirs(dst)
+            except FileExistsError as err: pass
+            os.rename(absf,dst+f)
+    
+    print("INF: move_download: finished")
+
+
+def loop_move_download():
+    while 1:
+        move_download()
+        break
+        time.sleep(60*1)
     
 
-#~ def loop_move_download():
+#~ ret = os.system("c:\exe\pscp -pw puba32puc c:/tmp/a.txt publac@robot-enhanced-education.org:/home/publac/")
+#~ print("ret: %s" % ret )
+#~ if ret == 0:
+    #~ print("Success !!!" )
     
-
-ret = os.system("c:\exe\pscp -pw puba32puc c:/tmp/a.txt publac@robot-enhanced-education.org:/home/publac/")
-print("ret: %s" % ret )
-if ret == 0:
-    print("Success !!!" )
+loop_move_download()

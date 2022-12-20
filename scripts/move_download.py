@@ -61,8 +61,7 @@ def move_download(strPath = ""):
 
 def loop_move_download():
     while 1:
-        move_download()
-        break
+        move_download()        
         time.sleep(60*1)
     
 

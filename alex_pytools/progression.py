@@ -3,6 +3,8 @@
 store the progression of different users using file to store it
 """
 
+import misctools
+
 
 class Progression:
     """
@@ -12,7 +14,11 @@ class Progression:
     A same user can have different category of progression (many books at the same time...)
     
     """
-    def __init__( self ):
+    def __init__( self, strSaveFilename = "" ):
+        self.strSaveFilename = strSaveFilename
+        if strSaveFilename == "": 
+            strSaveFilename = misctools getPathSave() + "progress.dat"
+            
         self.dictProg = {} # store a pair user__id => (timestamp,step)
         
     @staticmethod
@@ -22,21 +28,22 @@ class Progression:
     def _assumeExist( self, strUserId,strObjectId, nInitStep = 0 ):
         k = _createKey(strUserId,strObjectId)
         if k in self.dictProg: return
-        self.dictProg[k] = nInitStep
+        self.dictProg[k] = (getTimeStamp(),nInitStep)
         
     def update( self, strUserId, strObjectId, nNewStep ):
         self._assumeExist(strUserId, strObjectId)
         k = _createKey(strUserId,strObjectId)
-        self.dictProg[k] = nNewStep
+        self.dictProg[k] = (getTimeStamp(),nNewStep)
         
         
     def inc( self, strUserId, strObjectId, nIncStep = 1 ):
         self._assumeExist(strUserId, strObjectId)
         k = _createKey(strUserId,strObjectId)
-        self.update(strUserId, strObjectId, self.dictProg[k]+nIncStep)
+        self.update(strUserId, strObjectId, self.dictProg[k][1]+nIncStep)
         
     def load( self ):
         # will load every time it's usefull, but not more.
+        todo: adapt to this class!
         
         try:
             if self.timeLastLoaded > os.path.getmtime(self.strSaveFilename):
@@ -81,16 +88,13 @@ class Progression:
         f.close()
         self.timeLastLoaded = time.time() # prevent reloading next time
         
+progress = Progression()
         
 def autotest():
-    if 1:
-        if os.name == "nt" or 1:
-             # ne pas activer ce code après le developement!
-            lock = common.getLockForTools()
-            lock.release(bForceReleaseAny = True, bVerbose=True)
             
     dm = DediManager()
     strTestFilename = "/tmp/dedi_manager_test.dat"
+    
     try: os.unlink(strTestFilename)
     except (common.FileNotFoundError,OSError) as err: print("WRN: normal error?: " + str(err))
     dm.strSaveFilename = strTestFilename

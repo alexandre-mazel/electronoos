@@ -100,6 +100,12 @@ def getPathTemp():
         ret = "/tmp/"
     return ret
     
+def getPathSave():
+    """
+    return a nice place to save file
+    """
+    return getUserHome() + "save" + os.sep
+    
 def getTempFilename():
     return getPathTemp() + getFilenameFromTime()
     

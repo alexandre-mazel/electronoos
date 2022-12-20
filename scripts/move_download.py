@@ -31,7 +31,7 @@ def move_download(strPath = ""):
     listFiles = sorted(listFiles, key=lambda x: os.path.getmtime(strPath+x),reverse=True)
     
     for f in listFiles:
-        hash,ext = os.path.splitext(f)
+        body,ext = os.path.splitext(f)
         if ext not in [".pdf", ".doc", ".docx", ".jpg"]:
             continue
         absf = strPath + f
@@ -54,7 +54,14 @@ def move_download(strPath = ""):
             dst = strPath + os.sep + "moved_files" + os.sep
             try: os.makedirs(dst)
             except FileExistsError as err: pass
-            os.rename(absf,dst+f)
+            try: 
+                os.rename(absf,dst+f)
+            except FileExistsError as err: 
+                cpt = 1
+                body,ext = os.path.splitext(f)
+                while os.path.isfile(dst+body+("__%04d"%cpt)+ext):
+                    cpt += 1
+                os.rename(absf,dst+body+("__%04d"%cpt)+ext)
     
     print("INF: move_download: finished")
 

@@ -47,8 +47,8 @@ def move_download(strPath = ""):
             if bVerbose or 1: print("DBG: move_download: %s: skipping: too young (%.1fs)" % (ascii(f),age) )
             continue
             
-        if age > 60*60*24*7:
-            # this file was modified more than 1 week
+        if age > 60*60*24*31:
+            # this file was modified more than 1 month
             if bVerbose: print("DBG: move_download: %s: skipping: too old (%.1f jour(s))" % (ascii(f),age/60/60/24) )
             continue
             

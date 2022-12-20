@@ -6,6 +6,7 @@ sys.path.append("../alex_pytools/")
 import misctools
 
 global_strPassword = misctools.getEnv("PUBLAC_PWD")
+print("DBG: using passwd: '%s'" % global_strPassword )
 
 def transfer( path, filename ):
     global global_strPassword
@@ -13,8 +14,8 @@ def transfer( path, filename ):
         print("ERR: pscp not present")
         return False
     src = path + filename
-    # store key: echo y |  scp ... won't work # no solution right now
-    ret = os.system("c:\exe\pscp -pw %s \"%s\" publac@robot-enhanced-education.org:/home/publac/received/" % (global_strPassword,src))
+    # store key: echo y |  scp ... won't work # no solution right now # perhaps it work in fact
+    ret = os.system("echo y | c:\exe\pscp -pw %s \"%s\" publac@robot-enhanced-education.org:/home/publac/received/" % (global_strPassword,src))
     return ret==0
 
 def move_download(strPath = ""):

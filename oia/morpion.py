@@ -1,5 +1,3 @@
-
-
 class Game:
     def __init__(self):
         self.startNewGame()
@@ -104,7 +102,11 @@ class Game:
         return True if move is leggit
         """
         print("INF: Game.receiveMove: receive for player %d, pos: %s" % (numPlayer,str(pos)))
-        content = self.world[pos[1]][pos[0]]
+        
+        try:
+            content = self.world[pos[1]][pos[0]]
+        except IndexError: return False
+        
         if content != 0:
             return False
         if self.cpuManager != None: self.cpuManager.storeMove(self.world,pos,numPlayer)
@@ -113,15 +115,21 @@ class Game:
 # class Game - end
 
 def runGame():
+    aAutomaticHumanChoice = [(0,0),(1,1),(2,2)] # help debugging: faster
+    #~ aAutomaticHumanChoice = []
+    nIdxAutomaticHumanChoice = 0
     g = Game()
     if 1:
-        import ai_cpu
+        import ai_cpu_random as ai_cpu
         ai = ai_cpu.AiCpu("toto")
         g.registerCpu(ai)
     g.drawBoard()
     while 1:
         while 1:
-            pos = g.askPlayer()
+            if nIdxAutomaticHumanChoice < len(aAutomaticHumanChoice):
+                pos = aAutomaticHumanChoice[nIdxAutomaticHumanChoice];nIdxAutomaticHumanChoice+=1
+            else:
+                pos = g.askPlayer()
             ret = g.receiveMove(pos,1)
             if ret: break
             print("coup impossible, re-essaye encore")

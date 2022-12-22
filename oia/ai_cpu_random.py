@@ -2,7 +2,7 @@ import random
 
 class AiCpu:
     """
-    an AI to learn how to play to any game.
+    the AI to learn how to play to any game.
     """
     def __init__( self, name ):
         self.name = name

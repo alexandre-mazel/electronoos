@@ -14,7 +14,7 @@ def transfer( path, filename ):
         print("ERR: pscp not present")
         return False
     src = path + filename
-    # store key: echo y |  scp ... won't work # no solution right now # perhaps it work in fact
+    # echo y |  scp ... will say yes in a new computer asking for a key update
     ret = os.system("echo y | c:\exe\pscp -pw %s \"%s\" publac@robot-enhanced-education.org:/home/publac/received/" % (global_strPassword,src))
     return ret==0
 
@@ -49,6 +49,11 @@ def move_download(strPath = ""):
             
         if age > 60*60*24*31:
             # this file was modified more than 1 month
+            if bVerbose: print("DBG: move_download: %s: skipping: too old (%.1f jour(s))" % (ascii(f),age/60/60/24) )
+            continue
+            
+        if age > 60*60*24*7:
+            # this file was modified more than 1 week
             if bVerbose: print("DBG: move_download: %s: skipping: too old (%.1f jour(s))" % (ascii(f),age/60/60/24) )
             continue
             

@@ -186,7 +186,7 @@ def runGame(bBatch=False, bRepetitiveHuman=False,bFirstPlayerIsHuman=True,bQuiet
             ai = ai_cpu.AiCpu(cpu_name)
             g.registerCpu(ai)
             if bBatch: g.getCpuManager().bAutosave = False
-    g.startNewGame()
+    g.startNewGame(4,4)
     if not bQuiet: g.drawBoard()
     while 1:
         if bFirstPlayerIsHuman:

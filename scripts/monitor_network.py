@@ -37,19 +37,22 @@ def getNetworkStat_psutil():
     return received,send,total in Bytes in wifi interface
     # works fine !!!
     """
+    bVerbose = True
+    bVerbose = False
+    
     import psutil
     ret = psutil.net_io_counters(pernic=True)
-    #~ print(ret)
+    if bVerbose: print("\nDBG: getNetworkStat_psutil: io_counters: %s" % str(ret) )
     
     retInterestingInterface = None
     
     for k in ["Wi-Fi","eth0","wlan0"]:
         if k in ret.keys():
+            if bVerbose:
+                print("\nDBG: getNetworkStat_psutil: key: %s" % k )
             retInterestingInterface = ret[k]
             break
-    if 0:
-        print("")
-        print(retInterestingInterface )
+    if bVerbose: print("\nDBG: getNetworkStat_psutil: interface: %s" % str(retInterestingInterface) )
         
     if retInterestingInterface == None:
         print("ERR: getNetworkStat_psutil: io_counters: %s (len:%s)" % (str(ret),len(ret)) )
@@ -118,6 +121,13 @@ def analyseBandwith():
             # render bargraph in ascii
             nMB = (t-t_p)/(1024*1024)
             nMB = int(nMB+0.5)
+            if 1:
+                #~ nMB = 3 # to test
+                # sound fx
+                if nMB > 0:
+                    for i in range(nMB):
+                        misctools.tic(rSoundVolume=0.20,bWaitEnd=False)
+                        time.sleep(0.04)
             if 0:
                 # total:
                 strLine = "%4dMB " % nMB + "*"*nMB

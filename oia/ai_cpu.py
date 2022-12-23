@@ -92,6 +92,8 @@ class AiCpu:
         - possible_action: list of possible move/action
         - num_player: num player of ai
         """
+        bVerbose = 1
+        #~ bVerbose = 0
         k = self._getKeySituation(world, num_player)
         try:
             listKnown = self.mem[k]
@@ -99,9 +101,10 @@ class AiCpu:
             print("DBG: getAction: unknown situation => random (key:%s)" % str(err))
             return possible_action[random.randint(0,len(possible_action)-1)]
         
-        print("DBG: getAction: listKnown: %s" % str(listKnown))            
-        listKnownSortedKeys = sorted(listKnown,key = lambda x: x[1])
-        print("DBG: getAction: listKnown sorted keys: %s" % str(listKnownSortedKeys))
+        if bVerbose: print("DBG: getAction: listKnown: %s" % str(listKnown))            
+        #~ listKnownSortedKeys = sorted(listKnown,key = lambda x: x[1])
+        listKnownSortedKeys = [x for _,x in sorted(zip(listKnown.values(),listKnown.keys()),reverse=True)]
+        if bVerbose: print("DBG: getAction: listKnown sorted keys: %s" % str(listKnownSortedKeys))
         rSumPositive = 0
         allPositiveGain = []
         for i,k in enumerate(listKnownSortedKeys):
@@ -109,7 +112,7 @@ class AiCpu:
             if potential_gain<=0:
                 break
             allPositiveGain.append(potential_gain)
-        print("DBG: getAction: allPositiveGain: %s" % str(allPositiveGain))
+        if bVerbose: print("DBG: getAction: allPositiveGain: %s" % str(allPositiveGain))
         if len(allPositiveGain) > 0:
             i = chooseWeighted(allPositiveGain)
             pos = listKnownSortedKeys[i]
@@ -122,19 +125,19 @@ class AiCpu:
         for act in possible_action:
             if self._getKeyAction(act) not in listKnown:
                 listNotTested.append(act[:])
-        print("DBG: getAction: listNotTested: %s" % str(listNotTested))
+        if bVerbose: print("DBG: getAction: listNotTested: %s" % str(listNotTested))
         if len(listNotTested) > 0:
             return listNotTested[random.randint(0,len(listNotTested)-1)]
             
         # choose among the negative one
         listKnownPositived = [1+v for v in listKnown.values()]
-        print("DBG: getAction: listKnownPositived: %s" % str(listKnownPositived))
-        print("DBG: getAction: listKnown: %s" % listKnown )
+        if bVerbose: print("DBG: getAction: listKnownPositived: %s" % str(listKnownPositived))
+        if bVerbose: print("DBG: getAction: listKnown: %s" % listKnown )
         i = chooseWeighted(listKnownPositived)
         pos = list(listKnown.keys())[i]
-        print("DBG: getAction (2a): pos as str: %s" % pos )
+        if bVerbose: print("DBG: getAction (2a): pos as str: %s" % pos )
         pos = posStringToPos(pos)
-        print("DBG: getAction (2b): pos as tuple: %s" % str(pos) )
+        if bVerbose: print("DBG: getAction (2b): pos as tuple: %s" % str(pos) )
         return pos
         
                 
@@ -145,8 +148,10 @@ class AiCpu:
         what could have been made better and memorize them
         - num_winner: player who wins this game
         """
-        print("DBG: updateStats: current actions: %s" % str(self.currentActions))
-        print("DBG: updateStats: prev mem: %s" % str(self.mem))
+        bVerbose = 1
+        bVerbose = 0
+        if bVerbose: print("DBG: updateStats: current actions: %s" % str(self.currentActions))
+        if bVerbose: print("DBG: updateStats: prev mem: %s" % str(self.mem))
             
         for num,a in enumerate(self.currentActions):
             world, num_player,action = a        
@@ -163,7 +168,7 @@ class AiCpu:
             self._assumeExist(k)
             self.mem[k][kAction] = prev*(1-rate_new) + gain*rate_new
         
-        print("DBG: updateStats: new mem: %s" % str(self.mem))
+        if bVerbose: print("DBG: updateStats: new mem: %s" % str(self.mem))
         self.save()
         
         

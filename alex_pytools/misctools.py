@@ -724,14 +724,25 @@ def playWav( strFilename, bWaitEnd = True, rSoundVolume = 1. ):
     import sound_player
     return sound_player.soundPlayer.playFile(strFilename, bWaitEnd = bWaitEnd, rSoundVolume=rSoundVolume)
 
-def ting():
+def ting(rSoundVolume=0.10,bWaitEnd = True):
     """
     play a bell or a simulated one if no bell available
     """
-    if playWav(getPathData()+"ting.wav",rSoundVolume=0.10):
+    if playWav(getPathData()+"ting.wav",bWaitEnd=bWaitEnd,rSoundVolume=rSoundVolume):
         return
     beep(1200, 100)
-    time.sleep(200)
+    time.sleep(140)
+    
+def tic(rSoundVolume=0.10,bWaitEnd = True):
+    """
+    play a tic or a simulated one if no tic available
+    tic is a 120ms short gentle informationnal tic
+    """
+    
+    if playWav(getPathData()+"tic.wav",bWaitEnd=bWaitEnd,rSoundVolume=rSoundVolume):
+        return
+    beep(1800, 100)
+    time.sleep(110)
         
 def bell():
     """

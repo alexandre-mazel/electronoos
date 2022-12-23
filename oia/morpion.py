@@ -97,10 +97,10 @@ class Game:
                 print("Erreur, recommence (%s)" % str(err))
         return col, line
         
-    def askCpu(self,possibleMove):
+    def askCpu(self,possibleMove, nPlayerNum):
         if self.cpuManager == None:
             return possibleMove[0]
-        return self.cpuManager.getAction(self.world,possibleMove,2)
+        return self.cpuManager.getAction(self.world,possibleMove,nPlayerNum)
         
     def receiveMove(self,pos,numPlayer):
         """
@@ -130,7 +130,13 @@ def handleEnd(winner):
         return True
     return False
             
-def runGame(bRepetitiveHuman=False):
+def runGame(bRepetitiveHuman=False,bFirstPlayerIsHuman=True,bQuiet=False):
+    """
+    - bFirstPlayerIsHuman: else it's an ai
+    """
+    #~ bFirstPlayerIsHuman = False
+    #~ bFirstPlayerIsHuman = True
+    
     if bRepetitiveHuman:
         aAutomaticHumanChoice = [(0,0),(1,1),(2,2),(1,0),(2,0),(0,1),(0,2),(1,2)] # help debugging: faster and reproducible
     else:
@@ -145,36 +151,43 @@ def runGame(bRepetitiveHuman=False):
         g.registerCpu(ai)
     g.drawBoard()
     while 1:
-        while 1:
-            if nIdxAutomaticHumanChoice < len(aAutomaticHumanChoice):
-                pos = aAutomaticHumanChoice[nIdxAutomaticHumanChoice];nIdxAutomaticHumanChoice+=1
-            else:
-                pos = g.askPlayer()
-            ret = g.receiveMove(pos,1)
-            if ret: break
-            print("coup impossible, re-essaye encore")
-        g.drawBoard()
+        if bFirstPlayerIsHuman:
+            while 1:
+                if nIdxAutomaticHumanChoice < len(aAutomaticHumanChoice):
+                    pos = aAutomaticHumanChoice[nIdxAutomaticHumanChoice];nIdxAutomaticHumanChoice+=1
+                else:
+                    pos = g.askPlayer()
+                ret = g.receiveMove(pos,1)
+                if ret: break
+                print("coup impossible, re-essaye encore")
+        else:
+            pos = g.askCpu(g.getPossibleAction(),1)
+            g.receiveMove(pos,1)
+        if not bQuiet: g.drawBoard()            
         n = g.getWinner()
         if handleEnd(n):
             break
 
-        pos = g.askCpu(g.getPossibleAction())
+        pos = g.askCpu(g.getPossibleAction(),2)
         g.receiveMove(pos,2)
-        g.drawBoard()
+        if not bQuiet: g.drawBoard()
         n = g.getWinner()
         if handleEnd(n):
             break
     return n
 
-def runBatch(nbr_game=100):
+def runBatch(nbr_game=10000):
+    bFirstPlayerIsHuman = 1
+    bFirstPlayerIsHuman = 0
     listWinner = [0,0,0]
     for i in range(nbr_game):
-        winner = runGame(bRepetitiveHuman=True)
+        print("game %d/%d" % (i,nbr_game))
+        winner = runGame(bRepetitiveHuman=True,bFirstPlayerIsHuman=bFirstPlayerIsHuman,bQuiet=True)
         listWinner[winner-1] += 1
 
-    print("win human: %d" % listWinner[0])
-    print("win cpu: %d" % listWinner[1])
-    print("draw: %d" % listWinner[2])
+    print("win human: %.2f" % int(listWinner[0]*100/nbr_game) )
+    print("win cpu: %.2f" % int(listWinner[1]*100/nbr_game) )
+    print("draw: %.2f" % int(listWinner[2]*100/nbr_game) )
     
     
 #~ runBatch()

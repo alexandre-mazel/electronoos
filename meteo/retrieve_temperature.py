@@ -27,6 +27,7 @@ def store(city,temp,cond):
 def retrieveTemp():
     startbase = '<span data-testid="TemperatureValue" class="CurrentConditions--tempValue--MHmYY">'
     stopbase = "°</span>"
+    # beau: soleil avec des nuages, ensolleile: plein soleil
     astrDatas = [
             ["Paris", "https://weather.com/fr-FR/temps/aujour/l/48.86,2.35?par=google",startbase,stopbase],
             ["Le Kremlin-Bicetre", "https://weather.com/fr-FR/temps/aujour/l/ccb7b6dc48e255339753562e6a8ea1b48b796d68cc275ef58b3d8fe4c9b75fa7",startbase,stopbase],
@@ -39,6 +40,7 @@ def retrieveTemp():
             ["St Malo", "https://weather.com/fr-FR/temps/aujour/l/a1baaf192d861ad1bed879b83a55048b51283588728dfbcf6dc28281d5ce8f4f",startbase,stopbase],
             ["Bordeaux", "https://weather.com/fr-FR/temps/aujour/l/12fae739549c2bb1e6693bdb14c062671c7c87d40051273a05a4eaf5848064fe",startbase,stopbase],
             ["Tavira", "https://weather.com/fr-FR/temps/aujour/l/efa3db97660e2aaaa3efc076350dd00386e0453da1547361cd68e78a412f2fb8",startbase,stopbase],
+            ["VN Gaia", "https://weather.com/fr-FR/temps/aujour/l/7291c492bc9efb63e5a06ee49112469d08890e36e59bc3df64648f4c681440d5",startbase,stopbase],
     ]
     
     start_cond = '<div data-testid="wxPhrase" class="CurrentConditions--phraseValue--mZC_p">'
@@ -65,7 +67,7 @@ def retrieveTemp():
             
 # retrieveTemp - end
 
-def loop(nTimeLoopMin=15):
+def loop(nTimeLoopMin=14):
     while 1:
         retrieveTemp()
         print("sleeping %d min..." % nTimeLoopMin)

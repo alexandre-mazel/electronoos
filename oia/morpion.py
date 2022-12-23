@@ -69,8 +69,93 @@ class Game:
                     possible.append((i,j))
         return possible
         
-    
+    def findAligned(self,nbr_aligned):
+        """
+        look for an alignment of nbr_aligned in vertic, horiz or diag
+        return 0 if no one, symbol of aligned if aligned, 3 if drawgame
+        """
+        # horiz:
+        for j in range(self.h):
+            nPrev = -1
+            nConsecutive = 0
+            for i in range(self.w):
+                val = self.world[j][i]
+                if val == nPrev:
+                    nConsecutive += 1
+                    if nConsecutive == nbr_aligned and val != 0:
+                        return val
+                else:
+                    nPrev = val
+                    nConsecutive = 1
+                    
+        # vertic:
+        for i in range(self.w):
+            nPrev = -1
+            nConsecutive = 0
+            for j in range(self.h):
+                val = self.world[j][i]
+                if val == nPrev:
+                    nConsecutive += 1
+                    if nConsecutive == nbr_aligned and val != 0:
+                        return val
+                else:
+                    nPrev = val
+                    nConsecutive = 1
+                    
+        # for diags we decide of a starting point then we decay
+        # diag \
+        for j in range(self.h-nbr_aligned+1):
+            for i in range(self.w-nbr_aligned+1):
+                k = 0
+                nPrev = -1
+                nConsecutive = 0
+                while 1:
+                    print("DBG: findAligned diag \: testing %d,%d" % (i+k,j+k))
+                    try:
+                        val = self.world[j+k][i+k]
+                    except IndexError:break
+                    
+                    if val == nPrev:
+                        nConsecutive += 1
+                        if nConsecutive == nbr_aligned and val != 0:
+                            return val
+                    else:
+                        nPrev = val
+                        nConsecutive = 1
+                    k += 1
+                    
+        # diag /
+        for j in range(self.h-nbr_aligned+1):
+            for i in range(nbr_aligned-1,self.w):
+                k = 0
+                nPrev = -1
+                nConsecutive = 0
+                while 1:
+                    print("DBG: findAligned diag /: testing %d,%d" % (i-k,j+k))
+                    try:
+                        val = self.world[j+k][i-k]
+                    except IndexError:break
+                    
+                    if val == nPrev:
+                        nConsecutive += 1
+                        if nConsecutive == nbr_aligned and val != 0:
+                            return val
+                    else:
+                        nPrev = val
+                        nConsecutive = 1
+                    k += 1
+
+                    
+        return 0
+        
     def _getWinnerInternal(self):
+        if len(self.getPossibleAction()) < 1:
+            return 3
+        return self.findAligned( 3 )
+        
+        
+    
+    def _getWinnerInternalMorpion(self):
         """
         compute if someone has won.
         return 0 if no one, 1 if player 1 win, or 2 if player 2 win, 3 if drawgame
@@ -186,7 +271,7 @@ def runGame(bBatch=False, bRepetitiveHuman=False,bFirstPlayerIsHuman=True,bQuiet
             ai = ai_cpu.AiCpu(cpu_name)
             g.registerCpu(ai)
             if bBatch: g.getCpuManager().bAutosave = False
-    g.startNewGame(4,4)
+    g.startNewGame()
     if not bQuiet: g.drawBoard()
     while 1:
         if bFirstPlayerIsHuman:

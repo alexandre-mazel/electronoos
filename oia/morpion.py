@@ -1,3 +1,22 @@
+import random
+import time
+
+def renderWaiting(durationSec=1.):
+    timeBegin = time.time()
+    speedAnimation = 0.05
+    while time.time()-timeBegin<durationSec:
+        print("-\r",end="")
+        time.sleep(speedAnimation)
+        print("\\\r",end="")
+        time.sleep(speedAnimation)
+        print("|\r",end="")
+        time.sleep(speedAnimation)
+        print("/\r",end="")
+        time.sleep(speedAnimation)
+    print("  ")
+    
+
+
 class Game:
     def __init__(self):
         self.startNewGame()
@@ -5,6 +24,9 @@ class Game:
         
     def registerCpu(self,cpuObj):
         self.cpuManager = cpuObj
+        
+    def getCpuManager(self):
+        return self.cpuManager
         
     def startNewGame(self,w=3,h=3):
         self.world = []
@@ -18,7 +40,13 @@ class Game:
         self.h = h
     
     def drawBoard(self):
-        for line in self.world:
+        print("  ",end="")
+        for j in range(len(self.world[0])):
+            print("%d " % (j+1),end="")
+        print("")
+            
+        for j,line in enumerate(self.world):
+            print("%d " % (j+1),end="")
             for case in line:
                 if case == 0:
                     c = '.'
@@ -97,6 +125,9 @@ class Game:
                 print("Erreur, recommence (%s)" % str(err))
         return col, line
         
+    def askRandomPlayer(self,possibleMove):
+        return possibleMove[random.randint(0,len(possibleMove)-1)]
+        
     def askCpu(self,possibleMove, nPlayerNum):
         if self.cpuManager == None:
             return possibleMove[0]
@@ -129,13 +160,15 @@ def handleEnd(winner):
         if winner == 3: print("draw game")
         return True
     return False
-            
-def runGame(bRepetitiveHuman=False,bFirstPlayerIsHuman=True,bQuiet=False):
+        
+global_game = Game()
+
+def runGame(bBatch=False, bRepetitiveHuman=False,bFirstPlayerIsHuman=True,bQuiet=False):
     """
     - bFirstPlayerIsHuman: else it's an ai
     """
-    #~ bFirstPlayerIsHuman = False
-    #~ bFirstPlayerIsHuman = True
+    bFirstPlayerIsRandomAI = False
+    bFirstPlayerIsRandomAI = True
     
     if bRepetitiveHuman:
         aAutomaticHumanChoice = [(0,0),(1,1),(2,2),(1,0),(2,0),(0,1),(0,2),(1,2)] # help debugging: faster and reproducible
@@ -143,13 +176,18 @@ def runGame(bRepetitiveHuman=False,bFirstPlayerIsHuman=True,bQuiet=False):
         aAutomaticHumanChoice = []
         
     nIdxAutomaticHumanChoice = 0
-    g = Game()
+    g = global_game
     if 1:
-        #~ import ai_cpu_random as ai_cpu
-        import ai_cpu as ai_cpu
-        ai = ai_cpu.AiCpu("toto")
-        g.registerCpu(ai)
-    g.drawBoard()
+        if g.getCpuManager() == None:
+            #~ import ai_cpu_random as ai_cpu
+            import ai_cpu as ai_cpu
+            cpu_name = "toto" # first ai trained
+            cpu_name = "fight_random" # ai trained against pure random player
+            ai = ai_cpu.AiCpu(cpu_name)
+            g.registerCpu(ai)
+            if bBatch: g.getCpuManager().bAutosave = False
+    g.startNewGame()
+    if not bQuiet: g.drawBoard()
     while 1:
         if bFirstPlayerIsHuman:
             while 1:
@@ -161,13 +199,19 @@ def runGame(bRepetitiveHuman=False,bFirstPlayerIsHuman=True,bQuiet=False):
                 if ret: break
                 print("coup impossible, re-essaye encore")
         else:
-            pos = g.askCpu(g.getPossibleAction(),1)
+            if bFirstPlayerIsRandomAI:
+                pos = g.askRandomPlayer(g.getPossibleAction())
+            else:
+                pos = g.askCpu(g.getPossibleAction(),1)
             g.receiveMove(pos,1)
-        if not bQuiet: g.drawBoard()            
+        if not bQuiet: g.drawBoard()        
         n = g.getWinner()
         if handleEnd(n):
             break
 
+        if not bQuiet: 
+            print("AI is thinking...")
+            renderWaiting()
         pos = g.askCpu(g.getPossibleAction(),2)
         g.receiveMove(pos,2)
         if not bQuiet: g.drawBoard()
@@ -176,19 +220,65 @@ def runGame(bRepetitiveHuman=False,bFirstPlayerIsHuman=True,bQuiet=False):
             break
     return n
 
-def runBatch(nbr_game=10000):
+def runBatch(nbr_game=1000):
+    timeBegin = time.time()
     bFirstPlayerIsHuman = 1
     bFirstPlayerIsHuman = 0
     listWinner = [0,0,0]
     for i in range(nbr_game):
         print("game %d/%d" % (i,nbr_game))
-        winner = runGame(bRepetitiveHuman=True,bFirstPlayerIsHuman=bFirstPlayerIsHuman,bQuiet=True)
+        winner = runGame(bBatch=True, bRepetitiveHuman=True,bFirstPlayerIsHuman=bFirstPlayerIsHuman,bQuiet=True)
         listWinner[winner-1] += 1
 
+    print("")
     print("win human: %.2f" % int(listWinner[0]*100/nbr_game) )
     print("win cpu: %.2f" % int(listWinner[1]*100/nbr_game) )
     print("draw: %.2f" % int(listWinner[2]*100/nbr_game) )
     
     
-#~ runBatch()
+    global_game.getCpuManager().save()
+    
+    duration = time.time()-timeBegin
+    print("INF: duration per 100 games: %.1f" % (duration*100/nbr_game) )
+    return listWinner
+# runBatch - end
+
+def runVisioBatch():
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    playPerBatch = 1000
+    histHuman = []
+    histCpu = []
+    histDraw = []
+    nbr_batch = 100
+    for i in range(nbr_batch):
+        print("#"*160)
+        print("batch %d/%d" % (i,nbr_batch))
+        listWinner = runBatch(playPerBatch)
+        histHuman.append(listWinner[0])
+        histCpu.append(listWinner[1])
+        histDraw.append(listWinner[2])
+
+    print("histHuman: %s" % histHuman)
+    print("histCpu: %s" % histCpu)
+    print("histDraw: %s" % histDraw)
+    xaxis = range(len(histHuman))
+    yaxis1 = np.array(histHuman)
+    yaxis2 = np.array(histCpu)
+    yaxis3 = np.array(histDraw)
+
+    plt.plot(xaxis,yaxis1)
+    plt.plot(xaxis,yaxis2)
+    plt.plot(xaxis,yaxis3)
+    plt.legend(['human', 'cpu', "draw"], loc='upper left')
+    plt.show()
+    plt.savefig('/tmp/ai_evolution_%s.png' % time.time())
+    time.sleep(2.)  # time to save fig ?
+
+    
+
+#~ runBatch(10000)
+#~ runVisioBatch()
 runGame()
+

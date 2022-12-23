@@ -7,15 +7,47 @@ def chooseWeighted(a):
     pick an element among a list of weighted choice. (weight are not to be necessarily sorted)
     return the index of the element
     """
-    print("DBG: chooseWeighted: list: " + str(a) )
+    return chooseWeightedSquared(a)
+    bVerbose = 0
+    if bVerbose: print("DBG: chooseWeighted: list: " + str(a) )
     sum_weight = sum(a)
+    if sum_weight < 0.001:
+        # pure random
+        return random.randint(0,len(a)-1)
     c = random.random()*sum_weight
-    print("DBG: chooseWeighted: choose: %.3f" % c )
+    if bVerbose: print("DBG: chooseWeighted: choose: %.3f" % c )
     accu = 0
     for i,val in enumerate(a):
         accu += val
         if accu > c:
-            print("DBG: chooseWeighted: pick: %s" % i )
+            if bVerbose: print("DBG: chooseWeighted: pick: %s" % i )
+            return i
+    assert(0)
+    
+def chooseWeightedSquared(a):
+    """
+    pick an element among a list of weighted choice. (weight are not to be necessarily sorted)
+    return the index of the element
+    version squared to set enhance difference
+    """
+    #~ bVerbose = 1
+    bVerbose = 0
+    
+    if bVerbose: print("DBG: chooseWeightedSquared: list: " + str(a) )
+    a = [x*x for x in a]
+    
+    if bVerbose: print("DBG: chooseWeightedSquared: list squared: " + str(a) )
+    sum_weight = sum(a)
+    if sum_weight < 0.001:
+        # pure random
+        return random.randint(0,len(a)-1)
+    c = random.random()*sum_weight
+    if bVerbose: print("DBG: chooseWeightedSquared: choose: %.3f" % c )
+    accu = 0
+    for i,val in enumerate(a):
+        accu += val
+        if accu > c:
+            if bVerbose: print("DBG: chooseWeightedSquared: pick: %s" % i )
             return i
     assert(0)
 
@@ -40,6 +72,7 @@ class AiCpu:
         self.mem = {} # for each (world, num_player) a dict of action => the previous success chance: [-1.,+1.]: -1: bad, +1: good, 0: neutral
         self.currentActions = [] # store all world and actions of each player (world,num_player,action)
         self.load()
+        self.bAutosave = True
         
     def save(self):
         print("INF: saving to '%s'" % self.strSaveFilename)
@@ -93,7 +126,7 @@ class AiCpu:
         - num_player: num player of ai
         """
         bVerbose = 1
-        #~ bVerbose = 0
+        bVerbose = 0
         k = self._getKeySituation(world, num_player)
         try:
             listKnown = self.mem[k]
@@ -139,7 +172,7 @@ class AiCpu:
         pos = posStringToPos(pos)
         if bVerbose: print("DBG: getAction (2b): pos as tuple: %s" % str(pos) )
         return pos
-        
+    # getAction - end
                 
         
     def updateStats(self,num_winner,num_player_ai):
@@ -169,7 +202,7 @@ class AiCpu:
             self.mem[k][kAction] = prev*(1-rate_new) + gain*rate_new
         
         if bVerbose: print("DBG: updateStats: new mem: %s" % str(self.mem))
-        self.save()
-        
-        
+        self.currentActions = []
+        if self.bAutosave: self.save()
+    # updateStats - end
 # class AiCpu - end

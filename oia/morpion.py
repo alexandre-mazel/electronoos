@@ -224,14 +224,20 @@ class Game:
         """
         print("INF: Game.receiveMove: receive for player %d, pos: %s" % (numPlayer,str(pos)))
         
+        bGravity = 0
+        if not bGravity:
+            finalPos = pos[:]
+        
         try:
-            content = self.world[pos[1]][pos[0]]
+            content = self.world[finalPos[1]][finalPos[0]]
         except IndexError: return False
         
         if content != 0:
             return False
+            
         if self.cpuManager != None: self.cpuManager.storeAction(self.world,pos,numPlayer)
-        self.world[pos[1]][pos[0]] = numPlayer
+        
+        self.world[finalPos[1]][finalPos[0]] = numPlayer
         return True
 # class Game - end
 

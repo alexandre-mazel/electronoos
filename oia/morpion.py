@@ -45,7 +45,7 @@ class Game:
     def _getWinnerInternal(self):
         """
         compute if someone has won.
-        return 0 if no one, 1 if player 1 win, or 2 if player 2 win
+        return 0 if no one, 1 if player 1 win, or 2 if player 2 win, 3 if drawgame
         """
         # lazy code: work only for 3x3
         # horiz:
@@ -67,13 +67,18 @@ class Game:
             if self.world[0][0] == self.world[1][1] == self.world[2][2]:
                 return self.world[0][0]
             if self.world[0][2] == self.world[1][1] == self.world[2][0]:
-                return self.world[0][2]    
+                return self.world[0][2]   
+                
+        if len(self.getPossibleAction()) < 1:
+            return 3
+            
         return 0
         
     def getWinner(self):
         win = self._getWinnerInternal()
         if win != 0 and self.cpuManager != None:
-            self.cpuManager.updateStats(win)
+            if win != 3:
+                self.cpuManager.updateStats(win,2)
 
         return win
 
@@ -95,7 +100,7 @@ class Game:
     def askCpu(self,possibleMove):
         if self.cpuManager == None:
             return possibleMove[0]
-        return self.cpuManager.getMove(self.world,possibleMove)
+        return self.cpuManager.getAction(self.world,possibleMove,2)
         
     def receiveMove(self,pos,numPlayer):
         """
@@ -109,18 +114,33 @@ class Game:
         
         if content != 0:
             return False
-        if self.cpuManager != None: self.cpuManager.storeMove(self.world,pos,numPlayer)
+        if self.cpuManager != None: self.cpuManager.storeAction(self.world,pos,numPlayer)
         self.world[pos[1]][pos[0]] = numPlayer
         return True
 # class Game - end
 
-def runGame():
-    aAutomaticHumanChoice = [(0,0),(1,1),(2,2)] # help debugging: faster
-    #~ aAutomaticHumanChoice = []
+def handleEnd(winner):
+    """
+    return True if game is finished
+    """
+    if winner != 0:
+        if winner == 1: print("human win")
+        if winner == 2: print("cpu win")
+        if winner == 3: print("draw game")
+        return True
+    return False
+            
+def runGame(bRepetitiveHuman=False):
+    if bRepetitiveHuman:
+        aAutomaticHumanChoice = [(0,0),(1,1),(2,2),(1,0),(2,0),(0,1),(0,2),(1,2)] # help debugging: faster and reproducible
+    else:
+        aAutomaticHumanChoice = []
+        
     nIdxAutomaticHumanChoice = 0
     g = Game()
     if 1:
-        import ai_cpu_random as ai_cpu
+        #~ import ai_cpu_random as ai_cpu
+        import ai_cpu as ai_cpu
         ai = ai_cpu.AiCpu("toto")
         g.registerCpu(ai)
     g.drawBoard()
@@ -135,16 +155,26 @@ def runGame():
             print("coup impossible, re-essaye encore")
         g.drawBoard()
         n = g.getWinner()
-        if n != 0:
-            print("human win")
+        if handleEnd(n):
             break
+
         pos = g.askCpu(g.getPossibleAction())
         g.receiveMove(pos,2)
         g.drawBoard()
         n = g.getWinner()
-        if n != 0:
-            print("cpu win")
+        if handleEnd(n):
             break
+    return n
 
+def runBatch(nbr_game=100):
+    listWinner = [0,0,0]
+    for i in range(nbr_game):
+        winner = runGame(bRepetitiveHuman=True)
+        listWinner[winner-1] += 1
 
+    print("win human: %d" % listWinner[0])
+    print("win cpu: %d" % listWinner[1])
+    print("draw: %d" % listWinner[2])
+    
+#~ runBatch()
 runGame()

@@ -28,7 +28,7 @@ def findInFile( filename, strToMatch, bVerbose = True ):
             if line == None or len(line) == 0:
                 break
         except UnicodeDecodeError as err:
-            if bVerbose or 1: print( "WRN: decode error: %s\n=> skipping line %d in '%s'" % (str(err),nCptLine, filename) )
+            if bVerbose or 0: print( "WRN: decode error: %s\n=> skipping line %d in '%s'" % (str(err),nCptLine, filename) )
             nCptLine += 1
             nNbrErrorDecode += 1
             if nNbrErrorDecode > 3:

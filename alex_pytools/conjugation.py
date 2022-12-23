@@ -97,6 +97,7 @@ class Conjugator:
         """
         - nPers: 1: je, 2: tu, 3: il,elle, 4: nous, 5: vous, 6: ils
         - bOnlyVerb: when set => omit subject:  return "aimes" instead of "tu aimes"
+        return "" if fail to conjugate
         """
         bVerbose = 1
         bVerbose = 0
@@ -108,6 +109,8 @@ class Conjugator:
             verb = self.aaParticular[strInf][nTense-kTenseFirst][nPers]
         except KeyError as err:
             radical = strInf[:-2]
+            if radical == '':
+                return ''
             end = self.aaastrTerminationByTense[group-1][nTense-kTenseFirst][nPers]
             if group == 3:
                 bOire = strInf[-4:] in ['oire','aire'] # croire style
@@ -121,6 +124,8 @@ class Conjugator:
                 elif len(strInf)>4:
                     radical = strInf[:-5]
             if bVerbose: print("DBG: conjugate: radical: '%s'" % radical )
+            if radical == '':
+                return ''
             lastLeter = radical[-1]
             if lastLeter == 'g' and end[0] not in['e','é', 'è','i']:
                 radical += 'e'
@@ -189,6 +194,8 @@ class Conjugator:
                         if bVerbose: print("DBG: findInf: hit")
                         nPersToCheck = i+1
                         infi = strVerb[:-len(term)]
+                        if infi == '':
+                            continue
                         if bVerbose: print("DBG: findInf: look for infinitive group %d using '%s'" % (group,infi) )
                         if group == 1:
                             if (len(infi)> 0 and infi[-1] == 'y' ) or (len(infi)> 1 and infi[-2] == 'y'):
@@ -234,7 +241,7 @@ class Conjugator:
                         if bVerbose: print("DBG: findInf: aaParticularTrois: comparing %s and %s" % (end,term) )
                         if end == term:
                             infitest = strVerb[:-len(term)]+infi
-                            print(self.conjugate(infitest,pers,numTense+kTenseFirst))
+                            if bVerbose: print("conjugaison found peculiar:" + self.conjugate(infitest,pers,numTense+kTenseFirst))
                             return infitest,pers,numTense+kTenseFirst
                             
         if kTense != kTenseUnknown:

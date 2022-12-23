@@ -5,6 +5,9 @@
 #ifndef SIMPLE_TOUCH_DETECTION_H
 #define SIMPLE_TOUCH_DETECTION_H
 
+#define PORTRAIT  0
+#define LANDSCAPE 1
+
 int std_init();
 //int std_start();
 int std_getPressed(int * px, int * py, int * pz, bool bDebug = 1);

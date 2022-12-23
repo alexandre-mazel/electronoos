@@ -4,13 +4,13 @@
 // from Henning Karlsen's original UTouch_Calibration program.
 // Many Thanks.
 
-#define PORTRAIT  0
-#define LANDSCAPE 1
 #define USE_XPT2046   0
 #define USE_LOCAL_KBV 1
 
+#include "simple_touch_detection.h"
+
 #define TOUCH_ORIENTATION  PORTRAIT
-//#define TOUCH_ORIENTATION  LANDSCAPE
+#define TOUCH_ORIENTATION  LANDSCAPE // Doit etre le meme que celui du rendu
 
 #if defined(USB_PID) && USB_PID == 0x804E // Arduino M0 Native
 #define Serial SerialUSB
@@ -28,8 +28,9 @@ extern MCUFRIEND_kbv tft;
 int XP = 27, YP = 4, XM = 15, YM = 14;  //most common configuration
 #else
 //int XP = 6, YP = A1, XM = A2, YM = 7;  //most common configuration
-int XP = 7, YP = A2, XM = A1, YM = 6;  //next common configuration
+//int XP = 7, YP = A2, XM = A1, YM = 6;  //next common configuration
 //int XP=PB7,XM=PA6,YP=PA7,YM=PB6; //BLUEPILL must have Analog for YP, XM
+ int XP = 6, YP = A2, XM = A1, YM = 7;  //my alex configuration
 #endif
 #if USE_LOCAL_KBV
 #include "TouchScreen_kbv.h"         //my hacked version
@@ -38,8 +39,10 @@ int XP = 7, YP = A2, XM = A1, YM = 6;  //next common configuration
 #else
 #include <TouchScreen.h>         //Adafruit Library
 #endif
+
 TouchScreen ts(XP, YP, XM, YM, 300);   //re-initialised after diagnose
 TSPoint tp;                            //global point
+
 
 void readResistiveTouch(void)
 {
@@ -165,32 +168,69 @@ int std_getPressed(int * px, int * py, int * pz, bool bDebug )
 
     // d'apres soft de calib: 125/949 et 155/936
     // autre calib: 124/954 et 143/930
-    int xmin = 100; // 121
-    int xmax = 450; // 559
-    int ymin = 580; // 460
-    int ymax = 980; // 975
+    // 12/12/2022: x: 292/965 y:  136/968
+
+    // quand on regarde l'ecran en paysage avec l'usb en haut a gauche
+
+    // quand l'ecran est en orientation portrait
+    // xraw: min en bas, max en haut
+    // yraw: min a gauche, max a droite
+
+    // quand l'ecran est en orientation paysage
+    // xraw: min en bas, max en haut
+    // yraw: min a gauche, max a droite
+
+    int xmin = 195; // 292; // 121
+    int xmax = 898; // 965; // 559
+    int ymin = 184; // 136; // 460
+    int ymax = 941; // 968; // 975
     int w = 400;
     int h = 240;
-    int invert_x=1;
+    int invert_x=0;
 
     int x = xraw;
     int y = yraw;
 
-    if( x > xmax_calib) xmax_calib = x;
-    if( x < xmin_calib) xmin_calib = x; 
-    if( y > ymax_calib) ymax_calib = y;
-    if( y < ymin_calib) ymin_calib = y; 
-
-    if( 1 )
+    if( pressed )
     {
-      x = (long)((x-xmin))*w/(xmax-xmin);
-      y = (long)((y-ymin))*h/(ymax-ymin);
+      if( x > xmax_calib) xmax_calib = x;
+      if( x < xmin_calib) xmin_calib = x; 
+      if( y > ymax_calib) ymax_calib = y;
+      if( y < ymin_calib) ymin_calib = y; 
+    }
+    const int bUseCalibOnTheFly = 0;
+    if(TOUCH_ORIENTATION==PORTRAIT)
+    {
+      if( !bUseCalibOnTheFly )
+      {
+        x = (long)((x-xmin))*h/(xmax-xmin);
+        y = (long)((y-ymin))*w/(ymax-ymin);
+      }
+      else
+      {
+        // use calib on the fly
+        x = (long)((x-xmin_calib))*h/(xmax_calib-xmin_calib);
+        y = (long)((y-ymin_calib))*w/(ymax_calib-ymin_calib);
+      }
     }
     else
     {
-      // use calib on the fly
-      x = (long)((x-xmin_calib))*w/(xmax_calib-xmin_calib);
-      y = (long)((y-ymin_calib))*h/(ymax_calib-ymin_calib);
+      // swap x <==> y
+      int a = x;
+      x = y;
+      y = a;
+      if( !bUseCalibOnTheFly )
+      {
+        x = (long)((x-xmin))*w/(xmax-xmin);
+        y = (long)((y-ymin))*h/(ymax-ymin);
+      }
+      else
+      {
+        // use calib on the fly
+        x = (long)((x-xmin_calib))*w/(xmax_calib-xmin_calib);
+        y = (long)((y-ymin_calib))*h/(ymax_calib-ymin_calib);
+      }
+      y = h-1-y;
     }
 
     if( invert_x ) x = w-1-x;
@@ -230,8 +270,15 @@ int std_getPressed(int * px, int * py, int * pz, bool bDebug )
     {
       static int prevx = 0;
       static int prevy = 0;
-      tft.drawPixel(prevx,prevy,BLACK);
+      static int prevcolor = 0;
+      
+      //tft.drawPixel(prevx,prevy,BLACK);
+      tft.drawPixel(prevx,prevy,prevcolor);
+      prevcolor = tft.readPixel(x,y);
       tft.drawPixel(x,y,WHITE);
+      //tft.drawPixel(x+1,y,WHITE);
+      //tft.drawPixel(x,y+1,WHITE);
+      //tft.drawPixel(x+1,y+1,WHITE);
       prevx = x;
       prevy = y;
     }

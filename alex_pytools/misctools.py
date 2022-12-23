@@ -100,8 +100,71 @@ def getPathTemp():
         ret = "/tmp/"
     return ret
     
+def getPathSave():
+    """
+    return a nice place to save file
+    """
+    return getUserHome() + "save" + os.sep
+    
 def getTempFilename():
     return getPathTemp() + getFilenameFromTime()
+    
+def loadLocalEnv(strLocalFileName = ".env"):
+    """
+    load variable from a local file, typically .env
+    Return a dict key => value
+    """
+    if not '/' in strLocalFileName and not '\\' in strLocalFileName:
+        # transform localname to abspathname
+        path = os.path.dirname(__file__)
+        if path == "": path = "./"
+        else: path += '/'
+        strLocalFileName = path+strLocalFileName
+    print( "DBG: loadLocalEnv: opening %s" % strLocalFileName)
+    
+    dictNewEnv = {}
+    try:
+        f = open(strLocalFileName,"rt")
+    except FileNotFoundError as err:
+        return dictNewEnv
+    while 1:
+        li = f.readline()
+        #~ print("DBG: loadLocalEnv: line(%d): '%s'" % (len(li),li) )
+        if len(li) < 1:
+            break
+        if li[0] =='#' or len(li)<2:
+            continue
+        elems = li.split("=")
+        key = elems[0]
+        data = elems[1]
+        while data[-1] == '\n' or ord(data[-1])<14:
+            data = data[:-1]
+        if data[0] == '"' and data[-1] == '"':
+            data = data[1:-1]
+        dictNewEnv[key] = data
+        #~ print("DBG: loadLocalEnv: add '%s'=>'%s'" % (key,data) )
+    f.close()
+    return dictNewEnv
+        
+
+def getEnv(strName, strDefault = None ):
+    """
+    get a value from local env, then from environnement
+    """
+    dLocal = loadLocalEnv() # from current dir
+    try:
+        return dLocal[strName]
+    except:
+        pass
+    dLocal = loadLocalEnv(os.environ['USERPROFILE']+os.sep+".env") # from user dir
+    try:
+        return dLocal[strName]
+    except:
+        pass
+    retVal = os.getenv(strName)
+    if retVal == None:
+        retVal = strDefault
+    return retVal
     
 
 def check(v1,v2):

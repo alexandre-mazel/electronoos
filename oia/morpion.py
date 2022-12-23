@@ -176,5 +176,6 @@ def runBatch(nbr_game=100):
     print("win cpu: %d" % listWinner[1])
     print("draw: %d" % listWinner[2])
     
+    
 #~ runBatch()
 runGame()

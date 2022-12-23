@@ -227,6 +227,7 @@ class Game:
         bGravity = 0
         if not bGravity:
             finalPos = pos[:]
+        else:
         
         try:
             content = self.world[finalPos[1]][finalPos[0]]

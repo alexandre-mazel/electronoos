@@ -18,9 +18,22 @@ def renderWaiting(durationSec=1.):
 
 
 class Game:
-    def __init__(self):
-        self.startNewGame()
+    def __init__(self,w=3,h=3):
         self.cpuManager = None
+        if 0:
+            # morpion
+            self.bGravity = False
+            self.nNbrAligned = 3
+        else:
+            # puissance 4
+            self.bGravity = True
+            self.nNbrAligned = 4
+            w = 7
+            h = 6
+            
+        self.w = w
+        self.h = h
+        self.startNewGame()
         
     def registerCpu(self,cpuObj):
         self.cpuManager = cpuObj
@@ -28,16 +41,14 @@ class Game:
     def getCpuManager(self):
         return self.cpuManager
         
-    def startNewGame(self,w=3,h=3):
+    def startNewGame(self):
         self.world = []
         # the world is made of 0: empty, 1: player one, 2: player tow
-        for j in range(h):
+        for j in range(self.h):
             self.world.append([])
-            for i in range(w):
+            for i in range(self.w):
                 self.world[j].append(0)
-                
-        self.w = w
-        self.h = h
+
     
     def drawBoard(self):
         print("  ",end="")
@@ -63,10 +74,16 @@ class Game:
         num_player is 1 or 2
         """
         possible = []
-        for j in range(self.h):
+        if self.bGravity:
+            j = 0
             for i in range(self.w):
                 if self.world[j][i] == 0:
-                    possible.append((i,j))
+                        possible.append((i,j))
+        else:
+            for j in range(self.h):
+                for i in range(self.w):
+                    if self.world[j][i] == 0:
+                        possible.append((i,j))
         return possible
         
     def findAligned(self,nbr_aligned):
@@ -74,6 +91,7 @@ class Game:
         look for an alignment of nbr_aligned in vertic, horiz or diag
         return 0 if no one, symbol of aligned if aligned, 3 if drawgame
         """
+        bVerbose = 0
         # horiz:
         for j in range(self.h):
             nPrev = -1
@@ -110,7 +128,7 @@ class Game:
                 nPrev = -1
                 nConsecutive = 0
                 while 1:
-                    print("DBG: findAligned diag \: testing %d,%d" % (i+k,j+k))
+                    if bVerbose: print("DBG: findAligned diag \: testing %d,%d" % (i+k,j+k))
                     try:
                         val = self.world[j+k][i+k]
                     except IndexError:break
@@ -131,7 +149,7 @@ class Game:
                 nPrev = -1
                 nConsecutive = 0
                 while 1:
-                    print("DBG: findAligned diag /: testing %d,%d" % (i-k,j+k))
+                    if bVerbose: print("DBG: findAligned diag /: testing %d,%d" % (i-k,j+k))
                     try:
                         val = self.world[j+k][i-k]
                     except IndexError:break
@@ -151,7 +169,7 @@ class Game:
     def _getWinnerInternal(self):
         if len(self.getPossibleAction()) < 1:
             return 3
-        return self.findAligned( 3 )
+        return self.findAligned( self.nNbrAligned )
         
         
     
@@ -203,8 +221,11 @@ class Game:
             try:
                 print("A toi humain de jouer: entre une colonne (1..3):")
                 col = int(input())-1
-                print("et maintenant une ligne (1..3):")
-                line = int(input())-1
+                if not self.bGravity:
+                    print("et maintenant une ligne (1..3):")
+                    line = int(input())-1
+                else:
+                    line = 0
                 break
             except ValueError as err:
                 print("Erreur, recommence (%s)" % str(err))
@@ -224,10 +245,17 @@ class Game:
         """
         print("INF: Game.receiveMove: receive for player %d, pos: %s" % (numPlayer,str(pos)))
         
-        bGravity = 0
-        if not bGravity:
+        if not self.bGravity:
             finalPos = pos[:]
         else:
+            finalPos = [pos[0]]
+            alt = 0
+            while self.world[alt][finalPos[0]] == 0:
+                alt += 1
+                if alt >= self.h:
+                    break
+            finalPos.append(alt-1)
+            print("receiveMove: gravity: finalPos: %s" %str(finalPos))
         
         try:
             content = self.world[finalPos[1]][finalPos[0]]
@@ -323,9 +351,9 @@ def runBatch(nbr_game=1000):
         listWinner[winner-1] += 1
 
     print("")
-    print("win human: %.2f" % int(listWinner[0]*100/nbr_game) )
-    print("win cpu: %.2f" % int(listWinner[1]*100/nbr_game) )
-    print("draw: %.2f" % int(listWinner[2]*100/nbr_game) )
+    print("win human: %.2f" % int(listWinner[0]*100./nbr_game) )
+    print("win cpu: %.2f" % int(listWinner[1]*100./nbr_game) )
+    print("draw: %.2f" % int(listWinner[2]*100./nbr_game) )
     
     
     global_game.getCpuManager().save()
@@ -339,7 +367,7 @@ def runVisioBatch():
     import matplotlib.pyplot as plt
     import numpy as np
 
-    playPerBatch = 1000
+    playPerBatch = 100000
     histHuman = []
     histCpu = []
     histDraw = []
@@ -370,7 +398,7 @@ def runVisioBatch():
 
     
 
-#~ runBatch(10000)
-#~ runVisioBatch()
-runGame()
+#~ runBatch(1000)
+runVisioBatch()
+#~ runGame()
 

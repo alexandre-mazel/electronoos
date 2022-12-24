@@ -1,6 +1,7 @@
 import random
 import json
 import copy
+import gzip
 
 def chooseWeighted(a):
     """
@@ -76,7 +77,8 @@ class AiCpu:
         
     def save(self):
         print("INF: saving to '%s'" % self.strSaveFilename)
-        f = open(self.strSaveFilename,"wt")
+        f = open(self.strSaveFilename,"wt") # 16s  (for a file of 333M)
+        #~ f = gzip.open(self.strSaveFilename,"wt") # >  70s
         ret = json.dump((self.mem),f,indent=2, ensure_ascii=False)
         f.close()
         

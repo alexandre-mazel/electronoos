@@ -381,7 +381,7 @@ def runGame(bBatch=False, bRepetitiveHuman=False,bFirstPlayerIsHuman=True,bQuiet
             break
             
         mc_res = g.mc(2,6)
-        print("mc: %s" % str(mc_res) )    
+        #~ print("mc: %s" % str(mc_res) )    
         if not bQuiet: 
             print("AI is thinking...")
             if 0: renderWaiting()

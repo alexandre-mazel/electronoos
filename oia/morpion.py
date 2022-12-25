@@ -1,5 +1,7 @@
+import copy
 import random
 import time
+import numpy as np
 
 def renderWaiting(durationSec=1.):
     timeBegin = time.time()
@@ -151,6 +153,8 @@ class Game:
                 while 1:
                     if bVerbose: print("DBG: findAligned diag /: testing %d,%d" % (i-k,j+k))
                     try:
+                        if i-k<0:
+                            break
                         val = self.world[j+k][i-k]
                     except IndexError:break
                     
@@ -239,11 +243,11 @@ class Game:
             return possibleMove[0]
         return self.cpuManager.getAction(self.world,possibleMove,nPlayerNum)
         
-    def receiveMove(self,pos,numPlayer):
+    def receiveMove(self,pos,numPlayer,bSimulate=False):
         """
         return True if move is leggit
         """
-        print("INF: Game.receiveMove: receive for player %d, pos: %s" % (numPlayer,str(pos)))
+        #~ print("INF: Game.receiveMove: receive for player %d, pos: %s" % (numPlayer,str(pos)))
         
         if not self.bGravity:
             finalPos = pos[:]
@@ -255,7 +259,7 @@ class Game:
                 if alt >= self.h:
                     break
             finalPos.append(alt-1)
-            print("receiveMove: gravity: finalPos: %s" %str(finalPos))
+            #~ print("receiveMove: gravity: finalPos: %s" %str(finalPos))
         
         try:
             content = self.world[finalPos[1]][finalPos[0]]
@@ -264,10 +268,55 @@ class Game:
         if content != 0:
             return False
             
-        if self.cpuManager != None: self.cpuManager.storeAction(self.world,pos,numPlayer)
+        if self.cpuManager != None and not bSimulate: self.cpuManager.storeAction(self.world,pos,numPlayer)
         
         self.world[finalPos[1]][finalPos[0]] = numPlayer
         return True
+        
+    def mc(self,nNumPlayerToPlay,nDepth=4, bFirstCall = True):
+        """
+        calcul les gains pour le joueur 1, de toutes les combinaisons depuis le jeu actuel.
+        Si bFirstCall: retourne le gain, suivi d'un tableau des gains pour chaque actions possible
+        - nNumPlayerToPlay: numero du prochain joueur a jouer: 1 ou 2
+        - nDepth: profondeur de recherche
+        """
+        if 0:
+            print("DBG: mc: world depth: %d, nNumPlayerToPlay: %d" % (nDepth,nNumPlayerToPlay) )
+            self.drawBoard()
+        winner = self._getWinnerInternal()
+        if winner != 0:
+            gain = [1,-1,0]
+            pts = (gain[winner-1])*pow(self.w,nDepth)
+            if 0:
+                self.drawBoard()
+                print("DBG: mc victory depth: %d, pts: %d" % (nDepth,pts))
+            return pts
+            
+        if nDepth == 0:
+            return 0
+            
+        dupWorld = copy.deepcopy(self.world)
+        
+        actions = self.getPossibleAction()
+        sum = 0
+        nextPlayer = ((nNumPlayerToPlay-1+1)%2)+1
+        if bFirstCall:
+            scorePerActions = []
+        for act in actions:
+            self.receiveMove(act,nNumPlayerToPlay,bSimulate=True)
+            res = self.mc(nextPlayer,nDepth-1,bFirstCall=False)
+            sum += res
+            if bFirstCall: scorePerActions.append(res)
+            self.world = copy.deepcopy(dupWorld)
+        # last loop iteration, we have restaured world state
+        if bFirstCall:
+            print("INF: mc: actions: %s" % actions)
+            print("INF: mc: scorePerActions: %s" % scorePerActions)
+            return sum, scorePerActions
+        return sum
+        
+        
+            
 # class Game - end
 
 def handleEnd(winner):
@@ -303,12 +352,14 @@ def runGame(bBatch=False, bRepetitiveHuman=False,bFirstPlayerIsHuman=True,bQuiet
             import ai_cpu as ai_cpu
             cpu_name = "toto" # first ai trained
             cpu_name = "fight_random" # ai trained against pure random player
+            cpu_name = "dumb" # very few trained ai, train only against real human
             ai = ai_cpu.AiCpu(cpu_name)
             g.registerCpu(ai)
             if bBatch: g.getCpuManager().bAutosave = False
     g.startNewGame()
     if not bQuiet: g.drawBoard()
     while 1:
+        print("mc: %s" % str(g.mc(1,5)))
         if bFirstPlayerIsHuman:
             while 1:
                 if nIdxAutomaticHumanChoice < len(aAutomaticHumanChoice):
@@ -324,15 +375,23 @@ def runGame(bBatch=False, bRepetitiveHuman=False,bFirstPlayerIsHuman=True,bQuiet
             else:
                 pos = g.askCpu(g.getPossibleAction(),1)
             g.receiveMove(pos,1)
-        if not bQuiet: g.drawBoard()        
+        if not bQuiet: g.drawBoard()      
         n = g.getWinner()
         if handleEnd(n):
             break
-
+            
+        mc_res = g.mc(2,6)
+        print("mc: %s" % str(mc_res) )    
         if not bQuiet: 
             print("AI is thinking...")
-            renderWaiting()
-        pos = g.askCpu(g.getPossibleAction(),2)
+            if 0: renderWaiting()
+        if 0:
+            pos = g.askCpu(g.getPossibleAction(),2)
+        else:
+            # use mc:
+            sol = np.argmin(mc_res[1])
+            print("ai sol: %s" % sol)
+            pos = g.getPossibleAction()[sol]
         g.receiveMove(pos,2)
         if not bQuiet: g.drawBoard()
         n = g.getWinner()

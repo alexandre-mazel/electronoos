@@ -1051,7 +1051,7 @@ def dictToString(d,sortByValue=False):
 
 def backupFile( filename ):
     """
-    make a backup of a file, erase backuo first.
+    make a backup of a file, erase backup first.
     backup have same name than file, but a with an added .bak
     """
     if not os.path.isfile( filename ):

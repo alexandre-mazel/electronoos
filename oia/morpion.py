@@ -399,6 +399,6 @@ def runVisioBatch():
     
 
 #~ runBatch(1000)
-runVisioBatch()
-#~ runGame()
+#~ runVisioBatch()
+runGame()
 

@@ -2,6 +2,7 @@ import random
 import json
 import copy
 import gzip
+import pickle
 
 def chooseWeighted(a):
     """
@@ -72,28 +73,50 @@ class AiCpu:
         self.strSaveFilename = "/save/ai_%s.dat" % name
         self.mem = {} # for each (world, num_player) a dict of action => the previous success chance: [-1.,+1.]: -1: bad, +1: good, 0: neutral
         self.currentActions = [] # store all world and actions of each player (world,num_player,action)
+        self.bUsePickle = 1
         self.load()
         self.bAutosave = True
+
         
     def save(self):
         print("INF: saving to '%s'" % self.strSaveFilename)
-        f = open(self.strSaveFilename,"wt") # 16s  (for a file of 333M)
-        #~ f = gzip.open(self.strSaveFilename,"wt") # >  70s
-        ret = json.dump((self.mem),f,indent=2, ensure_ascii=False)
+        #~ misctools.backupFile(self.strSaveFilename)
+
+        if not self.bUsePickle:
+            f = open(self.strSaveFilename,"wt") # 16s  (for a file of 333M)
+            #~ f = gzip.open(self.strSaveFilename,"wt") # >  70s
+            ret = json.dump((self.mem),f,indent=2, ensure_ascii=False)
+        else:
+            f = open(self.strSaveFilename,"wb")
+            pickle.dump(self.mem,f)
         f.close()
         
     def load(self):
         print("INF: loading from '%s'" % self.strSaveFilename)
         try:
-            f = open(self.strSaveFilename,"rt")
-            dictlist = json.load(f)
-            self.mem = dictlist
-            f.close()      
+            if not self.bUsePickle or 0:
+                f = open(self.strSaveFilename,"rt")
+                dictlist = json.load(f)
+                self.mem = dictlist
+            else:
+                f = open(self.strSaveFilename,"rb")
+                self.mem = pickle.load(f)
+            f.close()
         except FileNotFoundError: pass
+        
+        if 0:
+            # compress key
+            dup = copy.deepcopy(self.mem)
+            self.mem = {}
+            for k,v in dup.items():
+                kcomp = k.replace('0','').replace(' ', '')
+                self.mem[kcomp] = v
         
     @staticmethod
     def _getKeySituation(world, num_player):
-        return "%s__%s" % (str(world),num_player)
+        o =  "%s__%s" % (str(world),num_player)
+        o = o.replace('0', '').replace(' ', '') # 'compress' data
+        return o
 
     @staticmethod
     def _getKeyAction(action):

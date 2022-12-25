@@ -17,6 +17,16 @@ def renderWaiting(durationSec=1.):
         time.sleep(speedAnimation)
     print("  ")
     
+def onlyonepositive(a):
+    """
+    return True if there's only one positive in list a
+    """
+    nbr = 0
+    for e in a:
+        if e >= 0: 
+            nbr += 1
+            if nbr>1: return False
+    return nbr==1
 
 
 class Game:
@@ -341,6 +351,16 @@ def runGame(bBatch=False, bRepetitiveHuman=False,bFirstPlayerIsHuman=True,bQuiet
     bFirstPlayerIsRandomAI = False
     #~ bFirstPlayerIsRandomAI = True
     
+    bActivateMc = False
+    bActivateMc = True
+    
+    if bActivateMc:
+        print("choisis un niveau d'IA: 1..5")
+        nMcLevel = int(input())
+        if nMcLevel < 1: nMcLevel = 1
+        if nMcLevel > 5: nMcLevel = 5
+        nMcLevel += 1 # mc is 2..6 (7 is *long*)
+    
     if bRepetitiveHuman:
         aAutomaticHumanChoice = [(0,0),(1,1),(2,2),(1,0),(2,0),(0,1),(0,2),(1,2)] # help debugging: faster and reproducible
     else:
@@ -361,7 +381,12 @@ def runGame(bBatch=False, bRepetitiveHuman=False,bFirstPlayerIsHuman=True,bQuiet
     g.startNewGame()
     if not bQuiet: g.drawBoard()
     while 1:
-        print("mc: %s" % str(g.mc(1,4)))
+        mc_res = g.mc(1,4)
+        print("mc: %s" % str(mc_res))
+        if mc_res[0]<0 and onlyonepositive(mc_res[1]):
+            amsg = ["huhuhu", "hihihi", "hunhun"]
+            msg = amsg[random.randint(0,len(amsg)-1)]
+            print("\n AI says: %s !!!\n" % msg)
         if bFirstPlayerIsHuman:
             while 1:
                 if nIdxAutomaticHumanChoice < len(aAutomaticHumanChoice):
@@ -384,15 +409,17 @@ def runGame(bBatch=False, bRepetitiveHuman=False,bFirstPlayerIsHuman=True,bQuiet
             
         if not bQuiet: 
             print("AI is thinking...")
-            if 0: renderWaiting()
-        mc_res = g.mc(2,6)
-        #~ print("mc: %s" % str(mc_res) )    
+        mc_res = g.mc(2,nMcLevel) # between 2 and 6
+        print("mc: %s" % str(mc_res) )   
+        
+        if 1: renderWaiting()      
+        
         if 0:
             pos = g.askCpu(g.getPossibleAction(),2)
         else:
             # use mc:
             sol = np.argmin(mc_res[1])
-            print("ai sol: %s" % sol)
+            #~ print("ai sol: %s" % sol)
             pos = g.getPossibleAction()[sol]
         g.receiveMove(pos,2)
         if not bQuiet: g.drawBoard()

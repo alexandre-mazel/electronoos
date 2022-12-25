@@ -223,10 +223,10 @@ class Game:
         """
         while 1:
             try:
-                print("A toi humain de jouer: entre une colonne (1..3):")
+                print("A toi humain de jouer: entre une colonne (1..%d):" % self.w)
                 col = int(input())-1
                 if not self.bGravity:
-                    print("et maintenant une ligne (1..3):")
+                    print("et maintenant une ligne (1..%d):" % self.h)
                     line = int(input())-1
                 else:
                     line = 0
@@ -254,6 +254,8 @@ class Game:
         else:
             finalPos = [pos[0]]
             alt = 0
+            if finalPos[0]<0 or finalPos[0]>=self.w:
+                return False
             while self.world[alt][finalPos[0]] == 0:
                 alt += 1
                 if alt >= self.h:
@@ -359,7 +361,7 @@ def runGame(bBatch=False, bRepetitiveHuman=False,bFirstPlayerIsHuman=True,bQuiet
     g.startNewGame()
     if not bQuiet: g.drawBoard()
     while 1:
-        print("mc: %s" % str(g.mc(1,5)))
+        print("mc: %s" % str(g.mc(1,4)))
         if bFirstPlayerIsHuman:
             while 1:
                 if nIdxAutomaticHumanChoice < len(aAutomaticHumanChoice):
@@ -380,11 +382,11 @@ def runGame(bBatch=False, bRepetitiveHuman=False,bFirstPlayerIsHuman=True,bQuiet
         if handleEnd(n):
             break
             
-        mc_res = g.mc(2,6)
-        #~ print("mc: %s" % str(mc_res) )    
         if not bQuiet: 
             print("AI is thinking...")
             if 0: renderWaiting()
+        mc_res = g.mc(2,6)
+        #~ print("mc: %s" % str(mc_res) )    
         if 0:
             pos = g.askCpu(g.getPossibleAction(),2)
         else:

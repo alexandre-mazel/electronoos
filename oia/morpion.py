@@ -288,7 +288,7 @@ def runGame(bBatch=False, bRepetitiveHuman=False,bFirstPlayerIsHuman=True,bQuiet
     - bFirstPlayerIsHuman: else it's an ai
     """
     bFirstPlayerIsRandomAI = False
-    bFirstPlayerIsRandomAI = True
+    #~ bFirstPlayerIsRandomAI = True
     
     if bRepetitiveHuman:
         aAutomaticHumanChoice = [(0,0),(1,1),(2,2),(1,0),(2,0),(0,1),(0,2),(1,2)] # help debugging: faster and reproducible
@@ -371,7 +371,7 @@ def runVisioBatch():
     histHuman = []
     histCpu = []
     histDraw = []
-    nbr_batch = 100
+    nbr_batch = 10
     for i in range(nbr_batch):
         print("#"*160)
         print("batch %d/%d" % (i,nbr_batch))

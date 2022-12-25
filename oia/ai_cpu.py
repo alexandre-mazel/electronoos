@@ -4,6 +4,10 @@ import copy
 import gzip
 import pickle
 
+import sys
+sys.path.append("../alex_pytools/")
+import misctools
+
 def chooseWeighted(a):
     """
     pick an element among a list of weighted choice. (weight are not to be necessarily sorted)
@@ -80,7 +84,13 @@ class AiCpu:
         
     def save(self):
         print("INF: saving to '%s'" % self.strSaveFilename)
-        #~ misctools.backupFile(self.strSaveFilename)
+        misctools.backupFile(self.strSaveFilename)
+        print("INF: saving %d situation(s)" % len(self.mem) )
+        if 1:
+            nSumActions = 0
+            for k,v in self.mem.items():
+                nSumActions += len(v)
+            print("INF: describing %d actions(s)" % nSumActions )
 
         if not self.bUsePickle:
             f = open(self.strSaveFilename,"wt") # 16s  (for a file of 333M)
@@ -104,13 +114,32 @@ class AiCpu:
             f.close()
         except FileNotFoundError: pass
         
+        print("INF: loaded %d situation(s)" % len(self.mem) )
+        if 1:
+            nSumActions = 0
+            for k,v in self.mem.items():
+                nSumActions += len(v)
+            print("INF: describing %d actions(s)" % nSumActions )
         if 0:
-            # compress key
+            print("DBG: load: compressing keys and actions...")
+            # compress keys
             dup = copy.deepcopy(self.mem)
             self.mem = {}
             for k,v in dup.items():
                 kcomp = k.replace('0','').replace(' ', '')
-                self.mem[kcomp] = v
+                # compress actions
+                vcomp = {}
+                for kk,vv in v.items():
+                    kkcomp = kk.replace('(', '').replace(')', '').replace(' ', '')
+                    vcomp[kkcomp] = vv
+                #~ print("action: %s => %s" % (v,vcomp))
+                self.mem[kcomp] = vcomp
+        if 0:
+            print("INF: loaded %d situation(s) (after recomp)" % len(self.mem) )
+            nSumActions = 0
+            for k,v in self.mem.items():
+                nSumActions += len(v)
+            print("INF: describing %d actions(s) (after recomp)" % nSumActions )
         
     @staticmethod
     def _getKeySituation(world, num_player):
@@ -120,7 +149,9 @@ class AiCpu:
 
     @staticmethod
     def _getKeyAction(action):
-        return "%s" % (str(action))
+        o = "%s" % (str(action))
+        o = o.replace('(', '').replace(')', '').replace(' ', '')
+        return o
         
     def _assumeExist( self, k ):
         if k in self.mem: return

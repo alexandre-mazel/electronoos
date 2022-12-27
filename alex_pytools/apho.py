@@ -27,14 +27,15 @@ Antoine de Saint-Exupery
         """
         f = io.open(misctools.getThisFilePath()+"datas/pensee.txt","r",encoding='cp1252')
         blob = [] # un bloc de ligne de texte séparé par une ligne vide
-        while 1:
+        bContinue = 1
+        while bContinue:
             line = f.readline()
             if len(line)<1:
-                break
-            if line[-1] == '\n': line = line[:-1]
+                bContinue = 0
+            if bContinue and line[-1] == '\n': line = line[:-1]
             if len(line)<1:
-                # end of blob
                 if len(blob)>1:
+                    # end of blob
                     citation = " ".join(blob[:-1])
                     auth = blob[-1]
                     self.thous.append( (citation,auth) )
@@ -43,6 +44,7 @@ Antoine de Saint-Exupery
                 blob = []
             else:
                 blob.append(line)
+        #~ print("DBG: load: blob: %s" % str(blob))
         #~ print(self.thous)
         
     def getThoughts( self, sentence ):
@@ -101,6 +103,7 @@ Antoine de Saint-Exupery
             cit = cit.lower()
             n = 0
             for w in words:
+                #~ print("compare with cit: %s" % cit)
                 if w in cit:
                     if bVerbose or 0: print( "match: '%s' in '%s'" % (w,cit) )
                     #~ n += 1
@@ -266,10 +269,13 @@ def autoTest():
     
     testApho("Dis moi, tu connais des gens célèbres?")
     testApho("Dis moi, tu connais des gens célèbres?")
+    testApho("travailler moins c'est cool ou pas ?")
+    testApho("travailler moins c'est cool ou pas ?")
+    testApho("Consommer moins c'est cool ou pas ?")
 
 
     print("global_testApho_nbr_hit: %s" % global_testApho_nbr_hit )
-    assert(global_testApho_nbr_hit > 14)
+    assert(global_testApho_nbr_hit >= 18)
     
     if 0:
         # test sur python 2.7

@@ -17,6 +17,22 @@ def renderWaiting(durationSec=1.):
         time.sleep(speedAnimation)
     print("  ")
     
+def pickMinRandomly(a):
+    """
+    pick one beyond minimal value in a list.
+    return the index of the element
+    """
+    listMin = []
+    m = np.min(a)
+    for i,e in enumerate(a):
+        if e == m:
+            listMin.append(i)
+    
+    #~ print(m)
+    #~ listMin = np.where(a==m)[0]
+    return listMin[random.randint(0,len(listMin)-1)]
+#~ print( pickMinRandomly([1,2,1,4]) )
+    
 def onlyonepositive(a):
     """
     return True if there's only one positive in list a
@@ -292,9 +308,9 @@ class Game:
         - nNumPlayerToPlay: numero du prochain joueur a jouer: 1 ou 2
         - nDepth: profondeur de recherche
         """
-        if 0:
-            print("DBG: mc: world depth: %d, nNumPlayerToPlay: %d" % (nDepth,nNumPlayerToPlay) )
-            self.drawBoard()
+        #~ if 0:
+            #~ print("DBG: mc: world depth: %d, nNumPlayerToPlay: %d" % (nDepth,nNumPlayerToPlay) )
+            #~ self.drawBoard()
         winner = self._getWinnerInternal()
         if winner != 0:
             gain = [1,-1,0]
@@ -358,8 +374,9 @@ def runGame(bBatch=False, bRepetitiveHuman=False,bFirstPlayerIsHuman=True,bQuiet
         print("choisis un niveau d'IA: 1..5")
         nMcLevel = int(input())
         if nMcLevel < 1: nMcLevel = 1
-        if nMcLevel > 5: nMcLevel = 5
+        if nMcLevel > 7: nMcLevel = 7
         nMcLevel += 1 # mc is 2..6 (7 is *long*)
+        aMcHistory = []
     
     if bRepetitiveHuman:
         aAutomaticHumanChoice = [(0,0),(1,1),(2,2),(1,0),(2,0),(0,1),(0,2),(1,2)] # help debugging: faster and reproducible
@@ -382,7 +399,7 @@ def runGame(bBatch=False, bRepetitiveHuman=False,bFirstPlayerIsHuman=True,bQuiet
     if not bQuiet: g.drawBoard()
     while 1:
         mc_res = g.mc(1,4)
-        print("mc: %s" % str(mc_res))
+        print("mc%d: %s" % (4,str(mc_res)) )
         if mc_res[0]<0 and onlyonepositive(mc_res[1]):
             amsg = ["huhuhu", "hihihi", "hunhun"]
             msg = amsg[random.randint(0,len(amsg)-1)]
@@ -409,16 +426,21 @@ def runGame(bBatch=False, bRepetitiveHuman=False,bFirstPlayerIsHuman=True,bQuiet
             
         if not bQuiet: 
             print("AI is thinking...")
-        mc_res = g.mc(2,nMcLevel) # between 2 and 6
-        print("mc: %s" % str(mc_res) )   
+        timeBegin = time.time()
+        if bActivateMc:
+            mc_res = g.mc(2,nMcLevel) # between 2 and 6
+            print("mc%d: %s (duration: %.1fs)" % (nMcLevel,str(mc_res),time.time()-timeBegin) )
+            aMcHistory.append(mc_res[0])
+            print("aMcHistory: %s" % str(aMcHistory) )
         
         if 1: renderWaiting()      
         
-        if 0:
+        if not bActivateMc:
             pos = g.askCpu(g.getPossibleAction(),2)
         else:
             # use mc:
-            sol = np.argmin(mc_res[1])
+            #~ sol = np.argmin(mc_res[1]) # pb si tous a zero => full gauche
+            sol = pickMinRandomly(mc_res[1])
             #~ print("ai sol: %s" % sol)
             pos = g.getPossibleAction()[sol]
         g.receiveMove(pos,2)
@@ -489,4 +511,46 @@ def runVisioBatch():
 #~ runBatch(1000)
 #~ runVisioBatch()
 runGame()
+"""
+Win tricks:
+
+ 1 2 3 4 5 6 7
+1 . . . . . . .
+2 . . . . . . .
+3 X . . . . . .
+4 O . O O . . .
+5 O . X X X . .
+6 O X X X O . .
+AI is thinking...
+INF: mc: actions: [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0)]
+INF: mc: scorePerActions: [6360, -132, 6392, 2679, 6544, 9602, 6619]
+mc: (38064, [6360, -132, 6392, 2679, 6544, 9602, 6619])
+
+  1 2 3 4 5 6 7
+1 O . O O . O O
+2 X . X X . X X
+3 X . O X . O X
+4 O . X O . X O
+5 O . X X . X O
+6 X X O X . O O
+AI is thinking...
+INF: mc: actions: [(1, 0), (4, 0)]
+INF: mc: scorePerActions: [15092, 33614]
+mc7: (48706, [15092, 33614]) (duration: 0.0s)
+aMcHistory: [20262, 8164, 42340, 30833, -4747, 3841, 32403, 81477, 74434, 90539, 65190, 46932, 41032, 35388, 30044, 48706]
+
+cpu win:
+  1 2 3 4 5 6 7
+1 . . O X . O X
+2 . X X O . X O
+3 . O O O . O X
+4 . X X O . X X
+5 O O X X . X X
+6 X O O X . O O
+AI is thinking...
+INF: mc: actions: [(0, 0), (1, 0), (4, 0)]
+INF: mc: scorePerActions: [76832, -24010, 76832]
+mc8: (129654, [76832, -24010, 76832]) (duration: 0.0s)
+aMcHistory: [371124, 223169, 691912, 617220, 142574, 351585, 188454, 276423, 114364, 73874, 80440, 45116, 366992, -901, 205996, 129654]
+"""
 

@@ -53,9 +53,18 @@ Antoine de Saint-Exupery
         bVerbose = 1
         bVerbose = 0
         
-        sentence = sentence.replace('.', ' ').replace(',', ' ')
-        words = sentence.split()
-        words = stringtools.lowerList(words)
+        bMatchShort = 0
+        bMatchShort = 1
+        
+        if 0:
+            sentence = sentence.replace('.', ' ').replace(',', ' ')
+            words = sentence.split()
+            words = stringtools.lowerList(words)
+        else:
+            import usual_words
+            words = usual_words.filterSentences(sentence,bVerbose=0)
+            words = stringtools.lowerList(words)
+            
         # add also words without '
         i = 0
         while i < len(words):
@@ -67,7 +76,7 @@ Antoine de Saint-Exupery
         # find radical style
         i = 0
         while i < len(words):
-            if len(words[i])<4:
+            if len(words[i])<3:
                 del words[i]
                 continue
             # on le fera plus tard pour essayer de matcher sur le mot reel
@@ -75,6 +84,17 @@ Antoine de Saint-Exupery
                 #~ words[i] = words[i][:-3] # travailler => travail
             i += 1
             
+        # remove usual words
+        if 0:
+            import usual_words
+            i = 0
+            while i < len(words):
+                if usual_words.isUsualWord(words[i]):
+                    del words[i]
+                    continue
+                i += 1
+            
+        print("match word: %s" % words)
         match = []
         for t in self.thous:
             cit = t[0]
@@ -85,13 +105,18 @@ Antoine de Saint-Exupery
                     if bVerbose or 0: print( "match: '%s' in '%s'" % (w,cit) )
                     #~ n += 1
                     n += len(w) # count more point if word is long!
-                if len(w)>5:
-                    ws = w[:-3]
+                if bMatchShort and len(w)>5:
+                    # lemmatisation du pauvre
+                    if "er" == w[-2:]:
+                        ws = w[:-3]
+                    else:
+                        ws = w[:-2]
                     if ws in cit:
+                        # pb: ecoute => eco can match with recommencer
                         if bVerbose: print( "match short: '%s' in '%s'" % (ws,cit) )
                         n += len(ws)
                     
-            match.append(n)
+            match.append(n*30/len(cit))
         #~ print("match: %s" % match)
         #~ [x for _, x in sorted(zip(Y, X))]
         # both are working, but second seems faster, todolater: measures
@@ -122,6 +147,7 @@ Antoine de Saint-Exupery
         
         self.aCountSaid[less_said_idx] += 1
         self.aLastSaid[less_said_idx] = time.time()
+        print("match: %.2f" % match[less_said_idx] )
         return self.thous[less_said_idx]
         
 # class Apho - end
@@ -194,23 +220,52 @@ less_said_idx: 8
 INF: say: 'Le bonheur est une petite chose que l'on grignote, assis par terre, au soleil.'
 """
 
+global_testApho_nbr_hit = 0
+def testApho(s):
+    global global_testApho_nbr_hit
+    ret = apho.getThoughts(s)
+    print("\n%s" % s)
+    print("=>")
+
+    if ret != None:
+        print(ret[0])
+        global_testApho_nbr_hit += 1
+    print("")
+
 def autoTest():
-    print(apho.getThoughts("j'aime pas travailler"))
-    print(apho.getThoughts("j'aime pas travailler"))
-    print(apho.getThoughts("j'aime pas travailler"))
-    print(apho.getThoughts("j'aime pas travailler"))
+    testApho("j'aime pas travailler")
+    testApho("j'aime pas travailler")
+    testApho("j'aime pas travailler")
+    testApho("j'aime pas travailler")
     print("")
-    #~ print(apho.getThoughts("j'ai la volonté de t'aider"))
-    #~ print(apho.getThoughts("j'ai la volonté de t'aider"))
-    #~ print(apho.getThoughts("j'ai la volonté de t'aider"))
-    #~ print(apho.getThoughts("j'ai la volonté de t'aider"))
-    #~ print(apho.getThoughts("j'ai la volonté de t'aider"))
+    
+    #~ testApho("j'ai la volonté de t'aider"))
+    #~ testApho("j'ai la volonté de t'aider"))
+    #~ testApho("j'ai la volonté de t'aider"))
+    testApho("j'ai la volonté de t'aider")
+    testApho("j'ai la volonté de t'aider")
+    testApho("j'ai la volonté de t'aider")
     print("")
-    print(apho.getThoughts("Il me faudrait du courage"))
-    print(apho.getThoughts("Il me faudrait du courage"))
-    print(apho.getThoughts("J'aime le ChamPagne."))
-    print(apho.getThoughts("J'aime le vin."))
-    print(apho.getThoughts("d'attendre la pluie"))
+    
+    testApho("Il me faudrait du courage")
+    testApho("Il me faudrait du courage")
+    testApho("J'aime le ChamPagne.")
+    testApho("J'aime le ChamPagne.")
+    testApho("J'aime le vin.")
+    testApho("J'aime le vin.")
+    testApho("d'attendre la pluie")
+    testApho("d'attendre la pluie")
+    testApho("attendre la pluie")
+    print("")
+    testApho("Dis moi une phrase")
+    testApho("Ecoute moi")
+    testApho("Dis moi un truc intelligent!")
+    testApho("Dis moi un truc intelligent!")
+
+
+    print("global_testApho_nbr_hit: %s" % global_testApho_nbr_hit )
+    assert(global_testApho_nbr_hit > 14)
+    
     if 0:
         # test sur python 2.7
         print(stringtools.accentToHtml("un élève"))
@@ -228,5 +283,5 @@ def autoTest():
         
     
 if __name__ == "__main__":
-    #~ autoTest()
-    test_loop_asr()
+    autoTest()
+    #~ test_loop_asr()

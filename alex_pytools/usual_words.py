@@ -12,7 +12,7 @@ class UsualWords:
         self.words = {} # words => occ
         self.maxOcc = 0 # le mot avec la plus grosse occ
         
-        self.nThresholdBanal = 2000
+        self.nThresholdBanal = 3200 # si on veut garder travailler on doit etre au dessus de 3133
         
     def load( self ):
         with io.open(misctools.getThisFilePath()+'datas/words_frequency_fr.json', encoding="utf8") as dataFile:
@@ -21,7 +21,7 @@ class UsualWords:
             jsonObj = json.loads(data)
             #~ print(jsonObj)
             self.maxOcc = jsonObj[0]["frequency"]
-            print("DBG: UsualWords: print 20 most frequent:")
+            print("DBG: UsualWords: print 20 most frequent(s):")
             for cpt,obj in enumerate(jsonObj):
                 w = obj["label"]
                 occ = obj["frequency"]
@@ -34,6 +34,8 @@ class UsualWords:
                 "les", "des","un", "une", "le","la",
                 "suis","es","est","sommes", "sont",
                 "mon", "ton", "son",
+                # congugate verb (should be detected when looking for verb, but doesn't work well)
+                "dis","faudrait"
         ]
         for w in listAdd:
             self.words[w] = 100000
@@ -54,11 +56,11 @@ class UsualWords:
                 import conjugation
                 infi = conjugation.conjugator.findInf(w)[0]
                 if bVerbose: print("DBG: isWordBanal: found infinitive: '%s' => '%s'" % (w,infi) )
-                if infi != "" and self.isWordBanal(infi):
+                if infi != "" and self.isWordBanal(infi,bVerbose=bVerbose):
                     return True
         return bBanal
                     
-    def filter_words( self, words, bLookForVerb = True ):
+    def filter_words( self, words, bLookForVerb = True, bVerbose = False ):
         """
         take a list of words and return the list of interesting words
         """
@@ -66,43 +68,50 @@ class UsualWords:
         for w in words:
             if len(w)<3:
                 continue
-            if not self.isWordBanal(w,bLookForVerb=bLookForVerb):
+            if not self.isWordBanal(w,bLookForVerb=bLookForVerb,bVerbose=bVerbose):
                 o.append(w)
         return o
         
-    def filter_sentences( self, s, bLookForVerb = True ):
+    def filter_sentences( self, s, bLookForVerb = True, bVerbose = False ):
         """
         take a sentence and return the list of interesting words
         """
         words = stringtools.cutSentenceToWords(s)
-        return self.filter_words(words,bLookForVerb=bLookForVerb)
+        return self.filter_words(words,bLookForVerb=bLookForVerb,bVerbose=bVerbose)
 # class UsualWords - end
 
 usualWords = UsualWords()
 usualWords.load()
 
+def isUsualWord(w,bLookForVerb = 1, bVerbose = False):
+    return usualWords.isWordBanal(w,bLookForVerb=bLookForVerb,bVerbose=bVerbose)
+    
+def filterSentences(w,bLookForVerb = 1, bVerbose = False):
+    return usualWords.filter_sentences(w,bLookForVerb=bLookForVerb,bVerbose=bVerbose)
+
 def autoTest():
-    assert_equal( usualWords.isWordBanal("je"),1)
-    assert_equal( usualWords.isWordBanal("jE"),1)
-    assert_equal( usualWords.isWordBanal("Avoir"),1)
-    assert_equal( usualWords.isWordBanal("être"),1)
-    assert_equal( usualWords.isWordBanal("suis"),1)
-    assert_equal( usualWords.isWordBanal("Alexandre"),0)
-    assert_equal( usualWords.isWordBanal("les"),1)
-    assert_equal( usualWords.isWordBanal("des"),1)
-    assert_equal( usualWords.isWordBanal("le"),1)
-    assert_equal( usualWords.isWordBanal("la"),1)
-    assert_equal( usualWords.isWordBanal("de"),1)
-    assert_equal( usualWords.isWordBanal("un"),1)
-    assert_equal( usualWords.isWordBanal("une"),1)
-    assert_equal( usualWords.isWordBanal("suis"),1)
-    assert_equal( usualWords.isWordBanal("es"),1)
-    assert_equal( usualWords.isWordBanal("est"),1)
-    assert_equal( usualWords.isWordBanal("sommes"),1)
-    assert_equal( usualWords.isWordBanal("sont"),1)
-    assert_equal( usualWords.isWordBanal("mon"),1)
-    assert_equal( usualWords.isWordBanal("ton"),1)
-    assert_equal( usualWords.isWordBanal("son"),1)
+    assert_equal( isUsualWord("je"),1)
+    assert_equal( isUsualWord("jE"),1)
+    assert_equal( isUsualWord("Avoir"),1)
+    assert_equal( isUsualWord("être"),1)
+    assert_equal( isUsualWord("suis"),1)
+    assert_equal( isUsualWord("Alexandre"),0)
+    assert_equal( isUsualWord("les"),1)
+    assert_equal( isUsualWord("des"),1)
+    assert_equal( isUsualWord("le"),1)
+    assert_equal( isUsualWord("la"),1)
+    assert_equal( isUsualWord("de"),1)
+    assert_equal( isUsualWord("un"),1)
+    assert_equal( isUsualWord("une"),1)
+    assert_equal( isUsualWord("suis"),1)
+    assert_equal( isUsualWord("es"),1)
+    assert_equal( isUsualWord("est"),1)
+    assert_equal( isUsualWord("sommes"),1)
+    assert_equal( isUsualWord("sont"),1)
+    assert_equal( isUsualWord("mon"),1)
+    assert_equal( isUsualWord("ton"),1)
+    assert_equal( isUsualWord("son"),1)
+    assert_equal( isUsualWord("dis"),1)
 
 
 if __name__ == "__main__":
@@ -116,6 +125,6 @@ if __name__ == "__main__":
     r = usualWords.filter_sentences(s)
     print("filter_sentences: '%s' => %s" % (s,r))
 
-    s = "un bon petit vin rouge"
+    s = "Un bon petit Vin Rouge"
     r = usualWords.filter_sentences(s)
     print("filter_sentences: '%s' => %s" % (s,r))

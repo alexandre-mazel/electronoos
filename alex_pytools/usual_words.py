@@ -35,7 +35,7 @@ class UsualWords:
                 "suis","es","est","sommes", "sont",
                 "mon", "ton", "son",
                 # congugate verb (should be detected when looking for verb, but doesn't work well)
-                "dis","faudrait"
+                "dis","faudrait", "connais"
         ]
         for w in listAdd:
             self.words[w] = 100000

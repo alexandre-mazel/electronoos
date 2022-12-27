@@ -19,7 +19,7 @@ class Apho:
         """
         Charge les pensees: un fichier avec des pensées, puis sur la derniere ligne l'auteur. séparé par des lignes vides.
         eg:
-    Je ne pense pas à toute la misère, je pense à la beauté qui reste.
+Je ne pense pas à toute la misère, je pense à la beauté qui reste.
 Anne Frank
 
 Fais de ta vie un rêve et d’un rêve une réalité.
@@ -257,10 +257,15 @@ def autoTest():
     testApho("d'attendre la pluie")
     testApho("attendre la pluie")
     print("")
+    
     testApho("Dis moi une phrase")
     testApho("Ecoute moi")
     testApho("Dis moi un truc intelligent!")
     testApho("Dis moi un truc intelligent!")
+    print("")
+    
+    testApho("Dis moi, tu connais des gens célèbres?")
+    testApho("Dis moi, tu connais des gens célèbres?")
 
 
     print("global_testApho_nbr_hit: %s" % global_testApho_nbr_hit )

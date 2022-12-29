@@ -1139,7 +1139,7 @@ def findDuplicate( strPath ):
     nNumFile = 0
     nNumTotalFile = len(listFiles)
     while nNumFile < len(listFiles):
-        print("INF: comparing %d/%d\r" % (nNumFile,nNumTotalFile), end="")
+        sys.stdout.write("INF: comparing %d/%d\r" % (nNumFile,nNumTotalFile))
         f = listFiles[nNumFile]
         nSize = os.path.getsize(strPath+f)
         # NB: we can have many file same size, but some are equal and some aren't

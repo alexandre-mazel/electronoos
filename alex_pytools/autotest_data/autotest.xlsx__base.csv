@@ -1,0 +1,7 @@
+Nous sommes mandatés par ENTERPRISE pour le recrutement d'TITLE_GENERIC pour SHOP_NAME.;
+Notre client propose un contrat en CONTRACT_TYPE, HOUR_PER_WEEK.;
+En explorant votre CV, votre parcours fait apparaitre des qualités intéressantes correspondantes aux besoins et critères de notre client.;
+Pouvez vous préciser votre expérience globale de TITLE_PERSONIFIED en année: ;Moins de 2 ans;de 2 à 5 ans;De 5 à 10 ans;10 et plus;EXPERIENCE;ANS_REFORMULATE;
+ Le lieu de travail se trouve JOB_PLACE, pouvez vous estimer votre temps de trajet?;Moins de 15 min;15 à 30 min;30 à 45 min;Plus de 45 min;DISTANCE_TO_JOB;ANS_REFORMULATE;
+Vous avez certainement un préavis à respecter, celui-ci est-il de:;Moins de 1 mois;1 à 2 mois;2 à 3 mois;Plus de 3 mois;NOTICE;ANS_REFORMULATE;
+Quelles sont vos prétentions salariales brutes annuelles fixes? ;GENERATE_SALARY;SALARY_CLAIM;ANS_REFORMULATE;

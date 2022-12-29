@@ -1132,12 +1132,14 @@ def findDuplicate( strPath ):
         
     out = []
     listFiles = os.listdir(strPath)
+    print("INF: findDuplicate: sorting...")
     listFiles = sorted(listFiles, key=lambda f: os.path.getsize(strPath+f),reverse=True)
     nSizePrev = -1
     nCountSameSize = 0
     nNumFile = 0
     nNumTotalFile = len(listFiles)
     while nNumFile < len(listFiles):
+        print("INF: comparing %d/%d\r" % (nNumFile,nNumTotalFile), end="")
         f = listFiles[nNumFile]
         nSize = os.path.getsize(strPath+f)
         # NB: we can have many file same size, but some are equal and some aren't
@@ -1155,7 +1157,7 @@ def findDuplicate( strPath ):
                         strOrig = f
                         nToDel = nNumFile - i - 1
 
-                    print("INF: findDuplicate: find a dup: %s - orig: %s" % (strDup, strOrig ) )
+                    print("INF: findDuplicate: find a dup: %s - orig: %s (size:%d)" % (strDup, strOrig,nSize ) )
                     out.append( strDup )
                     # remove this one from the list, helping future comparisons
                     del listFiles[nToDel]

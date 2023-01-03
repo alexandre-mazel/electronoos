@@ -2,11 +2,11 @@ import os
 import sys
 import time
 
-sys.path.append("../alex_pytools/")
+sys.path.append( os.path.dirname(__file__) + "/../alex_pytools/" )
 import misctools
 
 global_strPassword = misctools.getEnv("PUBLAC_PWD")
-print("DBG: using passwd: '%s'" % global_strPassword )
+#~ print("DBG: using passwd: '%s'" % global_strPassword )
 
 def transfer( path, filename ):
     global global_strPassword

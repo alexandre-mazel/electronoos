@@ -1,4 +1,0 @@
-Etes vous disponible du MISSION_DATE;YES_NO;ACK;
-Les horaires de la mission sont les suivants TIME_TABLE tous les jours de la misison. Ces horaires vous conviennent ils ?;YES_NO;ACK;
-Seriez vous d'accord pour prolonger votre mission?;YES_NO;ACK;
-Acceptez vous la mission au salaire horaire brut de PAY_PER_HOUR ?;YES_NO;ACK;

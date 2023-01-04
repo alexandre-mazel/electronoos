@@ -11,6 +11,7 @@ memorize the progression of different users using file to store it permanently
 
 import misctools
 from misctools import assert_equal
+from misctools import ExclusiveLock
 
 class Progression:
     """
@@ -62,6 +63,21 @@ class Progression:
         except KeyError:
             pass
         return defaultValue
+        
+    def getAndInc(self,strUserId, strObjectId, defaultValue = None, nIncStep = 1 ):
+        """
+        get and inc in one call
+        armoured !
+        """
+        
+        lock = ExclusiveLock()
+        lock.acquire()
+        
+        self.load()
+        v = self.get(strUserId, strObjectId, defaultValue)
+        self.inc(strUserId, strObjectId, nIncStep)
+        self.save()
+        lock.release()
         
     def delProgress(self,strUserId, strObjectId):
         k = Progression._createKey(strUserId,strObjectId)

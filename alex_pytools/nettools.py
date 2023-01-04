@@ -4,16 +4,18 @@ import http.client
 
 import misctools
 
-def download(remote,dst, bForceDownload=False):
+def download(remote,dst, bForceDownload=False, bInternalCalledForRetry = False):
     """
     Return a 1 if downloaded, 2 if already existing, 
     or <0 on error:
         -1: error 404: not found
         -2: error 403: forbidden
+        -3: temp error
         -5: error timeout
         -50: unknown error
         -100: ValueError
         -200: invalid url
+    - bInternalCalledForRetry: mechanism to try again, one time if connection  reset 
     """
     timestamp = misctools.getTimeStamp()
     if not bForceDownload and os.path.isfile(dst):
@@ -35,6 +37,11 @@ def download(remote,dst, bForceDownload=False):
     except http.client.InvalidURL as err:
         print("%s: ERR: common.download (3): %s\n err: %s" % (timestamp,remote,err) )
         return -200 
+    except urllib.error.URLError as err:
+        print("%s: ERR: common.download (4): %s\n err: %s" % (timestamp,remote,err) )
+        if not bInternalCalledForRetry:
+            return download(remote,dst,bForceDownload=bForceDownload,bInternalRetry=True)
+        return -3
         
     print("%s: INF: => %s" % (timestamp,dst))
     print("%s: INF: [OK]" % timestamp)

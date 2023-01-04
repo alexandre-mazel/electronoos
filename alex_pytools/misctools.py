@@ -65,6 +65,8 @@ def getUserHome():
         ret = "c:/"
     else:
         ret = os.path.expanduser("~/")
+        if ret == '/root/':
+            ret = "/tmp/"
     return ret
     
 def getThisFilePath(strModuleName = __name__):
@@ -1251,6 +1253,79 @@ def elision( strFirstWord, strSecondWord ):
     if strFirstWord[-1] == 'e' and isVoyelle(strSecondWord[0]):
         return strFirstWord[:-1] + "'" + strSecondWord
     return strFirstWord + " " + strSecondWord
+    
+class ExclusiveLock:
+    # inspired by https://github.com/drandreaskrueger/lockbydir
+    
+    def __init__( self, lockname):
+        """
+            get an exclusive opening of a lock, so no other process can access a critival ressources
+            call close to the returned object to release the lock
+            return None if a timeout was set and impossible to get the lock
+                - lockname: the lockname (will be shared among the whole system)
+        """
+        if os.name == "nt":
+            lockdir = "/tmp/"
+        else:
+            lockdir = "/var/www/html/obo/www/tmp/"
+            
+        self.acquired = False
+            
+        self.lockname = lockdir+os.path.basename(lockname) # need to be accessible from everywhere and every process
+            
+            
+    def acquire( self, timeout = 0, bVerbose=True ):
+        """
+        return True if the lock is get or False if not get (timeout)
+        
+            - timeout: time out in sec, 0 for no timeout
+            
+        """
+        if bVerbose: import threading
+        
+        timeStart = time.time()
+        while 1:
+
+            try:
+                os.mkdir(self.lockname)
+                if bVerbose: print("DBG: Lock.acquire: %s: locking '%s'" % (threading.current_thread().ident,self.lockname))
+                self.acquired = True
+                return True
+            except BaseException as err:
+                if bVerbose: print("DBG: Lock.acquire: %s: normal err: %s" % (threading.current_thread().ident,str(err) ) )
+                pass
+                
+            if timeout > 0 and time.time()-timeStart > timeout:
+                break
+                
+            time.sleep(0.05)
+            
+        return False
+        
+        
+    def release(self, bForceReleaseAny = False, bVerbose = True):
+        """
+        bForceRelease: release even if the lock is not from himself
+        """
+        if bVerbose: import threading
+        
+        if not self.acquired and not bForceReleaseAny:
+            import threading
+            print("ERR: Lock.release: %s: can't release an unacquired lock %s" % (threading.current_thread().ident,self.lockname))
+            return False
+        if bVerbose:
+            print("INF: Lock.release: %s: removing %s" % (threading.current_thread().ident,self.lockname) ) 
+        try:
+            os.rmdir(self.lockname)
+        except (FileNotFoundError,OSError) as err:
+            print("WRN: Lock.release: %s: while removing %s: the lock is not locked" % (threading.current_thread().ident,self.lockname) ) 
+            if not bForceReleaseAny:
+                print("ERR: Lock.release: Fatal in this case")
+                assert(0)
+        self.acquired = False
+        return True
+        
+# class ExclusiveLock - end
     
 def autoTest():
     print("cpu: %s" % str(getCpuModel()) )

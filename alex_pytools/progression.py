@@ -22,8 +22,8 @@ class Progression:
     """
     def __init__( self, strSaveFilename = "" ):
         self.strSaveFilename = strSaveFilename # not saved in file
-        if strSaveFilename == "": 
-            strSaveFilename = misctools.getPathSave() + "progress.dat"
+        if self.strSaveFilename == "": 
+            self.strSaveFilename = misctools.getPathSave() + "progress.dat"
             
         self.timeLastLoaded = 0.0 # not saved in file
             
@@ -92,9 +92,13 @@ class Progression:
             self.log(s)
             return 0
         dictlist = json.load(f)
-        self.dictProg = {};
-        for k,d in dictlist.items():
-            self.dictProg[k] = d
+        if sys.version_info[0] >= 3:
+            self.dictProg = dictlist
+        else:
+            self.dictProg = {};
+            for k,d in dictlist.items():
+                d[0] = str(d[0])
+                self.dictProg[str(k)] = d
         self.log("INF: Progression.load: loaded: %d progression(s)" % (len(self.dictProg)) )
         f.close()
         

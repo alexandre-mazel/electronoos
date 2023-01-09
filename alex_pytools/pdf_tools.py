@@ -313,6 +313,72 @@ def test():
         generatePdfFromImages(["../data/alexandre.jpg"], "temp_%s.pdf" % bNumPage,bAddPageNum=bNumPage)
         generatePdfFromImages(["../data/alexandre.jpg"]*4, "temp4_%s.pdf" % bNumPage,nNbrImagePerPage=4,bAddPageNum=bNumPage)
 
+
+def pdf_full_page_to_img(src,dst):
+    """
+    convert each page of a pdf to an img.
+    output image only in png
+    return the list of created image
+    """
+    print("INF: pdf_full_page_to_img: '%s' => '%s'" % (src,dst))
+    
+    if os.path.isfile(dst.replace(".png","_%04d.png"%0)):
+        listImg = []
+        nNumPage = 0
+        while os.path.isfile(dst.replace(".png","_%04d.png"%nNumPage)):
+            listImg.append(dst.replace(".png","_%04d.png"%nNumPage))
+            nNumPage += 1
+            return listImg
+    
+    print("INF: pdf_full_page_to_img: really generating images" )
+    """
+    # require poppler :(
+    import pdf2image 
+    pages = pdf2image.convert_from_path(src, 500)
+
+    nNumPage = 1
+    for page in pages:
+        page.save(dst.replace(".jpg","%04d.jpg"%nNumPage), 'JPEG')
+        nNumPage += 1
+    """
+    
+    listImg = []
+    # python -m pip install --upgrade pip
+    import fitz # python -m pip install --upgrade pymupdf
+    doc = fitz.open(src)
+    bFitz16=False
+    try:
+        nbrPage = doc.page_count
+    except:
+        # old fitz version
+        bFitz16 = True
+        nbrPage = doc.pageCount
+        doc.load_page=doc.loadPage
+    for i in range(nbrPage):        
+        print("INF: pdf_full_page_to_img: converting page %d" % i )
+        page = doc.load_page(i)  # number of page
+        if not hasattr(page,"get_pixmap"):
+                page.get_pixmap=page.getPixmap
+        # zoom not working
+        #~ zoom = 2    # zoom factor
+        #~ mat = fitz.Matrix(zoom, zoom)
+        #~ pix = page.get_pixmap(matrix=map)
+        for dpi in [300,150,75]:
+            try:
+                if bFitz16: 
+                    pix = page.get_pixmap()
+                    #~ print(dir(pix))
+                    pix.save = pix.writeImage
+                else: 
+                    pix = page.get_pixmap(dpi=dpi)
+                output = dst.replace(".png","_%04d.png"%i)
+                pix.save(output)
+                listImg.append(output)
+                break; # exit of the for dpi
+            except BaseException as err:
+                print("WRN: pdf_full_page_to_img: err occurs, trying with smaller def (dpi:%d), err:%s" % (dpi, err))
+    return listImg
+
 if __name__ == "__main__":
     pass
     #~ test()

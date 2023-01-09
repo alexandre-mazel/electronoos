@@ -1,4 +1,4 @@
-from sklearn import svm
+from sklearn import svm # pip install scikit-learn
 import numpy as np
 
 ## nos donnees
@@ -23,7 +23,7 @@ classifier.fit(features, classes)
 
 ## testons 
 
-new_comers = [16,1.8,2,0]
+new_comers = [500,5.8,4,1]
 
 predicted = classifier.predict([new_comers])
 

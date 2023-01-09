@@ -32,7 +32,7 @@ classifier.fit(features, classes)
 new_comers = [9,1.8,2,0] # en dessous de 18 ca donne toujours un trotinette, sauf si gamma est auto
 new_comers2 = [4,1.8,2,0]
 new_comers3 = [800,3.8,4,1]
-new_comers4 = [100,3.8,4,1]
+new_comers4 = [800,3.8,10,1]
 
 predicted = classifier.predict([new_comers,new_comers2,new_comers3,new_comers4])
 

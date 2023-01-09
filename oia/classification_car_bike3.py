@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 
 ## nos donnees
-libelle_features = ["poidss", "longueur", "nbr_roues", "moteur"]
+libelle_features = ["poids", "longueur", "nbr_roues", "moteur"]
 
 features = [
                 [14,1.8,2,0],
@@ -43,7 +43,7 @@ for c in predicted:
     print( "    " + libelle_class[c])
     
 if 0:
-    tree.plot_tree(classifier)
+    tree.plot_tree(classifier,impurity=False,fontsize=5)
     plt.show()
 else:
     import graphviz

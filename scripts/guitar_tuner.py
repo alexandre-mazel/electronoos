@@ -52,10 +52,21 @@ guitar_notes_freqs = { # for each notes the number of the string and the frequen
             "E4": (6, 329.63),
 }
 
+
+cello_notes_freqs = { # for each notes the number of the string and the frequency
+# do sol ré la
+            "C2": (1, 65.41),
+            "G2": (2, 98.00),
+            "D3": (3, 146.83),
+            "A3": (4, 220.00),
+}
+
 def printGuitarTunerStyle(max_freq,closest_note,closest_pitch):
     """
     print infos like a guitar tuner
     """
+    ref = guitar_notes_freqs
+    ref = cello_notes_freqs
     rDiff = max_freq-closest_pitch
     strSymbol = '?'
     strStringNum = '? '
@@ -74,8 +85,8 @@ def printGuitarTunerStyle(max_freq,closest_note,closest_pitch):
         else:
             strSymbol += "v"
     
-    if closest_note in guitar_notes_freqs:
-        strStringNum = str(guitar_notes_freqs[closest_note][0])
+    if closest_note in ref:
+        strStringNum = str(ref[closest_note][0])
     else:
         pass
     print("%s: str%s %s (%.1fHz / %.1fHz)" % (closest_note, strStringNum, strSymbol,max_freq,closest_pitch))

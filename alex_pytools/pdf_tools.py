@@ -323,12 +323,13 @@ def pdf_full_page_to_img(src,dst):
     print("INF: pdf_full_page_to_img: '%s' => '%s'" % (src,dst))
     
     if os.path.isfile(dst.replace(".png","_%04d.png"%0)):
+        # already existing, let's just return the filename
         listImg = []
         nNumPage = 0
         while os.path.isfile(dst.replace(".png","_%04d.png"%nNumPage)):
             listImg.append(dst.replace(".png","_%04d.png"%nNumPage))
             nNumPage += 1
-            return listImg
+        return listImg
     
     print("INF: pdf_full_page_to_img: really generating images" )
     """

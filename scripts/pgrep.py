@@ -28,7 +28,7 @@ def findInFile( filename, strToMatch, bVerbose = True ):
             if line == None or len(line) == 0:
                 break
         except UnicodeDecodeError as err:
-            if bVerbose or 1: print( "WRN: decode error: %s\n=> skipping line %d in '%s'" % (str(err),nCptLine, filename) )
+            if bVerbose or 0: print( "WRN: decode error: %s\n=> skipping line %d in '%s'" % (str(err),nCptLine, filename) )
             nCptLine += 1
             nNbrErrorDecode += 1
             if nNbrErrorDecode > 3:
@@ -114,7 +114,7 @@ def findInFiles( strPath, strToMatch, strFileMask = '*', bVerbose = True ):
         
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print( "\n  My Grep-clone v1.0\n\n  syntax: %s <string_to_match> <files_mask>\n\n  eg: %s a_word_in_a_line *.py\n  eg: %s *word1*word2* face*\n  eg: %s any_string_with_some* *" % ((sys.argv[0],)*4))
+        print( "\n  My Grep-clone v1.0\n\n  syntax: %s <string_to_match> <files_mask> [1]\n\n  eg: %s a_word_in_a_line *.py\n  eg: %s *word1*word2* face*\n  eg: %s any_string_with_some* * 1 => will print binary file kipped file(s)" % ((sys.argv[0],)*4))
         exit(-1)
     print("\n")
     

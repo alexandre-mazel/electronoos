@@ -46,6 +46,7 @@ Antoine de Saint-Exupery
                 blob.append(line)
         #~ print("DBG: load: blob: %s" % str(blob))
         #~ print(self.thous)
+        print("INF: Apho.load: %d loaded apho(s))" % len(self.thous))
         
     def getThoughts( self, sentence ):
         """

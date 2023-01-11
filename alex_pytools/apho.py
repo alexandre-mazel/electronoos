@@ -224,15 +224,28 @@ less_said_idx: 8
 INF: say: 'Le bonheur est une petite chose que l'on grignote, assis par terre, au soleil.'
 """
 
+def strToPrint(s):
+    if sys.version_info[0] >= 3:
+        return s
+
+    o = ""
+    for c in s:
+        #~ print( ord(c) )
+        if ord(c) <= 127:
+            o += c
+    return o
+
 global_testApho_nbr_hit = 0
 def testApho(s):
     global global_testApho_nbr_hit
     ret = apho.getThoughts(s)
-    print("\n%s" % s)
+    print("\n%s" % strToPrint(s))
     print("=>")
 
     if ret != None:
-        print(ret[0])
+        s = ret[0]
+        #~ print(str(s)) # UnicodeEncodeError: 'ascii' codec can't encode character u'\xe0'
+        print(strToPrint(s)) # cette ligne bloque en python 2.7,  LookupError: unknown encoding: cp65001 # corriger en faisant dans le shell: set PYTHONIOENCODING=UTF-8
         global_testApho_nbr_hit += 1
     print("")
 

@@ -25,6 +25,10 @@ Anne Frank
 Fais de ta vie un rêve et d’un rêve une réalité.
 Antoine de Saint-Exupery
         """
+        """
+        TODO a l'occasion: prendre un gros roman puis chercher des phrases assez courte sans prénom et les définir comme des pensee avec nom de l'auteur, livre et année.
+        cf D:\books avec des pdfs
+        """
         f = io.open(misctools.getThisFilePath()+"datas/pensee.txt","r",encoding='cp1252')
         blob = [] # un bloc de ligne de texte séparé par une ligne vide
         bContinue = 1
@@ -54,7 +58,7 @@ Antoine de Saint-Exupery
         return a pair, (thought,author) or None if none
         """
         bVerbose = 1
-        bVerbose = 0
+        #~ bVerbose = 0
         
         bMatchShort = 0
         bMatchShort = 1
@@ -286,7 +290,10 @@ def autoTest():
     testApho("travailler moins c'est cool ou pas ?")
     testApho("travailler moins c'est cool ou pas ?")
     testApho("Consommer moins c'est cool ou pas ?")
-
+    
+    testApho("c'est bien fait peur. tu es un bon petit gars. eh mon petit gnocchi est-ce qu'il a.")
+    # => "Gourmandise : source inépuisable de bonheur. a cause de bonheur" bon match bonheur, c'est moche.
+    # => maintenant donne, Quand vous êtes à Rome, faites comme les Romains. fait => faites
 
     print("global_testApho_nbr_hit: %s" % global_testApho_nbr_hit )
     assert(global_testApho_nbr_hit >= 18)

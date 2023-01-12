@@ -61,7 +61,7 @@ python monitor_pepper.py
 ./dev/git/electronoos/scripts/view_img.py ~/imgs/Jarc/
 
 # log interessant:
-cat /home/nao/agent_behavior_cherie.log
+tail -f -n 100 /home/nao/agent_behavior_cherie.log
 
 
 
@@ -259,6 +259,7 @@ class HumanManager:
             self.ab = agent_behavior.agentBehavior
         else:
             self.ab = None
+            self.mem = None
             
         # state info
         self.rTimeGlobalLastInteraction = time.time()-1000
@@ -304,6 +305,9 @@ class HumanManager:
             
         if img is None:
             return None
+            
+            
+        if self.mem != None: self.mem.raiseMicroEvent("updatingImage",int(time.time()))
             
             
         # reglage selon la machine:
@@ -402,6 +406,7 @@ class HumanManager:
             imgFace = img[y1:y2,x1:x2]
             timeBegin = time.time()
             try:
+                if self.mem != None: self.mem.raiseMicroEvent("sending_to_face_rec",time.time())
                 retVal = self.cs.imageReco_continuousLearn(imgFace)
             except BaseException as err:
                 print("ERR: updateImage: while imagereco: %s" % (str(err)))

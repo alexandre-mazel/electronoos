@@ -17,8 +17,8 @@ try: import v4l2capture  # can be found here : https://github.com/gebart/python-
 except: pass # can be skipped if no use of v4l2 function
 
 
-try: import pygame_tools
-except: pass
+#~ try: import pygame_tools
+#~ except: pass
 
 """
 sudo apt-get install libv4l-dev
@@ -109,7 +109,8 @@ def getPathSave():
     return getUserHome() + "save" + os.sep
     
 def getTempFilename():
-    return getPathTemp() + getFilenameFromTime()
+    import threading
+    return getPathTemp() + getFilenameFromTime() + "_" + str(threading.get_ident()) # if multithreading, two can have same time
     
 def loadLocalEnv(strLocalFileName = ".env"):
     """
@@ -312,12 +313,14 @@ def cleanText( txt, bEatAll = True):
     return out
 
 def getSystemCallReturn( strCommand ):
+    # TODO: replace os.system by subprocess.call cf ping_multi
     f = getTempFilename()+".txt"
     #~ print("DBG: getSystemCallReturn: running '%s' into '%s'" % (strCommand,f) )
     os.system("%s>%s" % (strCommand,f) )
     #file = open(f,"rt", encoding="utf-8", errors="surrogateescape") #cp1252 on windows, latin-1 on linux system
     file = open(f,"rt")
     data = file.read()
+    file.close()
     #~ print("DBG: getSystemCallReturn: data (1): %s" % str(data) )
     if len(data) > 0 and ord(data[0]) == 255:
         # command is of the type wmic and so is rotten in a wild burk encoding
@@ -328,8 +331,7 @@ def getSystemCallReturn( strCommand ):
         
     #~ print("DBG: getSystemCallReturn: data (2): %s" % str(data) )
     #~ data = data.decode()
-    file.close()
-    #~ os.unlink(f)
+    os.unlink(f)
     return str(data)
 
 def getCpuModel(bShort=False):
@@ -1328,7 +1330,16 @@ class ExclusiveLock:
 # class ExclusiveLock - end
     
 def autoTest():
-    print("cpu: %s" % str(getCpuModel()) )
+    s = str(getCpuModel())
+    print("cpu: %s" % s )
+    assert( "Intel64 Family 6 Model 126 Stepping 5, GenuineIntel" in s)
+    
+    if 1:
+        timeBegin = time.time()
+        for i in range(10):
+            getCpuModel()
+        print("cpu model takes %.4fms per call" % ((time.time()-timeBegin)*1000/10)) # 203ms per call
+        
     check(smoothstep(0),0)
     check(smoothstep(-1),0)
     check(smoothstep(0.5),0.5)

@@ -50,7 +50,7 @@ def generateWithSeed(prompt, seed = 123):
 
     # memory problem:
 
-    if 1:
+    if 0:
         print("\n reglage memory pytorch:\n")
 
         #~ torch.no_grad()
@@ -198,9 +198,10 @@ def generateImg(prompt = ""):
 
 if __name__ == "__main__":
     
-    if 0:
+    if 1:
         #~ generateImg()
         generateWithSeed("Labrador in the style of Vermeer")
+        exit(1)
     
     prompt = " ".join(sys.argv[1:])
     generateImg(prompt)

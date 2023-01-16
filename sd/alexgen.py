@@ -4,7 +4,20 @@ from diffusers import StableDiffusionPipeline
 
 import os
 import cv2
+import sys
 import time
+
+def save_and_show_pil_image( image, prompt = "none", nNumImage=0):
+    fn = prompt.replace(" ", "_")[:80] + '__' + str(time.time()) + ".png"
+    fn = os.path.expanduser("~/generated/" + fn)
+    image.save(fn)
+
+    print("INF: showing '%s'" % fn)
+    im = cv2.imread(fn)
+    win_name = "generated_%d" % nNumImage
+    cv2.imshow(win_name,im)
+    cv2.moveWindow(win_name, (nNumImage%4)*256, (nNumImage//4)*256 )
+    cv2.waitKey(1000)
 
 # faire une fois:
 # import huggingface_hub
@@ -21,6 +34,9 @@ device = "cuda"
 
 bLarge = 1
 bLarge = 0
+
+bCensored = 1
+#~ bCensored = 0
 
 def generateWithSeed(prompt, seed = 123):
     pipe = StableDiffusionPipeline.from_pretrained(
@@ -113,7 +129,7 @@ def generateWithSeed(prompt, seed = 123):
     
     
 
-def generateImg():
+def generateImg(prompt = ""):
 
     if bLarge:
         pipe = StableDiffusionPipeline.from_pretrained(model_id)
@@ -121,38 +137,46 @@ def generateImg():
         pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16)
         
     pipe = pipe.to(device)
-    pipe.safety_checker = lambda images, clip_input: (images, False)
+    if not bCensored: pipe.safety_checker = lambda images, clip_input: (images, False)
+    
+    if prompt == "":
 
-    #~ prompt = "a photo of an astronaut riding a horse on mars"
-    #~ prompt = "portrait of a girl"
-    #~ prompt = "a beautiful and naked red-head girl with high checkbones smiling at the camera at work"
-    #~ prompt = "portrait of a young cyberpunk woman"
-    # https://www.stable-diffusion-france.fr/prompt-helper.php
-    #~ prompt = "a woman  painting,  photorealistic vintage, art by ,  Alphonse Mucha Rembrandt, in the style of ,  Lovecraft,  natural lighting, blue eyes,  ultra realistic trending on artstation fine details complex picture Octane reflections"
-    #~ prompt = "a woman  painting,  photorealistic vintage, art by ,  Alphonse Mucha Goya, in the style of ,  Lovecraft,  natural lighting candlelight, blue eyes,  4k trending on artstation very detailed intricate scenery post-processing fine details reflections ultra realistic"
-    #~ prompt = "a woman  painting,  photorealistic vintage, art by ,  Alphonse Mucha Jose de ribeira, in the style of ,  Lovecraft,  natural lighting candlelight, blue eyes,  4k trending on artstation very detailed intricate scenery post-processing fine details reflections ultra realistic"
-    #~ prompt = "illustration of a handsome! ! man with long black curly hair + tan skin + anchor goatee, guitar | wearing a cowboy hat | art by hirohiko araki & jean giraud & artgerm & jack kirby | artstation, character design, concept art, full body, digital painting | intricate, high detail, smooth, sharp focus "
-    #~ prompt = "a realistic elven forest [moss]" # remove moss (not working)
-    #~ prompt = "a realistic elven forest (moss)-2" # remove moss (not working) => use negative_prompt
-    #~ prompt = "a realistic elven forest"
+        #~ prompt = "a photo of an astronaut riding a horse on mars"
+        #~ prompt = "portrait of a girl"
+        #~ prompt = "a beautiful and naked red-head girl with high checkbones smiling at the camera at work"
+        #~ prompt = "portrait of a young cyberpunk woman"
+        # https://www.stable-diffusion-france.fr/prompt-helper.php
+        #~ prompt = "a woman  painting,  photorealistic vintage, art by ,  Alphonse Mucha Rembrandt, in the style of ,  Lovecraft,  natural lighting, blue eyes,  ultra realistic trending on artstation fine details complex picture Octane reflections"
+        #~ prompt = "a woman  painting,  photorealistic vintage, art by ,  Alphonse Mucha Goya, in the style of ,  Lovecraft,  natural lighting candlelight, blue eyes,  4k trending on artstation very detailed intricate scenery post-processing fine details reflections ultra realistic"
+        #~ prompt = "a woman  painting,  photorealistic vintage, art by ,  Alphonse Mucha Jose de ribeira, in the style of ,  Lovecraft,  natural lighting candlelight, blue eyes,  4k trending on artstation very detailed intricate scenery post-processing fine details reflections ultra realistic"
+        #~ prompt = "illustration of a handsome! ! man with long black curly hair + tan skin + anchor goatee, guitar | wearing a cowboy hat | art by hirohiko araki & jean giraud & artgerm & jack kirby | artstation, character design, concept art, full body, digital painting | intricate, high detail, smooth, sharp focus "
+        #~ prompt = "a realistic elven forest [moss]" # remove moss (not working)
+        #~ prompt = "a realistic elven forest (moss)-2" # remove moss (not working) => use negative_prompt
+        #~ prompt = "a realistic elven forest"
 
-    prompt = "industrial age, (pocket watch), 35mm, sharp, high gloss, brass, gears wallpaper, cinematic atmosphere, panoramic"
-    #~ prompt = "picture of dimly lit living room, minimalist furniture, vaulted ceiling, huge room, floor to ceiling window with an ocean view, nighttime"
-    #~ prompt = "picture of a naked girl in a dimly lit living room, minimalist furniture, vaulted ceiling, huge room, floor to ceiling window with an ocean view, nighttime"
+        prompt = "industrial age, (pocket watch), 35mm, sharp, high gloss, brass, gears wallpaper, cinematic atmosphere, panoramic"
+        #~ prompt = "picture of dimly lit living room, minimalist furniture, vaulted ceiling, huge room, floor to ceiling window with an ocean view, nighttime"
+        #~ prompt = "picture of a naked girl in a dimly lit living room, minimalist furniture, vaulted ceiling, huge room, floor to ceiling window with an ocean view, nighttime"
 
 
-    #~ prompt = "a full page design of spaceship engine, black and bronze paper, intricate, highly detailed, epic, infographic, marginalia"
+        #~ prompt = "a full page design of spaceship engine, black and bronze paper, intricate, highly detailed, epic, infographic, marginalia"
 
-    #~ prompt ="alexandre mazel, diffuse lighting, fantasy, intricate elegant highly detailed lifelike photorealistic digital painting, artstation "
+        #~ prompt ="alexandre mazel, diffuse lighting, fantasy, intricate elegant highly detailed lifelike photorealistic digital painting, artstation "
 
-    #~ prompt = "zeus, diffuse lighting, mythology, intricate elegant highly detailed lifelike photorealistic realistic painting, long shot, studio lighting, by artgerm"
+        #~ prompt = "zeus, diffuse lighting, mythology, intricate elegant highly detailed lifelike photorealistic realistic painting, long shot, studio lighting, by artgerm"
+        
+        prompt = "house with flowers unicorns and rainbows, photorealistic vintage, art by ,  van gogh, in the style of ,  Lovecraft,  natural lighting candlelight,  4k trending on artstation very detailed intricate scenery post-processing fine details reflections ultra realistic"
 
     neg = ""
 
     neg = "disfigured, bad anatomy, extra legs, extra arms, extra fingers, poorly drawn hands, poorly drawn feet, disfigured, tiling, bad art, deformed, mutated"
     #~ neg += "out of frame, "
+    
+    #~ neg += "photorealistic, "
 
     #~ pipe.seed = 2229135949491605 # not working need to generate latents ourselves
+    
+    print("Generating with prompt:\n'%s'" % prompt)
 
     with autocast("cuda"):
         for i in range(4):
@@ -166,18 +190,18 @@ def generateImg():
                 #~ print("image: " + str(image))
             #~ image.show()
             
-            fn = prompt.replace(" ", "_")[:80] + '__' + str(time.time()) + ".png"
-            fn = os.path.expanduser("~/generated/" + fn)
-            image.save(fn)
-            
-            print("INF: showing '%s'" % fn)
-            im = cv2.imread(fn)
-            win_name = "generated_%d" % i
-            cv2.imshow(win_name,im)
-            cv2.moveWindow(win_name, (i%4)*256, (i//4)*256 )
-            cv2.waitKey(1000)
+            save_and_show_pil_image(image,prompt,i)
             
     cv2.waitKey(0)
     
-generateImg()
-#~ generateWithSeed("Labrador in the style of Vermeer")
+
+
+if __name__ == "__main__":
+    
+    if 0:
+        #~ generateImg()
+        generateWithSeed("Labrador in the style of Vermeer")
+    
+    prompt = " ".join(sys.argv[1:])
+    generateImg(prompt)
+    

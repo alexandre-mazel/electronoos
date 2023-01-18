@@ -175,6 +175,11 @@ def say(txt):
     global_tts.say(txt)
     global_tts.runAndWait()
     
+def sayGoogle(txt):
+    sys.path.append("../scripts")
+    import tts_say
+    tts_say.say(txt)
+    
 def wordsCallback(words,confidence):
     if confidence<0.6:
         return
@@ -184,8 +189,11 @@ def wordsCallback(words,confidence):
     #~ say(phrase)
     ret = apho.getThoughts(words)
     if ret != None:
-        say(ret[0])
-        say(ret[1])
+        saymethod = say
+        if 1:
+            saymethod = sayGoogle
+        saymethod(ret[0])
+        saymethod(ret[1])
         
 def test_loop_asr():
 
@@ -294,9 +302,12 @@ def autoTest():
     testApho("c'est bien fait peur. tu es un bon petit gars. eh mon petit gnocchi est-ce qu'il a.")
     # => "Gourmandise : source inépuisable de bonheur. a cause de bonheur" bon match bonheur, c'est moche.
     # => maintenant donne, Quand vous êtes à Rome, faites comme les Romains. fait => faites
+    
+    testApho("ambulance") # => Ben par exemple, c'est un mec qui va a une soirée genre bien habillé
+    print("")
 
     print("global_testApho_nbr_hit: %s" % global_testApho_nbr_hit )
-    assert(global_testApho_nbr_hit >= 18)
+    assert(global_testApho_nbr_hit >= 20)
     
     if 0:
         # test sur python 2.7

@@ -164,6 +164,100 @@ def isLookLikePhoto(im,roi,bDebug=False):
         cv2.waitKey(0)
         
     return bRet
+    
+"""
+find bigger square
+    class ImgProcessor:
+        def __init__(self, filename):
+            self.original = cv2.imread(filename)
+
+        def imProcess(self, ksmooth=7, kdilate=3, thlow=50, thigh= 100):
+            # Read Image in BGR format
+            img_bgr = self.original.copy()
+            # Convert Image to Gray
+            img_gray= cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+            # Gaussian Filtering for Noise Removal
+            gauss = cv2.GaussianBlur(img_gray, (ksmooth, ksmooth), 0)
+            # Canny Edge Detection
+            edges = cv2.Canny(gauss, thlow, thigh, 10)
+            # Morphological Dilation
+            # TODO: experiment diferent kernels
+            kernel = np.ones((kdilate, kdilate), 'uint8')
+            dil = cv2.dilate(edges, kernel)
+            cv2.namedWindow("dil", cv2.WINDOW_NORMAL)
+            cv2.imshow("dil", dil)
+            cv2.waitKey(0)
+
+            return dil
+        
+        def largestCC(self, imBW):
+            # Extract Largest Connected Component
+            # Source: https://stackoverflow.com/a/47057324
+            image = imBW.astype('uint8')
+            nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(image, connectivity=4)
+            sizes = stats[:, -1]
+
+            max_label = 1
+            max_size = sizes[1]
+            for i in range(2, nb_components):
+                if sizes[i] > max_size:
+                    max_label = i
+                    max_size = sizes[i]
+
+            img2 = np.zeros(output.shape)
+            img2[output == max_label] = 255
+            return img2
+        
+        def maskCorners(self, mask, outval=1):
+            y0 = np.min(np.nonzero(mask.sum(axis=1))[0])
+            y1 = np.max(np.nonzero(mask.sum(axis=1))[0])
+            x0 = np.min(np.nonzero(mask.sum(axis=0))[0])
+            x1 = np.max(np.nonzero(mask.sum(axis=0))[0])
+            output = np.zeros_like(mask)
+            output[y0:y1, x0:x1] = outval
+            return output
+
+        def extractROI(self):
+            im = self.imProcess()
+            lgcc = self.largestCC(im)
+            lgcc = lgcc.astype(np.uint8)
+            roi = self.maskCorners(lgcc)
+            # TODO mask BGR with this mask
+            exroi = cv2.bitwise_and(self.original, self.original, mask = roi)
+            return exroi
+
+        def show_res(self):
+            result = self.extractROI()
+            cv2.namedWindow("Result", cv2.WINDOW_NORMAL)
+            cv2.imshow("Result", result)
+            cv2.waitKey(0)
+            
+    ip = ImgProcessor("autotest_data/screen_linkedin.png") # pas la meilleur image pour ce test
+    ip.show_res()
+"""
+
+
+def findPicturesInImage(im):
+    """
+    take a big image (usually screencapture) and find picture area
+    """
+    searchSize = 32
+    startX = 0
+    startY = 0
+    h,w = im.shape[:2]
+    while 1:
+        
+        startX  += searchSize
+        if startX >= w:
+            startY += searchSize
+            print("DBG: findPicturesInImage: startY: %s" % startY )
+        if startY > h:
+            break
+    
+if 1:
+    im = cv2.imread("autotest_data/screen_linkedin.png")
+    findPicturesInImage(im)
+    exit(0)
 
 
 

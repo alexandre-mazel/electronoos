@@ -278,6 +278,39 @@ def getTimeStamp():
     strTimeStamp = datetimeObject.strftime( "%Y/%m/%d: %Hh%Mm%Ss" )
     return strTimeStamp
     
+def getWeekDay():
+    """
+    return the number 1..7 of the day in the week (beginning on monday)
+    """
+    return datetime.datetime.today().weekday() + 1
+"""
+matlab for a given date:
+day_name={'Sun','Mon','Tue','Wed','Thu','Fri','Sat'}
+month_offset=[0 3 3 6 1 4 6 2 5 0 3 5];  % common year
+
+% input date
+y1=2022
+m1=11
+d1=22
+
+% is y1 leap
+if mod(y1,4)==0 && mod(y1,100)==0 && mod(y1,400)==0
+    month_offset=[0 3 4 0 2 5 0 3 6 1 4 6];  % offset for leap year
+end
+
+% Gregorian calendar
+weekday_gregor=rem( d1+month_offset(m1) + 5*rem(y1-1,4) +  4*rem(y1-1,100) + 6*rem(y1-1,400),7)
+
+day_name{weekday_gregor+1}
+"""
+"""
+python for a given date:
+>>> import datetime
+>>> datetime.datetime.today()
+datetime.datetime(2012, 3, 23, 23, 24, 55, 173504)
+>>> datetime.datetime.today().weekday()
+"""
+    
 def getFilenameFromTime(timestamp=None):
   """
   get a string usable as a filename relative to the current datetime stamp.
@@ -312,7 +345,7 @@ def cleanText( txt, bEatAll = True):
             out += c
     return out
 
-def getSystemCallReturn( strCommand ):
+def getSystemCallReturnOld( strCommand ):
     # TODO: replace os.system by subprocess.call cf ping_multi
     f = getTempFilename()+".txt"
     #~ print("DBG: getSystemCallReturn: running '%s' into '%s'" % (strCommand,f) )
@@ -332,6 +365,24 @@ def getSystemCallReturn( strCommand ):
     #~ print("DBG: getSystemCallReturn: data (2): %s" % str(data) )
     #~ data = data.decode()
     os.unlink(f)
+    return str(data)
+    
+def getSystemCallReturn(strCommand):
+    command = strCommand.split(" ")
+    outfilename = getTempFilename() + ".txt"
+    outfile = open(outfilename, "wt")
+    ret = subprocess.call(command, stdout=outfile)
+    outfile.close()
+    outfile = open(outfilename, "rt")
+    data = outfile.read()
+    #~ print("DBG: ping: buf: %s" % buf)
+    outfile.close()
+    os.unlink(outfilename)
+    if len(data) > 0 and ord(data[0]) == 255:
+        # command is of the type wmic and so is rotten in a wild burk encoding
+        #~ data = data.encode("cp1252", "strict").decode("cp1252", "strict") 
+        # can't find working solution for wmic => handling by hand
+        data = cleanText(data)
     return str(data)
 
 def getCpuModel(bShort=False):
@@ -1338,7 +1389,15 @@ def autoTest():
         timeBegin = time.time()
         for i in range(10):
             getCpuModel()
-        print("cpu model takes %.4fms per call" % ((time.time()-timeBegin)*1000/10)) # 203ms per call
+        print("cpu model takes %.4fms per call" % ((time.time()-timeBegin)*1000/10)) 
+        # depuis scite
+        # 203ms per call avec un system call
+        # 194ms per call avec un subprocess
+        
+        # depuis le shell
+        # 143ms system call
+        # 109ms subprocess
+        
         
     check(smoothstep(0),0)
     check(smoothstep(-1),0)

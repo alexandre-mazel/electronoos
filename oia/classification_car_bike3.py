@@ -42,8 +42,12 @@ print("predicted: %s" % str(predicted) )
 for c in predicted:
     print( "    " + libelle_class[c])
     
-if 0:
-    tree.plot_tree(classifier,impurity=False,fontsize=5)
+if 1:
+    tree.plot_tree(classifier,impurity=False,fontsize=5,
+                        feature_names=libelle_features,
+                        class_names=libelle_class,
+                        filled=True, rounded=True,                        
+                        )
     plt.show()
 else:
     import graphviz

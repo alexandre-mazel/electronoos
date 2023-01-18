@@ -1,7 +1,9 @@
 import cv2
 import numpy as np
+import time
 
 import cv2_tools
+
 
 def show(im):
     cv2.imshow("temp",im)
@@ -245,36 +247,104 @@ def findPicturesInImage(im, nMinSize=16,nMaxSize=64, bRound=1):
     """
     take a big image (usually screencapture) and find picture area
     - bRound: search for round one, default look for rect.
+    return a list of area (centerx,centery,warea,harea)
     """
+    
+    bRender = 1
+    bRender = 0
+    
     im = cv2.resize(im,(0,0),fx=0.5,fy=0.5,interpolation=cv2.INTER_NEAREST) # INTER_NEAREST or INTER_AREA
     
+    listOut = []
+
     if 1:
-        out = im[:]
-        searchSize = 16
+
+        if bRender: out = im[:]
+        searchSize = 16 # size of search chunk
         startX = 0
         startY = 0
+        x = y = 0 # coord of chunk
         h,w = im.shape[:2]
+        wchunk = w//searchSize +1 # +1 in case smaller than chunk
+        hchunk = h//searchSize + 1
+        
+        store = np.zeros((hchunk,wchunk),np.uint8)
+        print(store.shape)
         while 1:
         
             hist = cv2.calcHist([im[startY:startY+searchSize,startX:startX+searchSize] ],[0],None,[256],[0,256])
             #~ print(hist[:16])
             nz = np.count_nonzero(hist)
             if nz > 50:
-                print("startX:%s, startY: %s, nz: %d" % (startX,startY,nz) )
+                if bRender: print("startX:%s, startY: %s, nz: %d" % (startX,startY,nz) )
                 color = (255,0,0)
-                cv2.rectangle(out,(startX,startY),(startX+searchSize,startY+searchSize), color )
+                if bRender: cv2.rectangle(out,(startX,startY),(startX+searchSize,startY+searchSize), color )
+                store[y,x] = 1
                 
             
             startX  += searchSize
+            x += 1
             if startX >= w:
                 startY += searchSize
                 startX = 0
-                print("DBG: findPicturesInImage: startY: %s" % startY )
+                y += 1
+                x = 0
+                #~ print("DBG: findPicturesInImage: startY: %s" % startY )
             if startY > h:
                 break
                 
-        show(out)
-    return
+        # paste area
+        j = 0
+        while j < hchunk:
+            i = 0
+            while i < wchunk:
+                harea = 0
+                warea = 0
+                if store[j,i]:
+                    # find contiguous : goal: find bbox, we scan each line to find at least one litten
+                    # if no litten stop
+                    bAtLeastOne = 1
+                    harea = 0
+                    while bAtLeastOne:
+                        k = 0
+                        bAtLeastOne = 0
+                        if j+harea+1 < hchunk and store[j+harea+1,i-1]:
+                            # the pixel on the left below is on so let's decay the area
+                            i -= 1
+                            warea += 1
+                        while i+k < wchunk:
+                            if store[j+harea,i+k] == 0:
+                                if k >= warea:
+                                    break
+                            else:
+                                store[j+harea,i+k] = 0 # so we won't analyse this area latter
+                                bAtLeastOne = 1
+                            k += 1
+                            if k > warea:
+                                warea = k
+                        harea += 1
+                    cx = i + warea//2
+                    cy = j + harea//2
+                    cx *= searchSize
+                    #~ cx += searchSize //2
+                    
+                    cy *= searchSize
+                    cy -= searchSize //2
+                    
+                    warea *= searchSize
+                    harea *= searchSize
+                    harea -= searchSize
+                    
+                    listOut.append((cx,cy,warea,harea))
+                    
+                    if bRender: cv2.rectangle(out,(cx-warea//2,cy-harea//2),(cx+warea//2,cy+harea//2), (0,255,0), 3 )
+                i += 1
+            j += 1
+                
+        if bRender: show(out)
+        
+        print("DBG: findPicturesInImage (%d area(s)): %s" % (len(listOut),listOut) )
+    return listOut
 
     
     #~ im = cv2.resize(im,(0,0),fx=1./nMinSize,fy=1./nMinSize)
@@ -364,7 +434,9 @@ def findPicturesInImage(im, nMinSize=16,nMaxSize=64, bRound=1):
     
 if 1:
     im = cv2.imread("autotest_data/screen_linkedin.png")
+    timeBegin = time.time()
     findPicturesInImage(im)
+    print("INF: duration: %.3fs" % (time.time()-timeBegin) ) # mstab7: 0.05s
     exit(0)
 
 

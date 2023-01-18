@@ -3,6 +3,10 @@ import numpy as np
 
 import cv2_tools
 
+def show(im):
+    cv2.imshow("temp",im)
+    cv2.waitKey(0)
+
 def getRatioWB(im):
     """
     return the ratio of pixel white and black in the image
@@ -237,22 +241,77 @@ find bigger square
 """
 
 
-def findPicturesInImage(im):
+def findPicturesInImage(im, nMinSize=16,nMaxSize=64, bRound=1):
     """
     take a big image (usually screencapture) and find picture area
+    - bRound: search for round one, default look for rect.
     """
-    searchSize = 32
-    startX = 0
-    startY = 0
-    h,w = im.shape[:2]
-    while 1:
+    #~ searchSize = 32
+    #~ startX = 0
+    #~ startY = 0
+    #~ h,w = im.shape[:2]
+    #~ while 1:
         
-        startX  += searchSize
-        if startX >= w:
-            startY += searchSize
-            print("DBG: findPicturesInImage: startY: %s" % startY )
-        if startY > h:
-            break
+        #~ startX  += searchSize
+        #~ if startX >= w:
+            #~ startY += searchSize
+            #~ print("DBG: findPicturesInImage: startY: %s" % startY )
+        #~ if startY > h:
+            #~ break
+
+    im = cv2.resize(im,(0,0),fx=0.5,fy=0.5)
+    #~ im = cv2.resize(im,(0,0),fx=1./nMinSize,fy=1./nMinSize)
+            
+    from scipy.ndimage import sobel
+    
+    gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+
+    gray = gray.astype(np.float32)
+    grad_x = sobel(gray, axis=1)
+    grad_y = sobel(gray, axis=0)
+    energy = np.abs(grad_x) + np.abs(grad_y)
+    show(energy)
+    
+    if 0:
+        #~ energy = energy.astype(np.uint8)
+         
+        #~ energy = cv2.convertTo(energy, CV_32SC1);
+        energy = energy.astype(np.float32)
+        print(energy.shape)
+        print(energy.dtype)
+        
+        ret,thresh = cv2.threshold(gray,50,255,0)
+        contours,hierarchy = cv2.findContours(thresh, 1, 2)
+        print("Number of contours detected:", len(contours))
+
+        for cnt in contours:
+           x1,y1 = cnt[0][0]
+           approx = cv2.approxPolyDP(cnt, 0.01*cv2.arcLength(cnt, True), True)
+           if len(approx) == 4:
+              x, y, w, h = cv2.boundingRect(cnt)
+              ratio = float(w)/h
+              if ratio >= 0.9 and ratio <= 1.1:
+                 img = cv2.drawContours(img, [cnt], -1, (0,255,255), 3)
+                 cv2.putText(img, 'Square', (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2)
+              else:
+                 cv2.putText(img, 'Rectangle', (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+                 img = cv2.drawContours(img, [cnt], -1, (0,255,0), 3)
+
+        show(img)
+
+    
+    energy = cv2.resize(energy,(0,0),fx=1./nMinSize,fy=1./nMinSize)
+    #~ energy = cv2.resize(energy,(0,0),fx=1./nMinSize,fy=1./nMinSize,interpolation=cv2.INTER_AREA)
+
+    kernel = np.ones((3, 3), np.uint8)
+    energy = cv2.erode(energy, kernel)
+
+    if 1:
+        temp = cv2.resize(energy,(0,0),fx=8,fy=8)
+        show(temp)
+    
+    
+# findPicturesInImage - end
     
 if 1:
     im = cv2.imread("autotest_data/screen_linkedin.png")

@@ -246,18 +246,29 @@ def findPicturesInImage(im, nMinSize=16,nMaxSize=64, bRound=1):
     take a big image (usually screencapture) and find picture area
     - bRound: search for round one, default look for rect.
     """
-    #~ searchSize = 32
-    #~ startX = 0
-    #~ startY = 0
-    #~ h,w = im.shape[:2]
-    #~ while 1:
+    
+    if 1:
+        searchSize = 32
+        startX = 0
+        startY = 0
+        h,w = im.shape[:2]
+        while 1:
         
-        #~ startX  += searchSize
-        #~ if startX >= w:
-            #~ startY += searchSize
-            #~ print("DBG: findPicturesInImage: startY: %s" % startY )
-        #~ if startY > h:
-            #~ break
+            hist = cv2.calcHist([im[startY:startY+searchSize,startX:startX+searchSize] ],[0],None,[256],[0,256])
+            #~ print(hist[:16])
+            nz = np.count_nonzero(hist)
+            if nz > 0:
+                print("startX:%s, startY: %s, nz: %d" % (startX,startY,nz) )
+            
+            startX  += searchSize
+            if startX >= w:
+                startY += searchSize
+                startX = 0
+                print("DBG: findPicturesInImage: startY: %s" % startY )
+            if startY > h:
+                break
+            
+    return
 
     im = cv2.resize(im,(0,0),fx=0.5,fy=0.5,interpolation=cv2.INTER_NEAREST) # INTER_NEAREST or INTER_AREA
     #~ im = cv2.resize(im,(0,0),fx=1./nMinSize,fy=1./nMinSize)

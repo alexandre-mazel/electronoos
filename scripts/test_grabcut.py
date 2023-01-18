@@ -4,8 +4,8 @@ import numpy as np
 # Read the original image
 IMAGES_FOLDER = "../alex_pytools/autotest_data/"
 original_image = cv2.imread(IMAGES_FOLDER + "spoon.jpg")
-original_image = cv2.imread(IMAGES_FOLDER + "groot.jpg")
-original_image = cv2.imread(IMAGES_FOLDER + "screen_linkedin.jpg")
+#~ original_image = cv2.imread(IMAGES_FOLDER + "groot.jpg")
+#~ original_image = cv2.imread(IMAGES_FOLDER + "screen_linkedin.png") # pas du tout ca!
 
 # Define boundary rectangle containing the foreground object
 height, width, _ = original_image.shape

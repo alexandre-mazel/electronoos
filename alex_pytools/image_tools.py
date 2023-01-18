@@ -259,9 +259,41 @@ def findPicturesInImage(im, nMinSize=16,nMaxSize=64, bRound=1):
         #~ if startY > h:
             #~ break
 
-    im = cv2.resize(im,(0,0),fx=0.5,fy=0.5)
+    im = cv2.resize(im,(0,0),fx=0.5,fy=0.5,interpolation=cv2.INTER_NEAREST) # INTER_NEAREST or INTER_AREA
     #~ im = cv2.resize(im,(0,0),fx=1./nMinSize,fy=1./nMinSize)
+
+    #~ mettre le noir en blanc (threshold?)
+    #~ div par 4
+    #~ cherche le nombre de couleur sur chaque rect ou faire histogram local
             
+                
+    gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+    cleaned = gray[:]
+    ret,cleaned = cv2.threshold(cleaned,50,255,cv2.THRESH_TOZERO)
+    #~ cleaned = cv2.bitwise_not(cleaned)
+    #~ ret,cleaned = cv2.threshold(cleaned,100,255,cv2.THRESH_TOZERO)
+    #~ ret,cleaned = cv2.threshold(cleaned,250,255,cv2.THRESH_TOZERO_INV)
+    #~ cleaned = cv2.bitwise_not(cleaned)
+    
+    #~ gray = cv2.bitwise_not(gray)
+    #~ blur = cv2.GaussianBlur(gray,(5,5),0)
+    #~ ret3,cleaned = cv2.threshold(blur,240,255,cv2.THRESH_TOZERO_INV+cv2.THRESH_OTSU)
+    
+    cleaned[np.where(cleaned==[0])] = 255
+    
+    show(cleaned)
+    
+    cleaned = cv2.resize(cleaned,(0,0),fx=1./nMinSize,fy=1./nMinSize,interpolation=cv2.INTER_NEAREST)
+    
+    #~ show(cleaned)
+    
+    if 1:
+        temp = cv2.resize(cleaned,(0,0),fx=8,fy=8)
+        show(temp)
+        
+    #~ return
+    
+
     from scipy.ndimage import sobel
     
     gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)

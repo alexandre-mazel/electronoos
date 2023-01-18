@@ -5,6 +5,7 @@ import numpy as np
 IMAGES_FOLDER = "../alex_pytools/autotest_data/"
 original_image = cv2.imread(IMAGES_FOLDER + "spoon.jpg")
 original_image = cv2.imread(IMAGES_FOLDER + "groot.jpg")
+original_image = cv2.imread(IMAGES_FOLDER + "screen_linkedin.jpg")
 
 # Define boundary rectangle containing the foreground object
 height, width, _ = original_image.shape
@@ -31,7 +32,7 @@ background_model = np.zeros((1, 65), np.float64)
 foreground_model = np.zeros((1, 65), np.float64)
 
 number_of_iterations = 5
-number_of_iterations = 50
+#~ number_of_iterations = 10 # pas mieux
 
 bUseMask = 0
 bUseMask = 1

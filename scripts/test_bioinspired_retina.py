@@ -1,6 +1,11 @@
-#import OpenCV module
 import cv2 as cv
 import cv2
+
+# ref:
+# https://docs.opencv.org/4.x/d2/d94/bioinspired_retina.html
+# and:
+# https://docs.opencv.org/3.4/d3/d86/tutorial_bioinspired_retina_model.html
+
 
 def acquire_camera():
     #setup webcam reader
@@ -39,7 +44,6 @@ def acquire_camera():
     
 def retina_effect(im):
     retina = cv.bioinspired_Retina.create((im.shape[1], im.shape[0]))
-        
     
     retina.setupOPLandIPLParvoChannel(horizontalCellsGain=0.3,photoreceptorsLocalAdaptationSensitivity=0.89,ganglionCellsSensitivity=0.89)
     
@@ -47,6 +51,7 @@ def retina_effect(im):
     
     retina.run(im)
     out = retina.getParvo()
+    #~ out = retina.getMagno()
     cv.imshow('retina parvo out', out)
     cv.waitKey(0)
         

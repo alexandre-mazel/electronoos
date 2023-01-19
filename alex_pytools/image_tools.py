@@ -243,22 +243,37 @@ find bigger square
 """
 
 
-def findPicturesInImage(im, nMinSize=16,nMaxSize=64, bRound=1):
+def findPicturesInImage(im, roi = None, nMinSize=16, nMaxSize=64, bRound=1,bDebug=0):
     """
-    take a big image (usually screencapture) and find picture area
-    - bRound: search for round one, default look for rect.
+    take a big image (usually screencapture) and find picture area.
     return a list of area (centerx,centery,warea,harea)
+    
+    - bRound: search for round one, default look for rect.
+    - roi: None: all images, or rect of interest (x1,y1,x2,y2) if x2 or y2 to -1 => until border )
+    
     """
+    
+    if roi != None:
+        r = list(roi[:])
+        if r[2] == -1:
+            r[2] = im.shape[0]
+        if r[3] == -1:
+            r[3] = im.shape[1]
+        im = im[r[1]:r[3],r[0]:r[2]]
     
     bRender = 1
     bRender = 0
     
-    im = cv2.resize(im,(0,0),fx=0.5,fy=0.5,interpolation=cv2.INTER_NEAREST) # INTER_NEAREST or INTER_AREA
+    bRender = bDebug
+    
+    bDivBy2 = 1
+    
+    if bDivBy2:
+        im = cv2.resize(im,(0,0),fx=0.5,fy=0.5,interpolation=cv2.INTER_NEAREST) # INTER_NEAREST or INTER_AREA
     
     listOut = []
 
     if 1:
-
         if bRender: out = im[:]
         searchSize = 16 # size of search chunk
         startX = 0
@@ -335,9 +350,18 @@ def findPicturesInImage(im, nMinSize=16,nMaxSize=64, bRound=1):
                     harea *= searchSize
                     harea -= searchSize
                     
-                    listOut.append((cx,cy,warea,harea))
+                    
                     
                     if bRender: cv2.rectangle(out,(cx-warea//2,cy-harea//2),(cx+warea//2,cy+harea//2), (0,255,0), 3 )
+                    if bDivBy2:
+                        cx *= 2
+                        cy *= 2
+                        warea *= 2
+                        harea *= 2
+                    if roi != None:
+                        cx += roi[0]
+                        cy += roi[1]
+                    listOut.append((cx,cy,warea,harea))
                 i += 1
             j += 1
                 
@@ -432,7 +456,7 @@ def findPicturesInImage(im, nMinSize=16,nMaxSize=64, bRound=1):
     
 # findPicturesInImage - end
     
-if 1:
+if 0:
     im = cv2.imread("autotest_data/screen_linkedin.png")
     timeBegin = time.time()
     findPicturesInImage(im)

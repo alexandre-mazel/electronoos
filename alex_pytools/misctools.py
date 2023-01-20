@@ -103,6 +103,13 @@ def getPathTemp():
     return ret
     
 def getPathSave():
+    if os.name == "nt":
+        ret = "c:/save/"
+    else:
+        ret = os.path.expanduser("~/save/")
+    return ret
+    
+def getPathSave():
     """
     return a nice place to save file
     """

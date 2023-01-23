@@ -10,6 +10,10 @@ import pygame_tools
 import os
 import time
 
+#~ def tts_google():
+# cf tts_say
+    
+
 
 class Tts:
     

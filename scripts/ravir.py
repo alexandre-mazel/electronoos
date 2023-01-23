@@ -10,7 +10,7 @@ scp -r C:/Users/alexa/perso/docs/2020-10-10_-_Ravir/cut* nao@192.168.0.:/home/na
 scp C:/Users/alexa/perso/docs/2020-10-10_-_Ravir/t*.wav nao@192.168.0.:/home/nao/noises/ # need to create folder before
 scp d:/Python38-32/Lib/site-packages/opensimplex/*.py nao@192.168.0.:/home/nao/.local/lib/python2.7/site-packages/
 or
-scp C:\Python38-32_dont_use\Lib/site-packages/opensimplex/*.py nao@192.168.0.:/home/nao/.local/lib/python2.7/site-packages/
+scp D:\Python38-32_dont_use\Lib/site-packages/opensimplex/*.py nao@192.168.0.:/home/nao/.local/lib/python2.7/site-packages/
 
 
 # update la demo
@@ -52,6 +52,14 @@ scp nao@192.168.1.211:/home/nao/dev/git/protolab_group/scripts/nao_camera_viewer
 # install notes:
 desactiver les reflexs: http://192.168.1.227/advanced/#/settings
 
+# creer les dossiers:
+mkdir -p /home/nao/dev/git/electronoos/
+mkdir -p /home/nao/dev/git/electronoos/scripts/
+mkdir -p /home/nao/.local/lib/python2.7/site-packages/abcdk/
+mkdir -p /home/nao/noises/
+mkdir -p /home/nao/dev/git/protolab_group/scripts/
+mkdir -p /home/nao/recorded_images/
+
 #ajouter alex_pytools
 scp -r C:/Users/alexa/dev/git/electronoos/alex* nao@192.168.1.211:/home/nao/dev/git/electronoos/
 
@@ -60,11 +68,9 @@ scp C:/Users/alexa/dev/git/electronoos/scripts/nex*.py nao@192.168.1.211:/home/n
 # ajouter abcdk
 cd C:\Users\alexa\dev\git\abcdk\sdk
 python sendsdk.py 192.168.1.
-# faire avant sur le robot: mkdir -p /home/nao/.local/lib/python2.7/site-packages/abcdk/
-
 
 ## + ajouter a la main:
-Jboot [0] ~ $ cat start_record_images.sh
+Jboot [0] ~ $ nano start_record_images.sh
 cd ~/dev/git/protolab_group/scripts
 python nao_camera_viewer.py
 
@@ -78,6 +84,9 @@ python next_step.py $*
 
 
 mkdir -p /home/nao/recorded_images/
+
+# derniere tete du sav amené: 192.168.1.174 (en filaire) 169 en wifi
+# reflash a la main: nao-autoflash pepper-x86-2.5.5.5_2016-11-28_with-root.opn
 
 """
 

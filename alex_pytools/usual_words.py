@@ -2,6 +2,7 @@
 
 import io
 import json
+import sys
 
 import misctools
 from misctools import assert_equal
@@ -26,8 +27,9 @@ class UsualWords:
                 w = obj["label"]
                 occ = obj["frequency"]
                 self.words[w] = occ
-                if cpt < 20:
-                    print("%s: %d" % (w,occ))
+                if sys.version_info[0] >= 3:
+                    if cpt < 20:
+                        print("%s: %d" % (w,occ))
                     
         # add banal word who should be there:
         listAdd = [

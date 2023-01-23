@@ -12,7 +12,10 @@ rPrevTempKneePitch = -1
 rPrevTempHipPitch = -1
 strPrevRecognizedWords = ""
 
+timeLastErrorPrinted = time.time()-100
+
 while 1:
+    # todo: entrelarder d'un watch du log  /home/nao/agent_behavior_cherie.log
     speech_detected = mem.getData("Audio/SpeechDetected")
     if speech_detected != prev_speech_detected:
         print("%s: speech_detected: %s" % (misctools.getTimeStamp(),speech_detected) )
@@ -40,6 +43,15 @@ while 1:
     if rTempHipPitch != rPrevTempHipPitch:
         print("%s: rTempHipPitch: %s" % (misctools.getTimeStamp(),rTempHipPitch) )
         rPrevTempHipPitch = rTempHipPitch
+        
+        
+    time_send_lastUpdatingImage = mem.getData("updatingImage")
+    #~ print(time_send_lastUpdatingImage)
+    delay_updateImage = time.time()-time_send_lastUpdatingImage
+    if delay_updateImage > 30:
+        if time.time() - timeLastErrorPrinted > 5:
+            timeLastErrorPrinted = time.time()
+            print("WRN: delay_updateImage not updated since %.1fs" % delay_updateImage )
         
         
     

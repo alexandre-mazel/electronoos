@@ -1,7 +1,13 @@
 import cv2
 import numpy as np
+import time
 
 import cv2_tools
+
+
+def show(im):
+    cv2.imshow("temp",im)
+    cv2.waitKey(0)
 
 def getRatioWB(im):
     """
@@ -164,6 +170,298 @@ def isLookLikePhoto(im,roi,bDebug=False):
         cv2.waitKey(0)
         
     return bRet
+    
+"""
+find bigger square
+    class ImgProcessor:
+        def __init__(self, filename):
+            self.original = cv2.imread(filename)
+
+        def imProcess(self, ksmooth=7, kdilate=3, thlow=50, thigh= 100):
+            # Read Image in BGR format
+            img_bgr = self.original.copy()
+            # Convert Image to Gray
+            img_gray= cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+            # Gaussian Filtering for Noise Removal
+            gauss = cv2.GaussianBlur(img_gray, (ksmooth, ksmooth), 0)
+            # Canny Edge Detection
+            edges = cv2.Canny(gauss, thlow, thigh, 10)
+            # Morphological Dilation
+            # TODO: experiment diferent kernels
+            kernel = np.ones((kdilate, kdilate), 'uint8')
+            dil = cv2.dilate(edges, kernel)
+            cv2.namedWindow("dil", cv2.WINDOW_NORMAL)
+            cv2.imshow("dil", dil)
+            cv2.waitKey(0)
+
+            return dil
+        
+        def largestCC(self, imBW):
+            # Extract Largest Connected Component
+            # Source: https://stackoverflow.com/a/47057324
+            image = imBW.astype('uint8')
+            nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(image, connectivity=4)
+            sizes = stats[:, -1]
+
+            max_label = 1
+            max_size = sizes[1]
+            for i in range(2, nb_components):
+                if sizes[i] > max_size:
+                    max_label = i
+                    max_size = sizes[i]
+
+            img2 = np.zeros(output.shape)
+            img2[output == max_label] = 255
+            return img2
+        
+        def maskCorners(self, mask, outval=1):
+            y0 = np.min(np.nonzero(mask.sum(axis=1))[0])
+            y1 = np.max(np.nonzero(mask.sum(axis=1))[0])
+            x0 = np.min(np.nonzero(mask.sum(axis=0))[0])
+            x1 = np.max(np.nonzero(mask.sum(axis=0))[0])
+            output = np.zeros_like(mask)
+            output[y0:y1, x0:x1] = outval
+            return output
+
+        def extractROI(self):
+            im = self.imProcess()
+            lgcc = self.largestCC(im)
+            lgcc = lgcc.astype(np.uint8)
+            roi = self.maskCorners(lgcc)
+            # TODO mask BGR with this mask
+            exroi = cv2.bitwise_and(self.original, self.original, mask = roi)
+            return exroi
+
+        def show_res(self):
+            result = self.extractROI()
+            cv2.namedWindow("Result", cv2.WINDOW_NORMAL)
+            cv2.imshow("Result", result)
+            cv2.waitKey(0)
+            
+    ip = ImgProcessor("autotest_data/screen_linkedin.png") # pas la meilleur image pour ce test
+    ip.show_res()
+"""
+
+
+def findPicturesInImage(im, roi = None, nMinSize=16, nMaxSize=64, bRound=1,bDebug=0):
+    """
+    take a big image (usually screencapture) and find picture area.
+    return a list of area (centerx,centery,warea,harea)
+    
+    - bRound: search for round one, default look for rect.
+    - roi: None: all images, or rect of interest (x1,y1,x2,y2) if x2 or y2 to -1 => until border )
+    
+    """
+    
+    if roi != None:
+        r = list(roi[:])
+        if r[2] == -1:
+            r[2] = im.shape[0]
+        if r[3] == -1:
+            r[3] = im.shape[1]
+        im = im[r[1]:r[3],r[0]:r[2]]
+    
+    bRender = 1
+    bRender = 0
+    
+    bRender = bDebug
+    
+    bDivBy2 = 1
+    
+    if bDivBy2:
+        im = cv2.resize(im,(0,0),fx=0.5,fy=0.5,interpolation=cv2.INTER_NEAREST) # INTER_NEAREST or INTER_AREA
+    
+    listOut = []
+
+    if 1:
+        if bRender: out = im[:]
+        searchSize = 16 # size of search chunk
+        startX = 0
+        startY = 0
+        x = y = 0 # coord of chunk
+        h,w = im.shape[:2]
+        wchunk = w//searchSize +1 # +1 in case smaller than chunk
+        hchunk = h//searchSize + 1
+        
+        store = np.zeros((hchunk,wchunk),np.uint8)
+        print(store.shape)
+        while 1:
+        
+            hist = cv2.calcHist([im[startY:startY+searchSize,startX:startX+searchSize] ],[0],None,[256],[0,256])
+            #~ print(hist[:16])
+            nz = np.count_nonzero(hist)
+            if nz > 50:
+                if bRender: print("startX:%s, startY: %s, nz: %d" % (startX,startY,nz) )
+                color = (255,0,0)
+                if bRender: cv2.rectangle(out,(startX,startY),(startX+searchSize,startY+searchSize), color )
+                store[y,x] = 1
+                
+            
+            startX  += searchSize
+            x += 1
+            if startX >= w:
+                startY += searchSize
+                startX = 0
+                y += 1
+                x = 0
+                #~ print("DBG: findPicturesInImage: startY: %s" % startY )
+            if startY > h:
+                break
+                
+        # paste area
+        j = 0
+        while j < hchunk:
+            i = 0
+            while i < wchunk:
+                harea = 0
+                warea = 0
+                if store[j,i]:
+                    # find contiguous : goal: find bbox, we scan each line to find at least one litten
+                    # if no litten stop
+                    bAtLeastOne = 1
+                    harea = 0
+                    while bAtLeastOne:
+                        k = 0
+                        bAtLeastOne = 0
+                        if j+harea+1 < hchunk and store[j+harea+1,i-1]:
+                            # the pixel on the left below is on so let's decay the area
+                            i -= 1
+                            warea += 1
+                        while i+k < wchunk:
+                            if store[j+harea,i+k] == 0:
+                                if k >= warea:
+                                    break
+                            else:
+                                store[j+harea,i+k] = 0 # so we won't analyse this area latter
+                                bAtLeastOne = 1
+                            k += 1
+                            if k > warea:
+                                warea = k
+                        harea += 1
+                    cx = i + warea//2
+                    cy = j + harea//2
+                    cx *= searchSize
+                    #~ cx += searchSize //2
+                    
+                    cy *= searchSize
+                    cy -= searchSize //2
+                    
+                    warea *= searchSize
+                    harea *= searchSize
+                    harea -= searchSize
+                    
+                    
+                    
+                    if bRender: cv2.rectangle(out,(cx-warea//2,cy-harea//2),(cx+warea//2,cy+harea//2), (0,255,0), 3 )
+                    if bDivBy2:
+                        cx *= 2
+                        cy *= 2
+                        warea *= 2
+                        harea *= 2
+                    if roi != None:
+                        cx += roi[0]
+                        cy += roi[1]
+                    listOut.append((cx,cy,warea,harea))
+                i += 1
+            j += 1
+                
+        if bRender: show(out)
+        
+        print("DBG: findPicturesInImage (%d area(s)): %s" % (len(listOut),listOut) )
+    return listOut
+
+    
+    #~ im = cv2.resize(im,(0,0),fx=1./nMinSize,fy=1./nMinSize)
+
+    #~ mettre le noir en blanc (threshold?)
+    #~ div par 4
+    #~ cherche le nombre de couleur sur chaque rect ou faire histogram local
+            
+                
+    gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+    cleaned = gray[:]
+    ret,cleaned = cv2.threshold(cleaned,50,255,cv2.THRESH_TOZERO)
+    #~ cleaned = cv2.bitwise_not(cleaned)
+    #~ ret,cleaned = cv2.threshold(cleaned,100,255,cv2.THRESH_TOZERO)
+    #~ ret,cleaned = cv2.threshold(cleaned,250,255,cv2.THRESH_TOZERO_INV)
+    #~ cleaned = cv2.bitwise_not(cleaned)
+    
+    #~ gray = cv2.bitwise_not(gray)
+    #~ blur = cv2.GaussianBlur(gray,(5,5),0)
+    #~ ret3,cleaned = cv2.threshold(blur,240,255,cv2.THRESH_TOZERO_INV+cv2.THRESH_OTSU)
+    
+    cleaned[np.where(cleaned==[0])] = 255
+    
+    show(cleaned)
+    
+    cleaned = cv2.resize(cleaned,(0,0),fx=1./nMinSize,fy=1./nMinSize,interpolation=cv2.INTER_NEAREST)
+    
+    #~ show(cleaned)
+    
+    if 1:
+        temp = cv2.resize(cleaned,(0,0),fx=8,fy=8)
+        show(temp)
+        
+    #~ return
+    
+
+    from scipy.ndimage import sobel
+    
+    gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+
+    gray = gray.astype(np.float32)
+    grad_x = sobel(gray, axis=1)
+    grad_y = sobel(gray, axis=0)
+    energy = np.abs(grad_x) + np.abs(grad_y)
+    show(energy)
+    
+    if 0:
+        #~ energy = energy.astype(np.uint8)
+         
+        #~ energy = cv2.convertTo(energy, CV_32SC1);
+        energy = energy.astype(np.float32)
+        print(energy.shape)
+        print(energy.dtype)
+        
+        ret,thresh = cv2.threshold(gray,50,255,0)
+        contours,hierarchy = cv2.findContours(thresh, 1, 2)
+        print("Number of contours detected:", len(contours))
+
+        for cnt in contours:
+           x1,y1 = cnt[0][0]
+           approx = cv2.approxPolyDP(cnt, 0.01*cv2.arcLength(cnt, True), True)
+           if len(approx) == 4:
+              x, y, w, h = cv2.boundingRect(cnt)
+              ratio = float(w)/h
+              if ratio >= 0.9 and ratio <= 1.1:
+                 img = cv2.drawContours(img, [cnt], -1, (0,255,255), 3)
+                 cv2.putText(img, 'Square', (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2)
+              else:
+                 cv2.putText(img, 'Rectangle', (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+                 img = cv2.drawContours(img, [cnt], -1, (0,255,0), 3)
+
+        show(img)
+
+    
+    energy = cv2.resize(energy,(0,0),fx=1./nMinSize,fy=1./nMinSize)
+    #~ energy = cv2.resize(energy,(0,0),fx=1./nMinSize,fy=1./nMinSize,interpolation=cv2.INTER_AREA)
+
+    kernel = np.ones((3, 3), np.uint8)
+    energy = cv2.erode(energy, kernel)
+
+    if 1:
+        temp = cv2.resize(energy,(0,0),fx=8,fy=8)
+        show(temp)
+    
+    
+# findPicturesInImage - end
+    
+if 0:
+    im = cv2.imread("autotest_data/screen_linkedin.png")
+    timeBegin = time.time()
+    findPicturesInImage(im)
+    print("INF: duration: %.3fs" % (time.time()-timeBegin) ) # mstab7: 0.05s
+    exit(0)
 
 
 

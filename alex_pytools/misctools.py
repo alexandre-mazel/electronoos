@@ -17,8 +17,8 @@ try: import v4l2capture  # can be found here : https://github.com/gebart/python-
 except: pass # can be skipped if no use of v4l2 function
 
 
-try: import pygame_tools
-except: pass
+#~ try: import pygame_tools
+#~ except: pass
 
 """
 sudo apt-get install libv4l-dev
@@ -103,13 +103,21 @@ def getPathTemp():
     return ret
     
 def getPathSave():
+    if os.name == "nt":
+        ret = "c:/save/"
+    else:
+        ret = os.path.expanduser("~/save/")
+    return ret
+    
+def getPathSave():
     """
     return a nice place to save file
     """
     return getUserHome() + "save" + os.sep
     
 def getTempFilename():
-    return getPathTemp() + getFilenameFromTime()
+    import threading
+    return getPathTemp() + getFilenameFromTime() + "_" + str(threading.get_ident()) # if multithreading, two can have same time
     
 def loadLocalEnv(strLocalFileName = ".env"):
     """
@@ -277,6 +285,39 @@ def getTimeStamp():
     strTimeStamp = datetimeObject.strftime( "%Y/%m/%d: %Hh%Mm%Ss" )
     return strTimeStamp
     
+def getWeekDay():
+    """
+    return the number 1..7 of the day in the week (beginning on monday)
+    """
+    return datetime.datetime.today().weekday() + 1
+"""
+matlab for a given date:
+day_name={'Sun','Mon','Tue','Wed','Thu','Fri','Sat'}
+month_offset=[0 3 3 6 1 4 6 2 5 0 3 5];  % common year
+
+% input date
+y1=2022
+m1=11
+d1=22
+
+% is y1 leap
+if mod(y1,4)==0 && mod(y1,100)==0 && mod(y1,400)==0
+    month_offset=[0 3 4 0 2 5 0 3 6 1 4 6];  % offset for leap year
+end
+
+% Gregorian calendar
+weekday_gregor=rem( d1+month_offset(m1) + 5*rem(y1-1,4) +  4*rem(y1-1,100) + 6*rem(y1-1,400),7)
+
+day_name{weekday_gregor+1}
+"""
+"""
+python for a given date:
+>>> import datetime
+>>> datetime.datetime.today()
+datetime.datetime(2012, 3, 23, 23, 24, 55, 173504)
+>>> datetime.datetime.today().weekday()
+"""
+    
 def getFilenameFromTime(timestamp=None):
   """
   get a string usable as a filename relative to the current datetime stamp.
@@ -311,13 +352,15 @@ def cleanText( txt, bEatAll = True):
             out += c
     return out
 
-def getSystemCallReturn( strCommand ):
+def getSystemCallReturnOld( strCommand ):
+    # TODO: replace os.system by subprocess.call cf ping_multi
     f = getTempFilename()+".txt"
     #~ print("DBG: getSystemCallReturn: running '%s' into '%s'" % (strCommand,f) )
     os.system("%s>%s" % (strCommand,f) )
     #file = open(f,"rt", encoding="utf-8", errors="surrogateescape") #cp1252 on windows, latin-1 on linux system
     file = open(f,"rt")
     data = file.read()
+    file.close()
     #~ print("DBG: getSystemCallReturn: data (1): %s" % str(data) )
     if len(data) > 0 and ord(data[0]) == 255:
         # command is of the type wmic and so is rotten in a wild burk encoding
@@ -328,8 +371,25 @@ def getSystemCallReturn( strCommand ):
         
     #~ print("DBG: getSystemCallReturn: data (2): %s" % str(data) )
     #~ data = data.decode()
-    file.close()
-    #~ os.unlink(f)
+    os.unlink(f)
+    return str(data)
+    
+def getSystemCallReturn(strCommand):
+    command = strCommand.split(" ")
+    outfilename = getTempFilename() + ".txt"
+    outfile = open(outfilename, "wt")
+    ret = subprocess.call(command, stdout=outfile)
+    outfile.close()
+    outfile = open(outfilename, "rt")
+    data = outfile.read()
+    #~ print("DBG: ping: buf: %s" % buf)
+    outfile.close()
+    os.unlink(outfilename)
+    if len(data) > 0 and ord(data[0]) == 255:
+        # command is of the type wmic and so is rotten in a wild burk encoding
+        #~ data = data.encode("cp1252", "strict").decode("cp1252", "strict") 
+        # can't find working solution for wmic => handling by hand
+        data = cleanText(data)
     return str(data)
 
 def getCpuModel(bShort=False):
@@ -1326,9 +1386,68 @@ class ExclusiveLock:
         return True
         
 # class ExclusiveLock - end
+
+    
+def eraseFileLongerLine(filename,sizemax):
+    """
+    """
+    print("INF: eraseFileLongerLine: checking file '%s' for line bigger than %s" % (filename,sizemax) )
+    f = open(filename,"rt")
+    lines = []
+    nNumLine = 0
+    nSumLine = 0
+    nLineErased = 0
+    nMaxLenRemaining = 0
+    while 1:
+        line = f.readline()
+        nLenLine = len(line)
+        nSumLine += nLenLine
+        nNumLine += 1
+        print("INF: eraseFileLongerLine: line %d: len: %d" % (nNumLine,nLenLine) )
+        if nLenLine < 1:
+            break
+        if nLenLine > sizemax:
+            print("INF: erasing this line")
+            nLineErased += 1
+            continue
+        nMaxLenRemaining = max(nMaxLenRemaining,nLenLine)
+        lines.append(line)
+    f.close()
+    print("INF: eraseFileLongerLine: average before erasing: %d" % (nSumLine//nNumLine))
+    print("INF: eraseFileLongerLine: nLineErased: %d" % (nLineErased))
+    print("INF: eraseFileLongerLine: max after erasing: %d" % (nMaxLenRemaining))
+    if nLineErased > 0:
+        print("INF: will write new one, waiting 5 sec so you can stop it...")
+        time.sleep(5)
+        f = open(filename,"wt")
+        for line in lines:
+            f.write(line)
+        f.close()
+    print("INF: eraseFileLongerLine: done")
+# eraseFileLongerLine - end
+    
+#~ eraseFileLongerLine("/tmp/data_offers.py",10000)
+#~ exit(0)
     
 def autoTest():
-    print("cpu: %s" % str(getCpuModel()) )
+    s = str(getCpuModel())
+    print("cpu: %s" % s )
+    assert( "Intel64 Family 6 Model 126 Stepping 5, GenuineIntel" in s)
+    
+    if 1:
+        timeBegin = time.time()
+        for i in range(10):
+            getCpuModel()
+        print("cpu model takes %.4fms per call" % ((time.time()-timeBegin)*1000/10)) 
+        # depuis scite
+        # 203ms per call avec un system call
+        # 194ms per call avec un subprocess
+        
+        # depuis le shell
+        # 143ms system call
+        # 109ms subprocess
+        
+        
     check(smoothstep(0),0)
     check(smoothstep(-1),0)
     check(smoothstep(0.5),0.5)

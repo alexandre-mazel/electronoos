@@ -25,6 +25,10 @@ Anne Frank
 Fais de ta vie un rêve et d’un rêve une réalité.
 Antoine de Saint-Exupery
         """
+        """
+        TODO a l'occasion: prendre un gros roman puis chercher des phrases assez courte sans prénom et les définir comme des pensee avec nom de l'auteur, livre et année.
+        cf D:\books avec des pdfs
+        """
         f = io.open(misctools.getThisFilePath()+"datas/pensee.txt","r",encoding='cp1252')
         blob = [] # un bloc de ligne de texte séparé par une ligne vide
         bContinue = 1
@@ -46,6 +50,7 @@ Antoine de Saint-Exupery
                 blob.append(line)
         #~ print("DBG: load: blob: %s" % str(blob))
         #~ print(self.thous)
+        print("INF: Apho.load: %d loaded apho(s))" % len(self.thous))
         
     def getThoughts( self, sentence ):
         """
@@ -53,7 +58,7 @@ Antoine de Saint-Exupery
         return a pair, (thought,author) or None if none
         """
         bVerbose = 1
-        bVerbose = 0
+        #~ bVerbose = 0
         
         bMatchShort = 0
         bMatchShort = 1
@@ -170,6 +175,11 @@ def say(txt):
     global_tts.say(txt)
     global_tts.runAndWait()
     
+def sayGoogle(txt):
+    sys.path.append("../scripts")
+    import tts_say
+    tts_say.say(txt)
+    
 def wordsCallback(words,confidence):
     if confidence<0.6:
         return
@@ -179,8 +189,11 @@ def wordsCallback(words,confidence):
     #~ say(phrase)
     ret = apho.getThoughts(words)
     if ret != None:
-        say(ret[0])
-        say(ret[1])
+        saymethod = say
+        if 1:
+            saymethod = sayGoogle
+        saymethod(ret[0])
+        saymethod(ret[1])
         
 def test_loop_asr():
 
@@ -223,15 +236,28 @@ less_said_idx: 8
 INF: say: 'Le bonheur est une petite chose que l'on grignote, assis par terre, au soleil.'
 """
 
+def strToPrint(s):
+    if sys.version_info[0] >= 3:
+        return s
+
+    o = ""
+    for c in s:
+        #~ print( ord(c) )
+        if ord(c) <= 127:
+            o += c
+    return o
+
 global_testApho_nbr_hit = 0
 def testApho(s):
     global global_testApho_nbr_hit
     ret = apho.getThoughts(s)
-    print("\n%s" % s)
+    print("\n%s" % strToPrint(s))
     print("=>")
 
     if ret != None:
-        print(ret[0])
+        s = ret[0]
+        #~ print(str(s)) # UnicodeEncodeError: 'ascii' codec can't encode character u'\xe0'
+        print(strToPrint(s)) # cette ligne bloque en python 2.7,  LookupError: unknown encoding: cp65001 # corriger en faisant dans le shell: set PYTHONIOENCODING=UTF-8
         global_testApho_nbr_hit += 1
     print("")
 
@@ -272,10 +298,16 @@ def autoTest():
     testApho("travailler moins c'est cool ou pas ?")
     testApho("travailler moins c'est cool ou pas ?")
     testApho("Consommer moins c'est cool ou pas ?")
-
+    
+    testApho("c'est bien fait peur. tu es un bon petit gars. eh mon petit gnocchi est-ce qu'il a.")
+    # => "Gourmandise : source inépuisable de bonheur. a cause de bonheur" bon match bonheur, c'est moche.
+    # => maintenant donne, Quand vous êtes à Rome, faites comme les Romains. fait => faites
+    
+    testApho("ambulance") # => Ben par exemple, c'est un mec qui va a une soirée genre bien habillé
+    print("")
 
     print("global_testApho_nbr_hit: %s" % global_testApho_nbr_hit )
-    assert(global_testApho_nbr_hit >= 18)
+    assert(global_testApho_nbr_hit >= 20)
     
     if 0:
         # test sur python 2.7

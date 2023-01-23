@@ -1,3 +1,4 @@
+# -*- coding: cp1252 -*-
 '''
 Guitar tuner script based on the Harmonic Product Spectrum (HPS)
 

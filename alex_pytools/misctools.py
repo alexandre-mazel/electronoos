@@ -1386,6 +1386,48 @@ class ExclusiveLock:
         return True
         
 # class ExclusiveLock - end
+
+    
+def eraseFileLongerLine(filename,sizemax):
+    """
+    """
+    print("INF: eraseFileLongerLine: checking file '%s' for line bigger than %s" % (filename,sizemax) )
+    f = open(filename,"rt")
+    lines = []
+    nNumLine = 0
+    nSumLine = 0
+    nLineErased = 0
+    nMaxLenRemaining = 0
+    while 1:
+        line = f.readline()
+        nLenLine = len(line)
+        nSumLine += nLenLine
+        nNumLine += 1
+        print("INF: eraseFileLongerLine: line %d: len: %d" % (nNumLine,nLenLine) )
+        if nLenLine < 1:
+            break
+        if nLenLine > sizemax:
+            print("INF: erasing this line")
+            nLineErased += 1
+            continue
+        nMaxLenRemaining = max(nMaxLenRemaining,nLenLine)
+        lines.append(line)
+    f.close()
+    print("INF: eraseFileLongerLine: average before erasing: %d" % (nSumLine//nNumLine))
+    print("INF: eraseFileLongerLine: nLineErased: %d" % (nLineErased))
+    print("INF: eraseFileLongerLine: max after erasing: %d" % (nMaxLenRemaining))
+    if nLineErased > 0:
+        print("INF: will write new one, waiting 5 sec so you can stop it...")
+        time.sleep(5)
+        f = open(filename,"wt")
+        for line in lines:
+            f.write(line)
+        f.close()
+    print("INF: eraseFileLongerLine: done")
+# eraseFileLongerLine - end
+    
+#~ eraseFileLongerLine("/tmp/data_offers.py",10000)
+#~ exit(0)
     
 def autoTest():
     s = str(getCpuModel())

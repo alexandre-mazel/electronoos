@@ -1358,7 +1358,7 @@ def elision( strFirstWord, strSecondWord ):
 class ExclusiveLock:
     # inspired by https://github.com/drandreaskrueger/lockbydir
     
-    def __init__( self, lockname):
+    def __init__( self, lockname="alextools.lck"):
         """
             get an exclusive opening of a lock, so no other process can access a critival ressources
             call close to the returned object to release the lock

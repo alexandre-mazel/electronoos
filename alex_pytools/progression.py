@@ -50,6 +50,16 @@ class Progression:
         k = Progression._createKey(strUserId,strObjectId)
         self.dictProg[k] = [misctools.getTimeStamp(),nNewStep]
         
+    def updateArmored(self, strUserId, strObjectId, nNewStep ):
+        lock = ExclusiveLock()
+        lock.acquire()
+        
+        self.load()
+        self.update( strUserId, strObjectId, nNewStep )
+        self.save()
+        
+        lock.release()
+        
         
     def inc( self, strUserId, strObjectId, nIncStep = 1 ):
         self._assumeExist(strUserId, strObjectId)
@@ -64,7 +74,7 @@ class Progression:
             pass
         return defaultValue
         
-    def getAndInc(self,strUserId, strObjectId, defaultValue = None, nIncStep = 1 ):
+    def getAndIncArmored(self,strUserId, strObjectId, defaultValue = None, nIncStep = 1 ):
         """
         get and inc in one call
         armoured !
@@ -77,7 +87,10 @@ class Progression:
         v = self.get(strUserId, strObjectId, defaultValue)
         self.inc(strUserId, strObjectId, nIncStep)
         self.save()
+        
         lock.release()
+        
+        return v
         
     def delProgress(self,strUserId, strObjectId):
         k = Progression._createKey(strUserId,strObjectId)

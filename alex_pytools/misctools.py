@@ -1248,7 +1248,7 @@ def guessExtension( filename ):
         strExt = "jpg"
     return strExt
     
-def  correctExtension( strPath ):
+def correctExtension( strPath ):
     """
     correct wrong file extension in strPath
     """
@@ -1275,7 +1275,48 @@ if 0:
     listDup = findDuplicate(strTestPath)
     eraseFiles(listDup, strTestPath)
     correctExtension(strTestPath)
-    exit(0)      
+    exit(0)
+    
+def eraseFileInAnotherFolder(path1,path2):
+    """
+    erase file in path1 that are in path2 (same size and same contents, but date can differ)
+    """
+    if os.path.abspath(path1) == os.path.abspath(path2):
+        print("WRN: eraseFileInAnotherFolder: path1 and path2 are the same!\n%s\n%s" % (path1,path2))
+        return
+    if path1[-1] != os.sep:
+        path1 += os.sep
+
+    if path2[-1] != os.sep:
+        path2 += os.sep
+        
+    out = []
+    listFiles = os.listdir(path1)
+    cpt = 0
+    for f in listFiles:
+        fn1 = path1+f
+        fn2 = path2+f
+        if not os.path.isfile(fn1) or not os.path.isfile(fn2):
+            continue
+        n1 = os.path.getsize(fn1)
+        n2 = os.path.getsize(fn2)
+        if n1 != n2:
+            continue
+        f1 = open(fn1,"rb")
+        b1 = f1.read()
+        f1.close()
+        f2 = open(fn2,"rb")
+        b2 = f2.read()
+        f2.close()
+        for i in range(len(b1)):
+            if b1[i] != b2[i]:
+                continue
+        # f1 and f2 are the same
+        print("INF: deleting '%s' of size %d from path1, because it's in path2)" % (f,n1))
+        os.unlink(fn1)
+#~ eraseFileInAnotherFolder - end
+        
+    
     
 def getCallStackStr():
     import traceback

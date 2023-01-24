@@ -323,7 +323,7 @@ def findPicturesInImage(im, roi = None, nMinSize=16, nMaxSize=64, bRound=1,bDebu
                     while bAtLeastOne:
                         k = 0
                         bAtLeastOne = 0
-                        if j+harea+1 < hchunk and store[j+harea+1,i-1]:
+                        if j+harea+1 < hchunk and i > 0 and store[j+harea+1,i-1]: # chez concept: bug en disant que index 29 utiilsé alors que que 29 de taille!
                             # the pixel on the left below is on so let's decay the area
                             i -= 1
                             warea += 1
@@ -453,8 +453,15 @@ def findPicturesInImage(im, roi = None, nMinSize=16, nMaxSize=64, bRound=1,bDebu
         temp = cv2.resize(energy,(0,0),fx=8,fy=8)
         show(temp)
     
-    
 # findPicturesInImage - end
+
+def pastImageWithRecouvrement(templateSkullFilename, destFilename):
+    """
+    paste a series of image templateSkullFilename % 0, templateSkullFilename % 1 ...
+    p0 is the image on the top, then p1 is above, then p2...
+    the recouvrement is to be computed by looking for minimal difference
+    """
+    
     
 if 0:
     im = cv2.imread("autotest_data/screen_linkedin.png")

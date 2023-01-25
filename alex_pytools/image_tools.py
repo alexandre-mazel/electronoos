@@ -461,6 +461,7 @@ def pastImageWithRecouvrement(templateSkullFilename, destFilename):
     p0 is the image on the top, then p1 is above, then p2...
     the recouvrement is to be computed by looking for minimal difference
     """
+    pass
     
     
 if 0:

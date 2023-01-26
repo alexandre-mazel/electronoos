@@ -1124,14 +1124,17 @@ def backupFile( filename ):
     filenamebak = filename + ".bak"
     if os.path.isfile(filenamebak):
         onedayinsec = 60*60*24
-        creatime = os.path.ctime(filenamebak)
+        creatime = os.path.getctime(filenamebak)
         if time.time() - creatime > onedayinsec:
             # fait un backup du backup
-            os.rename(filenamebak,finamebak+".time_"+ str(int(creatime)))
+            os.rename(filenamebak,filenamebak+".time_"+ str(int(creatime)))
         else:
             os.remove(filenamebak)
     os.rename(filename,filenamebak)
     
+backupFile("/tmp/test.txt")
+exit(1)
+
 def eraseFiles( listFiles, strPath = "" ):
     """
     Delete all file content in a list

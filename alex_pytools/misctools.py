@@ -1118,12 +1118,18 @@ def backupFile( filename ):
     make a backup of a file, erase backup first.
     backup have same name than file, but a with an added .bak
     """
-    if not os.path.isfile( filename ):
+    if not os.path.isfile( filename ) or os.path.getsize(filename)<=0:
         # nothing to do
         return
     filenamebak = filename + ".bak"
     if os.path.isfile(filenamebak):
-        os.remove(filenamebak)
+        onedayinsec = 60*60*24
+        creatime = os.path.ctime(filenamebak)
+        if time.time() - creatime > onedayinsec:
+            # fait un backup du backup
+            os.rename(filenamebak,finamebak+".time_"+ str(int(creatime)))
+        else:
+            os.remove(filenamebak)
     os.rename(filename,filenamebak)
     
 def eraseFiles( listFiles, strPath = "" ):
@@ -1314,8 +1320,10 @@ def eraseFileInAnotherFolder(path1,path2):
             if b1[i] != b2[i]:
                 continue
         # f1 and f2 are the same
-        print("INF: deleting '%s' of size %d from path1, because it's in path2)" % (f,n1))
+        print("INF: eraseFileInAnotherFolder: deleting '%s' of size %d from path1, because it's in path2" % (f,n1))
         os.unlink(fn1)
+        cpt += 1
+    print("INF: eraseFileInAnotherFolder: erased %d file(s)" % cpt )
 #~ eraseFileInAnotherFolder - end
         
     

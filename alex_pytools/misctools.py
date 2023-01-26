@@ -1132,8 +1132,8 @@ def backupFile( filename ):
             os.remove(filenamebak)
     os.rename(filename,filenamebak)
     
-backupFile("/tmp/test.txt")
-exit(1)
+#~ backupFile("/tmp/test.txt")
+#~ exit(1)
 
 def eraseFiles( listFiles, strPath = "" ):
     """

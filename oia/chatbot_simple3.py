@@ -1,7 +1,11 @@
+import io
+
 def clean_string(s):
     conversion_list = [ 
                 ("?",""), 
+                ("'"," "), 
                 (":"," sep ")
+                
     ]
     s = s.lower()
     for c in conversion_list:
@@ -9,16 +13,71 @@ def clean_string(s):
     return s
         
 tableau_questions_reponses = [
-[ ["bonjour", "hello", "salut"], "Salut Humain!"],
-[ ["comment ca va", "ca boume", "tu va bien"], "moi ca va!"],
-[ ["au revoir", "bye"], "a+"],
+    [ ["bonjour", "hello", "salut","coucou"], "Salut Humain!"],
+    [ ["comment ca va", "ca boume", "tu va bien"], "moi ca va!"],
+    [ ["au revoir", "bye"], "a+"],
 ]
+
+def loadFaq( filename ):
+    """
+    les faq sont sous la forme
+    question
+    reponse
+    (ligne vide)
+    
+    return a list of pair (q,ans)
+    """
+    faq = []
+    f = io.open(filename,"r",encoding='cp1252')
+    blob = [] # a block of lines separated by an empty line
+    bContinue = 1
+    while bContinue:
+        line = f.readline()
+        if len(line)<1:
+            bContinue = 0
+        if bContinue and line[-1] == '\n': line = line[:-1]
+        if len(line)<1:
+            if len(blob)>1:
+                # end of faq
+                question = " ".join(blob[:-1])
+                answer = blob[-1]
+                faq.append( (question,answer) )
+            blob = []
+        else:
+            blob.append(line)
+    #~ print("DBG: load: blob: %s" % str(blob))
+    #~ print(self.thous)
+    print("INF: loadFaq: %d loaded info(s))" % len(faq))
+    return faq
+    
+faq = loadFaq("faq_informatique.txt")
+
+def trim_usual_and_lower(words):
+    o = []
+    for w in words:
+        w = w.lower()
+        if w in ["", "c","est","quoi","le","la","les","c'est","un","une","dans","dis","moi"]:
+            continue
+        o.append(w)
+    return o
+
 def chatbot(user_input):
     user_input = clean_string(user_input)
     for qr in tableau_questions_reponses:
         qs,r = qr
         if user_input in qs:
             return r
+    
+    words = user_input.split(" ")
+    words = trim_usual_and_lower(words)
+    for q,a in faq:
+        q_words = trim_usual_and_lower(clean_string(q).split(" "))
+        #~ print("test '%s' in '%s'" % (words,q))
+        for w in words:
+            if w in q_words:
+                #~ print("found '%s' in '%s'" % (w,q))
+                print("=> Tu veux savoir %s ?"% q )
+                return a
     return "je sais pas"
         
     

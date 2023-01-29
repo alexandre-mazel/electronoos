@@ -144,6 +144,39 @@ def test_cpu_float( bPrint = True ):
     return rDuration;
 #test_cpu_float - end
 
+def test_ram( sizeGB = 4, bPrint = True ):
+    try:
+        import numpy
+        import numpy.random
+    except:
+        if bPrint: print( "numpy        : not found")
+        return 0
+    if bPrint: sys.stdout.write( "test_cpu_ram%dG   : " % sizeGB )
+    if bPrint: sys.stdout.flush();
+    timeBegin = time.time();
+    a = []
+    b = []
+    sizeGB //= 4 # alloc 32 bits
+    #~ sizeGB //= 2 # cause for 4GB, we will alloc 2*2GB (not here => 0.5=>0)
+    size_packet = sizeGB * 1024*1024//2 # 500Mb if 4 Gb => 
+    a = numpy.zeros((1024,size_packet),dtype=numpy.uint32)
+    b = numpy.zeros((1024,size_packet),dtype=numpy.uint32)
+    b = a.copy()
+    j = 0
+    while j < 1024 and 0:
+        i = 0
+        while i < size_packet:
+            a[j,i] = b[j,i]
+            i += 1
+        j += 1
+        if (j %100)==99:
+            if bPrint: sys.stdout.write( "#" );
+            if bPrint: sys.stdout.flush();
+    rDuration = time.time() - timeBegin;
+    if bPrint: print("%7.2fs" % rDuration);
+    return rDuration;
+#test_ram - end
+
 def test_numpy( bPrint = True ):
     try:
         import numpy
@@ -345,7 +378,7 @@ def test_multithreading():
         sys.stdout.write( "multiprocess x%-2d:" % nNbrProcessInParalell  )    
         bFirstInLine = True
         all_process = []
-        for func_to_test in (test_cpu_int,test_cpu_float,test_numpy,test_opencv_orb,test_opencv_orb_realcase,test_opencv_orb_realcase):
+        for func_to_test in (test_cpu_int,test_cpu_float,test_ram,test_numpy,test_opencv_orb,test_opencv_orb_realcase,test_opencv_orb_realcase):
             if not bFirstInLine: sys.stdout.write(" /" )
             bFirstInLine = False
             timeBegin = time.time()        
@@ -368,8 +401,12 @@ def test_perf(nDiskTestSizeMB=200,bTestMultiThreading=True):
     print_version()
     print_cpu()
     rTotalTime = 0;
-    rTotalTime += test_cpu_int();
-    rTotalTime += test_cpu_float();
+    #~ rTotalTime += test_cpu_int();
+    #~ rTotalTime += test_cpu_float();
+    rTotalTime += test_ram(4);
+    rTotalTime += test_ram(8);
+    rTotalTime += test_ram(12);
+    rTotalTime += test_ram(16);
     rTotalTime += test_numpy();
     rTotalTime += test_opencv_orb();
     rTotalTime += test_opencv_orb_realcase();

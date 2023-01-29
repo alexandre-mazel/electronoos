@@ -1,3 +1,4 @@
+# -*- coding: cp1252 -*-
 import io
 
 def clean_string(s):
@@ -17,15 +18,49 @@ tableau_questions_reponses = [
     [ ["comment ca va", "ca boume", "tu va bien"], "moi ca va!"],
     [ ["au revoir", "bye"], "a+"],
 ]
+def loadFaqSimple( filename ):
+    """
 
+    Charge un fichier de Frequently Asked Questions
+    return a list of pair (q,ans)
+    
+    Version simple sans check d'erreur
+    
+    les faq sont sous la forme
+    question1
+    reponse1
+    (ligne vide)
+    question2
+    reponse2
+    (ligne vide)
+    ...
+    """
+    faq = []
+    f = io.open(filename,"r",encoding='cp1252')
+    while 1:
+        q = f.readline()
+        if q == "":
+            break  # je suis a la fin du fichier
+        a = f.readline()
+        dummy = f.readline()
+        faq.append((q[:-1],a[:-1].strip())) # :-1: => enleve le \n (retour a la ligne)
+    print("INF: loadFaqSimple: %d loaded info(s))" % len(faq))
+    f.close()
+    return faq
+    
 def loadFaq( filename ):
     """
-    les faq sont sous la forme
-    question
-    reponse
-    (ligne vide)
-    
+    Charge un fichier de Frequently Asked Questions
     return a list of pair (q,ans)
+    
+    les faq sont sous la forme
+    question1
+    reponse1
+    (ligne vide)
+    question2
+    reponse2
+    (ligne vide)
+    ...
     """
     faq = []
     f = io.open(filename,"r",encoding='cp1252')
@@ -50,13 +85,15 @@ def loadFaq( filename ):
     print("INF: loadFaq: %d loaded info(s))" % len(faq))
     return faq
     
-faq = loadFaq("faq_informatique.txt")
+    
+faq = loadFaqSimple("faq_informatique.txt")
+#~ faq = loadFaq("faq_informatique.txt")
 
 def trim_usual_and_lower(words):
     o = []
     for w in words:
         w = w.lower()
-        if w in ["", "c","est","quoi","le","la","les","c'est","un","une","dans","dis","moi"]:
+        if w in ["", "c","est","quoi","le","la","les","c'est","un","une","dans","dis","moi", "qu", "est", "ce"]:
             continue
         o.append(w)
     return o
@@ -93,6 +130,7 @@ def autotest():
     assert(chatbot("Ca boume?") == "moi ca va!")
     assert(chatbot("bye") == "a+")
     assert(chatbot("pipi") == "je sais pas")
+    assert(chatbot("parle moi de ram") == "C'est la mémoire vive, espace virtuelle où évoluent les programmes quand ils sont lancés.")
     
     
 autotest()

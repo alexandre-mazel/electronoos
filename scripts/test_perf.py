@@ -116,6 +116,15 @@ def print_cpu():
         strCpuModel = "TODO"
     print( "cpu              : %s" % strCpuModel )
     
+def print_ram():
+    import psutil
+    try:
+        infomem = psutil.virtual_memory()
+        GB=1024*1024*1024
+        print("ram              : %.2f / %.2f GB" % (infomem.available/GB,infomem.total/GB))
+    except BaseException as err:
+        print("ERR: %s" % err)
+    
 def test_cpu_int( bPrint = True ):
     if bPrint: sys.stdout.write( "test_cpu_int2    : " )
     timeBegin = time.time();
@@ -151,14 +160,12 @@ def test_ram( sizeGB = 4, bPrint = True ):
     except:
         if bPrint: print( "numpy        : not found")
         return 0
-    if bPrint: sys.stdout.write( "test_cpu_ram%dG   : " % sizeGB )
+    if bPrint: sys.stdout.write( "test_cpu_ram%2dG  : " % sizeGB )
     if bPrint: sys.stdout.flush();
     timeBegin = time.time();
     a = []
     b = []
-    sizeGB //= 4 # alloc 32 bits
-    #~ sizeGB //= 2 # cause for 4GB, we will alloc 2*2GB (not here => 0.5=>0)
-    size_packet = sizeGB * 1024*1024//2 # 500Mb if 4 Gb => 
+    size_packet = sizeGB * 1024*1024//4//2 # div by 4 because 32bits, div by 2 because we alloc 2 arrays
     a = numpy.zeros((1024,size_packet),dtype=numpy.uint32)
     b = numpy.zeros((1024,size_packet),dtype=numpy.uint32)
     b = a.copy()
@@ -400,13 +407,17 @@ def test_multithreading():
 def test_perf(nDiskTestSizeMB=200,bTestMultiThreading=True):
     print_version()
     print_cpu()
+    print_ram()
     rTotalTime = 0;
     #~ rTotalTime += test_cpu_int();
     #~ rTotalTime += test_cpu_float();
     rTotalTime += test_ram(2);
     rTotalTime += test_ram(4);
+    rTotalTime += test_ram(6);
     rTotalTime += test_ram(8);
+    rTotalTime += test_ram(10);
     rTotalTime += test_ram(12);
+    rTotalTime += test_ram(14);
     rTotalTime += test_ram(16);
     rTotalTime += test_numpy();
     rTotalTime += test_opencv_orb();

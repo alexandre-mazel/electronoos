@@ -117,13 +117,17 @@ def print_cpu():
     print( "cpu              : %s" % strCpuModel )
     
 def print_ram():
+    GB=1024*1024*1024
     try:
         import psutil
         infomem = psutil.virtual_memory()
-        GB=1024*1024*1024
         print("ram              : %.2f / %.2f GB" % (infomem.available/GB,infomem.total/GB))
     except BaseException as err:
         print("ERR: %s" % err)
+        import os
+        mem_bytes = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')
+        print("ram              : %.2f GB" % mem_bytes/float(GB) )
+
     
 def test_cpu_int( bPrint = True ):
     if bPrint: sys.stdout.write( "test_cpu_int2    : " )

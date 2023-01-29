@@ -403,6 +403,7 @@ def test_perf(nDiskTestSizeMB=200,bTestMultiThreading=True):
     rTotalTime = 0;
     #~ rTotalTime += test_cpu_int();
     #~ rTotalTime += test_cpu_float();
+    rTotalTime += test_ram(2);
     rTotalTime += test_ram(4);
     rTotalTime += test_ram(8);
     rTotalTime += test_ram(12);

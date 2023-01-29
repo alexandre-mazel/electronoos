@@ -126,7 +126,7 @@ def print_ram():
         print("ERR: %s" % err)
         import os
         mem_bytes = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')
-        print("ram              : %.2f GB" % mem_bytes/float(GB) )
+        print("ram              : %.2f GB" % (mem_bytes/float(GB)) )
 
     
 def test_cpu_int( bPrint = True ):

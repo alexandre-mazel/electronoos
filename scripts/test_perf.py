@@ -126,7 +126,7 @@ def print_ram():
         #~ print("ERR: %s" % err)
         import os
         avail = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') 
-        tot = 
+        tot = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') 
         print("ram              : %.2f / %.2f GB" % (avail/GB,tot/GB))
 
     

@@ -177,23 +177,36 @@ def test_ram( sizeGB = 1, bPrint = True ):
         b = []
         size_packet = sizeGB * 1024*1024//4//2 # div by 4 because 32bits, div by 2 because we alloc 2 arrays
         a = numpy.zeros((1024,size_packet),dtype=numpy.uint32)
-        b = numpy.zeros((1024,size_packet),dtype=numpy.uint32)
-        b = a.copy()
-        j = 0
-        while j < 1024 and 0:
-            i = 0
-            while i < size_packet:
-                a[j,i] = b[j,i]
-                i += 1
-            j += 1
-            if (j %100)==99:
-                if bPrint: sys.stdout.write( "#" );
-                if bPrint: sys.stdout.flush();
+        if bPrint: sys.stdout.write( "#" )
+        if bPrint: sys.stdout.flush()
+        
+        if 0:
+            b = a.copy()
+            
+            if bPrint: sys.stdout.write( "#"*19 )
+            if bPrint: sys.stdout.flush()
+        else:
+            # plus lent, mais on voit la progression
+            b = numpy.zeros((1024,size_packet),dtype=numpy.uint32)
+            if bPrint: sys.stdout.write( "#" )
+            if bPrint: sys.stdout.flush()
+            j = 0
+            while j < 1024:
+                i = 0
+                #~ while i < size_packet:
+                    #~ a[j,i] = b[j,i]
+                    #~ i += 1
+                b[j,] = a[j,]
+                j += 1
+                if (j %55)==54:
+                    if bPrint: sys.stdout.write( "#" );
+                    if bPrint: sys.stdout.flush();
         rDuration = time.time() - timeBegin;
         if bPrint: print("%7.2fs" % rDuration);
     #~ except numpy.core._exceptions.MemoryError as err:
     except BaseException as err:
-        print("Memory Error: %s" % err )
+        #~ print("Memory Error: %s" % err )
+        print(" Memory Error..." )
         rDuration = 0
     return rDuration;
 #test_ram - end

@@ -121,11 +121,15 @@ def print_ram():
     try:
         import psutil
         infomem = psutil.virtual_memory()
-        print("ram              : %.2f / %.2f GB" % (infomem.available/GB,infomem.total/GB))
+        avail = infomem.available
+        tot = infomem.total
+        #~ avail = tot-avail # seems like it's reverted at least on raspberry [but not exactly !?!]
+        print("ram              : %.2f / %.2f GB" % (avail/GB,tot/GB))
+        #~ raise("toto") # to test the exception code check
     except BaseException as err:
         #~ print("ERR: %s" % err)
         import os
-        avail = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') 
+        avail = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_AVPHYS_PAGES') 
         tot = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') 
         print("ram              : %.2f / %.2f GB" % (avail/GB,tot/GB))
 

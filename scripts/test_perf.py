@@ -125,8 +125,9 @@ def print_ram():
     except BaseException as err:
         #~ print("ERR: %s" % err)
         import os
-        mem_bytes = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')
-        print("ram              : %.2f GB" % (mem_bytes/float(GB)) )
+        avail = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') 
+        tot = 
+        print("ram              : %.2f / %.2f GB" % (avail/GB,tot/GB))
 
     
 def test_cpu_int( bPrint = True ):

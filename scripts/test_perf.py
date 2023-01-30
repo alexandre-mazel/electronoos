@@ -162,7 +162,7 @@ def test_cpu_float( bPrint = True ):
     return rDuration;
 #test_cpu_float - end
 
-def test_ram( sizeGB = 4, bPrint = True ):
+def test_ram( sizeGB = 1, bPrint = True ):
     try:
         import numpy
         import numpy.random
@@ -172,24 +172,29 @@ def test_ram( sizeGB = 4, bPrint = True ):
     if bPrint: sys.stdout.write( "test_cpu_ram%2dG  : " % sizeGB )
     if bPrint: sys.stdout.flush();
     timeBegin = time.time();
-    a = []
-    b = []
-    size_packet = sizeGB * 1024*1024//4//2 # div by 4 because 32bits, div by 2 because we alloc 2 arrays
-    a = numpy.zeros((1024,size_packet),dtype=numpy.uint32)
-    b = numpy.zeros((1024,size_packet),dtype=numpy.uint32)
-    b = a.copy()
-    j = 0
-    while j < 1024 and 0:
-        i = 0
-        while i < size_packet:
-            a[j,i] = b[j,i]
-            i += 1
-        j += 1
-        if (j %100)==99:
-            if bPrint: sys.stdout.write( "#" );
-            if bPrint: sys.stdout.flush();
-    rDuration = time.time() - timeBegin;
-    if bPrint: print("%7.2fs" % rDuration);
+    try:
+        a = []
+        b = []
+        size_packet = sizeGB * 1024*1024//4//2 # div by 4 because 32bits, div by 2 because we alloc 2 arrays
+        a = numpy.zeros((1024,size_packet),dtype=numpy.uint32)
+        b = numpy.zeros((1024,size_packet),dtype=numpy.uint32)
+        b = a.copy()
+        j = 0
+        while j < 1024 and 0:
+            i = 0
+            while i < size_packet:
+                a[j,i] = b[j,i]
+                i += 1
+            j += 1
+            if (j %100)==99:
+                if bPrint: sys.stdout.write( "#" );
+                if bPrint: sys.stdout.flush();
+        rDuration = time.time() - timeBegin;
+        if bPrint: print("%7.2fs" % rDuration);
+    #~ except numpy.core._exceptions.MemoryError as err:
+    except BaseException as err:
+        print("Memory Error: %s" % err )
+        rDuration = 0
     return rDuration;
 #test_ram - end
 

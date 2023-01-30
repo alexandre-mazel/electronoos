@@ -1172,6 +1172,16 @@ high perf:
 INF: Changing disk test size to 1000 MB
 python version   : 3.9.5 (64bits) (8 core(s))
 cpu              : Intel(R) Core(TM) i7-1065G7 CPU @ 1.30GHz
+ram              : 11.02 / 15.60 GB
+ram              : 10.73 / 15.60 GB
+test_cpu_ram 2G  : ####################   0.37s
+test_cpu_ram 4G  : ####################   0.65s
+test_cpu_ram 6G  : ####################   0.94s
+test_cpu_ram 8G  : ####################   1.25s
+test_cpu_ram10G  : ####################   2.29s
+test_cpu_ram12G  : ####################   3.77s
+test_cpu_ram14G  : ####################   5.76s
+test_cpu_ram16G  : ####################   7.93s  # require some of empty spaces (for swap)
 test_cpu_int2    : ####################   0.46s
 test_cpu_float2  : ####################   0.07s
 test_scipy_xxt   : ####################   0.89s (449.65x)

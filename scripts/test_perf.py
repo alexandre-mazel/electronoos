@@ -117,7 +117,7 @@ def print_cpu():
     print( "cpu              : %s" % strCpuModel )
     
 def print_ram():
-    GB=1024*1024*1024
+    GB=1024*1024*1024.
     try:
         import psutil
         infomem = psutil.virtual_memory()

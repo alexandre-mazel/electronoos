@@ -1105,23 +1105,17 @@ power management:
 
 a@black:~/dev/electronoos/scripts$ sudo python test_perf.py 
 [sudo] password for a: 
-Sorry, try again.
-[sudo] password for a: 
-Sorry, try again.
-[sudo] password for a: 
-Sorry, try again.
-sudo: 3 incorrect password attempts
-a@black:~/dev/electronoos/scripts$ sudo python test_perf.py 
-[sudo] password for a: 
 INF: Due to low empty disk space, reducing disk test size to 648 MB
 python version   : 2.7.6 (64bits) (4 core(s))
-cpu              : todo
+cpu              : Intel(R) Core(TM) i5 CPU       M 480  @ 2.67GHz
+ram              : 5.07 / 5.63 GB # added 2GB
 test_cpu_int2    : ####################   0.55s
 test_cpu_float2  : ####################   0.14s
 scipy.fftpack    : not found
 test_orb2.4.8    : ####################   0.28s (358.00fps)
-test_orbcv imgs  : test_perf_vga_*.png: not found
-test_orbcv bis   : test_perf_vga_*.png: not found
+test_orb2.4.8    : ####################  11.24s ( 8.90fps) ?
+test_orbcv imgs  : ####################   2.41s (41.56fps)
+test_orbcv bis   : ####################   1.27s (78.62fps)
 multiprocess x1 :  0.55s /  0.14s /  0.00s /  0.42s /  0.13s /  0.12s =>    1.38s
 multiprocess x4 :  1.08s /  0.30s /  0.01s /  0.89s /  0.27s /  0.27s =>    4.20s
 multiprocess x8 :  2.15s /  0.61s /  0.02s /  1.78s /  0.55s /  0.55s =>    9.85s

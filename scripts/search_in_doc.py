@@ -81,12 +81,12 @@ def searchInDocs(path,s,bVerbose=0):
     return cptfilestot, cptparatot,cptmatchfiles,cptmatchlines
     
     
-#~ searchInDoc("C:/tmpdocrufet/1988.docx", "autoroute")
-#~ searchInDocs("C:/tmpdocrufet", "autoroute")
+#~ searchInDocx("test/1988.docx", "autoroute")
+#~ searchInDocs("test", "autoroute")
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print( "\n  Search in docx/odt v1.0\n\n  syntax: %s <string_to_match>[1]\n\n  eg: %s autoroute \n" % ((sys.argv[0],)*2))
+        print( "\n  Search in docx/odt v1.0\n\n  syntax: %s <string_to_match> [1]\n\n  eg: %s autoroute \n" % ((sys.argv[0],)*2))
         exit(-1)
     print("\n")
     

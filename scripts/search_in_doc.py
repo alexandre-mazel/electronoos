@@ -6,6 +6,14 @@ import odf.opendocument
 import os
 import sys
 
+strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
+if strLocalPath == "": strLocalPath = './'
+sys.path.append(strLocalPath+"/../alex_pytools/")
+import stringtools
+
+def removeAccent(s):
+    return stringtools.removeAccentString(s)
+
 def searchInDocx(filename, s):
     """
     search s in filename.
@@ -13,7 +21,7 @@ def searchInDocx(filename, s):
     """
     if ".docx" not in filename:
         return 0,0
-    s = s.lower()
+    s = removeAccent(s.lower())
     doc = docx.Document(filename)
     #~ print(dir(doc))
     #~ print("DBG: nbr paragraph: %s" % len(doc.paragraphs))
@@ -21,12 +29,15 @@ def searchInDocx(filename, s):
     bFirstTime = 1
     allparas = doc.paragraphs
     for nNumPara,p in enumerate(allparas):
-        #~ print("DBG: paragraph: " + p.text)
-        if s in p.text.lower():
+        p = p.text
+        #~ print("DBG: paragraph: " + p)
+        if s in removeAccent(p.lower()):
             if bFirstTime:
                 bFirstTime = 0
                 print("***** %s:" % filename)
-            print("paragraph %4d: %s" % ((nNumPara+1),p.text))
+            print("  paragraph %4d: %s" % ((nNumPara+1),p))
+            if len(p)>120:
+                print("") # add an extra line after big blocks
             cpt += 1
     return len(doc.paragraphs),cpt
     
@@ -38,8 +49,8 @@ def searchInOdt(filename, s):
     from odf import text, teletype
     if ".odt" not in filename:
         return 0,0
-    s = s.lower()
-    #~ print("odt!!!")
+    s = removeAccent(s.lower())
+
     doc = odf.opendocument.load(filename)
     #~ print(dir(doc))
     allparas = doc.getElementsByType(text.P)
@@ -49,11 +60,60 @@ def searchInOdt(filename, s):
     for nNumPara,p in enumerate(allparas):
         p = str(p)
         #~ print("DBG: paragraph: " + p)
-        if s in p.lower():
+        if s in removeAccent(p.lower()):
             if bFirstTime:
                 bFirstTime = 0
                 print("***** %s:" % filename)
-            print("paragraph %4d: %s" % ((nNumPara+1),p))
+            print("  paragraph %4d: %s" % ((nNumPara+1),p))
+            if len(p)>120:
+                print("") # add an extra line after big blocks
+            cpt += 1
+    return len(allparas),cpt
+    
+def extractParaFromPdf(doc):
+    """
+    cut text in doc in paragraph and return them
+    """
+    if 0:
+        # text per page:
+        for numpage in range(doc.pageCount):
+            page = doc.load_page(numpage) #put here the page number
+            page_to_text = page.get_text("text")
+            print("page: %s" % page_to_text )
+    
+    # text per block (closer to paragraph, titles are also paragraph)
+    blocks = []
+    for numpage in range(doc.pageCount):
+        bs = [x[4] for x in doc[numpage].get_text("blocks")]
+        blocks.extend(bs)
+    #~ for b in blocks:
+        #~ print("block: %s" % b )
+    return blocks
+    
+def searchInPdf(filename, s):
+    """
+    search s in filename.
+    return nbr paragraph, nbr match
+    """
+    if ".pdf" not in filename:
+        return 0,0
+        
+    import fitz
+
+    s = removeAccent(s.lower())
+    
+    doc = fitz.open(filename)
+    allparas = extractParaFromPdf(doc)
+    cpt = 0
+    bFirstTime = 1
+    for nNumPara,p in enumerate(allparas):
+        p = str(p)
+        #~ print("DBG: paragraph: " + p)
+        if s in removeAccent(p.lower()):
+            if bFirstTime:
+                bFirstTime = 0
+                print("***** %s:" % filename)
+            print("  paragraph %4d: %s" % ((nNumPara+1),p))
             cpt += 1
     return len(allparas),cpt
     
@@ -70,6 +130,8 @@ def searchInDocs(path,s,bVerbose=0):
             nbrpara,match = searchInDocx( path+f,s)
         elif ".odt" in f:
             nbrpara,match = searchInOdt( path+f,s)
+        elif ".pdf" in f:
+            nbrpara,match = searchInPdf( path+f,s)
         else:
             continue
         cptfilestot += 1
@@ -94,7 +156,7 @@ if __name__ == "__main__":
     if len(sys.argv)>2 and sys.argv[2]=='1':
         bVerbose = 1
     strToMatch = sys.argv[1]
-    print("INF: bVerbose: %s" % bVerbose ) 
+    if bVerbose: print("INF: bVerbose: %s" % bVerbose ) 
     na,nf,nla,nlm = searchInDocs(".",strToMatch,bVerbose=bVerbose)
     print("\nNbr Analysed Files: %d\nNbr Matching Files: %d\nNbr Total Paragraph Analysed: %d\nNbr Total Paragraph With Match: %d" % (na,nf,nla,nlm) )
       

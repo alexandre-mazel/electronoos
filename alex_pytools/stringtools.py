@@ -484,7 +484,7 @@ def removeAccentString( s ):
     for c in s:
         if ord(c)>127:
             c = removeAccent(c) # WARNING: in python2.7 this method will cut extra char in two char, and so they won't be detected correctly
-            print("DBG: removeAccentString: received '%s'" % c )
+            #~ print("DBG: removeAccentString: received '%s'" % c )
         out += c
     return out
     

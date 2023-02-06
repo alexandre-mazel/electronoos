@@ -4,6 +4,10 @@ import sys
 import serial # pip install pyserial
 
 def listPorts():
+    """
+    list all open ports and print information on them.
+    Return the first found
+    """
     bVerbose = 1
     # chose an implementation, depending on os
     #~ if sys.platform == 'cli':
@@ -16,14 +20,18 @@ def listPorts():
     else:
         raise ImportError("Sorry: no implementation for your platform ('{}') available".format(os.name))
 
+    strFirstOpenPort = ""
 
     iterator = sorted(comports())
     # list them
     for n, (port, desc, hwid) in enumerate(iterator, 1):
-        sys.stdout.write("{:20}\n".format(port))
+        if strFirstOpenPort == "": strFirstOpenPort = port
+        sys.stdout.write("listPorts: open port: {:20}\n".format(port))
         if bVerbose:
             sys.stdout.write("    desc: {}\n".format(desc))
             sys.stdout.write("    hwid: {}\n".format(hwid))
+            
+    return strFirstOpenPort
         
         
 def monitorPort(strPortName):
@@ -39,7 +47,8 @@ def monitorPort(strPortName):
         print("%s"%buf)
     ser.close()
 
-listPorts()
+#~ listPorts()
 strPortName = '/dev/ttyUSB0'
 strPortName = 'COM7'
+strPortName = listPorts()
 monitorPort(strPortName)

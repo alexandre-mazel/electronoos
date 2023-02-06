@@ -35,7 +35,8 @@ int XP = 8, YP = A3, XM = A2, YM = 9;  // tft2 config 0X9487
 
 //const int XP=8,XM=A2,YP=A3,YM=9; 
 //320x480 ID=0x9487 const int TS_LEFT=193,TS_RT=920,TS_TOP=962,TS_BOT=198;
-//PORTRAIT CALIBRATION 320 x 480x = map(p.x, LEFT=193, RT=920, 0, 320)y = map(p.y, TOP=962, BOT=198, 0, 480)LANDSCAPE CALIBRATION 480 x 320x = map(p.y, LEFT=962, RT=198, 0, 480)y = map(p.x, TOP=920, BOT=193, 0, 320)
+//PORTRAIT CALIBRATION 320 x 480x = map(p.x, LEFT=193, RT=920, 0, 320)y = map(p.y, TOP=962, BOT=198, 0, 480)
+//LANDSCAPE CALIBRATION 480 x 320 x = map(p.y, LEFT=962, RT=198, 0, 480)y = map(p.x, TOP=920, BOT=193, 0, 320)
 
 #endif
 #if USE_LOCAL_KBV
@@ -195,66 +196,79 @@ int std_getPressed(int * px, int * py, int * pz, bool bDebug )
     // xraw: min en bas, max en haut
     // yraw: min a gauche, max a droite
 
-    int xmin = 195; // 292; // 121
-    int xmax = 898; // 965; // 559
-    int ymin = 184; // 136; // 460
-    int ymax = 941; // 968; // 975
-    int w = 400;
-    int h = 240;
-    int invert_x=0;
+    int xmin = 187;
+    int xmax = 885;
+    int ymin = 172;
+    int ymax = 935;
+    int w = 480;
+    int h = 320;
+    int invert_x=1;
+    int invert_y=1;
 
     int x = xraw;
     int y = yraw;
 
-    if( pressed )
+    if( 0 )
     {
-      if( x > xmax_calib) xmax_calib = x;
-      if( x < xmin_calib) xmin_calib = x; 
-      if( y > ymax_calib) ymax_calib = y;
-      if( y < ymin_calib) ymin_calib = y; 
-    }
-    const int bUseCalibOnTheFly = 0;
-    if(TOUCH_ORIENTATION==PORTRAIT)
-    {
-      if( !bUseCalibOnTheFly )
-      {
-        x = (long)((x-xmin))*h/(xmax-xmin);
-        y = (long)((y-ymin))*w/(ymax-ymin);
-      }
-      else
-      {
-        // use calib on the fly
-        x = (long)((x-xmin_calib))*h/(xmax_calib-xmin_calib);
-        y = (long)((y-ymin_calib))*w/(ymax_calib-ymin_calib);
-      }
+        // use info from mcu_touchscreen_calib
+        x = map(y, 962, 198, 0, 480);
+        y = map(x, 920, 193, 0, 320);
     }
     else
     {
-      // swap x <==> y
-      int a = x;
-      x = y;
-      y = a;
-      if( !bUseCalibOnTheFly )
+      // auto calibration on the fly system
+
+      if( pressed )
       {
-        x = (long)((x-xmin))*w/(xmax-xmin);
-        y = (long)((y-ymin))*h/(ymax-ymin);
+        if( x > xmax_calib) xmax_calib = x;
+        if( x < xmin_calib) xmin_calib = x; 
+        if( y > ymax_calib) ymax_calib = y;
+        if( y < ymin_calib) ymin_calib = y; 
+      }
+      const int bUseCalibOnTheFly = 0;
+      if(TOUCH_ORIENTATION==PORTRAIT)
+      {
+        if( !bUseCalibOnTheFly )
+        {
+          x = (long)((x-xmin))*h/(xmax-xmin);
+          y = (long)((y-ymin))*w/(ymax-ymin);
+        }
+        else
+        {
+          // use calib on the fly
+          x = (long)((x-xmin_calib))*h/(xmax_calib-xmin_calib);
+          y = (long)((y-ymin_calib))*w/(ymax_calib-ymin_calib);
+        }
       }
       else
       {
-        // use calib on the fly
-        x = (long)((x-xmin_calib))*w/(xmax_calib-xmin_calib);
-        y = (long)((y-ymin_calib))*h/(ymax_calib-ymin_calib);
+        // swap x <==> y
+        int a = x;
+        x = y;
+        y = a;
+        if( !bUseCalibOnTheFly )
+        {
+          x = (long)((x-xmin))*w/(xmax-xmin);
+          y = (long)((y-ymin))*h/(ymax-ymin);
+        }
+        else
+        {
+          // use calib on the fly
+          x = (long)((x-xmin_calib))*w/(xmax_calib-xmin_calib);
+          y = (long)((y-ymin_calib))*h/(ymax_calib-ymin_calib);
+        }
+        if(invert_y) y = h-1-y;
       }
-      y = h-1-y;
-    }
 
-    if( invert_x ) x = w-1-x;
+      if( invert_x ) x = w-1-x;
+
+    } // my own calibration
 
     *px = x;
     *py = y;
     *pz = tp.z;
 
-    if( bDebug && 0)
+    if( bDebug && pressed)
     {
       Serial.print("touch, x: ");
       Serial.print(x);
@@ -283,6 +297,7 @@ int std_getPressed(int * px, int * py, int * pz, bool bDebug )
     }
     if( 1 )
     {
+      // draw a pixel on mouse click
       static int prevx = 0;
       static int prevy = 0;
       static int prevcolor = 0;

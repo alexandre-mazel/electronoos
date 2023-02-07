@@ -832,6 +832,14 @@ def ringTheBell( nTimes ):
     for i in range( nTimes ):
         deepbell()
         time.sleep(2.) # was 1.3
+        
+def microWave():
+    # it's not exactly as alarm_microwave.wav (added saturation)
+    for i in range(4):
+        beep(2000, 500)
+        time.sleep(0.5)
+
+    
     
 def viewSmoothstep():
     # demo de subplot:

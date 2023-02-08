@@ -159,22 +159,29 @@ def loadLocalEnv(strLocalFileName = ".env"):
     return dictNewEnv
         
 
-def getEnv(strName, strDefault = None ):
+def getEnv(strName, strDefault = None, bVerbose = 0 ):
     """
     get a value from local env, then from environnement
     """
-    dLocal = loadLocalEnv() # from current dir
+    dLocal0 = loadLocalEnv("./.env") # from current dir
     try:
-        return dLocal[strName]
-    except:
+        return dLocal0[strName]
+    except KeyError as err:
         pass
-    dLocal = loadLocalEnv(os.environ['USERPROFILE']+os.sep+".env") # from user dir
+        
+    dLocal1 = loadLocalEnv() # from alextools dir
     try:
-        return dLocal[strName]
-    except:
+        return dLocal1[strName]
+    except KeyError as err:
+        pass
+    dLocal2 = loadLocalEnv(os.environ['USERPROFILE']+os.sep+".env") # from user dir
+    try:
+        return dLocal2[strName]
+    except KeyError as err:
         pass
     retVal = os.getenv(strName)
     if retVal == None:
+        if bVerbose: print("WRN: getEnv: key not found, dict0:\n%s\ndict1:\n%s\ndict2:\n%s" % (dLocal0,dLocal1,dLocal2) )
         retVal = strDefault
     return retVal
     

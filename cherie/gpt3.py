@@ -50,6 +50,10 @@ def interact(q):
     chat_log = append_interaction_to_chat_log(q ,answ, chat_log)
     print("answ: %s" % answ)
     return answ
+    
+while 1:
+    s = input("?")
+    interact(s)
 
 interact("hello !")
 interact("how are you?")

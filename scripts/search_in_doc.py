@@ -117,7 +117,7 @@ def searchInPdf(filename, s):
             cpt += 1
     return len(allparas),cpt
     
-def searchInDocs(path,s,bVerbose=0):
+def searchInDocs(path,s,bRecurse=1,bVerbose=0):
     if path[-1] not in "/\\": path += os.sep
     listFiles = os.listdir(path)
     listFiles = sorted(listFiles)
@@ -126,19 +126,34 @@ def searchInDocs(path,s,bVerbose=0):
     cptmatchfiles = 0
     cptmatchlines = 0
     for f in listFiles:
-        if ".docx" in f:
-            nbrpara,match = searchInDocx( path+f,s)
-        elif ".odt" in f:
-            nbrpara,match = searchInOdt( path+f,s)
-        elif ".pdf" in f:
-            nbrpara,match = searchInPdf( path+f,s)
+        cfn = path + f
+        if os.path.isfile(cfn) and f[0] != '~': # ~: lock file
+            name,ext = os.path.splitext(f)
+            ext = ext.lower()
+            if ext in [".docx",".doc"]:
+                nbrpara,match = searchInDocx( cfn,s)
+            elif ext == ".odt":
+                nbrpara,match = searchInOdt( cfn,s)
+            elif ext == ".pdf":
+                nbrpara,match = searchInPdf( cfn,s)
+            else:
+                continue
         else:
+            if bRecurse: 
+                if os.path.isdir(cfn):
+                    nfa,npa,nfm,npm = searchInDocs(cfn,s,bRecurse=bRecurse,bVerbose=bVerbose)
+                    cptfilestot += nfa
+                    cptparatot += npa
+                    cptmatchfiles += nfm
+                    cptmatchlines += npm
             continue
         cptfilestot += 1
         cptparatot += nbrpara
         if match > 0:
             cptmatchfiles += 1
             cptmatchlines += match
+            if match > 5:
+                print("----- %s - end" % cfn)
 
     return cptfilestot, cptparatot,cptmatchfiles,cptmatchlines
     
@@ -147,8 +162,9 @@ def searchInDocs(path,s,bVerbose=0):
 #~ searchInDocs("test", "autoroute")
 
 if __name__ == "__main__":
+    print( "\n  Search in docx/odt v1.01 by Alma\n  Searching into .pdf, doc, docx and odt")
     if len(sys.argv) < 2:
-        print( "\n  Search in docx/odt v1.0\n\n  syntax: %s <string_to_match> [1]\n\n  eg: %s autoroute \n" % ((sys.argv[0],)*2))
+        print( "  syntax: %s <string_to_match> [1 (for verbose NDEV)]\n\n  eg: %s autoroute \n" % ((sys.argv[0],)*2))
         exit(-1)
     print("\n")
     
@@ -157,6 +173,6 @@ if __name__ == "__main__":
         bVerbose = 1
     strToMatch = sys.argv[1]
     if bVerbose: print("INF: bVerbose: %s" % bVerbose ) 
-    na,nf,nla,nlm = searchInDocs(".",strToMatch,bVerbose=bVerbose)
-    print("\nNbr Analysed Files: %d\nNbr Matching Files: %d\nNbr Total Paragraph Analysed: %d\nNbr Total Paragraph With Match: %d" % (na,nf,nla,nlm) )
+    nfa,npa,nfm,npm = searchInDocs(".",strToMatch,bVerbose=bVerbose)
+    print("\nNbr Analysed Files: %d\nNbr Matching Files: %d\nNbr Total Paragraph Analysed  : %d\nNbr Total Paragraph With Match: %d" % (nfa,nfm,npa,npm) )
       

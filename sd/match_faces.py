@@ -31,7 +31,7 @@ def learnAllImages(path):
         listFiles = os.listdir(path)
         listFiles = sorted(listFiles)
         for numfile, f in enumerate(listFiles):
-            print("INF: learnAllImages: %d/%d" % (numfile/len(listFiles) ))
+            print("INF: learnAllImages: %d/%d" % (numfile,len(listFiles) ))
             fn = path+f
             if not os.path.isfile(fn):
                 continue
@@ -61,6 +61,7 @@ cacheImages = dict() # filename => img
 def findmatch(path,im):
     fr = loadReco(path)
     ret = fr.recognise(im,bSpeedUp=False)
+    import facerecognition_dlib
     facerecognition_dlib.User.rDistThreshold = 10 # choppe tout le monde !
     #ret: with ids: [id, "firstname", dist, confidence, confidence_corrected
     print("ret:%s" % ret)
@@ -72,14 +73,31 @@ def findmatch(path,im):
                 
         if reco[0] != -1:
             filename_looksalike = r[6]
+            dist = r[2]
+            conf = r[4]
+            
+            filename_looksalike = filename_looksalike.replace("/lki/", "/lki0/")
             if filename_looksalike in cacheImages:
-                imlooksalike = cacheImages[filename_looksalike]
+                imlooksalike = cacheImages[filename_looksalike].copy()
             else:
-                print("loading file...")
+                print("INF: loading file %s" % filename_looksalike)
                 imlooksalike = cv2.imread(filename_looksalike)
                 cacheImages[filename_looksalike] = imlooksalike
-            win_name = "recognised"
-            cv2.imshow(win_name,imlooksalike)
+            
+            if 1:
+                h,w = imlooksalike.shape[:2]
+                txt = "dist: %3.1f, conf: %3.1f" % (dist,conf)
+                fontFace = 0
+                fontScale = 0.4
+                thickness = 1
+                x = int(h/2)
+                x = 10
+                cv2.putText( imlooksalike, txt, (x, h-10 ), fontFace, fontScale, (255,255,255), thickness )
+            try:
+                win_name = "recognised"
+                cv2.imshow(win_name,imlooksalike)
+            except BaseException as err:
+                print("ERR: in imshow: err: %s" % err )
             cv2.moveWindow(win_name, 640, 0)
 
             #~ cv2.waitKey(10)        
@@ -123,6 +141,7 @@ def loopwebcam(pathlearned):
     
 if __name__ == "__main__":
     path = "d:/generated_portraits/"
-    learnAllImages(path)
+    #~ path = "C:/Users/alexa/Downloads/lki0/"
+    #~ learnAllImages(path)
     loopwebcam(path)
     

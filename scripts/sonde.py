@@ -1,3 +1,6 @@
+import os
+import sys
+
 strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
 if strLocalPath == "": strLocalPath = './'
 sys.path.append(strLocalPath+"/../alex_pytools/")

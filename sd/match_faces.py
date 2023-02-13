@@ -78,18 +78,19 @@ def findmatch(path,im):
             
             filename_looksalike = filename_looksalike.replace("/lki/", "/lki0/")
             if filename_looksalike in cacheImages:
-                imlooksalike = cacheImages[filename_looksalike].copy()
+                imlooksalike = cacheImages[filename_looksalike]
             else:
                 print("INF: loading file %s" % filename_looksalike)
                 imlooksalike = cv2.imread(filename_looksalike)
                 cacheImages[filename_looksalike] = imlooksalike
             
             if 1:
+                imlooksalike = imlooksalike.copy()
                 h,w = imlooksalike.shape[:2]
-                txt = "dist: %3.1f, conf: %3.1f" % (dist,conf)
+                txt = "dst: %4.2f, conf: %4.2f" % (dist,conf)
                 fontFace = 0
-                fontScale = 0.4
-                thickness = 1
+                fontScale = 0.8
+                thickness = 2
                 x = int(h/2)
                 x = 10
                 cv2.putText( imlooksalike, txt, (x, h-10 ), fontFace, fontScale, (255,255,255), thickness )

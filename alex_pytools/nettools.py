@@ -9,7 +9,7 @@ def getHostName():
         hostname = os.environ['COMPUTERNAME']
     else:
         unames = os.uname()
-        print("unames: %s" % str(unames))
+        #~ print("unames: %s" % str(unames))
         hostname = unames[1]
         print(hostname)
     return hostname.replace(" ", "_")

@@ -1,6 +1,10 @@
 import os
-import urllib.request
-import http.client
+try:
+    import urllib.request # pip install requests # pas sur, pb sur python2 rpi
+except BaseException as err: print("WRN: urllib.request load error. err: %s" % err)
+try:
+    import http.client
+except BaseException as err: print("WRN: urllib.client load error. err: %s" % err)
 
 import misctools
 

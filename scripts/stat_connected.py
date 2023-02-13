@@ -19,6 +19,7 @@ logDebug("strLocalPath: " + strLocalPath)
 if strLocalPath == "": strLocalPath = './'
 sys.path.append(strLocalPath+"/../alex_pytools/")
 import misctools
+import nettools
 
 
 def runCommandGetResults( strCommand ):
@@ -199,6 +200,7 @@ class Stater:
             "20:C1:9B:F3:F2:0A": "Kakashi",
             
             "84:CF:BF:95:4A:88": "FairCorto",
+            "74:DA:38:F6:D8:DB": "Edimax_meteo",
             
             
             
@@ -311,13 +313,18 @@ def getTemperatureFrom1wire(strDeviceID):
 
     """
     f = open("/sys/bus/w1/devices/%s/w1_slave" % strDeviceID,"rt")
-    lines = f.readlines(2)
-    t = lines[-1].split("t=")[-1]
-    t = int(t)/1000.
+    lines = f.readlines()
+    if len(lines)>0:
+        t = lines[-1].split("t=")[-1]
+        t = int(t)/1000.
+    else:
+        t = -127
     return t
     
 def updateTemperature():
     t = getTemperatureFrom1wire( "28-3cb1f649c835")
+    if t <= -127:
+        return
     
     #~ print("INF: updateTemperature: %.1f" % t )
     
@@ -329,8 +336,10 @@ def updateTemperature():
         dest = "/home/pi/save/office_temperature.txt" # here we want to save there, even if running as root
     
     f = open(dest,"a+")
-    f.write("%s: %s: %s\n" % (timestamp,"armoire",t) )
+    f.write("%s: %s: %.1f\n" % (timestamp,"armoire",t) )
     f.close()
+    
+    nettools. sendDataToEngServer("temp", t)
     
 #~ updateTemperature()
 #~ exit(1)

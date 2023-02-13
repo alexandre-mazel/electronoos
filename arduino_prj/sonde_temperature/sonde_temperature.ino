@@ -3,7 +3,7 @@
 #include "DallasTemperature.h"
  
  /* Broche du bus 1-Wire */
-const byte BROCHE_ONEWIRE = 10;
+const byte BROCHE_ONEWIRE = 2;
 
 /* Code de retour de la fonction getTemperature() */
 enum DS18B20_RCODES {
@@ -17,7 +17,7 @@ enum DS18B20_RCODES {
 //OneWire oneWire(10);
 OneWire ds(BROCHE_ONEWIRE);
 
-//#define USE_DALLAS 1
+#define USE_DALLAS 1
 
 #ifdef USE_DALLAS
 DallasTemperature sensors(&ds);
@@ -103,7 +103,7 @@ void lookUpSensors(){
 
 void setup() {
   Serial.begin(9600);  // definition de l'ouverture du port serie
-  //pinMode(BROCHE_ONEWIRE,INPUT);
+  pinMode(BROCHE_ONEWIRE,INPUT);
 
 #ifdef USE_DALLAS
   Serial.println("using Dallas");
@@ -125,7 +125,7 @@ byte getTemperature(float *temperature, byte reset_search) {
   
   /* Reset le bus 1-Wire si nécessaire (requis pour la lecture du premier capteur) */
   if (reset_search) {
-    Serial.println("INF: getTemperature: resetting..." );
+    //Serial.println("INF: getTemperature: resetting..." );
     ds.reset_search();
   }
  
@@ -136,11 +136,13 @@ byte getTemperature(float *temperature, byte reset_search) {
     return NO_SENSOR_FOUND;
   }
 
-  Serial.print("addr: ");
+#if 0
+  Serial.print("DBG: addr: ");
 
   for(int i = 0; i < 9; i++)
     Serial.print(addr[i]);
   Serial.println("");
+#endif
 
   /* Vérifie que l'adresse a été correctement reçue */
   if (OneWire::crc8(addr, 7) != addr[7]) {
@@ -185,9 +187,15 @@ void loop() {
 #if USE_DALLAS
 
   sensors.requestTemperatures();
-  int t = sensors.getTempCByIndex(0);
-  Serial.print(t);
-  Serial.println( "C" );
+  for( int i = 0; i < 5; ++i)
+  {
+    float t = sensors.getTempCByIndex(i);
+    if( t <= -40 ) break;
+    Serial.print(i);
+    Serial.print(": ");
+    Serial.print(t,1);
+    Serial.println( "C" );
+  }
   delay(1000);
 
 #else
@@ -204,9 +212,10 @@ void loop() {
 
     /* Affiche la température */
     Serial.print(F("Temperature : "));
-    Serial.print(temperature, 2);
-    Serial.write(176); // Caractère degré
-    Serial.write('C');
+    Serial.print(temperature, 1);
+    //Serial.write(176); // Caractère degré
+    //Serial.write('C');
+    Serial.write('deg');
     Serial.println();
   }
   else

@@ -17,7 +17,7 @@ enum DS18B20_RCODES {
 //OneWire oneWire(10);
 OneWire ds(BROCHE_ONEWIRE);
 
-#define USE_DALLAS 1
+#define USE_DALLAS 1 // avec et sans ca fonctionne, mais avec je peux gerer plusieurs capteurs sur une meme entrée.
 
 #ifdef USE_DALLAS
 DallasTemperature sensors(&ds);

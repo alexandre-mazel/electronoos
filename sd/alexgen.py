@@ -7,22 +7,23 @@ import cv2
 import sys
 import time
 
-def save_and_show_pil_image( image, prompt = "none", nNumImage=0):
+def save_and_show_pil_image( image, prompt = "none", nNumImage=0, bShow = True):
     fn = prompt.replace(" ", "_")[:80] + '__' + str(time.time()) + ".png"
     fn = os.path.expanduser("~/generated/" + fn)
     image.save(fn)
 
-    print("INF: showing '%s'" % fn)
-    im = cv2.imread(fn)
-    nNumWindow = nNumImage % 8
-    win_name = "generated_%d" % (nNumWindow)
-    cv2.imshow(win_name,im)
-    cv2.moveWindow(win_name, (nNumWindow%4)*(256+24), (nNumWindow//4)*(256+64) )
-    cv2.setWindowProperty(win_name, cv2.WND_PROP_TOPMOST, 1)
-    cv2.setWindowProperty(win_name,cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
-    cv2.setWindowProperty(win_name,cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_NORMAL)
+    if bShow:
+        print("INF: showing '%s'" % fn)
+        im = cv2.imread(fn)
+        nNumWindow = nNumImage % 8
+        win_name = "generated_%d" % (nNumWindow)
+        cv2.imshow(win_name,im)
+        cv2.moveWindow(win_name, (nNumWindow%4)*(256+24), (nNumWindow//4)*(256+64) )
+        cv2.setWindowProperty(win_name, cv2.WND_PROP_TOPMOST, 1)
+        cv2.setWindowProperty(win_name,cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
+        cv2.setWindowProperty(win_name,cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_NORMAL)
 
-    cv2.waitKey(100)
+        cv2.waitKey(100)
 
 # faire une fois:
 # import huggingface_hub
@@ -254,7 +255,7 @@ def generateFaces():
                 #~ print("image: " + str(image))
             #~ image.show()
             
-            save_and_show_pil_image(image,prompt,nCptGen)
+            save_and_show_pil_image(image,prompt,nCptGen, bShow=0)
             nCptGen += 1
             if (nCptGen % 10) == 0:
                 duration = time.time()-timeBegin

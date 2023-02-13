@@ -14,10 +14,15 @@ def save_and_show_pil_image( image, prompt = "none", nNumImage=0):
 
     print("INF: showing '%s'" % fn)
     im = cv2.imread(fn)
-    win_name = "generated_%d" % nNumImage
+    nNumWindow = nNumImage % 8
+    win_name = "generated_%d" % (nNumWindow)
     cv2.imshow(win_name,im)
-    cv2.moveWindow(win_name, (nNumImage%4)*256, (nNumImage//4)*256 )
-    cv2.waitKey(1000)
+    cv2.moveWindow(win_name, (nNumWindow%4)*(256+24), (nNumWindow//4)*(256+64) )
+    cv2.setWindowProperty(win_name, cv2.WND_PROP_TOPMOST, 1)
+    cv2.setWindowProperty(win_name,cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
+    cv2.setWindowProperty(win_name,cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_NORMAL)
+
+    cv2.waitKey(100)
 
 # faire une fois:
 # import huggingface_hub
@@ -36,7 +41,7 @@ bLarge = 1
 bLarge = 0
 
 bCensored = 1
-#~ bCensored = 0
+bCensored = 0
 
 def generateWithSeed(prompt, seed = 123):
     pipe = StableDiffusionPipeline.from_pretrained(
@@ -154,7 +159,7 @@ def generateImg(prompt = ""):
         #~ prompt = "a realistic elven forest (moss)-2" # remove moss (not working) => use negative_prompt
         #~ prompt = "a realistic elven forest"
 
-        prompt = "industrial age, (pocket watch), 35mm, sharp, high gloss, brass, gears wallpaper, cinematic atmosphere, panoramic"
+        #~ prompt = "industrial age, (pocket watch), 35mm, sharp, high gloss, brass, gears wallpaper, cinematic atmosphere, panoramic"
         #~ prompt = "picture of dimly lit living room, minimalist furniture, vaulted ceiling, huge room, floor to ceiling window with an ocean view, nighttime"
         #~ prompt = "picture of a naked girl in a dimly lit living room, minimalist furniture, vaulted ceiling, huge room, floor to ceiling window with an ocean view, nighttime"
 
@@ -165,14 +170,26 @@ def generateImg(prompt = ""):
 
         #~ prompt = "zeus, diffuse lighting, mythology, intricate elegant highly detailed lifelike photorealistic realistic painting, long shot, studio lighting, by artgerm"
         
-        prompt = "house with flowers unicorns and rainbows, photorealistic vintage, art by ,  van gogh, in the style of ,  Lovecraft,  natural lighting candlelight,  4k trending on artstation very detailed intricate scenery post-processing fine details reflections ultra realistic"
+        #~ prompt = "house with flowers unicorns and rainbows, photorealistic vintage, art by ,  van gogh, in the style of ,  Lovecraft,  natural lighting candlelight,  4k trending on artstation very detailed intricate scenery post-processing fine details reflections ultra realistic"
+        
+        prompt += "a woman and a horse"
+        
+        #~ prompt += " gorgeous valkyrie| (detailed face with war paint)| ((black eyeliner))| dark background| hyperrealistic| highly detailed| intricate| cinematic lighting| greyscale| Midjourney style"
+
+        #~ prompt += " Pixar style 4k, unreal engine, octane render photorealistic by cosmicwonder, hdr, photography by cosmicwonder, high definition, symmetrical face, volumetric lighting, dusty haze, photo, 24mm, DSLR, high quality, ultra realistic, kids park "
+        #~ prompt += " in a cloudy red abstract background , a detailed painting by Eden Seifu, trending on artstation"
+        #~ prompt += " with a pixel face, buttons, joysticks, arms and legs. trending on artstation, highly detailed digital art "
+        prompt += " a wholesome animation key shot of kids eating popcorn at a tropical beach, medium shot, waist up, studio Ghibli, Pixar and Disney animation, sharp, very detailed, high resolution, Rendered in Unreal Engine 5, anime key art by Greg Rutkowski, Bloom, dramatic lighting"
+
 
     neg = ""
 
-    neg = "disfigured, bad anatomy, extra legs, extra arms, extra fingers, poorly drawn hands, poorly drawn feet, disfigured, tiling, bad art, deformed, mutated"
-    #~ neg += "out of frame, "
+    neg += " disfigured, bad anatomy, extra legs, extra arms, extra fingers, poorly drawn hands, poorly drawn feet, disfigured, tiling, bad art, deformed, mutated"
+    #~ neg += ", out of frame"
     
-    #~ neg += "photorealistic, "
+    #~ neg += ", photorealistic"
+    
+    neg += " bad anatomy| extra legs| extra arms| extra fingers| poorly drawn hands| poorly drawn feet| disfigured| out of frame| tiling| bad art| deformed| mutated| blurry| fuzzy| misshaped| mutant| gross| disgusting| ugly| fat| watermark| watermarks "
 
     #~ pipe.seed = 2229135949491605 # not working need to generate latents ourselves
     
@@ -194,13 +211,66 @@ def generateImg(prompt = ""):
             
     cv2.waitKey(0)
     
+# generateImg - end
+    
+def generateFaces():
+    if bLarge:
+        pipe = StableDiffusionPipeline.from_pretrained(model_id)
+    else:
+        pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16)
+        
+    pipe = pipe.to(device)
+    if not bCensored: pipe.safety_checker = lambda images, clip_input: (images, False)
+    
+    neg = ""
+
+    neg += " disfigured, bad anatomy, extra legs, extra arms, extra fingers, poorly drawn hands, poorly drawn feet, disfigured, tiling, bad art, deformed, mutated"
+    #~ neg += ", out of frame"
+    
+    #~ neg += ", photorealistic"
+    
+    neg += " bad anatomy| extra legs| extra arms| extra fingers| poorly drawn hands| poorly drawn feet| disfigured| out of frame| tiling| bad art| deformed| mutated| blurry| fuzzy| misshaped| mutant| gross| disgusting| ugly| fat| watermark| watermarks "
+
+    prompt = ""
+    prompt += "portrait of a man,"
+    prompt += " realistic,"
+    prompt += " sharp, very detailed, high resolution, dramatic lighting"
+    
+    #~ prompt += " a wholesome animation key shot, medium shot, waist up, studio Ghibli, Pixar and Disney animation, sharp, very detailed, high resolution, Rendered in Unreal Engine 5, anime key art by Greg Rutkowski, Bloom, dramatic lighting"
+
+    print("Generating with prompt:\n'%s'" % prompt)
+
+    nCptGen = 0
+    timeBegin = time.time()
+    with autocast("cuda"):
+        while 1:
+            print("INF: generateFaces: Generating image %d" % nCptGen )
+            if bLarge:
+                image = pipe(prompt)["sample"][0]  
+            else:
+                ret = pipe(prompt, negative_prompt=neg, guidance_scale=7.5) # champion1: 9.9 it/s
+                #~ print("dir: " + str(dir(ret)))
+                image = ret["images"][0]  
+                #~ print("image: " + str(image))
+            #~ image.show()
+            
+            save_and_show_pil_image(image,prompt,nCptGen)
+            nCptGen += 1
+            if (nCptGen % 10) == 0:
+                duration = time.time()-timeBegin
+                fps = nCptGen / duration
+                print("INF: generateFaces: fps: %5.1f" % fps )
+            
+# generateFaces - end
+            
 
 
 if __name__ == "__main__":
     
     if 1:
         #~ generateImg()
-        generateWithSeed("Labrador in the style of Vermeer")
+        generateFaces()
+        #~ generateWithSeed("Labrador in the style of Vermeer")
         exit(1)
     
     prompt = " ".join(sys.argv[1:])

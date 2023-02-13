@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 
 strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
 if strLocalPath == "": strLocalPath = './'
@@ -13,17 +14,22 @@ def getTemperatureFrom1wire(strDeviceID):
 
     """
     f = open("/sys/bus/w1/devices/%s/w1_slave" % strDeviceID,"rt")
-    lines = f.readlines(2)
-    t = lines[-1].split("t=")[-1]
-    t = int(t)/1000.
+    lines = f.readlines()
+    print("lines: %s" % str(lines))
+    if len(lines)>0:
+        t = lines[-1].split("t=")[-1]
+        t = int(t)/1000.
+    else:
+        t = -127
     return t
     
     
 def run_loop_send(strDeviceID):
     while 1:
         t = getTemperatureFrom1wire(strDeviceID)
-        nettools. sendDataToEngServer("temp", t)
-        time.sleep(10*60)
+        if t > -127:
+            nettools. sendDataToEngServer("temp", t)
+        time.sleep(5*60)
         
 if __name__ == "__main__":
     run_loop_send("28-3c09f64897a2")

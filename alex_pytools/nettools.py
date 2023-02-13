@@ -4,6 +4,17 @@ import http.client
 
 import misctools
 
+def getHostName():
+    if os.name == "nt":
+        hostname = os.environ['COMPUTERNAME']
+    else:
+        unames = os.uname()
+        print("unames: %s" % str(unames))
+        hostname = unames[1]
+        print(hostname)
+    return hostname.replace(" ", "_")
+
+
 def download(remote,dst, bForceDownload=False, bInternalCalledForRetry = False):
     """
     Return a 1 if downloaded, 2 if already existing, 
@@ -46,4 +57,30 @@ def download(remote,dst, bForceDownload=False, bInternalCalledForRetry = False):
     print("%s: INF: => %s" % (timestamp,dst))
     print("%s: INF: [OK]" % timestamp)
     return 1
+# download - end
+
+def sendDataToEngServer( dataname, value, timestamp = None ):
+    """
+    - timestamp: if the data is from another time, you can specify it, else it will be server time
+    """
+    print("INF: sendDataToEngServer: data: %s, value: %s" % (dataname,value) )
+    import requests
+    hostname = getHostName()
+    req = "?h=%s&dn=%s&dv=%s" % (hostname,dataname,value)
+    if timestamp != None:
+        req += "&t=%s" % timestamp
+    fullreq = "http://engrenage.studio/index.py" + req
+    print("DBG: sendDataToEngServer: req: " + str(req) )
+    requests.get(fullreq)
+    print("INF: sendDataToEngServer: done")
+
+    
+def autoTest():
+    sendDataToEngServer("dummy", 1.23)
+
+
+if __name__ == "__main__":
+        autoTest()
+    
+    
     

@@ -26,5 +26,5 @@ def run_loop_send(strDeviceID):
         time.sleep(10*60)
         
 if __name__ == "__main__":
-    run_loop_send()
+    run_loop_send("28-3c09f64897a2")
     

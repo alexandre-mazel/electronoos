@@ -196,6 +196,11 @@ class Stater:
             "A0:32:99:D1:52:CA": "LenovoYoga",
             "8A:E2:56:9A:7D:6A": "IphoneXAlex",
             "72:1C:0D:52:39:39": "A52_Alex",
+            "20:C1:9B:F3:F2:0A": "Kakashi",
+            
+            "84:CF:BF:95:4A:88": "FairCorto",
+            
+            
             
             
         }
@@ -298,6 +303,37 @@ def updateScrap():
     strPath = os.path.expanduser("~/")+"/records/"
     strPath = "/home/pi/records/"
     scrap.scrapAndSaveCryptoCurrency(strPath)
+    
+def getTemperatureFrom1wire(strDeviceID):
+    """
+    open w1 devices and extract temperature, return it in degree Celsius
+    find /sys/bus/w1/devices/ -name "28-*" -exec cat {}/w1_slave \; | grep "t=" | awk -F "t=" '{print $2/1000}'
+
+    """
+    f = open("/sys/bus/w1/devices/%s/w1_slave" % strDeviceID,"rt")
+    lines = f.readlines(2)
+    t = lines[-1].split("t=")[-1]
+    t = int(t)/1000.
+    return t
+    
+def updateTemperature():
+    t = getTemperatureFrom1wire( "28-3cb1f649c835")
+    
+    #~ print("INF: updateTemperature: %.1f" % t )
+    
+    timestamp = misctools.getTimeStamp()
+    if os.name == "nt":
+        dest = "c:/save/office_temperature.txt"
+    else:
+        #~ dest = os.path.expanduser("~/save/office_temperature.txt")
+        dest = "/home/pi/save/office_temperature.txt" # here we want to save there, even if running as root
+    
+    f = open(dest,"a+")
+    f.write("%s: %s: %s\n" % (timestamp,"armoire",t) )
+    f.close()
+    
+#~ updateTemperature()
+#~ exit(1)
 
 def loopUpdate():
     logDebug("loopUpdate: begin")
@@ -316,10 +352,19 @@ def loopUpdate():
                 if misctools.isEvery10min() or 0:
                     stats.save()
                 updateScrap()
+
             except BaseException as err:
                 strErr = "ERR: loopUpdate: err: %s" % str(err)
                 print(strErr)
                 logDebug(strErr)
+                
+            try:
+                updateTemperature()
+            except BaseException as err:
+                strErr = "ERR: loopUpdate2: err: %s" % str(err)
+                print(strErr)
+                logDebug(strErr)
+                
             nCnt += 1
             #~ if nCnt>3:
                 #~ break

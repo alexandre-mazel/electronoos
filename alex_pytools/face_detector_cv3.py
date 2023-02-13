@@ -122,7 +122,7 @@ class FaceDetector:
             cv2.putText(im,"%.2f"%confidence,(startX+2, startY-2),cv2.FONT_HERSHEY_SIMPLEX, 0.5, color=(255,255,255), thickness = 1 )
         return im
         
-    def detect( self, im, bRenderBox = True,confidence_threshold = 0.5 ):
+    def detect( self, im, bRenderBox = True,confidence_threshold = 0.5, bRenderAll = True ):
         """
         return a list of face: x_start, y_start, x_end, y_end
         """
@@ -151,7 +151,7 @@ class FaceDetector:
                 #~ print("DBG: box: %s" % str(box))
                 #~ print("DBG: x,y: %d,%d" % (startX, startY))
                 
-        if bRenderBox: self.render_res( im, res )
+        if bRenderBox: self.render_res( im, res, bRenderAll=bRenderAll )
         return res
 # class FaceDetector - end
 

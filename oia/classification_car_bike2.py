@@ -5,7 +5,7 @@ import numpy as np
 # poids/longueur/nbr_roues/moteur
 
 features = [
-                [14,1.8,2,0],
+                [14.,1.8,2.,0.],
                 [32,1.7,2,0],
                 
                 [800,3.4,4,1],

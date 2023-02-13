@@ -6,6 +6,8 @@ some classic handy classes
 import datetime
 try: import cv2 # made with cv 3.2.0-dev
 except: pass
+try: import numpy as np
+except: print("WRN: No numpy found!")
 import os
 import platform
 import random
@@ -103,6 +105,13 @@ def getPathTemp():
     return ret
     
 def getPathSave():
+    if os.name == "nt":
+        ret = "c:/save/"
+    else:
+        ret = os.path.expanduser("~/save/")
+    return ret
+    
+def getPathSave():
     """
     return a nice place to save file
     """
@@ -150,22 +159,29 @@ def loadLocalEnv(strLocalFileName = ".env"):
     return dictNewEnv
         
 
-def getEnv(strName, strDefault = None ):
+def getEnv(strName, strDefault = None, bVerbose = 0 ):
     """
     get a value from local env, then from environnement
     """
-    dLocal = loadLocalEnv() # from current dir
+    dLocal0 = loadLocalEnv("./.env") # from current dir
     try:
-        return dLocal[strName]
-    except:
+        return dLocal0[strName]
+    except KeyError as err:
         pass
-    dLocal = loadLocalEnv(os.environ['USERPROFILE']+os.sep+".env") # from user dir
+        
+    dLocal1 = loadLocalEnv() # from alextools dir
     try:
-        return dLocal[strName]
-    except:
+        return dLocal1[strName]
+    except KeyError as err:
+        pass
+    dLocal2 = loadLocalEnv(os.environ['USERPROFILE']+os.sep+".env") # from user dir
+    try:
+        return dLocal2[strName]
+    except KeyError as err:
         pass
     retVal = os.getenv(strName)
     if retVal == None:
+        if bVerbose: print("WRN: getEnv: key not found, dict0:\n%s\ndict1:\n%s\ndict2:\n%s" % (dLocal0,dLocal1,dLocal2) )
         retVal = strDefault
     return retVal
     
@@ -278,6 +294,39 @@ def getTimeStamp():
     strTimeStamp = datetimeObject.strftime( "%Y/%m/%d: %Hh%Mm%Ss" )
     return strTimeStamp
     
+def getWeekDay():
+    """
+    return the number 1..7 of the day in the week (beginning on monday)
+    """
+    return datetime.datetime.today().weekday() + 1
+"""
+matlab for a given date:
+day_name={'Sun','Mon','Tue','Wed','Thu','Fri','Sat'}
+month_offset=[0 3 3 6 1 4 6 2 5 0 3 5];  % common year
+
+% input date
+y1=2022
+m1=11
+d1=22
+
+% is y1 leap
+if mod(y1,4)==0 && mod(y1,100)==0 && mod(y1,400)==0
+    month_offset=[0 3 4 0 2 5 0 3 6 1 4 6];  % offset for leap year
+end
+
+% Gregorian calendar
+weekday_gregor=rem( d1+month_offset(m1) + 5*rem(y1-1,4) +  4*rem(y1-1,100) + 6*rem(y1-1,400),7)
+
+day_name{weekday_gregor+1}
+"""
+"""
+python for a given date:
+>>> import datetime
+>>> datetime.datetime.today()
+datetime.datetime(2012, 3, 23, 23, 24, 55, 173504)
+>>> datetime.datetime.today().weekday()
+"""
+    
 def getFilenameFromTime(timestamp=None):
   """
   get a string usable as a filename relative to the current datetime stamp.
@@ -312,7 +361,7 @@ def cleanText( txt, bEatAll = True):
             out += c
     return out
 
-def getSystemCallReturn( strCommand ):
+def getSystemCallReturnOld( strCommand ):
     # TODO: replace os.system by subprocess.call cf ping_multi
     f = getTempFilename()+".txt"
     #~ print("DBG: getSystemCallReturn: running '%s' into '%s'" % (strCommand,f) )
@@ -332,6 +381,24 @@ def getSystemCallReturn( strCommand ):
     #~ print("DBG: getSystemCallReturn: data (2): %s" % str(data) )
     #~ data = data.decode()
     os.unlink(f)
+    return str(data)
+    
+def getSystemCallReturn(strCommand):
+    command = strCommand.split(" ")
+    outfilename = getTempFilename() + ".txt"
+    outfile = open(outfilename, "wt")
+    ret = subprocess.call(command, stdout=outfile)
+    outfile.close()
+    outfile = open(outfilename, "rt")
+    data = outfile.read()
+    #~ print("DBG: ping: buf: %s" % buf)
+    outfile.close()
+    os.unlink(outfilename)
+    if len(data) > 0 and ord(data[0]) == 255:
+        # command is of the type wmic and so is rotten in a wild burk encoding
+        #~ data = data.encode("cp1252", "strict").decode("cp1252", "strict") 
+        # can't find working solution for wmic => handling by hand
+        data = cleanText(data)
     return str(data)
 
 def getCpuModel(bShort=False):
@@ -772,6 +839,14 @@ def ringTheBell( nTimes ):
     for i in range( nTimes ):
         deepbell()
         time.sleep(2.) # was 1.3
+        
+def microWave():
+    # it's not exactly as alarm_microwave.wav (added saturation)
+    for i in range(4):
+        beep(2000, 500)
+        time.sleep(0.5)
+
+    
     
 def viewSmoothstep():
     # demo de subplot:
@@ -1058,14 +1133,23 @@ def backupFile( filename ):
     make a backup of a file, erase backup first.
     backup have same name than file, but a with an added .bak
     """
-    if not os.path.isfile( filename ):
+    if not os.path.isfile( filename ) or os.path.getsize(filename)<=0:
         # nothing to do
         return
     filenamebak = filename + ".bak"
     if os.path.isfile(filenamebak):
-        os.remove(filenamebak)
+        onedayinsec = 60*60*24
+        creatime = os.path.getctime(filenamebak)
+        if time.time() - creatime > onedayinsec:
+            # fait un backup du backup
+            os.rename(filenamebak,filenamebak+".time_"+ str(int(creatime)))
+        else:
+            os.remove(filenamebak)
     os.rename(filename,filenamebak)
     
+#~ backupFile("/tmp/test.txt")
+#~ exit(1)
+
 def eraseFiles( listFiles, strPath = "" ):
     """
     Delete all file content in a list
@@ -1190,7 +1274,7 @@ def guessExtension( filename ):
         strExt = "jpg"
     return strExt
     
-def  correctExtension( strPath ):
+def correctExtension( strPath ):
     """
     correct wrong file extension in strPath
     """
@@ -1217,7 +1301,50 @@ if 0:
     listDup = findDuplicate(strTestPath)
     eraseFiles(listDup, strTestPath)
     correctExtension(strTestPath)
-    exit(0)      
+    exit(0)
+    
+def eraseFileInAnotherFolder(path1,path2):
+    """
+    erase file in path1 that are in path2 (same size and same contents, but date can differ)
+    """
+    if os.path.abspath(path1) == os.path.abspath(path2):
+        print("WRN: eraseFileInAnotherFolder: path1 and path2 are the same!\n%s\n%s" % (path1,path2))
+        return
+    if path1[-1] != os.sep:
+        path1 += os.sep
+
+    if path2[-1] != os.sep:
+        path2 += os.sep
+        
+    out = []
+    listFiles = os.listdir(path1)
+    cpt = 0
+    for f in listFiles:
+        fn1 = path1+f
+        fn2 = path2+f
+        if not os.path.isfile(fn1) or not os.path.isfile(fn2):
+            continue
+        n1 = os.path.getsize(fn1)
+        n2 = os.path.getsize(fn2)
+        if n1 != n2:
+            continue
+        f1 = open(fn1,"rb")
+        b1 = f1.read()
+        f1.close()
+        f2 = open(fn2,"rb")
+        b2 = f2.read()
+        f2.close()
+        for i in range(len(b1)):
+            if b1[i] != b2[i]:
+                continue
+        # f1 and f2 are the same
+        print("INF: eraseFileInAnotherFolder: deleting '%s' of size %d from path1, because it's in path2" % (f,n1))
+        os.unlink(fn1)
+        cpt += 1
+    print("INF: eraseFileInAnotherFolder: erased %d file(s)" % cpt )
+#~ eraseFileInAnotherFolder - end
+        
+    
     
 def getCallStackStr():
     import traceback
@@ -1259,7 +1386,7 @@ def elision( strFirstWord, strSecondWord ):
 class ExclusiveLock:
     # inspired by https://github.com/drandreaskrueger/lockbydir
     
-    def __init__( self, lockname):
+    def __init__( self, lockname="alextools.lck"):
         """
             get an exclusive opening of a lock, so no other process can access a critival ressources
             call close to the returned object to release the lock
@@ -1328,6 +1455,48 @@ class ExclusiveLock:
         return True
         
 # class ExclusiveLock - end
+
+    
+def eraseFileLongerLine(filename,sizemax):
+    """
+    """
+    print("INF: eraseFileLongerLine: checking file '%s' for line bigger than %s" % (filename,sizemax) )
+    f = open(filename,"rt")
+    lines = []
+    nNumLine = 0
+    nSumLine = 0
+    nLineErased = 0
+    nMaxLenRemaining = 0
+    while 1:
+        line = f.readline()
+        nLenLine = len(line)
+        nSumLine += nLenLine
+        nNumLine += 1
+        print("INF: eraseFileLongerLine: line %d: len: %d" % (nNumLine,nLenLine) )
+        if nLenLine < 1:
+            break
+        if nLenLine > sizemax:
+            print("INF: erasing this line")
+            nLineErased += 1
+            continue
+        nMaxLenRemaining = max(nMaxLenRemaining,nLenLine)
+        lines.append(line)
+    f.close()
+    print("INF: eraseFileLongerLine: average before erasing: %d" % (nSumLine//nNumLine))
+    print("INF: eraseFileLongerLine: nLineErased: %d" % (nLineErased))
+    print("INF: eraseFileLongerLine: max after erasing: %d" % (nMaxLenRemaining))
+    if nLineErased > 0:
+        print("INF: will write new one, waiting 5 sec so you can stop it...")
+        time.sleep(5)
+        f = open(filename,"wt")
+        for line in lines:
+            f.write(line)
+        f.close()
+    print("INF: eraseFileLongerLine: done")
+# eraseFileLongerLine - end
+    
+#~ eraseFileLongerLine("/tmp/data_offers.py",10000)
+#~ exit(0)
     
 def autoTest():
     s = str(getCpuModel())
@@ -1338,7 +1507,15 @@ def autoTest():
         timeBegin = time.time()
         for i in range(10):
             getCpuModel()
-        print("cpu model takes %.4fms per call" % ((time.time()-timeBegin)*1000/10)) # 203ms per call
+        print("cpu model takes %.4fms per call" % ((time.time()-timeBegin)*1000/10)) 
+        # depuis scite
+        # 203ms per call avec un system call
+        # 194ms per call avec un subprocess
+        
+        # depuis le shell
+        # 143ms system call
+        # 109ms subprocess
+        
         
     check(smoothstep(0),0)
     check(smoothstep(-1),0)

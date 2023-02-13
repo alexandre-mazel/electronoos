@@ -116,6 +116,24 @@ def print_cpu():
         strCpuModel = "TODO"
     print( "cpu              : %s" % strCpuModel )
     
+def print_ram():
+    GB=1024*1024*1024.
+    try:
+        import psutil
+        infomem = psutil.virtual_memory()
+        avail = infomem.available
+        tot = infomem.total
+        #~ avail = tot-avail # seems like it's reverted at least on raspberry [but not exactly !?!]
+        print("ram              : %.2f / %.2f GB" % (avail/GB,tot/GB))
+        #~ raise("toto") # to test the exception code check
+    except BaseException as err:
+        #~ print("ERR: %s" % err)
+        import os
+        avail = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_AVPHYS_PAGES') 
+        tot = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') 
+        print("ram              : %.2f / %.2f GB" % (avail/GB,tot/GB))
+
+    
 def test_cpu_int( bPrint = True ):
     if bPrint: sys.stdout.write( "test_cpu_int2    : " )
     timeBegin = time.time();
@@ -143,6 +161,55 @@ def test_cpu_float( bPrint = True ):
     if bPrint: print("%7.2fs" % rDuration);
     return rDuration;
 #test_cpu_float - end
+
+def test_ram( sizeGB = 1, bPrint = True ):
+    try:
+        import numpy
+        import numpy.random
+    except:
+        if bPrint: print( "numpy        : not found")
+        return 0
+    if bPrint: sys.stdout.write( "test_cpu_ram%2dG  : " % sizeGB )
+    if bPrint: sys.stdout.flush();
+    timeBegin = time.time();
+    try:
+        a = []
+        b = []
+        size_packet = sizeGB * 1024*1024//4//2 # div by 4 because 32bits, div by 2 because we alloc 2 arrays
+        a = numpy.zeros((1024,size_packet),dtype=numpy.uint32)
+        if bPrint: sys.stdout.write( "#" )
+        if bPrint: sys.stdout.flush()
+        
+        if 0:
+            b = a.copy()
+            
+            if bPrint: sys.stdout.write( "#"*19 )
+            if bPrint: sys.stdout.flush()
+        else:
+            # plus lent, mais on voit la progression
+            b = numpy.zeros((1024,size_packet),dtype=numpy.uint32)
+            if bPrint: sys.stdout.write( "#" )
+            if bPrint: sys.stdout.flush()
+            j = 0
+            while j < 1024:
+                i = 0
+                #~ while i < size_packet:
+                    #~ a[j,i] = b[j,i]
+                    #~ i += 1
+                b[j,] = a[j,]
+                j += 1
+                if (j %55)==54:
+                    if bPrint: sys.stdout.write( "#" );
+                    if bPrint: sys.stdout.flush();
+        rDuration = time.time() - timeBegin;
+        if bPrint: print("%7.2fs" % rDuration);
+    #~ except numpy.core._exceptions.MemoryError as err:
+    except BaseException as err:
+        #~ print("Memory Error: %s" % err )
+        print(" Memory Error..." )
+        rDuration = 0
+    return rDuration;
+#test_ram - end
 
 def test_numpy( bPrint = True ):
     try:
@@ -345,7 +412,7 @@ def test_multithreading():
         sys.stdout.write( "multiprocess x%-2d:" % nNbrProcessInParalell  )    
         bFirstInLine = True
         all_process = []
-        for func_to_test in (test_cpu_int,test_cpu_float,test_numpy,test_opencv_orb,test_opencv_orb_realcase,test_opencv_orb_realcase):
+        for func_to_test in (test_cpu_int,test_cpu_float,test_ram,test_numpy,test_opencv_orb,test_opencv_orb_realcase,test_opencv_orb_realcase):
             if not bFirstInLine: sys.stdout.write(" /" )
             bFirstInLine = False
             timeBegin = time.time()        
@@ -367,9 +434,18 @@ def test_multithreading():
 def test_perf(nDiskTestSizeMB=200,bTestMultiThreading=True):
     print_version()
     print_cpu()
+    print_ram()
     rTotalTime = 0;
-    rTotalTime += test_cpu_int();
-    rTotalTime += test_cpu_float();
+    #~ rTotalTime += test_cpu_int();
+    #~ rTotalTime += test_cpu_float();
+    rTotalTime += test_ram(2);
+    rTotalTime += test_ram(4);
+    rTotalTime += test_ram(6);
+    rTotalTime += test_ram(8);
+    rTotalTime += test_ram(10);
+    rTotalTime += test_ram(12);
+    rTotalTime += test_ram(14);
+    rTotalTime += test_ram(16);
     rTotalTime += test_numpy();
     rTotalTime += test_opencv_orb();
     rTotalTime += test_opencv_orb_realcase();
@@ -1029,23 +1105,17 @@ power management:
 
 a@black:~/dev/electronoos/scripts$ sudo python test_perf.py 
 [sudo] password for a: 
-Sorry, try again.
-[sudo] password for a: 
-Sorry, try again.
-[sudo] password for a: 
-Sorry, try again.
-sudo: 3 incorrect password attempts
-a@black:~/dev/electronoos/scripts$ sudo python test_perf.py 
-[sudo] password for a: 
 INF: Due to low empty disk space, reducing disk test size to 648 MB
 python version   : 2.7.6 (64bits) (4 core(s))
-cpu              : todo
+cpu              : Intel(R) Core(TM) i5 CPU       M 480  @ 2.67GHz
+ram              : 5.07 / 5.63 GB # added 2GB
 test_cpu_int2    : ####################   0.55s
 test_cpu_float2  : ####################   0.14s
 scipy.fftpack    : not found
 test_orb2.4.8    : ####################   0.28s (358.00fps)
-test_orbcv imgs  : test_perf_vga_*.png: not found
-test_orbcv bis   : test_perf_vga_*.png: not found
+test_orb2.4.8    : ####################  11.24s ( 8.90fps) ?
+test_orbcv imgs  : ####################   2.41s (41.56fps)
+test_orbcv bis   : ####################   1.27s (78.62fps)
 multiprocess x1 :  0.55s /  0.14s /  0.00s /  0.42s /  0.13s /  0.12s =>    1.38s
 multiprocess x4 :  1.08s /  0.30s /  0.01s /  0.89s /  0.27s /  0.27s =>    4.20s
 multiprocess x8 :  2.15s /  0.61s /  0.02s /  1.78s /  0.55s /  0.55s =>    9.85s
@@ -1096,6 +1166,16 @@ high perf:
 INF: Changing disk test size to 1000 MB
 python version   : 3.9.5 (64bits) (8 core(s))
 cpu              : Intel(R) Core(TM) i7-1065G7 CPU @ 1.30GHz
+ram              : 11.02 / 15.60 GB
+ram              : 10.73 / 15.60 GB
+test_cpu_ram 2G  : ####################   0.37s
+test_cpu_ram 4G  : ####################   0.65s
+test_cpu_ram 6G  : ####################   0.94s
+test_cpu_ram 8G  : ####################   1.25s
+test_cpu_ram10G  : ####################   2.29s
+test_cpu_ram12G  : ####################   3.77s
+test_cpu_ram14G  : ####################   5.76s
+test_cpu_ram16G  : ####################   7.93s  # require some of empty spaces (for swap)
 test_cpu_int2    : ####################   0.46s
 test_cpu_float2  : ####################   0.07s
 test_scipy_xxt   : ####################   0.89s (449.65x)

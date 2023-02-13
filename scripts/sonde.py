@@ -21,3 +21,7 @@ def run_loop_send(strDeviceID):
         t = getTemperatureFrom1wire(strDeviceID)
         nettools. sendDataToEngServer("temp", t)
         time.sleep(10*60)
+        
+if __name__ == "__main__":
+    run_loop_send()
+    

@@ -5,6 +5,7 @@ import time
 strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
 if strLocalPath == "": strLocalPath = './'
 sys.path.append(strLocalPath+"/../alex_pytools/")
+import misctools
 import nettools
 
 def getTemperatureFrom1wire(strDeviceID):
@@ -19,6 +20,7 @@ def getTemperatureFrom1wire(strDeviceID):
     if len(lines)>0:
         t = lines[-1].split("t=")[-1]
         t = int(t)/1000.
+#        t -= 1.5 # seems to be a bit higher than real
     else:
         t = -127
     return t
@@ -26,9 +28,26 @@ def getTemperatureFrom1wire(strDeviceID):
     
 def run_loop_send(strDeviceID):
     while 1:
-        t = getTemperatureFrom1wire(strDeviceID)
-        if t > -127:
-            nettools. sendDataToEngServer("temp", t)
+        for i in range(10):
+            t = getTemperatureFrom1wire(strDeviceID)
+            if t > -127:
+                if 1:
+                    # save in local file
+                    timestamp = misctools.getTimeStamp()
+                    if os.name == "nt":
+                        dest = "c:/save/office_temperature.txt"
+                    else:
+                        #~ dest = os.path.expanduser("~/save/office_temperature.txt")
+                        dest = "/home/pi/save/local_temperature.txt" # here we want to save there, even if running as root
+                    
+                    f = open(dest,"a+")
+                    f.write("%s: %s: %.1f\n" % (timestamp,"various",t) )
+                    f.close()
+                    
+                nettools. sendDataToEngServer("temp", t)
+                break
+            else:
+                time.sleep(2)
         time.sleep(5*60)
         
 if __name__ == "__main__":

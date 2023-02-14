@@ -36,15 +36,25 @@ def listPorts():
         
 def monitorPort(strPortName):
     ser = serial.Serial(strPortName)
-    print("INF: %s is open: %s" % (ser.name,ser.is_open) )
-    #~ for i in range(100):
-    while 1:
-        buf = ser.readline()
-        buf = str(buf)
-        buf = buf.replace("\n","")
-        buf = buf.replace("\r","")
-        buf = buf.replace("\\r\\n","")
-        print("%s"%buf)
+    try:
+        print("INF: %s is open: %s" % (ser.name,ser.is_open) )
+        #~ for i in range(100):
+        prevPrint = ""
+        while 1:
+            buf = ser.readline()
+            buf = str(buf)
+            buf = buf.replace("\n","")
+            buf = buf.replace("\r","")
+            buf = buf.replace("\\r\\n","")
+            buf = buf.replace("b'","")
+            if buf[-1]== "'": buf = buf[:-1]
+            #~ buf = buf.decode(encoding='utf-8', errors='strict')
+            if buf != prevPrint:
+                prevPrint = buf
+                print(buf)
+    except BaseException as err: # including KeyboardInterrupt
+        print("ERR: monitorPort: %s" % err )
+        pass
     ser.close()
 
 #~ listPorts()

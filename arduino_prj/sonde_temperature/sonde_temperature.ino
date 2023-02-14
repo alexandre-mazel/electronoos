@@ -187,6 +187,7 @@ void loop() {
 #if USE_DALLAS
 
   sensors.requestTemperatures();
+  // boucle sur tout les capteurs
   for( int i = 0; i < 5; ++i)
   {
     float t = sensors.getTempCByIndex(i);

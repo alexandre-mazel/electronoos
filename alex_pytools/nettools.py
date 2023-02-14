@@ -1,8 +1,23 @@
 import os
-import urllib.request
-import http.client
+try:
+    import urllib.request # pip install requests # pas sur, pb sur python2 rpi
+except BaseException as err: print("WRN: urllib.request load error. err: %s" % err)
+try:
+    import http.client
+except BaseException as err: print("WRN: urllib.client load error. err: %s" % err)
 
 import misctools
+
+def getHostName():
+    if os.name == "nt":
+        hostname = os.environ['COMPUTERNAME']
+    else:
+        unames = os.uname()
+        #~ print("unames: %s" % str(unames))
+        hostname = unames[1]
+        print(hostname)
+    return hostname.replace(" ", "_")
+
 
 def download(remote,dst, bForceDownload=False, bInternalCalledForRetry = False):
     """
@@ -46,4 +61,30 @@ def download(remote,dst, bForceDownload=False, bInternalCalledForRetry = False):
     print("%s: INF: => %s" % (timestamp,dst))
     print("%s: INF: [OK]" % timestamp)
     return 1
+# download - end
+
+def sendDataToEngServer( dataname, value, timestamp = None ):
+    """
+    - timestamp: if the data is from another time, you can specify it, else it will be server time
+    """
+    print("INF: sendDataToEngServer: data: %s, value: %s" % (dataname,value) )
+    import requests
+    hostname = getHostName()
+    req = "?h=%s&dn=%s&dv=%s" % (hostname,dataname,value)
+    if timestamp != None:
+        req += "&t=%s" % timestamp
+    fullreq = "http://engrenage.studio/index.py" + req
+    print("DBG: sendDataToEngServer: req: " + str(req) )
+    requests.get(fullreq)
+    print("INF: sendDataToEngServer: done")
+
+    
+def autoTest():
+    sendDataToEngServer("dummy", 1.23)
+
+
+if __name__ == "__main__":
+        autoTest()
+    
+    
     

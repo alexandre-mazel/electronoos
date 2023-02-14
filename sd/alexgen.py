@@ -233,7 +233,13 @@ def generateFaces():
     neg += " bad anatomy| extra legs| extra arms| extra fingers| poorly drawn hands| poorly drawn feet| disfigured| out of frame| tiling| bad art| deformed| mutated| blurry| fuzzy| misshaped| mutant| gross| disgusting| ugly| fat| watermark| watermarks "
 
     prompt = ""
-    prompt += "portrait of a man,"
+    #~ prompt += "portrait of a man,"
+    prompt += "portrait of a woman,"
+    #~ prompt += "portrait of a boy,"
+    #~ prompt += "portrait of a girl,"
+    #~ prompt += "portrait of an old man,"
+    #~ prompt += "portrait of an old woman,"
+    
     prompt += " realistic,"
     prompt += " sharp, very detailed, high resolution, dramatic lighting"
     

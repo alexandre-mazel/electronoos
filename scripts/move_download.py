@@ -90,7 +90,7 @@ def loop_move_download():
         time.sleep(60*1)
     
 
-#~ ret = os.system("c:\exe\pscp -pw c:/tmp/a.txt publac@robot-enhanced-education.org:/home/publac/")
+#~ ret = os.system("c:\exe\pscp -pw ??? c:/tmp/a.txt publac@robot-enhanced-education.org:/home/publac/")
 #~ print("ret: %s" % ret )
 #~ if ret == 0:
     #~ print("Success !!!" )

@@ -62,8 +62,8 @@ def learnAllImages(path):
             name = name.lower()
             
             if fr.findUserByName(name) != None:
-                print("WRN: learnAllIdent: '%s' already in base" % name)
-                continue
+                print("WRN: learnAllIdent: already in base: '%s'" % name)
+                #~ continue
                 break # so we already have done this one so all next are done also
                 
             ret = fr.learnFromFile(fn,name)
@@ -168,6 +168,6 @@ def loopwebcam(pathlearned):
 if __name__ == "__main__":
     path = "d:/generated_portraits/"
     #~ path = "C:/Users/alexa/Downloads/lki0/"
-    learnAllImages(path)
-    #~ loopwebcam(path)
+    #~ learnAllImages(path)
+    loopwebcam(path)
     

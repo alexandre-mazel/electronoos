@@ -1,7 +1,15 @@
 import os
 import sys
+import time
 
 import cv2
+
+"""
+scp a@192.168.0.45:/home/a/generated/portr* d:\generated_portraits\
+
+sudo mount -t drvfs d: /mnt/d
+rsync -rv --size-only a@192.168.0.45:/home/a/generated/portr* /mnt/d/generated_portraits/
+"""
 
 global_facerecognizer = None
 
@@ -26,10 +34,15 @@ def learnAllImages(path):
     """
     pathDB = path
     fr = loadReco(pathDB)
+    import facerecognition_dlib
+    facerecognition_dlib.User.rDistThreshold = 0.2 # force to learn many more people
     cpt = 0
+    cptAdded = 0
+    cptTooClose = 0
     if 1:
         listFiles = os.listdir(path)
-        listFiles = sorted(listFiles)
+        #~ listFiles = sorted(listFiles)
+        listFiles = sorted(listFiles, key=lambda x: os.path.getmtime(path+x),reverse=True) # sort by most recent added
         for numfile, f in enumerate(listFiles):
             print("INF: learnAllImages: %d/%d" % (numfile,len(listFiles) ))
             fn = path+f
@@ -37,6 +50,10 @@ def learnAllImages(path):
                 continue
             if "!" in f: # do we learn some ref ? (usefull for debug!)
                 continue
+                
+            if time.time()-os.path.getmtime(path+f) > 60*60*1 and 0:
+                print("INF: learnAllImages: too old, breaking")
+                break
                 
             name,ext = os.path.splitext(f)
             if not ext in [".jpg", ".png"]:
@@ -47,14 +64,22 @@ def learnAllImages(path):
             if fr.findUserByName(name) != None:
                 print("WRN: learnAllIdent: '%s' already in base" % name)
                 continue
-            fr.learnFromFile(fn,name) # ne semble plus fonctionner !!! setSavePath est remis a none !
-            #~ fr.continuousLearnFromFile(fn,name) essayer ca ?
+                break # so we already have done this one so all next are done also
+                
+            ret = fr.learnFromFile(fn,name)
+            print("INF: learnAllImages: learnFromFile: ret: %s" % ret)
+            status = ret[0]
+            if status == 2: cptAdded += 1
+            if status == -3: cptTooClose += 1
+            
             cpt += 1
             #~ if cpt > 9:
                 #~ break
+            #~ if cpt > 100:
+                #~ break
     #~ if 1:
     fr.save(pathDB+"recface/")
-    print("INF: learnAllImages: cpt: %s" % cpt )
+    print("INF: learnAllImages: cpt: %s, cptAdded: %d, cptTooClose: %d" % (cpt,cptAdded,cptTooClose) )
     
 cacheImages = dict() # filename => img
 
@@ -143,6 +168,6 @@ def loopwebcam(pathlearned):
 if __name__ == "__main__":
     path = "d:/generated_portraits/"
     #~ path = "C:/Users/alexa/Downloads/lki0/"
-    #~ learnAllImages(path)
-    loopwebcam(path)
+    learnAllImages(path)
+    #~ loopwebcam(path)
     

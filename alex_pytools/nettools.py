@@ -15,7 +15,7 @@ def getHostName():
         unames = os.uname()
         #~ print("unames: %s" % str(unames))
         hostname = unames[1]
-        print(hostname)
+        #~ print(hostname)
     return hostname.replace(" ", "_")
 
 

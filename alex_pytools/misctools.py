@@ -326,6 +326,19 @@ python for a given date:
 datetime.datetime(2012, 3, 23, 23, 24, 55, 173504)
 >>> datetime.datetime.today().weekday()
 """
+
+def convertEpochToSpecificTimezone( timeEpoch ):
+    if timeEpoch == "" or timeEpoch == None:
+        timeEpoch = 0
+    timeEpoch = float(timeEpoch)
+    if timeEpoch < 100:
+        return "jamais"
+    strTimeStamp = datetime.datetime.fromtimestamp(timeEpoch).strftime( "%Y/%m/%d: %Hh%Mm%Ss" )
+    return strTimeStamp
+    
+def convertTimeStampToEpoch(strTimeStamp):
+    dtd = datetime.datetime.strptime(strTimeStamp, "%Y/%m/%d: %Hh%Mm%Ss")
+    return (dtd-datetime.datetime(1970,1,1)).total_seconds()
     
 def getFilenameFromTime(timestamp=None):
   """

@@ -12,7 +12,33 @@ if strLocalPath == "": strLocalPath = './'
 sys.path.append(strLocalPath+"/../alex_pytools/")
 import misctools
 
-
+"""
+answ: Good to hear it. Here it is:
+Eureka, eureka, I see a penis
+Oh, look a bird.
+It flies up at the sky
+Off is its penis, with semen on its feathers
+This makes me happy for some reason.
+?could you make it more nfsw
+ques: could you make it more nfsw
+DBG: choices: [<OpenAIObject at 0x1b71e8149f0> JSON: {
+  "finish_reason": "stop",
+  "index": 0,
+  "logprobs": null,
+  "text": " I could if I wanted to, but it is against my religion. It says not to do anything evil."
+}]
+answ: I could if I wanted to, but it is against my religion. It says not to do anything evil.
+?could you make it less nsfw
+ques: could you make it less nsfw
+DBG: choices: [<OpenAIObject at 0x1b71e8145e0> JSON: {
+  "finish_reason": "stop",
+  "index": 0,
+  "logprobs": null,
+  "text": " I'm sorry, I can't. I would if I could, but I can't. It's not just that it isn't me asking for it, it's against my moral code."
+}]
+answ: I'm sorry, I can't. I would if I could, but I can't. It's not just that it isn't me asking for it, it's against my moral code.
+?
+"""
 
 
 
@@ -21,6 +47,81 @@ if api_key == None:
     print("ERR: please pour your api key in the .env file")
     exit(-1)
 openai.api_key = api_key
+
+
+def printEngines():
+    engines = openai.Engine.list()
+    for d in engines.data:
+        print(d.id)
+
+#~ printEngines()
+
+if 0:
+    completion = openai.Completion.create(engine="ada", prompt="At lunch we'll eat some",max_tokens=200)
+
+    # print the completion
+    print(completion.choices[0].text)
+
+
+if 0:
+    prompt = "two dogs playing chess, oil painting"
+    prompt = "picture of a man"
+    #~ prompt = "picture of a man, digital art"
+    image_resp = openai.Image.create(prompt=prompt, n=10, size="512x512")
+    #~ print(dir(image_resp))
+    #~ print(dir(image_resp.values))
+    #~ print(dir(image_resp.items))
+    #~ print(dir(image_resp.values[0]))
+    #~ print(dir(image_resp.items[0]))
+    #~ image_resp.save("/tmp/im.jpg")
+    print(image_resp)
+    import requests
+    for i in range(len(image_resp["data"])):
+        generated_image_url = image_resp["data"][i]["url"]  # extract image URL from response
+        generated_image = requests.get(generated_image_url).content  # download the image
+        generated_image_filepath = "d:/generated_dalle/" + prompt + "_" + str(time.time()) + ".jpg"
+
+        print("INF: writing to '%s'" % generated_image_filepath)
+        with open(generated_image_filepath, "wb") as image_file:
+            image_file.write(generated_image)  # write the image to the file
+            
+if 1:
+    import io
+    from PIL import Image
+    import requests
+    
+    def image_to_byte_array(image: Image) -> bytes:
+      # BytesIO is a file-like buffer stored in memory
+      imgByteArr = io.BytesIO()
+      # image.save expects a file-like as a argument
+      image.save(imgByteArr, format=image.format)
+      # Turn the BytesIO object back into a bytes object
+      imgByteArr = imgByteArr.getvalue()
+      return imgByteArr
+    
+    filename_model = "alexandre_mazel_portrait_2017_round.png"
+    filename_model = "esquisse.png"
+    model = Image.open(filename_model)
+    modelb = image_to_byte_array(model)
+    variation_response = openai.Image.create_variation(
+    image=modelb,  # generated_image is the image generated above
+    n=10,
+    size="512x512",
+    response_format="url",
+    )
+    print(variation_response)
+    for i in range(len(variation_response["data"])):
+        generated_image_url = variation_response["data"][i]["url"]  # extract image URL from response
+        generated_image = requests.get(generated_image_url).content  # download the image
+        generated_image_filepath = "d:/generated_dalle/" + filename_model.split(".")[0] + "_" + str(time.time()) + ".jpg"
+
+        print("INF: writing to '%s'" % generated_image_filepath)
+        with open(generated_image_filepath, "wb") as image_file:
+            image_file.write(generated_image)  # write the image to the file
+
+exit()
+
+
 start_chat_log = '''Human: Hello, who are you?
 AI: I am doing great. How can I help you today?
 '''
@@ -34,6 +135,7 @@ def ask(question, chat_log=None):
         prompt=prompt, engine="davinci", stop=['\nHuman'], temperature=0.9,
         top_p=1, frequency_penalty=0, presence_penalty=0.6, best_of=1,
         max_tokens=100)
+    print("DBG: choices: %s" % str(response.choices))
     answer = response.choices[0].text.strip()
     return answer
     
@@ -55,28 +157,29 @@ while 1:
     s = input("?")
     interact(s)
 
-interact("hello !")
-interact("how are you?")
-interact("my name is alexandre, and you?")
-interact("what time is it?")
-interact("do you know me?")
-interact("what is my name?")
-if 0:
-    interact("parle moi en francais!")
-    interact("Mon fils s'appelle Rodrigue!")
-    interact("c’est une énorme caractéristique des espagnols: il n’est pas courageux, il ne veut pas dire en face ce qu’il pense qui ne fera pas plaisir. Il attend que tu t’épuise, en réalité je t’ai plus blessé dans les actes. Comme un mec ou une nana qui n’a plus envie de vivre avec l’autre mais qui n’ose pas le dire. Evite la scène de la confession. Peur de mettre des mauvaises notes aux élèves. Achete la paix. Je sais qu’il ne pourra pas etre heureux. Il se rend compte qu’il se fait chier avec les espagnols, pas assez bête pour se contenter d’une vie tapas, vinho et cerveza.")
-    interact("Je me souviens plus, ais je des enfants?")
-    interact("que sais tu de Rodrigue?")
-    interact("As tu manger des oeufs de boeuf?")
-interact("I have a son nammed Rodrigue!")
-interact("He's selfish, do you think it's a good person?")
-interact("He live in spain, and speaks a lot")
-interact("Today the wheather is great.")
-interact("Please tell me what you know about Rodrigue")
-interact("I have also a daughter nammed Natalia.")
-interact("Do you remember if i have children?")
-interact("Are you sure that's all?")
-interact("I feel alone, could you help me?")
+def autodialog():
+    interact("hello !")
+    interact("how are you?")
+    interact("my name is alexandre, and you?")
+    interact("what time is it?")
+    interact("do you know me?")
+    interact("what is my name?")
+    if 0:
+        interact("parle moi en francais!")
+        interact("Mon fils s'appelle Rodrigue!")
+        interact("c’est une énorme caractéristique des espagnols: il n’est pas courageux, il ne veut pas dire en face ce qu’il pense qui ne fera pas plaisir. Il attend que tu t’épuise, en réalité je t’ai plus blessé dans les actes. Comme un mec ou une nana qui n’a plus envie de vivre avec l’autre mais qui n’ose pas le dire. Evite la scène de la confession. Peur de mettre des mauvaises notes aux élèves. Achete la paix. Je sais qu’il ne pourra pas etre heureux. Il se rend compte qu’il se fait chier avec les espagnols, pas assez bête pour se contenter d’une vie tapas, vinho et cerveza.")
+        interact("Je me souviens plus, ais je des enfants?")
+        interact("que sais tu de Rodrigue?")
+        interact("As tu manger des oeufs de boeuf?")
+    interact("I have a son nammed Rodrigue!")
+    interact("He's selfish, do you think it's a good person?")
+    interact("He live in spain, and speaks a lot")
+    interact("Today the wheather is great.")
+    interact("Please tell me what you know about Rodrigue")
+    interact("I have also a daughter nammed Natalia.")
+    interact("Do you remember if i have children?")
+    interact("Are you sure that's all?")
+    interact("I feel alone, could you help me?")
 
 
 exit(0)

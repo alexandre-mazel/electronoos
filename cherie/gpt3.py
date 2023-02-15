@@ -85,7 +85,7 @@ if 0:
         with open(generated_image_filepath, "wb") as image_file:
             image_file.write(generated_image)  # write the image to the file
             
-if 1:
+if 0:
     import io
     from PIL import Image
     import requests
@@ -101,13 +101,16 @@ if 1:
     
     filename_model = "alexandre_mazel_portrait_2017_round.png"
     filename_model = "esquisse.png"
+    filename_model = "bonne_annee_2023_web.png"
+    filename_model = "gaia_toit.png"
+    #~ filename_model = "trio_famille.png"
     model = Image.open(filename_model)
     modelb = image_to_byte_array(model)
     variation_response = openai.Image.create_variation(
     image=modelb,  # generated_image is the image generated above
     n=10,
     size="512x512",
-    response_format="url",
+    response_format="url"
     )
     print(variation_response)
     for i in range(len(variation_response["data"])):
@@ -118,6 +121,39 @@ if 1:
         print("INF: writing to '%s'" % generated_image_filepath)
         with open(generated_image_filepath, "wb") as image_file:
             image_file.write(generated_image)  # write the image to the file
+
+if 0:
+    # edit an image
+
+    # create a mask
+    width = 1024
+    height = 1024
+    mask = Image.new("RGBA", (width, height), (0, 0, 0, 1))  # create an opaque image mask
+
+    # set the bottom half to be transparent
+    for x in range(width):
+        for y in range(height // 2, height):  # only loop over the bottom half of the mask
+            # set alpha (A) to zero to turn pixel transparent
+            alpha = 0
+            mask.putpixel((x, y), (0, 0, 0, alpha))
+
+    # save the mask
+    mask_name = "bottom_half_mask.png"
+    mask_filepath = os.path.join(image_dir, mask_name)
+    mask.save(mask_filepath)
+
+    # call the OpenAI API
+    edit_response = openai.Image.create_edit(
+        image=open(generated_image_filepath, "rb"),  # from the generation section
+        mask=open(mask_filepath, "rb"),  # from right above
+        prompt=prompt,  # from the generation section
+        n=1,
+        size="1024x1024",
+        response_format="url",
+    )
+
+# print response
+print(edit_response)
 
 exit()
 

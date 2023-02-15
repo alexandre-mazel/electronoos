@@ -90,7 +90,7 @@ if 1:
             return nbr_added
             
         title = p.title
-        print("title: %s" % title)
+        print("title: %s" % stringtools.removeAccentString(title) )
         sum = p.summary.strip().strip("\n")
         if len(sum) < 4:
             return nbr_added

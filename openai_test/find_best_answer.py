@@ -190,10 +190,18 @@ def getEmbeddingForLists( listSentences, engine ):
         listEmbed.append(embed)
     return listEmbed
 
-# info sur l'embedding:
-# https://openai.com/blog/introducing-text-and-code-embeddings/
-# example:
-if 0:
+
+if 1:
+    """
+    info sur l'embedding:
+    https://openai.com/blog/introducing-text-and-code-embeddings/
+    
+    An embedding is a vector (list) of floating point numbers.
+    
+    example:
+    
+    """
+
     import openai, numpy as np
     
     #~ resp = openai.Embedding.create(
@@ -243,6 +251,7 @@ if 0:
     strModelName = "text-similarity-davinci-001"
     strModelName = "text-search-davinci-query-001" # best result for this example
     #~ strModelName = "text-search-davinci-doc-001"
+    strModelName = "text-embedding-ada-002" # peut etre vaguement mieux et prend up to 8191 tokens
     
     print("computing answer vectors...")
     listAns = []
@@ -383,6 +392,22 @@ q: What it the name of your son?, a: my son is nammed Corto, simi: 0.75
 q: meow, a: J'ai faim, simi: 0.74
 q: whouwhou, a: J'ai faim, simi: 0.77
 
+comparing using model text-embedding-ada-002:
+q: I have a kids, a: I have a boy, simi: 0.90
+q: I'm hungry, a: J'ai faim, simi: 0.91
+q: I'm very hungry, a: J'ai très faim, simi: 0.92
+q: J'ai envie de boire, a: J'ai faim, simi: 0.89
+q: J'ai envie de faire pipi, a: J'ai faim, simi: 0.88
+q: J'ai envie de manger, a: J'ai faim, simi: 0.95
+q: Quel est le nom de ton fils?, a: Mon fils s'appelle Corto, simi: 0.87
+q: Quel est le nom de ton garcon?, a: J'ai un garcon, simi: 0.89
+q: Quel sont les noms de tes enfants?, a: Mon fils s'appelle Corto, simi: 0.83
+q: What it the name of your boy?, a: I have a boy, simi: 0.89
+q: What it the name of your kids?, a: my son is nammed Corto, simi: 0.82
+q: What it the name of your son?, a: my son is nammed Corto, simi: 0.86
+q: meow, a: feline friends go, simi: 0.86
+q: whouwhou, a: feline friends go, simi: 0.79
+
 
 """
 
@@ -413,7 +438,7 @@ if 0:
     print("encoded sent2: " + str(encoded))
     
     
-if 1:
+if 0:
     import json
     
     # test sur oia faq_informatique
@@ -485,6 +510,16 @@ if 1:
     print("q: %s, qref: %s, simi: %.2f" % (q,maxAns,maxSimilarity))
     print("answer: %s" % faq[num][1])
     
+    
+"""
+About usage of embedding:    
+    Search (where results are ranked by relevance to a query string)
+    Clustering (where text strings are grouped by similarity)
+    Recommendations (where items with related text strings are recommended)
+    Anomaly detection (where outliers with little relatedness are identified)
+    Diversity measurement (where similarity distributions are analyzed)
+    Classification (where text strings are classified by their most similar label)
+"""
         
         
     

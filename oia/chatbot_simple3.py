@@ -86,8 +86,6 @@ def loadFaq( filename ):
     return faq
     
     
-faq = loadFaqSimple("faq_informatique.txt")
-#~ faq = loadFaq("faq_informatique.txt")
 
 def trim_usual_and_lower(words):
     o = []
@@ -133,5 +131,8 @@ def autotest():
     assert(chatbot("parle moi de ram") == "C'est la mémoire vive, espace virtuelle où évoluent les programmes quand ils sont lancés.")
     
     
-autotest()
-chatbot_run()
+if __name__ == "__main__":    
+    faq = loadFaqSimple("faq_informatique.txt")
+    #~ faq = loadFaq("faq_informatique.txt")
+    autotest()
+    chatbot_run()

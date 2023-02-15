@@ -23,12 +23,13 @@ openai.api_key = api_key
 import pandas as pd
 import numpy as np
 
+from openai.embeddings_utils import get_embedding
+
 def generateEmbedding():
     # imports
     import pandas as pd
     import tiktoken
 
-    from openai.embeddings_utils import get_embedding
 
     # embedding model parameters
     embedding_model = "text-embedding-ada-002"
@@ -182,11 +183,17 @@ Context:
 
 """
 
+def getEmbeddingForLists( listSentences, engine ):
+    listEmbed = []
+    for s in listSentences:
+        embed = get_embedding(s, engine=engine)
+        listEmbed.append(embed)
+    return listEmbed
 
 # info sur l'embedding:
 # https://openai.com/blog/introducing-text-and-code-embeddings/
 # example:
-if 1:
+if 0:
     import openai, numpy as np
     
     #~ resp = openai.Embedding.create(
@@ -242,7 +249,19 @@ if 1:
     for pair2 in to_compare:
         listAns.append(pair2[0])
     listAns = list(set(listAns))
-    embedAns = openai.Embedding.create( input=listAns, engine=strModelName)
+    
+    bStandardCall = 1  # more limit with the standard ?
+    bStandardCall = 0
+    
+    if bStandardCall:
+        embedAns = openai.Embedding.create( input=listAns, engine=strModelName)
+        o = []
+        for d in embedAns['data']:
+            o.append(d['embedding'])
+        embedAns = o
+    else:
+        embedAns = getEmbeddingForLists( listAns, engine=strModelName )
+    
     
     print("comparing using model %s:" % strModelName)
     listQ = []
@@ -250,15 +269,16 @@ if 1:
         listQ.append(pair2[1])
     listQ = sorted(list(set(listQ)))
     for q in listQ:
-        resp = openai.Embedding.create( input=[q], engine=strModelName)
-        v1 = resp['data'][0]['embedding']
-        
+        if bStandardCall:
+            resp = openai.Embedding.create( input=[q], engine=strModelName)
+            vQ = resp['data'][0]['embedding']
+        else:
+            vQ = getEmbeddingForLists( [q], engine=strModelName )
 
 
         maxSimilarity = 0
-        for numAns,d in enumerate(embedAns['data']):
-            v2 = d['embedding']
-            simi = np.dot(v1,v2)
+        for numAns,vAns in enumerate(embedAns):
+            simi = np.dot(vQ,vAns)
             if simi > maxSimilarity:
                 maxSimilarity = simi
                 ans = listAns[numAns]
@@ -365,3 +385,108 @@ q: whouwhou, a: J'ai faim, simi: 0.77
 
 
 """
+
+if 0:
+    # BPE encoding
+    import tiktoken
+    enc = tiktoken.get_encoding("gpt2")
+    encoded = enc.encode("hello world")
+    print("encoded gpt2: " + str(encoded))
+    assert enc.decode(encoded) == "hello world"
+    
+    # To get the tokeniser corresponding to a specific model in the OpenAI API:
+    enc = tiktoken.encoding_for_model("text-davinci-003")
+    encoded = enc.encode("hello world")
+    print("encoded d3: " + str(encoded))
+    assert enc.decode(encoded) == "hello world"
+
+    encoded = enc.encode("J'ai un fils")
+    print("encoded sent0: " + str(encoded))
+    
+    encoded = enc.encode("J'ai un fils.")
+    print("encoded sent0.: " + str(encoded))
+    
+    encoded = enc.encode("J'ai un fils qui aime jouer avec les voitures de courses")
+    print("encoded sent1: " + str(encoded))
+
+    encoded = enc.encode("J'ai un fils qui aime jouer avec les fils a coudre")
+    print("encoded sent2: " + str(encoded))
+    
+    
+if 1:
+    import json
+    
+    # test sur oia faq_informatique
+    
+    def saveEmbed(fn,data):
+        f = open(fn,"wt")
+        f.write(json.dumps(data))
+        f.close()
+        
+    def loadEmbed(fn):
+        f = open(fn,"rt")
+        buf = f.read()
+        data = json.loads(buf)
+        if 0:
+            print("DBG: loadEmbed: converting...")
+            # convert to numpy
+            print("DBG: loadEmbed: len data: %s" % len(data))
+            print("DBG: loadEmbed: len data[0]: %s" % len(data[0]))
+            for i in range(3):
+                print("DBG: loadEmbed: type data0: %s" % type(data[0][i]))
+                print("DBG: loadEmbed: data0: %s" % str(data[0][i]))
+            
+            for j in range(len(data)):
+                for i in range(len(data[j])):
+                    data[j][i] = float(data[j][i])
+        f.close()
+        return data
+        
+    strModelName = "text-search-davinci-query-001"
+        
+        
+    sys.path.append("../oia/")
+    import chatbot_simple3
+    faq = chatbot_simple3.loadFaqSimple("../oia/faq_informatique.txt")
+
+    listq = [item[0] for item in faq]
+
+    fn_embed = "faq_informatique_embed.txt"
+    if not os.path.isfile(fn_embed):
+        print("generating embedding to %s..." % fn_embed)
+        embedQ = getEmbeddingForLists( listq, engine = strModelName )
+        saveEmbed(fn_embed,embedQ)
+    else:
+       embedQ = loadEmbed(fn_embed)
+       print("generating loading from %s..." % fn_embed)
+       
+    q = "parle moi de la mémoire vive" # => Qu'est ce que La mémoire morte 0.8
+    q = "parle moi de la calculatrice" # => Où trouve-t-on la calculatrice?, simi: 0.85
+    q = "J'ai besoin de faire des calculs" # => Où trouve-t-on la calculatrice?, simi: 0.78
+    q = "J'ai besoin de faire des multiplication" # => Où trouve-t-on la calculatrice?, simi: 0.72
+    q = "J'ai besoin de faire 16*16" # => Où trouve-t-on la calculatrice?, simi: 0.66
+    q = "J'ai besoin d'envoyer un email" # => Que doit contenir obligatoirement une adresse mail ?, simi: 0.76
+    q = "J'ai besoin d'envoyer un courrier electronique" # => Que doit contenir obligatoirement une adresse mail ?, simi: 0.76
+    vQ = getEmbeddingForLists( [q], engine = strModelName )[0]
+    print(type(vQ[0]))
+    print(type(embedQ[0][0]))
+    
+    maxSimilarity = 0
+    maxIdx = -1
+    for num,v in enumerate(embedQ):
+        simi = np.dot(vQ,v)
+        ans = faq[num][0]
+        print("simi: %.2f, %s" % (simi, ans))
+        if simi > maxSimilarity:
+            maxSimilarity = simi
+            maxAns = ans
+            maxIdx = num
+            
+    print("q: %s, qref: %s, simi: %.2f" % (q,maxAns,maxSimilarity))
+    print("answer: %s" % faq[num][1])
+    
+        
+        
+    
+    
+    

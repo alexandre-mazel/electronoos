@@ -65,18 +65,30 @@ def download(remote,dst, bForceDownload=False, bInternalCalledForRetry = False):
 
 def sendDataToEngServer( dataname, value, timestamp = None ):
     """
+    return nbr of data sent (normally 1, but could happens than some will be sent in a burst
+    
     - timestamp: if the data is from another time, you can specify it, else it will be server time
+    
     """
     print("INF: sendDataToEngServer: data: %s, value: %s" % (dataname,value) )
-    import requests
-    hostname = getHostName()
-    req = "?h=%s&dn=%s&dv=%s" % (hostname,dataname,value)
-    if timestamp != None:
-        req += "&t=%s" % timestamp
-    fullreq = "http://engrenage.studio/index.py" + req
-    print("DBG: sendDataToEngServer: req: " + str(req) )
-    requests.get(fullreq)
-    print("INF: sendDataToEngServer: done")
+    nbr_data_sent = 0
+    try:
+        
+        import requests
+        hostname = getHostName()
+        req = "?h=%s&dn=%s&dv=%s" % (hostname,dataname,value)
+        if timestamp != None:
+            req += "&t=%s" % timestamp
+        fullreq = "http://engrenage.studio/index.py" + req
+        print("DBG: sendDataToEngServer: req: " + str(req) )
+        requests.get(fullreq)
+        print("INF: sendDataToEngServer: done")
+        nbr_data_sent += 1
+        
+    except BaseException as err:
+        print("ERR: sendDataToEngServer: err (1): %s" % err )
+    
+    return nbr_data_sent
 
     
 def autoTest():

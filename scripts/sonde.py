@@ -44,7 +44,7 @@ def run_loop_send(strDeviceID):
                     f.write("%s: %s: %.1f\n" % (timestamp,"various",t) )
                     f.close()
                     
-                nettools. sendDataToEngServer("temp", t)
+                nettools.sendDataToEngServer("temp", t)
                 break
             else:
                 time.sleep(2)

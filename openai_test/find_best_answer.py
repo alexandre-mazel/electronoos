@@ -183,6 +183,15 @@ Context:
 
 """
 
+def compute_num_tokens_from_string(string: str, encoding_name: str) -> int:
+    """Returns the number of tokens in a text string."""
+    encoding = tiktoken.get_encoding(encoding_name)
+    num_tokens = len(encoding.encode(string))
+    return num_tokens
+
+#~ compute_num_tokens_from_string("tiktoken is great!", "cl100k_base")
+
+
 def getEmbeddingForLists( listSentences, engine ):
     listEmbed = []
     for s in listSentences:
@@ -198,8 +207,10 @@ if 1:
     
     An embedding is a vector (list) of floating point numbers.
     
-    example:
+    # comment evaluer un embedding
+    https://github.com/facebookresearch/SentEval
     
+    example above:
     """
 
     import openai, numpy as np
@@ -251,7 +262,16 @@ if 1:
     strModelName = "text-similarity-davinci-001"
     strModelName = "text-search-davinci-query-001" # best result for this example
     #~ strModelName = "text-search-davinci-doc-001"
-    strModelName = "text-embedding-ada-002" # peut etre vaguement mieux et prend up to 8191 tokens
+    strModelName = "text-embedding-ada-002" # peut etre vaguement mieux et prend up to 8191 tokens (use cl100k_base) cd compute_num_tokens_from_string pour savoir combien il y a de token dans une phrase
+    
+    # Limitation: Models lack knowledge of events that occurred after August 2020.
+    
+    #~ We recommend cosine similarity. The choice of distance function typically doesn’t matter much.
+
+    #~ OpenAI embeddings are normalized to length 1, which means that:
+
+    #~ Cosine similarity can be computed slightly faster using just a dot product
+    #~ Cosine similarity and Euclidean distance will result in the identical rankings
     
     print("computing answer vectors...")
     listAns = []

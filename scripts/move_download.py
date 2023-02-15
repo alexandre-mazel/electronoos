@@ -44,7 +44,10 @@ def move_download(strDownloadPath = "", strSpecificFolder = ""):
     
     for f in listFiles:
         body,ext = os.path.splitext(f)
-        if ext not in [".pdf", ".doc", ".docx", ".jpg"]:
+        extWanted = [".pdf", ".doc", ".docx", ".jpg"]
+        if "lki" in strSpecificFolder:
+            extWanted.extend([".txt"])
+        if ext not in extWanted:
             continue
         absf = strDownloadPath + f
         modtime = os.path.getmtime(absf)

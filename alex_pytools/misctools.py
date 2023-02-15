@@ -121,7 +121,7 @@ def getTempFilename():
     import threading
     return getPathTemp() + getFilenameFromTime() + "_" + str(threading.get_ident()) # if multithreading, two can have same time
     
-def loadLocalEnv(strLocalFileName = ".env"):
+def loadLocalEnv(strLocalFileName = ".env", bVerbose=False):
     """
     load variable from a local file, typically .env
     Return a dict key => value
@@ -132,7 +132,7 @@ def loadLocalEnv(strLocalFileName = ".env"):
         if path == "": path = "./"
         else: path += '/'
         strLocalFileName = path+strLocalFileName
-    print( "DBG: loadLocalEnv: opening %s" % strLocalFileName)
+    if bVerbose: print( "DBG: loadLocalEnv: opening %s" % strLocalFileName)
     
     dictNewEnv = {}
     try:
@@ -163,18 +163,18 @@ def getEnv(strName, strDefault = None, bVerbose = 0 ):
     """
     get a value from local env, then from environnement
     """
-    dLocal0 = loadLocalEnv("./.env") # from current dir
+    dLocal0 = loadLocalEnv("./.env",bVerbose=bVerbose) # from current dir
     try:
         return dLocal0[strName]
     except KeyError as err:
         pass
         
-    dLocal1 = loadLocalEnv() # from alextools dir
+    dLocal1 = loadLocalEnv(bVerbose=bVerbose) # from alextools dir
     try:
         return dLocal1[strName]
     except KeyError as err:
         pass
-    dLocal2 = loadLocalEnv(os.environ['USERPROFILE']+os.sep+".env") # from user dir
+    dLocal2 = loadLocalEnv(os.environ['USERPROFILE']+os.sep+".env",bVerbose=bVerbose) # from user dir
     try:
         return dLocal2[strName]
     except KeyError as err:

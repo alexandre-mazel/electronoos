@@ -168,6 +168,6 @@ def loopwebcam(pathlearned):
 if __name__ == "__main__":
     path = "d:/generated_portraits/"
     #~ path = "C:/Users/alexa/Downloads/lki0/"
-    #~ learnAllImages(path)
-    loopwebcam(path)
+    learnAllImages(path)
+    #~ loopwebcam(path)
     

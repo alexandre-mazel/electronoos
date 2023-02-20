@@ -43,13 +43,13 @@ def loadInfos(fn):
         buf = f.read()
         data = json.loads(buf)
         if 0:
-            print("DBG: loadEmbed: converting...")
+            print("DBG: loadInfos: converting...")
             # convert to numpy
-            print("DBG: loadEmbed: len data: %s" % len(data))
-            print("DBG: loadEmbed: len data[0]: %s" % len(data[0]))
+            print("DBG: loadInfos: len data: %s" % len(data))
+            print("DBG: loadInfos: len data[0]: %s" % len(data[0]))
             for i in range(3):
-                print("DBG: loadEmbed: type data0: %s" % type(data[0][i]))
-                print("DBG: loadEmbed: data0: %s" % str(data[0][i]))
+                print("DBG: loadInfos: type data0: %s" % type(data[0][i]))
+                print("DBG: loadInfos: data0: %s" % str(data[0][i]))
             
             for j in range(len(data)):
                 for i in range(len(data[j])):

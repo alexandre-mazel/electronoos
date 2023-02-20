@@ -200,7 +200,13 @@ def getEmbeddingForLists( listSentences, engine ):
     return listEmbed
 
 
-if 1:
+def printEmbed(v):
+    #~ print(len(v))
+    for r in v[:8]:
+        print("%.04f, " % r, end="" )
+    print("...")
+    
+if 0:
     """
     info sur l'embedding:
     https://openai.com/blog/introducing-text-and-code-embeddings/
@@ -244,7 +250,7 @@ if 1:
                     ["I have a boy", "Quel sont les noms de tes enfants?"],
                 ]
 
-    if 0:
+    if 1:
         print("\n*** pair comparing:")
         for pair in to_compare:
             resp = openai.Embedding.create(
@@ -253,7 +259,9 @@ if 1:
 
             embedding_a = resp['data'][0]['embedding']
             embedding_b = resp['data'][1]['embedding']
-
+            printEmbed(embedding_a)
+            printEmbed(embedding_b)
+            
             similarity_score = np.dot(embedding_a, embedding_b)
             print("similarity_score %s: %.2f" % (str(pair),similarity_score ))
         

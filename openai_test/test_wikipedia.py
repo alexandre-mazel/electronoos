@@ -141,7 +141,7 @@ def retrieveInfoOnPage( page_name, depth = 0 ):
                     break
             print("type: '%s'" % type )
             listInfos[page_name] = (title,categs,type,sum)
-            exit(1)
+            #~ exit(1)
         else:
             listInfos[page_name] = (title,sum)
         if len(listInfos) % 100 == 0:
@@ -178,9 +178,9 @@ if __name__ == "__main__":
         listInfos = loadInfos(fn)
         if 1:
             #~ retrieveInfoOnPage("Puissance (physique)")
-            #~ retrieveInfoOnPage("Maryline monroe")
+            retrieveInfoOnPage("Maryline monroe")
             #~ retrieveInfoOnPage("Montpellier")
-            retrieveInfoOnPage("Le Plessis-Robinson")
+            #~ retrieveInfoOnPage("Le Plessis-Robinson")
             #~ retrieveInfoOnPage("Autoroute")
             #~ retrieveInfoOnPage("Dollar australien")
             storeInfos(fn,listInfos)

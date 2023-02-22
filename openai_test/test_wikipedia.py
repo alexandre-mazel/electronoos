@@ -97,7 +97,53 @@ def retrieveInfoOnPage( page_name, depth = 0 ):
     else:            
         print( "sum: %s" % stringtools.removeAccentString(sum) )
         # really adding to the list
-        listInfos[page_name] = (title,sum)
+        if 1:
+            categs = p.categories[:]
+            #~ print(categs)
+            i = 0
+            while i < len(categs):
+                # clean each categ
+                categs[i] = categs[i].replace("Catégorie:", "")
+                
+                startCategToRemove = ["Article ", "Page pointant ", "Page utilisant ", "Bon article"]
+                bFound = 0
+                for startRemo in startCategToRemove:
+                    #~ print("'%s'?"%categs[i][:len(startRemo)])
+                    if categs[i][:len(startRemo)] == startRemo:
+                        bFound = 1
+                        break
+                if bFound:
+                    #~ print("=> match: '%s'" % categs[i] )
+                    del categs[i]
+                    continue
+                #~ print("=> no match: '%s'"% categs[i])
+                i += 1
+            print(categs)
+            typeGuess = {
+                # en minuscule
+                "Personnage": ["article biographique"],
+                "Ville": ["unité urbaine","commune de france"],
+                "Infrastructure": ["infrastructure"],
+                "Monnaie": ["monnaie"],
+                }
+            
+            type = ""
+            bFound = 0
+            for k,v in typeGuess.items():
+                for match in v:
+                    for categ in categs:
+                        if match in categ.lower():
+                            bFound = 1
+                            break
+                    if bFound: break
+                if bFound: 
+                    type = k
+                    break
+            print("type: '%s'" % type )
+            listInfos[page_name] = (title,categs,type,sum)
+            exit(1)
+        else:
+            listInfos[page_name] = (title,sum)
         if len(listInfos) % 100 == 0:
             storeInfos(fn,listInfos)
         nbr_added += 1
@@ -127,9 +173,14 @@ def retrieveInfoOnPage( page_name, depth = 0 ):
     
 if __name__ == "__main__":
     if 1:
-        listInfos = dict() # page_name =>title, summary
+        listInfos = dict() # page_name => title, categories, summary
         fn = "wiki_knowledge.txt"
         listInfos = loadInfos(fn)
-        if 0:
-            retrieveInfoOnPage("Puissance (physique)")
+        if 1:
+            #~ retrieveInfoOnPage("Puissance (physique)")
+            #~ retrieveInfoOnPage("Maryline monroe")
+            #~ retrieveInfoOnPage("Montpellier")
+            retrieveInfoOnPage("Le Plessis-Robinson")
+            #~ retrieveInfoOnPage("Autoroute")
+            #~ retrieveInfoOnPage("Dollar australien")
             storeInfos(fn,listInfos)

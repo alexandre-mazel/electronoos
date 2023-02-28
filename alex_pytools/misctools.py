@@ -427,7 +427,20 @@ def getCpuModel(bShort=False):
     
     if platform.system() == "Windows":
         name1 = platform.processor()
-        name2 = getSystemCallReturn( "wmic cpu get name" ).split("\n")[-3]
+        #~ name2 = getSystemCallReturn( "wmic cpu get name" ).split("\n")[-3]
+        #  a bit quicker:
+        #~ name2 = subprocess.check_output(["wmic","cpu","get", "name"]).strip().decode(encoding='utf-8', errors='strict').split("\n")[1]
+        name2 = subprocess.check_output(["wmic","cpu","get", "name"]).strip().decode(encoding='utf-8', errors='strict')
+        idx = name2.find("\n")
+        name2 = name2[idx+1:]
+        
+        #~ print("name1: '%s'" % name1)
+        #~ print("name2: '%s'" % name2)
+        if 0:
+            # same info than wmic cpu, but way longer
+            import cpuinfo
+            name3 =  cpuinfo.get_cpu_info()['brand_raw']
+            print("name3: '%s'" % name3)
     elif platform.system() == "Darwin":
         os.environ['PATH'] = os.environ['PATH'] + os.pathsep + '/usr/sbin'
         command ="sysctl -n machdep.cpu.brand_string"
@@ -1180,14 +1193,19 @@ def eraseFiles( listFiles, strPath = "" ):
     
 def isFileHasSameContent( fn1,fn2 ):
     """
-    return True if content are same
+    return True if content are same.
+    Return False if content are different or one file isn't a file !
     """
     # not always usefull, but can save some time
     #~ print("INF: isFileHasSameContent: comparing '%s' and '%s'" % (fn1,fn2) )
+    if not os.path.isfile(fn1) or not os.path.isfile(fn2):
+        return False
+        
     s1 = os.path.getsize(fn1)
     s2 = os.path.getsize(fn2)
     if s1 != s2:
         return False
+        
         
     strEncoding = "utf-8"
     strAltEncoding = "cp1252"
@@ -1239,10 +1257,17 @@ def findDuplicate( strPath ):
     nCountSameSize = 0
     nNumFile = 0
     nNumTotalFile = len(listFiles)
+    nTotalSizeDup = 0
     while nNumFile < len(listFiles):
+        
         if nNumFile % 1000 == 0: sys.stdout.write("INF: comparing %d/%d\r" % (nNumFile,nNumTotalFile))
         f = listFiles[nNumFile]
+        if not os.path.isfile(strPath+f):
+            nNumFile += 1
+            continue
+            
         nSize = os.path.getsize(strPath+f)
+            
         # NB: we can have many file same size, but some are equal and some aren't
         if nSize == nSizePrev:
             nCountSameSize += 1
@@ -1258,7 +1283,16 @@ def findDuplicate( strPath ):
                         strOrig = f
                         nToDel = nNumFile - i - 1
 
-                    print("INF: findDuplicate: find a dup: %s - orig: %s (size:%d)" % (strDup, strOrig,nSize ) )
+                    nTotalSizeDup += nSize
+                    if nSize > 0:
+                        try:
+                            print("INF: findDuplicate: find a dup: %s - orig: %s (size:%d)" % (strDup, strOrig,nSize ) )
+                        except UnicodeEncodeError as err:
+                            import stringtools
+                            print("INF: findDuplicate: find a dup (accent removed): %s - orig: %s (size:%d)" % (stringtools.removeAccentString(strDup), stringtools.removeAccentString(strOrig),nSize ) )
+                    else:
+                        print("INF: findDuplicate: file empty: %s" % strDup )
+                        
                     out.append( strDup )
                     # remove this one from the list, helping future comparisons
                     del listFiles[nToDel]
@@ -1275,6 +1309,7 @@ def findDuplicate( strPath ):
         
         
     print("INF: findDuplicate: duplicate in '%s': %d file(s) / %d" % (strPath, len(out), nNumTotalFile ) )
+    if nTotalSizeDup >  0: print("INF: findDuplicate: total duplicated size taken: %.1fMB" % (nTotalSizeDup/1024/1024. ) )
     return out
     
 def guessExtension( filename ):
@@ -1587,3 +1622,14 @@ if __name__ == "__main__":
     autoTest()
     #~ viewSmoothstep()
     #~ testSound()
+    
+    if 0:
+        # clean some folder:
+        strPath = "D:/tmp_from_c/"
+        strPath = "D:/tmp_from_ms4/tmp/"
+        strPath = "D:/tmp_from_ms4/tmp_scr/"
+        strPath = "c:/scr/"
+        #~ strPath = "c:/Users/alexa/downloads/"
+        
+        listDup = findDuplicate(strPath)
+        #~ eraseFiles(listDup, strPath)

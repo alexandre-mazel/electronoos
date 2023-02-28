@@ -98,6 +98,7 @@ def retrieveInfoOnPage( page_name, depth = 0 ):
         print( "sum: %s" % stringtools.removeAccentString(sum) )
         # really adding to the list
         if 1:
+            # add categs et type (unfinished)
             categs = p.categories[:]
             #~ print(categs)
             i = 0

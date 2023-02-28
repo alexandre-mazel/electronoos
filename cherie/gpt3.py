@@ -70,6 +70,7 @@ if 1:
     #~ prompt = "picture of a man, digital art"
     prompt = "a sprite of a missile" # bien
     #~ prompt = "a sprite of a missile, vertical" #pas bien, on voit moins de sprite
+    prompt = "a fox skiing on the lava, paintings by van gogh"
     image_resp = openai.Image.create(prompt=prompt, n=10, size="512x512")
     #~ print(dir(image_resp))
     #~ print(dir(image_resp.values))

@@ -110,6 +110,8 @@ def findmatch(path,im):
                 cacheImages[filename_looksalike] = imlooksalike
             
             if 1:
+                if imlooksalike is None:
+                    return None
                 imlooksalike = imlooksalike.copy()
                 h,w = imlooksalike.shape[:2]
                 txt = "dst: %4.2f, conf: %4.2f" % (dist,conf)
@@ -167,7 +169,7 @@ def loopwebcam(pathlearned):
     
 if __name__ == "__main__":
     path = "d:/generated_portraits/"
-    #~ path = "C:/Users/alexa/Downloads/lki0/"
+    path = "C:/Users/alexa/Downloads/lki0/"
     #~ learnAllImages(path)
     loopwebcam(path)
     

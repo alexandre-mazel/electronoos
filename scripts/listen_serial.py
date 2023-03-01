@@ -4,6 +4,10 @@ import sys
 import serial # pip install pyserial
 
 def listPorts():
+    """
+    list all open ports and print information on them.
+    Return the first found
+    """
     bVerbose = 1
     # chose an implementation, depending on os
     #~ if sys.platform == 'cli':
@@ -16,30 +20,45 @@ def listPorts():
     else:
         raise ImportError("Sorry: no implementation for your platform ('{}') available".format(os.name))
 
+    strFirstOpenPort = ""
 
     iterator = sorted(comports())
     # list them
     for n, (port, desc, hwid) in enumerate(iterator, 1):
-        sys.stdout.write("{:20}\n".format(port))
+        if strFirstOpenPort == "": strFirstOpenPort = port
+        sys.stdout.write("listPorts: open port: {:20}\n".format(port))
         if bVerbose:
             sys.stdout.write("    desc: {}\n".format(desc))
             sys.stdout.write("    hwid: {}\n".format(hwid))
+            
+    return strFirstOpenPort
         
         
 def monitorPort(strPortName):
     ser = serial.Serial(strPortName)
-    print("INF: %s is open: %s" % (ser.name,ser.is_open) )
-    #~ for i in range(100):
-    while 1:
-        buf = ser.readline()
-        buf = str(buf)
-        buf = buf.replace("\n","")
-        buf = buf.replace("\r","")
-        buf = buf.replace("\\r\\n","")
-        print("%s"%buf)
+    try:
+        print("INF: %s is open: %s" % (ser.name,ser.is_open) )
+        #~ for i in range(100):
+        prevPrint = ""
+        while 1:
+            buf = ser.readline()
+            buf = str(buf)
+            buf = buf.replace("\n","")
+            buf = buf.replace("\r","")
+            buf = buf.replace("\\r\\n","")
+            buf = buf.replace("b'","")
+            if buf[-1]== "'": buf = buf[:-1]
+            #~ buf = buf.decode(encoding='utf-8', errors='strict')
+            if buf != prevPrint:
+                prevPrint = buf
+                print(buf)
+    except BaseException as err: # including KeyboardInterrupt
+        print("ERR: monitorPort: %s" % err )
+        pass
     ser.close()
 
-listPorts()
+#~ listPorts()
 strPortName = '/dev/ttyUSB0'
 strPortName = 'COM7'
+strPortName = listPorts()
 monitorPort(strPortName)

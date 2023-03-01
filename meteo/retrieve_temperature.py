@@ -1,5 +1,9 @@
 # -*- coding: cp1252 -*-
 
+"""
+copy to windows:
+scp -P 14092 pi@thenardier.fr:/home/pi/save/temperature.txt c:\save\temperature_thenardier.txt
+"""
 
 import io
 import os

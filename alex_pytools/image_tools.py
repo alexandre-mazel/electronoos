@@ -320,14 +320,16 @@ def findPicturesInImage(im, roi = None, nMinSize=16, nMaxSize=64, bRound=1,bDebu
                     # if no litten stop
                     bAtLeastOne = 1
                     harea = 0
-                    while bAtLeastOne:
+                    while bAtLeastOne and j+harea < hchunk:  # chez concept: bug en disant que index 29 utilise alors que que 29 de taille!
                         k = 0
                         bAtLeastOne = 0
-                        if j+harea+1 < hchunk and i > 0 and store[j+harea+1,i-1]: # chez concept: bug en disant que index 29 utiilsé alors que que 29 de taille!
+                        if j+harea+1 < hchunk and i > 0 and store[j+harea+1,i-1]:
                             # the pixel on the left below is on so let's decay the area
                             i -= 1
                             warea += 1
                         while i+k < wchunk:
+                            #~ print("DBG: findPicturesInImage: i: %s, k: %s, wchunk: %s" % (i,k,wchunk))
+                            #~ print("DBG: findPicturesInImage: j: %s, harea: %s, wchunk: %s" % (j,harea,hchunk))
                             if store[j+harea,i+k] == 0:
                                 if k >= warea:
                                     break

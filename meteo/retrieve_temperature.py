@@ -41,6 +41,7 @@ def retrieveTemp():
             ["Bordeaux", "https://weather.com/fr-FR/temps/aujour/l/12fae739549c2bb1e6693bdb14c062671c7c87d40051273a05a4eaf5848064fe",startbase,stopbase],
             ["Tavira", "https://weather.com/fr-FR/temps/aujour/l/efa3db97660e2aaaa3efc076350dd00386e0453da1547361cd68e78a412f2fb8",startbase,stopbase],
             ["VN Gaia", "https://weather.com/fr-FR/temps/aujour/l/7291c492bc9efb63e5a06ee49112469d08890e36e59bc3df64648f4c681440d5",startbase,stopbase],
+            ["Las Palmas", "https://weather.com/fr-FR/temps/aujour/l/9e18ab8b60528d5a8feb814d67eaf1bcf4dbadaeff6525ac3bd8441f91152ddf",startbase,stopbase],
     ]
     
     start_cond = '<div data-testid="wxPhrase" class="CurrentConditions--phraseValue--mZC_p">'
@@ -57,10 +58,13 @@ def retrieveTemp():
         # beau: soleil avec un peu de nuage
         # ensoleillé: plein soleil
         print("DBG: retrieveTemp: %s: temp: '%s' cond: '%s'" % (city,temp,cond) )
-        if len(temp) < 3:
-            temp = int(temp)
-            cond = cond.replace("é","e")
-            store(city,temp,cond)
+        try:
+            if len(temp) < 3:
+                temp = int(temp)
+                cond = cond.replace("é","e")
+                store(city,temp,cond)
+        except BaseException as err:
+            print("ERR: retrieveTemp: during store, err: %s" % err )
         time.sleep(random.random()*10)
         time.sleep(8)
         #~ break

@@ -55,7 +55,7 @@ def download(remote,dst, bForceDownload=False, bInternalCalledForRetry = False):
     except urllib.error.URLError as err:
         print("%s: ERR: common.download (4): %s\n err: %s" % (timestamp,remote,err) )
         if not bInternalCalledForRetry:
-            return download(remote,dst,bForceDownload=bForceDownload,bInternalRetry=True)
+            return download(remote,dst,bForceDownload=bForceDownload,bInternalCalledForRetry=True)
         return -3
         
     print("%s: INF: => %s" % (timestamp,dst))

@@ -1165,10 +1165,14 @@ def backupFile( filename ):
     filenamebak = filename + ".bak"
     if os.path.isfile(filenamebak):
         onedayinsec = 60*60*24
-        creatime = os.path.getctime(filenamebak)
-        if time.time() - creatime > onedayinsec:
+        modtime = os.path.getmtime(filenamebak)
+        print("DBG: backupFile: modtime: %s" % modtime)
+        if time.time() - modtime > onedayinsec:
             # fait un backup du backup
-            os.rename(filenamebak,filenamebak+".time_"+ str(int(creatime)))
+            try:
+                os.rename(filenamebak,filenamebak+".time_"+ str(int(modtime)))
+            except FileExistsError as err: 
+                print("WRN: backupFile: erreur inatendue: on en a deja fait un a cette seconde precise, c'est bizarre...\nerr:%s" % err)
         else:
             os.remove(filenamebak)
     os.rename(filename,filenamebak)

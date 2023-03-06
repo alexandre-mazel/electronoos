@@ -1465,6 +1465,7 @@ class ExclusiveLock:
         if bVerbose: import threading
         
         timeStart = time.time()
+        cptLoop = 0
         while 1:
 
             try:
@@ -1480,6 +1481,8 @@ class ExclusiveLock:
                 break
                 
             time.sleep(0.05)
+            cptLoop += 1
+            if(cptLoop % 100) == 99: print("WRN: Lock.acquire: self.lockname: %s, seems locked for a longtime?" % self.lockname )
             
         return False
         

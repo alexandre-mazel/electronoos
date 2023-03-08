@@ -63,7 +63,7 @@ if 0:
     print(completion.choices[0].text)
 
 
-if 1:
+if 0:
     # generation of an image
     prompt = "two dogs playing chess, oil painting"
     prompt = "picture of a man"
@@ -159,7 +159,7 @@ if 0:
 # print response
 #~ print(edit_response)
 
-exit()
+#~ exit()
 
 
 start_chat_log = '''Human: Hello, who are you?
@@ -172,9 +172,9 @@ def ask(question, chat_log=None):
         chat_log = start_chat_log
     prompt = f'{chat_log}Human: {question}\nAI:'
     response = completion.create(
-        prompt=prompt, engine="davinci", stop=['\nHuman'], temperature=0.9,
+        prompt=prompt, engine="curie", stop=['\nHuman'], temperature=0.9,
         top_p=1, frequency_penalty=0, presence_penalty=0.6, best_of=1,
-        max_tokens=100)
+        max_tokens=1000) # was 100
     print("DBG: choices: %s" % str(response.choices))
     answer = response.choices[0].text.strip()
     return answer

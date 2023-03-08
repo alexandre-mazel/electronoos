@@ -135,6 +135,8 @@ class Firstnames:
         listForgot = [
                             ("Karine", True, ["fr"]),
                             ("Nadège", True, ["fr"]),
+                            ("Marise", True, ["fr"]),
+                            ("Maryse", True, ["fr"]),
                         ]
         
         for data in listForgot:

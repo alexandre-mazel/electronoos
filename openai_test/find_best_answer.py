@@ -475,8 +475,11 @@ if 1:
     bUseOpenAI = 0
     
     if not bUseOpenAI:
-        sys.path.append("../../obo/camembert")
-        import bert_test_similarity
+        #~ sys.path.append("../../obo/camembert")
+        #~ from bert_test_similarity import camEmbedList
+        sys.path.append("../camembert")
+        from sentence_embedding import camEmbedList
+
     
     def saveEmbed(fn,data):
         f = open(fn,"wt")
@@ -516,7 +519,7 @@ if 1:
     if not os.path.isfile(fn_embed):
         print("generating embedding to %s..." % fn_embed)
         if bUseOpenAI: embedQ = getEmbeddingForLists( listq, engine = strModelName )
-        else: embedQ = bert_test_similarity.camEmbedList( listq )
+        else: embedQ = camEmbedList( listq )
         saveEmbed(fn_embed,embedQ)
     else:
        print("loading from %s..." % fn_embed)
@@ -524,6 +527,7 @@ if 1:
        
        
     # result simi avec openai gpt3 / puis avec camembert (gpt2?)
+    # camembert a seulement 512 float et gpt3 12k (24 fois plus)
     # Camembert: on remarque qu'on a une erreur et dans ce cas la la simi est < 0.2
     q = "parle moi de la mémoire vive" # => Qu'est ce que La mémoire morte 0.8 / 0.35
     q = "parle moi de la calculatrice" # => Où trouve-t-on la calculatrice?, simi: 0.85 / 0.26
@@ -533,7 +537,7 @@ if 1:
     q = "J'ai besoin d'envoyer un email" # => Que doit contenir obligatoirement une adresse mail ?, simi: 0.76 / 0.38
     q = "J'ai besoin d'envoyer un courrier electronique" # => Que doit contenir obligatoirement une adresse mail ?, simi: 0.76 / 0.37
     if bUseOpenAI: vQ = getEmbeddingForLists( [q], engine = strModelName )[0]
-    else: vQ = bert_test_similarity.camEmbedList( [q] )
+    else: vQ = camEmbedList( [q] )
     print(type(embedQ))
     print(type(vQ))
     print(type(embedQ[0]))

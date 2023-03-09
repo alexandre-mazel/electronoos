@@ -76,6 +76,29 @@ def precomputeList(list_s,filenametostore):
        if len(embedList) != len(list_s):
            print("WRN: camPrecomputeList: file '%s' not up to date ? (contains: %d and asked: %d)" % (len(embedQ),len(list_s)) )
     return embedList
+    
+def getBests(s,listEmbed):
+    """
+    find best simi between a sentence and a list of already computing embedding.
+    return the index in the list, and the simi
+    """
+    simiMax = 0
+    imax = -1
+    simiMax2 = 0
+    imax2 = -1
+    e = camEmbed(s)
+    for i,v in enumerate(listEmbed):
+        simi = np.dot(e,v)
+        if simi > simiMax:
+            simiMax2 = simiMax
+            imax2 = imax
+            simiMax = simi
+            imax = i
+        elif simi > simiMax2:
+            simiMax2 = simi
+            imax = i
+            
+    return [(imax,simiMax),(imax2,simiMax2)]
 
 def autotest():
     tresh = 0.4

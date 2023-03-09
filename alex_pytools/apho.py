@@ -15,6 +15,8 @@ class Apho:
         self.aCountSaid = [] # for each sentence, number of said time
         self.aLastSaid = [] # time of last said
         
+        self.embed = None # when using it
+        
     def load( self ):
         """
         Charge les pensees: un fichier avec des pensées, puis sur la derniere ligne l'auteur. séparé par des lignes vides.
@@ -63,69 +65,111 @@ Antoine de Saint-Exupery
         bMatchShort = 0
         bMatchShort = 1
         
-        if 0:
-            sentence = sentence.replace('.', ' ').replace(',', ' ')
-            words = sentence.split()
-            words = stringtools.lowerList(words)
-        else:
-            import usual_words
-            words = usual_words.filterSentences(sentence,bVerbose=0)
-            words = stringtools.lowerList(words)
-            
-        # add also words without '
-        i = 0
-        while i < len(words):
-            if "'" in words[i]:
-                words.extend(words[i].split("'"))
-            i += 1
-        if bVerbose: print("DBG: getThoughts: words: %s" % words)
+        bUseWordMatching = 1
+        #~ bUseWordMatching = 0 # use camembert
         
-        # find radical style
-        i = 0
-        while i < len(words):
-            if len(words[i])<3:
-                del words[i]
-                continue
-            # on le fera plus tard pour essayer de matcher sur le mot reel
-            #~ if len(words[i])>5:
-                #~ words[i] = words[i][:-3] # travailler => travail
-            i += 1
-            
-        # remove usual words
-        if 0:
-            import usual_words
+        if bUseWordMatching:
+            if 0:
+                sentence = sentence.replace('.', ' ').replace(',', ' ')
+                words = sentence.split()
+                words = stringtools.lowerList(words)
+            else:
+                import usual_words
+                words = usual_words.filterSentences(sentence,bVerbose=0)
+                words = stringtools.lowerList(words)
+                
+            # add also words without '
             i = 0
             while i < len(words):
-                if usual_words.isUsualWord(words[i]):
+                if "'" in words[i]:
+                    words.extend(words[i].split("'"))
+                i += 1
+            if bVerbose: print("DBG: getThoughts: words: %s" % words)
+            
+            # find radical style
+            i = 0
+            while i < len(words):
+                if len(words[i])<3:
                     del words[i]
                     continue
+                # on le fera plus tard pour essayer de matcher sur le mot reel
+                #~ if len(words[i])>5:
+                    #~ words[i] = words[i][:-3] # travailler => travail
                 i += 1
+                
+            # remove usual words
+            if 0:
+                import usual_words
+                i = 0
+                while i < len(words):
+                    if usual_words.isUsualWord(words[i]):
+                        del words[i]
+                        continue
+                    i += 1
+                
+            print("match word: %s" % words)
+            match = []
+            for t in self.thous:
+                cit = t[0]
+                cit = cit.lower()
+                n = 0
+                for w in words:
+                    #~ print("compare with cit: %s" % cit)
+                    if w in cit:
+                        if bVerbose or 0: print( "match: '%s' in '%s'" % (w,cit) )
+                        #~ n += 1
+                        n += len(w) # count more point if word is long!
+                    if bMatchShort and len(w)>5:
+                        # lemmatisation du pauvre
+                        if "er" == w[-2:]:
+                            ws = w[:-3]
+                        else:
+                            ws = w[:-2]
+                        if ws in cit:
+                            # pb: ecoute => eco can match with recommencer
+                            if bVerbose: print( "match short: '%s' in '%s'" % (ws,cit) )
+                            n += len(ws)
+                        
+                match.append(n*30/len(cit))
+        else:
+            # camembert
+            import numpy as np
+            sys.path.append("../camembert")
+            import sentence_embedding
+
+            # generating for all apho
+            if self.embed == None:
+                timeBegin = time.time()
+                if 0:
+                    # 6s
+                    listEmb = []
+                    for t in self.thous:
+                        cit = t[0]
+                        v = sentence_embedding.camEmbedList([cit])[0]
+                        listEmb.append(v)
+                else:
+                    # once precomputed: 0.12s
+                    list_s = [x[0] for x in self.thous]
+                    listEmb = sentence_embedding.precomputeList(list_s,"apho_embed.txt")
+                    # le 7ieme chiffre après la virgule est différent quand on sauve dans un fichier
+                print("listEmb takes %.2fs" % (time.time()-timeBegin))
+                #~ print(listEmb[0])
+                #~ print(listEmb[1])
+                #~ print(listEmb[2])
+                self.embed = listEmb
+                
+            e = sentence_embedding.camEmbedList(sentence)
+            match = []
+            for v in self.embed:
+                simi = np.dot(e,v)/0.4 # 0.4 is a good threshold for simi
+                 #reglage pour ne pas prendre ceux qui sont trop loin (on a ensuite un filtre >=1)
+                #~ simi *= 2.35 # un peu trop sympa, 19 hits: laisse passer 'c'est bien fait peur. tu es un bon petit gars. eh mon petit gnocchi est-ce qu'il a." => Gaïa, c'est l'heure d'aller te coucher. 
+                simi *= 2.2 # plus limité: 14 hits
+                match.append(simi)
             
-        print("match word: %s" % words)
-        match = []
-        for t in self.thous:
-            cit = t[0]
-            cit = cit.lower()
-            n = 0
-            for w in words:
-                #~ print("compare with cit: %s" % cit)
-                if w in cit:
-                    if bVerbose or 0: print( "match: '%s' in '%s'" % (w,cit) )
-                    #~ n += 1
-                    n += len(w) # count more point if word is long!
-                if bMatchShort and len(w)>5:
-                    # lemmatisation du pauvre
-                    if "er" == w[-2:]:
-                        ws = w[:-3]
-                    else:
-                        ws = w[:-2]
-                    if ws in cit:
-                        # pb: ecoute => eco can match with recommencer
-                        if bVerbose: print( "match short: '%s' in '%s'" % (ws,cit) )
-                        n += len(ws)
-                    
-            match.append(n*30/len(cit))
-        #~ print("match: %s" % match)
+        # at this point we have a list of match for each thou (the greater the better)
+        
+        print("match: %s" % match)
         #~ [x for _, x in sorted(zip(Y, X))]
         # both are working, but second seems faster, todolater: measures
         #~ index_order = [x for _, x in sorted(zip(match, range(len(match))),reverse=True)]
@@ -302,7 +346,7 @@ def autoTest():
     testApho("c'est bien fait peur. tu es un bon petit gars. eh mon petit gnocchi est-ce qu'il a.")
     # => "Gourmandise : source inépuisable de bonheur. a cause de bonheur" bon match bonheur, c'est moche.
     # => maintenant donne, Quand vous êtes à Rome, faites comme les Romains. fait => faites
-    
+    # => Le seul fait d’exister est un véritable bonheur
     testApho("ambulance") # => Ben par exemple, c'est un mec qui va a une soirée genre bien habillé
     print("")
 
@@ -326,5 +370,5 @@ def autoTest():
         
     
 if __name__ == "__main__":
-    #~ autoTest()
-    test_loop_asr()
+    autoTest()
+    #~ test_loop_asr()

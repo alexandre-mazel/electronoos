@@ -466,10 +466,17 @@ if 0:
     print("encoded sent2: " + str(encoded))
     
     
-if 0:
+if 1:
     import json
     
-    # test sur oia faq_informatique
+    print("test sur oia faq_informatique")
+    
+    bUseOpenAI = 1 # else it's camembert
+    bUseOpenAI = 0
+    
+    if not bUseOpenAI:
+        sys.path.append("../../obo/camembert")
+        import bert_test_similarity
     
     def saveEmbed(fn,data):
         f = open(fn,"wt")
@@ -504,39 +511,57 @@ if 0:
 
     listq = [item[0] for item in faq]
 
-    fn_embed = "faq_informatique_embed.txt"
+    if bUseOpenAI: fn_embed = "faq_informatique_embed_openai.txt"
+    else: fn_embed = "faq_informatique_embed_camembert.txt"
     if not os.path.isfile(fn_embed):
         print("generating embedding to %s..." % fn_embed)
-        embedQ = getEmbeddingForLists( listq, engine = strModelName )
+        if bUseOpenAI: embedQ = getEmbeddingForLists( listq, engine = strModelName )
+        else: embedQ = bert_test_similarity.camEmbedList( listq )
         saveEmbed(fn_embed,embedQ)
     else:
+       print("loading from %s..." % fn_embed)
        embedQ = loadEmbed(fn_embed)
-       print("generating loading from %s..." % fn_embed)
        
-    q = "parle moi de la mémoire vive" # => Qu'est ce que La mémoire morte 0.8
-    q = "parle moi de la calculatrice" # => Où trouve-t-on la calculatrice?, simi: 0.85
-    q = "J'ai besoin de faire des calculs" # => Où trouve-t-on la calculatrice?, simi: 0.78
-    q = "J'ai besoin de faire des multiplication" # => Où trouve-t-on la calculatrice?, simi: 0.72
-    q = "J'ai besoin de faire 16*16" # => Où trouve-t-on la calculatrice?, simi: 0.66
-    q = "J'ai besoin d'envoyer un email" # => Que doit contenir obligatoirement une adresse mail ?, simi: 0.76
-    q = "J'ai besoin d'envoyer un courrier electronique" # => Que doit contenir obligatoirement une adresse mail ?, simi: 0.76
-    vQ = getEmbeddingForLists( [q], engine = strModelName )[0]
+       
+    # result simi avec openai gpt3 / puis avec camembert (gpt2?)
+    # Camembert: on remarque qu'on a une erreur et dans ce cas la la simi est < 0.2
+    q = "parle moi de la mémoire vive" # => Qu'est ce que La mémoire morte 0.8 / 0.35
+    q = "parle moi de la calculatrice" # => Où trouve-t-on la calculatrice?, simi: 0.85 / 0.26
+    q = "J'ai besoin de faire des calculs" # => Où trouve-t-on la calculatrice?, simi: 0.78 / 0.32
+    q = "J'ai besoin de faire des multiplication" # => Où trouve-t-on la calculatrice?, simi: 0.27
+    q = "J'ai besoin de faire 16*16" # => Où trouve-t-on la calculatrice?, simi: 0.66 / Citez 4 raccourcis clavier, 0.14; Où trouve-t-on la calculatrice? est a 0.10
+    q = "J'ai besoin d'envoyer un email" # => Que doit contenir obligatoirement une adresse mail ?, simi: 0.76 / 0.38
+    q = "J'ai besoin d'envoyer un courrier electronique" # => Que doit contenir obligatoirement une adresse mail ?, simi: 0.76 / 0.37
+    if bUseOpenAI: vQ = getEmbeddingForLists( [q], engine = strModelName )[0]
+    else: vQ = bert_test_similarity.camEmbedList( [q] )
+    print(type(embedQ))
+    print(type(vQ))
+    print(type(embedQ[0]))
     print(type(vQ[0]))
     print(type(embedQ[0][0]))
+    print(type(vQ[0][0]))
+    
+    print(len(embedQ))
+    print(len(vQ))
+    print(len(embedQ[0]))
+    print(len(vQ[0]))
+    
+    #~ print(embedQ[0].shape)
+    #~ print(vQ[0].shape)
     
     maxSimilarity = 0
     maxIdx = -1
     for num,v in enumerate(embedQ):
-        simi = np.dot(vQ,v)
+        simi = np.dot(vQ[0],v)
         ans = faq[num][0]
         print("simi: %.2f, %s" % (simi, ans))
         if simi > maxSimilarity:
             maxSimilarity = simi
             maxAns = ans
             maxIdx = num
-            
-    print("q: %s, qref: %s, simi: %.2f" % (q,maxAns,maxSimilarity))
-    print("answer: %s" % faq[num][1])
+    print("")
+    print("q: %s\nqref: %s\nsimi: %.2f" % (q,maxAns,maxSimilarity))
+    print("answer: %s" % faq[maxIdx][1])
     
     
 """

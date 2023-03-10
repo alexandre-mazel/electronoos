@@ -67,20 +67,90 @@ def loadEmbed(fn):
     
 def precomputeList(list_s,filenametostore):
     if not os.path.isfile(filenametostore):
-        print("generating embedding to %s..." % filenametostore)
+        print("INF: precomputeList: generating embedding to %s..." % filenametostore)
         embedList = camEmbedList( list_s )
         saveEmbed(filenametostore,embedList)
     else:
-       print("loading from %s..." % filenametostore)
+       print("INF: precomputeList: loading from %s..." % filenametostore)
        embedList = loadEmbed(filenametostore)
        if len(embedList) != len(list_s):
            print("WRN: camPrecomputeList: file '%s' not up to date ? (contains: %d and asked: %d)" % (len(embedQ),len(list_s)) )
     return embedList
     
+def cutParagraphToSentences(p):
+    import re
+    #~ ss = p.replace("\n",".").split(".")
+    ss = list(filter(None, re.split("[.!?\n]+", p))) # [.!?:\n]+
+    i = 0
+    # remove empty element
+    while i < len(ss):
+        ss[i] = ss[i].replace("\t","").strip()
+        if ss[i] == "":
+            del ss[i]
+        else: i += 1
+    return ss
+    
+if 0:
+    s = """Salut les gars
+    Comment ca va?
+    moi: c'est cool!
+    J'ai une soeur et un frère. Mon pere s'appelle tutu.
+    """
+    print('\n'.join(cutParagraphToSentences(s)))
+    exit(1)
+
+    
+    
+def avgList( l ):
+    """
+    do an average cell by cell of a list of vectors.
+    eg: [1,2,3],[1,4,21] => [1,3,12]
+    """
+    s = l[0]
+    for v in l[1:]:
+        for i,e in enumerate(v):
+            s[i] += e
+    len_l = len(l) 
+    for i in range(len(s)):
+        s[i] /= len_l
+    return s
+assert(avgList(( [1,2,3],[1,4,21])) == [1,3,12] )
+        
+def precomputeParagraph(list_p,filenametostore):
+    """
+    get a list of long text. Embed each sentences of each long text.
+    return a list for each paragraph:
+        [average embed of each sentences, embed of s1, embed of s2, ...]
+    Then call getBestParagraphs to find better
+    
+    """
+    if not os.path.isfile(filenametostore):
+        print("INF: precomputeParagraph: generating embedding to %s..." % filenametostore)
+        embedListList = []
+        for p in list_p:
+            list_s = cutParagraphToSentences(p)
+            e = camEmbedList( list_s )
+            avg = avgList(e)
+            e.insert(0,avg)
+            embedListList.append(e)
+            
+        print("DBG: precomputeParagraph: saving embed of %d paragraph " % len(embedListList))
+        print("DBG: precomputeParagraph: len first paragraph: %s" % len(embedListList[0]))
+        saveEmbed(filenametostore,embedListList)
+    else:
+        print("INF: precomputeParagraph: loading from %s..." % filenametostore)
+        embedListList = loadEmbed(filenametostore)
+        print("DBG: precomputeParagraph: loaded embed of %d paragraph " % len(embedListList))
+        print("DBG: precomputeParagraph: len first paragraph: %s" % len(embedListList[0]))
+        if len(embedListList) != len(list_p):
+            print("WRN: camPrecomputeList: file '%s' not up to date ? (contains: %d and asked: %d)" % (len(embedQ),len(list_s)) )
+            assert(0)
+    return embedListList
+    
 def getBests(s,listEmbed):
     """
     find best simi between a sentence and a list of already computing embedding.
-    return the index in the list, and the simi
+    return the best and second best; [index in the list, and the simi] * 2
     """
     simiMax = 0
     imax = -1
@@ -99,6 +169,53 @@ def getBests(s,listEmbed):
             imax2 = i
             
     return [(imax,simiMax),(imax2,simiMax2)]
+    
+def getBestParagraphs(s,listEmbedParagraph):
+    """
+    find best simi between a text and many paragraph
+    return the index in the list, and the simi and also the best on average sentence
+    """
+    print("DBG: getBestParagraphs: s: '%s', len listEmbedParagraph: %s" % (s,len(listEmbedParagraph)) )
+    simiMax = 0
+    imax = -1
+    simiMax2 = 0
+    imax2 = -1
+    jmax = -1 # which sentence is the best match
+    
+    simiAvgMax = 0
+    imaxAvg = -1
+    simiAvgMax2 = 0
+    imaxAvg2 = -1
+    
+    e = camEmbed(s)
+    for i,vv in enumerate(listEmbedParagraph): 
+        #~ print("DBG: getBestParagraphs: len vv: %s" % (len(vv)) )
+        sumSimi = 0
+        for j,v in enumerate(vv):
+            #~ print("DBG: getBestParagraphs: len v: %s" % (len(v)) )
+            simi = np.dot(e,v)
+            sumSimi += simi
+            if simi > simiMax:
+                simiMax2 = simiMax
+                imax2 = imax
+                simiMax = simi
+                imax = i
+                jmax = j
+            elif simi > simiMax2:
+                simiMax2 = simi
+                imax2 = i
+        sumSimi /= len(vv)
+        if sumSimi > simiAvgMax:
+            simiAvgMax2 = simiAvgMax
+            imaxAvg2 = imaxAvg
+            simiAvgMax = sumSimi
+            imaxAvg = i
+        elif sumSimi > simiAvgMax2:
+            simiAvgMax2 = sumSimi
+            imaxAvg2 = i
+            
+    print("DBG: getBestParagraphs: best subphrase jmax: %s" % jmax)
+    return [(imax,simiMax),(imaxAvg,simiAvgMax),jmax]
 
 def autotest():
     tresh = 0.4

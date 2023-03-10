@@ -19,12 +19,13 @@ if 0:
     ret = wikipedia.summary("francois miterrand", sentences=1)
     print(stringtools.removeAccentString(ret))
 
-if 0:
+if 1:
     ny = wikipedia.page("New York")
     print("title: " + ny.title)
     print("url: " + ny.url)
     print(stringtools.removeAccentString(ny.content))
     print("link: " + stringtools.removeAccentString(str(ny.links)))
+    exit(0)
     
 
 

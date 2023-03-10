@@ -43,6 +43,14 @@ def loadInfos(fn):
         data = {}
         
     print("INF: loadInfos: loaded %d page(s)" % len(data))
+    first_article = list(data.keys())[0]
+    print("DBG: loadInfos: first article len: %s" % len(data[first_article]))
+    if len(data[first_article]) == 2:
+        print("DBG: loadInfos: converting to new format")
+        # conversion to new format: from (title,sum) to (title,categs,type,sum)
+        for k,v in data.items():
+            data[k] = [data[k][0],"","",data[k][1]]
+    
     return data
     
 def printPage(tuplePage):
@@ -51,12 +59,12 @@ def printPage(tuplePage):
     print("categ: %s" % tuplePage[1])
     print("summa: %s" % stringtools.removeAccentString(tuplePage[3]))
     
-def createEmbedForPages(listInfos):
+def createEmbedForPages(listInfos,versionname=""):
     sys.path.append("../camembert")
     import sentence_embedding
     # store key list, cause order can change
     
-    fn_keylist = "wiki_keylist.txt"
+    fn_keylist = "generated/wiki_keylist%s.txt" % versionname
     if os.path.isfile(fn_keylist):
         f = open(fn_keylist,"rt")
         buf = f.read()
@@ -71,22 +79,26 @@ def createEmbedForPages(listInfos):
         
     list_title = [listInfos[x][0] for x in listKeys]
     list_sum = [listInfos[x][3] for x in listKeys]
-    print(list_title[:3])
-    print(stringtools.removeAccentString(list_sum[0]))
-    embTitle = sentence_embedding.precomputeList(list_title,"wiki_embed_title.txt")
-    embSum = sentence_embedding.precomputeList(list_sum,"wiki_embed_summary.txt")
+    #~ print(list_title[:3])
+    #~ print(stringtools.removeAccentString(list_sum[0]))
+    embTitle = sentence_embedding.precomputeList(list_title,"generated/wiki_embed_title%s.txt" % versionname)
+    embSum = sentence_embedding.precomputeList(list_sum,"generated/wiki_embed_summary%s.txt" % versionname)
+    embSumPara = sentence_embedding.precomputeParagraph(list_sum,"generated/wiki_embed_summary_paragraph%s.txt" % versionname)
     
-    return listKeys,embTitle,embSum
+    return listKeys,embTitle,embSum,embSumPara
     
 
 def find(req):
     """
-    find a wikipedia page best matching a sentences
+    find a wikipedia page best matching a sentence
     """
     print("INF: find: '%s'" % req )
     sys.path.append("../camembert")
     import sentence_embedding
-    fn = "wiki_knowledge.txt"
+    versionname = ""
+    versionname = "_maryline"
+    versionname = "_5100art"
+    fn = "wiki_knowledge%s.txt" % versionname
     listInfos = loadInfos(fn)
     if 0:
         # test one shot
@@ -108,11 +120,29 @@ def find(req):
         print("req: %s" % (str(emb[:5])))
         exit(1)
         
-    listK,embTitle,embSum = createEmbedForPages(listInfos)
-    for emb in [embTitle,embSum]:
-        bests = sentence_embedding.getBests(req,emb)
+    listK,embTitle,embSum,embSumPara = createEmbedForPages(listInfos,versionname)
+    for nEmbeddingUsed,emb in enumerate([embTitle,embSum,embSumPara]):
+        print("*"*20)
+        print("- %s:"% ["title", "summary", "summary among sentence"][nEmbeddingUsed])
+        if nEmbeddingUsed==2:
+            bests = sentence_embedding.getBestParagraphs(req,emb)
+            idxBestSentence = bests[2]
+            bests = bests[:2]
+            
+            nPara = bests[0][0]
+            kPara = listK[nPara]
+            txtPara = listInfos[kPara][3]
+            print("nPara:%s" % nPara)
+            print("kPara:%s" % kPara)
+            print("txtPara:%s" % stringtools.removeAccentString(txtPara))
+            if idxBestSentence>0:
+                strBest = sentence_embedding.cutParagraphToSentences(txtPara)[idxBestSentence-1]
+            else: 
+                strBest = "(the average)"
+            print("strBest: %s\n" % strBest  )
+        else:
+            bests = sentence_embedding.getBests(req,emb)
         #~ (i1,sim1),(i2,sim2) = bests
-        print("")
         print("find results: bests:%s" % str(bests))
         for best in bests:
             i,sim = best
@@ -120,11 +150,14 @@ def find(req):
             print("k: %s" % k)
             printPage(listInfos[k])
             print("simi: %.2f\n" % sim)
+            
+# find - end
 
     
     
 if __name__ == "__main__":
     #~ find("actrice de cinéma")
-    find("actrice, mannequin et chanteuse")
+    #~ find("actrice, mannequin et chanteuse")
+    find("actrice de cinéma blonde")
     #~ find("Elle se destine initialement au mannequinat avant d'etre reperee")
     #~ find("Elle se destine initialement au mannequinat avant d'etre reperee par Ben Lyon et de signer son premier contrat d'actrice avec la 20th Century Fox en aout 1946")

@@ -109,16 +109,17 @@ def find(req):
         exit(1)
         
     listK,embTitle,embSum = createEmbedForPages(listInfos)
-    bests = sentence_embedding.getBests(req,embSum)
-    #~ (i1,sim1),(i2,sim2) = bests
-    print("")
-    print("find results: bests:%s" % str(bests))
-    for best in bests:
-        i,sim = best
-        k = listK[i]
-        print("k: %s" % k)
-        printPage(listInfos[k])
-        print("simi: %.2f\n" % sim)
+    for emb in [embTitle,embSum]:
+        bests = sentence_embedding.getBests(req,emb)
+        #~ (i1,sim1),(i2,sim2) = bests
+        print("")
+        print("find results: bests:%s" % str(bests))
+        for best in bests:
+            i,sim = best
+            k = listK[i]
+            print("k: %s" % k)
+            printPage(listInfos[k])
+            print("simi: %.2f\n" % sim)
 
     
     

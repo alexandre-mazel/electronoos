@@ -12,6 +12,7 @@ import time
 
 
 import wikipedia # pip install wikipedia
+import wikipedia_tools
 
 wikipedia.set_lang("fr")
 
@@ -19,12 +20,15 @@ if 0:
     ret = wikipedia.summary("francois miterrand", sentences=1)
     print(stringtools.removeAccentString(ret))
 
-if 1:
+if 0:
     ny = wikipedia.page("New York")
+    print("dir: " + str(dir(ny)))
     print("title: " + ny.title)
     print("url: " + ny.url)
-    print(stringtools.removeAccentString(ny.content))
-    print("link: " + stringtools.removeAccentString(str(ny.links)))
+    print("summary: " + stringtools.removeAccentString(ny.summary[:1000]+"...\n"))
+    print("contents: " + stringtools.removeAccentString(ny.content[:1000]+"...\n"))
+    print("link: " + stringtools.removeAccentString(str(ny.links[:10])+"..."))
+    print("images: " + stringtools.removeAccentString(str(ny.images[:4])+"..."))
     exit(0)
     
 
@@ -112,9 +116,29 @@ def retrieveInfoOnPage( page_name, depth = 0 ):
             listInfos[page_name] = (title,categs,type,sum)
             #~ exit(1)
         else:
+            # no categ
             listInfos[page_name] = (title,sum)
+        if 1:
+            # save all images
+            import nettools
+            listImages = p.images
+            for link_image in listImages:
+                fn = os.path.basename(link_image)
+                name,ext = os.path.splitext(fn)
+                if ext.lower() not in [".jpg",".jpeg",".png"]:
+                    continue
+                name = name[:110]
+                fn = name + ext
+                fn_dst = "stored_images/"+page_name+"__"+fn
+                print("DBG: retrieveInfoOnPage: saving image '%s' to '%s'..." % (fn,fn_dst))
+                if os.path.isfile(fn_dst):
+                    print("DBG: retrieveInfoOnPage: image already in dst")
+                else:
+                    nettools.download(link_image,fn_dst)
+            
+            
         if len(listInfos) % 100 == 0:
-            storeInfos(fn,listInfos)
+            wikipedia_tools.storeInfos(fn,listInfos)
         nbr_added += 1
     
     #~ print( p.links )
@@ -144,12 +168,15 @@ if __name__ == "__main__":
     if 1:
         listInfos = dict() # page_name => title, categories, summary
         fn = "wiki_knowledge.txt"
-        listInfos = loadInfos(fn)
+        listInfos = wikipedia_tools.loadInfos(fn)
         if 1:
             #~ retrieveInfoOnPage("Puissance (physique)")
-            retrieveInfoOnPage("Maryline monroe")
+            #~ retrieveInfoOnPage("Maryline monroe")
             #~ retrieveInfoOnPage("Montpellier")
             #~ retrieveInfoOnPage("Le Plessis-Robinson")
             #~ retrieveInfoOnPage("Autoroute")
             #~ retrieveInfoOnPage("Dollar australien")
-            storeInfos(fn,listInfos)
+            wikipedia.set_lang("en")
+            retrieveInfoOnPage("Lists_of_American_actors")
+            retrieveInfoOnPage("List_of_French_actors")
+            wikipedia_tools.storeInfos(fn,listInfos)

@@ -96,7 +96,7 @@ def getBests(s,listEmbed):
             imax = i
         elif simi > simiMax2:
             simiMax2 = simi
-            imax = i
+            imax2 = i
             
     return [(imax,simiMax),(imax2,simiMax2)]
 

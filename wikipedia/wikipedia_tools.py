@@ -52,8 +52,15 @@ def loadInfos(fn):
             data[k] = [data[k][0],"","",data[k][1]]
     
     return data
+
+def printWikipediaPage(page):
+    print("title: %s" % page.title)
+    print("url: %s" % page.url)
+    print("summary: %s" % stringtools.removeAccentString(page.summary))    
+    print("links: %s" % page.links[:4])
+    print("imgs: %s" % page.images[:4])
     
-def printPage(tuplePage):
+def printInfos(tuplePage):
     print("title: %s" % tuplePage[0])
     print("type: %s" % tuplePage[2])
     print("categ: %s" % tuplePage[1])
@@ -147,8 +154,8 @@ def find(req):
         for best in bests:
             i,sim = best
             k = listK[i]
-            print("k: %s" % k)
-            printPage(listInfos[k])
+            print("k: %s" % stringtools.removeAccentString(k))
+            printInfos(listInfos[k])
             print("simi: %.2f\n" % sim)
             
 # find - end
@@ -158,6 +165,7 @@ def find(req):
 if __name__ == "__main__":
     #~ find("actrice de cinéma")
     #~ find("actrice, mannequin et chanteuse")
-    find("actrice de cinéma blonde")
+    #~ find("actrice de cinéma blonde")
+    find("actrice de cinéma americaine blonde")
     #~ find("Elle se destine initialement au mannequinat avant d'etre reperee")
     #~ find("Elle se destine initialement au mannequinat avant d'etre reperee par Ben Lyon et de signer son premier contrat d'actrice avec la 20th Century Fox en aout 1946")

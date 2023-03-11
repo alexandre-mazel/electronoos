@@ -14,6 +14,8 @@ import time
 import wikipedia # pip install wikipedia
 import wikipedia_tools
 
+wikipedia.set_user_agent("AlmaBot/0.6 (http://human-machine-interaction.org; alexandre.mazel@human-machine-interaction.org)")
+
 wikipedia.set_lang("fr")
 
 if 0:
@@ -31,6 +33,15 @@ if 0:
     print("images: " + stringtools.removeAccentString(str(ny.images[:4])+"..."))
     exit(0)
     
+if 0:
+    # page that does not match test
+    wikipedia.set_lang("en")
+    
+    page_name = "Billy Burke"
+    p = wikipedia.page(page_name,auto_suggest =1)
+    wikipedia_tools.printWikipediaPage(p)
+    exit(0)
+    
 
 
 def retrieveInfoOnPage( page_name, depth = 0 ):       
@@ -38,22 +49,33 @@ def retrieveInfoOnPage( page_name, depth = 0 ):
     return nbr of page stored
     """
     nbr_added = 0
+    bVerbose = 1
+    #~ bVerbose = 0
 
-        
-    if depth > 3:
+    
+    if depth > 1: # was 3 # 1 is great when going from a page like Lists_of_American_actors
         # too depth!
-        return nbr_added
-        
+        splitted = page_name.split(" ")
+        nbr_word = len(splitted)
+        bLooksLikeFirstAndLastName = nbr_word == 2
+        if not bLooksLikeFirstAndLastName or depth > 2: # on laisse un coup de plus si ca ressemble a un prenom
+            print("%sDBG: retrieveInfoOnPage: nbr_word: %s (splitted:%s)" % ("\t"*depth,nbr_word,str(splitted) ))
+            if bVerbose: print("%sDBG: retrieveInfoOnPage: page_name: '%s' => too depth (%d)" % ("\t"*depth, page_name, depth) )
+            return nbr_added
     
     if depth > 0 and page_name in listInfos:
-        print("INF: retrieveInfoOnPage: already in list: page_name: '%s'" % page_name )
+        print("%sINF: retrieveInfoOnPage: already in list: page_name: '%s'" % ("\t"*depth,page_name ) )
         return nbr_added
     
-    print("page_name: %s" % stringtools.removeAccentString( page_name))
+    print("%sDBG:page_name: %s" % ("\t"*depth,stringtools.removeAccentString( page_name)) )
     try:
-        p = wikipedia.page(page_name)
-    except:
+        p = wikipedia.page(page_name,auto_suggest =0)
+    except KeyboardInterrupt as err:
+        print("WRN: retrieveInfoOnPage: keyboard interrupt: %s" % str(err))
+        exit(-1)
+    except BaseException as err:
         # various problem
+        print("WRN: retrieveInfoOnPage: exception occurs: %s" % str(err))
         return nbr_added
         
     title = p.title
@@ -121,20 +143,25 @@ def retrieveInfoOnPage( page_name, depth = 0 ):
         if 1:
             # save all images
             import nettools
-            listImages = p.images
-            for link_image in listImages:
-                fn = os.path.basename(link_image)
-                name,ext = os.path.splitext(fn)
-                if ext.lower() not in [".jpg",".jpeg",".png"]:
-                    continue
-                name = name[:110]
-                fn = name + ext
-                fn_dst = "stored_images/"+page_name+"__"+fn
-                print("DBG: retrieveInfoOnPage: saving image '%s' to '%s'..." % (fn,fn_dst))
-                if os.path.isfile(fn_dst):
-                    print("DBG: retrieveInfoOnPage: image already in dst")
-                else:
-                    nettools.download(link_image,fn_dst)
+            try:
+                listImages = p.images
+                for link_image in listImages:
+                    fn = os.path.basename(link_image)
+                    name,ext = os.path.splitext(fn)
+                    if ext.lower() not in [".jpg",".jpeg",".png"]:
+                        continue
+                    name = name[:110]
+                    fn = name + ext
+                    fn_dst = "stored_images/"+page_name+"__"+fn
+                    print("DBG: retrieveInfoOnPage: saving image '%s' to '%s'..." % (fn,fn_dst))
+                    if os.path.isfile(fn_dst):
+                        print("DBG: retrieveInfoOnPage: image already in dst")
+                    else:
+                        nettools.download(link_image,fn_dst)
+                        time.sleep(0.3)
+            except KeyError as err:
+                print("WRN: retrieveInfoOnPage: KeyError: err: %s" % err )
+                pass
             
             
         if len(listInfos) % 100 == 0:
@@ -152,7 +179,15 @@ def retrieveInfoOnPage( page_name, depth = 0 ):
             continue
         if l in  [".de",".eu",".en"]:
             continue
-        nb = retrieveInfoOnPage(l,depth=depth+1)
+        try:
+            time.sleep(0.1)
+            nb = retrieveInfoOnPage(l,depth=depth+1)
+        except BaseException as err:
+            print("WRN: Received exception in sub retrieve on '%s', err: '%s'" % (l,str(err)))
+            nb = 0
+            if(str(err)=="-1"):
+                print("INF: user want to quit...")
+                exit(-2)
         if nb > 0: 
             nbr_added += nb
             print("nbr_added: %s" % nbr_added )
@@ -177,6 +212,7 @@ if __name__ == "__main__":
             #~ retrieveInfoOnPage("Autoroute")
             #~ retrieveInfoOnPage("Dollar australien")
             wikipedia.set_lang("en")
-            retrieveInfoOnPage("Lists_of_American_actors")
+            #~ retrieveInfoOnPage("List_of_American_film_actresses")
+            #~ retrieveInfoOnPage("List_of_American_television_actresses")
             retrieveInfoOnPage("List_of_French_actors")
             wikipedia_tools.storeInfos(fn,listInfos)

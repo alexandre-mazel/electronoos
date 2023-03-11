@@ -374,6 +374,34 @@ class Regions:
     def getListRegions( self ):
         return self.dictDeptByRegion.keys()
         
+    def regionToArea(self,region)
+        """
+        region name => area
+        area: des grandes zones pour séparer la france
+        
+        un peu comme les aires d'indicatif de telephone
+
+        "Île-de-France", 1
+        "Auvergne-Rhône-Alpes", 4
+        "Provence-Alpes-Côte d'Azur", 4,
+        ...
+        "Unknown Region", 7
+        """
+        if 1:
+            # generate dict to include juste below
+            for k,v in self.dictDeptByRegion.items():
+                print("'%s': ?," % k)
+            
+        dictRegionToArea = {
+            "ile-de-france": 1,
+            "auvergne-rhone-alpes": 4,
+            "Provence-Alpes-Cote d'Azur": 4,
+        }
+        dictDeptByRegion => afficher, cleane les strings et faire le dict
+        region_clean = cleanString(region.lower())
+        area = dictRegionToArea[region_clean]
+        
+        return area
 # class Regions - end
     
 class Cities:

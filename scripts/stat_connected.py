@@ -317,6 +317,7 @@ def getTemperatureFrom1wire(strDeviceID):
     if len(lines)>0:
         t = lines[-1].split("t=")[-1]
         t = int(t)/1000.
+        #~ t -= 1.5 # overheat
     else:
         t = -127
     return t

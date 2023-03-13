@@ -374,7 +374,7 @@ class Regions:
     def getListRegions( self ):
         return self.dictDeptByRegion.keys()
         
-    def regionToArea(self,region)
+    def regionToArea(self,region):
         """
         region name => area
         area: des grandes zones pour séparer la france
@@ -385,24 +385,57 @@ class Regions:
         "Auvergne-Rhône-Alpes", 4
         "Provence-Alpes-Côte d'Azur", 4,
         ...
+        "dom tom", 6
         "Unknown Region", 7
         """
-        if 1:
+        if 0:
             # generate dict to include juste below
             for k,v in self.dictDeptByRegion.items():
-                print("'%s': ?," % k)
+                print('"%s": ?,' % k)
+            return
             
         dictRegionToArea = {
-            "ile-de-france": 1,
             "auvergne-rhone-alpes": 4,
-            "Provence-Alpes-Cote d'Azur": 4,
+            "hauts-de-france": 3,
+            "provence-alpes-cote d'azur": 4,
+            "grand est": 3,
+            "occitanie": 5,
+            "normandie": 2,
+            "nouvelle-aquitaine": 5,
+            "centre-val de loire": 2,
+            "corse": 4,
+            "bourgogne-franche-comte": 3,
+            "bretagne": 2,
+            "pays de la loire": 2,
+            "ile-de-france": 1,
+            "guadeloupe": 6,
+            "martinique": 6,
+            "guyane": 6,
+            "la reunion": 6,
+            "mayotte": 6,
         }
-        dictDeptByRegion => afficher, cleane les strings et faire le dict
-        region_clean = cleanString(region.lower())
-        area = dictRegionToArea[region_clean]
-        
+        #~ dictDeptByRegion => afficher, cleane les strings et faire le dict
+        try:
+            region_clean = cleanString(region.lower())
+            area = dictRegionToArea[region_clean]
+        except KeyError:
+            area = 7
         return area
+        
+    def areaToLib( self, nArea ):
+        aArea = ["Idf", "Ouest", "Est", "Sud Est", "Sud Ouest", "Dom-Tom", "Inconnu"]
+        try:
+            return aArea[int(nArea)-1]
+        except IndexError as err:
+            pass
+        return aArea[-1]
+        
 # class Regions - end
+if 0:
+    r = Regions()
+    r.load()
+    print(r.regionToArea("bof"))
+    exit(1)
     
 class Cities:
     """
@@ -1317,8 +1350,6 @@ def autotest_cities():
     
     dist = cities.distTwoZip("98000","06500",bVerbose=True) # Menton et Monaco
     assert_diff(dist,11,4)
-    exit()
-    
     
 # autotest_cities - end
 
@@ -1344,6 +1375,22 @@ def autotest_region():
     
     val = r.getDeptNumber( "Paris" )
     assert_equal( val, "75" )
+    
+    val = r.regionToArea("Île-de-France")
+    assert_equal( val, 1 )
+    
+    val = r.regionToArea("occitanie")
+    assert_equal( val, 5 )
+
+    val = r.regionToArea("Bof")
+    assert_equal( val, 7 )
+
+    
+    val = r.areaToLib(1)
+    assert_equal( val, "Idf" )
+    
+    val = r.areaToLib(14)
+    assert_equal( val, "Inconnu" )
     
 # autotest_region - end
     

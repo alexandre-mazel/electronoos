@@ -1,8 +1,3 @@
-"""
-Pour generer l'exe:
-
-copier ce fichier dans search_in_docs_release
-"""
 import docx
 
 import odf

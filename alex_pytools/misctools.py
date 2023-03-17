@@ -1520,7 +1520,7 @@ class ExclusiveLock:
         return False
         
         
-    def release(self, bForceReleaseAny = False, bVerbose = True):
+    def release(self, bForceReleaseAny = False, bVerbose = False):
         """
         bForceRelease: release even if the lock is not from himself
         """

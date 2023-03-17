@@ -1,3 +1,13 @@
+"""
+Pour generer l'exe:
+
+copier ce fichier dans search_in_docs_release
+lancer C:\Python39\Scripts\autopytoexe.exe
+ouvrir les settings et importer to_exe_config.json
+lancer le truc
+le resultat arrive dans output.
+le deplacer dans pas output.
+"""
 import docx
 
 import odf
@@ -171,10 +181,10 @@ def searchInDocs(path,s,bRecurse=1,nVerbose=0):
 #~ searchInDocs("test", "autoroute")
 
 if __name__ == "__main__":
-    print( "\n  Search in docx/odt v1.02 by Alma\n  Searching into .pdf, doc, docx and odt")
+    print( "\n  Search in docx/odt v1.03 by Alma\n  Searching into .pdf, doc, docx and odt")
     if len(sys.argv) < 2:
-        print( "  syntax: %s <string_to_match> [1 (for verbose)]\n\n  eg: %s autoroute \n" % ((sys.argv[0],)*2))
-        exit(-1)
+        print( "  syntax: %s <string_to_match> [1 ou 2 (for verbose/extra verbose)]\n\n  eg: %s autoroute \n" % ((sys.argv[0],)*2))
+        sys.exit(-1) #todo: find a way to leave without exiting => NameError: name 'exit' is not defined
     print("\n")
     
     nVerbose = 0

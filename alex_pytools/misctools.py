@@ -724,6 +724,30 @@ def makeDirsQuiet( strPath ):
     try: os.makedirs(strPath)
     except OSError as err: pass
     
+    
+    
+def addToDict(d,k,inc_value=1):
+    """
+    add a numeric value to a specific key
+    """
+    try:
+        d[k] += inc_value
+    except KeyError as err:
+        d[k] = inc_value
+        
+def appendToDict(d,k,value,bRemoveDup):
+    """
+    append an element to a list in a specific key
+    """
+    try:
+        if not bRemoveDup or not value in d[k]: # on aurait pu faire un set
+            d[k].append(value)
+    except KeyError as err:
+        d[k] = [value]
+        
+
+
+    
 def beep(frequency, duration):
     # duration in ms
     if isRPI():
@@ -1205,10 +1229,13 @@ def backupFile( filename ):
             try:
                 os.rename(filenamebak,filenamebak+".time_"+ str(int(modtime)))
             except FileExistsError as err: 
-                print("WRN: backupFile: erreur inatendue: on en a deja fait un a cette seconde precise, c'est bizarre...\nerr:%s" % err)
+                print("WRN: backupFile: rename error (1): on a deja sauvé ce fichier, et pourtant il est encore la...\nerr:%s" % err)
         else:
             os.remove(filenamebak)
-    os.rename(filename,filenamebak)
+    try:
+        os.rename(filename,filenamebak)
+    except FileExistsError as err: 
+        print("WRN: backupFile: rename error (2): on a deja sauvé ce fichier, et pourtant il est encore la...\nerr:%s" % err)
     
 #~ backupFile("/tmp/test.txt")
 #~ exit(1)

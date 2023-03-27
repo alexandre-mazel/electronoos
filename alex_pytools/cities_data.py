@@ -289,7 +289,7 @@ def simpleString( s ):
             c = stringtools.removeAccent(c)
             #~ print("=> %c" % c )
             bPrintResultForDebug = 1
-        elif c == '-':
+        elif c == '-' or c =='+': # +: when from web
             c = ' '
         c = c.lower()
         o += c
@@ -1236,6 +1236,8 @@ def autotest_cities():
     dist = cities.distTwoZip(zipFoireux,"34000",bVerbose=True)
     assert_diff(dist,225,5)
     dist = cities.distTwoZip("75006",zipFoireux,bVerbose=True)
+    assert_diff(dist,703,5)
+    dist = cities.distTwoZip("75006","Saint+Tropez",bVerbose=True)
     assert_diff(dist,703,5)
     
     # bug Schiltigheim / parly

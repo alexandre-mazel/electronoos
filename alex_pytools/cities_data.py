@@ -734,15 +734,28 @@ class Cities:
                 return zip, city[2], rConfidence
         return retVal
         
-    def distTwoZip(self,zip1,zip2,bVerbose=False):
+    def distTwoZip( self, zip1, zip2, bApproxSearch=True, bVerbose=False ):
+        """
+        - bApproxSearch: set to one to accept city name as zipcode, eg Saint-Tropez instead of 83990
+        """
         c1 = getLongLatParis(zip1)
         if c1 is None:
 
             c1 = self.findByZip(zip1,bQuiet=not bVerbose)
             if c1 == None:
                 print("WRN: distTwoZip: zip1 '%s' not found" % zip1)
-                assert(0)
-                return 99999
+                if not bApproxSearch:
+                    assert(0)
+                    return 99999
+                zip1 = self.findByRealName(zip1)
+                print("WRN: distTwoZip: zip1 changed to '%s'" % zip1)
+                c1 = self.findByZip(zip1,bQuiet=not bVerbose)
+                if c1 == None:
+                    print("WRN: distTwoZip: zip1 '%s' not found" % zip1)
+                    if not bApproxSearch:
+                        assert(0)
+                        return 99999                    
+                
             if bVerbose: print("DBG: distTwoZip: ville 1: %s" % str(c1) )
             if bVerbose: print("DBG: distTwoZip: ville 1: long: %.3f, lat: %.3f" % (c1[4],c1[5]) )
             c1 = c1[4:6]
@@ -752,8 +765,17 @@ class Cities:
             c2 = self.findByZip(zip2,bQuiet=not bVerbose)
             if c2 == None:
                 print("WRN: distTwoZip: zip2 '%s' not found" % zip2)
-                assert(0)
-                return 99999
+                if not bApproxSearch:
+                    assert(0)
+                    return 99999
+                zip2 = self.findByRealName(zip2)
+                print("WRN: distTwoZip: zip2 changed to '%s'" % zip2)
+                c2 = self.findByZip(zip2,bQuiet=not bVerbose)
+                if c2 == None:
+                    print("WRN: distTwoZip: zip2 '%s' not found" % zip1)
+                    if not bApproxSearch:
+                        assert(0)
+                        return 99999           
                 
             if bVerbose: print("DBG: distTwoZip: ville 2: %s" % str(c2) )
             if bVerbose: print("DBG: distTwoZip: ville 2: long: %.3f, lat: %.3f" % (c2[4],c2[5]) )
@@ -1208,6 +1230,13 @@ def autotest_cities():
     zip2 = "78140"
     dist = cities.distTwoZip(zip1,zip2,bVerbose=True)
     assert_diff(dist,22,5)
+
+    # bug Saint-Tropez
+    zipFoireux = "Saint-Tropez"
+    dist = cities.distTwoZip(zipFoireux,"34000",bVerbose=True)
+    assert_diff(dist,225,5)
+    dist = cities.distTwoZip("75006",zipFoireux,bVerbose=True)
+    assert_diff(dist,703,5)
     
     # bug Schiltigheim / parly
     zip1 = cities.findByRealName("Schiltigheim")

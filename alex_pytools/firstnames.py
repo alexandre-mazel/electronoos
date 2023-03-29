@@ -137,6 +137,11 @@ class Firstnames:
                             ("Nadège", True, ["fr"]),
                             ("Marise", True, ["fr"]),
                             ("Maryse", True, ["fr"]),
+                            # marocain temp
+                            ("Aissa", True, ["fr"]),
+                            ("Cherazade", True, ["fr"]),
+                            ("Ahmed", False, ["fr"]),
+                            
                         ]
         
         for data in listForgot:

@@ -289,7 +289,7 @@ def simpleString( s ):
             c = stringtools.removeAccent(c)
             #~ print("=> %c" % c )
             bPrintResultForDebug = 1
-        elif c == '-':
+        elif c == '-' or c =='+': # +: when from web
             c = ' '
         c = c.lower()
         o += c
@@ -374,7 +374,7 @@ class Regions:
     def getListRegions( self ):
         return self.dictDeptByRegion.keys()
         
-    def regionToArea(self,region)
+    def regionToArea(self,region):
         """
         region name => area
         area: des grandes zones pour séparer la france
@@ -385,24 +385,57 @@ class Regions:
         "Auvergne-Rhône-Alpes", 4
         "Provence-Alpes-Côte d'Azur", 4,
         ...
+        "dom tom", 6
         "Unknown Region", 7
         """
-        if 1:
+        if 0:
             # generate dict to include juste below
             for k,v in self.dictDeptByRegion.items():
-                print("'%s': ?," % k)
+                print('"%s": ?,' % k)
+            return
             
         dictRegionToArea = {
-            "ile-de-france": 1,
             "auvergne-rhone-alpes": 4,
-            "Provence-Alpes-Cote d'Azur": 4,
+            "hauts-de-france": 3,
+            "provence-alpes-cote d'azur": 4,
+            "grand est": 3,
+            "occitanie": 5,
+            "normandie": 2,
+            "nouvelle-aquitaine": 5,
+            "centre-val de loire": 2,
+            "corse": 4,
+            "bourgogne-franche-comte": 3,
+            "bretagne": 2,
+            "pays de la loire": 2,
+            "ile-de-france": 1,
+            "guadeloupe": 6,
+            "martinique": 6,
+            "guyane": 6,
+            "la reunion": 6,
+            "mayotte": 6,
         }
-        dictDeptByRegion => afficher, cleane les strings et faire le dict
-        region_clean = cleanString(region.lower())
-        area = dictRegionToArea[region_clean]
-        
+        #~ dictDeptByRegion => afficher, cleane les strings et faire le dict
+        try:
+            region_clean = cleanString(region.lower())
+            area = dictRegionToArea[region_clean]
+        except KeyError:
+            area = 7
         return area
+        
+    def areaToLib( self, nArea ):
+        aArea = ["Idf", "Ouest", "Est", "Sud Est", "Sud Ouest", "Dom-Tom", "Inconnu"]
+        try:
+            return aArea[int(nArea)-1]
+        except IndexError as err:
+            pass
+        return aArea[-1]
+        
 # class Regions - end
+if 0:
+    r = Regions()
+    r.load()
+    print(r.regionToArea("bof"))
+    exit(1)
     
 class Cities:
     """
@@ -701,15 +734,28 @@ class Cities:
                 return zip, city[2], rConfidence
         return retVal
         
-    def distTwoZip(self,zip1,zip2,bVerbose=False):
+    def distTwoZip( self, zip1, zip2, bApproxSearch=True, bVerbose=False ):
+        """
+        - bApproxSearch: set to one to accept city name as zipcode, eg Saint-Tropez instead of 83990
+        """
         c1 = getLongLatParis(zip1)
         if c1 is None:
 
             c1 = self.findByZip(zip1,bQuiet=not bVerbose)
             if c1 == None:
                 print("WRN: distTwoZip: zip1 '%s' not found" % zip1)
-                assert(0)
-                return 99999
+                if not bApproxSearch:
+                    assert(0)
+                    return 99999
+                zip1 = self.findByRealName(zip1)
+                print("WRN: distTwoZip: zip1 changed to '%s'" % zip1)
+                c1 = self.findByZip(zip1,bQuiet=not bVerbose)
+                if c1 == None:
+                    print("WRN: distTwoZip: zip1 '%s' not found" % zip1)
+                    if not bApproxSearch:
+                        assert(0)
+                        return 99999                    
+                
             if bVerbose: print("DBG: distTwoZip: ville 1: %s" % str(c1) )
             if bVerbose: print("DBG: distTwoZip: ville 1: long: %.3f, lat: %.3f" % (c1[4],c1[5]) )
             c1 = c1[4:6]
@@ -719,8 +765,17 @@ class Cities:
             c2 = self.findByZip(zip2,bQuiet=not bVerbose)
             if c2 == None:
                 print("WRN: distTwoZip: zip2 '%s' not found" % zip2)
-                assert(0)
-                return 99999
+                if not bApproxSearch:
+                    assert(0)
+                    return 99999
+                zip2 = self.findByRealName(zip2)
+                print("WRN: distTwoZip: zip2 changed to '%s'" % zip2)
+                c2 = self.findByZip(zip2,bQuiet=not bVerbose)
+                if c2 == None:
+                    print("WRN: distTwoZip: zip2 '%s' not found" % zip1)
+                    if not bApproxSearch:
+                        assert(0)
+                        return 99999           
                 
             if bVerbose: print("DBG: distTwoZip: ville 2: %s" % str(c2) )
             if bVerbose: print("DBG: distTwoZip: ville 2: long: %.3f, lat: %.3f" % (c2[4],c2[5]) )
@@ -1175,6 +1230,15 @@ def autotest_cities():
     zip2 = "78140"
     dist = cities.distTwoZip(zip1,zip2,bVerbose=True)
     assert_diff(dist,22,5)
+
+    # bug Saint-Tropez
+    zipFoireux = "Saint-Tropez"
+    dist = cities.distTwoZip(zipFoireux,"34000",bVerbose=True)
+    assert_diff(dist,225,5)
+    dist = cities.distTwoZip("75006",zipFoireux,bVerbose=True)
+    assert_diff(dist,703,5)
+    dist = cities.distTwoZip("75006","Saint+Tropez",bVerbose=True)
+    assert_diff(dist,703,5)
     
     # bug Schiltigheim / parly
     zip1 = cities.findByRealName("Schiltigheim")
@@ -1317,8 +1381,6 @@ def autotest_cities():
     
     dist = cities.distTwoZip("98000","06500",bVerbose=True) # Menton et Monaco
     assert_diff(dist,11,4)
-    exit()
-    
     
 # autotest_cities - end
 
@@ -1344,6 +1406,22 @@ def autotest_region():
     
     val = r.getDeptNumber( "Paris" )
     assert_equal( val, "75" )
+    
+    val = r.regionToArea("Île-de-France")
+    assert_equal( val, 1 )
+    
+    val = r.regionToArea("occitanie")
+    assert_equal( val, 5 )
+
+    val = r.regionToArea("Bof")
+    assert_equal( val, 7 )
+
+    
+    val = r.areaToLib(1)
+    assert_equal( val, "Idf" )
+    
+    val = r.areaToLib(14)
+    assert_equal( val, "Inconnu" )
     
 # autotest_region - end
     

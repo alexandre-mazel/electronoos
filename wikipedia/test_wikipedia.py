@@ -43,7 +43,9 @@ if 0:
     exit(0)
     
 
-
+def hasNumber(s):
+    return any(char.isdigit() for char in s)
+    
 def retrieveInfoOnPage( page_name, depth = 0 ):       
     """
     return nbr of page stored
@@ -57,8 +59,8 @@ def retrieveInfoOnPage( page_name, depth = 0 ):
         # too depth!
         splitted = page_name.split(" ")
         nbr_word = len(splitted)
-        bLooksLikeFirstAndLastName = nbr_word == 2
-        if not bLooksLikeFirstAndLastName or depth > 2: # on laisse un coup de plus si ca ressemble a un prenom
+        bLooksLikeFirstAndLastName = nbr_word == 2 and not "century" in page_name.lower() and not "BC" in page_name and not "AD" in page_name and not hasNumber(page_name)
+        if not bLooksLikeFirstAndLastName or depth > 4: # on laisse un coup de plus si ca ressemble a un prenom
             print("%sDBG: retrieveInfoOnPage: nbr_word: %s (splitted:%s)" % ("\t"*depth,nbr_word,str(splitted) ))
             if bVerbose: print("%sDBG: retrieveInfoOnPage: page_name: '%s' => too depth (%d)" % ("\t"*depth, page_name, depth) )
             return nbr_added
@@ -180,10 +182,11 @@ def retrieveInfoOnPage( page_name, depth = 0 ):
         if l in  [".de",".eu",".en"]:
             continue
         try:
-            time.sleep(0.1)
+            time.sleep(0.01)
             nb = retrieveInfoOnPage(l,depth=depth+1)
         except BaseException as err:
             print("WRN: Received exception in sub retrieve on '%s', err: '%s'" % (l,str(err)))
+            time.sleep(0.4)
             nb = 0
             if(str(err)=="-1"):
                 print("INF: user want to quit...")

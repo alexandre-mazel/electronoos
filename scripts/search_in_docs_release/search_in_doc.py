@@ -6,8 +6,7 @@ lancer C:\Python39\Scripts\autopytoexe.exe
 ouvrir les settings et importer to_exe_config.json
 lancer le truc
 le resultat arrive dans output.
-le deplacer depuis output.
-copy output\search*.exe .
+le deplacer dans pas output.
 """
 import docx
 
@@ -185,7 +184,7 @@ if __name__ == "__main__":
     print( "\n  Search in docx/odt v1.03 by Alma\n  Searching into .pdf, doc, docx and odt")
     if len(sys.argv) < 2:
         print( "  syntax: %s <string_to_match> [1 ou 2 (for verbose/extra verbose)]\n\n  eg: %s autoroute \n" % ((sys.argv[0],)*2))
-        sys.exit(-1)
+        sys.exit(-1) #todo: find a way to leave without exiting => NameError: name 'exit' is not defined
     print("\n")
     
     nVerbose = 0

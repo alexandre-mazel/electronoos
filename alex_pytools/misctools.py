@@ -466,6 +466,28 @@ def getCpuModel(bShort=False):
     if bShort: return name2
     return name1, name2
     
+def getCpuTemp():
+    #~ import wmi # pip install wmi
+    #~ w = wmi.WMI(namespace="root\OpenHardwareMonitor")
+    #~ temperature_infos = w.Sensor()
+    #~ for sensor in temperature_infos:
+        #~ if sensor.SensorType==u'Temperature':
+            #~ print(sensor.Name)
+            #~ print(sensor.Value)
+    #~ import wmi
+    #~ w = wmi.WMI()
+    #~ prob = w.Win32_TemperatureProbe()
+    #~ print(prob)
+    #~ print(prob[0].CurrentReading)
+    import wmi
+    w = wmi.WMI(namespace="root\wmi")
+    temperature_info = w.MSAcpi_ThermalZoneTemperature()[0]
+    print(temperature_info.CurrentTemperature)
+
+#~ getCpuTemp()
+#~ exit(1)
+            
+    
 def is_available_resolution(cam,x,y):
     cam.set(cv2.CAP_PROP_FRAME_WIDTH, int(x))
     cam.set(cv2.CAP_PROP_FRAME_HEIGHT, int(y))
@@ -702,6 +724,30 @@ def makeDirsQuiet( strPath ):
     try: os.makedirs(strPath)
     except OSError as err: pass
     
+    
+    
+def addToDict(d,k,inc_value=1):
+    """
+    add a numeric value to a specific key
+    """
+    try:
+        d[k] += inc_value
+    except KeyError as err:
+        d[k] = inc_value
+        
+def appendToDict(d,k,value,bRemoveDup):
+    """
+    append an element to a list in a specific key
+    """
+    try:
+        if not bRemoveDup or not value in d[k]: # on aurait pu faire un set
+            d[k].append(value)
+    except KeyError as err:
+        d[k] = [value]
+        
+
+
+    
 def beep(frequency, duration):
     # duration in ms
     if isRPI():
@@ -710,6 +756,17 @@ def beep(frequency, duration):
         return
     import winsound
     winsound.Beep(frequency, duration)
+    #~ try that: win32api.Beep(880,100)
+    
+def multiBeep(nbr):
+    for i in range(nbr):
+        beep(880,400)
+        time.sleep(0.4)
+        
+def beepError(nbrError = 4):
+    for i in range(nbrError):
+        multiBeep(3)
+        time.sleep(1)
 
 global_dictLastHalfHour = dict() # for each id the last (h,m)    
 def isHalfHour(id=1,nOffsetMin = 0):
@@ -1172,10 +1229,13 @@ def backupFile( filename ):
             try:
                 os.rename(filenamebak,filenamebak+".time_"+ str(int(modtime)))
             except FileExistsError as err: 
-                print("WRN: backupFile: erreur inatendue: on en a deja fait un a cette seconde precise, c'est bizarre...\nerr:%s" % err)
+                print("WRN: backupFile: rename error (1): on a deja sauvé ce fichier, et pourtant il est encore la...\nerr:%s" % err)
         else:
             os.remove(filenamebak)
-    os.rename(filename,filenamebak)
+    try:
+        os.rename(filename,filenamebak)
+    except FileExistsError as err: 
+        print("WRN: backupFile: rename error (2): on a deja sauvé ce fichier, et pourtant il est encore la...\nerr:%s" % err)
     
 #~ backupFile("/tmp/test.txt")
 #~ exit(1)
@@ -1487,7 +1547,7 @@ class ExclusiveLock:
         return False
         
         
-    def release(self, bForceReleaseAny = False, bVerbose = True):
+    def release(self, bForceReleaseAny = False, bVerbose = False):
         """
         bForceRelease: release even if the lock is not from himself
         """

@@ -186,11 +186,14 @@ def getEnv(strName, strDefault = None, bVerbose = 0 ):
     return retVal
     
 
+global_count_check = 0
 def check(v1,v2):
+    global global_count_check
+    global_count_check += 1
     if v1==v2:
-        print( "GOOD: %s == %s" % (str(v1),str(v2) ) )
+        print( "%s: GOOD: %s == %s" % (global_count_check,str(v1),str(v2) ) )
         return
-    print( "BAD: %s != %s" % (str(v1),str(v2) ) )
+    print( "%s: BAD: %s != %s" % (global_count_check,str(v1),str(v2) ) )
     assert(v1==v2)
     return
     
@@ -331,19 +334,40 @@ def getCurrentTimeZoneName():
     return datetime.datetime.now(datetime.timezone(datetime.timedelta(0))).astimezone().tzinfo
 
 
-def convertEpochToSpecificTimezone( timeEpoch ):
+def convertEpochToSpecificTimezone( timeEpoch, bRemoveNever=0 ):
+    time.localtime()
     if timeEpoch == "" or timeEpoch == None:
         timeEpoch = 0
     timeEpoch = float(timeEpoch)
-    if timeEpoch < 100:
+    if timeEpoch < 100 and not bRemoveNever:
         return "jamais"
-    # fromtimestamp assume c'est en heure locale
-    strTimeStamp = datetime.datetime.fromtimestamp(timeEpoch).strftime( "%Y/%m/%d: %Hh%Mm%Ss" )
+        
+    # theoriquement fromtimestamp assume que c'est en heure locale
+    # mais ca ne semble pas etre le cas
+    dtd = datetime.datetime.fromtimestamp(timeEpoch)
+    
+    # on RPI, epoch seems to be at 1h in the morning (tested during summertime)
+    # we could do this patch, but then current time from time.time() is not good!
+    # todo: retester en hiver !
+    #~ if isRPI() and time.localtime().tm_isdst:
+        #~ dtd += datetime.timedelta(hours=-2)
+        
+    print("DBG: convertEpochToSpecificTimezone: avant: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
+    # on lui dit que c'est de l'utc
+    #~ dtd = dtd.replace(tzinfo=datetime.timezone.utc)
+    dtd = dtd.astimezone(datetime.timezone.utc) # on lui dit que c'est de l'utc
+    print("DBG: convertEpochToSpecificTimezone: apres: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
+    dtd = dtd.astimezone(getCurrentTimeZoneName()) # on le convert en local
+    
+    print("DBG: convertEpochToSpecificTimezone: apres2: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
+
+        
+    strTimeStamp = dtd.strftime( "%Y/%m/%d: %Hh%Mm%Ss" )
     return strTimeStamp
     
 def convertTimeStampToEpoch(strTimeStamp):
     """
-    assume: le timestamp est celui local, et on le stocke en epoch (qui est basé sur utc)
+    assume: le timestamp est celui local, et on le stocke en epoch (qui est basé sur utc heure d'hiver)
     """
     if len(strTimeStamp)<=10:
         print("WRN: convertTimeStampToEpoch: only date received => adding 00h00!")
@@ -353,8 +377,13 @@ def convertTimeStampToEpoch(strTimeStamp):
         strTimeStamp = strTimeStamp.replace("_","/")
     
     dtd = datetime.datetime.strptime(strTimeStamp, "%Y/%m/%d: %Hh%Mm%Ss" )
+    # denaive l'heure
+    print("DBG: convertTimeStampToEpoch: before: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
     dtd = dtd.replace(tzinfo=getCurrentTimeZoneName())
-    print("DBG: convertTimeStampToEpoch: dtd.tzinfo: %s" % dtd.tzinfo )
+    # la passe en utc heure d'hiver, bug ? non semble ok
+    #~ if isRPI() and time.localtime().tm_isdst:
+        #~ dtd += datetime.timedelta(hours=-1)
+    print("DBG: convertTimeStampToEpoch: after: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
     # le passe en utc:
     
     #~ import pytz
@@ -362,6 +391,7 @@ def convertTimeStampToEpoch(strTimeStamp):
     #~ dtd = utc.localize(dtd)
     #~ dtd = dtd.replace(tzinfo=None)
     dtd = dtd.astimezone(datetime.timezone.utc) # convert to utc
+    print("DBG: convertTimeStampToEpoch: after2: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
     dtd = dtd.replace(tzinfo=None) # transforme en naif, on aurait pu aussi passer le 1 janvier de naif en utc
     return (dtd-datetime.datetime(1970,1,1)).total_seconds()
     
@@ -1641,7 +1671,11 @@ def eraseFileLongerLine(filename,sizemax):
 def autoTest():
     s = str(getCpuModel())
     print("cpu: %s" % s )
-    assert( "Intel64 Family 6 Model 126 Stepping 5, GenuineIntel" in s)
+    # attention ce test ne fonctionne que sur mes machines !
+    if os.name == "nt":
+        assert( "Intel64 Family 6 Model 126 Stepping 5, GenuineIntel" in s)
+    else:
+        assert( "ARMv7" in s) # RPI
     
     if 1:
         timeBegin = time.time()
@@ -1679,8 +1713,10 @@ def autoTest():
     
     check(getDiffTwoDateStamp("2022_01_18","2022_02_21"),34)
         
+    check(convertEpochToSpecificTimezone(0,bRemoveNever=1),"1970/01/01: 02h00m00s") # en local ca fait 2h en été
+    
     print("getCurrentTimeZoneName: %s" % getCurrentTimeZoneName() )
-    check(convertTimeStampToEpoch("1974_08_19"),146095200)
+    check(convertTimeStampToEpoch("1974_08_19"),146095200.0)
     check(convertEpochToSpecificTimezone(146095200+90),"1974/08/19: 00h01m30s")
     
     check(intToHashLike(0),'A')

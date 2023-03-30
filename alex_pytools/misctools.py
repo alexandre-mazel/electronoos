@@ -327,17 +327,42 @@ datetime.datetime(2012, 3, 23, 23, 24, 55, 173504)
 >>> datetime.datetime.today().weekday()
 """
 
+def getCurrentTimeZoneName():
+    return datetime.datetime.now(datetime.timezone(datetime.timedelta(0))).astimezone().tzinfo
+
+
 def convertEpochToSpecificTimezone( timeEpoch ):
     if timeEpoch == "" or timeEpoch == None:
         timeEpoch = 0
     timeEpoch = float(timeEpoch)
     if timeEpoch < 100:
         return "jamais"
+    # fromtimestamp assume c'est en heure locale
     strTimeStamp = datetime.datetime.fromtimestamp(timeEpoch).strftime( "%Y/%m/%d: %Hh%Mm%Ss" )
     return strTimeStamp
     
 def convertTimeStampToEpoch(strTimeStamp):
-    dtd = datetime.datetime.strptime(strTimeStamp, "%Y/%m/%d: %Hh%Mm%Ss")
+    """
+    assume: le timestamp est celui local, et on le stocke en epoch (qui est basé sur utc)
+    """
+    if len(strTimeStamp)<=10:
+        print("WRN: convertTimeStampToEpoch: only date received => adding 00h00!")
+        strTimeStamp += ": 00h00m00s"
+    if '_' in strTimeStamp:
+        print("DBG: convertTimeStampToEpoch: converting '_' to '/'")
+        strTimeStamp = strTimeStamp.replace("_","/")
+    
+    dtd = datetime.datetime.strptime(strTimeStamp, "%Y/%m/%d: %Hh%Mm%Ss" )
+    dtd = dtd.replace(tzinfo=getCurrentTimeZoneName())
+    print("DBG: convertTimeStampToEpoch: dtd.tzinfo: %s" % dtd.tzinfo )
+    # le passe en utc:
+    
+    #~ import pytz
+    #~ utc = pytz.timezone('UTC')
+    #~ dtd = utc.localize(dtd)
+    #~ dtd = dtd.replace(tzinfo=None)
+    dtd = dtd.astimezone(datetime.timezone.utc) # convert to utc
+    dtd = dtd.replace(tzinfo=None) # transforme en naif, on aurait pu aussi passer le 1 janvier de naif en utc
     return (dtd-datetime.datetime(1970,1,1)).total_seconds()
     
 def getFilenameFromTime(timestamp=None):
@@ -1653,6 +1678,10 @@ def autoTest():
     print("isExitRequired: %s" % isExitRequired() )
     
     check(getDiffTwoDateStamp("2022_01_18","2022_02_21"),34)
+        
+    print("getCurrentTimeZoneName: %s" % getCurrentTimeZoneName() )
+    check(convertTimeStampToEpoch("1974_08_19"),146095200)
+    check(convertEpochToSpecificTimezone(146095200+90),"1974/08/19: 00h01m30s")
     
     check(intToHashLike(0),'A')
     check(intToHashLike(1),'B')
@@ -1684,6 +1713,10 @@ def autoTest():
     assert_equal(elision("de", "Alice"), "d'Alice")
     assert_equal(elision("de", "Jean-Pierre"), "de Jean-Pierre")
     assert_equal(elision("je", "aime"), "j'aime")
+    
+    
+    print("current time is (assert with your eyes): %s" % convertEpochToSpecificTimezone(time.time()) )
+    
     
 if __name__ == "__main__":
     autoTest()

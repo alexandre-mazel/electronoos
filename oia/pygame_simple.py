@@ -70,26 +70,27 @@ class Game:
         self.clock.tick(self.fps)
         
         self.square.x += self.square.vx
+        
+        # out of screen test
         if      (self.square.vx > 0 and self.square.x + self.square.w > self.screen.get_width()) \
             or (self.square.vx < 0 and self.square.x < 0) \
             :
             self.square.vx *= -1
-    
-        return False
 
     def render(self):
         """
         Show a representation of the world to the user
         """
         self.screen.fill(black)
-        self.screen.blit(self.square.img, [self.square.x,self.square.y,self.square.x+self.square.w,self.square.y+self.square.h] )
+        self.screen.blit(self.square.img, [self.square.x,self.square.y,self.square.x+self.square.w,
+                                                                                                self.square.y+self.square.h] )
         
         pygame.display.update()  # or pygame.display.flip()
         
 # class Game - end
 
 
-def startGame():
+def runGame():
     game = Game()
     while 1:
         bQuit = game.handleInput()
@@ -101,4 +102,4 @@ def startGame():
 # startGame - end
 
 
-startGame()
+runGame()

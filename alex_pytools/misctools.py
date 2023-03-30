@@ -355,7 +355,13 @@ def convertEpochToSpecificTimezone( timeEpoch, bRemoveNever=0 ):
     print("DBG: convertEpochToSpecificTimezone: avant: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
     # on lui dit que c'est de l'utc
     #~ dtd = dtd.replace(tzinfo=datetime.timezone.utc)
-    dtd = dtd.astimezone(datetime.timezone.utc) # on lui dit que c'est de l'utc
+    try:
+        dtd = dtd.astimezone(datetime.timezone.utc) # on lui dit que c'est de l'utc
+    except OSError:
+        # on windows, you can't ask for something before 1 janv 1h ! so hard setting manually a date
+        print("WRN: convertEpochToSpecificTimezone: platform (windows) error: date may be wrong...")
+        return "1970/01/01: 02h00m00s" # en été, retourne 2h, sinon ? a tester en hiver
+        
     print("DBG: convertEpochToSpecificTimezone: apres: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
     dtd = dtd.astimezone(getCurrentTimeZoneName()) # on le convert en local
     

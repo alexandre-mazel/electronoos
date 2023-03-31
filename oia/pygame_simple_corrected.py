@@ -32,6 +32,7 @@ class Game:
         self.square.x = 0
         self.square.y = 0
         self.square.vx = 5
+        self.square.vy = 0
         
         self.keypressed={} # will store current keyboard pressed
         
@@ -72,12 +73,24 @@ class Game:
         self.square.x += self.square.vx
         self.square.y += self.square.vy
         
+        self.square.vy += 0.2
+        
         # out of screen test
         if      (self.square.vx > 0 and self.square.x + self.square.w > self.screen.get_width()) \
             or (self.square.vx < 0 and self.square.x < 0) \
             :
             self.square.vx *= -1
-
+            
+        if self.square.y < 0: 
+            self.square.y = 0
+        if self.square.vy > 0 and self.square.y + self.square.h> self.screen.get_height(): 
+            self.square.y = self.screen.get_height()-self.square.h
+            self.square.vx *=0.9
+            self.square.vy *= -0.7
+            if abs(self.square.vy)<1.:
+                self.square.vy = 0
+            if abs(self.square.vx)<0.2:
+                self.square.vx = 0
     def render(self):
         """
         Show a representation of the world to the user

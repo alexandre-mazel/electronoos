@@ -359,13 +359,13 @@ def convertEpochToSpecificTimezone( timeEpoch, bRemoveNever=0 ):
         dtd = dtd.astimezone(datetime.timezone.utc) # on lui dit que c'est de l'utc
     except OSError:
         # on windows, you can't ask for something before 1 janv 1h ! so hard setting manually a date
-        print("WRN: convertEpochToSpecificTimezone: platform (windows) error: date may be wrong...")
+        #~ print("WRN: convertEpochToSpecificTimezone: platform (windows) error: date may be wrong...")
         return "1970/01/01: 02h00m00s" # en été, retourne 2h, sinon ? a tester en hiver
         
-    print("DBG: convertEpochToSpecificTimezone: apres: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
+    #~ print("DBG: convertEpochToSpecificTimezone: apres: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
     dtd = dtd.astimezone(getCurrentTimeZoneName()) # on le convert en local
     
-    print("DBG: convertEpochToSpecificTimezone: apres2: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
+    #~ print("DBG: convertEpochToSpecificTimezone: apres2: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
 
         
     strTimeStamp = dtd.strftime( "%Y/%m/%d: %Hh%Mm%Ss" )
@@ -376,7 +376,7 @@ def convertTimeStampToEpoch(strTimeStamp):
     assume: le timestamp est celui local, et on le stocke en epoch (qui est basé sur utc heure d'hiver)
     """
     if len(strTimeStamp)<=10:
-        print("WRN: convertTimeStampToEpoch: only date received => adding 00h00!")
+        #~ print("WRN: convertTimeStampToEpoch: only date received => adding 00h00!")
         strTimeStamp += ": 00h00m00s"
     if '_' in strTimeStamp:
         print("DBG: convertTimeStampToEpoch: converting '_' to '/'")
@@ -384,12 +384,12 @@ def convertTimeStampToEpoch(strTimeStamp):
     
     dtd = datetime.datetime.strptime(strTimeStamp, "%Y/%m/%d: %Hh%Mm%Ss" )
     # denaive l'heure
-    print("DBG: convertTimeStampToEpoch: before: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
+    #~ print("DBG: convertTimeStampToEpoch: before: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
     dtd = dtd.replace(tzinfo=getCurrentTimeZoneName())
     # la passe en utc heure d'hiver, bug ? non semble ok
     #~ if isRPI() and time.localtime().tm_isdst:
         #~ dtd += datetime.timedelta(hours=-1)
-    print("DBG: convertTimeStampToEpoch: after: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
+    #~ print("DBG: convertTimeStampToEpoch: after: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
     # le passe en utc:
     
     #~ import pytz
@@ -397,7 +397,7 @@ def convertTimeStampToEpoch(strTimeStamp):
     #~ dtd = utc.localize(dtd)
     #~ dtd = dtd.replace(tzinfo=None)
     dtd = dtd.astimezone(datetime.timezone.utc) # convert to utc
-    print("DBG: convertTimeStampToEpoch: after2: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
+    #~ print("DBG: convertTimeStampToEpoch: after2: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
     dtd = dtd.replace(tzinfo=None) # transforme en naif, on aurait pu aussi passer le 1 janvier de naif en utc
     return (dtd-datetime.datetime(1970,1,1)).total_seconds()
     

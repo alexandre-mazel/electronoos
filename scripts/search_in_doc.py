@@ -16,6 +16,7 @@ import odf.opendocument
 
 import os
 import sys
+import time
 
 strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
 if strLocalPath == "": strLocalPath = './'
@@ -24,6 +25,12 @@ import stringtools
 
 def removeAccent(s):
     return stringtools.removeAccentString(s)
+    
+def getModifiedTimeAsHumanTime(filename):
+    mtime = os.path.getmtime(filename)
+    s = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(mtime))      
+    return s
+    
 
 def searchInDocx(filename, s):
     """
@@ -45,7 +52,8 @@ def searchInDocx(filename, s):
         if s in removeAccent(p.lower()):
             if bFirstTime:
                 bFirstTime = 0
-                print("***** %s:" % filename)
+                strDate = getModifiedTimeAsHumanTime(filename)
+                print("***** %s (date: %s):" % (filename,strDate))
             print("  paragraph %4d: %s" % ((nNumPara+1),p))
             if len(p)>120:
                 print("") # add an extra line after big blocks
@@ -74,7 +82,8 @@ def searchInOdt(filename, s):
         if s in removeAccent(p.lower()):
             if bFirstTime:
                 bFirstTime = 0
-                print("***** %s:" % filename)
+                strDate = getModifiedTimeAsHumanTime(filename)
+                print("***** %s (date: %s):" % (filename,strDate))
             print("  paragraph %4d: %s" % ((nNumPara+1),p))
             if len(p)>120:
                 print("") # add an extra line after big blocks
@@ -123,7 +132,8 @@ def searchInPdf(filename, s):
         if s in removeAccent(p.lower()):
             if bFirstTime:
                 bFirstTime = 0
-                print("***** %s:" % filename)
+                strDate = getModifiedTimeAsHumanTime(filename)
+                print("***** %s (date: %s):" % (filename,strDate))
             print("  paragraph %4d: %s" % ((nNumPara+1),p))
             cpt += 1
     return len(allparas),cpt
@@ -155,6 +165,9 @@ def searchInDocs(path,s,bRecurse=1,nVerbose=0):
                 else:
                     if nVerbose>1: print("DBG: => skipping '%s'" % cfn)
                     continue
+            except KeyboardInterrupt as err:
+                print("INF: User ask to skip...")
+                sys.exit(-2)
             except BaseException as err:
                 if nVerbose>0: print("WRN: problem with file '%s', err: %s" % (cfn,err)) 
                 continue

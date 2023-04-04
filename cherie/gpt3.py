@@ -63,7 +63,7 @@ if 0:
     print(completion.choices[0].text)
 
 
-if 0:
+if 1:
     # generation of an image
     prompt = "two dogs playing chess, oil painting"
     prompt = "picture of a man"
@@ -71,6 +71,14 @@ if 0:
     prompt = "a sprite of a missile" # bien
     #~ prompt = "a sprite of a missile, vertical" #pas bien, on voit moins de sprite
     prompt = "a fox skiing on the lava, paintings by van gogh"
+    #~ prompt = "picture of a nice man working in an office, facing the lens"
+    prompt = "picture of a nice man working in suit, facing the lens, "
+    #~ prompt += ",readhead,"
+    #~ neg = ""
+    #~ neg += " disfigured, bad anatomy, extra legs, extra arms, extra fingers, poorly drawn hands, poorly drawn feet, disfigured, tiling, bad art, deformed, mutated"
+    #~ neg += " bad anatomy| extra legs| extra arms| extra fingers| poorly drawn hands| poorly drawn feet| disfigured| out of frame| tiling| bad art| deformed| mutated| blurry| fuzzy| misshaped| mutant| gross| disgusting| ugly| fat| watermark| watermarks "
+    # can't find neg
+    prompt += "good anatomy, nicely drawn hands, nice figure, well formed"
     image_resp = openai.Image.create(prompt=prompt, n=10, size="512x512")
     #~ print(dir(image_resp))
     #~ print(dir(image_resp.values))
@@ -88,6 +96,7 @@ if 0:
         print("INF: writing to '%s'" % generated_image_filepath)
         with open(generated_image_filepath, "wb") as image_file:
             image_file.write(generated_image)  # write the image to the file
+    exit(1)
             
 if 0:
     import io

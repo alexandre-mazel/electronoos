@@ -7,6 +7,9 @@ import time
 strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
 print("strLocalPath: " + strLocalPath)
 
+
+from sklearn.neighbors import KNeighborsClassifier
+
 def isSameArray(a,b):
     if len(a) != len(b):
         return False
@@ -63,8 +66,12 @@ def associateRects(listRect1,listRect2):
     return for each rect in rect2 their index in list1.
     return -1 if it seems like a new rect
     """
-    from sklearn.neighbors import KNeighborsClassifier
-    import numpy as np
+    if len(listRect2) < 1:
+        return []
+        
+    if len(listRect1) < 1:
+        return [-1]*len(listRect2)
+        
     classes = np.arange(len(listRect1))
     knn = KNeighborsClassifier(n_neighbors=1)
     knn.fit(listRect1,y=classes)
@@ -149,6 +156,12 @@ def testAssociateRects():
     associateRects(lr1,lr2) # time for init
     
     timeBegin = time.time()
+
+    r = associateRects(lr1,[])
+    checkArray(r, [])
+    
+    r = associateRects([],lr2)
+    checkArray(r, [-1,-1,-1,-1,-1])
     
     r = associateRects(lr1,lr2)
     checkArray(r, [4,2,0,1,3])
@@ -166,7 +179,7 @@ def testAssociateRects():
     print("duration: %.3fs" % (time.time()-timeBegin))
     exit(0)
     
-testAssociateRects()
+#~ testAssociateRects()
 
 
 def findCloser( listFaceResult, rect, confidence_treshold = 0.13 ):
@@ -292,14 +305,14 @@ class FaceDetector:
             im = cv2.cvtColor(im, cv2.COLOR_GRAY2BGR)
         blob = cv2.dnn.blobFromImage( im, 1.0, (300, 300), (104.0, 177.0, 123.0) )
         h,w,n=im.shape
-        print("DBG: detect: src is %dx%dx%d" % (w,h,n) )
+        #~ print("DBG: FaceDetector. detect: src is %dx%dx%d" % (w,h,n) )
 
-        print("DBG: computing face detections...")
+        #~ print("DBG: FaceDetector.detect: computing face detections...")
         timeBegin = time.time()
         self.net.setInput(blob)
         detections = self.net.forward()
-        #~ print("INF: detections: %s\n" % (str(detections)))
-        print("INF: analyse takes: %5.2fs\n" % (time.time()-timeBegin))
+        #~ print("INF: FaceDetector. detect: %s\n" % (str(detections)))
+        #~ print("INF: FaceDetector. detect: analyse takes: %5.2fs\n" % (time.time()-timeBegin))
         res = []
         for i in range(0, detections.shape[2]):
             confidence = detections[0, 0, i, 2]

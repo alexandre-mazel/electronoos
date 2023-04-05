@@ -74,6 +74,7 @@ if 1:
     #~ prompt = "picture of a nice man working in an office, facing the lens"
     prompt = "picture of a nice man working in suit, facing the lens, "
     #~ prompt += ",readhead,"
+    prompt = "a black and white photograph of a girl and a boy playing with a ballon by annie lebovitz, highly-detailed"
     #~ neg = ""
     #~ neg += " disfigured, bad anatomy, extra legs, extra arms, extra fingers, poorly drawn hands, poorly drawn feet, disfigured, tiling, bad art, deformed, mutated"
     #~ neg += " bad anatomy| extra legs| extra arms| extra fingers| poorly drawn hands| poorly drawn feet| disfigured| out of frame| tiling| bad art| deformed| mutated| blurry| fuzzy| misshaped| mutant| gross| disgusting| ugly| fat| watermark| watermarks "

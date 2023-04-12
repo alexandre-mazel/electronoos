@@ -63,7 +63,7 @@ if 0:
     print(completion.choices[0].text)
 
 
-if 1:
+if 0:
     # generation of an image
     prompt = "two dogs playing chess, oil painting"
     prompt = "picture of a man"
@@ -75,11 +75,13 @@ if 1:
     prompt = "picture of a nice man working in suit, facing the lens, "
     #~ prompt += ",readhead,"
     prompt = "a black and white photograph of a girl and a boy playing with a ballon by annie lebovitz, highly-detailed"
+    prompt = "a black and white photograph of a robot eating a yoghurt by annie lebovitz, highly-detailed"
+    prompt = "a studio photography of a robot by annie lebovitz, highly-detailed"
     #~ neg = ""
     #~ neg += " disfigured, bad anatomy, extra legs, extra arms, extra fingers, poorly drawn hands, poorly drawn feet, disfigured, tiling, bad art, deformed, mutated"
     #~ neg += " bad anatomy| extra legs| extra arms| extra fingers| poorly drawn hands| poorly drawn feet| disfigured| out of frame| tiling| bad art| deformed| mutated| blurry| fuzzy| misshaped| mutant| gross| disgusting| ugly| fat| watermark| watermarks "
     # can't find neg
-    prompt += "good anatomy, nicely drawn hands, nice figure, well formed"
+    prompt += ", good anatomy, nicely drawn hands, nice figure, well formed"
     image_resp = openai.Image.create(prompt=prompt, n=10, size="512x512")
     #~ print(dir(image_resp))
     #~ print(dir(image_resp.values))
@@ -99,7 +101,8 @@ if 1:
             image_file.write(generated_image)  # write the image to the file
     exit(1)
             
-if 0:
+if 1:
+    # generate variation
     import io
     from PIL import Image
     import requests
@@ -117,6 +120,10 @@ if 0:
     filename_model = "esquisse.png"
     filename_model = "bonne_annee_2023_web.png"
     filename_model = "gaia_toit.png"
+    filename_model = "obo_1.png"
+    filename_model = "obo_2.png"
+    filename_model = "mathieu_neouze.png"
+    filename_model = "stand_alex.png"
     #~ filename_model = "trio_famille.png"
     model = Image.open(filename_model)
     modelb = image_to_byte_array(model)
@@ -135,6 +142,7 @@ if 0:
         print("INF: writing to '%s'" % generated_image_filepath)
         with open(generated_image_filepath, "wb") as image_file:
             image_file.write(generated_image)  # write the image to the file
+    exit(1)
 
 if 0:
     # edit an image

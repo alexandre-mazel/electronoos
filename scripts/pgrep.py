@@ -23,7 +23,7 @@ def findInFile( filename, strToMatch, bVerbose = True ):
     nCptLineAnalysed = 0
     while 1:
         try:
-            line = file.readline()
+            line = file.readline() # ATTENTION READLINE A UNE LIMITE SUR LES GROS FICHIERS: il ne retourne pas toutes les lignes.
             #~ print("DBG: nCptLine: %d, offset: %s" % (nCptLine,file.tell() ) )
             if line == None or len(line) == 0:
                 break

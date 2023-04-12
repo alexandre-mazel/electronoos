@@ -30,6 +30,9 @@ def checkArray(v1,v2):
     assert(0)
     return
     
+######################
+# in all next function, rect are [x1,y1,x2,y2] !!!
+    
 def union(a, b):
     x1 = min(a[0],b[0])
     y1 = min(a[1],b[1])
@@ -59,18 +62,28 @@ def similarity(a,b):
     """
     # compute the area of intersection/ area of union
     return areaSquarred(intersection(a,b))/areaSquarred(union(a,b))
+    
+def reduceListElement( a, nbrElement ):
+    return [e[:nbrElement] for e in a]
 
-def associateRects(listRect1,listRect2):
+def associateRects(listRect1,listRect2, bReduceToSize4):
     """
     find the best combination to match rect in list2 to the one in list1.
     return for each rect in rect2 their index in list1.
+    rects are [x1,y1,x2,y2]
     return -1 if it seems like a new rect
+    bReduceToSize4: reduce all rects to remove extra information (extra info could be useful for matching)
     """
+    print("DBG: associateRects: %s, %s" % (str(listRect1),str(listRect2) ) )
     if len(listRect2) < 1:
         return []
         
     if len(listRect1) < 1:
         return [-1]*len(listRect2)
+        
+    if bReduceToSize4:
+        listRect1 = reduceListElement(listRect1,4)
+        listRect2 = reduceListElement(listRect2,4)
         
     classes = np.arange(len(listRect1))
     knn = KNeighborsClassifier(n_neighbors=1)
@@ -80,8 +93,11 @@ def associateRects(listRect1,listRect2):
         # internal test
         print(r)
         assert(isSameArray(r,range(len(listRect1))))
+        
     r = knn.predict(listRect2)
-    if len(listRect1)>=len(listRect2):
+    
+    #if len(listRect1)>=len(listRect2)
+    if len(set(r))==len(r): # on peut avoir des doublons meme si les listes avait la meme longueur
         print("INF: associateRects: %s" % r)
     else:
         print("INF: associateRects: before kill: %s" % r)
@@ -108,7 +124,7 @@ def associateRects(listRect1,listRect2):
             j += 1
         print("INF: associateRects: %s" % r)
 
-    return r
+    return r.tolist()
     
 def testAssociateRects():
     lr1 = [

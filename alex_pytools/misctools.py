@@ -121,6 +121,15 @@ def getTempFilename():
     import threading
     return getPathTemp() + getFilenameFromTime() + "_" + str(threading.get_ident()) # if multithreading, two can have same time
     
+def cleanForFilename(s):
+    """
+    change a string to a normal filename
+    """
+    o = s
+    for c in " ?:/\\;*!|-=~&<>'\"":
+        o = o.replace(c, "_")
+    return o
+    
 def loadLocalEnv(strLocalFileName = ".env", bVerbose=False):
     """
     load variable from a local file, typically .env
@@ -1451,6 +1460,7 @@ def correctExtension( strPath ):
     """
     correct wrong file extension in strPath
     """
+    print("INF: correctExtension: starting in '%s'" % strPath)
     if strPath[-1] != os.sep:
         strPath += os.sep
         

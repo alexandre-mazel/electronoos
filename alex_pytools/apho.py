@@ -370,5 +370,5 @@ def autoTest():
         
     
 if __name__ == "__main__":
-    autoTest()
-    #~ test_loop_asr()
+    #~ autoTest()
+    test_loop_asr()

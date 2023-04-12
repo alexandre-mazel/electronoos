@@ -29,6 +29,13 @@ def mse(imageA, imageB):
     # return the MSE, the lower the error, the more "similar"
     # the two images are
     return abs(err)
+    
+def getScreenWidth():
+    import ctypes
+    user32 = ctypes.windll.user32
+    screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
+    print("screensize: %s" % str(screensize))
+    return screensize[0]
 
 def viewImg( strFilename, bAnalyse = False, bAnalyseAlt = False ):
     """
@@ -52,9 +59,14 @@ def viewImg( strFilename, bAnalyse = False, bAnalyseAlt = False ):
     idx = -1
     strFolder = ""
     listFiles = []
+    bAutoZoom = 1
     rZoomFactor = 1.
     bFilenameIsShownInWindowsTitle = True
     bFilenameIsShownInWindowsTitle = False
+    
+    # do we extract interesting info like facereco num from filename ?
+    bOutputOnScreenInfoFromFilename = True
+    bOutputOnScreenInfoFromFilename = False
 
     fr = None
     maskDetector = None
@@ -317,29 +329,30 @@ def viewImg( strFilename, bAnalyse = False, bAnalyseAlt = False ):
                     cv2.destroyAllWindows()
                     strWindowName = strFileToShow
                 else:
-                    strFilenameToDraw = listFiles[idx]                        
-                    cv2.putText( im, strFilenameToDraw, (10,30), cv2.FONT_HERSHEY_SIMPLEX, 0.43, (0,0,0), 2 )
-                    cv2.putText( im, strFilenameToDraw, (10,30), cv2.FONT_HERSHEY_SIMPLEX, 0.43, (255,0,0), 1 )
-                    strIndexEnd = strFilenameToDraw.split("_")[-1].split('.')[0]
-                    
-                    cv2.putText( im, strIndexEnd, (xPosIndex,yPosIndex), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0,0,0), 4 )
-                    cv2.putText( im, strIndexEnd, (xPosIndex,yPosIndex), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255,0,0), 2 )
-                    
-                    if fr:
-                        # print also index below the face
-                        xf = int(( facepos[0]+facepos[2] ) / 2 - 15)
-                        yf = int( facepos[3] + 32 )
+                    if bOutputOnScreenInfoFromFilename:
+                        strFilenameToDraw = listFiles[idx]                        
+                        cv2.putText( im, strFilenameToDraw, (10,30), cv2.FONT_HERSHEY_SIMPLEX, 0.43, (0,0,0), 2 )
+                        cv2.putText( im, strFilenameToDraw, (10,30), cv2.FONT_HERSHEY_SIMPLEX, 0.43, (255,0,0), 1 )
+                        strIndexEnd = strFilenameToDraw.split("_")[-1].split('.')[0]
+                        
+                        cv2.putText( im, strIndexEnd, (xPosIndex,yPosIndex), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0,0,0), 4 )
+                        cv2.putText( im, strIndexEnd, (xPosIndex,yPosIndex), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255,0,0), 2 )
+                        
+                        if fr:
+                            # print also index below the face
+                            xf = int(( facepos[0]+facepos[2] ) / 2 - 15)
+                            yf = int( facepos[3] + 32 )
 
-                        if 1:
-                            # render also face size
-                            strIndexEnd += "(%dx%d)" % (facepos[2]-facepos[0],facepos[3]-facepos[1])
-                        
-                        cv2.putText( im, strIndexEnd, (xf,yf), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0,0,0), 4 )
-                        cv2.putText( im, strIndexEnd, (xf,yf), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (255,0,0), 2 )                        
-                        
-                    if strIndexEnd != strPrevIndexEnd:
-                        strPrevIndexEnd = strIndexEnd
-                        cv2.rectangle( im, (0,0), (im.shape[1]-1, im.shape[0]-1), (0,255,0), 16 )
+                            if 1:
+                                # render also face size
+                                strIndexEnd += "(%dx%d)" % (facepos[2]-facepos[0],facepos[3]-facepos[1])
+                            
+                            cv2.putText( im, strIndexEnd, (xf,yf), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0,0,0), 4 )
+                            cv2.putText( im, strIndexEnd, (xf,yf), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (255,0,0), 2 )                        
+                            
+                        if strIndexEnd != strPrevIndexEnd:
+                            strPrevIndexEnd = strIndexEnd
+                            cv2.rectangle( im, (0,0), (im.shape[1]-1, im.shape[0]-1), (0,255,0), 16 )
                         
                     
                     
@@ -350,9 +363,25 @@ def viewImg( strFilename, bAnalyse = False, bAnalyseAlt = False ):
             if strRename != "":
                 cv2.putText( im, strRename, (xPosIndex,yPosIndex+50), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0,255,0), 4 )
                             
-            cv2.namedWindow(strWindowName,cv2.WINDOW_NORMAL)                                        
+            cv2.namedWindow(strWindowName,cv2.WINDOW_NORMAL)      
+
+            windowPosX, windowPosY = 10+150, 50 # 10, 50 for top left corner, a bit more to be able to see person index in my file
+            if bAutoZoom:
+                rZoomToApply = 1
+                while 1:
+                    rIdealRatio = getScreenWidth()/(im.shape[1]*rZoomToApply)
+                    if rIdealRatio < 1:
+                        rZoomToApply /= 2
+                    elif rIdealRatio >= 2:
+                        rZoomToApply *= 2
+                    else:
+                        break
+                im = cv2.resize(im,(0,0),fx=rZoomToApply,fy=rZoomToApply)
+                rZoomFactor = rZoomFactor
+                windowPosX, windowPosY = 0,0
+
             cv2.imshow( strWindowName, im )
-            cv2.moveWindow( strWindowName, 10+150, 50 ) # 10, 50 for top left corner, a bit more to be able to see person index in my file
+            cv2.moveWindow( strWindowName, windowPosX, windowPosY )
             h,w,p = im.shape
             cv2.resizeWindow(strWindowName, int(rZoomFactor*w),int(rZoomFactor*h))            
     

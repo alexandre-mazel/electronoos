@@ -2,6 +2,7 @@ import qrcode # pip3 install qrcode
 # example data
 data = "http://engrenage.studio/oia/OIA_2022_2023_Cycle1.pdf"
 #~ data = "http://engrenage.studio/vcards/alexandre.htm"
+data = "http://obo-world.com"
 # output file name
 filename = "oia_cycle_x.png"
 # generate qr code

@@ -70,9 +70,35 @@ def test():
     )
     print(completion.choices[0].message)
     
-def loopDialog():
+
+strHumanName = "Pierrette"
+
+def getUserNameToFilename(strUserName):
+    return "data/%s.dia"+strUserName
+
+def loadHistoric(strUserName):
+    try:
+        f = open(getUserNameToFilename(strUserName), "rb")
+        newdict = json.load(f)
+        if len(newdict)>4:
+            print("INF: loadHistoric: good: %d exchanges loaded" % (len(newdict)))
+            historic = newdict
+        f.close()
+    except FileNotFoundError as err:
+        print("WRN: can't load historic for '%s'" % strUserName )
+    
+def saveHistoric(strUserName):
+    f = open(getUserNameToFilename(strUserName), "wb")
+    json.dump(historic,f,indent=0)
+    print("INF: loadHistoric: good: %d exchanges saved" % (len(historic)))
+    f.close()
+    
+def loopDialog(strHumanName):
+    print("Starting a dialog with '%s'" % strHumanName )
+    loadHistoric(strHumanName)
+    
     while 1:
-        msg = input("humain: ")
+        msg = input("Humain: ")
         msglo = msg.lower()
         if msglo in ["quit","bye"]:
             print("AI: a+")
@@ -87,9 +113,11 @@ def loopDialog():
                         )
         
         #~ print(completion.choices[0].message)
+        answer = completion.choices[0].message["content"]
         print("AI: " + completion.choices[0].message["content"])
-        historic.append(completion.choices[0].message)
+        historic.append({"role":"assistant", "content": answer})
         
     print(historic)
+    saveHistoric(strHumanName)
         
-loopDialog()
+loopDialog("Pierrette")

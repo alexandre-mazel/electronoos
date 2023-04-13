@@ -55,7 +55,8 @@ class Game:
         for key, bPressed in self.keypressed.items():
             if bPressed:
                 if key == pygame.K_a or key == pygame.K_UP:
-                    self.square.y -= 1
+                    #~ self.square.y -= 1
+                    self.square.vy -= 1
                 elif key == pygame.K_q or key == pygame.K_DOWN:
                     self.square.y += 1
                 elif key == pygame.K_ESCAPE:
@@ -91,6 +92,7 @@ class Game:
                 self.square.vy = 0
             if abs(self.square.vx)<0.2:
                 self.square.vx = 0
+                
     def render(self):
         """
         Show a representation of the world to the user

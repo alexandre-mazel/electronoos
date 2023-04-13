@@ -122,6 +122,9 @@ def askUserName():
     return name
     
 def loopDialog(strHumanName):
+    # more info here:
+    # https://platform.openai.com/docs/api-reference
+    
     print("Starting a dialog with '%s'" % strHumanName )
     historic = loadHistoric(strHumanName,initial_historic)
     

@@ -57,11 +57,13 @@ def searchStringInBigFile(filename,motif,nSizeContext=1000):
     nTotalRead = 0
     motif_binary = motif.encode("cp1252")
     while 1:
-        print("INF: offset: %s\r" % nTotalRead,end="" )
+        print("INF: offset: %s (%dMB)\r" % (nTotalRead,nTotalRead//1024//1024),end="" )
         buf = f.read(nPacketSize)
         nTotalRead += len(buf)
         idx = buf.find(motif_binary)
         if idx != -1:
+            offset = nTotalRead-len(buf)+idx
+            print("\nINF: searchStringInBigFile: motif found at offset: %s\n" % offset)
             start = idx-nSizeContext
             end = idx+nSizeContext
             if start<0:
@@ -82,11 +84,17 @@ def searchStringInBigFile(filename,motif,nSizeContext=1000):
     
     
 f = "D:/takeout_google_zelma (ext)/Tous les messages, y compris ceux du dossier Spam -055.mbox"
-s = "From 1614052608291360005@xxx Thu Oct 11 17:55:17 +0000 2018"
+#~ s = "From 1614052608291360005@xxx Thu Oct 11 17:55:17 +0000 2018"
 s = "2018 19:54:50"
-#~ searchStringInBigFile(f,s,nSizeContext=20000)
+s = "Subject: La petit chanteuse allemande"
+nSizeContext=20000
+nSizeContext=40000
+#~ nSizeContext=1024*1024*10
+#~ searchStringInBigFile(f,s,nSizeContext=nSizeContext) # we will print only interesting lines
 
 offset = 2635129925
+offset = 11136184000
+
 nSizeContext=1024*1024*10
-#~ nSizeContext=2000
+nSizeContext=10000
 showPartBigFile(f,offset,nSizeContext=nSizeContext)

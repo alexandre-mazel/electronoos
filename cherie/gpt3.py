@@ -101,7 +101,7 @@ if 0:
             image_file.write(generated_image)  # write the image to the file
     exit(1)
             
-if 1:
+if 0:
     # generate variation
     import io
     from PIL import Image
@@ -211,9 +211,10 @@ def interact(q):
     print("answ: %s" % answ)
     return answ
     
-while 1:
-    s = input("?")
-    interact(s)
+def loopInteract():
+    while 1:
+        s = input("?")
+        interact(s)
 
 def autodialog():
     interact("hello !")
@@ -239,27 +240,32 @@ def autodialog():
     interact("Are you sure that's all?")
     interact("I feel alone, could you help me?")
 
-
-exit(0)
+def testUsingSocket():
         
-parser=argparse.ArgumentParser()
-parser.add_argument("port", help="server port", type=int, default="4000")
+    parser=argparse.ArgumentParser()
+    parser.add_argument("port", help="server port", type=int, default="4000")
 
 
-args=parser.parse_args()
+    args=parser.parse_args()
 
-port = args.port
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect((socket.gethostname(),port))
-while(True):
-    msg=s.recv(1024)
-    msg=msg.decode()
-    if(len(msg)>0):
-        if(msg=="exit"):
-            break
-        answ=ask(msg,chat_log)
-        chat_log = append_interaction_to_chat_log(msg ,answ, chat_log)
-        print(answ)
-        s.send(answ.encode())
-  
+    port = args.port
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((socket.gethostname(),port))
+    while(True):
+        msg=s.recv(1024)
+        msg=msg.decode()
+        if(len(msg)>0):
+            if(msg=="exit"):
+                break
+            answ=ask(msg,chat_log)
+            chat_log = append_interaction_to_chat_log(msg ,answ, chat_log)
+            print(answ)
+            s.send(answ.encode())
+            
+            
+if __name__ == "__main__":
+    #~ autodialog()
+    #~ loopInteract()
+    testUsingSocket()
+      
   

@@ -2,6 +2,7 @@
 import os
 import openai # pip install openai
 import time
+import json
 import socket
 import pickle 
 import argparse
@@ -32,7 +33,7 @@ def printEngines():
 
 #~ printEngines()
 
-historic = [
+initial_historic = [
 #~ {"role": "system", "content": "Tu es un assistant dévoué programmé pour tenir compagnie a une personne agée."},
 {"role": "system", "content": "Tu es un robot de compagnie d'une personne agée."},
 #~ {"role": "system", "content": "Cette personne est une femme nommée Pierrette, elle a 82 ans, un enfant nommé Corto de 45 ans et une fille Gaia de 40 ans."},
@@ -40,7 +41,7 @@ historic = [
 {"role": "user", "content": "Je suis une femme nommée Pierrette, j'ai 82 ans, un enfant nommé Corto de 45 ans et une fille Gaia de 40 ans."},
 {"role": "user", "content": "Mon mari Jean est mort du cancer a l'age de 65 ans."},
 #~ {"role": "user", "content": "Bonjour, comment va tu ? Suis je marié?"},
-{"role": "user", "content": "Bonjour, comment va tu ? Suis je marié? ais je des enfants ? quel jour sommes nous ? on est le matin ou l'après midi?"},
+#~ {"role": "user", "content": "Bonjour, comment va tu ? Suis je marié? ais je des enfants ? quel jour sommes nous ? on est le matin ou l'après midi?"},
 #~ {"role": "user", "content": "Bonjour, comment va tu ? ai-je des enfants?"},
 #~ {"role": "user", "content": "Ca va bien, et vous ? au fait quel est mon nom ?"},
 ]
@@ -54,7 +55,7 @@ def test():
     {"role": "user", "content": "Je suis une femme nommée Pierrette, j'ai 82 ans, un enfant nommé Corto de 45 ans et une fille Gaia de 40 ans."},
     {"role": "user", "content": "Mon mari Jean est mort du cancer a l'age de 65 ans."},
     #~ {"role": "user", "content": "Bonjour, comment va tu ? Suis je marié?"},
-    {"role": "user", "content": "Bonjour, comment va tu ? Suis je marié? ais je des enfants ? quel jour sommes nous ? on est le matin ou l'après midi?"},
+    #~ {"role": "user", "content": "Bonjour, comment va tu ? Suis je marié? ais je des enfants ? quel jour sommes nous ? on est le matin ou l'après midi?"},
     #~ {"role": "user", "content": "Bonjour, comment va tu ? ai-je des enfants?"},
     #~ {"role": "user", "content": "Ca va bien, et vous ? au fait quel est mon nom ?"},
     ]
@@ -74,33 +75,62 @@ def test():
 strHumanName = "Pierrette"
 
 def getUserNameToFilename(strUserName):
-    return "data/%s.dia"+strUserName
+    return "data/%s.dia"%strUserName
+    
+def getListKnownUsers():
+    users = []
+    listF = sorted(os.listdir("data/"))
+    for f in listF:
+        f = f.replace(".dia","")
+        users.append(f)
+        
+    if users == []:
+        users.append("Pierrette")
+    return users
+    
 
-def loadHistoric(strUserName):
+def loadHistoric(strUserName,defaultHistoric):
+    historic = defaultHistoric
     try:
-        f = open(getUserNameToFilename(strUserName), "rb")
+        f = open(getUserNameToFilename(strUserName), "rt")
         newdict = json.load(f)
-        if len(newdict)>4:
+        if len(newdict)>1:
             print("INF: loadHistoric: good: %d exchanges loaded" % (len(newdict)))
             historic = newdict
+        else:
+            print("WRN: historic for '%s' looks empty !" % strUserName )
         f.close()
     except FileNotFoundError as err:
         print("WRN: can't load historic for '%s'" % strUserName )
+    return historic
     
-def saveHistoric(strUserName):
-    f = open(getUserNameToFilename(strUserName), "wb")
+def saveHistoric(strUserName,historic):
+    f = open(getUserNameToFilename(strUserName), "wt")
     json.dump(historic,f,indent=0)
     print("INF: loadHistoric: good: %d exchanges saved" % (len(historic)))
     f.close()
     
+def askUserName():
+    users = getListKnownUsers()
+    print("Qui etes vous ?")
+    for i,u in enumerate(users):
+        print("%d: %s" % (i+1, u))
+    num = input("Taper le nombre qui correspond: ")
+    num = int(num)
+    name = users[num-1]
+    print("INF: askUserName: selecting %s" % name)
+    return name
+    
 def loopDialog(strHumanName):
     print("Starting a dialog with '%s'" % strHumanName )
-    loadHistoric(strHumanName)
+    historic = loadHistoric(strHumanName,initial_historic)
     
     while 1:
-        msg = input("Humain: ")
+        msg = ""
+        while msg == "":
+            msg = input("%s: " % strHumanName)
         msglo = msg.lower()
-        if msglo in ["quit","bye"]:
+        if msglo in ["quit","quit()", "bye"]:
             print("AI: a+")
             break
         historic.append({"role":"user","content":msg})
@@ -117,7 +147,9 @@ def loopDialog(strHumanName):
         print("AI: " + completion.choices[0].message["content"])
         historic.append({"role":"assistant", "content": answer})
         
-    print(historic)
-    saveHistoric(strHumanName)
+    #~ print(historic)
+    saveHistoric(strHumanName,historic)
         
-loopDialog("Pierrette")
+strUsername = "Pierrette"
+strUsername = askUserName()
+loopDialog(strUsername)

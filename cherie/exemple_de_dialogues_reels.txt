@@ -92,3 +92,11 @@ AI: Parfait, n'hÃ©site pas Ã  me poser d'autres questions si tu en as besoin.
 
 humain: bye
 AI: a+
+
+Gaia: je sais pas quoi faire!
+AI: Je suis désolé d'entendre cela, Gaia. Que dirais-tu de jouer à un jeu ou de faire une activité amusante? Par exemple, nous pouvons jouer à un jeu de devinettes, dessiner ou faire un bricolage ensemble. Ou peut-être que tu aimerais écouter de la musique ou regarder un film? Il y a tellement de choses amusantes à faire, il suffit de trouver celle qui te convient le mieux!
+Humain: Traceback (most recent call last):
+
+(je rajoute qu'elle ne doit pas faire trop d'ecran)
+Gaia: je sais pas quoi faire!
+AI: Que dirais-tu de faire une activité créative comme dessiner, peindre ou faire de l'artisanat ? Ou peut-être pourrais-tu jouer à un jeu de société avec ta famille ou tes amis ? Si tu as envie de bouger, tu pourrais faire une promenade à l'extérieur ou danser sur ta musique préférée. Il y a tellement de choses à faire, il suffit de trouver ce qui te plaît le plus !

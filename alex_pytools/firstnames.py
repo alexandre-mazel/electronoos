@@ -139,6 +139,7 @@ class Firstnames:
                             ("Maryse", True, ["fr"]),
                             # marocain temp
                             ("Aissa", True, ["fr"]),
+                            ("Chahinez", True, ["fr"]),
                             ("Cherazade", True, ["fr"]),
                             ("Ahmed", False, ["fr"]),
                             

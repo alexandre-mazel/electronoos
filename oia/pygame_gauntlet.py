@@ -29,9 +29,20 @@ class Player:
         self.v = 0
         self.angle = angle
     
-    def update(self):
+    def update(self,ws,hs):
         self.x += math.cos(self.angle)*self.v
         self.y += math.sin(self.angle)*self.v
+        
+        # warping
+        if self.x>ws:
+            self.x-=ws
+        elif self.x<0:
+            self.x+=ws
+            
+        if self.y>hs:
+            self.y-=hs
+        elif self.y<0:
+            self.y+=hs
     
     def render(self, surface):
         color = (255,255,0)
@@ -97,7 +108,7 @@ class Game:
         self.clock.tick(self.fps)
         
         for p in self.players:
-            p.update()
+            p.update(self.ws,self.hs)
         
                 
     def render(self):

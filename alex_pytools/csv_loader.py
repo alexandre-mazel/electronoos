@@ -231,7 +231,7 @@ def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
             return load_datas_from_xlsx_exploded_for_python27(filename, encoding=encoding)
 
         try: import pandas as pd # pip install pandas
-        except: print("WRN: no pandas found...") # on python2.7, it will be ok
+        except BaseException as err: print("WRN: no pandas found... (err: %s)" % err) # on python2.7, it will be ok
         
         df = pd.read_excel( filename, sheet_name=None, header=None )
     

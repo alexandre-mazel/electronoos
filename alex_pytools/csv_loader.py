@@ -252,7 +252,9 @@ def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
                 if col == 'nan':
                     break
                 oneLine.append(col)
-            listLine.append(oneLine)
+
+            if oneLine != []: # skip empty line
+                listLine.append(oneLine)
 
         dOut[sheet_name] = listLine
     if bVerbose:

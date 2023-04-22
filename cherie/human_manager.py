@@ -76,6 +76,13 @@ pscp -pw naonao nao@87.90.82.139:/home/nao/recorded/rawWavs/* d:\cherie_sound_re
 # rsync -rv --size-only nao@87.90.82.139:/home/nao/recorded/rawWavs/ /mnt/d/cherie_sound_record/ # d n'est pas monté!
 
 
+# installation chez Brice (2nd version: mars 2023)
+192.168.1.254
+mdp: bribri345!
+(on passe les mots de passe du courrier)
+puis carré bleu bbox, services de la box.
+On met jarc en .15
+puis on redirige le port 22
 
 """
 

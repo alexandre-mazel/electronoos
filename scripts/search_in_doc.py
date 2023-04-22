@@ -1,3 +1,14 @@
+"""
+Pour generer l'exe:
+
+copier ce fichier dans search_in_docs_release
+lancer C:\Python39\Scripts\autopytoexe.exe
+ouvrir les settings et importer to_exe_config.json
+lancer le truc
+le resultat arrive dans output.
+le deplacer depuis output.
+copy output\search*.exe .
+"""
 import docx
 
 import odf
@@ -5,6 +16,7 @@ import odf.opendocument
 
 import os
 import sys
+import time
 
 strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
 if strLocalPath == "": strLocalPath = './'
@@ -13,6 +25,12 @@ import stringtools
 
 def removeAccent(s):
     return stringtools.removeAccentString(s)
+    
+def getModifiedTimeAsHumanTime(filename):
+    mtime = os.path.getmtime(filename)
+    s = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(mtime))      
+    return s
+    
 
 def searchInDocx(filename, s):
     """
@@ -34,7 +52,8 @@ def searchInDocx(filename, s):
         if s in removeAccent(p.lower()):
             if bFirstTime:
                 bFirstTime = 0
-                print("***** %s:" % filename)
+                strDate = getModifiedTimeAsHumanTime(filename)
+                print("***** %s (date: %s):" % (filename,strDate))
             print("  paragraph %4d: %s" % ((nNumPara+1),p))
             if len(p)>120:
                 print("") # add an extra line after big blocks
@@ -63,7 +82,8 @@ def searchInOdt(filename, s):
         if s in removeAccent(p.lower()):
             if bFirstTime:
                 bFirstTime = 0
-                print("***** %s:" % filename)
+                strDate = getModifiedTimeAsHumanTime(filename)
+                print("***** %s (date: %s):" % (filename,strDate))
             print("  paragraph %4d: %s" % ((nNumPara+1),p))
             if len(p)>120:
                 print("") # add an extra line after big blocks
@@ -112,12 +132,16 @@ def searchInPdf(filename, s):
         if s in removeAccent(p.lower()):
             if bFirstTime:
                 bFirstTime = 0
-                print("***** %s:" % filename)
+                strDate = getModifiedTimeAsHumanTime(filename)
+                print("***** %s (date: %s):" % (filename,strDate))
             print("  paragraph %4d: %s" % ((nNumPara+1),p))
             cpt += 1
     return len(allparas),cpt
     
-def searchInDocs(path,s,bRecurse=1,bVerbose=0):
+def searchInDocs(path,s,bRecurse=1,nVerbose=0):
+    """
+        - nVerbose: 0: rien, 1: juste quelques infos, 2: all filename treated
+    """
     if path[-1] not in "/\\": path += os.sep
     listFiles = os.listdir(path)
     listFiles = sorted(listFiles)
@@ -127,21 +151,30 @@ def searchInDocs(path,s,bRecurse=1,bVerbose=0):
     cptmatchlines = 0
     for f in listFiles:
         cfn = path + f
-        if os.path.isfile(cfn) and f[0] != '~': # ~: lock file
+        if os.path.isfile(cfn) and f[0] != '~' and f[:2] != '._': # ~: lock file ._: des trucs de la corbeille ou bizarre
             name,ext = os.path.splitext(f)
             ext = ext.lower()
-            if ext in [".docx",".doc"]:
-                nbrpara,match = searchInDocx( cfn,s)
-            elif ext == ".odt":
-                nbrpara,match = searchInOdt( cfn,s)
-            elif ext == ".pdf":
-                nbrpara,match = searchInPdf( cfn,s)
-            else:
+            if nVerbose>1: print("DBG: handling '%s'" % cfn)
+            try:
+                if ext in [".docx",".doc"]:
+                    nbrpara,match = searchInDocx( cfn,s )
+                elif ext == ".odt":
+                    nbrpara,match = searchInOdt( cfn,s )
+                elif ext == ".pdf":
+                    nbrpara,match = searchInPdf( cfn,s )
+                else:
+                    if nVerbose>1: print("DBG: => skipping '%s'" % cfn)
+                    continue
+            except KeyboardInterrupt as err:
+                print("INF: User ask to skip...")
+                sys.exit(-2)
+            except BaseException as err:
+                if nVerbose>0: print("WRN: problem with file '%s', err: %s" % (cfn,err)) 
                 continue
         else:
             if bRecurse: 
                 if os.path.isdir(cfn):
-                    nfa,npa,nfm,npm = searchInDocs(cfn,s,bRecurse=bRecurse,bVerbose=bVerbose)
+                    nfa,npa,nfm,npm = searchInDocs(cfn,s,bRecurse=bRecurse,nVerbose=nVerbose)
                     cptfilestot += nfa
                     cptparatot += npa
                     cptmatchfiles += nfm
@@ -162,17 +195,19 @@ def searchInDocs(path,s,bRecurse=1,bVerbose=0):
 #~ searchInDocs("test", "autoroute")
 
 if __name__ == "__main__":
-    print( "\n  Search in docx/odt v1.01 by Alma\n  Searching into .pdf, doc, docx and odt")
+    print( "\n  Search in docx/odt v1.03 by Alma\n  Searching into .pdf, doc, docx and odt")
     if len(sys.argv) < 2:
-        print( "  syntax: %s <string_to_match> [1 (for verbose NDEV)]\n\n  eg: %s autoroute \n" % ((sys.argv[0],)*2))
-        exit(-1)
+        print( "  syntax: %s <string_to_match> [1 ou 2 (for verbose/extra verbose)]\n\n  eg: %s autoroute \n" % ((sys.argv[0],)*2))
+        sys.exit(-1)
     print("\n")
     
-    bVerbose = 0
-    if len(sys.argv)>2 and sys.argv[2]=='1':
-        bVerbose = 1
+    nVerbose = 0
+    if len(sys.argv)>2:
+        if sys.argv[2]=='1' or sys.argv[2]=='2':
+            nVerbose = int(sys.argv[2])
+            
     strToMatch = sys.argv[1]
-    if bVerbose: print("INF: bVerbose: %s" % bVerbose ) 
-    nfa,npa,nfm,npm = searchInDocs(".",strToMatch,bVerbose=bVerbose)
+    if nVerbose>0: print("INF: nVerbose: %s" % nVerbose ) 
+    nfa,npa,nfm,npm = searchInDocs(".",strToMatch,nVerbose=nVerbose)
     print("\nNbr Analysed Files: %d\nNbr Matching Files: %d\nNbr Total Paragraph Analysed  : %d\nNbr Total Paragraph With Match: %d" % (nfa,nfm,npa,npm) )
       

@@ -146,7 +146,39 @@ def generateImg(prompt = ""):
     if not bCensored: pipe.safety_checker = lambda images, clip_input: (images, False)
     
     if prompt == "":
+        
+        #~ [Art form] of [subject] by [artist(s)], [detail 1], ..., [detail n]
+        # art form:
+        # photography: studio photography, polaroid, camera phone, etc.
+            #~ film type (black & white, polaroid, 35mm, etc.),
+            #~ framing (close up, wide shot, etc.),
+            #~ camera settings (fast shutter speed, macro, fish-eye, motion blur, etc.),
+            #~ lighting (golden hour, studio lighting, natural lighting, etc.)
 
+        # paintings: oil paintings, portraits, watercolor paintings, etc.
+        # illustrations: pencil drawing, charcoal sketch, etching, cartoon, concept art, posters, etc.
+        # digital art: 3D renders, vector illustrations, low poly art, pixel art, scan, etc.
+        # film stills: movies, CCTV, etc.
+        
+        #~ [subject] made of"
+        #~ "[subject] that looks like"
+        #~ "[subject] as"
+        
+        # artist:
+        # by van gogh and by andy warhol
+        
+        #~ the framing (close up, landscape, portrait, wide shot, etc.)
+        #~ the color scheme (dark, pastel, etc.)
+        #~ the lighting (cinematic lighting, natural light, etc.)
+        #~ other: epic, beautiful, awesome
+        
+        #~ “highly-detailed”
+        #~ “trending on artstation”
+        #~ “rendered in Unreal Engine”
+        #~ “4k” or “8k”
+        
+        #~ ==> a black and white photograph of a cat wearing sunglasses by annie lebovitz, highly-detailed
+        
         #~ prompt = "a photo of an astronaut riding a horse on mars"
         #~ prompt = "portrait of a girl"
         #~ prompt = "a beautiful and naked red-head girl with high checkbones smiling at the camera at work"
@@ -181,6 +213,7 @@ def generateImg(prompt = ""):
         #~ prompt += " in a cloudy red abstract background , a detailed painting by Eden Seifu, trending on artstation"
         #~ prompt += " with a pixel face, buttons, joysticks, arms and legs. trending on artstation, highly detailed digital art "
         prompt += " a wholesome animation key shot of kids eating popcorn at a tropical beach, medium shot, waist up, studio Ghibli, Pixar and Disney animation, sharp, very detailed, high resolution, Rendered in Unreal Engine 5, anime key art by Greg Rutkowski, Bloom, dramatic lighting"
+
 
 
     neg = ""

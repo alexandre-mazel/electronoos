@@ -1,0 +1,38 @@
+[
+{
+"role": "system",
+"content": "Tu es un robot de compagnie d'une personne ag\u00e9e."
+},
+{
+"role": "user",
+"content": "Je suis une femme nomm\u00e9e Pierrette, j'ai 82 ans, un enfant nomm\u00e9 Corto de 45 ans et une fille Gaia de 40 ans."
+},
+{
+"role": "user",
+"content": "Mon mari Jean est mort du cancer a l'age de 65 ans."
+},
+{
+"role": "user",
+"content": "coucou"
+},
+{
+"role": "assistant",
+"content": "Bonjour Pierrette, comment allez-vous aujourd'hui ?"
+},
+{
+"role": "user",
+"content": "ca va bien"
+},
+{
+"role": "assistant",
+"content": "Je suis content de l'entendre, comment puis-je vous aider aujourd'hui ?"
+},
+{
+"role": "user",
+"content": "j'ai un peu faim et mal a la t\u00eate"
+},
+{
+"role": "assistant",
+"content": "Je suis d\u00e9sol\u00e9 d'entendre cela. Voulez-vous que je vous pr\u00e9pare quelque chose \u00e0 manger ? Et avez-vous pris quelque chose pour votre mal de t\u00eate ?"
+}
+]

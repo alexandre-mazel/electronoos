@@ -211,7 +211,7 @@ while 1:
         #~ im = cv2.resize(im,(0,0),fx=2,fy=2)
         
         cv2.imshow("random img", im)
-        if 0:
+        if 1:
             key = cv2.waitKey(1)
         else:
             key = cv2.waitKey(0)

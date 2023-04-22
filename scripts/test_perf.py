@@ -30,9 +30,12 @@ def getFreeDiskSpace():
         s = os.statvfs('/')
         nSize = (s.f_bavail * s.f_frsize)
         return nSize
-    import psutil # pip install psutil
-    usa = psutil.disk_usage('/')
-    return usa.free
+    try:
+        import psutil # pip install psutil
+        usa = psutil.disk_usage('/')
+        return usa.free
+    except ImportError as err: pass
+    return -1
 
 
 class FlushableFile:

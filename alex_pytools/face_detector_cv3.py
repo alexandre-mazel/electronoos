@@ -8,6 +8,196 @@ strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
 print("strLocalPath: " + strLocalPath)
 
 
+from sklearn.neighbors import KNeighborsClassifier
+
+def isSameArray(a,b):
+    if len(a) != len(b):
+        return False
+    for i in range(len(a)):
+        if a[i] != b[i]:
+            return False
+    return True
+
+global_count_check = 0
+def checkArray(v1,v2):
+    global global_count_check
+    global_count_check += 1
+    bEqual = isSameArray(v1,v2)
+    if bEqual:
+        print( "%s: GOOD: %s == %s" % (global_count_check,str(v1),str(v2) ) )
+        return
+    print( "%s: BAD: %s != %s" % (global_count_check,str(v1),str(v2) ) )
+    assert(0)
+    return
+    
+######################
+# in all next function, rect are [x1,y1,x2,y2] !!!
+    
+def union(a, b):
+    x1 = min(a[0],b[0])
+    y1 = min(a[1],b[1])
+    x2 = max(a[2],b[2])
+    y2 = max(a[3],b[3])
+    
+    return [x1,y1,x2,y2]
+    
+def intersection(a, b):
+    x1 = max(a[0],b[0])
+    y1 = max(a[1],b[1])
+    x2 = min(a[2],b[2])
+    y2 = min(a[3],b[3])
+    
+    if x2<=x1 or y2<=y1:
+        return [0,0,0,0]
+    
+    return [x1,y1,x2,y2]
+
+    
+def areaSquarred(a):
+    return (a[2]-a[0])*(a[3]-a[1])
+    
+def similarity(a,b):
+    """
+    return the cost (difference) between two rect
+    """
+    # compute the area of intersection/ area of union
+    return areaSquarred(intersection(a,b))/areaSquarred(union(a,b))
+    
+def reduceListElement( a, nbrElement ):
+    return [e[:nbrElement] for e in a]
+
+def associateRects(listRect1,listRect2, bReduceToSize4):
+    """
+    find the best combination to match rect in list2 to the one in list1.
+    return for each rect in rect2 their index in list1.
+    rects are [x1,y1,x2,y2]
+    return -1 if it seems like a new rect
+    bReduceToSize4: reduce all rects to remove extra information (extra info could be useful for matching)
+    """
+    print("DBG: associateRects: %s, %s" % (str(listRect1),str(listRect2) ) )
+    if len(listRect2) < 1:
+        return []
+        
+    if len(listRect1) < 1:
+        return [-1]*len(listRect2)
+        
+    if bReduceToSize4:
+        listRect1 = reduceListElement(listRect1,4)
+        listRect2 = reduceListElement(listRect2,4)
+        
+    classes = np.arange(len(listRect1))
+    knn = KNeighborsClassifier(n_neighbors=1)
+    knn.fit(listRect1,y=classes)
+    r = knn.predict(listRect1)
+    if 0:
+        # internal test
+        print(r)
+        assert(isSameArray(r,range(len(listRect1))))
+        
+    r = knn.predict(listRect2)
+    
+    #if len(listRect1)>=len(listRect2)
+    if len(set(r))==len(r): # on peut avoir des doublons meme si les listes avait la meme longueur
+        print("INF: associateRects: %s" % r)
+    else:
+        print("INF: associateRects: before kill: %s" % r)
+        # two or more are pointing the same or sames
+        simiTable = [0]*len(listRect2)
+        for i in range(len(listRect2)):
+            c = similarity(listRect2[i],listRect1[r[i]])
+            simiTable[i] = c
+        print("DBG: associateRects: costTable: %s" % simiTable )
+        j = 0
+        while j < len(r):
+            # find other pointer to r[j]
+            if r[j] != -1:
+                i = 0 # on pourrait commencer a j+ 1 ?
+                while i < len(r):
+                    if i != j:
+                        if r[i] == r[j]:
+                            if simiTable[i] < simiTable[j]:
+                               r[i] = -1
+                            else:
+                                r[j] = -1
+                                break
+                    i += 1
+            j += 1
+        print("INF: associateRects: %s" % r)
+
+    return r.tolist()
+    
+def testAssociateRects():
+    lr1 = [
+                [100,1000,200,1100],
+                [500,1000,700,1200],
+                [500,2000,700,2200],
+                [500,2000,520,2020],
+                [100,1000,1100,2100],
+            ]
+            
+    lr2 = [
+                [100,1000,1100,2100], # 4
+                [500,2000,700,2200], # 2
+                [100,1000,200,1100], # 0
+                [500,1000,700,1200], # 1
+                [500,2000,520,2020], # 3
+            ]
+            
+    lr3 = [
+                [100,1000,1100,2100], # 4
+                [9500,92000,9700,92200], # 2 is very different
+                [100,1000,200,1100], # 0
+                [500,1000,700,1200], # 1
+                [500,2000,520,2020], # 3
+            ]
+            
+    lr4 = [
+                [100,1000,1100,2100], # 4
+                # 2 is missing
+                [100,1000,200,1100], # 0
+                [500,1000,700,1200], # 1
+                [500,2000,520,2020], # 3
+            ]
+            
+    lr5 = [
+                [100,1000,1100,2100], # 4
+                [500,2000,700,2200], # 2
+                [100,1000,200,1100], # 0
+                [500,1000,700,1200], # 1
+                [500,2000,520,2020], # 3
+                [600,2100,620,2120], # a new one: 5
+            ]
+
+
+    associateRects(lr1,lr2) # time for init
+    
+    timeBegin = time.time()
+
+    r = associateRects(lr1,[])
+    checkArray(r, [])
+    
+    r = associateRects([],lr2)
+    checkArray(r, [-1,-1,-1,-1,-1])
+    
+    r = associateRects(lr1,lr2)
+    checkArray(r, [4,2,0,1,3])
+    
+    r = associateRects(lr1,lr3)
+    checkArray(r, [4,2,0,1,3])
+    
+    r = associateRects(lr1,lr4)
+    checkArray(r, [4,0,1,3])
+    
+    r = associateRects(lr1,lr5)
+    checkArray(r, [4,2,0,1,3,-1])
+
+    
+    print("duration: %.3fs" % (time.time()-timeBegin))
+    exit(0)
+    
+#~ testAssociateRects()
+
+
 def findCloser( listFaceResult, rect, confidence_treshold = 0.13 ):
     """
     find in listFaceResult the closer rect with rect.
@@ -122,7 +312,7 @@ class FaceDetector:
             cv2.putText(im,"%.2f"%confidence,(startX+2, startY-2),cv2.FONT_HERSHEY_SIMPLEX, 0.5, color=(255,255,255), thickness = 1 )
         return im
         
-    def detect( self, im, bRenderBox = True,confidence_threshold = 0.5, bRenderAll = True ):
+    def detect( self, im, bRenderBox = True,confidence_threshold = 0.5, bRenderAll = False ):
         """
         return a list of face: x_start, y_start, x_end, y_end
         """
@@ -131,14 +321,14 @@ class FaceDetector:
             im = cv2.cvtColor(im, cv2.COLOR_GRAY2BGR)
         blob = cv2.dnn.blobFromImage( im, 1.0, (300, 300), (104.0, 177.0, 123.0) )
         h,w,n=im.shape
-        print("DBG: detect: src is %dx%dx%d" % (w,h,n) )
+        #~ print("DBG: FaceDetector. detect: src is %dx%dx%d" % (w,h,n) )
 
-        print("DBG: computing face detections...")
+        #~ print("DBG: FaceDetector.detect: computing face detections...")
         timeBegin = time.time()
         self.net.setInput(blob)
         detections = self.net.forward()
-        #~ print("INF: detections: %s\n" % (str(detections)))
-        print("INF: analyse takes: %5.2fs\n" % (time.time()-timeBegin))
+        #~ print("INF: FaceDetector. detect: %s\n" % (str(detections)))
+        #~ print("INF: FaceDetector. detect: analyse takes: %5.2fs\n" % (time.time()-timeBegin))
         res = []
         for i in range(0, detections.shape[2]):
             confidence = detections[0, 0, i, 2]

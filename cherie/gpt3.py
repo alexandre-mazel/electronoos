@@ -64,9 +64,24 @@ if 0:
 
 
 if 0:
+    # generation of an image
     prompt = "two dogs playing chess, oil painting"
     prompt = "picture of a man"
     #~ prompt = "picture of a man, digital art"
+    prompt = "a sprite of a missile" # bien
+    #~ prompt = "a sprite of a missile, vertical" #pas bien, on voit moins de sprite
+    prompt = "a fox skiing on the lava, paintings by van gogh"
+    #~ prompt = "picture of a nice man working in an office, facing the lens"
+    prompt = "picture of a nice man working in suit, facing the lens, "
+    #~ prompt += ",readhead,"
+    prompt = "a black and white photograph of a girl and a boy playing with a ballon by annie lebovitz, highly-detailed"
+    prompt = "a black and white photograph of a robot eating a yoghurt by annie lebovitz, highly-detailed"
+    prompt = "a studio photography of a robot by annie lebovitz, highly-detailed"
+    #~ neg = ""
+    #~ neg += " disfigured, bad anatomy, extra legs, extra arms, extra fingers, poorly drawn hands, poorly drawn feet, disfigured, tiling, bad art, deformed, mutated"
+    #~ neg += " bad anatomy| extra legs| extra arms| extra fingers| poorly drawn hands| poorly drawn feet| disfigured| out of frame| tiling| bad art| deformed| mutated| blurry| fuzzy| misshaped| mutant| gross| disgusting| ugly| fat| watermark| watermarks "
+    # can't find neg
+    prompt += ", good anatomy, nicely drawn hands, nice figure, well formed"
     image_resp = openai.Image.create(prompt=prompt, n=10, size="512x512")
     #~ print(dir(image_resp))
     #~ print(dir(image_resp.values))
@@ -84,8 +99,10 @@ if 0:
         print("INF: writing to '%s'" % generated_image_filepath)
         with open(generated_image_filepath, "wb") as image_file:
             image_file.write(generated_image)  # write the image to the file
+    exit(1)
             
 if 0:
+    # generate variation
     import io
     from PIL import Image
     import requests
@@ -103,6 +120,10 @@ if 0:
     filename_model = "esquisse.png"
     filename_model = "bonne_annee_2023_web.png"
     filename_model = "gaia_toit.png"
+    filename_model = "obo_1.png"
+    filename_model = "obo_2.png"
+    filename_model = "mathieu_neouze.png"
+    filename_model = "stand_alex.png"
     #~ filename_model = "trio_famille.png"
     model = Image.open(filename_model)
     modelb = image_to_byte_array(model)
@@ -121,6 +142,7 @@ if 0:
         print("INF: writing to '%s'" % generated_image_filepath)
         with open(generated_image_filepath, "wb") as image_file:
             image_file.write(generated_image)  # write the image to the file
+    exit(1)
 
 if 0:
     # edit an image
@@ -153,9 +175,9 @@ if 0:
     )
 
 # print response
-print(edit_response)
+#~ print(edit_response)
 
-exit()
+#~ exit()
 
 
 start_chat_log = '''Human: Hello, who are you?
@@ -168,9 +190,9 @@ def ask(question, chat_log=None):
         chat_log = start_chat_log
     prompt = f'{chat_log}Human: {question}\nAI:'
     response = completion.create(
-        prompt=prompt, engine="davinci", stop=['\nHuman'], temperature=0.9,
+        prompt=prompt, engine="curie", stop=['\nHuman'], temperature=0.9,
         top_p=1, frequency_penalty=0, presence_penalty=0.6, best_of=1,
-        max_tokens=100)
+        max_tokens=1000) # was 100
     print("DBG: choices: %s" % str(response.choices))
     answer = response.choices[0].text.strip()
     return answer
@@ -189,9 +211,10 @@ def interact(q):
     print("answ: %s" % answ)
     return answ
     
-while 1:
-    s = input("?")
-    interact(s)
+def loopInteract():
+    while 1:
+        s = input("?")
+        interact(s)
 
 def autodialog():
     interact("hello !")
@@ -217,27 +240,32 @@ def autodialog():
     interact("Are you sure that's all?")
     interact("I feel alone, could you help me?")
 
-
-exit(0)
+def testUsingSocket():
         
-parser=argparse.ArgumentParser()
-parser.add_argument("port", help="server port", type=int, default="4000")
+    parser=argparse.ArgumentParser()
+    parser.add_argument("port", help="server port", type=int, default="4000")
 
 
-args=parser.parse_args()
+    args=parser.parse_args()
 
-port = args.port
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect((socket.gethostname(),port))
-while(True):
-    msg=s.recv(1024)
-    msg=msg.decode()
-    if(len(msg)>0):
-        if(msg=="exit"):
-            break
-        answ=ask(msg,chat_log)
-        chat_log = append_interaction_to_chat_log(msg ,answ, chat_log)
-        print(answ)
-        s.send(answ.encode())
-  
+    port = args.port
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((socket.gethostname(),port))
+    while(True):
+        msg=s.recv(1024)
+        msg=msg.decode()
+        if(len(msg)>0):
+            if(msg=="exit"):
+                break
+            answ=ask(msg,chat_log)
+            chat_log = append_interaction_to_chat_log(msg ,answ, chat_log)
+            print(answ)
+            s.send(answ.encode())
+            
+            
+if __name__ == "__main__":
+    #~ autodialog()
+    #~ loopInteract()
+    testUsingSocket()
+      
   

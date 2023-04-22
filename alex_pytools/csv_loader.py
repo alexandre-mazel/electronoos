@@ -93,10 +93,16 @@ def load_csv(filename, sepa = ';', bSkipFirstLine = 0, encoding =  'utf-8', bVer
             #~ elif not isinstance(fields[i], str):
             elif looksLikeNumber(fields[i]):
                 # TODO: handle array
+                bConverted = False
                 if '.' in fields[i]:
-                    fields[i] = float(fields[i])
-                else:
-                    fields[i] = int(fields[i])
+                    try:
+                        fields[i] = float(fields[i])
+                        bConverted = True
+                    except ValueError: pass
+                if not bConverted:
+                    try:
+                        fields[i] = int(fields[i])
+                    except ValueError: pass
         data.append(fields)
         
     # concatenate line with some " and unclosing " (eg a \n is in the text)
@@ -147,9 +153,9 @@ def load_csv(filename, sepa = ';', bSkipFirstLine = 0, encoding =  'utf-8', bVer
         else:
             nNumLine += 1
             
-        
     return data
-    
+# load_csv - end
+
 def load_datas_from_xlsx_exploded_for_python27( filename, encoding = 'utf-8', bVerbose = 0 ):
     dOut = dict()
     fi = io.open(filename + "__index.csv","rt", encoding=encoding)
@@ -225,7 +231,7 @@ def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
             return load_datas_from_xlsx_exploded_for_python27(filename, encoding=encoding)
 
         try: import pandas as pd # pip install pandas
-        except: print("WRN: no pandas found...") # on python2.7, it will be ok
+        except BaseException as err: print("WRN: no pandas found... (err: %s)" % err) # on python2.7, it will be ok
         
         df = pd.read_excel( filename, sheet_name=None, header=None )
     
@@ -246,7 +252,9 @@ def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
                 if col == 'nan':
                     break
                 oneLine.append(col)
-            listLine.append(oneLine)
+
+            if oneLine != []: # skip empty line
+                listLine.append(oneLine)
 
         dOut[sheet_name] = listLine
     if bVerbose:
@@ -282,6 +290,8 @@ def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
     
     return dOut
     
+# load_datas_from_xlsx - end
+    
 #~ load_datas_from_xlsx( r"C:\Users\alexa\dev\git\obo\www\chatbot\OBO_Recruitement_dialog.xlsx")
     
 def save_csv(filename, data, bForceEndingBySeparator=True):
@@ -299,6 +309,51 @@ def save_csv(filename, data, bForceEndingBySeparator=True):
                 s += sepa
         file.write(s+"\n")
     file.close()
+# save_csv - end
+
+    
+def pasteOnChar( datas, begin = '(',end = ')', sepa = ',', bVerbose=0 ):
+    """
+    receive an array of array. (eg result from load_csv)
+    paste field in second array if contain begin until field containing end.
+    eg [ "bobo","les animaux (chat", "rat", "poule) sont heureux." ,"youpi" ] => [ "bobo", "les animaux (chat,rat,poule) sont heureux." ,"youpi" ]
+    """
+    assert(begin != end)
+    for j in range(len(datas)):
+        d = datas[j]
+        if bVerbose: print("DBG: pasteOnChar: d1:" + str(d))
+        i = 0
+        nIdxStart = -1 # -1 if not between begin and end
+        while i < len(d):
+            if nIdxStart == -1:
+                idx1 = d[i].rfind(begin) # cherche le dernier
+                if idx1 > -1:
+                    #~ print("idx1: %s" % idx1)
+                     # handling a ) in the same field than ( but no multiple () # todo
+                    idx2 = d[i][idx1:].find(end)
+                    if idx2 == -1 :
+                        #~ print("idx2: %s" % idx2)
+                        nIdxStart = i
+            else:
+                if end in d[i]: # todo: multi ()
+                    j = nIdxStart +1
+                    for k in range(i-nIdxStart):
+                        d[nIdxStart] += ',' + d[nIdxStart+1]
+                        del d[nIdxStart+1]
+                    i = nIdxStart # fait reculer le pointeur pour que le +1 l'envoie sur le prochain
+                    if i > 0: i -=1 # repasse celui ci car il peut aussi contenir un ( apres le ) qui a fermer
+                    nIdxStart = -1
+            i += 1
+        # while - end
+        if bVerbose: print("DBG: pasteOnChar: d2:" + str(d))
+        if 0:
+            # debug specific
+            if len(d) == 12:
+                print("DBG: pasteOnChar: breaking on 12")
+                break
+    return datas
+# pasteOnChar - end
+    
     
 def autotestXlsx():
     timeBeginXls = time.time()
@@ -312,6 +367,18 @@ def autotestXlsx():
 
     
 def autotest():
+    a = [[ "bobo","les animaux (chat", "rat", "poule) sont heureux." ,"youpi" ]]
+    out = [[ "bobo", "les animaux (chat,rat,poule) sont heureux." ,"youpi" ]]
+    out2 = pasteOnChar(a)
+    print(out2)
+    assert( out2 == out )
+    
+    a = [['2022/05/24: 05h27m36s', 'obo-world', 'www.obo-world.com', '', 'Mozilla/5.0 (Linux', ' Android 6.0.1', ' Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.64 Mobile Safari/537.36 (compatible', ' Googlebot/2.1', ' +http://www.google.com/bot.html)', '192.168.0.11']]
+    out = [['2022/05/24: 05h27m36s', 'obo-world', 'www.obo-world.com', '', 'Mozilla/5.0 (Linux, Android 6.0.1, Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.64 Mobile Safari/537.36 (compatible, Googlebot/2.1, +http://www.google.com/bot.html)', '192.168.0.11']]
+    out2 = pasteOnChar(a)
+    print(out2)
+    assert( out2 == out )
+    
     loadmethods = [load_csv,load_csv_multiline]
     loadmethods = [load_csv_multiline]
     for loadmethod in loadmethods:

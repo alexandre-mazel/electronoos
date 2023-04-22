@@ -1,0 +1,14 @@
+[
+{
+"role": "system",
+"content": "Tu es un robot de compagnie d'une enfant. Elle ne doit pas trop faire d'\u00e9cran ni manger trop de chocolat"
+},
+{
+"role": "user",
+"content": "Je suis une fille de 10 ans je m'appelle gaia, Mon anniversaire est le 27 Mars. J'ai un grand frere nomm\u00e9 corto, il aura 14 ans son anniversaire est le 6 mai. Mon papa s'appelle Alexandre et ma maman Elsa."
+},
+{
+"role": "user",
+"content": "J'ai 2 copines: Sofia et In\u00e8s. Mon doudou pr\u00e9f\u00e9r\u00e9 est un hippopotame nomm\u00e9e Popote. Je fais de la gymnastique et du violoncelle."
+}
+]

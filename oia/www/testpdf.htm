@@ -1,0 +1,147 @@
+<html>
+<head>
+<style>
+#pdf_canvas_nav {
+  width:100%;
+    text-align: center;
+}
+#pdf_canvas {
+  border: 1px solid black;
+  direction: ltr;
+  width:100%;
+}
+</style>
+<script src="./pdfjs_build/pdf.js"></script>
+<script>
+function load_pdf(url_pdf,canvas_element,button_prev_element, button_next_element,text_page_num)
+{
+    button_prev_element.disabled=true;
+
+// If absolute URL from the remote server is provided, configure the CORS
+// header on that server.
+var url = url_pdf;
+
+// Loaded via <script> tag, create shortcut to access PDF.js exports.
+//~ var pdfjsLib = window['pdfjs_build/pdf'];
+
+// The workerSrc property shall be specified.
+pdfjsLib.GlobalWorkerOptions.workerSrc = './pdfjs_build/pdf.worker.js';
+
+var pdfDoc = null,
+    pageNum = 1,
+    pageRendering = false,
+    pageNumPending = null,
+    scale = 0.8,
+    canvas = canvas_element,
+    ctx = canvas.getContext('2d');
+
+/**
+ * Get page info from document, resize canvas accordingly, and render page.
+ * @param num Page number.
+ */
+function renderPage(num) {
+  pageRendering = true;
+  // Using promise to fetch the page
+  pdfDoc.getPage(num).then(function(page) {
+    var viewport = page.getViewport({scale: scale*4});
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+
+    // Render PDF page into canvas context
+    var renderContext = {
+      canvasContext: ctx,
+      viewport: viewport
+    };
+    var renderTask = page.render(renderContext);
+
+    // Wait for rendering to finish
+    renderTask.promise.then(function() {
+      pageRendering = false;
+      if (pageNumPending !== null) {
+        // New page rendering is pending
+        renderPage(pageNumPending);
+        pageNumPending = null;
+      }
+    });
+  });
+
+  // Update page counters
+  document.getElementById('page_num').textContent = num;
+}
+
+/**
+ * If another page rendering in progress, waits until the rendering is
+ * finised. Otherwise, executes rendering immediately.
+ */
+function queueRenderPage(num) {
+  if (pageRendering) {
+    pageNumPending = num;
+  } else {
+    renderPage(num);
+  }
+}
+
+/**
+ * Displays previous page.
+ */
+function onPrevPage() {
+  if (pageNum <= 1) {
+    return;
+  }
+  pageNum--;
+  queueRenderPage(pageNum);
+  button_next_element.disabled=false;
+  if (pageNum <= 1)
+    button_prev_element.disabled=true;
+}
+button_prev_element.addEventListener('click', onPrevPage);
+
+/**
+ * Displays next page.
+ */
+function onNextPage() {
+  if (pageNum >= pdfDoc.numPages) {
+    return;
+  }
+  pageNum++;
+  queueRenderPage(pageNum);
+  button_prev_element.disabled=false;
+  if (pageNum >= pdfDoc.numPages)
+    button_next_element.disabled=true;
+}
+button_next_element.addEventListener('click', onNextPage);
+
+/**
+ * Asynchronously downloads PDF.
+ */
+pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
+  pdfDoc = pdfDoc_;
+  text_page_num.textContent = pdfDoc.numPages;
+
+  // Initial/first page rendering
+  renderPage(pageNum);
+});
+
+}
+
+</script>
+</head>
+<body>
+<h1>test alex view pdf pour iphone et ...</h1>
+
+<div id='pdf_canvas_nav'>
+  <button id="prev">Previous</button>
+  <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
+  <button id="next">Next</button>
+</div>
+
+<canvas id='pdf_canvas'></canvas>
+<script>
+//~ let f = "OIA_Python_CheatSheets.pdf";
+let f = "CGU_obo_world_2022_09_15.pdf";
+
+load_pdf(f,document.getElementById("pdf_canvas"),document.getElementById('prev'),document.getElementById('next'),document.getElementById('page_count'));
+</script>
+
+</body>
+</html>

@@ -121,6 +121,15 @@ def getTempFilename():
     import threading
     return getPathTemp() + getFilenameFromTime() + "_" + str(threading.get_ident()) # if multithreading, two can have same time
     
+def cleanForFilename(s):
+    """
+    change a string to a normal filename
+    """
+    o = s
+    for c in " ?:/\\;*!|-=~&<>'\"":
+        o = o.replace(c, "_")
+    return o
+    
 def loadLocalEnv(strLocalFileName = ".env", bVerbose=False):
     """
     load variable from a local file, typically .env
@@ -186,11 +195,14 @@ def getEnv(strName, strDefault = None, bVerbose = 0 ):
     return retVal
     
 
+global_count_check = 0
 def check(v1,v2):
+    global global_count_check
+    global_count_check += 1
     if v1==v2:
-        print( "GOOD: %s == %s" % (str(v1),str(v2) ) )
+        print( "%s: GOOD: %s == %s" % (global_count_check,str(v1),str(v2) ) )
         return
-    print( "BAD: %s != %s" % (str(v1),str(v2) ) )
+    print( "%s: BAD: %s != %s" % (global_count_check,str(v1),str(v2) ) )
     assert(v1==v2)
     return
     
@@ -327,17 +339,75 @@ datetime.datetime(2012, 3, 23, 23, 24, 55, 173504)
 >>> datetime.datetime.today().weekday()
 """
 
-def convertEpochToSpecificTimezone( timeEpoch ):
+def getCurrentTimeZoneName():
+    return datetime.datetime.now(datetime.timezone(datetime.timedelta(0))).astimezone().tzinfo
+
+
+def convertEpochToSpecificTimezone( timeEpoch, bRemoveNever=0 ):
+    time.localtime()
     if timeEpoch == "" or timeEpoch == None:
         timeEpoch = 0
     timeEpoch = float(timeEpoch)
-    if timeEpoch < 100:
+    if timeEpoch < 100 and not bRemoveNever:
         return "jamais"
-    strTimeStamp = datetime.datetime.fromtimestamp(timeEpoch).strftime( "%Y/%m/%d: %Hh%Mm%Ss" )
+        
+    # theoriquement fromtimestamp assume que c'est en heure locale
+    # mais ca ne semble pas etre le cas
+    dtd = datetime.datetime.fromtimestamp(timeEpoch)
+    
+    # on RPI, epoch seems to be at 1h in the morning (tested during summertime)
+    # we could do this patch, but then current time from time.time() is not good!
+    # todo: retester en hiver !
+    #~ if isRPI() and time.localtime().tm_isdst:
+        #~ dtd += datetime.timedelta(hours=-2)
+        
+    print("DBG: convertEpochToSpecificTimezone: avant: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
+    # on lui dit que c'est de l'utc
+    #~ dtd = dtd.replace(tzinfo=datetime.timezone.utc)
+    try:
+        dtd = dtd.astimezone(datetime.timezone.utc) # on lui dit que c'est de l'utc
+    except OSError:
+        # on windows, you can't ask for something before 1 janv 1h ! so hard setting manually a date
+        #~ print("WRN: convertEpochToSpecificTimezone: platform (windows) error: date may be wrong...")
+        return "1970/01/01: 02h00m00s" # en été, retourne 2h, sinon ? a tester en hiver
+        
+    #~ print("DBG: convertEpochToSpecificTimezone: apres: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
+    dtd = dtd.astimezone(getCurrentTimeZoneName()) # on le convert en local
+    
+    #~ print("DBG: convertEpochToSpecificTimezone: apres2: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
+
+        
+    strTimeStamp = dtd.strftime( "%Y/%m/%d: %Hh%Mm%Ss" )
     return strTimeStamp
     
 def convertTimeStampToEpoch(strTimeStamp):
-    dtd = datetime.datetime.strptime(strTimeStamp, "%Y/%m/%d: %Hh%Mm%Ss")
+    """
+    assume: le timestamp est celui local, et on le stocke en epoch (qui est basé sur utc heure d'hiver)
+    """
+    if len(strTimeStamp)<=10:
+        #~ print("WRN: convertTimeStampToEpoch: only date received => adding 00h00!")
+        strTimeStamp += ": 00h00m00s"
+    if '_' in strTimeStamp:
+        print("DBG: convertTimeStampToEpoch: converting '_' to '/'")
+        strTimeStamp = strTimeStamp.replace("_","/")
+    
+    dtd = datetime.datetime.strptime(strTimeStamp, "%Y/%m/%d: %Hh%Mm%Ss" )
+    # denaive l'heure
+    #~ print("DBG: convertTimeStampToEpoch: before: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
+    dtd = dtd.replace(tzinfo=getCurrentTimeZoneName())
+    # la passe en utc heure d'hiver, bug ? non semble ok
+    #~ if isRPI() and time.localtime().tm_isdst:
+        #~ dtd += datetime.timedelta(hours=-1)
+    #~ print("DBG: convertTimeStampToEpoch: after: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
+    # le passe en utc:
+    
+    #~ import pytz
+    #~ utc = pytz.timezone('UTC')
+    #~ dtd = utc.localize(dtd)
+    #~ dtd = dtd.replace(tzinfo=None)
+    dtd = dtd.astimezone(datetime.timezone.utc) # convert to utc
+    #~ print("DBG: convertTimeStampToEpoch: after2: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
+    dtd = dtd.replace(tzinfo=None) # transforme en naif, on aurait pu aussi passer le 1 janvier de naif en utc
     return (dtd-datetime.datetime(1970,1,1)).total_seconds()
     
 def getFilenameFromTime(timestamp=None):
@@ -427,7 +497,20 @@ def getCpuModel(bShort=False):
     
     if platform.system() == "Windows":
         name1 = platform.processor()
-        name2 = getSystemCallReturn( "wmic cpu get name" ).split("\n")[-3]
+        #~ name2 = getSystemCallReturn( "wmic cpu get name" ).split("\n")[-3]
+        #  a bit quicker:
+        #~ name2 = subprocess.check_output(["wmic","cpu","get", "name"]).strip().decode(encoding='utf-8', errors='strict').split("\n")[1]
+        name2 = subprocess.check_output(["wmic","cpu","get", "name"]).strip().decode(encoding='utf-8', errors='strict')
+        idx = name2.find("\n")
+        name2 = name2[idx+1:]
+        
+        #~ print("name1: '%s'" % name1)
+        #~ print("name2: '%s'" % name2)
+        if 0:
+            # same info than wmic cpu, but way longer
+            import cpuinfo
+            name3 =  cpuinfo.get_cpu_info()['brand_raw']
+            print("name3: '%s'" % name3)
     elif platform.system() == "Darwin":
         os.environ['PATH'] = os.environ['PATH'] + os.pathsep + '/usr/sbin'
         command ="sysctl -n machdep.cpu.brand_string"
@@ -452,6 +535,28 @@ def getCpuModel(bShort=False):
         name1, name2 =  "TODO:getCpuModel", "todo"
     if bShort: return name2
     return name1, name2
+    
+def getCpuTemp():
+    #~ import wmi # pip install wmi
+    #~ w = wmi.WMI(namespace="root\OpenHardwareMonitor")
+    #~ temperature_infos = w.Sensor()
+    #~ for sensor in temperature_infos:
+        #~ if sensor.SensorType==u'Temperature':
+            #~ print(sensor.Name)
+            #~ print(sensor.Value)
+    #~ import wmi
+    #~ w = wmi.WMI()
+    #~ prob = w.Win32_TemperatureProbe()
+    #~ print(prob)
+    #~ print(prob[0].CurrentReading)
+    import wmi
+    w = wmi.WMI(namespace="root\wmi")
+    temperature_info = w.MSAcpi_ThermalZoneTemperature()[0]
+    print(temperature_info.CurrentTemperature)
+
+#~ getCpuTemp()
+#~ exit(1)
+            
     
 def is_available_resolution(cam,x,y):
     cam.set(cv2.CAP_PROP_FRAME_WIDTH, int(x))
@@ -689,6 +794,30 @@ def makeDirsQuiet( strPath ):
     try: os.makedirs(strPath)
     except OSError as err: pass
     
+    
+    
+def addToDict(d,k,inc_value=1):
+    """
+    add a numeric value to a specific key
+    """
+    try:
+        d[k] += inc_value
+    except KeyError as err:
+        d[k] = inc_value
+        
+def appendToDict(d,k,value,bRemoveDup):
+    """
+    append an element to a list in a specific key
+    """
+    try:
+        if not bRemoveDup or not value in d[k]: # on aurait pu faire un set
+            d[k].append(value)
+    except KeyError as err:
+        d[k] = [value]
+        
+
+
+    
 def beep(frequency, duration):
     # duration in ms
     if isRPI():
@@ -697,6 +826,17 @@ def beep(frequency, duration):
         return
     import winsound
     winsound.Beep(frequency, duration)
+    #~ try that: win32api.Beep(880,100)
+    
+def multiBeep(nbr):
+    for i in range(nbr):
+        beep(880,400)
+        time.sleep(0.4)
+        
+def beepError(nbrError = 4):
+    for i in range(nbrError):
+        multiBeep(3)
+        time.sleep(1)
 
 global_dictLastHalfHour = dict() # for each id the last (h,m)    
 def isHalfHour(id=1,nOffsetMin = 0):
@@ -1152,13 +1292,20 @@ def backupFile( filename ):
     filenamebak = filename + ".bak"
     if os.path.isfile(filenamebak):
         onedayinsec = 60*60*24
-        creatime = os.path.getctime(filenamebak)
-        if time.time() - creatime > onedayinsec:
+        modtime = os.path.getmtime(filenamebak)
+        print("DBG: backupFile: modtime: %s" % modtime)
+        if time.time() - modtime > onedayinsec:
             # fait un backup du backup
-            os.rename(filenamebak,filenamebak+".time_"+ str(int(creatime)))
+            try:
+                os.rename(filenamebak,filenamebak+".time_"+ str(int(modtime)))
+            except FileExistsError as err: 
+                print("WRN: backupFile: rename error (1): on a deja sauvé ce fichier, et pourtant il est encore la...\nerr:%s" % err)
         else:
             os.remove(filenamebak)
-    os.rename(filename,filenamebak)
+    try:
+        os.rename(filename,filenamebak)
+    except FileExistsError as err: 
+        print("WRN: backupFile: rename error (2): on a deja sauvé ce fichier, et pourtant il est encore la...\nerr:%s" % err)
     
 #~ backupFile("/tmp/test.txt")
 #~ exit(1)
@@ -1180,14 +1327,19 @@ def eraseFiles( listFiles, strPath = "" ):
     
 def isFileHasSameContent( fn1,fn2 ):
     """
-    return True if content are same
+    return True if content are same.
+    Return False if content are different or one file isn't a file !
     """
     # not always usefull, but can save some time
     #~ print("INF: isFileHasSameContent: comparing '%s' and '%s'" % (fn1,fn2) )
+    if not os.path.isfile(fn1) or not os.path.isfile(fn2):
+        return False
+        
     s1 = os.path.getsize(fn1)
     s2 = os.path.getsize(fn2)
     if s1 != s2:
         return False
+        
         
     strEncoding = "utf-8"
     strAltEncoding = "cp1252"
@@ -1239,10 +1391,17 @@ def findDuplicate( strPath ):
     nCountSameSize = 0
     nNumFile = 0
     nNumTotalFile = len(listFiles)
+    nTotalSizeDup = 0
     while nNumFile < len(listFiles):
+        
         if nNumFile % 1000 == 0: sys.stdout.write("INF: comparing %d/%d\r" % (nNumFile,nNumTotalFile))
         f = listFiles[nNumFile]
+        if not os.path.isfile(strPath+f):
+            nNumFile += 1
+            continue
+            
         nSize = os.path.getsize(strPath+f)
+            
         # NB: we can have many file same size, but some are equal and some aren't
         if nSize == nSizePrev:
             nCountSameSize += 1
@@ -1258,7 +1417,16 @@ def findDuplicate( strPath ):
                         strOrig = f
                         nToDel = nNumFile - i - 1
 
-                    print("INF: findDuplicate: find a dup: %s - orig: %s (size:%d)" % (strDup, strOrig,nSize ) )
+                    nTotalSizeDup += nSize
+                    if nSize > 0:
+                        try:
+                            print("INF: findDuplicate: find a dup: %s - orig: %s (size:%d)" % (strDup, strOrig,nSize ) )
+                        except UnicodeEncodeError as err:
+                            import stringtools
+                            print("INF: findDuplicate: find a dup (accent removed): %s - orig: %s (size:%d)" % (stringtools.removeAccentString(strDup), stringtools.removeAccentString(strOrig),nSize ) )
+                    else:
+                        print("INF: findDuplicate: file empty: %s" % strDup )
+                        
                     out.append( strDup )
                     # remove this one from the list, helping future comparisons
                     del listFiles[nToDel]
@@ -1275,6 +1443,7 @@ def findDuplicate( strPath ):
         
         
     print("INF: findDuplicate: duplicate in '%s': %d file(s) / %d" % (strPath, len(out), nNumTotalFile ) )
+    if nTotalSizeDup >  0: print("INF: findDuplicate: total duplicated size taken: %.1fMB" % (nTotalSizeDup/1024/1024. ) )
     return out
     
 def guessExtension( filename ):
@@ -1291,6 +1460,7 @@ def correctExtension( strPath ):
     """
     correct wrong file extension in strPath
     """
+    print("INF: correctExtension: starting in '%s'" % strPath)
     if strPath[-1] != os.sep:
         strPath += os.sep
         
@@ -1426,6 +1596,7 @@ class ExclusiveLock:
         if bVerbose: import threading
         
         timeStart = time.time()
+        cptLoop = 0
         while 1:
 
             try:
@@ -1441,11 +1612,13 @@ class ExclusiveLock:
                 break
                 
             time.sleep(0.05)
+            cptLoop += 1
+            if(cptLoop % 100) == 99: print("WRN: Lock.acquire: self.lockname: %s, seems locked for a longtime?" % self.lockname )
             
         return False
         
         
-    def release(self, bForceReleaseAny = False, bVerbose = True):
+    def release(self, bForceReleaseAny = False, bVerbose = False):
         """
         bForceRelease: release even if the lock is not from himself
         """
@@ -1514,7 +1687,11 @@ def eraseFileLongerLine(filename,sizemax):
 def autoTest():
     s = str(getCpuModel())
     print("cpu: %s" % s )
-    assert( "Intel64 Family 6 Model 126 Stepping 5, GenuineIntel" in s)
+    # attention ce test ne fonctionne que sur mes machines !
+    if os.name == "nt":
+        assert( "Intel64 Family 6 Model 126 Stepping 5, GenuineIntel" in s)
+    else:
+        assert( "ARMv7" in s) # RPI
     
     if 1:
         timeBegin = time.time()
@@ -1551,6 +1728,12 @@ def autoTest():
     print("isExitRequired: %s" % isExitRequired() )
     
     check(getDiffTwoDateStamp("2022_01_18","2022_02_21"),34)
+        
+    check(convertEpochToSpecificTimezone(0,bRemoveNever=1),"1970/01/01: 02h00m00s") # en local ca fait 2h en été
+    
+    print("getCurrentTimeZoneName: %s" % getCurrentTimeZoneName() )
+    check(convertTimeStampToEpoch("1974_08_19"),146095200.0)
+    check(convertEpochToSpecificTimezone(146095200+90),"1974/08/19: 00h01m30s")
     
     check(intToHashLike(0),'A')
     check(intToHashLike(1),'B')
@@ -1583,7 +1766,22 @@ def autoTest():
     assert_equal(elision("de", "Jean-Pierre"), "de Jean-Pierre")
     assert_equal(elision("je", "aime"), "j'aime")
     
+    
+    print("current time is (assert with your eyes): %s" % convertEpochToSpecificTimezone(time.time()) )
+    
+    
 if __name__ == "__main__":
     autoTest()
     #~ viewSmoothstep()
     #~ testSound()
+    
+    if 0:
+        # clean some folder:
+        strPath = "D:/tmp_from_c/"
+        strPath = "D:/tmp_from_ms4/tmp/"
+        strPath = "D:/tmp_from_ms4/tmp_scr/"
+        strPath = "c:/scr/"
+        #~ strPath = "c:/Users/alexa/downloads/"
+        
+        listDup = findDuplicate(strPath)
+        #~ eraseFiles(listDup, strPath)

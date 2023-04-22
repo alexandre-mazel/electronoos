@@ -2,6 +2,14 @@ import os
 import sys
 import time
 
+"""
+copy from pimeteo
+scp pi@192.168.0.38:/home/pi/save/local_temperature.txt C:\Users\alexa\dev\git\electronoos\meteo\pimeteo_local_temperature.txt
+ou
+scp pi@192.168.0.38:/home/pi/save/local_temperature.txt C:\save\pimeteo_local_temperature.txt
+"""
+
+
 strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
 if strLocalPath == "": strLocalPath = './'
 sys.path.append(strLocalPath+"/../alex_pytools/")

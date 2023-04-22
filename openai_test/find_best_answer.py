@@ -183,6 +183,15 @@ Context:
 
 """
 
+def compute_num_tokens_from_string(string: str, encoding_name: str) -> int:
+    """Returns the number of tokens in a text string."""
+    encoding = tiktoken.get_encoding(encoding_name)
+    num_tokens = len(encoding.encode(string))
+    return num_tokens
+
+#~ compute_num_tokens_from_string("tiktoken is great!", "cl100k_base")
+
+
 def getEmbeddingForLists( listSentences, engine ):
     listEmbed = []
     for s in listSentences:
@@ -190,10 +199,26 @@ def getEmbeddingForLists( listSentences, engine ):
         listEmbed.append(embed)
     return listEmbed
 
-# info sur l'embedding:
-# https://openai.com/blog/introducing-text-and-code-embeddings/
-# example:
+
+def printEmbed(v):
+    #~ print(len(v))
+    for r in v[:8]:
+        print("%.04f, " % r, end="" )
+    print("...")
+    
 if 0:
+    """
+    info sur l'embedding:
+    https://openai.com/blog/introducing-text-and-code-embeddings/
+    
+    An embedding is a vector (list) of floating point numbers.
+    
+    # comment evaluer un embedding
+    https://github.com/facebookresearch/SentEval
+    
+    example above:
+    """
+
     import openai, numpy as np
     
     #~ resp = openai.Embedding.create(
@@ -225,7 +250,7 @@ if 0:
                     ["I have a boy", "Quel sont les noms de tes enfants?"],
                 ]
 
-    if 0:
+    if 1:
         print("\n*** pair comparing:")
         for pair in to_compare:
             resp = openai.Embedding.create(
@@ -234,7 +259,9 @@ if 0:
 
             embedding_a = resp['data'][0]['embedding']
             embedding_b = resp['data'][1]['embedding']
-
+            printEmbed(embedding_a)
+            printEmbed(embedding_b)
+            
             similarity_score = np.dot(embedding_a, embedding_b)
             print("similarity_score %s: %.2f" % (str(pair),similarity_score ))
         
@@ -243,6 +270,16 @@ if 0:
     strModelName = "text-similarity-davinci-001"
     strModelName = "text-search-davinci-query-001" # best result for this example
     #~ strModelName = "text-search-davinci-doc-001"
+    strModelName = "text-embedding-ada-002" # peut etre vaguement mieux et prend up to 8191 tokens (use cl100k_base) cd compute_num_tokens_from_string pour savoir combien il y a de token dans une phrase
+    
+    # Limitation: Models lack knowledge of events that occurred after August 2020.
+    
+    #~ We recommend cosine similarity. The choice of distance function typically doesn’t matter much.
+
+    #~ OpenAI embeddings are normalized to length 1, which means that:
+
+    #~ Cosine similarity can be computed slightly faster using just a dot product
+    #~ Cosine similarity and Euclidean distance will result in the identical rankings
     
     print("computing answer vectors...")
     listAns = []
@@ -383,6 +420,22 @@ q: What it the name of your son?, a: my son is nammed Corto, simi: 0.75
 q: meow, a: J'ai faim, simi: 0.74
 q: whouwhou, a: J'ai faim, simi: 0.77
 
+comparing using model text-embedding-ada-002:
+q: I have a kids, a: I have a boy, simi: 0.90
+q: I'm hungry, a: J'ai faim, simi: 0.91
+q: I'm very hungry, a: J'ai très faim, simi: 0.92
+q: J'ai envie de boire, a: J'ai faim, simi: 0.89
+q: J'ai envie de faire pipi, a: J'ai faim, simi: 0.88
+q: J'ai envie de manger, a: J'ai faim, simi: 0.95
+q: Quel est le nom de ton fils?, a: Mon fils s'appelle Corto, simi: 0.87
+q: Quel est le nom de ton garcon?, a: J'ai un garcon, simi: 0.89
+q: Quel sont les noms de tes enfants?, a: Mon fils s'appelle Corto, simi: 0.83
+q: What it the name of your boy?, a: I have a boy, simi: 0.89
+q: What it the name of your kids?, a: my son is nammed Corto, simi: 0.82
+q: What it the name of your son?, a: my son is nammed Corto, simi: 0.86
+q: meow, a: feline friends go, simi: 0.86
+q: whouwhou, a: feline friends go, simi: 0.79
+
 
 """
 
@@ -416,7 +469,17 @@ if 0:
 if 1:
     import json
     
-    # test sur oia faq_informatique
+    print("test sur oia faq_informatique")
+    
+    bUseOpenAI = 1 # else it's camembert
+    bUseOpenAI = 0
+    
+    if not bUseOpenAI:
+        #~ sys.path.append("../../obo/camembert")
+        #~ from bert_test_similarity import camEmbedList
+        sys.path.append("../camembert")
+        from sentence_embedding import camEmbedList
+
     
     def saveEmbed(fn,data):
         f = open(fn,"wt")
@@ -451,40 +514,69 @@ if 1:
 
     listq = [item[0] for item in faq]
 
-    fn_embed = "faq_informatique_embed.txt"
+    if bUseOpenAI: fn_embed = "faq_informatique_embed_openai.txt"
+    else: fn_embed = "faq_informatique_embed_camembert.txt"
     if not os.path.isfile(fn_embed):
         print("generating embedding to %s..." % fn_embed)
-        embedQ = getEmbeddingForLists( listq, engine = strModelName )
+        if bUseOpenAI: embedQ = getEmbeddingForLists( listq, engine = strModelName )
+        else: embedQ = camEmbedList( listq )
         saveEmbed(fn_embed,embedQ)
     else:
+       print("loading from %s..." % fn_embed)
        embedQ = loadEmbed(fn_embed)
-       print("generating loading from %s..." % fn_embed)
        
-    q = "parle moi de la mémoire vive" # => Qu'est ce que La mémoire morte 0.8
-    q = "parle moi de la calculatrice" # => Où trouve-t-on la calculatrice?, simi: 0.85
-    q = "J'ai besoin de faire des calculs" # => Où trouve-t-on la calculatrice?, simi: 0.78
-    q = "J'ai besoin de faire des multiplication" # => Où trouve-t-on la calculatrice?, simi: 0.72
-    q = "J'ai besoin de faire 16*16" # => Où trouve-t-on la calculatrice?, simi: 0.66
-    q = "J'ai besoin d'envoyer un email" # => Que doit contenir obligatoirement une adresse mail ?, simi: 0.76
-    q = "J'ai besoin d'envoyer un courrier electronique" # => Que doit contenir obligatoirement une adresse mail ?, simi: 0.76
-    vQ = getEmbeddingForLists( [q], engine = strModelName )[0]
+       
+    # result simi avec openai gpt3 / puis avec camembert (gpt2?)
+    # camembert a seulement 512 float et gpt3 12k (24 fois plus)
+    # Camembert: on remarque qu'on a une erreur et dans ce cas la la simi est < 0.2
+    q = "parle moi de la mémoire vive" # => Qu'est ce que La mémoire morte 0.8 / 0.35
+    q = "parle moi de la calculatrice" # => Où trouve-t-on la calculatrice?, simi: 0.85 / 0.26
+    q = "J'ai besoin de faire des calculs" # => Où trouve-t-on la calculatrice?, simi: 0.78 / 0.32
+    q = "J'ai besoin de faire des multiplication" # => Où trouve-t-on la calculatrice?, simi: 0.27
+    q = "J'ai besoin de faire 16*16" # => Où trouve-t-on la calculatrice?, simi: 0.66 / Citez 4 raccourcis clavier, 0.14; Où trouve-t-on la calculatrice? est a 0.10
+    q = "J'ai besoin d'envoyer un email" # => Que doit contenir obligatoirement une adresse mail ?, simi: 0.76 / 0.38
+    q = "J'ai besoin d'envoyer un courrier electronique" # => Que doit contenir obligatoirement une adresse mail ?, simi: 0.76 / 0.37
+    if bUseOpenAI: vQ = getEmbeddingForLists( [q], engine = strModelName )[0]
+    else: vQ = camEmbedList( [q] )
+    print(type(embedQ))
+    print(type(vQ))
+    print(type(embedQ[0]))
     print(type(vQ[0]))
     print(type(embedQ[0][0]))
+    print(type(vQ[0][0]))
+    
+    print(len(embedQ))
+    print(len(vQ))
+    print(len(embedQ[0]))
+    print(len(vQ[0]))
+    
+    #~ print(embedQ[0].shape)
+    #~ print(vQ[0].shape)
     
     maxSimilarity = 0
     maxIdx = -1
     for num,v in enumerate(embedQ):
-        simi = np.dot(vQ,v)
+        simi = np.dot(vQ[0],v)
         ans = faq[num][0]
         print("simi: %.2f, %s" % (simi, ans))
         if simi > maxSimilarity:
             maxSimilarity = simi
             maxAns = ans
             maxIdx = num
-            
-    print("q: %s, qref: %s, simi: %.2f" % (q,maxAns,maxSimilarity))
-    print("answer: %s" % faq[num][1])
+    print("")
+    print("q: %s\nqref: %s\nsimi: %.2f" % (q,maxAns,maxSimilarity))
+    print("answer: %s" % faq[maxIdx][1])
     
+    
+"""
+About usage of embedding:    
+    Search (where results are ranked by relevance to a query string)
+    Clustering (where text strings are grouped by similarity)
+    Recommendations (where items with related text strings are recommended)
+    Anomaly detection (where outliers with little relatedness are identified)
+    Diversity measurement (where similarity distributions are analyzed)
+    Classification (where text strings are classified by their most similar label)
+"""
         
         
     

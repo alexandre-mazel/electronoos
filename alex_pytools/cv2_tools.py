@@ -62,6 +62,7 @@ def saveImage_JpgWithSpecificSize( filename, img, nSizeMaxKo, nSizeMinKo = 0, nQ
         print("DBG: saveImage_JpgWithSpecificSize: trying with quality: %s" % nQuality)
         bRet = cv2.imwrite(filename,img,[int(cv2.IMWRITE_JPEG_QUALITY), nQuality])
         if not bRet:
+            print("ERR: can't write to file '%s" % filename )
             return -1
         nSize = os.path.getsize(filename) // 1024
         print("DBG: saveImage_JpgWithSpecificSize: nSize: %dkB" % nSize )

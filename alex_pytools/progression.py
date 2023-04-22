@@ -108,7 +108,7 @@ class Progression:
             if self.timeLastLoaded > os.path.getmtime(self.strSaveFilename):
                 #warning: changing strSaveFilename after load can prevent real loading!
                 return 0
-        except (common.FileNotFoundError, OSError) as err: 
+        except (misctools.FileNotFoundError, OSError) as err: 
             print("DBG: Progression.load: FileNotFoundError: " + str(err) )
             pass
         
@@ -116,7 +116,7 @@ class Progression:
         print("DBG: Progression.load: loading from '%s'" % self.strSaveFilename)
         try:
             f = io.open(self.strSaveFilename,"rt", encoding='cp1252')
-        except common.FileNotFoundError:
+        except misctools.FileNotFoundError:
             s = "WRN: Progression.load: file not found: '%s'" % self.strSaveFilename;
             self.log(s)
             return 0

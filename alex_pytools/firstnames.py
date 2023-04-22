@@ -137,6 +137,7 @@ class Firstnames:
                             ("Nadège", True, ["fr"]),
                             ("Marise", True, ["fr"]),
                             ("Maryse", True, ["fr"]),
+                            ("Murielle", True, ["fr"]),
                             # marocain temp
                             ("Aissa", True, ["fr"]),
                             ("Chahinez", True, ["fr"]),

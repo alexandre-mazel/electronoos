@@ -176,12 +176,16 @@ def renderTemperatureOnImage(render, frame,nCameraInternalTemp):
 
 def acquire():
 
-    cap = cv2.VideoCapture(2) #or 0 + cv2.CAP_DSHOW
+    cap = cv2.VideoCapture(0) #or 0 + cv2.CAP_DSHOW
     cap.set(cv2.CAP_PROP_FRAME_WIDTH,640)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
+    
+    print("capW: %s" % cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    print("capH: %s" % cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
     cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('Y','1','6',' '))
-    cap.set(cv2.CAP_PROP_CONVERT_RGB, False)
+    #~ cap.set(cv2.CAP_PROP_CONVERT_RGB, False)
+    cap.set(cv2.CAP_PROP_CONVERT_RGB, 0.)
 
     # Check if the webcam is opened correctly
     if not cap.isOpened():

@@ -7,6 +7,7 @@ import sys
 strElectroPath = "C:/Users/alexa/dev/git/electronoos/"
 sys.path.append(strElectroPath+"/alex_pytools/")
 #~ print sys.path
+import misctools
 import stringmatch
 
 def findInFile( filename, strToMatch, bVerbose = True ):
@@ -46,7 +47,8 @@ def findInFile( filename, strToMatch, bVerbose = True ):
         if strToMatchLower in line.lower() or stringmatch.isMatch(line.lower(),strToMatchLower):
             if bFirstTime:
                 bFirstTime = False
-                print( "\n***** %s:" % filename )
+                stamp = misctools.getTimeStamp()
+                print( "\n***** %s (date: %s):" % (filename,stamp) )
                 line=line.replace(chr(13),"")
             lenLineMax = 200
             if len(line)>lenLineMax:

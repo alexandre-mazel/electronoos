@@ -1448,13 +1448,39 @@ def findDuplicate( strPath ):
     
 def guessExtension( filename ):
     """
-    mainly image, but not only
+    mainly image, but not only.
+    Return extension, eg: "jpg", "png", "pdf", ...
+    Return None if unknown file
     """
+    f = open(filename,"rb")
+    buf = f.read(10)
+    f.close()
+    if len(buf)<4:
+        return None
+    tableHeaderFileStart = [ # pair of ext, first char
+        ("pdf",b"%PDF-"),
+        ("docx",b'PK\x03\x04\x14\x00\x06\x00\x08\x00'),
+        ("doc",b'\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1\x00\x00'),
+        ("rtf",b'{\\rtf1\\ans'),
+    ]
+    for pot in tableHeaderFileStart:
+        ext, start = pot
+        #~ print(buf[:len(start)])
+        if buf[:len(start)] == start:
+            return ext
+            
+    print("DBG: guessExtension: %s: first: %s" % (filename,buf))
+        
     import imghdr
     strExt = imghdr.what(filename)
     if strExt == "jpeg":
         strExt = "jpg"
     return strExt
+   
+if 0:       
+    s = guessExtension("C:/cvs/cvs_obo/cv__Baillard__Paola__paolabaillard06_AT_gmail_DOT_com__2022_11_17__from_obo__dnow__tvendeur__x1m__cjob__f5__e3__s74000__a_74.pdf")
+    print(s)
+    exit(0)
     
 def correctExtension( strPath ):
     """
@@ -1468,6 +1494,8 @@ def correctExtension( strPath ):
     listFiles = os.listdir(strPath)
     cpt = 0
     for f in listFiles:
+        #~ if f[-4:].lower() == ".pdf": # skip this classical extension, sometimes we could have error on this one also
+            #~ continue
         strExtDetected = guessExtension(strPath+f)
         if strExtDetected != None:
             name,ext = os.path.splitext(f)
@@ -1760,11 +1788,26 @@ def autoTest():
     
     strTestPath = "./autotest_data"
     listDup = findDuplicate(strTestPath)
-    assert(len(listDup)==7)
+    assert(len(listDup)==8)
     
     assert_equal(elision("de", "Alice"), "d'Alice")
     assert_equal(elision("de", "Jean-Pierre"), "de Jean-Pierre")
     assert_equal(elision("je", "aime"), "j'aime")
+    
+    for i in range(1,7):
+        assert("pdf"==guessExtension("autotest_data/cv_%d.pdf"%i))
+        
+    for i in range(1,3):
+        assert("docx"==guessExtension("autotest_data/cv_%d.docx"%i))
+        
+    for i in range(1,2):
+        assert("doc"==guessExtension("autotest_data/cv_%d.doc"%i))
+
+    for i in range(1,2):
+        assert("rtf"==guessExtension("autotest_data/cv_%d.rtf"%i))
+        
+    assert(None==guessExtension("autotest_data/empty_file"))
+    
     
     
     print("current time is (assert with your eyes): %s" % convertEpochToSpecificTimezone(time.time()) )

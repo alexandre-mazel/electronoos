@@ -10,16 +10,9 @@ white = (255, 255, 255)
 red = (255, 0, 0)
 green = (0, 255, 0) 
 blue = (0, 0, 255)
+lblue = (127, 127, 255)
 
-class Object:
-    def __init__(self,x=10,y=10,w=32,h=32):
-        self.x = w
-        self.y = y
-        self.w = w
-        self.h = h
-        self.vx = 0
-        self.vy = 0
-# class Object - end
+
 
 class Player:
     def __init__(self,x=100,y=100,r=10,angle=0):
@@ -45,13 +38,47 @@ class Player:
             self.y+=hs
     
     def render(self, surface):
-        color = (255,255,0)
+        color = lblue
         pg.draw.circle(surface,color,(self.x,self.y),self.r,width=2)
         x2 = self.x+math.cos(self.angle)*(self.r+5)
         y2 = self.y+math.sin(self.angle)*(self.r+5)
         pg.draw.line(surface,color,(self.x,self.y),(x2,y2),width=1)
+        
+    def shoot(self):
+        """
+        create a projectile coming from me.
+        return the created projectile
+        """
+        p = Projectile(self.x+math.cos(self.angle)*(self.r+5),self.y+math.sin(self.angle)*(self.r+5),self.v*1.1+1,self.angle)
+        return p
 
-# class Object - end
+# class Player - end
+
+class Projectile:
+    def __init__(self,x=100,y=100,v=0,angle=0):
+        self.x = x
+        self.y = y
+        self.v = v
+        self.angle = angle
+    
+    def update(self,ws,hs):
+        self.x += math.cos(self.angle)*self.v
+        self.y += math.sin(self.angle)*self.v
+        
+        # warping
+        if self.x>ws:
+            self.x-=ws
+        elif self.x<0:
+            self.x+=ws
+            
+        if self.y>hs:
+            self.y-=hs
+        elif self.y<0:
+            self.y+=hs
+    
+    def render(self, surface):
+        color = red
+        pg.draw.circle(surface,color,(self.x,self.y),2,width=2)
 
 class Game:
     def __init__(self):
@@ -65,6 +92,8 @@ class Game:
         self.players = []
         self.players.append(Player())
         self.players.append(Player(x=self.ws-100,angle=math.pi))
+        
+        self.projectiles = []
 
         
         self.keypressed={} # will store current keyboard pressed
@@ -85,6 +114,9 @@ class Game:
             if event.type == pygame.KEYUP:
                 self.keypressed[event.key] = 0
                 
+                if event.key == pygame.K_RETURN:
+                    self.addProjectile(0)
+                
         for key, bPressed in self.keypressed.items():
             if bPressed:
                 if key == pygame.K_a or key == pygame.K_UP:
@@ -99,6 +131,10 @@ class Game:
                     return True
                     
         return False
+        
+    def addProjectile(self, numPlayer):
+        newProj = self.players[numPlayer].shoot()
+        self.projectiles.append(newProj)
     
     def update(self):
         """
@@ -109,7 +145,9 @@ class Game:
         
         for p in self.players:
             p.update(self.ws,self.hs)
-        
+
+        for p in self.projectiles:
+            p.update(self.ws,self.hs)        
                 
     def render(self):
         """
@@ -118,6 +156,9 @@ class Game:
         self.screen.fill(black)
 
         for p in self.players:
+            p.render(self.screen)
+            
+        for p in self.projectiles:
             p.render(self.screen)
             
         pygame.display.update()  # or pygame.display.flip()

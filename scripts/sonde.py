@@ -22,14 +22,17 @@ def getTemperatureFrom1wire(strDeviceID):
     find /sys/bus/w1/devices/ -name "28-*" -exec cat {}/w1_slave \; | grep "t=" | awk -F "t=" '{print $2/1000}'
 
     """
-    f = open("/sys/bus/w1/devices/%s/w1_slave" % strDeviceID,"rt")
-    lines = f.readlines()
-    print("lines: %s" % str(lines))
-    if len(lines)>0:
-        t = lines[-1].split("t=")[-1]
-        t = int(t)/1000.
-#        t -= 1.5 # seems to be a bit higher than real
-    else:
+    try:    
+        f = open("/sys/bus/w1/devices/%s/w1_slave" % strDeviceID,"rt")
+        lines = f.readlines()
+        print("lines: %s" % str(lines))
+        if len(lines)>0:
+            t = lines[-1].split("t=")[-1]
+            t = int(t)/1000.
+    #        t -= 1.5 # seems to be a bit higher than real
+        else:
+            t = -127
+    except FileNotFoundError:
         t = -127
     return t
     

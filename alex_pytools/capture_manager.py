@@ -272,8 +272,8 @@ def showAndSaveAllCameras( strSavePath = None,rThresholdDifferenceToSave =0.01):
     aCap = []
     nFirst = 0
     nLast = 8
-    if os.name == "nt": nFirst = 1
-    if os.name == "nt": nLast = 2
+    if os.name == "nt": nFirst = 0 # 0: front, 1: eos manager, 2: rear, 3: usb (therm or ...)
+    if os.name == "nt": nLast = 4
     
     for i in range(nFirst,nLast):
         cap = cv2.VideoCapture(i) #or 0 + cv2.CAP_DSHOW
@@ -297,13 +297,16 @@ def showAndSaveAllCameras( strSavePath = None,rThresholdDifferenceToSave =0.01):
                 print("INF: prop %d: %s (0X%X)" % (prop,str(retVal),int(retVal)) )
                 
             w = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+            h = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+            print("wxh: %dx%d" % (w,h))
             fps = cap.get(cv2.CAP_PROP_FPS)
-            if w == 160:
+            if w == 160 or w == 80:
                 # thermal camera
                 print("INF: Thermal camera detected: changing format")
                 if os.name == "nt":
                     cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('Y','1','6',' '))
-                    cap.set(cv2.CAP_PROP_CONVERT_RGB, False)
+                    #~ cap.set(cv2.CAP_PROP_CONVERT_RGB, False)
+                    cap.set(cv2.CAP_PROP_CONVERT_RGB, 0.0)
                 fps = 9
                 
             if fps < 1:
@@ -367,6 +370,8 @@ def showAndSaveAllCameras( strSavePath = None,rThresholdDifferenceToSave =0.01):
                     pass
                         
                 cm.newImage(frame, strSourceName = i )
+            else:
+                print("WRN: showAndSaveAllCameras: cap read error for camera %d" % (i))
         if not cm.render():
             return
 #showAndSaveAllCameras - end

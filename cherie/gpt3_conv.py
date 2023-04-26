@@ -128,6 +128,15 @@ def loopDialog(strHumanName):
     print("Starting a dialog with '%s'" % strHumanName )
     historic = loadHistoric(strHumanName,initial_historic)
     
+    print("")
+    
+    if len(historic)>4:
+        print("3 Prev:")
+        
+        for conv in historic[-3:]:
+            print("%s: %s" % (conv['role'], conv['content']))
+        print("")
+    
     while 1:
         msg = ""
         while msg == "":

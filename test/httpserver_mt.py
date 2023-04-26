@@ -4,7 +4,7 @@ import threading
 
 import time
 
-USE_HTTPS = False
+USE_HTTPS = True
 
 class Handler(BaseHTTPRequestHandler):
 
@@ -33,11 +33,13 @@ class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
     pass
 
 def run():
-    print("test by typing: localhost:4444/www/test_big.htm")
-    server = ThreadingSimpleServer(('0.0.0.0', 4444), Handler)
+    nPort = 4443
+    print("test by typing: localhost:%s/www/test_big.htm" % nPort)
+    print("ou https://78.199.86.189:44414/www/test_big.htm")
+    server = ThreadingSimpleServer(('0.0.0.0', nPort), Handler)
     if USE_HTTPS:
         import ssl
-        server.socket = ssl.wrap_socket(server.socket, keyfile='./key.pem', certfile='./cert.pem', server_side=True)
+        server.socket = ssl.wrap_socket(server.socket, keyfile="keys/key_without_pass.pem", certfile='keys/cert.pem', server_side=True )
     server.serve_forever()
     
 

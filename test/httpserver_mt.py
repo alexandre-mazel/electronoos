@@ -17,10 +17,13 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         if bExtraWait: time.sleep(10)
         #self.wfile.write(b'Hello world\t' + threading.currentThread().getName().encode() + b'\t' + str(threading.active_count()).encode() + b'\n')
-        f = open("./"+self.path,"rb")
-        buf = f.read()
-        f.close()
-        self.wfile.write(buf)
+        try:
+            f = open("./"+self.path,"rb")
+            buf = f.read()
+            f.close()
+            self.wfile.write(buf)
+        except FileNotFoundError:
+            self.wfile.write(b"Error 404")
         
         print("%.3f: fin write: " % time.time() + threading.currentThread().getName() + " " + str(threading.active_count()))
         if bExtraWait: time.sleep(10)

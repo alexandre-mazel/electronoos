@@ -34,7 +34,7 @@ class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
 
 def run():
     nPort = 4443
-    print("test by typing: localhost:%s/www/test_big.htm" % nPort)
+    print("test by typing: https://localhost:%s/www/test_big.htm" % nPort)
     print("ou https://78.199.86.189:44414/www/test_big.htm")
     server = ThreadingSimpleServer(('0.0.0.0', nPort), Handler)
     if USE_HTTPS:

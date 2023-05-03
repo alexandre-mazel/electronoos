@@ -7,6 +7,9 @@ import socket
 import pickle 
 import argparse
 
+# get song from youtube:
+# https://www.justgeek.fr/headset-lecteur-de-musique-open-source-95893/
+
 import sys
 strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
 if strLocalPath == "": strLocalPath = './'
@@ -81,6 +84,8 @@ def getListKnownUsers():
     users = []
     listF = sorted(os.listdir("data/"))
     for f in listF:
+        if ".bak" in f:
+            continue
         f = f.replace(".dia","")
         users.append(f)
         
@@ -104,10 +109,12 @@ def loadHistoric(strUserName,defaultHistoric):
         print("WRN: can't load historic for '%s'" % strUserName )
     return historic
     
-def saveHistoric(strUserName,historic):
-    f = open(getUserNameToFilename(strUserName), "wt")
+def saveHistoric(strUserName,historic,bQuiet=0):
+    filename = getUserNameToFilename(strUserName)
+    misctools.backupFile(filename,bQuiet=1)
+    f = open(filename, "wt")
     json.dump(historic,f,indent=0)
-    print("INF: loadHistoric: good: %d exchanges saved" % (len(historic)))
+    if not bQuiet: print("INF: loadHistoric: good: %d exchanges saved" % (len(historic)))
     f.close()
     
 def askUserName():
@@ -121,6 +128,35 @@ def askUserName():
     print("INF: askUserName: selecting %s" % name)
     return name
     
+def mySayText(txt):
+    sys.path.append("../scripts/")
+    import tts_say
+    tts_say.say(txt,bUseGoogle=False)
+    
+#~ mySayText("coucou")
+
+global_sentenceHeard = ""
+def wordsCallback(words,confidence):
+    if confidence<0.6:
+        return
+    if len(words)<4:
+        return
+    import microphone
+    microphone.stop_loop()
+    print("INF: heard: '%s'" % words)
+    global global_sentenceHeard
+    global_sentenceHeard = words
+
+def myGetTextFromSpeechReco():
+    # my own one
+    import microphone
+    microphone.loopProcess(wordsCallback)
+    global global_sentenceHeard
+    return global_sentenceHeard
+    
+#~ txt = myGetTextFromSpeechReco()
+#~ print("txt: '%s'" % txt)
+        
 def loopDialog(strHumanName):
     # more info here:
     # https://platform.openai.com/docs/api-reference
@@ -136,18 +172,36 @@ def loopDialog(strHumanName):
         for conv in historic[-3:]:
             print("%s: %s" % (conv['role'], conv['content']))
         print("")
+        
+    bUseVoice = 0
+    bUseVoice = 1
     
     while 1:
         msg = ""
         while msg == "":
-            msg = input("%s: " % strHumanName)
+            if bUseVoice:
+                msg = myGetTextFromSpeechReco()
+            else:
+                msg = input("%s: " % strHumanName)
         msglo = msg.lower()
-        if msglo in ["quit","quit()", "bye"]:
+        if msglo in ["quit","quit()", "bye","au revoir", "a+", "a plus tard"] or "au revoir" in msglo: # condition facile pour la tts
             print("AI: a+")
             break
         historic.append({"role":"user","content":msg})
+        saveHistoric(strHumanName,historic,bQuiet=1)
         print("l'ia réfléchit...\r",end="")
-        completion = openai.ChatCompletion.create(
+        try:
+            completion = openai.ChatCompletion.create(
+                              model="gpt-3.5-turbo",
+                              messages=historic,
+                              temperature=0.2,
+                              user=username
+                            )
+        except BaseException as err:
+            print("ERR: %s" % err)
+            print("retrying in 1min...")
+            time.sleep(1)
+            completion = openai.ChatCompletion.create(
                           model="gpt-3.5-turbo",
                           messages=historic,
                           temperature=0.2,
@@ -156,7 +210,9 @@ def loopDialog(strHumanName):
         
         #~ print(completion.choices[0].message)
         answer = completion.choices[0].message["content"]
-        print("AI: " + completion.choices[0].message["content"])
+        print("AI: " + answer )
+        if bUseVoice:
+            mySayText(answer)
         historic.append({"role":"assistant", "content": answer})
         
     #~ print(historic)

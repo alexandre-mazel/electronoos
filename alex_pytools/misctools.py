@@ -1281,7 +1281,7 @@ def dictToString(d,sortByValue=False):
         
 #~ print(dictToString({'2022/09/06': 120, '2022/09/07': 43, '2022/09/08': 54, '2022/09/09': 64, '2022/09/12': 91, '2022/09/13': 131},True))
 
-def backupFile( filename ):
+def backupFile( filename, bQuiet = 0 ):
     """
     make a backup of a file, erase backup first.
     backup have same name than file, but a with an added .bak
@@ -1293,7 +1293,7 @@ def backupFile( filename ):
     if os.path.isfile(filenamebak):
         onedayinsec = 60*60*24
         modtime = os.path.getmtime(filenamebak)
-        print("DBG: backupFile: modtime: %s" % modtime)
+        if not bQuiet: print("DBG: backupFile: modtime: %s" % modtime)
         if time.time() - modtime > onedayinsec:
             # fait un backup du backup
             try:

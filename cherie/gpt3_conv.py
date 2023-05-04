@@ -10,6 +10,16 @@ import argparse
 # get song from youtube:
 # https://www.justgeek.fr/headset-lecteur-de-musique-open-source-95893/
 
+"""
+3mai 16h: test avec Brice.
+- pb1: coupe la parole. il dit "ecoute moi" et marque un blanc puis commence une phrase et l'IA coupe en disant: "je t'écoute".
+- pb2: politiquement correct sur illuminati: ne décroche pas de la réponse mesurée et politiquement correct:
+Je suis d\u00e9sol\u00e9 si je me r\u00e9p\u00e8te. Cependant, je tiens \u00e0 souligner que les informations que je t'ai fournies sont bas\u00e9es sur des sources fiables et v\u00e9rifi\u00e9es. Il n'y a pas de preuve concr\u00e8te que Jacob Rothschild ait un r\u00f4le dans les Illuminatis ou dans tout autre groupe secret. Si tu as d'autres questions ou si tu as besoin d'aide pour rechercher des informations, n'h\u00e9site pas \u00e0 me le dire."
+- pb3: parle plus lentement => a recuperer avant.
+
+bienveillance vs compétence
+"""
+
 import sys
 strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
 if strLocalPath == "": strLocalPath = './'

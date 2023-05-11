@@ -62,11 +62,12 @@ class Player:
         elif self.y<0:
             self.y+=hs
             
-    def receiveDamage( self, damage, projectile_angle, projectile_speed):
+    def receiveDamage( self, damage, projectile_speed,projectile_angle):
         self.life -= damage
         # impossible to apply that, because we don't have inertia in our ship
-        #~ self.angle = self.angle*0.9+projectile_angle*0.1
-        #~ self.v = self.v*0.9 + projectile_speed*0.1
+        self.vx += 0.3*math.cos(projectile_angle)
+        self.vy += 0.3*math.sin(projectile_angle)
+
     
     def render(self, surface):
         color = bluel
@@ -138,6 +139,35 @@ class Projectile:
     def render(self, surface):
         color = red
         pg.draw.circle(surface,color,(self.x,self.y),2,width=2)
+        
+        
+class Planet:
+    def __init__(self,x=0,y=0,r=50,angle=0):
+        self.x = x
+        self.y = y
+        self.r = random.randint(50,200)
+        self.vx = random.random()*2-1
+        self.vy = random.random()*2-1
+        self.color = (random.randint(100,255),random.randint(100,255),random.randint(100,255))
+        
+    def update(self,ws,hs):
+        self.x += self.vx
+        self.y += self.vy
+        
+        # warping
+        if self.x>ws:
+            self.x-=ws
+        elif self.x<0:
+            self.x+=ws
+            
+        if self.y>hs:
+            self.y-=hs
+        elif self.y<0:
+            self.y+=hs
+        
+    def render(self, surface):
+        pg.draw.circle(surface,self.color,(self.x,self.y),self.r,width=0)
+        
 
 class Game:
     def __init__(self):
@@ -153,6 +183,12 @@ class Game:
         self.players.append(Player(x=self.ws-200,angle=math.pi))
         
         self.projectiles = []
+        self.planets = []
+        
+        
+        
+        for i in range(4):
+            self.planets.append(Planet())
 
         
         self.keypressed={} # will store current keyboard pressed
@@ -208,10 +244,13 @@ class Game:
         
         self.clock.tick(self.fps)
         
+        for p in self.planets:
+            p.update(self.ws,self.hs)
+        
         for p in self.players:
             p.update(self.ws,self.hs)
             
-        # colision interplayer
+        # collision interplayer
         for i in range(len(self.players)):
             for j in range(i,len(self.players)):
                 if i == j:
@@ -226,6 +265,13 @@ class Game:
                     self.players[i].life -= 2             
                     self.players[j].life -= 2             
 
+        # collision player /planets
+        for p in self.players:
+            for planet in self.planets:
+                if distSquared(p,planet)<math.pow(p.r,2)+math.pow(planet.r,2):
+                    p.vx = -p.vx*0.7
+                    p.vy = -p.vy*0.7
+                
 
         i = 0
         while i < len(self.projectiles):
@@ -239,12 +285,13 @@ class Game:
             
             # colliding with everything
             
-            for p in self.players:                
+            for p in self.players+self.planets :                
                 if distSquared(proj,p)<p.r*p.r:
                     # touch
                     damage = 10*abs(proj.v)
                     damage = 1
-                    p.receiveDamage(damage, proj.v,proj.angle)
+                    if isinstance(p,Player):
+                        p.receiveDamage(damage, proj.v,proj.angle)
                     # rebond direct (prevent further touch)
                     proj.x -= math.cos(proj.angle)*proj.v
                     proj.y -= math.sin(proj.angle)*proj.v
@@ -256,6 +303,9 @@ class Game:
         """
         self.screen.fill(black)
 
+        for p in self.planets:
+            p.render(self.screen)
+            
         for p in self.players:
             p.render(self.screen)
             

@@ -1,30 +1,40 @@
 import math
-import pygame
 import pygame as pg
+import random
 
-successes, failures = pygame.init()
+successes, failures = pg.init()
 print("INF: pygame int: %s successes and %s failure(s)" % (successes, failures))
 
 black = (0, 0, 0)
 white = (255, 255, 255)
 red = (255, 0, 0)
-green = (0, 255, 0) 
+green = (0, 255, 0)
+yellow = (255, 255, 0)
+yellowd = (230, 230, 0)
 blue = (0, 0, 255)
 lblue = (127, 127, 255)
 
 
+def distSquared(a,b):
+    return (a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y)
+
+
 
 class Player:
-    def __init__(self,x=100,y=100,r=10,angle=0):
+    def __init__(self,x=200,y=200,r=10,angle=0):
         self.x = x
         self.y = y
         self.r = r
-        self.v = 0
+        self.vx = 0
+        self.vy = 0
+
         self.angle = angle
+        self.lifemax = 100
+        self.life = self.lifemax
     
     def update(self,ws,hs):
-        self.x += math.cos(self.angle)*self.v
-        self.y += math.sin(self.angle)*self.v
+        self.x += math.cos(self.angle)*self.vx
+        self.y += math.sin(self.angle)*self.vy
         
         # warping
         if self.x>ws:
@@ -36,6 +46,12 @@ class Player:
             self.y-=hs
         elif self.y<0:
             self.y+=hs
+            
+    def receiveDamage( self, damage, projectile_angle, projectile_speed):
+        self.life -= damage
+        # impossible to apply that, because we don't have inertia in our ship
+        #~ self.angle = self.angle*0.9+projectile_angle*0.1
+        #~ self.v = self.v*0.9 + projectile_speed*0.1
     
     def render(self, surface):
         color = lblue
@@ -43,13 +59,23 @@ class Player:
         x2 = self.x+math.cos(self.angle)*(self.r+5)
         y2 = self.y+math.sin(self.angle)*(self.r+5)
         pg.draw.line(surface,color,(self.x,self.y),(x2,y2),width=1)
+        # life bar
+        barw2 = 30
+        barh2 = 6
+        barcolor = green
+        if self.life <= self.lifemax*0.7:
+            barcolor = yellowd
+        if self.life <= self.lifemax*0.35:
+            barcolor = red
+        pg.draw.rect(surface,white,(self.x-barw2,self.y+self.r+12-barh2,barw2*2,barh2*2))
+        pg.draw.rect(surface,barcolor,(self.x-barw2+2,self.y+self.r+12-barh2+2,(barw2*2-4)*(self.life/self.lifemax),barh2*2-4))
         
     def shoot(self):
         """
         create a projectile coming from me.
         return the created projectile
         """
-        p = Projectile(self.x+math.cos(self.angle)*(self.r+5),self.y+math.sin(self.angle)*(self.r+5),self.v*1.1+1,self.angle)
+        p = Projectile(self.x+math.cos(self.angle)*(self.r+5),self.y+math.sin(self.angle)*(self.r+5),self.vx*1.1+1,self.angle)
         return p
 
 # class Player - end
@@ -60,8 +86,12 @@ class Projectile:
         self.y = y
         self.v = v
         self.angle = angle
+        self.life = 800
     
     def update(self,ws,hs):
+        """
+        return false if this projectile is dead
+        """
         self.x += math.cos(self.angle)*self.v
         self.y += math.sin(self.angle)*self.v
         
@@ -75,6 +105,10 @@ class Projectile:
             self.y-=hs
         elif self.y<0:
             self.y+=hs
+            
+        self.life -= 1
+
+        return self.life > 0
     
     def render(self, surface):
         color = red
@@ -82,16 +116,16 @@ class Projectile:
 
 class Game:
     def __init__(self):
-        self.screen = pygame.display.set_mode((720, 480))
+        self.screen = pg.display.set_mode((1024, 768))
         self.ws = self.screen.get_width()
         self.hs = self.screen.get_height()
         
-        self.clock = pygame.time.Clock()
+        self.clock = pg.time.Clock()
         self.fps = 60  # Frames per second.
         
         self.players = []
         self.players.append(Player())
-        self.players.append(Player(x=self.ws-100,angle=math.pi))
+        self.players.append(Player(x=self.ws-200,angle=math.pi))
         
         self.projectiles = []
 
@@ -103,31 +137,31 @@ class Game:
         Analyse user command
         return True if user want to quit
         """
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
                 return True
                 
-            if event.type == pygame.KEYDOWN:     
-                print("DBG: key '%s' pressed" % event.key )
+            if event.type == pg.KEYDOWN:     
+                #~ print("DBG: key '%s' pressed" % event.key )
                 self.keypressed[event.key] = 1
                 
-            if event.type == pygame.KEYUP:
+            if event.type == pg.KEYUP:
                 self.keypressed[event.key] = 0
                 
-                if event.key == pygame.K_RETURN:
+                if event.key == pg.K_RETURN or event.key == pg.K_SPACE:
                     self.addProjectile(0)
                 
         for key, bPressed in self.keypressed.items():
             if bPressed:
-                if key == pygame.K_a or key == pygame.K_UP:
+                if key == pg.K_a or key == pg.K_UP:
                     self.players[0].v += 0.05
-                elif key == pygame.K_q or key == pygame.K_DOWN:
-                    self.players[0].v = 0
-                elif key == pygame.K_q or key == pygame.K_LEFT:
+                elif key == pg.K_q or key == pg.K_DOWN:
+                    self.players[0].v -= 0.02
+                elif key == pg.K_q or key == pg.K_LEFT:
                     self.players[0].angle -= 0.05
-                elif key == pygame.K_q or key == pygame.K_RIGHT:
+                elif key == pg.K_q or key == pg.K_RIGHT:
                     self.players[0].angle += 0.05
-                elif key == pygame.K_ESCAPE:
+                elif key == pg.K_ESCAPE:
                     return True
                     
         return False
@@ -145,9 +179,39 @@ class Game:
         
         for p in self.players:
             p.update(self.ws,self.hs)
+            
+        # colision interplayer
+        for i in range(len(self.players)):
+            for j in range(len(self.players)):
+                if i == j:
+                    continue
+                if distSquared(self.players[i],self.players[j])<math.pow(self.players[i].r,2)+math.pow(self.players[j].r,2):
+                    self.players[i].angle += 180 + (random.random()*2)-1
+                    self.players[j].angle += 180 + (random.random()*2)-1
+                    
 
-        for p in self.projectiles:
-            p.update(self.ws,self.hs)        
+        i = 0
+        while i < len(self.projectiles):
+            if not self.projectiles[i].update(self.ws,self.hs):
+                del self.projectiles[i]
+                continue
+            i += 1
+            
+            
+        for proj in self.projectiles:
+            
+            # colliding with everything
+            
+            for p in self.players:                
+                if distSquared(proj,p)<p.r*p.r:
+                    # touch
+                    damage = 10*abs(proj.v)
+                    damage = 1
+                    p.receiveDamage(damage, proj.v,proj.angle)
+                    # rebond direct (prevent further touch)
+                    proj.x -= math.cos(proj.angle)*proj.v
+                    proj.y -= math.sin(proj.angle)*proj.v
+                    proj.angle += 180 + (random.random()*2)-1
                 
     def render(self):
         """
@@ -161,7 +225,7 @@ class Game:
         for p in self.projectiles:
             p.render(self.screen)
             
-        pygame.display.update()  # or pygame.display.flip()
+        pg.display.update()  # or pygame.display.flip()
         
 # class Game - end
 

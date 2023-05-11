@@ -11,13 +11,23 @@ red = (255, 0, 0)
 green = (0, 255, 0)
 yellow = (255, 255, 0)
 yellowd = (230, 230, 0)
+orange = (255, 135, 0)
 blue = (0, 0, 255)
-lblue = (127, 127, 255)
+bluel = (127, 127, 255)
 
 
 def distSquared(a,b):
     return (a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y)
-
+    
+def limit(val,maxval):
+    """
+    ensure val is in [-maxval,maxval]
+    """
+    if abs(val)<=maxval:
+        return val
+    if val < 0:
+        return -maxval
+    return maxval
 
 
 class Player:
@@ -27,14 +37,19 @@ class Player:
         self.r = r
         self.vx = 0
         self.vy = 0
+        self.bAccelerate = False
 
         self.angle = angle
         self.lifemax = 100
         self.life = self.lifemax
     
     def update(self,ws,hs):
-        self.x += math.cos(self.angle)*self.vx
-        self.y += math.sin(self.angle)*self.vy
+        self.x += self.vx
+        self.y += self.vy
+        
+        rCoefFrot = 0.995
+        self.vx *= rCoefFrot
+        self.vy *= rCoefFrot
         
         # warping
         if self.x>ws:
@@ -54,14 +69,14 @@ class Player:
         #~ self.v = self.v*0.9 + projectile_speed*0.1
     
     def render(self, surface):
-        color = lblue
+        color = bluel
         pg.draw.circle(surface,color,(self.x,self.y),self.r,width=2)
         x2 = self.x+math.cos(self.angle)*(self.r+5)
         y2 = self.y+math.sin(self.angle)*(self.r+5)
         pg.draw.line(surface,color,(self.x,self.y),(x2,y2),width=1)
         # life bar
         barw2 = 30
-        barh2 = 6
+        barh2 = 4
         barcolor = green
         if self.life <= self.lifemax*0.7:
             barcolor = yellowd
@@ -70,12 +85,22 @@ class Player:
         pg.draw.rect(surface,white,(self.x-barw2,self.y+self.r+12-barh2,barw2*2,barh2*2))
         pg.draw.rect(surface,barcolor,(self.x-barw2+2,self.y+self.r+12-barh2+2,(barw2*2-4)*(self.life/self.lifemax),barh2*2-4))
         
+        if self.bAccelerate:
+            x1 = self.x-math.cos(self.angle)*(self.r-1)
+            y1 = self.y-math.sin(self.angle)*(self.r-1)
+            x2 = self.x-math.cos(self.angle)*(self.r+4)
+            y2 = self.y-math.sin(self.angle)*(self.r+4)
+            pg.draw.line(surface,orange,(x1,y1),(x2,y2),width=7)
+            
+            self.bAccelerate = False
+        
     def shoot(self):
         """
         create a projectile coming from me.
         return the created projectile
         """
-        p = Projectile(self.x+math.cos(self.angle)*(self.r+5),self.y+math.sin(self.angle)*(self.r+5),self.vx*1.1+1,self.angle)
+        vproj = (abs(self.vx)+abs(self.vx))*1.1+1
+        p = Projectile(self.x+math.cos(self.angle)*(self.r+5),self.y+math.sin(self.angle)*(self.r+5),vproj,self.angle)
         return p
 
 # class Player - end
@@ -154,15 +179,21 @@ class Game:
         for key, bPressed in self.keypressed.items():
             if bPressed:
                 if key == pg.K_a or key == pg.K_UP:
-                    self.players[0].v += 0.05
+                    self.players[0].vx += 0.05*math.cos(self.players[0].angle)
+                    self.players[0].vy += 0.05*math.sin(self.players[0].angle)
+                    self.players[0].bAccelerate = True
                 elif key == pg.K_q or key == pg.K_DOWN:
-                    self.players[0].v -= 0.02
+                    self.players[0].vx -= 0.05*math.cos(self.players[0].angle)
+                    self.players[0].vy -= 0.05*math.sin(self.players[0].angle)
                 elif key == pg.K_q or key == pg.K_LEFT:
                     self.players[0].angle -= 0.05
                 elif key == pg.K_q or key == pg.K_RIGHT:
                     self.players[0].angle += 0.05
                 elif key == pg.K_ESCAPE:
                     return True
+                    
+                self.players[0].vx = limit(self.players[0].vx,3)
+                self.players[0].vy = limit(self.players[0].vy,3)
                     
         return False
         
@@ -182,13 +213,19 @@ class Game:
             
         # colision interplayer
         for i in range(len(self.players)):
-            for j in range(len(self.players)):
+            for j in range(i,len(self.players)):
                 if i == j:
                     continue
                 if distSquared(self.players[i],self.players[j])<math.pow(self.players[i].r,2)+math.pow(self.players[j].r,2):
-                    self.players[i].angle += 180 + (random.random()*2)-1
-                    self.players[j].angle += 180 + (random.random()*2)-1
-                    
+                    ovx = self.players[j].vx
+                    ovy = self.players[j].vy
+                    self.players[j].vx = self.players[i].vx * 0.7 - self.players[j].vx * 0.7
+                    self.players[j].vy = self.players[i].vy * 0.7 - self.players[j].vy * 0.7
+                    self.players[i].vx = -self.players[i].vx * 0.7 + ovx * 0.7
+                    self.players[i].vy = -self.players[i].vy * 0.7 + ovy * 0.7     
+                    self.players[i].life -= 2             
+                    self.players[j].life -= 2             
+
 
         i = 0
         while i < len(self.projectiles):

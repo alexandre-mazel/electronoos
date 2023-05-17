@@ -63,7 +63,7 @@ if 0:
     print(completion.choices[0].text)
 
 
-if 0:
+if 1:
     # generation of an image
     prompt = "two dogs playing chess, oil painting"
     prompt = "picture of a man"
@@ -77,12 +77,19 @@ if 0:
     prompt = "a black and white photograph of a girl and a boy playing with a ballon by annie lebovitz, highly-detailed"
     prompt = "a black and white photograph of a robot eating a yoghurt by annie lebovitz, highly-detailed"
     prompt = "a studio photography of a robot by annie lebovitz, highly-detailed"
+    
+    prompt = "I remember the day I found a pair of Dr Martens on a pavement. I wore them for nearly a year"
+    prompt = "I remember the day I found a red pair of Dr Martens on the pavement. I wore them for nearly a year."
+    prompt = "I remember the day my parents showed me my future High School through the bars of the park. I thought it was a police station."
+    prompt = "A big stoney monument with columns looking like a police station, seen through garden fence."
+    prompt = "A street with a big stoney monument looking like a police station, seen through garden fence."
+    prompt += "analog photography, grainy, oldies, memory,photography"
     #~ neg = ""
     #~ neg += " disfigured, bad anatomy, extra legs, extra arms, extra fingers, poorly drawn hands, poorly drawn feet, disfigured, tiling, bad art, deformed, mutated"
     #~ neg += " bad anatomy| extra legs| extra arms| extra fingers| poorly drawn hands| poorly drawn feet| disfigured| out of frame| tiling| bad art| deformed| mutated| blurry| fuzzy| misshaped| mutant| gross| disgusting| ugly| fat| watermark| watermarks "
     # can't find neg
-    prompt += ", good anatomy, nicely drawn hands, nice figure, well formed"
-    image_resp = openai.Image.create(prompt=prompt, n=10, size="512x512")
+    #~ prompt += ", good anatomy, nicely drawn hands, nice figure, well formed"
+    image_resp = openai.Image.create(prompt=prompt, n=5, size="512x512")
     #~ print(dir(image_resp))
     #~ print(dir(image_resp.values))
     #~ print(dir(image_resp.items))
@@ -94,11 +101,19 @@ if 0:
     for i in range(len(image_resp["data"])):
         generated_image_url = image_resp["data"][i]["url"]  # extract image URL from response
         generated_image = requests.get(generated_image_url).content  # download the image
-        generated_image_filepath = "d:/generated_dalle/" + prompt + "_" + str(time.time()) + ".jpg"
+        generated_image_filepath = "d:/generated_dalle/" + prompt 
+        generated_image_filepath = generated_image_filepath[:128]
+        generated_image_filepath += "_" + str(time.time()) + ".jpg"
 
         print("INF: writing to '%s'" % generated_image_filepath)
         with open(generated_image_filepath, "wb") as image_file:
             image_file.write(generated_image)  # write the image to the file
+        if 1:
+            # show it
+            import cv2
+            im = cv2.imread(generated_image_filepath)
+            cv2.imshow(generated_image_filepath,im)
+            cv2.waitKey(100)
     exit(1)
             
 if 0:

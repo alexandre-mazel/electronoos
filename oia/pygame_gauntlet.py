@@ -9,6 +9,7 @@ black = (0, 0, 0)
 white = (255, 255, 255)
 red = (255, 0, 0)
 green = (0, 255, 0)
+greenl = (127, 255, 127)
 yellow = (255, 255, 0)
 yellowd = (230, 230, 0)
 orange = (255, 135, 0)
@@ -31,17 +32,18 @@ def limit(val,maxval):
 
 
 class Player:
-    def __init__(self,x=200,y=200,r=10,angle=0):
+    def __init__(self,x=200,y=200,r=10,angle=0,color=bluel):
         self.x = x
         self.y = y
         self.r = r
         self.vx = 0
         self.vy = 0
-        self.bAccelerate = False
 
         self.angle = angle
         self.lifemax = 100
         self.life = self.lifemax
+        self.color = color
+        self.bAccelerating = False
     
     def update(self,ws,hs):
         self.x += self.vx
@@ -64,13 +66,12 @@ class Player:
             
     def receiveDamage( self, damage, projectile_speed,projectile_angle):
         self.life -= damage
-        # impossible to apply that, because we don't have inertia in our ship
         self.vx += 0.3*math.cos(projectile_angle)
         self.vy += 0.3*math.sin(projectile_angle)
 
     
     def render(self, surface):
-        color = bluel
+        color = self.color
         pg.draw.circle(surface,color,(self.x,self.y),self.r,width=2)
         x2 = self.x+math.cos(self.angle)*(self.r+5)
         y2 = self.y+math.sin(self.angle)*(self.r+5)
@@ -86,21 +87,21 @@ class Player:
         pg.draw.rect(surface,white,(self.x-barw2,self.y+self.r+12-barh2,barw2*2,barh2*2))
         pg.draw.rect(surface,barcolor,(self.x-barw2+2,self.y+self.r+12-barh2+2,(barw2*2-4)*(self.life/self.lifemax),barh2*2-4))
         
-        if self.bAccelerate:
+        if self.bAccelerating:
             x1 = self.x-math.cos(self.angle)*(self.r-1)
             y1 = self.y-math.sin(self.angle)*(self.r-1)
             x2 = self.x-math.cos(self.angle)*(self.r+4)
             y2 = self.y-math.sin(self.angle)*(self.r+4)
             pg.draw.line(surface,orange,(x1,y1),(x2,y2),width=7)
             
-            self.bAccelerate = False
+            self.bAccelerating = False
         
     def shoot(self):
         """
         create a projectile coming from me.
         return the created projectile
         """
-        vproj = (abs(self.vx)+abs(self.vx))*1.1+1
+        vproj = (abs(self.vx)+abs(self.vy))*1.1+1
         p = Projectile(self.x+math.cos(self.angle)*(self.r+5),self.y+math.sin(self.angle)*(self.r+5),vproj,self.angle)
         return p
 
@@ -180,7 +181,7 @@ class Game:
         
         self.players = []
         self.players.append(Player())
-        self.players.append(Player(x=self.ws-200,angle=math.pi))
+        self.players.append(Player(x=self.ws-200,angle=math.pi,color=greenl))
         
         self.projectiles = []
         self.planets = []
@@ -193,11 +194,25 @@ class Game:
         
         self.keypressed={} # will store current keyboard pressed
         
+        self.loadSound()
+        
+    def loadSound(self):
+        self.sound_missile = pg.mixer.Sound("weird_laser.wav")
+        self.sound_crash = pg.mixer.Sound("crash.wav")
+        
     def handleInput(self):
         """
         Analyse user command
         return True if user want to quit
         """
+        # define keys for each player
+        listConfigKeys = [
+                            # accelerate, decelerate, left, right, shoot
+                            [pg.K_UP,pg.K_DOWN,pg.K_LEFT,pg.K_RIGHT,pg.K_SPACE], # player 1
+                            [pg.K_z,pg.K_s,pg.K_q,pg.K_s,pg.K_a], # player 2
+                      ]
+                      
+                      
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return True
@@ -205,27 +220,33 @@ class Game:
             if event.type == pg.KEYDOWN:     
                 #~ print("DBG: key '%s' pressed" % event.key )
                 self.keypressed[event.key] = 1
+                                    
+                for numplayer,configkey in enumerate(listConfigKeys):
+                    key_shoot = configkey[4]
+                    if event.key == key_shoot:
+                        self.addProjectile(numplayer)
+                        pg.mixer.Sound.play(self.sound_missile)
                 
             if event.type == pg.KEYUP:
                 self.keypressed[event.key] = 0
                 
-                if event.key == pg.K_RETURN or event.key == pg.K_SPACE:
-                    self.addProjectile(0)
-                
         for key, bPressed in self.keypressed.items():
             if bPressed:
-                if key == pg.K_a or key == pg.K_UP:
-                    self.players[0].vx += 0.05*math.cos(self.players[0].angle)
-                    self.players[0].vy += 0.05*math.sin(self.players[0].angle)
-                    self.players[0].bAccelerate = True
-                elif key == pg.K_q or key == pg.K_DOWN:
-                    self.players[0].vx -= 0.05*math.cos(self.players[0].angle)
-                    self.players[0].vy -= 0.05*math.sin(self.players[0].angle)
-                elif key == pg.K_q or key == pg.K_LEFT:
-                    self.players[0].angle -= 0.05
-                elif key == pg.K_q or key == pg.K_RIGHT:
-                    self.players[0].angle += 0.05
-                elif key == pg.K_ESCAPE:
+                for numplayer,configkey in enumerate(listConfigKeys):
+                    key_up, key_down, key_left, key_right, key_shoot = configkey
+                    if key == key_up:
+                        self.players[numplayer].vx += 0.05*math.cos(self.players[numplayer].angle)
+                        self.players[numplayer].vy += 0.05*math.sin(self.players[numplayer].angle)
+                        self.players[numplayer].bAccelerating = True
+                    elif key == key_down:
+                        self.players[numplayer].vx -= 0.05*math.cos(self.players[numplayer].angle)
+                        self.players[numplayer].vy -= 0.05*math.sin(self.players[numplayer].angle)
+                    elif key == key_left:
+                        self.players[numplayer].angle -= 0.05
+                    elif key == key_right:
+                        self.players[numplayer].angle += 0.05
+                
+                if key == pg.K_ESCAPE:
                     return True
                     
                 self.players[0].vx = limit(self.players[0].vx,3)
@@ -292,10 +313,15 @@ class Game:
                     damage = 1
                     if isinstance(p,Player):
                         p.receiveDamage(damage, proj.v,proj.angle)
-                    # rebond direct (prevent further touch)
-                    proj.x -= math.cos(proj.angle)*proj.v
-                    proj.y -= math.sin(proj.angle)*proj.v
+
+                    pg.mixer.Sound.play(self.sound_crash)
+                    
+                    while distSquared(proj,p)<p.r*p.r:
+                        # move point while into object
+                        proj.x -= math.cos(proj.angle)*proj.v
+                        proj.y -= math.sin(proj.angle)*proj.v
                     proj.angle += 180 + (random.random()*2)-1
+                        
                 
     def render(self):
         """
@@ -312,7 +338,7 @@ class Game:
         for p in self.projectiles:
             p.render(self.screen)
             
-        pg.display.update()  # or pygame.display.flip()
+        pg.display.update()  # or .display.flip()
         
 # class Game - end
 

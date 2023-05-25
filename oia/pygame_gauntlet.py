@@ -209,7 +209,7 @@ class Game:
         listConfigKeys = [
                             # accelerate, decelerate, left, right, shoot
                             [pg.K_UP,pg.K_DOWN,pg.K_LEFT,pg.K_RIGHT,pg.K_SPACE], # player 1
-                            [pg.K_z,pg.K_s,pg.K_q,pg.K_s,pg.K_a], # player 2
+                            [pg.K_z,pg.K_s,pg.K_q,pg.K_d,pg.K_a], # player 2
                       ]
                       
                       
@@ -290,8 +290,28 @@ class Game:
         for p in self.players:
             for planet in self.planets:
                 if distSquared(p,planet)<math.pow(p.r,2)+math.pow(planet.r,2):
-                    p.vx = -p.vx*0.7
-                    p.vy = -p.vy*0.7
+                    
+                    sumv = abs(p.vx)+abs(p.vy)
+                    if sumv>1.5:
+                        #~ self.sound_crash.set_volume(sumv/2)
+                        pg.mixer.Sound.play(self.sound_crash)
+                        
+                    
+                    p.vx = -p.vx*0.7 + planet.vx
+                    p.vy = -p.vy*0.7 + planet.vy
+                    
+                    if abs(p.vx) < 0.01 and abs(p.vy) < 0.01:
+                        p.vx = planet.vx+(random.random()*2-1)*0.1
+                        p.vy = planet.vy+(random.random()*2-1)*0.1
+                    cpt = 1
+                    while distSquared(p,planet)<math.pow(p.r,2)+math.pow(planet.r,2):
+                        # move point while into object
+                        p.x += p.vx
+                        p.y += p.vy
+                        #~ print("x: %s, y: %s vx: %s, vy: %s" % (p.x,p.y,p.vx,p.vy))
+                        cpt+= 1
+                        if cpt > 100:
+                            break
                 
 
         i = 0

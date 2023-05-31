@@ -4,6 +4,7 @@ def index(req):
     o = """<!DOCTYPE html><html>
     <head><meta charset='cp1252'/>
     <title>AlmaTools EI</title>
+    <link rel="shortcut icon" href="favicon.ico">
     <style>
     .divelem{
     font-size:20px;
@@ -41,6 +42,8 @@ def index(req):
             Site web et serveur
         </div>
     </div>
+    <br>
+    <a href='tarif.htm'>tarifs</a>
     </body>
     </html>
     """

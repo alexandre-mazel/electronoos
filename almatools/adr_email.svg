@@ -2,13 +2,13 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="116.49033mm"
+   width="158.66476mm"
    height="10.5833mm"
-   viewBox="0 0 116.49033 10.5833"
+   viewBox="0 0 158.66476 10.5833"
    version="1.1"
    id="svg3437"
    inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
-   sodipodi:docname="email.svg"
+   sodipodi:docname="adr_email.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -25,7 +25,7 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="0.4204826"
-     inkscape:cx="580.2856"
+     inkscape:cx="581.47472"
      inkscape:cy="208.09422"
      inkscape:window-width="1368"
      inkscape:window-height="890"
@@ -39,7 +39,7 @@
      inkscape:label="Calque 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-26.914797,-141.71518)">
+     transform="translate(-27.010047,-141.71518)">
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
@@ -50,6 +50,6 @@
          id="tspan3921"
          style="stroke-width:0.264583"
          x="26.427965"
-         y="149.75848">alex@engrenage.studio</tspan></text>
+         y="149.75848">contact: alex@engrenage.studio</tspan></text>
   </g>
 </svg>

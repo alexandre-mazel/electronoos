@@ -129,11 +129,12 @@ int std_init()
 
 int std_getPressed(int * px, int * py, int * pz, bool bDebug )
 {
-  // return 1 if somethi is pressed, x,y,and z are then filled
+  // return 1 if something is pressed, x,y,and z are then filled
   // fill x, y & z
   // .kbv was too sensitive !!
   // now touch has to be stable for 50ms
   // 
+  
   static int xmin_calib = 9999;
   static int xmax_calib = 0;
   static int ymin_calib = 9999;
@@ -166,7 +167,7 @@ int std_getPressed(int * px, int * py, int * pz, bool bDebug )
         yraw = 0;
         prev_pressed = pressed;
       }
-      delay(5);
+      delay(1);
   }
   if( pressed )
   {

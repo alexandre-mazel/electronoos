@@ -74,6 +74,8 @@ void setup()
 {
     Serial.begin(9600);
     if (!Serial) delay(5000);           //allow some time for Leonardo
+    
+
 #if 1
   //tft.begin(0x7793);
   tft.begin(0x9487); // new tft
@@ -152,8 +154,18 @@ void setup()
 
 #endif
   
-  std_init();
+  //std_init();
+
+  delay(300);
+
+  Serial.println("");
+  Serial.println("");
+  Serial.println("");
+  Serial.println("");
   bjy_init();
+
+  Serial.println("DBG: Blangle v0.7");  
+  Serial.println("Starting...");
 }
 
 int render_img( const int x, const int y, const int w, const int h, const unsigned char* pImg, const unsigned char* pPalette, int flip=0)
@@ -361,7 +373,7 @@ void loop()
 
     // update sensors
     bjy_update();
-    return;
+    
 
     if(0)
     { // code de test/debug
@@ -419,7 +431,7 @@ void loop()
       dy = 16;
 
       tft.print(int(fps)); y += dy;
-      if( 1 )
+      if( 0 )
       {
         tft.print("\n");
         //tft.setCursor(0, y);
@@ -435,8 +447,9 @@ void loop()
       delay(1);
     } // code de debug
     
-    if( 1 )
+    if( (nCptFrame % 100)==0 ) // reading every frame prevent serial reading ?!?
     {
+      // detect touch
       int x,y,z;
       bool bPressed = std_getPressed(&x,&y,&z);
       if( bPressed )
@@ -510,10 +523,14 @@ void loop()
       } // if bPressed
 
       render_screen(20,23,rCirc,nLocked);
-    }
 
+    } // detect touch
+
+    //delay(40); // leave some time to system (limit to 25fps)
+
+    //delay(1); // ! L'appel a delay nique la lecture du capteur !?!
     ++nCptFrame;
-    if( nCptFrame > 400)
+    if( nCptFrame > 4000) // 400
     {
       // sur uno, avec loop delay 1 => 44fps, 43 avec un println
       // avec text size 1 => 103fps // 188 si affichÃ© en int
@@ -529,5 +546,6 @@ void loop()
       timeBegin = millis();
       Serial.print("fps: ");
       Serial.println(fps);
+      bjy_displayLastAngles();
     }
 }

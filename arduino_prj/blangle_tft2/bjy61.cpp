@@ -62,7 +62,13 @@ void analyse( int nNumSensor, byte * pTrame, int len )
   short int aZ = ((short) (pTrame[5]<<8|pTrame[4]))/32768.0*1800;  
   short int t =  ((short) (pTrame[7]<<8|pTrame[6]))/34.0+365.30; // 13 when at 8, <2 when at -18 (also seen: +36.25)
                                                                  // 26 when at 26, but then 33: the sensor should arise by itself
-                                                                 
+        
+    if(0)
+    {      
+        Serial.print( "DBG: analyse: storing " );       
+        Serial.print( aX, DEC );    
+        Serial.println( "." ); 
+    }
   anLastX[nNumSensor] = aX;
   if( 0 )
   {
@@ -182,12 +188,12 @@ void bjy_update()
         //~ Serial.print(i,DEC);
         if( hs[i].available() > 0 )
         {
-            Serial.print("avail!");
+            //~ Serial.print("avail!");
             // read the incoming byte:
             incomingByte = hs[i].read();
             bjy_receiveBytes(i, incomingByte);
 
-            if( 1 )
+            if( 0 )
             {
               // say what you got:
               Serial.print("Sensor");              
@@ -198,4 +204,28 @@ void bjy_update()
             }
         }
    }
+}
+
+void bjy_displayLastAngles()
+{
+      for( int i = 0; i < nNbrSensor; ++i )
+      {
+        // output as a sign and 4 chars: +9999 zeropadded
+        short int v = anLastX[i];
+        char s = '+';
+        if( v < 0 )
+        {
+          s = '-';
+          v = -v;
+        }
+        Serial.print(s);
+        Serial.print(v/1000, DEC);
+        v -= (v/1000)*1000;        
+        Serial.print(v/100, DEC);
+        v -= (v/100)*100;
+        Serial.print(v/10, DEC);
+        v -= (v/10)*10;        
+        Serial.print(v, DEC);
+      }
+      Serial.println( "" );
 }

@@ -20,5 +20,6 @@
 void bjy_init();
 void bjy_receiveBytes(int nNumSensor, signed short s);
 void bjy_update(void);
+void bjy_displayLastAngles(void);
 
 #endif // _BJY62_H_

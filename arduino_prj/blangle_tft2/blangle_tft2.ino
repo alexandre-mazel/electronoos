@@ -50,6 +50,7 @@ void loop()
 #include <MCUFRIEND_kbv.h>
 #include "imgs.h" // cf comments in render_lock
 #include "simple_touch_detection.h"
+#include "bjy61.h"
 
 MCUFRIEND_kbv tft;
 
@@ -152,6 +153,7 @@ void setup()
 #endif
   
   std_init();
+  bjy_init();
 }
 
 int render_img( const int x, const int y, const int w, const int h, const unsigned char* pImg, const unsigned char* pPalette, int flip=0)
@@ -356,6 +358,11 @@ void loop()
     int y = 0;
     int dy = 0;
     //Serial.println("loop... blangle2");
+
+    // update sensors
+    bjy_update();
+    return;
+
     if(0)
     { // code de test/debug
       const char *aspectname[] = 

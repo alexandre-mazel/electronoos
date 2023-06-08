@@ -16,6 +16,25 @@ orange = (255, 135, 0)
 blue = (0, 0, 255)
 bluel = (127, 127, 255)
 
+"""
+Exemple de collision entre 2 rectangles
+"""
+def isIntersectedSegments(x1,len1,x2,len2):
+    """
+    is there an intersection between segment starting at x1 of len1 and segment starting at x2 of len2
+    """
+    
+    return not(x1+len1<x2 or x1>x2+len2)
+    
+"""
+isCollision = isIntersectedSegments(square.x, square.w, obstacle.x, obstactle.w)  \
+                        and isIntersectedSegments(square.y, square.h, obstacle.y, obstactle.h)
+    if bIsCollision:
+        # reaction a la collision
+        print("collision square obstacle")
+        square.vx *= -1
+        # blablabla
+"""
 
 def distSquared(a,b):
     return (a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y)
@@ -40,7 +59,7 @@ class Player:
         self.vy = 0
 
         self.angle = angle
-        self.lifemax = 100
+        self.lifemax = 10
         self.life = self.lifemax
         self.color = color
         self.bAccelerating = False
@@ -186,6 +205,13 @@ class Game:
         self.projectiles = []
         self.planets = []
         
+        self.bEndOfGame = 0
+        
+        pg.font.init() # you have to call this at the start, 
+                   # if you want to use this module.
+        self.fontTitle = pg.font.SysFont('Comic Sans MS', 30)
+
+        
         
         
         for i in range(4):
@@ -265,6 +291,9 @@ class Game:
         
         self.clock.tick(self.fps)
         
+        if self.bEndOfGame:
+            return
+        
         for p in self.planets:
             p.update(self.ws,self.hs)
         
@@ -341,8 +370,13 @@ class Game:
                         proj.x -= math.cos(proj.angle)*proj.v
                         proj.y -= math.sin(proj.angle)*proj.v
                     proj.angle += 180 + (random.random()*2)-1
+                    
+                    
+        for num_player,p in enumerate(self.players):
+            if p.life <= 0:
+                print("player %d lose" % num_player)
+                self.bEndOfGame = 1
                         
-                
     def render(self):
         """
         Show a representation of the world to the user
@@ -358,7 +392,22 @@ class Game:
         for p in self.projectiles:
             p.render(self.screen)
             
+        if self.bEndOfGame:
+            color = white
+            rectMessage = (100,100,self.ws-200,self.hs-400)
+            pg.draw.rect(self.screen,color,rectMessage,width=10)
+            text_surface = self.fontTitle.render('Game Over', False, color)
+            self.screen.blit(text_surface, (rectMessage[0]+320,rectMessage[1]+100))
+            
+            num_player = 1
+            color = red
+            if self.players[1].life <= 0:
+                num_player = 2
+                color = green
+            text_surface = self.fontTitle.render('Player %d is dead' % num_player, False, color)
+            self.screen.blit(text_surface, (rectMessage[0]+300,rectMessage[1]+200))
         pg.display.update()  # or .display.flip()
+        
         
 # class Game - end
 
@@ -367,9 +416,9 @@ def runGame():
     game = Game()
     while 1:
         bQuit = game.handleInput()
-        game.update()
         if bQuit:
             break
+        game.update()
         game.render()
         
 # startGame - end

@@ -21,5 +21,6 @@ void bjy_init();
 void bjy_receiveBytes(int nNumSensor, signed short s);
 void bjy_update(void);
 void bjy_displayLastAngles(void);
+int bjy_getAngle(int nIndex); // return angle in degrees * 10
 
 #endif // _BJY62_H_

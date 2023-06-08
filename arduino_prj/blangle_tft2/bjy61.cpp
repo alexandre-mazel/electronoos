@@ -11,7 +11,7 @@ HardwareSerial hs[] = {Serial1, Serial2, Serial3};
 byte aaTrame[nNbrSensor][20]; // for each sensor
 int anTrameLen[nNbrSensor] = {0,0,0};
 int anTrameStatus[nNbrSensor] = {0,0,0}; // -1: ?, 0: waiting for first mark, 1: waiting for 2nd start mark, 2: in the trame
-int anLastX[nNbrSensor] = {0,0,0};
+int anLastX[nNbrSensor] = {0,0,0}; // in degrees*10
 
 unsigned long timeLastOutput = 0;
 
@@ -204,6 +204,11 @@ void bjy_update()
             }
         }
    }
+}
+
+int bjy_getAngle(int nIndex)
+{
+    return anLastX[nIndex];
 }
 
 void bjy_displayLastAngles()

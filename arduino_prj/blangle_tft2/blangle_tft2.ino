@@ -259,6 +259,8 @@ int render_screen(int nip, int db, float circ,int bLocked)
 {
   static uint8_t bDrawed = 0;
   static uint8_t bPrevLocked = 2;
+  static int nPrevDb = 9999;
+  static int nPrevNip = 9999;
   
   // dessine l'interface, ne redessinne que ce qui est utile
   // la vraie interface 400x240
@@ -267,8 +269,8 @@ int render_screen(int nip, int db, float circ,int bLocked)
   const int h = 320; // 240
 
   const int nMenuW = 36;
-  const int nMenuH = 240;
-  const int nAreaW = 182;
+  const int nMenuH = h;
+  const int nAreaW = (w-nMenuW)/2; // width of an area
   const int nAreaH = 120;
   const int nNbrSettings = 8;
   const int nLineH = 8;
@@ -305,19 +307,31 @@ int render_screen(int nip, int db, float circ,int bLocked)
 
 
   tft.setTextSize(5);
-  tft.setCursor(nMenuW+50, 26);
-  tft.print("NIP");
-  tft.setCursor(nMenuW+50, 26+nLineH*5);
-  tft.print(nip);
-  tft.print("cm");
 
-  tft.setCursor(nMenuW+nAreaW+50, 26);
-  tft.print("DB");
-  tft.setCursor(nMenuW+nAreaW+50, 26+nLineH*5);
-  tft.print(db);
-  tft.setCursor(tft.getCursorX(), 26+nLineH*5-nLineH+2);
-  tft.setTextSize(3);
-  tft.print("o");
+  if(nPrevNip != nip || !bDrawed )
+  {
+    nPrevNip = nip;
+    tft.fillRect(nMenuW,0+nAreaH/2,nAreaW,nAreaH/2,BLUE);
+    tft.setCursor(nMenuW+50, 26);
+    tft.print("NIP");
+    tft.setCursor(nMenuW+50, 26+nLineH*5);
+    
+    tft.print(nip);
+    tft.print("cm");
+  }
+
+  if(nPrevDb != db )
+  {
+    nPrevDb = db;
+    tft.fillRect(nMenuW+nAreaW,0+nAreaH/2,nAreaW,nAreaH/2,RED);
+    tft.setCursor(nMenuW+nAreaW+50, 26);
+    tft.print("DB");
+    tft.setCursor(nMenuW+nAreaW+50, 26+nLineH*5);
+    tft.print(db/10.,1);
+    tft.setCursor(tft.getCursorX(), 26+nLineH*5-nLineH+2);
+    tft.setTextSize(3);
+    tft.print("o");
+  }
 
   tft.setTextSize(4);
   tft.setCursor(nMenuW+22, nAreaH+48);
@@ -366,13 +380,19 @@ void loop()
 {
     static uint8_t aspect = 0;
     static int nLocked = 1;
-    static float rCirc = 5550.5;
+    static float rCirc = 5550.5; // mm
     int y = 0;
     int dy = 0;
+    int nip; //cm
+    int db;
     //Serial.println("loop... blangle2");
 
     // update sensors
     bjy_update();
+
+    db = bjy_getAngle(1);
+    //nip = 2*rCirc*3.14159265358979323846264*db/360;
+    nip = (rCirc*db/360)/10/10; // /10 for angle, then /10 for cm
     
 
     if(0)
@@ -522,7 +542,7 @@ void loop()
         
       } // if bPressed
 
-      render_screen(20,23,rCirc,nLocked);
+      render_screen(nip,db,rCirc,nLocked);
 
     } // detect touch
 

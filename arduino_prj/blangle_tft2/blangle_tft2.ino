@@ -168,7 +168,7 @@ void setup()
   Serial.println("Starting...");
 }
 
-int render_img( const int x, const int y, const int w, const int h, const unsigned char* pImg, const unsigned char* pPalette, int flip=0)
+int render_img( const int x, const int y, const int w, const int h, const unsigned char* pImg, const unsigned char* pPalette, int flip=0, int neg=0)
 {
   // flip: 0: none, 1: flip vertical
 
@@ -221,7 +221,7 @@ int render_img( const int x, const int y, const int w, const int h, const unsign
         Serial.println(color,HEX);
       }
 
-      if( color != 0 )
+      if( (color != 0 && !neg) || (neg && color == 0))
       {
         //color = 0xF800;
         if( flip == 0 )
@@ -244,7 +244,7 @@ int render_lock(int x,int y)
   // sur Uno quand l'image etait trop grosse il ne restait que 148 octets pour les variables locales et ca faisait nimp
 
   // generated from electronoos\generate_img.py:
-  // python C:\Users\alexa\dev\git\electronoos\generate_img\generate_img.py "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\just_lock.png" "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\just_arrow.png" 4
+  // python C:\Users\alexa\dev\git\electronoos\generate_img\generate_img.py "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\just_lock.png" "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\just_arrow.png" "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\bubble.png" 4
   // copy \tmp\imgs.* C:\Users\alexa\dev\git\electronoos\arduino_prj\blangle_tft2\ /Y
 
   render_img(x,y,IMG_1_SIZE_X,IMG_1_SIZE_Y,aImgs_1,aPalette_1);
@@ -255,25 +255,43 @@ int render_arrow(int x,int y,int flip=0)
   render_img(x,y,IMG_2_SIZE_X,IMG_2_SIZE_Y,aImgs_2,aPalette_2,flip);
 }
 
-int render_screen(int nip, int db, float circ,int bLocked)
+int render_bubble(int x,int y)
+{
+  //render_img(x,y,IMG_3_SIZE_X,IMG_3_SIZE_Y,aImgs_3,aPalette_3,0,1); // trait noir
+  render_img(x,y,IMG_3_SIZE_X,IMG_3_SIZE_Y,aImgs_3,aPalette_3,0,0); // trait blanc (palette changé a la main dans le fichier généré)
+}
+
+const int w_screen = 480; // 400
+const int h_screen = 320; // 240
+const int nMenuW = 36;
+const int nMenuH = h;
+
+const int nMenuW = 36;
+const int nMenuH = h;
+const int nBubbleW = 32; // bubble level
+const int nBubbleH = h;
+const int nAreaW = (w-nMenuW-nBubbleW)/2; // width of an area
+const int nAreaH = h/2;
+const int nNbrSettings = 8;
+const int nLineH = 8;
+
+
+int render_screen(int nip, int db, int bubble, float circ,int bLocked)
 {
   static uint8_t bDrawed = 0;
   static uint8_t bPrevLocked = 2;
   static int nPrevDb = 9999;
   static int nPrevNip = 9999;
+  static int nPrevBubble = 9999;
   
   // dessine l'interface, ne redessinne que ce qui est utile
-  // la vraie interface 400x240
-  // barre a gauche de 36 de large puis 2 zones de 182, hauteur 120
-  const int w = 480; // 400
-  const int h = 320; // 240
 
-  const int nMenuW = 36;
-  const int nMenuH = h;
-  const int nAreaW = (w-nMenuW)/2; // width of an area
-  const int nAreaH = 120;
-  const int nNbrSettings = 8;
-  const int nLineH = 8;
+  const int w = w_screen;
+  const int h = h_screen;
+
+
+
+  int nBubblePos = 0;
 
   if( 0 )
   {
@@ -342,6 +360,25 @@ int render_screen(int nip, int db, float circ,int bLocked)
   tft.setTextColor(WHITE);
   tft.print("mm");
 
+  if(nPrevBubble != bubble )
+  {
+    // render bubble
+    const int nBubbleSize2=32/2;
+    nPrevBubble = bubble;
+    int bubble_back_color = GREEN;
+    if(bubble>5 || bubble<-5) bubble_back_color = MAGENTA; // half degree => bad
+    tft.fillRect(w-nBubbleW,0,w,h,bubble_back_color);
+    nBubblePos = (bubble/10.)*(bubble/10.);
+    if(nBubblePos>h/2-nBubbleSize2) nBubblePos = h/2-nBubbleSize2;
+  //  if(nBubblePos<-(h/2-nBubbleSize2)) nBubblePos = -(h/2-nBubbleSize2);
+    if(bubble>0) nBubblePos=h/2-16-nBubblePos;
+    else nBubblePos=h/2-16+nBubblePos;
+    render_bubble(w-nBubbleW+2,nBubblePos);
+    tft.drawRect(w-nBubbleW,h/2-nBubbleSize2-2,nBubbleW,2,BLACK);
+    tft.drawRect(w-nBubbleW,h/2+nBubbleSize2,nBubbleW,2,BLACK);
+  }
+  
+
 
   if( bPrevLocked != bLocked )
   {
@@ -385,11 +422,13 @@ void loop()
     int dy = 0;
     int nip; //cm
     int db;
+    int bubble;
     //Serial.println("loop... blangle2");
 
     // update sensors
     bjy_update();
 
+    bubble = bjy_getAngle(0);
     db = bjy_getAngle(1);
     //nip = 2*rCirc*3.14159265358979323846264*db/360;
     nip = (rCirc*db/360)/10/10; // /10 for angle, then /10 for cm
@@ -542,7 +581,7 @@ void loop()
         
       } // if bPressed
 
-      render_screen(nip,db,rCirc,nLocked);
+      render_screen(nip,db,bubble,rCirc,nLocked);
 
     } // detect touch
 

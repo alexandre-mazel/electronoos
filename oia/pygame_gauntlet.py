@@ -214,8 +214,8 @@ class Game:
         
         
         
-        for i in range(4):
-            self.planets.append(Planet())
+        #~ for i in range(4):
+            #~ self.planets.append(Planet())
 
         
         self.keypressed={} # will store current keyboard pressed
@@ -225,6 +225,36 @@ class Game:
     def loadSound(self):
         self.sound_missile = pg.mixer.Sound("weird_laser.wav")
         self.sound_crash = pg.mixer.Sound("crash.wav")
+        
+    def getCommandIA(self):
+        nFront=nTurn=bShoot=0
+
+        dx = self.players[0].x-self.players[1].x
+        dy = self.players[0].y-self.players[1].y
+        dist = dx*dx+dy*dy
+        #~ print("dist: %s" % dist )
+        if dist<80000:
+            if random.random()>0.95:
+                print("shoot")
+                bShoot = 1
+        else:
+            nFront=1
+        
+        
+        dangle = math.atan2(dy,dx)
+        #~ print("dangle: %.2f" % dangle)
+        if dangle<0: dangle+=math.pi*2
+        diffangle = dangle-self.players[1].angle
+        print("dangle: %.2f, angle:%.2f, diff: %.2f" % (dangle,self.players[1].angle,diffangle))
+        if diffangle<-0.05:
+            nTurn=1
+            nFront=0
+        elif diffangle>0.05:
+            nTurn=-1
+            nFront=0
+        #~ elif math.atan2(dy,dx)-self.players[1].angle<-0.1
+            #~ nTurn=-1
+        return nFront,nTurn,bShoot
         
     def handleInput(self):
         """
@@ -256,6 +286,28 @@ class Game:
             if event.type == pg.KEYUP:
                 self.keypressed[event.key] = 0
                 
+        if not self.bEndOfGame:
+            # AI emulate keys:
+            # to rewrite: badly programmed
+            nFrontAI, nTurnAI,bShootAI = self.getCommandIA()
+            print("nFrontAI, nTurnAI,bShootAI: %s,%s,%s" % (nFrontAI, nTurnAI,bShootAI) )
+            self.keypressed[listConfigKeys[1][0]] = 0
+            self.keypressed[listConfigKeys[1][1]] = 0
+            if nFrontAI == 1: self.keypressed[listConfigKeys[1][0]] = 1
+            elif nFrontAI == -1: self.keypressed[listConfigKeys[1][1]] = 1
+
+            self.keypressed[listConfigKeys[1][2]] = 0
+            self.keypressed[listConfigKeys[1][3]] = 0
+                
+            if nTurnAI == 1: self.keypressed[listConfigKeys[1][2]] = 1
+            elif nTurnAI == -1: self.keypressed[listConfigKeys[1][3]] = 1
+
+            
+            if bShootAI == 1: 
+                # ugly: cut and paste! don't do that please
+                self.addProjectile(1)
+                pg.mixer.Sound.play(self.sound_missile)
+
         for key, bPressed in self.keypressed.items():
             if bPressed:
                 for numplayer,configkey in enumerate(listConfigKeys):

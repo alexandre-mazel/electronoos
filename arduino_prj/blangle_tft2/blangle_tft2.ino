@@ -264,16 +264,23 @@ int render_bubble(int x,int y)
 const int w_screen = 480; // 400
 const int h_screen = 320; // 240
 const int nMenuW = 36;
-const int nMenuH = h;
+const int nMenuH = h_screen;
 
-const int nMenuW = 36;
-const int nMenuH = h;
 const int nBubbleW = 32; // bubble level
-const int nBubbleH = h;
-const int nAreaW = (w-nMenuW-nBubbleW)/2; // width of an area
-const int nAreaH = h/2;
+const int nBubbleH = h_screen;
+const int nAreaW = (w_screen-nMenuW-nBubbleW)/2; // width of an area
+const int nAreaH = h_screen/2;
 const int nNbrSettings = 8;
 const int nLineH = 8;
+
+const int xLock = nMenuW+304;
+const int yLock = nAreaH+32;
+
+const int xArrow = nMenuW+75;
+const int yArrow = nAreaH+22;
+const int yArrowBottom = nAreaH+80+3;
+const int wArrow = 16;
+const int wInterArrow = 8;
 
 
 int render_screen(int nip, int db, int bubble, float circ,int bLocked)
@@ -325,14 +332,15 @@ int render_screen(int nip, int db, int bubble, float circ,int bLocked)
 
 
   tft.setTextSize(5);
+  const int yText = 40;
 
   if(nPrevNip != nip || !bDrawed )
   {
     nPrevNip = nip;
     tft.fillRect(nMenuW,0+nAreaH/2,nAreaW,nAreaH/2,BLUE);
-    tft.setCursor(nMenuW+50, 26);
+    tft.setCursor(nMenuW+50, yText);
     tft.print("NIP");
-    tft.setCursor(nMenuW+50, 26+nLineH*5);
+    tft.setCursor(nMenuW+50, yText+nLineH*5);
     
     tft.print(nip);
     tft.print("cm");
@@ -342,11 +350,11 @@ int render_screen(int nip, int db, int bubble, float circ,int bLocked)
   {
     nPrevDb = db;
     tft.fillRect(nMenuW+nAreaW,0+nAreaH/2,nAreaW,nAreaH/2,RED);
-    tft.setCursor(nMenuW+nAreaW+50, 26);
+    tft.setCursor(nMenuW+nAreaW+50, yText);
     tft.print("DB");
-    tft.setCursor(nMenuW+nAreaW+50, 26+nLineH*5);
+    tft.setCursor(nMenuW+nAreaW+50, yText+nLineH*5);
     tft.print(db/10.,1);
-    tft.setCursor(tft.getCursorX(), 26+nLineH*5-nLineH+2);
+    tft.setCursor(tft.getCursorX(), yText+nLineH*5-nLineH+2);
     tft.setTextSize(3);
     tft.print("o");
   }
@@ -383,10 +391,8 @@ int render_screen(int nip, int db, int bubble, float circ,int bLocked)
   if( bPrevLocked != bLocked )
   {
     bPrevLocked = bLocked;
-    render_lock(nMenuW+304, nAreaH+32);
-    const int xArrow = nMenuW+75;
-    const int yArrow = nAreaH+22;
-    const int yArrowBottom = nAreaH+80+3;
+    render_lock(xLock, yLock);
+
     int x = xArrow;
     if( ! bLocked )
     {
@@ -397,10 +403,10 @@ int render_screen(int nip, int db, int bubble, float circ,int bLocked)
       
       for( int i = 0; i < 5; ++i )
       {
-        if( i == 4 ) x += 24;
+        if( i == 4 ) x += wArrow+wInterArrow;
         render_arrow(x,yArrow);
         render_arrow(x,yArrowBottom, 1);
-        x += 24;
+        x += wArrow+wInterArrow;
       }
     }
     else
@@ -424,6 +430,7 @@ void loop()
     int db;
     int bubble;
     //Serial.println("loop... blangle2");
+    rCirc = 628.3;
 
     // update sensors
     bjy_update();
@@ -513,17 +520,17 @@ void loop()
       bool bPressed = std_getPressed(&x,&y,&z);
       if( bPressed )
       {
-        const int dw_arrow = 24;
+        const int dw_arrow = wArrow+wInterArrow;
         const int dh_arrow = 58;
         short int listPos[(1+5*2)*2] = {
-                    360,182, // lock // 370/200
+                    xLock,yLock, // lock // 370/200 // 360/182
                     // 80,120, // first arrow
         };
         // add 10 arrows
         for( int i = 0; i < 5; ++i )
         {
-          listPos[2+i*2+0] = 118+i*dw_arrow;
-          listPos[2+i*2+1] = 145;//+i*dh_arrow;
+          listPos[2+i*2+0] = xArrow+i*dw_arrow;
+          listPos[2+i*2+1] = yArrow+i*dh_arrow;
 
           // fleches du bas
           listPos[2+(i+5)*2+0] = listPos[2+(i+0)*2+0];

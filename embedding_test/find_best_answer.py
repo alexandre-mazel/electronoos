@@ -618,6 +618,60 @@ if 1:
         conf2 = min(simi2/0.36,1.)
         qref2,aref2 = faq[imax2]
         print("# 2: faqVrac: %s =>\n%d: %s\n%s\n(conf: %.2f)" % (q,imax2,qref2,aref2,conf2 ) )
+        
+
+"""
+DBG: faqVrac: bests: [(34, 0.3819858172588727), (35, 0.14339179273520386)]
+# 1: faqVrac: J'ai besoin d'envoyer un email =>
+34: Que doit contenir obligatoirement une adresse mail ?
+une adresse email doit toujours contenir un arobase, c'est a dire le caractere special ou symbol: "@"
+(conf: 1.00)
+# 2: faqVrac: J'ai besoin d'envoyer un email =>
+35: Puis je poser mes congés de manière rétroactive ?
+Les congés doivent être posé 3 jours à l'avance pour des raisons d'assurances.
+(conf: 0.40)
+
+DBG: faqVrac: bests: [(40, 0.17489819483113084), (37, 0.1489064417242786)]
+# 1: faqVrac: Je suis handicapé. =>
+40: Je suis en situation de handicap : un restaurateur peut-il me refuser l’accès à son établissement ?
+Un restaurateur ne peut refuser l’accès à son établissement pour des motifs discriminatoires (religion, race, etc.), ni du fait de la présence d’enfants.
+(conf: 0.49)
+# 2: faqVrac: Je suis handicapé. =>
+37: Puis-je refusé un candidat car il est trop vieux.
+En france il est interdit de juger de la qualité d'un candidat uniquement en fonction de son age.
+(conf: 0.41)
+
+DBG: faqVrac: bests: [(6, 0.17427715375144598), (41, 0.15232267567338456)]
+# 1: faqVrac: Je suis végétarien. =>
+6: Qu'est ce qu'une puce 
+Symbole marquant le début d'une ligne dans le cadre entre autre d'une liste
+(conf: 0.48)
+# 2: faqVrac: Je suis végétarien. =>
+41: Je souhaite manger seul au restaurant. Puis-je me voir opposer un refus du restaurateur ?
+Un restaurateur ne peut pas refuser de vous servir du fait que vous êtes seul. Cependant, vous serez contraint d’accepter la table proposée.
+(conf: 0.42)
+
+DBG: faqVrac: bests: [(23, 0.246399040562425), (45, 0.24355220346289008)]
+# 1: faqVrac: Quels sont les limitations sur la pose de congés? =>
+23: A quoi reconnaît-t-on un raccourci ?
+à la flèche bleu en bas à gauche de l'icone
+(conf: 0.68)
+# 2: faqVrac: Quels sont les limitations sur la pose de congés? =>
+45: Qu'est ce que le Management de Transition ?
+Le Management de Transition : C’est un accompagnement temporaire et à temps plein d’un Directeur qui doit s’absenter pour de longs mois et dont l’absence pénalise l’entreprise.
+(conf: 0.68)
+
+DBG: faqVrac: bests: [(46, 0.23275017776430346), (44, 0.2286323657259607)]
+# 1: faqVrac: Quels sont les limitations sur la pose de vacances? =>
+46: Qu'est ce que le Temps Partagé Augmenté ?
+Le Temps partagé Augmenté : C’est une création du Groupe Reference. C’est un accompagnement à temps partiel ou temps plein qui peut se réaliser sur quelques mois, le temps du développement complet de l’entreprise, à plusieurs années. Certains de nos clients utilisent cette solution depuis la naissance du Groupe montrant que c’est aussi une solution pérenne ! Il est augmenté de par la multiplicité des services proposés qu’un indépendant ne peut pas proposer.
+(conf: 0.65)
+# 2: faqVrac: Quels sont les limitations sur la pose de vacances? =>
+44: Qu'est ce que le Temps Partagé ?
+Le Temps partagé : Ce terme désigne une organisation du travail d’une personne (salariée ou non) entre différentes entreprises. Un freelance qui travaille pour plusieurs entreprises en tant que DRH est de facto en temps partagé. Son temps est partagé entre les entreprises qui elles, l’utilisent à temps partiel.
+(conf: 0.64)
+
+"""
      
     
     

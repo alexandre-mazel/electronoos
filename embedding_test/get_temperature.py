@@ -122,6 +122,8 @@ def autotest():
              ["Je suis content",0.8],
              ["J'adore beaucoup",1.],
              ["J'adore",0.8],
+             ["J'aime bien",0.8],
+             
              ["Nous adorons",0.8],
              ["Je kiffe",0.7],
              # 1: getPosNeg: Je kiffe => 9: je kiffe 1.00 (conf: 0.97)
@@ -211,7 +213,7 @@ def autotest():
     if nCptError > 0:
         print("\nINF: nCptRealError: %d, nCptErrorLowConf: %d, ConfavgConfErreur: %.2f (rAvgConf:%.2f)" % (nCptRealError,nCptErrorLowConf,rSumConfError/nCptError,rSumConf/len(al)))
             
-        # INF: nCptRealError: 0, nCptErrorLowConf 1, ConfavgConfErreur: 0.23  (rAvgConf:0.80)
+        # INF: nCptRealError: 0, nCptErrorLowConf 1, ConfavgConfErreur: 0.23  (rAvgConf:0.81)
         
 if __name__ == "__main__":
     autotest()

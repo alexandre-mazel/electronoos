@@ -147,10 +147,11 @@ def precomputeParagraph(list_p,filenametostore):
             assert(0)
     return embedListList
     
-def getBests(s,listEmbed):
+def getBests(s,listEmbed,bVerbose=0,listWordForVerbose = []):
     """
     find best simi between a sentence and a list of already computing embedding.
-    - listEmbed: a list of embedded vectors TODO: document!
+    - listEmbed: a list of embedded vectors: list of vector (a vector is a list of 512 floats or more: the embedding vector)
+    - listWordForVerbose: list of word relative to listEmbed
     return the best and second best; [index in the list, and the simi] * 2
     """
     simiMax = 0
@@ -160,7 +161,13 @@ def getBests(s,listEmbed):
     e = camEmbed(s)
     for i,v in enumerate(listEmbed):
         simi = np.dot(e,v)
+        if bVerbose: 
+            sEmb = ""
+            if listWordForVerbose != []:
+                sEmb = listWordForVerbose[i]
+            print("DBG: getBests: %d, simi: %.3f %s" % (i,simi,sEmb)) 
         if simi > simiMax:
+            if bVerbose: print("DBG: getBests: new best!")
             simiMax2 = simiMax
             imax2 = imax
             simiMax = simi
@@ -168,6 +175,8 @@ def getBests(s,listEmbed):
         elif simi > simiMax2:
             simiMax2 = simi
             imax2 = i
+        else:
+            if bVerbose: print("DBG: getBests: new best!")
             
     return [(imax,simiMax),(imax2,simiMax2)]
     

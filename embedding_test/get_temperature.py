@@ -182,6 +182,9 @@ def autotest():
              ["Et toi, detestes-tu?",-1.],
              # 1: getPosNeg: Et toi, detestes-tu? => 33: je déteste -1.00 (conf: 0.80)
              # 2: getPosNeg: Et toi, detestes-tu? => 9: je kiffe 1.00 (conf: 0.67)
+             
+             ["J'ai adoré ce restaurant",1.],
+             ["J'ai pas aimé du tout cette pièce de théatre",-0.7],
         ]
         
     nCptError = 0

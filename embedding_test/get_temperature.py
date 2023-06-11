@@ -99,6 +99,7 @@ def getPosNeg(s,bVerbose=0):
     
     if abs(vref-vref2)>0.8:
         if bPrint: print("WRN: getPosNeg: two different results, may be false!")
+        conf *= 0.7 # apply a malus on conf
         return vref,conf
         
     
@@ -123,9 +124,12 @@ def autotest():
              ["J'adore",0.8],
              ["Nous adorons",0.8],
              ["Je kiffe",0.7],
+             # 1: getPosNeg: Je kiffe => 9: je kiffe 1.00 (conf: 0.97)
+             # 2: getPosNeg: Je kiffe => 15: bof -0.20 (conf: 0.80)
+             
              ["Je kiffe ma race",0.7],
-             # DBG:   1: getPosNeg: Je kiffe ma race => 9: je kiffe 1.00 (conf: 0.67)
-             # DBG:   2: getPosNeg: Je kiffe ma race => 32: je déteste -1.00 (conf: 0.61)
+             # 1: getPosNeg: Je kiffe ma race => 9: je kiffe 1.00 (conf: 0.67)
+             # 2: getPosNeg: Je kiffe ma race => 32: je déteste -1.00 (conf: 0.61)
 
              ["Je suis triste", -1.], # j'aurai aimé 0.2, mais c'est tres neg
              ["C'est nul ce truc",-0.5],
@@ -200,7 +204,9 @@ def autotest():
             rSumConfError += conf
     
     if nCptError > 0:
-        print("\nINF: nCptRealError: %d, nCptErreurFaible %d, ConfavgConfErreur: %.2f" % (nCptRealError,nCptErrorLowConf,rSumConfError/nCptError))
+        print("\nINF: nCptRealError: %d, nCptErrorLowConf: %d, ConfavgConfErreur: %.2f" % (nCptRealError,nCptErrorLowConf,rSumConfError/nCptError))
             
+        # INF: nCptRealError: 0, nCptErrorLowConf 1, ConfavgConfErreur: 0.23
+        
 if __name__ == "__main__":
     autotest()

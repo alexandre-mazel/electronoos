@@ -11,6 +11,8 @@
 /*
 TFT_eSPI tft = TFT_eSPI();
 
+
+
 void setup()
 {
   Serial.begin(9600);
@@ -261,6 +263,72 @@ int render_bubble(int x,int y)
   render_img(x,y,IMG_3_SIZE_X,IMG_3_SIZE_Y,aImgs_3,aPalette_3,0,0); // trait blanc (palette changé a la main dans le fichier généré)
 }
 
+
+float readFloatFromEeprom( int nOffset )
+{
+    float val;
+    byte *p = (byte*)&val;
+    for( int i = 0; i < 4; ++i)
+    {
+        p = EEPROM.read(nOffset)
+        ++nOffset;
+        ++p;
+    }
+    return val;
+}
+
+void writeFloatToEeprom( int nOffset, float val )
+{
+    const byte *p = (byte*)&val;
+    for( int i = 0; i < 4; ++i)
+    {
+        p = EEPROM.write(nOffset,p)
+        ++nOffset;
+        ++p;
+    }
+}
+
+
+const int nNbrSettings = 8;
+int nNumSettingsSelected = 0; // 0 to nNbrSettings-1
+
+
+float presetCirc[nNbrSettings];
+
+const byte nEepromVersion = 100; // to differentiate from other program (arome...)
+void loadConfigFromEeprom()
+{
+    int nOffset = 0;
+    byte nEepromCurrent = EEPROM.read( nOffset );  nOffset += 1;
+    Serial.print( "eeprom current version: " );
+    Serial.println( nEepromCurrent );
+    if( nEepromVersion != nEepromCurrent )
+    {
+        // eg: first read
+        return;
+    }
+    Serial.println( "Loading eeprom..." );
+    
+    nNumSettingsSelected = EEPROM.read( nOffset );  nOffset += 1;
+    
+    for( int i = 0; i < nNbrSettings; ++i)
+    {
+        presetCirc[i] = readFloatFromEeprom( nOffset ); nOffset += 4;
+    }
+}
+
+void saveConfigFromEeprom()
+{
+    int nOffset = 0;
+    EEPROM.write( nOffset, nEepromVersion ); nOffset += 1;
+    EEPROM.write( nOffset, nNumSettingsSelected ); nOffset += 1;
+    for( int i = 0; i < nNbrSettings; ++i)
+    {
+        writeFloatToEeprom( nOffset,presetCirc[i] ); nOffset += 4;
+    }
+}
+
+
 const int w_screen = 480; // 400
 const int h_screen = 320; // 240
 const int nMenuW = 36;
@@ -270,7 +338,6 @@ const int nBubbleW = 32; // bubble level
 const int nBubbleH = h_screen;
 const int nAreaW = (w_screen-nMenuW-nBubbleW)/2; // width of an area
 const int nAreaH = h_screen/2;
-const int nNbrSettings = 8;
 const int nLineH = 8;
 
 const int xLock = nMenuW+304;
@@ -281,7 +348,6 @@ const int yArrow = nAreaH+22;
 const int yArrowBottom = nAreaH+80+3;
 const int wArrow = 16;
 const int wInterArrow = 8;
-
 
 int render_screen(int nip, int db, int bubble, float circ,int bLocked)
 {

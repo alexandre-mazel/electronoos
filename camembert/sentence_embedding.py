@@ -227,6 +227,26 @@ def getBestParagraphs(s,listEmbedParagraph):
             
     print("DBG: getBestParagraphs: best subphrase jmax: %s" % jmax)
     return [(imax,simiMax),(imaxAvg,simiAvgMax),jmax]
+    
+def generateEmbedListCached(listText,cacheFilename, bForceRecompute=0):
+    """
+    generate embedded vector for a list of text and store results in cacheFilename
+    -bForceRecompute:
+    """
+    
+    if not os.path.isfile(cacheFilename) or bForceRecompute:
+        print("generating embedding to %s..." % cacheFilename)
+        listEmb = camEmbedList( listText )
+        saveEmbed(cacheFilename,listEmb)
+    else:
+       print("loading from %s..." % cacheFilename)
+       listEmb = loadEmbed(cacheFilename)
+       if len(listEmb)!=len(listText):
+           print("WRN: generateEmbedListCached: regenerating list as len are different (%d/%d" % (len(listEmb),len(listText) ) )
+           listEmb = generateEmbedListCached(listText,cacheFilename, bForceRecompute=1)
+       
+    return listEmb
+       
 
 def autotest():
     tresh = 0.4

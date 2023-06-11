@@ -57,7 +57,7 @@ def loadPosNeg():
         return global_loadedEmbedPosNeg
         
     bForceGeneration = 1
-    #~ bForceGeneration = 0
+    bForceGeneration = 0
     
     fn_embed = "posneg_embed_camembert.txt"
     if not os.path.isfile(fn_embed) or bForceGeneration:

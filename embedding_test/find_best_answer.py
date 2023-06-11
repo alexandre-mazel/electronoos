@@ -6,6 +6,18 @@ import socket
 import pickle 
 import argparse
 
+    
+"""
+About usage of embedding:    
+    Search (where results are ranked by relevance to a query string)
+    Clustering (where text strings are grouped by similarity)
+    Recommendations (where items with related text strings are recommended)
+    Anomaly detection (where outliers with little relatedness are identified)
+    Diversity measurement (where similarity distributions are analyzed)
+    Classification (where text strings are classified by their most similar label)
+"""
+        
+
 import sys
 strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
 if strLocalPath == "": strLocalPath = './'
@@ -466,7 +478,7 @@ if 0:
     print("encoded sent2: " + str(encoded))
     
     
-if 1:
+if 0:
     import json
     
     print("test sur oia faq_informatique")
@@ -568,16 +580,49 @@ if 1:
     print("answer: %s" % faq[maxIdx][1])
     
     
-"""
-About usage of embedding:    
-    Search (where results are ranked by relevance to a query string)
-    Clustering (where text strings are grouped by similarity)
-    Recommendations (where items with related text strings are recommended)
-    Anomaly detection (where outliers with little relatedness are identified)
-    Diversity measurement (where similarity distributions are analyzed)
-    Classification (where text strings are classified by their most similar label)
-"""
-        
+if 1:
+    # test sur faq en vrac
+    sys.path.append("../camembert")
+    import sentence_embedding
+
+    sys.path.append("../oia/")
+    import chatbot_simple3
+    faq1 = chatbot_simple3.loadFaqSimple("../oia/faq_informatique.txt")
+    faq2 = chatbot_simple3.loadFaqSimple("./faq_drh.txt")
+    faq3 = chatbot_simple3.loadFaqSimple("./faq_vrac.txt")
+    faq = faq1+faq2+faq3
+
+    listQ = [item[0] for item in faq]
+    
+    listQTest = [
+                        "J'ai besoin d'envoyer un email",
+                        "Je suis handicapé.",
+                        "Je suis végétarien.",
+                        "Quels sont les limitations sur la pose de congés?",
+                        "Quels sont les limitations sur la pose de vacances?",
+                    ]
+    
+    listEmb = sentence_embedding.generateEmbedListCached(listQ,"faq_vrac_embed_camembert.txt")
+    
+    for q in listQTest:
+        bests = sentence_embedding.getBests(q,listEmb)
+        print("\nDBG: faqVrac: bests: %s" % bests)
+        #~ print("DBG: faqVrac: refs: %s and %s" % (faq[bests[0][0]],faq[bests[1][0]]))
+        imax = bests[0][0]
+        simi = bests[0][1]
+        conf = min(simi/0.36,1.)
+        qref,aref = faq[imax]
+        print("# 1: faqVrac: %s =>\n%d: %s\n%s\n(conf: %.2f)" % (q,imax,qref,aref,conf ) )
+        imax2 = bests[1][0]
+        simi2 = bests[1][1]
+        conf2 = min(simi2/0.36,1.)
+        qref2,aref2 = faq[imax2]
+        print("# 2: faqVrac: %s =>\n%d: %s\n%s\n(conf: %.2f)" % (q,imax2,qref2,aref2,conf2 ) )
+     
+    
+    
+    
+
         
     
     

@@ -150,6 +150,7 @@ def precomputeParagraph(list_p,filenametostore):
 def getBests(s,listEmbed):
     """
     find best simi between a sentence and a list of already computing embedding.
+    - listEmbed: a list of embedded vectors TODO: document!
     return the best and second best; [index in the list, and the simi] * 2
     """
     simiMax = 0
@@ -173,6 +174,7 @@ def getBests(s,listEmbed):
 def getBestParagraphs(s,listEmbedParagraph):
     """
     find best simi between a text and many paragraph
+    - listEmbedParagraph: document format
     return the index in the list, and the simi and also the best on average sentence
     """
     print("DBG: getBestParagraphs: s: '%s', len listEmbedParagraph: %s" % (s,len(listEmbedParagraph)) )

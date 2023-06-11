@@ -79,7 +79,7 @@ def getPosNeg(s,bVerbose=0):
         - "C'est trop nul" => -1.
     """
     bPrint = 1
-    #~ bPrint = bVerbose
+    bPrint = bVerbose
     
     s = s.replace(".","").replace("!","")
     embed = loadPosNeg()
@@ -199,7 +199,7 @@ def autotest():
         r2,conf = getPosNeg(s,bVerbose)
         rSumConf += conf
         rDiff = abs(r-r2)
-        print(" => %s ref: %2f,  found: %.2f, diff: %.2f (conf: %.2f)" % (s,r,r2,rDiff,conf))
+        print(" => %s ref: %.2f,  posneg: %.2f, diff: %.2f (conf: %.2f)" % (s,r,r2,rDiff,conf))
         if rDiff > 0.5:
             nCptError += 1
             if conf < 0.5:

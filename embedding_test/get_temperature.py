@@ -188,9 +188,11 @@ def autotest():
     nCptRealError = 0
     nCptErrorLowConf = 0
     rSumConfError = 0
+    rSumConf = 0
     for s,r in al:
         print("\nINF: PosNeg for '%s':" % s)
         r2,conf = getPosNeg(s,bVerbose)
+        rSumConf += conf
         rDiff = abs(r-r2)
         print(" => %s ref: %2f,  found: %.2f, diff: %.2f (conf: %.2f)" % (s,r,r2,rDiff,conf))
         if rDiff > 0.5:
@@ -204,9 +206,9 @@ def autotest():
             rSumConfError += conf
     
     if nCptError > 0:
-        print("\nINF: nCptRealError: %d, nCptErrorLowConf: %d, ConfavgConfErreur: %.2f" % (nCptRealError,nCptErrorLowConf,rSumConfError/nCptError))
+        print("\nINF: nCptRealError: %d, nCptErrorLowConf: %d, ConfavgConfErreur: %.2f (rAvgConf:%.2f)" % (nCptRealError,nCptErrorLowConf,rSumConfError/nCptError,rSumConf/len(al)))
             
-        # INF: nCptRealError: 0, nCptErrorLowConf 1, ConfavgConfErreur: 0.23
+        # INF: nCptRealError: 0, nCptErrorLowConf 1, ConfavgConfErreur: 0.23  (rAvgConf:0.80)
         
 if __name__ == "__main__":
     autotest()

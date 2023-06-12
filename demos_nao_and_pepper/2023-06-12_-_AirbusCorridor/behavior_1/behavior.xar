@@ -1,0 +1,1119 @@
+<?xml version="1.0" encoding="UTF-8" ?><ChoregrapheProject xmlns="http://www.aldebaran-robotics.com/schema/choregraphe/project.xsd" xar_version="3"><Box name="root" id="-1" localization="8" tooltip="Root box of Choregraphe&apos;s behavior. Highest level possible." x="0" y="0"><bitmap>media/images/box/root.png</bitmap><script language="4"><content><![CDATA[]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Timeline enable="0"><BehaviorLayer name="behavior_layer1"><BehaviorKeyframe name="keyframe1" index="1"><Diagram><Box name="init" id="3" localization="8" tooltip="" x="275" y="108"><bitmap>media/images/box/box-diagram.png</bitmap><script language="4"><content><![CDATA[]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Timeline enable="0"><BehaviorLayer name="behavior_layer1"><BehaviorKeyframe name="keyframe1" index="1"><Diagram><Box name="DisplayImage" id="1" localization="8" tooltip="Display an image on the tablet or the pico projector&#x0A;&#x0A;v0.6" x="434" y="77"><bitmap>media/images/box/box-python-script.png</bitmap><script language="4"><content><![CDATA[import abcdk.display
+
+if( 1 ):
+    reload( abcdk.display )
+    import abcdk.naoqitools
+    reload( abcdk.naoqitools )
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onLoad(self):
+        #put initialization code here
+        pass
+
+    def onUnload(self):
+        #put clean-up code here
+        pass
+
+    def onInput_onStart(self, p):
+        bRet = abcdk.display.display.showImage( p, bDeleteFileJustAfter = self.getParameter( "bEraseImageAfter" ) );
+        if( not bRet ):
+            self.output_error();
+            return;
+
+        self.onStopped() #activate the output of the box
+
+    def onInput_onStop(self):
+        abcdk.display.display.hide();]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="3" type_size="1" nature="2" inner="0" tooltip="absolute image path" id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Output name="output_error" type="1" type_size="1" nature="2" inner="0" tooltip="" id="5" /><Parameter name="bEraseImageAfter" inherits_from_parent="0" content_type="0" value="0" default_value="0" tooltip="Erase image after showing it!" id="6" /></Box><Box name="Get Attached File" id="4" localization="8" tooltip="Use this box to choose an attached file in its parameters. The filename will be sent on&#x0A;the output when the input is stimulated." x="165" y="47"><bitmap>media/images/box/folder.png</bitmap><script language="4"><content><![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.framemanager = ALProxy("ALFrameManager")
+
+    def onInput_onStart(self):
+        self.onStopped(self.framemanager.getBehaviorPath(self.behaviorId) + self.getParameter("File name"))]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="1" inner="0" tooltip="To send the filepath on the output." id="2" /><Output name="onStopped" type="3" type_size="1" nature="2" inner="0" tooltip="The filepath of the selected resource file." id="3" /><Parameter name="File name" inherits_from_parent="1" content_type="4" value="/../tablet_screen.png" default_value="" tooltip="Name of the file which is going to be sent on the box output.&#x0A;&#x0A;Note: You can click on the folder icon to browse the project content or import&#x0A;new files to the project." id="4" /></Box><Link inputowner="1" indexofinput="2" outputowner="4" indexofoutput="3" /><Link inputowner="4" indexofinput="2" outputowner="0" indexofoutput="2" /><Link inputowner="0" indexofinput="4" outputowner="1" indexofoutput="4" /></Diagram></BehaviorKeyframe></BehaviorLayer></Timeline></Box><Box name="Template_While" id="2" localization="8" tooltip="Our template for the boxes using a while loop in their start method.&#x0A;*** ref box in: ./4_localize/Templates/TemplateWhile/ExampleTemplateWhile.xar ***&#x0A;*** last modification date(git):   Thu Oct 15 16:26:21 2009 +0200 ***" x="307" y="901"><bitmap>media/images/box/loop.png</bitmap><script language="4"><content><![CDATA[# Template_White
+# v1.0
+
+import time
+class MyClass(GeneratedClass):
+    """ insert here your comments about this class """
+    def __init__(self):
+        GeneratedClass.__init__(self);
+
+    def onLoad(self):
+        self.bMustStop = False;
+        self.bIsRunning = False;
+
+    def onUnload(self):
+        self.onInput_onStop(); # stop current loop execution
+
+    def onInput_onStart(self):
+        self.log( self.boxName + ": start - begin" );
+
+        if( self.bIsRunning ):
+            self.log( self.boxName + ": already started => nothing" );
+            return;
+
+        self.bIsRunning = True;
+        self.bMustStop = False;
+
+        rPeriod = self.getParameter( 'rPeriod' );
+        while( not self.bMustStop ):
+            # insert some good and powerful code here
+            time.sleep( rPeriod );
+        # end while
+        self.bIsRunning = False;
+        self.onStopped();
+        self.log( self.boxName + ": start - end" );
+
+    def onInput_onStop(self):
+        self.bMustStop = True; # stop current loop execution
+
+# Template_White - end
+pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Parameter name="rPeriod" inherits_from_parent="0" content_type="2" value="1" default_value="1" min="0" max="100000" tooltip="period in seconds" id="5" /></Box><Box name="Template_StateMachine" id="4" localization="8" tooltip="Template_StateMachine&#x0A;v0.9&#x0A;A small state machine, the most simple and efficient. Developped by the Applications and Usage Team At Aldebaran." x="475" y="895"><bitmap>media/images/box/box-timeLine.png</bitmap><script language="4"><content><![CDATA[# Template_StateMachine
+# v0.9
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onLoad(self):
+        self.bRunning = False;
+
+    def onUnload(self):
+        self.onInput_onStop();
+
+    def onInput_onStart(self):
+        self.bRunning = True;
+        self.gotoAndStop(1)
+
+    def onInput_onStop(self):
+        if( self.bRunning ):
+            self.bRunning = False;
+            self.onStopped();
+        pass
+
+# Template_StateMachine - end
+pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="1" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Timeline enable="1" fps="10" start_frame="1" end_frame="-1" size="-1"><BehaviorLayer name="behavior_layer1"><BehaviorKeyframe name="state_1" index="1"><Diagram scale="88"><Box name="NumberEdit" id="1" localization="8" tooltip="This Box just transmits the number you entered when its Input is stimulated." plugin="numberedit_plugin" x="280" y="121"><script language="4"><content><![CDATA[# /!\ Generated content. Do not edit!
+class MyClass(GeneratedClass):
+	def __init__(self):
+		GeneratedClass.__init__(self)
+
+	def onInput_onStart(self):
+		self.onStopped(3)]]></content></script><pluginContent><number>3</number></pluginContent><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Transmits number." id="2" /><Output name="onStopped" type="2" type_size="1" nature="1" inner="0" tooltip="Signal sent when Box behavior is finished." id="3" /></Box><Box name="TextEdit" id="2" localization="8" tooltip="This Box just transmits the text you entered when its Input is stimulated." plugin="textedit_plugin" x="295" y="228"><script language="4"><content><![CDATA[# /!\ Generated content. Do not edit!
+class MyClass(GeneratedClass):
+	def __init__(self):
+		GeneratedClass.__init__(self)
+
+	def onInput_onStart(self):
+		self.onStopped("Put there a more realistic change state condition.")]]></content></script><pluginContent><text><![CDATA[Put there a more realistic change state condition.]]></text></pluginContent><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Transmits text." id="2" /><Output name="onStopped" type="3" type_size="1" nature="1" inner="0" tooltip="Signal sent when Box behavior is finished." id="3" /></Box><Box name="Wait" id="3" localization="8" tooltip="The wait that can be stopped immediately and reset at any time. Stopping the box won&apos;t output a signal." x="446" y="121"><bitmap>media/images/box/wait.png</bitmap><script language="4"><content><![CDATA[import threading # opkg install python-threading
+class MyClass(GeneratedClass):
+  def __init__(self):
+    GeneratedClass.__init__(self)
+    self.tb = False;
+
+  def onUnload(self):
+    self.onInput_onStop();
+
+  def triggerOutput( self, rPeriod = 1 ):
+    self.timerOutput();
+    self.onInput_onStop(); # to clean everything
+
+  def startTimer( self, rPeriod = 1 ):
+    if( self.tb ):
+      self.tb.cancel();
+    self.tb = threading.Timer( rPeriod, self.triggerOutput, [rPeriod] );
+    self.tb.start();
+
+  def onInput_onStart(self, p):
+    self.startTimer( float(p) );
+
+  def onInput_onStop(self):
+    if( self.tb ):
+      self.tb.cancel();
+      self.tb = False;]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="2" type_size="1" nature="2" inner="0" tooltip="Start the timer with a specified period value (in seconds)" id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Stop the timer" id="3" /><Output name="timerOutput" type="1" type_size="1" nature="2" inner="0" tooltip="send a bang after a certain amount of time. Warning: don&apos;t outputted if stopped before time lapse." id="4" /></Box><Box name="goto_state_2" id="4" localization="8" tooltip="gotoXxx - explicit&#x0A;Jump to a given frame (edit parameters to modify it) and stop the timeline parent at this index. The frame name is the one directly for the box name, so that it prevents copy-paste error and it&apos;s more explicit&#x0A;v0.6: first version" x="592" y="149"><bitmap>media/images/box/box-timeLine.png</bitmap><script language="4"><content><![CDATA[import datetime
+import time
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onUnload(self):
+        pass
+
+    def onInput_onStart(self):
+        strJumpDestination = self.boxName;
+        strJumpDestination = strJumpDestination.replace( "goto_", "" );
+        strJumpDestination = strJumpDestination.replace( "goto", "" );
+        strHumanTime = datetime.datetime.now().strftime( "%Y_%m_%d-%Hh%Mm%Ss%fms" );
+        self.log("[%s] %s: goto frame '%s'" % ( strHumanTime, time.time(), strJumpDestination ) );
+        self.gotoAndStopParent( strJumpDestination );
+
+    def onInput_onStop(self):
+        pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Parent timeline gotoAndStop when a signal is received on this input." id="2" /></Box><Link inputowner="3" indexofinput="2" outputowner="1" indexofoutput="3" /><Link inputowner="1" indexofinput="2" outputowner="0" indexofoutput="1" /><Link inputowner="4" indexofinput="2" outputowner="3" indexofoutput="4" /></Diagram></BehaviorKeyframe><BehaviorKeyframe name="state_2" index="20"><Diagram scale="100"><Box name="NumberEdit" id="1" localization="8" tooltip="This Box just transmits the number you entered when its Input is stimulated." plugin="numberedit_plugin" x="139" y="71"><script language="4"><content><![CDATA[# /!\ Generated content. Do not edit!
+class MyClass(GeneratedClass):
+	def __init__(self):
+		GeneratedClass.__init__(self)
+
+	def onInput_onStart(self):
+		self.onStopped(2)]]></content></script><pluginContent><number>2</number></pluginContent><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Transmits number." id="2" /><Output name="onStopped" type="2" type_size="1" nature="1" inner="0" tooltip="Signal sent when Box behavior is finished." id="3" /></Box><Box name="Wait" id="2" localization="8" tooltip="The wait that can be stopped immediately and reset at any time. Stopping the box won&apos;t output a signal." x="297" y="71"><bitmap>media/images/box/wait.png</bitmap><script language="4"><content><![CDATA[import threading # opkg install python-threading
+class MyClass(GeneratedClass):
+  def __init__(self):
+    GeneratedClass.__init__(self)
+    self.tb = False;
+
+  def onUnload(self):
+    self.onInput_onStop();
+
+  def triggerOutput( self, rPeriod = 1 ):
+    self.timerOutput();
+    self.onInput_onStop(); # to clean everything
+
+  def startTimer( self, rPeriod = 1 ):
+    if( self.tb ):
+      self.tb.cancel();
+    self.tb = threading.Timer( rPeriod, self.triggerOutput, [rPeriod] );
+    self.tb.start();
+
+  def onInput_onStart(self, p):
+    self.startTimer( float(p) );
+
+  def onInput_onStop(self):
+    if( self.tb ):
+      self.tb.cancel();
+      self.tb = False;]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="2" type_size="1" nature="2" inner="0" tooltip="Start the timer with a specified period value (in seconds)" id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Stop the timer" id="3" /><Output name="timerOutput" type="1" type_size="1" nature="2" inner="0" tooltip="send a bang after a certain amount of time. Warning: don&apos;t outputted if stopped before time lapse." id="4" /></Box><Box name="goto_state_1" id="3" localization="8" tooltip="gotoXxx - explicit&#x0A;Jump to a given frame (edit parameters to modify it) and stop the timeline parent at this index. The frame name is the one directly for the box name, so that it prevents copy-paste error and it&apos;s more explicit&#x0A;v0.6: first version" x="477" y="83"><bitmap>media/images/box/box-timeLine.png</bitmap><script language="4"><content><![CDATA[import datetime
+import time
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onUnload(self):
+        pass
+
+    def onInput_onStart(self):
+        strJumpDestination = self.boxName;
+        strJumpDestination = strJumpDestination.replace( "goto_", "" );
+        strJumpDestination = strJumpDestination.replace( "goto", "" );
+        strHumanTime = datetime.datetime.now().strftime( "%Y_%m_%d-%Hh%Mm%Ss%fms" );
+        self.log("[%s] %s: goto frame '%s'" % ( strHumanTime, time.time(), strJumpDestination ) );
+        self.gotoAndStopParent( strJumpDestination );
+
+    def onInput_onStop(self):
+        pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Parent timeline gotoAndStop when a signal is received on this input." id="2" /></Box><Link inputowner="2" indexofinput="2" outputowner="1" indexofoutput="3" /><Link inputowner="1" indexofinput="2" outputowner="0" indexofoutput="1" /><Link inputowner="3" indexofinput="2" outputowner="2" indexofoutput="4" /></Diagram></BehaviorKeyframe></BehaviorLayer></Timeline></Box><Box name="welcoming" id="1" localization="8" tooltip="Template_StateMachine&#x0A;v0.9&#x0A;A small state machine, the most simple and efficient. Developped by the Applications and Usage Team At Aldebaran." x="321" y="377"><bitmap>media/images/box/box-timeLine.png</bitmap><script language="4"><content><![CDATA[# Template_StateMachine
+# v0.9
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onLoad(self):
+        self.bRunning = False;
+
+    def onUnload(self):
+        self.onInput_onStop();
+
+    def onInput_onStart(self):
+        self.bRunning = True;
+        self.gotoAndStop(1)
+
+    def onInput_onStop(self):
+        if( self.bRunning ):
+            self.bRunning = False;
+            self.onStopped();
+        pass
+
+# Template_StateMachine - end
+pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="1" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Input name="FaceDetection/FaceDetected" type="0" type_size="1" nature="4" stm_value_name="FaceDetection/FaceDetected" inner="1" tooltip="FaceDetection/FaceDetected desc" id="4" /><Input name="FaceDetected" type="0" type_size="1" nature="4" stm_value_name="FaceDetected" inner="1" tooltip="FaceDetected desc" id="5" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="6" /><Timeline enable="1" fps="10" start_frame="1" end_frame="-1" size="-1"><BehaviorLayer name="behavior_layer1"><BehaviorKeyframe name="wait_human" index="1"><Diagram scale="88"><Box name="goto_speak" id="4" localization="8" tooltip="gotoXxx - explicit&#x0A;Jump to a given frame (edit parameters to modify it) and stop the timeline parent at this index. The frame name is the one directly for the box name, so that it prevents copy-paste error and it&apos;s more explicit&#x0A;v0.6: first version" x="592" y="149"><bitmap>media/images/box/box-timeLine.png</bitmap><script language="4"><content><![CDATA[import datetime
+import time
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onUnload(self):
+        pass
+
+    def onInput_onStart(self):
+        strJumpDestination = self.boxName;
+        strJumpDestination = strJumpDestination.replace( "goto_", "" );
+        strJumpDestination = strJumpDestination.replace( "goto", "" );
+        strHumanTime = datetime.datetime.now().strftime( "%Y_%m_%d-%Hh%Mm%Ss%fms" );
+        self.log("[%s] %s: goto frame '%s'" % ( strHumanTime, time.time(), strJumpDestination ) );
+        self.gotoAndStopParent( strJumpDestination );
+
+    def onInput_onStop(self):
+        pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Parent timeline gotoAndStop when a signal is received on this input." id="2" /></Box><Box name="Face Detection" id="1" localization="8" tooltip="Detect people&apos;s face and return the number of detected faces.&#x0A;&#x0A;Note: Detect even faces that are not registered in the faces database (that&#x0A;you can teach him with the Learn Face box)." x="192" y="58"><bitmap>media/images/box/interaction/face.png</bitmap><script language="4"><content><![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.bIsRunning = False
+
+    def onUnload(self):
+        self.bIsRunning = False
+
+    def onInput_onStart(self):
+        self.bIsRunning = True
+
+    def onInput_onStop(self):
+        if( self.bIsRunning ):
+            self.onUnload()
+            self.onStopped()]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Input name="FaceDetected" type="0" type_size="1" nature="4" stm_value_name="FaceDetected" inner="1" tooltip="Connected to ALMemory. Will be stimulated every time the value subscribed to changes, respecting the refresh period." id="4" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is stopped." id="5" /><Output name="numberOfFaces" type="2" type_size="1" nature="2" inner="0" tooltip="Number of detected faces. This output is stimulated each time the number of&#x0A;detected faces change." id="6" /><Output name="onNoFace" type="1" type_size="1" nature="2" inner="0" tooltip="No face is detected." id="7" /><Timeline enable="0"><BehaviorLayer name="behavior_layer1"><BehaviorKeyframe name="keyframe1" index="1"><Diagram><Box name="Count Det. Faces" id="3" localization="8" tooltip="Process face detection extractor data (FaceDetected) to count the number&#x0A;of detected faces and notify when there is no face detected.&#x0A;&#x0A;An output (either one or the other) is stimulated each time the number of&#x0A;detected faces change." x="174" y="71"><bitmap>media/images/box/interaction/reco_face.png</bitmap><script language="4"><content><![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.nFacesDetected = -1
+
+    def onUnload(self):
+        #puts code for box cleanup here
+        pass
+
+    def onInput_onStart(self, p):
+        if(len(p) > 0):
+            if(self.nFacesDetected != len(p[1]) -1): # an additional array has been placed at the end for time
+                self.nFacesDetected = len(p[1]) -1  # filtered info and has to be substracted when counting faces
+                if(self.nFacesDetected != 0):
+                    self.onFaceDetected( self.nFacesDetected )
+                else:
+                    self.onNoFace()
+        else:
+            if(self.nFacesDetected != 0):
+                self.nFacesDetected = 0
+                self.onNoFace()
+
+    def onInput_onStop(self):
+        pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="0" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input. It must be the&#x0A;FaceDetected extractor data." id="2" /><Output name="onFaceDetected" type="2" type_size="1" nature="1" inner="0" tooltip="Number of detected faces." id="3" /><Output name="onNoFace" type="1" type_size="1" nature="1" inner="0" tooltip="No face is detected." id="4" /></Box><Link inputowner="3" indexofinput="2" outputowner="0" indexofoutput="4" /><Link inputowner="0" indexofinput="6" outputowner="3" indexofoutput="3" /><Link inputowner="0" indexofinput="7" outputowner="3" indexofoutput="4" /></Diagram></BehaviorKeyframe></BehaviorLayer></Timeline></Box><Box name="HeadRandomStoppable" id="2" localization="8" tooltip="Random head behaviour - the robot move his head randomly, fully customisable.&#x0A;&#x0A;It&apos;s designed to stop very fast.&#x0A;&#x0A;v0.8" x="301" y="403"><bitmap>media/images/box/interaction/face.png</bitmap><script language="4"><content><![CDATA[# HeadRandomStoppable
+# v0.8
+import random
+import time
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+        self.chain = "Head"
+        self.duration = 0.8 # 1 second
+        self.motionProxy = ALProxy('ALMotion')
+        # Put adequate max
+        self.nMaxPitch = self.getParameter( 'rPitchRangeMax' );
+        self.nMaxYaw = self.getParameter( 'rYawRangeMax' );
+        self.nPitchOffset = self.getParameter( 'rPitchOffset' ); # direction of look
+        self.nSpeedMovement = self.getParameter( 'nSpeedMovement' ); # direction of look
+        self.bMustStop = False;
+        self.bIsRunning = False;
+        self.nCurrentMoveID = -1;
+        self.nCurrentSleepID = -1;
+
+    def onLoad(self):
+        self.bMustStop = False;
+        self.bIsRunning = False;
+
+    def onUnload(self):
+        self.onInput_onStop()
+
+    def waitStoppable( self, rDurationSec ):
+        timeBegin = time.time();
+        while( time.time() - timeBegin < rDurationSec and not self.bMustStop ):
+            time.sleep( 0.04 ); # this is the max stop reactivity: at worst, one thread remain occupied, but it's not a big deal (it's not a moving one)
+
+    def onInput_onStart(self):
+        self.log( "%s: on start - begin" % self.boxName );
+        if( self.bIsRunning ):
+            self.log( "%s: on start - already started" % self.boxName );
+            return;
+        self.bIsRunning = True;
+        self.bMustStop = False;
+        nMaxWait = self.getParameter( "nMaxWait" );
+        bRegularTiming = self.getParameter( "bRegularTiming" );
+        while not self.bMustStop:
+            nValPitch = random.uniform( -self.nMaxPitch , self.nMaxPitch  );
+            nValYaw = random.uniform( -self.nMaxYaw , self.nMaxYaw );
+            angles = [nValYaw,nValPitch+self.nPitchOffset] # add an offset on pitch
+            #if nValPitch*nValPitch + nValYaw*nValYaw > 0.04:
+            self.nCurrentMoveID = self.motionProxy.post.angleInterpolationWithSpeed(self.chain, angles, self.nSpeedMovement / 100. );
+            self.motionProxy.wait( self.nCurrentMoveID, 0 )
+            self.nCurrentMoveID = -1;
+            if( not self.bMustStop ):
+                nTimeToWaitMs = 500 + random.randint(0,nMaxWait);
+                if( bRegularTiming ):
+                    nTimeToWaitMs = nMaxWait;
+                self.waitStoppable( nTimeToWaitMs/1000. );
+            if( random.uniform( 0, 1.0 ) > 0.5 and not self.bMustStop ):
+                # often add a return to center
+                self.nCurrentMoveID = self.motionProxy.post.angleInterpolationWithSpeed( self.chain, [0,self.nPitchOffset], random.randint( 1, self.nSpeedMovement * 2 ) / 100. ); # la vitesse du return to center est aléatoire, et peut etre plus rapide
+                self.motionProxy.wait( self.nCurrentMoveID, 0 )
+                self.nCurrentMoveID = -1;
+                if( not self.bMustStop ):
+                    nTimeToWaitMs = 500 + random.randint(0,nMaxWait);
+                    if( bRegularTiming ):
+                        nTimeToWaitMs = nMaxWait;
+                    self.waitStoppable( nTimeToWaitMs/1000. );
+            # if random - end
+        # while - end
+        self.bIsRunning = False;
+        self.onStopped();
+        self.log( self.boxName + ": start - end" );
+    # onInput_onStart - end
+
+    def onInput_onStop(self):
+            if( self.bIsRunning ):
+                self.bMustStop = True;
+            if( self.nCurrentMoveID != -1 ):
+                try:
+                    self.motionProxy.stop( self.nCurrentMoveID );
+                except:
+                    pass # cas ou la méthode a fini entre le test et le stop
+                self.nCurrentMoveID = -1;
+# HeadRandomStoppable - end
+pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Parameter name="nMaxWait" inherits_from_parent="0" content_type="1" value="3000" default_value="3000" min="1" max="100000000" tooltip="Maximum milliseconds of wait between two movement" id="5" /><Parameter name="nSpeedMovement" inherits_from_parent="0" content_type="1" value="2" default_value="2" min="1" max="100" tooltip="speed movement in %" id="6" /><Parameter name="rPitchOffset" inherits_from_parent="0" content_type="2" value="-0.3" default_value="-0.2" min="-2" max="2" tooltip="Offset to add to the barycentre of all position (to look around top or ...)" id="7" /><Parameter name="rPitchRangeMax" inherits_from_parent="0" content_type="2" value="0.1" default_value="0.3" min="0" max="2" tooltip="max of movement range" id="8" /><Parameter name="rYawRangeMax" inherits_from_parent="0" content_type="2" value="0.2" default_value="1" min="0" max="2" tooltip="max of movement range" id="9" /><Parameter name="bRegularTiming" inherits_from_parent="0" content_type="0" value="1" default_value="0" tooltip="Enable this value to make a new movement at a regular timing (the maxwait parameter is then used as a regular time)" id="10" /></Box><Box name="AutoArmsBreath" id="7" localization="8" tooltip="Auto random arms moves (multi robot)&#x0A;v0.3" x="234" y="566"><bitmap>media/images/box/loop.png</bitmap><script language="4"><content><![CDATA[# RomeoArmsBreath
+# v0.3
+# todo: essayer de tirer un pitch et un yaw puis appliquer au prorata de la distance de l'epaule
+import random
+import time
+class MyClass(GeneratedClass):
+    """ insert here your comments about this class """
+    def __init__(self):
+        GeneratedClass.__init__(self);
+
+    def onLoad(self):
+        self.bMustStop = False;
+        self.bIsRunning = False;
+        self.motion = ALProxy( "ALMotion" );
+        self.id = -1;
+
+    def onUnload(self):
+        self.onInput_onStop(); # stop current loop execution
+
+    def onInput_onStart(self):
+        self.log( self.boxName + ": start - begin" );
+
+        if( self.bIsRunning ):
+            self.log( self.boxName + ": already started => nothing" );
+            return;
+
+        self.bIsRunning = True;
+        self.bMustStop = False;
+
+        rPeriod = self.getParameter( 'rPeriod' );
+        listJointsRef = self.motion.getJointNames( "Arms" );
+        listJointsPosRef = self.motion.getAngles( listJointsRef, True ); # store this position as a ref
+        print( "listJointsRef: %s" % listJointsRef );
+        print( "listJointsPosRef: %s" % listJointsRef );
+        self.id = -1;
+        while( not self.bMustStop ):
+            if( random.random() > 0 ):
+                # select some joints, and apply a small moves from the ref position
+                listJoints = [];
+                listJointsPos = [];
+                for idx, joint in enumerate(listJointsRef):
+                    if( random.random() > 0.5 ):
+                        listJoints.append( joint );
+                        if( "Hand" in joint ):
+                            if( random.random() > 0.5 ):
+                                rVal = 0.01;
+                            else:
+                                rVal = 0.95;
+                        else:
+                            rOffset = (random.random()-0.5)*0.2;
+                            if( "WristRoll" in joint ):
+                                rOffset *= 5.;
+                            elif( "Wrist" in joint ):
+                                rOffset *= 3.;
+                            elif( "Elbow" in joint ):
+                                rOffset *= 1.5;
+                            rVal = listJointsPosRef[idx] + rOffset;
+                        listJointsPos.append( rVal );
+                if( len(listJoints) > 0 ):
+                    print( "listJoints: %s" % listJoints );
+                    print( "listJointsPos: %s" % listJointsPos );
+                    nLoop = random.randint(1,3);
+                    for i in range(nLoop):
+                        self.id = self.motion.post.angleInterpolationWithSpeed( listJoints, listJointsPos, 0.02+random.random()/20 );
+                        self.motion.wait( self.id, 0 );
+                        if( self.bMustStop ):
+                            break;
+                        time.sleep( random.random() );
+                        if( self.bMustStop ):
+                            break;
+
+                        self.id = self.motion.post.angleInterpolationWithSpeed( listJointsRef, listJointsPosRef, 0.02+random.random()/20 );
+                        self.motion.wait( self.id, 0 );
+                        time.sleep( random.random() + 1. );
+                        if( self.bMustStop ):
+                            break;
+                    if( self.bMustStop ):
+                        break;
+                    self.id = self.motion.post.angleInterpolationWithSpeed( listJoints, listJointsPos, 0.02+random.random()/20 );
+                    self.motion.wait( self.id, 0 );
+
+            else:
+                # place all joint to the ref pos but some to other pose
+                listJoints = listJointsRef[:];
+                listJointsPos = listJointsPosRef[:];
+                for idx, joint in enumerate(listJointsRef):
+                    if( random.random() > 0.8 ):
+                        listJointsPos[idx] += (random.random()-0.5)*0.2;
+                if( len(listJoints) > 0 ):
+                    print( "listJoints: %s" % listJoints );
+                    print( "listJointsPos: %s" % listJointsPos );
+                    self.id = self.motion.post.angleInterpolationWithSpeed( listJoints, listJointsPos, 0.1 );
+                    self.motion.wait( self.id, 0 );
+            if( self.bMustStop ):
+                break;
+            time.sleep( rPeriod * random.random() + 1. );
+        # end while
+        if( self.id != -1 ):
+            try:
+                self.motion.stop( self.id );
+            except BaseException, err:
+                print( "err in stop: %s" % err );
+        self.bIsRunning = False;
+        self.onStopped();
+        self.log( self.boxName + ": start - end" );
+
+    def onInput_onStop(self):
+        self.bMustStop = True; # stop current loop execution
+        if( self.id != -1 ):
+            try:
+                self.motion.stop( self.id );
+            except BaseException, err:
+                print( "err in stop: %s" % err );
+
+# Template_White - end
+pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Parameter name="rPeriod" inherits_from_parent="0" content_type="2" value="1" default_value="1" min="0" max="100000" tooltip="period in seconds" id="5" /></Box><Link inputowner="1" indexofinput="2" outputowner="0" indexofoutput="1" /><Link inputowner="4" indexofinput="2" outputowner="1" indexofoutput="6" /><Link inputowner="2" indexofinput="2" outputowner="0" indexofoutput="1" /><Link inputowner="7" indexofinput="2" outputowner="0" indexofoutput="1" /></Diagram></BehaviorKeyframe><BehaviorKeyframe name="speak" index="20"><Diagram scale="100"><Box name="NumberEdit" id="1" localization="8" tooltip="This Box just transmits the number you entered when its Input is stimulated." plugin="numberedit_plugin" x="881" y="471"><script language="4"><content><![CDATA[# /!\ Generated content. Do not edit!
+class MyClass(GeneratedClass):
+	def __init__(self):
+		GeneratedClass.__init__(self)
+
+	def onInput_onStart(self):
+		self.onStopped(2)]]></content></script><pluginContent><number>2</number></pluginContent><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Transmits number." id="2" /><Output name="onStopped" type="2" type_size="1" nature="1" inner="0" tooltip="Signal sent when Box behavior is finished." id="3" /></Box><Box name="Wait" id="2" localization="8" tooltip="The wait that can be stopped immediately and reset at any time. Stopping the box won&apos;t output a signal." x="1039" y="471"><bitmap>media/images/box/wait.png</bitmap><script language="4"><content><![CDATA[import threading # opkg install python-threading
+class MyClass(GeneratedClass):
+  def __init__(self):
+    GeneratedClass.__init__(self)
+    self.tb = False;
+
+  def onUnload(self):
+    self.onInput_onStop();
+
+  def triggerOutput( self, rPeriod = 1 ):
+    self.timerOutput();
+    self.onInput_onStop(); # to clean everything
+
+  def startTimer( self, rPeriod = 1 ):
+    if( self.tb ):
+      self.tb.cancel();
+    self.tb = threading.Timer( rPeriod, self.triggerOutput, [rPeriod] );
+    self.tb.start();
+
+  def onInput_onStart(self, p):
+    self.startTimer( float(p) );
+
+  def onInput_onStop(self):
+    if( self.tb ):
+      self.tb.cancel();
+      self.tb = False;]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="2" type_size="1" nature="2" inner="0" tooltip="Start the timer with a specified period value (in seconds)" id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Stop the timer" id="3" /><Output name="timerOutput" type="1" type_size="1" nature="2" inner="0" tooltip="send a bang after a certain amount of time. Warning: don&apos;t outputted if stopped before time lapse." id="4" /></Box><Box name="goto_wait_human" id="3" localization="8" tooltip="gotoXxx - explicit&#x0A;Jump to a given frame (edit parameters to modify it) and stop the timeline parent at this index. The frame name is the one directly for the box name, so that it prevents copy-paste error and it&apos;s more explicit&#x0A;v0.6: first version" x="1219" y="483"><bitmap>media/images/box/box-timeLine.png</bitmap><script language="4"><content><![CDATA[import datetime
+import time
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onUnload(self):
+        pass
+
+    def onInput_onStart(self):
+        strJumpDestination = self.boxName;
+        strJumpDestination = strJumpDestination.replace( "goto_", "" );
+        strJumpDestination = strJumpDestination.replace( "goto", "" );
+        strHumanTime = datetime.datetime.now().strftime( "%Y_%m_%d-%Hh%Mm%Ss%fms" );
+        self.log("[%s] %s: goto frame '%s'" % ( strHumanTime, time.time(), strJumpDestination ) );
+        self.gotoAndStopParent( strJumpDestination );
+
+    def onInput_onStop(self):
+        pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Parent timeline gotoAndStop when a signal is received on this input." id="2" /></Box><Box name="analyse_face" id="6" localization="8" tooltip="la botie s&apos;arrete quand il n&apos;y a plus personne" x="397" y="872"><bitmap>media/images/box/loop.png</bitmap><script language="4"><content><![CDATA[# Template_White
+# v1.0
+
+import time
+
+import abcdk.extractortools
+
+class MyClass(GeneratedClass):
+    """ insert here your comments about this class """
+    def __init__(self):
+        GeneratedClass.__init__(self);
+
+    def onLoad(self):
+        self.bMustStop = False;
+        self.bIsRunning = False;
+
+    def onUnload(self):
+        self.onInput_onStop(); # stop current loop execution
+
+    def onInput_onStart(self):
+        self.log( self.boxName + ": start - begin" );
+
+        if( self.bIsRunning ):
+            self.log( self.boxName + ": already started => nothing" );
+            return;
+
+        self.bIsRunning = True;
+        self.bMustStop = False;
+
+        rPeriod = self.getParameter( 'rPeriod' );
+        self.nSeen = 1
+        while( not self.bMustStop ):
+            # insert some good and powerful code here
+            time.sleep( rPeriod );
+            if self.nSeen == 0:
+                break
+            self.nSeen = 0
+
+        # end while
+        self.bIsRunning = False;
+        self.onStopped();
+        self.log( self.boxName + ": start - end" );
+
+    def onInput_onStop(self):
+        self.bMustStop = True; # stop current loop execution
+
+    def onInput_onSeen(self,p):
+        if p != []:
+            self.nSeen = 1
+            self.log("\nreceived:\n" + str(p))
+            if 1:
+                # decodage a la main
+                facesinfo = p[1][0][0]
+                self.log("\nfaceinfos:\n" + str(facesinfo))
+                height = facesinfo[4]
+                self.log("\nheight:\n" + str(height))
+                biggerheight = height
+            else:
+                # factorisation du code par l'usage d'une fonction
+                infos = abcdk.extractortools.FaceDetectionNew_decodeInfos(p)
+                self.log("\nfaceinfos:\n" + str(facesinfo))
+
+            if 0:
+                # on cherche le plus gros visage
+                biggerheight = 0
+                for info in infos.objects:
+                    #self.log(info.faceInfo)
+                    vertices = info.faceInfo.vertices
+                    self.log(vertices)
+                    height = info.faceInfo.vertices[3][1]-info.faceInfo.vertices[0][1]
+                    if height>biggerheight:
+                        biggerheight = height
+            self.output_face_height(biggerheight)
+            if biggerheight>0.14:
+                self.output_face_near()
+
+# Template_White - end
+pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Input name="onSeen" type="0" type_size="1" nature="1" inner="0" tooltip="" id="4" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="5" /><Output name="output_face_height" type="2" type_size="1" nature="2" inner="0" tooltip="" id="6" /><Output name="output_face_near" type="1" type_size="1" nature="2" inner="0" tooltip="" id="7" /><Parameter name="rPeriod" inherits_from_parent="0" content_type="2" value="2" default_value="1" min="0" max="100000" tooltip="period in seconds" id="8" /></Box><Box name="Face Detection" id="5" localization="8" tooltip="Detect people&apos;s face and return the number of detected faces.&#x0A;&#x0A;Note: Detect even faces that are not registered in the faces database (that&#x0A;you can teach him with the Learn Face box)." x="181" y="516"><bitmap>media/images/box/interaction/face.png</bitmap><script language="4"><content><![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.bIsRunning = False
+
+    def onUnload(self):
+        self.bIsRunning = False
+
+    def onInput_onStart(self):
+        self.bIsRunning = True
+
+    def onInput_onStop(self):
+        if( self.bIsRunning ):
+            self.onUnload()
+            self.onStopped()]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Input name="FaceDetected" type="0" type_size="1" nature="4" stm_value_name="FaceDetected" inner="1" tooltip="Connected to ALMemory. Will be stimulated every time the value subscribed to changes, respecting the refresh period." id="4" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is stopped." id="5" /><Output name="numberOfFaces" type="2" type_size="1" nature="2" inner="0" tooltip="Number of detected faces. This output is stimulated each time the number of&#x0A;detected faces change." id="6" /><Output name="onNoFace" type="1" type_size="1" nature="2" inner="0" tooltip="No face is detected." id="7" /><Output name="output_seen" type="0" type_size="1" nature="2" inner="0" tooltip="" id="8" /><Timeline enable="0"><BehaviorLayer name="behavior_layer1"><BehaviorKeyframe name="keyframe1" index="1"><Diagram><Box name="Count Det. Faces" id="3" localization="8" tooltip="Process face detection extractor data (FaceDetected) to count the number&#x0A;of detected faces and notify when there is no face detected.&#x0A;&#x0A;An output (either one or the other) is stimulated each time the number of&#x0A;detected faces change." x="407" y="0"><bitmap>media/images/box/interaction/reco_face.png</bitmap><script language="4"><content><![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.nFacesDetected = -1
+
+    def onUnload(self):
+        #puts code for box cleanup here
+        pass
+
+    def onInput_onStart(self, p):
+        if(len(p) > 0):
+            if(self.nFacesDetected != len(p[1]) -1): # an additional array has been placed at the end for time
+                self.nFacesDetected = len(p[1]) -1  # filtered info and has to be substracted when counting faces
+                if(self.nFacesDetected != 0):
+                    self.onFaceDetected( self.nFacesDetected )
+                else:
+                    self.onNoFace()
+        else:
+            if(self.nFacesDetected != 0):
+                self.nFacesDetected = 0
+                self.onNoFace()
+
+    def onInput_onStop(self):
+        pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="0" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input. It must be the&#x0A;FaceDetected extractor data." id="2" /><Output name="onFaceDetected" type="2" type_size="1" nature="1" inner="0" tooltip="Number of detected faces." id="3" /><Output name="onNoFace" type="1" type_size="1" nature="1" inner="0" tooltip="No face is detected." id="4" /></Box><Link inputowner="3" indexofinput="2" outputowner="0" indexofoutput="4" /><Link inputowner="0" indexofinput="6" outputowner="3" indexofoutput="3" /><Link inputowner="0" indexofinput="7" outputowner="3" indexofoutput="4" /><Link inputowner="0" indexofinput="8" outputowner="0" indexofoutput="4" /></Diagram></BehaviorKeyframe></BehaviorLayer></Timeline></Box><Box name="look_top" id="8" localization="8" tooltip="" x="504" y="79"><bitmap>media/images/box/box-timeLine.png</bitmap><script language="4"><content><![CDATA[]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Timeline enable="1" fps="25" start_frame="1" end_frame="-1" size="31"><ActuatorList model="juliette"><ActuatorCurve name="value" actuator="HeadPitch" mute="0" unit="0"><Key frame="31" value="-28.916" /></ActuatorCurve><ActuatorCurve name="value" actuator="HeadYaw" mute="0" unit="0"><Key frame="31" value="0" /></ActuatorCurve></ActuatorList></Timeline></Box><Box name="abcdk_BodyTalk" id="13" localization="8" tooltip="The abcdk_bodytalk: start fast and lightweight.&#x0A;&#x0A;v0.96: optionnal no wait at end&#x0A;v0.95: handle obstacles and exclude joint&#x0A;v0.94: patching on every error case&#x0A;v0.93: onSay: add the global speech speed&#x0A;v0.92: onSay: add a pause before speaking&#x0A;v0.91b: add comments&#x0A;v0.91: add direct txt inputing&#x0A;v0.9: change initialisation&#x0A;v0.8: add a track face&#x0A;v0.7: add an option to disable head movement (so you can launch what you want on it)" x="360" y="366"><bitmap>media/images/box/interaction/say.png</bitmap><bitmap>media/images/box/movement/move.png</bitmap><script language="4"><content><![CDATA[# abcdk_BodyTalk
+# v0.96
+
+try: import abcdk.bodytalk
+except: pass # this error could occurs only on first execution, it's handled in the installer
+try: import abcdk.naoqitools
+except: pass
+try: import abcdk.speech
+except: pass
+
+if( 1 ):
+    import abcdk.bodytalk
+    reload(abcdk.bodytalk)
+    import abcdk.motiontools
+    reload(abcdk.motiontools)
+    reload(abcdk.speech)
+    import abcdk.tracking
+    reload(abcdk.tracking)
+    import abcdk.leds
+    reload(abcdk.leds)
+
+import time
+class MyClass(GeneratedClass):
+    """ insert here your comments about this class """
+    def __init__(self):
+        GeneratedClass.__init__(self);
+        try:
+            self.tts = ALProxy( "ALTextToSpeech" );
+        except Exception, err:
+            self.log( "ERR: tts seems not to be present, so we won't use it..." );
+            self.tts = False;
+
+    def onLoad(self):
+        self.bMustStop = False;
+        self.bIsRunning = False;
+
+    def onUnload(self):
+        self.onInput_onStop(); # stop current loop execution
+
+    def onInput_onPrepare(self):
+        abcdk.bodytalk.bodyTalk.prepare( bUseHead = self.getParameter( 'bUseHead' ), rSide = self.getParameter( "rSide" ), rElevation = self.getParameter( "rElevation" ),
+                    astrJointsToExclude = eval(self.getParameter( "astrJointsToExclude" )),
+                    astrObstacles = eval(self.getParameter( "astrObstacles" )),
+        );
+
+    def startBodyTalk( self, nSayID ):
+        self.log( self.boxName + ": start - begin" );
+
+        if( self.bIsRunning ):
+            self.log( self.boxName + ": already started => nothing" );
+            return;
+
+        self.bIsRunning = True;
+        self.bMustStop = False;
+
+        abcdk.bodytalk.bodyTalk.start( bUseHead = self.getParameter( 'bUseHead' ), bTrackFace = self.getParameter( 'bTrackFace' ),
+                nSayID = nSayID, astrJointsToExclude = eval(self.getParameter( "astrJointsToExclude" )), astrObstacles = eval(self.getParameter( "astrObstacles" )),
+        );
+        rPeriod = 0.5;
+        while( not self.bMustStop ):
+            bRet = abcdk.bodytalk.bodyTalk.update( rSide = self.getParameter( "rSide" ), rElevation = self.getParameter( "rElevation" ) );
+            if( not bRet ):
+                self.bMustStop = True;
+            time.sleep( rPeriod );
+        # end while
+        abcdk.bodytalk.bodyTalk.stop(self.getParameter("bWaitEndOfRestMovement"));
+        self.bIsRunning = False;
+        self.onStopped();
+        self.log( self.boxName + ": start - end" );
+
+
+    def onInput_onStart(self):
+        self.startBodyTalk( -1 );
+
+    def onInput_onStop(self):
+        self.bMustStop = True; # stop current loop execution
+
+    def onInput_onSay( self, strTxt ):
+        if( self.bIsRunning ):
+            self.log( "Already running => nothing..." );
+            return;
+        nSayID = self.tts.post.say( "\\PAU=700\\ " + abcdk.speech.getTextWithCurrentSpeed( strTxt ) );
+        self.startBodyTalk( nSayID );
+
+# abcdk_BodyTalk - end
+pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onPrepare" type="1" type_size="1" nature="1" inner="0" tooltip="If you know you will talk, you can prepare to have a starting more reactive." id="2" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Start the box behavior" id="3" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="4" /><Input name="onSay" type="3" type_size="1" nature="1" inner="0" tooltip="automatic say and animate imput: just send some text, and it will say them while talking, if the text is enough long..." id="5" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="6" /><Parameter name="bUseHead" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Do we send movements to the head ?" id="7" /><Parameter name="rElevation" inherits_from_parent="0" content_type="2" value="0" default_value="0" min="-0.5" max="0.5" tooltip="" id="8" /><Parameter name="rSide" inherits_from_parent="0" content_type="2" value="0" default_value="0" min="-1" max="1" tooltip="" id="9" /><Parameter name="bTrackFace" inherits_from_parent="0" content_type="0" value="0" default_value="0" tooltip="Mario use face tracking to look at human" id="10" /><Parameter name="astrJointsToExclude" inherits_from_parent="0" content_type="3" value="[]" default_value='[&quot;RArm&quot;]' custom_choice="1" tooltip="a string to evaluate as an array: it&apos;s a list of obstacles" id="11"><Choice value="[]" /><Choice value='[&quot;RHand&quot;]' /><Choice value='[&quot;RArm&quot;]' /></Parameter><Parameter name="astrObstacles" inherits_from_parent="0" content_type="3" value="[]" default_value='[&quot;Table&quot;]' custom_choice="0" tooltip="a string to evaluate as an array: it&apos;s a list of obstacles" id="12"><Choice value="[]" /><Choice value='[&quot;Table&quot;]' /></Parameter><Parameter name="bWaitEndOfRestMovement" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="The box will wait for the rest movement to be finished. So when the stop is triggered, no movement is on the stack. (default)" id="13" /></Box><Box name="Text Edit" id="14" localization="8" tooltip="Send the text you entered when the input is stimulated." plugin="textedit_plugin" x="127" y="28"><bitmap>media/images/box/interaction/vocabulary.png</bitmap><script language="4"><content><![CDATA[# /!\ Generated content. Do not edit!
+class MyClass(GeneratedClass):
+	def __init__(self):
+		GeneratedClass.__init__(self)
+
+	def onInput_onStart(self):
+		self.onStopped("Bonjour, si vous avez besoin d\'aide, approchez-vous pour me parler.")]]></content></script><pluginContent><text><![CDATA[Bonjour, si vous avez besoin d'aide, approchez-vous pour me parler.]]></text></pluginContent><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="1" inner="0" tooltip="To send the text on the output." id="2" /><Output name="onStopped" type="3" type_size="1" nature="2" inner="0" tooltip="The text you entered." id="3" /></Box><Box name="abcdk_BodyTalk (1)" id="4" localization="8" tooltip="The abcdk_bodytalk: start fast and lightweight.&#x0A;&#x0A;v0.96: optionnal no wait at end&#x0A;v0.95: handle obstacles and exclude joint&#x0A;v0.94: patching on every error case&#x0A;v0.93: onSay: add the global speech speed&#x0A;v0.92: onSay: add a pause before speaking&#x0A;v0.91b: add comments&#x0A;v0.91: add direct txt inputing&#x0A;v0.9: change initialisation&#x0A;v0.8: add a track face&#x0A;v0.7: add an option to disable head movement (so you can launch what you want on it)" x="1004" y="700"><bitmap>media/images/box/interaction/say.png</bitmap><bitmap>media/images/box/movement/move.png</bitmap><script language="4"><content><![CDATA[# abcdk_BodyTalk
+# v0.96
+
+try: import abcdk.bodytalk
+except: pass # this error could occurs only on first execution, it's handled in the installer
+try: import abcdk.naoqitools
+except: pass
+try: import abcdk.speech
+except: pass
+
+if( 1 ):
+    import abcdk.bodytalk
+    reload(abcdk.bodytalk)
+    import abcdk.motiontools
+    reload(abcdk.motiontools)
+    reload(abcdk.speech)
+    import abcdk.tracking
+    reload(abcdk.tracking)
+    import abcdk.leds
+    reload(abcdk.leds)
+
+import time
+class MyClass(GeneratedClass):
+    """ insert here your comments about this class """
+    def __init__(self):
+        GeneratedClass.__init__(self);
+        try:
+            self.tts = ALProxy( "ALTextToSpeech" );
+        except Exception, err:
+            self.log( "ERR: tts seems not to be present, so we won't use it..." );
+            self.tts = False;
+
+    def onLoad(self):
+        self.bMustStop = False;
+        self.bIsRunning = False;
+
+    def onUnload(self):
+        self.onInput_onStop(); # stop current loop execution
+
+    def onInput_onPrepare(self):
+        abcdk.bodytalk.bodyTalk.prepare( bUseHead = self.getParameter( 'bUseHead' ), rSide = self.getParameter( "rSide" ), rElevation = self.getParameter( "rElevation" ),
+                    astrJointsToExclude = eval(self.getParameter( "astrJointsToExclude" )),
+                    astrObstacles = eval(self.getParameter( "astrObstacles" )),
+        );
+
+    def startBodyTalk( self, nSayID ):
+        self.log( self.boxName + ": start - begin" );
+
+        if( self.bIsRunning ):
+            self.log( self.boxName + ": already started => nothing" );
+            return;
+
+        self.bIsRunning = True;
+        self.bMustStop = False;
+
+        abcdk.bodytalk.bodyTalk.start( bUseHead = self.getParameter( 'bUseHead' ), bTrackFace = self.getParameter( 'bTrackFace' ),
+                nSayID = nSayID, astrJointsToExclude = eval(self.getParameter( "astrJointsToExclude" )), astrObstacles = eval(self.getParameter( "astrObstacles" )),
+        );
+        rPeriod = 0.5;
+        while( not self.bMustStop ):
+            bRet = abcdk.bodytalk.bodyTalk.update( rSide = self.getParameter( "rSide" ), rElevation = self.getParameter( "rElevation" ) );
+            if( not bRet ):
+                self.bMustStop = True;
+            time.sleep( rPeriod );
+        # end while
+        abcdk.bodytalk.bodyTalk.stop(self.getParameter("bWaitEndOfRestMovement"));
+        self.bIsRunning = False;
+        self.onStopped();
+        self.log( self.boxName + ": start - end" );
+
+
+    def onInput_onStart(self):
+        self.startBodyTalk( -1 );
+
+    def onInput_onStop(self):
+        self.bMustStop = True; # stop current loop execution
+
+    def onInput_onSay( self, strTxt ):
+        if( self.bIsRunning ):
+            self.log( "Already running => nothing..." );
+            return;
+        nSayID = self.tts.post.say( "\\PAU=700\\ " + abcdk.speech.getTextWithCurrentSpeed( strTxt ) );
+        self.startBodyTalk( nSayID );
+
+# abcdk_BodyTalk - end
+pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onPrepare" type="1" type_size="1" nature="1" inner="0" tooltip="If you know you will talk, you can prepare to have a starting more reactive." id="2" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Start the box behavior" id="3" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="4" /><Input name="onSay" type="3" type_size="1" nature="1" inner="0" tooltip="automatic say and animate imput: just send some text, and it will say them while talking, if the text is enough long..." id="5" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="6" /><Parameter name="bUseHead" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Do we send movements to the head ?" id="7" /><Parameter name="rElevation" inherits_from_parent="0" content_type="2" value="0" default_value="0" min="-0.5" max="0.5" tooltip="" id="8" /><Parameter name="rSide" inherits_from_parent="0" content_type="2" value="0" default_value="0" min="-1" max="1" tooltip="" id="9" /><Parameter name="bTrackFace" inherits_from_parent="0" content_type="0" value="0" default_value="0" tooltip="Mario use face tracking to look at human" id="10" /><Parameter name="astrJointsToExclude" inherits_from_parent="0" content_type="3" value="[]" default_value='[&quot;RArm&quot;]' custom_choice="1" tooltip="a string to evaluate as an array: it&apos;s a list of obstacles" id="11"><Choice value="[]" /><Choice value='[&quot;RHand&quot;]' /><Choice value='[&quot;RArm&quot;]' /></Parameter><Parameter name="astrObstacles" inherits_from_parent="0" content_type="3" value="[]" default_value='[&quot;Table&quot;]' custom_choice="0" tooltip="a string to evaluate as an array: it&apos;s a list of obstacles" id="12"><Choice value="[]" /><Choice value='[&quot;Table&quot;]' /></Parameter><Parameter name="bWaitEndOfRestMovement" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="The box will wait for the rest movement to be finished. So when the stop is triggered, no movement is on the stack. (default)" id="13" /></Box><Box name="Text Edit (1)" id="7" localization="8" tooltip="Send the text you entered when the input is stimulated." plugin="textedit_plugin" x="734" y="731"><bitmap>media/images/box/interaction/vocabulary.png</bitmap><script language="4"><content><![CDATA[# /!\ Generated content. Do not edit!
+class MyClass(GeneratedClass):
+	def __init__(self):
+		GeneratedClass.__init__(self)
+
+	def onInput_onStart(self):
+		self.onStopped("Bonne journée.")]]></content></script><pluginContent><text><![CDATA[Bonne journée.]]></text></pluginContent><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="1" inner="0" tooltip="To send the text on the output." id="2" /><Output name="onStopped" type="3" type_size="1" nature="2" inner="0" tooltip="The text you entered." id="3" /></Box><Box name="abcdk_BodyTalk (2)" id="9" localization="8" tooltip="The abcdk_bodytalk: start fast and lightweight.&#x0A;&#x0A;v0.96: optionnal no wait at end&#x0A;v0.95: handle obstacles and exclude joint&#x0A;v0.94: patching on every error case&#x0A;v0.93: onSay: add the global speech speed&#x0A;v0.92: onSay: add a pause before speaking&#x0A;v0.91b: add comments&#x0A;v0.91: add direct txt inputing&#x0A;v0.9: change initialisation&#x0A;v0.8: add a track face&#x0A;v0.7: add an option to disable head movement (so you can launch what you want on it)" x="1024" y="962"><bitmap>media/images/box/interaction/say.png</bitmap><bitmap>media/images/box/movement/move.png</bitmap><script language="4"><content><![CDATA[# abcdk_BodyTalk
+# v0.96
+
+try: import abcdk.bodytalk
+except: pass # this error could occurs only on first execution, it's handled in the installer
+try: import abcdk.naoqitools
+except: pass
+try: import abcdk.speech
+except: pass
+
+if( 1 ):
+    import abcdk.bodytalk
+    reload(abcdk.bodytalk)
+    import abcdk.motiontools
+    reload(abcdk.motiontools)
+    reload(abcdk.speech)
+    import abcdk.tracking
+    reload(abcdk.tracking)
+    import abcdk.leds
+    reload(abcdk.leds)
+
+import time
+class MyClass(GeneratedClass):
+    """ insert here your comments about this class """
+    def __init__(self):
+        GeneratedClass.__init__(self);
+        try:
+            self.tts = ALProxy( "ALTextToSpeech" );
+        except Exception, err:
+            self.log( "ERR: tts seems not to be present, so we won't use it..." );
+            self.tts = False;
+
+    def onLoad(self):
+        self.bMustStop = False;
+        self.bIsRunning = False;
+
+    def onUnload(self):
+        self.onInput_onStop(); # stop current loop execution
+
+    def onInput_onPrepare(self):
+        abcdk.bodytalk.bodyTalk.prepare( bUseHead = self.getParameter( 'bUseHead' ), rSide = self.getParameter( "rSide" ), rElevation = self.getParameter( "rElevation" ),
+                    astrJointsToExclude = eval(self.getParameter( "astrJointsToExclude" )),
+                    astrObstacles = eval(self.getParameter( "astrObstacles" )),
+        );
+
+    def startBodyTalk( self, nSayID ):
+        self.log( self.boxName + ": start - begin" );
+
+        if( self.bIsRunning ):
+            self.log( self.boxName + ": already started => nothing" );
+            return;
+
+        self.bIsRunning = True;
+        self.bMustStop = False;
+
+        abcdk.bodytalk.bodyTalk.start( bUseHead = self.getParameter( 'bUseHead' ), bTrackFace = self.getParameter( 'bTrackFace' ),
+                nSayID = nSayID, astrJointsToExclude = eval(self.getParameter( "astrJointsToExclude" )), astrObstacles = eval(self.getParameter( "astrObstacles" )),
+        );
+        rPeriod = 0.5;
+        while( not self.bMustStop ):
+            bRet = abcdk.bodytalk.bodyTalk.update( rSide = self.getParameter( "rSide" ), rElevation = self.getParameter( "rElevation" ) );
+            if( not bRet ):
+                self.bMustStop = True;
+            time.sleep( rPeriod );
+        # end while
+        abcdk.bodytalk.bodyTalk.stop(self.getParameter("bWaitEndOfRestMovement"));
+        self.bIsRunning = False;
+        self.onStopped();
+        self.log( self.boxName + ": start - end" );
+
+
+    def onInput_onStart(self):
+        self.startBodyTalk( -1 );
+
+    def onInput_onStop(self):
+        self.bMustStop = True; # stop current loop execution
+
+    def onInput_onSay( self, strTxt ):
+        if( self.bIsRunning ):
+            self.log( "Already running => nothing..." );
+            return;
+        nSayID = self.tts.post.say( "\\PAU=700\\ " + abcdk.speech.getTextWithCurrentSpeed( strTxt ) );
+        self.startBodyTalk( nSayID );
+
+# abcdk_BodyTalk - end
+pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onPrepare" type="1" type_size="1" nature="1" inner="0" tooltip="If you know you will talk, you can prepare to have a starting more reactive." id="2" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Start the box behavior" id="3" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="4" /><Input name="onSay" type="3" type_size="1" nature="1" inner="0" tooltip="automatic say and animate imput: just send some text, and it will say them while talking, if the text is enough long..." id="5" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="6" /><Parameter name="bUseHead" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Do we send movements to the head ?" id="7" /><Parameter name="rElevation" inherits_from_parent="0" content_type="2" value="-0.5" default_value="0" min="-0.5" max="0.5" tooltip="" id="8" /><Parameter name="rSide" inherits_from_parent="0" content_type="2" value="0" default_value="0" min="-1" max="1" tooltip="" id="9" /><Parameter name="bTrackFace" inherits_from_parent="0" content_type="0" value="0" default_value="0" tooltip="Mario use face tracking to look at human" id="10" /><Parameter name="astrJointsToExclude" inherits_from_parent="0" content_type="3" value="[]" default_value='[&quot;RArm&quot;]' custom_choice="1" tooltip="a string to evaluate as an array: it&apos;s a list of obstacles" id="11"><Choice value="[]" /><Choice value='[&quot;RHand&quot;]' /><Choice value='[&quot;RArm&quot;]' /></Parameter><Parameter name="astrObstacles" inherits_from_parent="0" content_type="3" value="[]" default_value='[&quot;Table&quot;]' custom_choice="0" tooltip="a string to evaluate as an array: it&apos;s a list of obstacles" id="12"><Choice value="[]" /><Choice value='[&quot;Table&quot;]' /></Parameter><Parameter name="bWaitEndOfRestMovement" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="The box will wait for the rest movement to be finished. So when the stop is triggered, no movement is on the stack. (default)" id="13" /></Box><Box name="Text Edit (2)" id="10" localization="8" tooltip="Send the text you entered when the input is stimulated." plugin="textedit_plugin" x="754" y="993"><bitmap>media/images/box/interaction/vocabulary.png</bitmap><script language="4"><content><![CDATA[# /!\ Generated content. Do not edit!
+class MyClass(GeneratedClass):
+	def __init__(self):
+		GeneratedClass.__init__(self)
+
+	def onInput_onStart(self):
+		self.onStopped("Que désirez-vous?")]]></content></script><pluginContent><text><![CDATA[Que désirez-vous?]]></text></pluginContent><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="1" inner="0" tooltip="To send the text on the output." id="2" /><Output name="onStopped" type="3" type_size="1" nature="2" inner="0" tooltip="The text you entered." id="3" /></Box><Box name="OnlyOneValue_ref" id="11" localization="8" tooltip="send a specific value only one time.&#x0A;mutex version&#x0A;v0.9" x="552" y="948"><bitmap>media/images/box/icons_appu/node.png</bitmap><script language="4"><content><![CDATA[# OnlyOneValue - thread safe version
+# v0.9
+
+import mutex
+import time
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self);
+        self.mutex = mutex.mutex();
+
+    def onLoad(self):
+        self.nNbrTimesOutputted = 0;
+        self.nNbrMaxOutputting = 1; # change it it would want to output more than once
+
+    def onUnload(self):
+        pass
+
+    def onInput_onSendValue(self, p):
+        while( self.mutex.testandset() == False ):
+            time.sleep( 0.005 ); # wait a little
+            return;
+
+        if( self.nNbrTimesOutputted < self.nNbrMaxOutputting  ):
+            self.nNbrTimesOutputted += 1;
+            self.output_SendValue( p );
+        self.mutex.unlock();
+
+    def onInput_onReset(self):
+        while( self.mutex.testandset() == False ):
+            time.sleep( 0.005 ); # wait a little
+            return;
+        self.nNbrTimesOutputted = 0;
+        self.mutex.unlock();
+
+# OnlyOneValue - end
+pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onSendValue" type="0" type_size="1" nature="1" inner="0" tooltip="Value to send only one time" id="2" /><Input name="onReset" type="1" type_size="1" nature="1" inner="0" tooltip="next time value enter it will be outputted" id="3" /><Output name="output_SendValue" type="0" type_size="1" nature="2" inner="0" tooltip="value outputted" id="4" /></Box><Link inputowner="2" indexofinput="2" outputowner="1" indexofoutput="3" /><Link inputowner="3" indexofinput="2" outputowner="2" indexofoutput="4" /><Link inputowner="6" indexofinput="4" outputowner="5" indexofoutput="8" /><Link inputowner="13" indexofinput="5" outputowner="14" indexofoutput="3" /><Link inputowner="14" indexofinput="2" outputowner="0" indexofoutput="1" /><Link inputowner="5" indexofinput="2" outputowner="13" indexofoutput="6" /><Link inputowner="6" indexofinput="2" outputowner="13" indexofoutput="6" /><Link inputowner="7" indexofinput="2" outputowner="6" indexofoutput="5" /><Link inputowner="4" indexofinput="5" outputowner="7" indexofoutput="3" /><Link inputowner="8" indexofinput="2" outputowner="13" indexofoutput="6" /><Link inputowner="1" indexofinput="2" outputowner="4" indexofoutput="6" /><Link inputowner="9" indexofinput="5" outputowner="10" indexofoutput="3" /><Link inputowner="11" indexofinput="2" outputowner="6" indexofoutput="7" /><Link inputowner="10" indexofinput="2" outputowner="11" indexofoutput="4" /></Diagram></BehaviorKeyframe></BehaviorLayer></Timeline></Box><Box name="Speech Reco. - mod" id="5" localization="8" tooltip="Recognize a word from a list of words set in the box parameters.&#x0A;&#x0A;V1.1.0&#x0A;" x="232" y="566"><bitmap>media/images/box/interaction/ear.png</bitmap><script language="4"><content><![CDATA[
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+        try:
+            self.asr = ALProxy("ALSpeechRecognition")
+        except Exception as e:
+            self.asr = None
+            self.logger.error(e)
+        self.memory = ALProxy("ALMemory")
+
+    def onLoad(self):
+        from threading import Lock
+        self.bIsRunning = False
+        self.mutex = Lock()
+        self.hasPushed = False
+        self.hasSubscribed = False
+        self.BIND_PYTHON(self.getName(), "onWordRecognized")
+
+    def onUnload(self):
+        from threading import Lock
+        self.mutex.acquire()
+        try:
+            if (self.bIsRunning):
+                if (self.hasSubscribed):
+                    self.memory.unsubscribeToEvent("WordRecognized", self.getName())
+                if (self.hasPushed and self.asr):
+                    self.asr.popContexts()
+        except RuntimeError, e:
+            self.mutex.release()
+            raise e
+        self.bIsRunning = False;
+        self.mutex.release()
+
+    def onInput_onStart(self):
+        from threading import Lock
+        self.mutex.acquire()
+        if(self.bIsRunning):
+            self.mutex.release()
+            return
+        self.bIsRunning = True
+        try:
+            if self.asr:
+                self.asr.setVisualExpression(self.getParameter("Visual expression"))
+                self.asr.pushContexts()
+            self.hasPushed = True
+            if self.asr:
+                # worldlist = self.getParameter("Word list").split(';')
+                wordlist,names = generateListSentences()
+                self.log("worldlist: " + str(wordlist))
+                self.asr.setVocabulary( wordlist, self.getParameter("Enable word spotting") )
+            self.memory.subscribeToEvent("WordRecognized", self.getName(), "onWordRecognized")
+            self.hasSubscribed = True
+        except RuntimeError, e:
+            self.mutex.release()
+            self.onUnload()
+            raise e
+        self.mutex.release()
+
+    def onInput_onStop(self):
+        if( self.bIsRunning ):
+            self.onUnload()
+            self.onStopped()
+
+    def onWordRecognized(self, key, value, message):
+        if(len(value) > 1 and value[1] >= self.getParameter("Confidence threshold (%)")/100.):
+            self.wordRecognized(value[0]) #~ activate output of the box
+        else:
+            self.onNothing()]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Output name="wordRecognized" type="3" type_size="1" nature="2" inner="0" tooltip="Word recognized with a confidence higher than the threshold set in the box parameters." id="5" /><Output name="onNothing" type="1" type_size="1" nature="2" inner="0" tooltip="Nothing has been understood." id="6" /><Parameter name="Word list" inherits_from_parent="0" content_type="3" value="" default_value="yes;no" custom_choice="0" tooltip="Try to recognize a word from a list of words set in the box parameters." id="7" /><Parameter name="Confidence threshold (%)" inherits_from_parent="0" content_type="1" value="40" default_value="30" min="0" max="100" tooltip="If the confidence associated with the word recognized is below this threshold, the robot will consider that it is not recognized." id="8" /><Parameter name="Visual expression" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Use the LEDs to show feedbacks from the robot during the recognition.&#x0A;&#x0A;For example:&#x0A;- Eyes leds get blue and turn when the speech recognition is launched.&#x0A;- They get yellow when the robot hears someone talking and analyses what it heard.&#x0A;- They flash in green when the robot understood and flash in red otherwise." id="9" /><Parameter name="Enable word spotting" inherits_from_parent="0" content_type="0" value="0" default_value="0" tooltip="If this option is not activated the robot will only understand exact expressions. If it is, he will spot the exact expressions even in the middle of a sentence.&#x0A;&#x0A;!!Warning!! This option is only available with the speech recognition module using Nuance (ie in Atom version of the robot)." id="10" /><Resource name="Speech recognition" type="Lock" timeout="0" /></Box><Box name="global variable" id="6" localization="8" tooltip="" x="725" y="199"><bitmap>media/images/box/box-python-script.png</bitmap><script language="4"><content><![CDATA[listEmployee = ["Fabien Bardinet", "Lynda Rachet", "Zaimah Zaini","Talla Kebe"]
+# for each employee his office number
+listOffice = ["1320", "1318", "1318", "1310"]
+
+# for each list of office, a sentence and number of door and a boolean isRight
+listPlan = {
+            "1318": ("Au fond à droite", 4, 1),
+            "1320": ("Au fond à droite", 4, 1),
+            "1310": ("A votre gauche", 0,0)
+        }
+
+
+def generateListSentences():
+    """
+    generate all sentences for speech recognition, return the list and the id associated
+    """
+    listQuestion = ["J'ai rendez vous avec", "J'aimerais voir", "Je cherche le bureau de"]
+    o = []
+    names = []
+    for q in listQuestion:
+        for e in listEmployee:
+            f,l = e.split(" ")
+            o.append( q + " " + e )
+            o.append( q + " " + f )
+            o.append( q + " M " + l )
+            names.append(e)
+            names.append(e)
+            names.append(e)
+    return o,names
+
+def findID(s):
+    print("INF: findID '%s'" % s)
+    sentences,names = generateListSentences()
+    try:
+        idx = sentences.index(s)
+    except ValueError as err:
+        return "inconnu",-1
+    return names[idx]
+
+def nameToPlan(name):
+    idx = listEmployee.index(name)
+    office = listOffice[idx]
+    try:
+        return listPlan[office]
+    except KeyError as err:
+        pass
+    return "lieu inconnu", -1, -1
+
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onLoad(self):
+        #put initialization code here
+        pass
+
+    def onUnload(self):
+        #put clean-up code here
+        pass
+
+    def onInput_onStart(self):
+        #self.onStopped() #activate the output of the box
+        pass
+
+    def onInput_onStop(self):
+        self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
+        self.onStopped() #activate the output of the box]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /></Box><Box name="AnalyseRecoResults" id="7" localization="8" tooltip="" x="414" y="557"><bitmap>media/images/box/box-python-script.png</bitmap><script language="4"><content><![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+        self.tts = ALProxy("ALTextToSpeech")
+
+    def onLoad(self):
+        #put initialization code here
+        pass
+
+    def onUnload(self):
+        #put clean-up code here
+        pass
+
+    def onInput_onStart(self, p):
+        strPersonName = findID(p)
+        instruction, nNbrDoor, bIsRight = nameToPlan(strPersonName)
+
+        self.tts.say("le bureau de %s ? c'est facile: %s" % (strPersonName,instruction))
+        self.onStopped() #activate the output of the box
+        pass
+
+    def onInput_onStop(self):
+        self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
+        self.onStopped() #activate the output of the box]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="3" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /></Box><Link inputowner="1" indexofinput="2" outputowner="3" indexofoutput="4" /><Link inputowner="5" indexofinput="2" outputowner="0" indexofoutput="2" /><Link inputowner="7" indexofinput="2" outputowner="5" indexofoutput="5" /></Diagram></BehaviorKeyframe></BehaviorLayer></Timeline></Box></ChoregrapheProject>

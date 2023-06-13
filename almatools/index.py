@@ -64,7 +64,7 @@ def index(req):
     <br>
     <br>
     <div style='vertical-align: middle;'>
-    <img src='adr_email.svg' height=15px>
+    <img src='adr_email_at.svg' height=15px>
     </div>
     </body>
     </html>

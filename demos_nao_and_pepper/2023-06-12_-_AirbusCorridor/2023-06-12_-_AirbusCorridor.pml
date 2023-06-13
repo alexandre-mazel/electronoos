@@ -7,6 +7,7 @@
     <Dialogs />
     <Resources>
         <File name="tablet_screen" src="tablet_screen.png" />
+        <File name="explosion" src="explosion.mp3" />
     </Resources>
     <Topics />
     <IgnoredPaths />

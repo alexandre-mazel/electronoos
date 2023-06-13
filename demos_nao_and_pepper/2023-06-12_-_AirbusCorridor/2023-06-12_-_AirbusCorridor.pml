@@ -8,6 +8,8 @@
     <Resources>
         <File name="tablet_screen" src="tablet_screen.png" />
         <File name="explosion" src="explosion.mp3" />
+        <File name="tablet_screen_help_en" src="tablet_screen_help_en.png" />
+        <File name="tablet_screen_help_fr" src="tablet_screen_help_fr.png" />
     </Resources>
     <Topics />
     <IgnoredPaths />

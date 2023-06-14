@@ -6,6 +6,7 @@ import json
 import socket
 import pickle 
 import argparse
+import tiktoken
 
 # get song from youtube:
 # https://www.justgeek.fr/headset-lecteur-de-musique-open-source-95893/
@@ -186,6 +187,10 @@ def loopDialog(strHumanName):
     bUseVoice = 0
     bUseVoice = 1
     
+    # model cl100k_base 	gpt-4, gpt-3.5-turbo, text-embedding-ada-002
+    enc_tiktoken = tiktoken.get_encoding("cl100k_base") # count token in sentence
+    
+    
     while 1:
         msg = ""
         while msg == "":
@@ -200,24 +205,67 @@ def loopDialog(strHumanName):
         historic.append({"role":"user","content":msg})
         saveHistoric(strHumanName,historic,bQuiet=1)
         print("l'ia réfléchit...\r",end="")
+        
+        historicToUse = []
+        
+        # limit historic to limit money spending
+        if 0 or len(historic)<13:
+            historicToUse = historic[:]
+        else:
+            historicToUse = historic[:3]+historic[-10:]
+            print("historicToUse: %s" % str(historicToUse))
+        
+        nNbrMaxToken = 128 # size of completion, prompt + completion are limited by model size, eg 4k for gpt3.5
+        # si on met trop peu, le moteur coupe au milieu et il faut dire "continue" (continue en francais)
+        # pour qu'il continue
+        # default 4k or inf, depending of the model.
+        
+        # other way to cut is to define a stop sequence (eg \n or .)
+        # or stop:
+        """
+        string or array
+        Optional
+        Defaults to null
+
+        Up to 4 sequences where the API will stop generating further tokens. The returned text will not contain the stop sequence.
+        cf https://platform.openai.com/docs/api-reference/completions/create
+        """
+
+        if 1:
+            # count token
+            nNbrToken = 0
+            for h in historicToUse:
+                tokens = enc_tiktoken.encode(h["content"])
+                n = len(tokens)
+                nNbrToken += n
+                tokens = enc_tiktoken.encode(h["role"])
+                n = len(tokens)
+                nNbrToken += n
+            print("nNbrToken sent: %s" % nNbrToken)
+            #~ return
+                
+        
         try:
             completion = openai.ChatCompletion.create(
                               model="gpt-3.5-turbo",
-                              messages=historic,
+                              messages=historicToUse,
                               temperature=0.2,
-                              user=username
+                              user=username,
+                              max_tokens=nNbrMaxToken
                             )
         except BaseException as err:
             print("ERR: %s" % err)
             print("retrying in 1min...")
-            time.sleep(1)
+            time.sleep(60)
             completion = openai.ChatCompletion.create(
                           model="gpt-3.5-turbo",
                           messages=historic,
                           temperature=0.2,
-                          user=username
+                          user=username,
+                          max_tokens=nNbrMaxToken
                         )
         
+        print(completion)
         #~ print(completion.choices[0].message)
         answer = completion.choices[0].message["content"]
         print("AI: " + answer )

@@ -477,3 +477,13 @@ def runGame():
 
 
 runGame()
+
+"""
+terminal:
+faire des tps sur 1 mois (sur une notion speciofique?)
+puis 3 dernier mois un gros prokjets
+
+premiere:
+la partie sur les classe va trop vite
+plusse de  cours
+"""

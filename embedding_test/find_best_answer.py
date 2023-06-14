@@ -580,7 +580,7 @@ if 0:
     print("answer: %s" % faq[maxIdx][1])
     
     
-if 1:
+if 0:
     # test sur faq en vrac
     sys.path.append("../camembert")
     import sentence_embedding
@@ -672,9 +672,50 @@ Le Temps partagé : Ce terme désigne une organisation du travail d’une personne (
 (conf: 0.64)
 
 """
-     
+
+if 1:
+    # generation de simi et de proximité pour des presentations:
+    sys.path.append("../camembert")
+    import sentence_embedding
+    listTxt = [
+        "J'ai faim",
+        "J'ai soif",
+        "J'ai envie de faire pipi",
+        "Quel est le nom du président de la république francaise?",
+        "2+2=4",
+        "Etes vous fort en math?",
+        "Les calculs c'est mon dada",
+        "I'm hungry",
+        "Gaston Deferre est un homme politique francais mort en 1953",
+        "Barack Obama was the president of the united states",
+        "I'm very thirsty",
+        "J'ai très faim",
+        "Ich bin hungrig", # j'ai faim en allemand
+        "ho fame", # j'ai faim en italien
+    ]
     
+    listEmb = sentence_embedding.generateEmbedListCached(listTxt,"tuto_embed_camembert.txt")
     
+    for s1 in listTxt:
+        # camembert: 512 floats
+        #~ bests = sentence_embedding.getBests(q,listEmb)
+        #~ print("\nDBG: tuto: bests: %s" % bests)
+        #~ imax = bests[0][0]
+        #~ simi = bests[0][1]
+        #~ conf = min(simi/0.36,1.)
+        #~ smax = listTxt[imax]
+        #~ print("# 1: faqVrac: %s => %d: %s (conf: %.2f)" % (q,imax,smax, conf ) )
+        #~ imax2 = bests[1][0]
+        #~ simi2 = bests[1][1]
+        #~ conf2 = min(simi2/0.36,1.)
+        #~ smax2 = listTxt[imax2]
+        #~ print("# 2: faqVrac: %s => %d: %s (conf: %.2f)" % (q,imax2,smax2, conf2 ) )
+        for s2 in listTxt:
+            if s1==s2: continue
+            simi = sentence_embedding.getSimiSentences(s1,s2)
+            #~ print("similarity '%s' and '%s': %.2f" % (s1,s2,simi) )
+            print("'%s' / '%s'  =>  %.2f" % (s1,s2,simi) )
+
     
 
         

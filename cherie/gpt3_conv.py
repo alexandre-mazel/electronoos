@@ -6,7 +6,8 @@ import json
 import socket
 import pickle 
 import argparse
-import tiktoken
+try:import tiktoken
+except: print("WRN: no tiktoken found")
 
 # get song from youtube:
 # https://www.justgeek.fr/headset-lecteur-de-musique-open-source-95893/
@@ -188,9 +189,10 @@ def loopDialog(strHumanName):
     if os.name == "nt":
         bUseVoice = 1
     
-    # model cl100k_base 	gpt-4, gpt-3.5-turbo, text-embedding-ada-002
-    enc_tiktoken = tiktoken.get_encoding("cl100k_base") # count token in sentence
-    
+    if os.name == "nt":
+        # model cl100k_base 	gpt-4, gpt-3.5-turbo, text-embedding-ada-002
+        enc_tiktoken = tiktoken.get_encoding("cl100k_base") # count token in sentence
+        
     
     while 1:
         msg = ""
@@ -232,18 +234,19 @@ def loopDialog(strHumanName):
         cf https://platform.openai.com/docs/api-reference/completions/create
         """
 
-        if 1:
-            # count token
-            nNbrToken = 0
-            for h in historicToUse:
-                tokens = enc_tiktoken.encode(h["content"])
-                n = len(tokens)
-                nNbrToken += n
-                tokens = enc_tiktoken.encode(h["role"])
-                n = len(tokens)
-                nNbrToken += n
-            print("nNbrToken sent: %s" % nNbrToken)
-            #~ return
+        if os.name == "nt":
+            if 1:
+                # count token
+                nNbrToken = 0
+                for h in historicToUse:
+                    tokens = enc_tiktoken.encode(h["content"])
+                    n = len(tokens)
+                    nNbrToken += n
+                    tokens = enc_tiktoken.encode(h["role"])
+                    n = len(tokens)
+                    nNbrToken += n
+                print("nNbrToken sent: %s" % nNbrToken)
+                #~ return
                 
         
         try:

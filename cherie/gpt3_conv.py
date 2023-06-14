@@ -185,7 +185,8 @@ def loopDialog(strHumanName):
         print("")
         
     bUseVoice = 0
-    bUseVoice = 1
+    if os.name == "nt":
+        bUseVoice = 1
     
     # model cl100k_base 	gpt-4, gpt-3.5-turbo, text-embedding-ada-002
     enc_tiktoken = tiktoken.get_encoding("cl100k_base") # count token in sentence

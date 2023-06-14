@@ -216,7 +216,7 @@ def loopDialog(strHumanName):
             historicToUse = historic[:]
         else:
             historicToUse = historic[:3]+historic[-10:]
-            print("historicToUse: %s" % str(historicToUse))
+            #~ print("historicToUse: %s" % str(historicToUse))
         
         nNbrMaxToken = 128 # size of completion, prompt + completion are limited by model size, eg 4k for gpt3.5
         # si on met trop peu, le moteur coupe au milieu et il faut dire "continue" (continue en francais)

@@ -274,5 +274,21 @@
 {
 "role": "assistant",
 "content": "Tr\u00e8s bien, je vous souhaite une bonne nuit de sommeil. N'h\u00e9sitez pas \u00e0 me contacter si vous avez besoin de quelque chose d'autre. Je serai l\u00e0 pour vous aider d\u00e8s que vous en aurez besoin. Bonne nuit !"
+},
+{
+"role": "user",
+"content": "J'ai bien dormi!"
+},
+{
+"role": "assistant",
+"content": "Je suis content d'entendre que vous avez bien dormi ! Est-ce que je peux vous aider avec quelque chose aujourd'hui ?"
+},
+{
+"role": "user",
+"content": "no ca va merci"
+},
+{
+"role": "assistant",
+"content": "Tr\u00e8s bien, n'h\u00e9sitez pas \u00e0 me contacter si vous avez besoin de quelque chose plus tard. Je suis toujours l\u00e0 pour vous aider. Passez une excellente journ\u00e9e !"
 }
 ]

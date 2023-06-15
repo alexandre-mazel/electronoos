@@ -68,7 +68,7 @@ listYesNoRef = [
     ["vrai",1.],
     ["oui",0.9],
     ["yes",0.9],
-    ["un peu",-0.3],
+    ["un peu",0.3],
     ["moyen",0.],
     ["bof",0.],
     ["average",0.],
@@ -178,7 +178,7 @@ def getYesNo(s,bVerbose=0):
 def autotestPosNeg():
     
     bVerbose = 1
-    #~ bVerbose = 0
+    bVerbose = 0
     
     al = [
                 ["Je suis content",0.8],
@@ -249,6 +249,7 @@ def autotestPosNeg():
 
                 ["J'ai adoré ce restaurant",1.],
                 ["J'ai pas aimé du tout cette pièce de théatre",-0.7],
+                ["La fin du monde",-0.7],
         ]
         
     nCptError = 0
@@ -280,13 +281,13 @@ def autotestPosNeg():
 def autotestYesNo():
     
     bVerbose = 1
-    #~ bVerbose = 0
+    bVerbose = 0
     
     al = [
             ["oui",0.8],
             ["yeah!",0.8],
             ["non",-0.8],
-            ["OUI",0.8], # tres decevant !
+            ["OUI",0.8], # tres decevant ! (est ce un acronyme en anglais?)
             # 1: getPosNeg: OUI  => 10: bof 0.00 (conf: 1.00)
             # 2: getPosNeg: OUI  => 7: yes 0.90 (conf: 1.00)
             
@@ -312,6 +313,9 @@ def autotestYesNo():
             ["Tout a fait Thierry!",0.8],
             ["Sure !",0.8],
             ["Sure as 1 + 1 equal 2",0.8],
+            ["ok",0.8],
+            ["OK",0.8],
+            ["OKAY",0.8],
         ]
         
     nCptError = 0
@@ -338,10 +342,10 @@ def autotestYesNo():
     if nCptError > 0:
         print("\nINF: autotestYesNo: nCptRealError: %d, nCptErrorLowConf: %d, ConfavgConfErreur: %.2f (rAvgConf:%.2f)" % (nCptRealError,nCptErrorLowConf,rSumConfError/nCptError,rSumConf/len(al)))
             
-        # INF: autotestYesNo: nCptRealError: 0, nCptErrorLowConf 1, ConfavgConfErreur: 0.23  (rAvgConf:0.81)
+        # INF: autotestYesNo: nCptRealError: 0, nCptErrorLowConf 1, ConfavgConfErreur: 0.23  (rAvgConf:0.80)
 
 def autotest():
-        #~ autotestPosNeg()
+        autotestPosNeg()
         autotestYesNo()
 if __name__ == "__main__":
     autotest()

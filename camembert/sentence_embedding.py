@@ -159,10 +159,21 @@ def getBests(s,listEmbed,bVerbose=0,listWordForVerbose = []):
     simiMax2 = 0
     imax2 = -1
     e = camEmbed(s)
+    bComputeAverage = 0
+    if listWordForVerbose != []:
+        bComputeAverage = 1
+        rSumSimi = 0
+        rSumNotePonderate = 0
+        rSumAll = 0
     if bVerbose:
         sortedDebug = []
     for i,v in enumerate(listEmbed):
         simi = np.dot(e,v)
+        if bComputeAverage:
+            rSumSimi += simi
+            rSumNotePonderate += listWordForVerbose[i][1]*simi
+            rSumAll += listWordForVerbose[i][1]
+            
         if bVerbose: 
             sEmb = ""
             if listWordForVerbose != []:
@@ -188,6 +199,13 @@ def getBests(s,listEmbed,bVerbose=0,listWordForVerbose = []):
         print("DBG: sortedDebug:")
         for v in sorted(sortedDebug,reverse=True):
             print("  %s: %.2f" % (v[1],v[0]))
+            
+    if bComputeAverage:
+        rAvg = rSumNotePonderate/rSumSimi
+        rRef = rSumAll/len(listEmbed)
+        rDiff = (rAvg - rRef)*10
+        print("DBG: => avg value: %.2f, diff: %.2f (ref: %.2f)" % (rAvg,rDiff,rRef) )
+        
             
     return [(imax,simiMax),(imax2,simiMax2)]
     

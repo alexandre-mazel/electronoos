@@ -81,7 +81,11 @@ def findInFiles( strPath, strToMatch, strFileMask = '*', bVerbose = True ):
     """
     return nbr files analysed, nbr file where match is found and nbr total lines
     """
-    aFiles = sorted(os.listdir(strPath))
+    try:
+        aFiles = sorted(os.listdir(strPath))
+    except PermissionError as err:
+        print("WRN: findInFiles: permission error for '%s'" % strPath)
+        return 0,0,0,0
     #~ print(aFiles)
 
     nbrFilesAnalysed = 0

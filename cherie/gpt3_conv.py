@@ -215,6 +215,8 @@ def loopDialog(strHumanName):
         if 0 or len(historic)<13:
             historicToUse = historic[:]
         else:
+            # => ~400 tokens input, and ~100 output => 0.1 cents per sentence.
+            
             historicToUse = historic[:3]+historic[-10:]
             #~ print("historicToUse: %s" % str(historicToUse))
         
@@ -232,6 +234,9 @@ def loopDialog(strHumanName):
 
         Up to 4 sequences where the API will stop generating further tokens. The returned text will not contain the stop sequence.
         cf https://platform.openai.com/docs/api-reference/completions/create
+        
+        # pricing:
+        https://openai.com/pricing
         """
 
         if os.name == "nt":

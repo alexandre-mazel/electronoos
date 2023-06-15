@@ -29,6 +29,114 @@ def rgba2rgb( rgba, background=(255,255,255) ):
     return rgb
 # rgba2rgb - end
 
+import cv2
+import numpy as np
+
+def addRoundedRectangleBorder(img):
+    height, width, channels = img.shape
+    import random
+
+    border_radius = int(width * random.randint(1, 10)/100.0)
+    line_thickness = int(max(width, height) * random.randint(1, 3)/100.0)
+    edge_shift = int(line_thickness/2.0)
+
+    red = random.randint(230,255)
+    green = random.randint(230,255)
+    blue = random.randint(230,255)
+    color = (blue, green, red)
+
+    #draw lines
+    #top
+    cv2.line(img, (border_radius, edge_shift), 
+    (width - border_radius, edge_shift), (blue, green, red), line_thickness)
+    #bottom
+    cv2.line(img, (border_radius, height-line_thickness), 
+    (width - border_radius, height-line_thickness), (blue, green, red), line_thickness)
+    #left
+    cv2.line(img, (edge_shift, border_radius), 
+    (edge_shift, height  - border_radius), (blue, green, red), line_thickness)
+    #right
+    cv2.line(img, (width - line_thickness, border_radius), 
+    (width - line_thickness, height  - border_radius), (blue, green, red), line_thickness)
+
+    #corners
+    cv2.ellipse(img, (border_radius+ edge_shift, border_radius+edge_shift), 
+    (border_radius, border_radius), 180, 0, 90, color, line_thickness)
+    cv2.ellipse(img, (width-(border_radius+line_thickness), border_radius), 
+    (border_radius, border_radius), 270, 0, 90, color, line_thickness)
+    cv2.ellipse(img, (width-(border_radius+line_thickness), height-(border_radius + line_thickness)), 
+    (border_radius, border_radius), 10, 0, 90, color, line_thickness)
+    cv2.ellipse(img, (border_radius+edge_shift, height-(border_radius + line_thickness)), 
+    (border_radius, border_radius), 90, 0, 90, color, line_thickness)
+
+    return img
+
+def rounded_rectangle(src, top_left, bottom_right, radius=1, color=255, thickness=1, line_type=cv2.LINE_AA):
+
+    # WRN: top and bottom are given (y,x) !!!
+    
+    #  corners:
+    #  p1 - p2
+    #  |     |
+    #  p4 - p3
+
+    p1 = top_left
+    p2 = (bottom_right[1], top_left[1])
+    p3 = (bottom_right[1], bottom_right[0])
+    p4 = (top_left[0], bottom_right[0])
+
+    height = abs(bottom_right[0] - top_left[1])
+
+    if radius > 1:
+        radius = 1
+
+    corner_radius = int(radius * (height/2))
+
+    if thickness < 0:
+
+        #big rect
+        top_left_main_rect = (int(p1[0] + corner_radius), int(p1[1]))
+        bottom_right_main_rect = (int(p3[0] - corner_radius), int(p3[1]))
+
+        top_left_rect_left = (p1[0], p1[1] + corner_radius)
+        bottom_right_rect_left = (p4[0] + corner_radius, p4[1] - corner_radius)
+
+        top_left_rect_right = (p2[0] - corner_radius, p2[1] + corner_radius)
+        bottom_right_rect_right = (p3[0], p3[1] - corner_radius)
+
+        all_rects = [
+        [top_left_main_rect, bottom_right_main_rect], 
+        [top_left_rect_left, bottom_right_rect_left], 
+        [top_left_rect_right, bottom_right_rect_right]]
+
+        [cv2.rectangle(src, rect[0], rect[1], color, thickness) for rect in all_rects]
+
+    # draw straight lines
+    cv2.line(src, (p1[0] + corner_radius, p1[1]), (p2[0] - corner_radius, p2[1]), color, abs(thickness), line_type)
+    cv2.line(src, (p2[0], p2[1] + corner_radius), (p3[0], p3[1] - corner_radius), color, abs(thickness), line_type)
+    cv2.line(src, (p3[0] - corner_radius, p4[1]), (p4[0] + corner_radius, p3[1]), color, abs(thickness), line_type)
+    cv2.line(src, (p4[0], p4[1] - corner_radius), (p1[0], p1[1] + corner_radius), color, abs(thickness), line_type)
+
+    # draw arcs
+    cv2.ellipse(src, (p1[0] + corner_radius, p1[1] + corner_radius), (corner_radius, corner_radius), 180.0, 0, 90, color ,thickness, line_type)
+    cv2.ellipse(src, (p2[0] - corner_radius, p2[1] + corner_radius), (corner_radius, corner_radius), 270.0, 0, 90, color , thickness, line_type)
+    cv2.ellipse(src, (p3[0] - corner_radius, p3[1] - corner_radius), (corner_radius, corner_radius), 0.0, 0, 90,   color , thickness, line_type)
+    cv2.ellipse(src, (p4[0] + corner_radius, p4[1] - corner_radius), (corner_radius, corner_radius), 90.0, 0, 90,  color , thickness, line_type)
+
+    return src
+    
+def paintCorner(img,color,corner_size=40):
+    """
+    """
+    h,w = img.shape[:2]
+    thickness = corner_size//2
+    cv2.ellipse(img, (0+corner_size-thickness//2,      0+corner_size-thickness//2),(corner_size,corner_size),0,180,270,color,thickness)
+    cv2.ellipse(img, (w-corner_size+thickness//2-1,  0+corner_size-thickness//2),(corner_size,corner_size),0,270,360,color,thickness)
+    cv2.ellipse(img, (0+corner_size-thickness//2,      h-corner_size+thickness//2-1),(corner_size,corner_size),0,90,180,color,thickness)
+    cv2.ellipse(img, (w-corner_size+thickness//2-1,  h-corner_size+thickness//2-1),(corner_size,corner_size),0,0,90,color,thickness)    
+    
+    
+
 def computeStatOnArucoDict(aruco_dict):
     i = 0
     while 1:
@@ -45,7 +153,7 @@ def computeStatOnArucoDict(aruco_dict):
     print("nNbrMarkers: %s" % nNbrMarkers )
 # computeStatOnArucoDict - end
 
-def generateImage( nNumMark, strName, strDstPath = "./generated/", strSrcPath = "./imgs/" ):
+def generateImage( nNumMark, strName, strDstPath = "./generated/", strSrcPath = "./imgs/", strLogoFilename = "logo_sbr.jpg", bPrintName=False ):
     try: os.makedirs( strDstPath )
     except: pass
 
@@ -65,10 +173,23 @@ def generateImage( nNumMark, strName, strDstPath = "./generated/", strSrcPath = 
         strImgIn += "jpg"
         
     pic = cv2.imread(strImgIn,cv2.IMREAD_UNCHANGED) # also read potential alpha layer
+    if pic is None:
+        print("ERR: img '%s' not found" % strImgIn)
+        exit(1)
     hp, wp, nNbrPlane = pic.shape
     if nNbrPlane == 4:
         # set white to pixel containing alpha at 0
         pic = rgba2rgb( pic, white )
+        
+    if 1:
+        # if image < 600 faire *2
+        if pic.shape[1]<600:
+            pic = cv2.resize(pic,(0,0),fx=2,fy=2)
+        # round corner
+        #rounded_rectangle(pic,(0,0),(hp,wp))
+        #~ addRoundedRectangleBorder(pic)
+        paintCorner(pic,(255,255,255),40)
+        
         
     #~ BGRA[y,x,3]
     
@@ -132,7 +253,7 @@ def generateImage( nNumMark, strName, strDstPath = "./generated/", strSrcPath = 
 
     if 1:
         # too bad redoing that for each image!!!
-        logo = cv2.imread("logo_sbr.jpg")
+        logo = cv2.imread(strLogoFilename)
         hl,wl,dummy = logo.shape
         wlf = 400
         hlf = (wlf*hl) // wl
@@ -140,6 +261,14 @@ def generateImage( nNumMark, strName, strDstPath = "./generated/", strSrcPath = 
         nAddedMargin = 30
         #im[h-hlf-nMarginBorder-nAddedMargin:h-nMarginBorder-nAddedMargin,w-wlf-nMarginBorder-nAddedMargin:w-nMarginBorder-nAddedMargin] = logo
         im[h-hlf-nMarginBorder-nAddedMargin:h-nMarginBorder-nAddedMargin,nMarginBorder+nAddedMargin+10:nMarginBorder+nAddedMargin+wlf+10] = logo
+    
+    if bPrintName:
+        nFontScale = 2
+        nFontThickness = 3
+        nMarginH = 30
+        (nLegendW, nLegendH), baseline = cv2.getTextSize(strName,cv2.FONT_HERSHEY_SIMPLEX, nFontScale,nFontThickness)
+        cv2.putText(im,strName, (w//2-nLegendW//2,h_pic_dst+ypic+nLegendH+nMarginH), cv2.FONT_HERSHEY_SIMPLEX, nFontScale, (0,0,0), nFontThickness )
+        
     cv2.imwrite(strImgOut, im)
 
     if 0:
@@ -188,7 +317,7 @@ def genereatePdfFromImages( listImgs, strOutPdfFilename, nOuputType=0 ):
         
     
 
-def generateFromCsv(strCsvFile):
+def generateFromCsv(strCsvFile,strImgPath="./imgs/", strLogoFilename = "logo_sbr.jpg", bPrintName=False):
     """
     generate all images and python datas from the global list as a csv
     - strCsvFile: global list as a csv
@@ -197,8 +326,10 @@ def generateFromCsv(strCsvFile):
     line = file.readline() # skip headers
     line = file.readline() # 2nd line
     nCpt = 0
+    nCptEmptyLine = 0
     listFiles = []
     dictArucoDef = {} # store to generate a python library file
+
     while 1:
         line = file.readline()
         if len(line)<4:
@@ -208,12 +339,17 @@ def generateFromCsv(strCsvFile):
         print( "splitted: %s" % splitted )
         strNumMark, strName, strCategory, strEnglish, strFrench = splitted[:5]
         if strName == '':
+            nCptEmptyLine += 1
+            if nCptEmptyLine >= 20:
+                print("WRN: %d empty line, exiting..." % (nCptEmptyLine))
+                break # skip before the subject part
             continue
+        nCptEmptyLine = 0
         nNumMark = int(strNumMark)
         strOutFilename = None
-        strOutFilename = generateImage( nNumMark, strName )
+        strOutFilename = generateImage( nNumMark, strName,strSrcPath=strImgPath, strLogoFilename = strLogoFilename, bPrintName=bPrintName )
         listFiles.append(strOutFilename)
-        dictArucoDef[nNumMark] = [strEnglish, strFrench]
+        dictArucoDef[nNumMark] = [strCategory,strEnglish, strFrench]
         nCpt += 1
         
         #~ if nCpt > 8:
@@ -227,7 +363,7 @@ def generateFromCsv(strCsvFile):
     out += "# tools are in abcdk/aruco_global_tools.py\n"
     out += "dictDesc = {\n"
     for k,d in sorted(dictArucoDef.items() ):
-        out += "  %d: {'en': %s, 'fr': %s},\n" % (k,repr(d[0]),repr(d[1])) # ( (k,) + tuple(d) )
+        out += "  %d: {'categ':%s, 'en': %s, 'fr': %s},\n" % (k,repr(d[0]),repr(d[1]),repr(d[2])) # ( (k,) + tuple(d) )
     out += "}\n"
     global global_dictionnary_type
     out += "nDictionaryType = %s" % global_dictionnary_type
@@ -239,4 +375,5 @@ def generateFromCsv(strCsvFile):
         
 
 # generateFromCsv - end    
-generateFromCsv( "aruco_global_list - table1.csv" )
+#~ generateFromCsv( "aruco_global_list - table1.csv" )
+generateFromCsv( "aruco_airbus - table1.csv", strImgPath="./imgs_airbus/", strLogoFilename="logo_airbus.png", bPrintName=1 )

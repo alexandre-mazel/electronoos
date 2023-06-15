@@ -1010,6 +1010,7 @@ class CardGame:
         if len(q)==1:
             print("WRN: chooseQuestion: no question for %s: %s" % (idx,q[0]))
             return self.chooseQuestion() # pick another one!
+
         idxq = random.randint(1,len(q)-1)
 
         num = abcdk.aruco_global_tools.findByName(self.strAnswer)

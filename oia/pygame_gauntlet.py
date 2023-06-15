@@ -480,10 +480,11 @@ runGame()
 
 """
 terminal:
-faire des tps sur 1 mois (sur une notion speciofique?)
-puis 3 dernier mois un gros prokjets
+faire des tps sur 1 mois (sur une notion specifique?)
+puis 3 dernier mois un gros projets.
 
 premiere:
 la partie sur les classe va trop vite
 plusse de  cours
 """
+

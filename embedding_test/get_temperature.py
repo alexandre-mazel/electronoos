@@ -9,11 +9,15 @@ global_loadedEmbedPosNeg = None
 
 # a list of tagged reference,
 # the idea if to find closer sentence and get it's positiveness
+#
+# imagine the text as an answer to the question: tu aime ce film ?
+#
 listPosNegRef = [
     # mettre a la fois des phrase a la premiere et troisieme personne, attention a bien les balancer
     # si une a la 3ieme, mettre son contraire aussi a la 3ieme
     ["super",1.],
     ["agréable",1.],
+    #~ ["passionnant",1.], # nazi et ben laden sortent sur passionnant en 2ieme au lieu de dégoutant et nul!
     ["c'est agréable",1.],
     ["c'est bien",0.6],
     ["c'est très bien",0.6],
@@ -51,29 +55,63 @@ listPosNegRef = [
     ["je n'aime pas du tout",-1.],
 ]
 
-def loadPosNeg():
+# imagine la question: As tu dormi ? / as tu mangé ?
+listYesNoRef = [
+    ["tout à fait",1.],
+    ["oui",0.9],
+    ["un peu",-0.3],
+    ["moyen",0.],
+    ["bof",0.],
+    ["pas trop",-0.3],
+    ["non",-0.9],
+    ["pas du tout",-1.],
+]
+
+def loadPosNeg( bForceGeneration = False ):
     global global_loadedEmbedPosNeg
     if global_loadedEmbedPosNeg !=  None:
         return global_loadedEmbedPosNeg
         
-    bForceGeneration = 1
-    bForceGeneration = 0
-    
+    #~ bForceGeneration = 1
+
     fn_embed = "posneg_embed_camembert.txt"
     if not os.path.isfile(fn_embed) or bForceGeneration:
-        print("generating embedding to %s..." % fn_embed)
+        print("INF: loadPosNeg: generating embedding and storing %d embedding to %s..." % (len(listPosNegRef),fn_embed))
         listOnlyStr = [e[0] for e in listPosNegRef]
         #~ print(listOnlyStr)
         global_loadedEmbedPosNeg = sentence_embedding.camEmbedList( listOnlyStr )
         sentence_embedding.saveEmbed(fn_embed,global_loadedEmbedPosNeg)
     else:
-       print("loading from %s..." % fn_embed)
-       global_loadedEmbedPosNeg = sentence_embedding.loadEmbed(fn_embed)
+        print("INF: loadPosNeg: loading from %s..." % fn_embed)
+        embed = sentence_embedding.loadEmbed(fn_embed)
+        print("INF: loadPosNeg: %d embedding(s) loaded" % len(embed))
+        #~ print("DBG: loadPosNeg: %d sentences in ref" % len(listPosNegRef))
+        if len(embed) != len(listPosNegRef):
+            if bForceGeneration:
+                print("ERR: generation error size differs (%d!=%d)" % (len(embed),len(listPosNegRef)))
+                return None
+            print("WRN: loadPosNeg: regenerating (size differs)" % len(embed))
+            return loadPosNeg(bForceGeneration=True)
+        global_loadedEmbedPosNeg = embed
+           
     return global_loadedEmbedPosNeg
+    
+def getFloatFromEmbed():
+    
+    
+def getYesNo(s,bVerbose=0):
+    """
+    return a float [-1,1] of the positivness of a sentence
+    eg:
+        - "oui" => 1.
+        - "non" => -1.
+    """
+    pass
+    
 
 def getPosNeg(s,bVerbose=0):
     """
-    return a float [-1,1] of the positivness of a sentence
+    return a float [-1,1] of the positivness/likeliness of a sentence
     eg:
         - "C'est super" => 1.
         - "C'est trop nul" => -1.
@@ -116,7 +154,7 @@ def getPosNeg(s,bVerbose=0):
 def autotest():
     
     bVerbose = 1
-    bVerbose = 0
+    #~ bVerbose = 0
     
     al = [
              ["Je suis content",0.8],

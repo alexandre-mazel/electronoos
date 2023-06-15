@@ -16,6 +16,7 @@ listPosNegRef = [
     # mettre a la fois des phrase a la premiere et troisieme personne, attention a bien les balancer
     # si une a la 3ieme, mettre son contraire aussi a la 3ieme
     ["super",1.],
+    #~ ["top",1.],  # TODO: pourquoi ca ajoute une erreur?
     ["agréable",1.],
     #~ ["passionnant",1.], # nazi et ben laden sortent sur passionnant en 2ieme au lieu de dégoutant et nul!
     ["c'est agréable",1.],
@@ -184,7 +185,7 @@ def getYesNo(s,bVerbose=0):
 def autotestPosNeg():
     
     bVerbose = 1
-    #~ bVerbose = 0
+    bVerbose = 0
     
     al = [
                 ["Je suis content",0.8],
@@ -362,7 +363,7 @@ def autotestYesNo():
 
 def autotest():
         autotestPosNeg()
-        #~ autotestYesNo()
+        autotestYesNo()
         
 def interactiveLoop():
     print("\nApprenons à mieux nous connaitre!\n")
@@ -376,4 +377,4 @@ def interactiveLoop():
  
 if __name__ == "__main__":
     autotest()
-    #~ interactiveLoop()
+    interactiveLoop()

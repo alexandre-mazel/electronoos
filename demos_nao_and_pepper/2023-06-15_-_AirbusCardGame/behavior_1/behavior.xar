@@ -958,8 +958,8 @@ class CardGame:
         self.nNumQuestion = 0
         self.listTextMulti = {
             "WELCOME": ("Welcome to the airbus quizz","Bienvenue dans le qouizz airbus."),
-            "CORRECT": ("todo","Bravo, c'est bien le %s !"),
-            "WRONG": ("todo","Non ce n'est pas ça. Essaye encore"),
+            "CORRECT": ("Correct, it's the %s!","Bravo, c'est bien le %s !"),
+            "WRONG": ("Bad answer, try again!","Non ce n'est pas ça. Essaye encore"),
             "PASS": ("Anyway","Passons"),
             "LETS_START": ("Let's start:","C'est parti:"),
             "NEW_QUESTION": ("New question:","Nouvelle question:"),
@@ -972,9 +972,9 @@ class CardGame:
 
     def loadQuestions(self,strBehaviorPath):
         print("INF: CardGame.loadQuestions: strBehaviorPath: %s" % strBehaviorPath )
-        strFileName = "Airbus_airplane_questions - Feuille 1.csv"
-        if self.getLangIndex() == 0:
-            strFileName = "Airbus_airplane_questions_en - Feuille 1.csv"
+        strFileName = "Airbus_airplane_questions - en.csv"
+        if self.getLangIndex() == 1:
+            strFileName = "Airbus_airplane_questions - fr.csv"
         lines = abcdk.filetools.loadCsv(strBehaviorPath + "/../" + strFileName,bSkipHeader=True)
         print("DBG: CardGame.loadQuestions: loaded = " + str(lines))
         for line in lines:

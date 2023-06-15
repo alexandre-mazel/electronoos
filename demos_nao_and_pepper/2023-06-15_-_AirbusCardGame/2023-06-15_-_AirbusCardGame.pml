@@ -6,7 +6,8 @@
     </BehaviorDescriptions>
     <Dialogs />
     <Resources>
-        <File name="Airbus_airplane_questions - Feuille 1" src="Airbus_airplane_questions - Feuille 1.csv" />
+        <File name="Airbus_airplane_questions - en" src="Airbus_airplane_questions - en.csv" />
+        <File name="Airbus_airplane_questions - fr" src="Airbus_airplane_questions - fr.csv" />
     </Resources>
     <Topics />
     <IgnoredPaths />

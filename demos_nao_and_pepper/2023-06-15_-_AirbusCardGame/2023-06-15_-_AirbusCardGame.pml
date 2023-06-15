@@ -5,7 +5,9 @@
         <BehaviorDescription name="behavior" src="behavior_1" xar="behavior.xar" />
     </BehaviorDescriptions>
     <Dialogs />
-    <Resources />
+    <Resources>
+        <File name="Airbus_airplane_questions - Feuille 1" src="Airbus_airplane_questions - Feuille 1.csv" />
+    </Resources>
     <Topics />
     <IgnoredPaths />
     <Translations auto-fill="en_US">

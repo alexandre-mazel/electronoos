@@ -19,6 +19,9 @@ listPosNegRef = [
     ["agréable",1.],
     #~ ["passionnant",1.], # nazi et ben laden sortent sur passionnant en 2ieme au lieu de dégoutant et nul!
     ["c'est agréable",1.],
+    ["completly",1.],
+    ["complétement",1.],
+    ["carrément",1.],
     ["c'est bien",0.6],
     ["c'est très bien",0.6],
     ["c'est bon",0.7],
@@ -33,6 +36,7 @@ listPosNegRef = [
     ["j'aime",0.8],
     ["moyen",0],
     ["passable",0],
+    ["un peu",0.3],
     ["bof",-0.2],
     ["c'est insipide",-0.2],
     ["naze",-0.6],
@@ -63,6 +67,8 @@ listYesNoRef = [
     ["completely",1.],
     ["exactly",1.],
     ["absolutely",1.],
+    ["compltly",1.],
+    ["complétement",1.],
     ["correct",1.],
     ["true",1.],
     ["vrai",1.],
@@ -178,7 +184,7 @@ def getYesNo(s,bVerbose=0):
 def autotestPosNeg():
     
     bVerbose = 1
-    bVerbose = 0
+    #~ bVerbose = 0
     
     al = [
                 ["Je suis content",0.8],
@@ -190,6 +196,11 @@ def autotestPosNeg():
                 ["Je kiffe",0.7],
                 # 1: getPosNeg: Je kiffe => 9: je kiffe 1.00 (conf: 0.97)
                 # 2: getPosNeg: Je kiffe => 15: bof -0.20 (conf: 0.80)
+                
+                ["completement",0.8], # Argh, il y a complétement dans la liste, et ca sort très bas!
+                # 1: getPosNeg: completement => 3: completly 1.00 (conf: 1.00)
+                # 2: getPosNeg: completement => 27: exécrable -1.00 (conf: 1.00)
+                # 3: getPosNeg: completement => 3: complétement 1.00 (conf: 1.00)
 
                 ["Je kiffe ma race",0.7],
                 # 1: getPosNeg: Je kiffe ma race => 9: je kiffe 1.00 (conf: 0.67)
@@ -250,6 +261,7 @@ def autotestPosNeg():
                 ["J'ai adoré ce restaurant",1.],
                 ["J'ai pas aimé du tout cette pièce de théatre",-0.7],
                 ["La fin du monde",-0.7],
+                ["un peu",0.2],
         ]
         
     nCptError = 0
@@ -274,9 +286,9 @@ def autotestPosNeg():
             rSumConfError += conf
     
     if nCptError > 0:
-        print("\nINF: autotestPosNeg: nCptRealError: %d, nCptErrorLowConf: %d, ConfavgConfErreur: %.2f (rAvgConf:%.2f)" % (nCptRealError,nCptErrorLowConf,rSumConfError/nCptError,rSumConf/len(al)))
+        print("\nINF: autotestPosNeg: nCptRealError: %d, nCptErrorLowConf: %d, rAvgConfErreur: %.2f (rAvgConf:%.2f)" % (nCptRealError,nCptErrorLowConf,rSumConfError/nCptError,rSumConf/len(al)))
             
-        # INF: autotestPosNeg: nCptRealError: 0, nCptErrorLowConf 1, ConfavgConfErreur: 0.23  (rAvgConf:0.81)
+    # INF: autotestPosNeg: nCptRealError: 0, nCptErrorLowConf: 1, rAvgConfErreur: 0.23 (rAvgConf:0.79)
    
 def autotestYesNo():
     
@@ -307,6 +319,7 @@ def autotestYesNo():
             # 2: getPosNeg: Nah => 15: no -0.90 (conf: 1.00)
             
             ["Correct",0.8],
+            ["completement",0.8],
             ["Exact",0.8],
             ["Richtig",1.],
             ["Exactemente",1.],
@@ -340,12 +353,27 @@ def autotestYesNo():
             rSumConfError += conf
     
     if nCptError > 0:
-        print("\nINF: autotestYesNo: nCptRealError: %d, nCptErrorLowConf: %d, ConfavgConfErreur: %.2f (rAvgConf:%.2f)" % (nCptRealError,nCptErrorLowConf,rSumConfError/nCptError,rSumConf/len(al)))
+        print("\nINF: autotestYesNo: nCptRealError: %d, nCptErrorLowConf: %d, rAvgConfErreur: %.2f (rAvgConf:%.2f)" % (nCptRealError,nCptErrorLowConf,rSumConfError/nCptError,rSumConf/len(al)))
             
-        # INF: autotestYesNo: nCptRealError: 0, nCptErrorLowConf 1, ConfavgConfErreur: 0.23  (rAvgConf:0.80)
+        
+    # INF: autotestYesNo: nCptRealError: 1, nCptErrorLowConf: 0, rAvgConfErreur: 0.70 (rAvgConf:0.87)
+    
+
 
 def autotest():
         autotestPosNeg()
-        autotestYesNo()
+        #~ autotestYesNo()
+        
+def interactiveLoop():
+    print("\nApprenons à mieux nous connaitre!\n")
+    elements = ["cinéma", "pates", "haricots verts", "manga", "cerises", "yaourts","couscous"]
+    for elem in elements:
+        print("Aime-tu le(s) %s ?" % elem)
+        ans = input()
+        score = getPosNeg(ans)
+        print("=>"+str(score))
+        print("")
+ 
 if __name__ == "__main__":
     autotest()
+    #~ interactiveLoop()

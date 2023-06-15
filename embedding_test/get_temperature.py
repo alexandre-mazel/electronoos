@@ -112,10 +112,11 @@ def loadEmbed( listValueRef, strFileNameEmbedCache,bForceGeneration = False ):
     globals()[globalVarName] = embed
     return embed
     
-def getValueFromEmbed( s, listRef, strFileNameEmbedCache, bVerbose=False ):
+def getValueFromEmbed( s, listRef, strFileNameEmbedCache, bVerbose=False, rGoodSimi=0.36 ):
     """
     compute average value of the two bests similarity
     return value, confidence
+    - rGoodSimi: similarity to have a confidence of 1
     """
     bPrint = 1
     bPrint = bVerbose
@@ -127,12 +128,12 @@ def getValueFromEmbed( s, listRef, strFileNameEmbedCache, bVerbose=False ):
     if bPrint: print("DBG: getPosNeg: refs: %s and %s" % (listRef[bests[0][0]],listRef[bests[1][0]]))
     imax = bests[0][0]
     simi = bests[0][1]
-    conf = min(simi/0.36,1.)
+    conf = min(simi/rGoodSimi,1.)
     sref,vref = listRef[imax]
     if bPrint: print("# 1: getPosNeg: %s => %d: %s %.2f (conf: %.2f)" % (s,imax,sref,vref,conf ) )
     imax2 = bests[1][0]
     simi2 = bests[1][1]
-    conf2 = min(simi2/0.36,1.)
+    conf2 = min(simi2/rGoodSimi,1.)
     sref2,vref2 = listRef[imax2]
     if bPrint: print("# 2: getPosNeg: %s => %d: %s %.2f (conf: %.2f)" % (s,imax2,sref2,vref2,conf2 ) )
     
@@ -154,16 +155,6 @@ def getValueFromEmbed( s, listRef, strFileNameEmbedCache, bVerbose=False ):
     
     
     
-def getYesNo(s,bVerbose=0):
-    """
-    return a float [-1,1] of the positivness of a sentence
-    eg:
-        - "oui" => 1.
-        - "non" => -1.
-    """
-    return getValueFromEmbed(s,listYesNoRef,"yesno_embed_camembert_cache.txt",bVerbose=bVerbose)
-    
-
 def getPosNeg(s,bVerbose=0):
     """
     return a float [-1,1] of the positivness/likeliness of a sentence
@@ -172,6 +163,17 @@ def getPosNeg(s,bVerbose=0):
         - "C'est trop nul" => -1.
     """
     return getValueFromEmbed(s,listPosNegRef,"posneg_embed_camembert_cache.txt",bVerbose=bVerbose)
+    
+    
+def getYesNo(s,bVerbose=0):
+    """
+    return a float [-1,1] of the positivness of a sentence
+    eg:
+        - "oui" => 1.
+        - "non" => -1.
+    """
+    return getValueFromEmbed(s,listYesNoRef,"yesno_embed_camembert_cache.txt",bVerbose=bVerbose,rGoodSimi=0.5)
+
 
 def autotestPosNeg():
     
@@ -284,7 +286,7 @@ def autotestYesNo():
             ["oui",0.8],
             ["yeah!",0.8],
             ["non",-0.8],
-            #~ ["OUI",0.8], # tres decevant !
+            ["OUI",0.8], # tres decevant !
             # 1: getPosNeg: OUI  => 10: bof 0.00 (conf: 1.00)
             # 2: getPosNeg: OUI  => 7: yes 0.90 (conf: 1.00)
             

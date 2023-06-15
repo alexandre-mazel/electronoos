@@ -10,7 +10,7 @@ dictDesc = {
   107: {'categ':'airplane', 'en': 'A330-MRTT', 'fr': 'A330-MRTT'},
   108: {'categ':'airplane', 'en': 'A350', 'fr': 'A350'},
   109: {'categ':'airplane', 'en': 'A380', 'fr': 'A380'},
-  110: {'categ':'airplane', 'en': 'A400m', 'fr': 'A400m'},
+  110: {'categ':'airplane', 'en': 'A400M', 'fr': 'A400M'},
   113: {'categ':'airplane', 'en': 'Eurofighter', 'fr': 'Eurofighter'},
   115: {'categ':'helicopter', 'en': 'H145', 'fr': 'H145'},
   116: {'categ':'helicopter', 'en': 'H160', 'fr': 'H160'},

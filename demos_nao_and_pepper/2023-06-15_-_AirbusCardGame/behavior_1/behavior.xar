@@ -696,7 +696,7 @@ pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0"
 
     def onInput_onStop(self):
         self.onUnload() #~ it is usually a good idea to call onUnload of this box in a onStop method, as the code written in onUnload is used to finish the working of the box as well
-        pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="0" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /></Box><Link inputowner="1" indexofinput="2" outputowner="0" indexofoutput="4" /><Link inputowner="0" indexofinput="8" outputowner="1" indexofoutput="4" /><Link inputowner="2" indexofinput="2" outputowner="0" indexofoutput="5" /><Link inputowner="0" indexofinput="9" outputowner="2" indexofoutput="4" /><Link inputowner="3" indexofinput="2" outputowner="0" indexofoutput="6" /><Link inputowner="0" indexofinput="10" outputowner="3" indexofoutput="4" /></Diagram></BehaviorKeyframe></BehaviorLayer></Timeline><Resource name="Head-sequence" type="Lock" timeout="0" /></Box><Box name="goto_question" id="4" localization="8" tooltip="gotoXxx - explicit&#x0A;Jump to a given frame (edit parameters to modify it) and stop the timeline parent at this index. The frame name is the one directly for the box name, so that it prevents copy-paste error and it&apos;s more explicit&#x0A;v0.6: first version" x="881" y="87"><bitmap>media/images/box/box-timeLine.png</bitmap><script language="4"><content><![CDATA[import datetime
+        pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="0" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /></Box><Link inputowner="1" indexofinput="2" outputowner="0" indexofoutput="4" /><Link inputowner="0" indexofinput="8" outputowner="1" indexofoutput="4" /><Link inputowner="2" indexofinput="2" outputowner="0" indexofoutput="5" /><Link inputowner="0" indexofinput="9" outputowner="2" indexofoutput="4" /><Link inputowner="3" indexofinput="2" outputowner="0" indexofoutput="6" /><Link inputowner="0" indexofinput="10" outputowner="3" indexofoutput="4" /></Diagram></BehaviorKeyframe></BehaviorLayer></Timeline><Resource name="Head-sequence" type="Lock" timeout="0" /></Box><Box name="goto_question" id="4" localization="8" tooltip="gotoXxx - explicit&#x0A;Jump to a given frame (edit parameters to modify it) and stop the timeline parent at this index. The frame name is the one directly for the box name, so that it prevents copy-paste error and it&apos;s more explicit&#x0A;v0.6: first version" x="1007" y="202"><bitmap>media/images/box/box-timeLine.png</bitmap><script language="4"><content><![CDATA[import datetime
 import time
 class MyClass(GeneratedClass):
     def __init__(self):
@@ -799,7 +799,108 @@ class MyClass(GeneratedClass):
         self.startBodyTalk( nSayID );
 
 # abcdk_BodyTalk - end
-pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onPrepare" type="1" type_size="1" nature="1" inner="0" tooltip="If you know you will talk, you can prepare to have a starting more reactive." id="2" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Start the box behavior" id="3" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="4" /><Input name="onSay" type="3" type_size="1" nature="1" inner="0" tooltip="automatic say and animate imput: just send some text, and it will say them while talking, if the text is enough long..." id="5" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="6" /><Parameter name="bUseHead" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Do we send movements to the head ?" id="7" /><Parameter name="rElevation" inherits_from_parent="0" content_type="2" value="-0.25" default_value="0" min="-0.5" max="0.5" tooltip="" id="8" /><Parameter name="rSide" inherits_from_parent="0" content_type="2" value="0" default_value="0" min="-1" max="1" tooltip="" id="9" /><Parameter name="bTrackFace" inherits_from_parent="0" content_type="0" value="0" default_value="0" tooltip="Mario use face tracking to look at human" id="10" /><Parameter name="astrJointsToExclude" inherits_from_parent="0" content_type="3" value="[]" default_value='[&quot;RArm&quot;]' custom_choice="1" tooltip="a string to evaluate as an array: it&apos;s a list of obstacles" id="11"><Choice value="[]" /><Choice value='[&quot;RHand&quot;]' /><Choice value='[&quot;RArm&quot;]' /></Parameter><Parameter name="astrObstacles" inherits_from_parent="0" content_type="3" value="[]" default_value='[&quot;Table&quot;]' custom_choice="0" tooltip="a string to evaluate as an array: it&apos;s a list of obstacles" id="12"><Choice value="[]" /><Choice value='[&quot;Table&quot;]' /></Parameter><Parameter name="bWaitEndOfRestMovement" inherits_from_parent="0" content_type="0" value="0" default_value="1" tooltip="The box will wait for the rest movement to be finished. So when the stop is triggered, no movement is on the stack. (default)" id="13" /></Box><Link inputowner="11" indexofinput="2" outputowner="0" indexofoutput="4" /><Link inputowner="1" indexofinput="2" outputowner="11" indexofoutput="4" /><Link inputowner="13" indexofinput="5" outputowner="1" indexofoutput="4" /><Link inputowner="2" indexofinput="2" outputowner="0" indexofoutput="1" /><Link inputowner="4" indexofinput="2" outputowner="2" indexofoutput="10" /><Link inputowner="3" indexofinput="5" outputowner="1" indexofoutput="5" /><Link inputowner="4" indexofinput="2" outputowner="3" indexofoutput="6" /></Diagram></BehaviorKeyframe><BehaviorKeyframe name="results" index="53"><Diagram /></BehaviorKeyframe></BehaviorLayer></Timeline></Box><Box name="CardGameClass" id="5" localization="8" tooltip="" x="488" y="31"><bitmap>media/images/box/box-python-script.png</bitmap><script language="4"><content><![CDATA[
+pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onPrepare" type="1" type_size="1" nature="1" inner="0" tooltip="If you know you will talk, you can prepare to have a starting more reactive." id="2" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Start the box behavior" id="3" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="4" /><Input name="onSay" type="3" type_size="1" nature="1" inner="0" tooltip="automatic say and animate imput: just send some text, and it will say them while talking, if the text is enough long..." id="5" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="6" /><Parameter name="bUseHead" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Do we send movements to the head ?" id="7" /><Parameter name="rElevation" inherits_from_parent="0" content_type="2" value="-0.25" default_value="0" min="-0.5" max="0.5" tooltip="" id="8" /><Parameter name="rSide" inherits_from_parent="0" content_type="2" value="0" default_value="0" min="-1" max="1" tooltip="" id="9" /><Parameter name="bTrackFace" inherits_from_parent="0" content_type="0" value="0" default_value="0" tooltip="Mario use face tracking to look at human" id="10" /><Parameter name="astrJointsToExclude" inherits_from_parent="0" content_type="3" value="[]" default_value='[&quot;RArm&quot;]' custom_choice="1" tooltip="a string to evaluate as an array: it&apos;s a list of obstacles" id="11"><Choice value="[]" /><Choice value='[&quot;RHand&quot;]' /><Choice value='[&quot;RArm&quot;]' /></Parameter><Parameter name="astrObstacles" inherits_from_parent="0" content_type="3" value="[]" default_value='[&quot;Table&quot;]' custom_choice="0" tooltip="a string to evaluate as an array: it&apos;s a list of obstacles" id="12"><Choice value="[]" /><Choice value='[&quot;Table&quot;]' /></Parameter><Parameter name="bWaitEndOfRestMovement" inherits_from_parent="0" content_type="0" value="0" default_value="1" tooltip="The box will wait for the rest movement to be finished. So when the stop is triggered, no movement is on the stack. (default)" id="13" /></Box><Box name="abcdk_BodyTalk (2)" id="5" localization="8" tooltip="The abcdk_bodytalk: start fast and lightweight.&#x0A;&#x0A;v0.96: optionnal no wait at end&#x0A;v0.95: handle obstacles and exclude joint&#x0A;v0.94: patching on every error case&#x0A;v0.93: onSay: add the global speech speed&#x0A;v0.92: onSay: add a pause before speaking&#x0A;v0.91b: add comments&#x0A;v0.91: add direct txt inputing&#x0A;v0.9: change initialisation&#x0A;v0.8: add a track face&#x0A;v0.7: add an option to disable head movement (so you can launch what you want on it)" x="700" y="90"><bitmap>media/images/box/interaction/say.png</bitmap><bitmap>media/images/box/movement/move.png</bitmap><script language="4"><content><![CDATA[# abcdk_BodyTalk
+# v0.96
+
+try: import abcdk.bodytalk
+except: pass # this error could occurs only on first execution, it's handled in the installer
+try: import abcdk.naoqitools
+except: pass
+try: import abcdk.speech
+except: pass
+
+if( 1 ):
+    import abcdk.bodytalk
+    reload(abcdk.bodytalk)
+    import abcdk.motiontools
+    reload(abcdk.motiontools)
+    reload(abcdk.speech)
+    import abcdk.tracking
+    reload(abcdk.tracking)
+    import abcdk.leds
+    reload(abcdk.leds)
+
+import time
+class MyClass(GeneratedClass):
+    """ insert here your comments about this class """
+    def __init__(self):
+        GeneratedClass.__init__(self);
+        try:
+            self.tts = ALProxy( "ALTextToSpeech" );
+        except Exception, err:
+            self.log( "ERR: tts seems not to be present, so we won't use it..." );
+            self.tts = False;
+
+    def onLoad(self):
+        self.bMustStop = False;
+        self.bIsRunning = False;
+
+    def onUnload(self):
+        self.onInput_onStop(); # stop current loop execution
+
+    def onInput_onPrepare(self):
+        abcdk.bodytalk.bodyTalk.prepare( bUseHead = self.getParameter( 'bUseHead' ), rSide = self.getParameter( "rSide" ), rElevation = self.getParameter( "rElevation" ),
+                    astrJointsToExclude = eval(self.getParameter( "astrJointsToExclude" )),
+                    astrObstacles = eval(self.getParameter( "astrObstacles" )),
+        );
+
+    def startBodyTalk( self, nSayID ):
+        self.log( self.boxName + ": start - begin" );
+
+        if( self.bIsRunning ):
+            self.log( self.boxName + ": already started => nothing" );
+            return;
+
+        self.bIsRunning = True;
+        self.bMustStop = False;
+
+        abcdk.bodytalk.bodyTalk.start( bUseHead = self.getParameter( 'bUseHead' ), bTrackFace = self.getParameter( 'bTrackFace' ),
+                nSayID = nSayID, astrJointsToExclude = eval(self.getParameter( "astrJointsToExclude" )), astrObstacles = eval(self.getParameter( "astrObstacles" )),
+        );
+        rPeriod = 0.5;
+        while( not self.bMustStop ):
+            bRet = abcdk.bodytalk.bodyTalk.update( rSide = self.getParameter( "rSide" ), rElevation = self.getParameter( "rElevation" ) );
+            if( not bRet ):
+                self.bMustStop = True;
+            time.sleep( rPeriod );
+        # end while
+        abcdk.bodytalk.bodyTalk.stop(self.getParameter("bWaitEndOfRestMovement"));
+        self.bIsRunning = False;
+        self.onStopped();
+        self.log( self.boxName + ": start - end" );
+
+
+    def onInput_onStart(self):
+        self.startBodyTalk( -1 );
+
+    def onInput_onStop(self):
+        self.bMustStop = True; # stop current loop execution
+
+    def onInput_onSay( self, strTxt ):
+        if( self.bIsRunning ):
+            self.log( "Already running => nothing..." );
+            return;
+        nSayID = self.tts.post.say( "\\PAU=700\\ " + abcdk.speech.getTextWithCurrentSpeed( strTxt ) );
+        self.startBodyTalk( nSayID );
+
+# abcdk_BodyTalk - end
+pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onPrepare" type="1" type_size="1" nature="1" inner="0" tooltip="If you know you will talk, you can prepare to have a starting more reactive." id="2" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Start the box behavior" id="3" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="4" /><Input name="onSay" type="3" type_size="1" nature="1" inner="0" tooltip="automatic say and animate imput: just send some text, and it will say them while talking, if the text is enough long..." id="5" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="6" /><Parameter name="bUseHead" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Do we send movements to the head ?" id="7" /><Parameter name="rElevation" inherits_from_parent="0" content_type="2" value="-0.25" default_value="0" min="-0.5" max="0.5" tooltip="" id="8" /><Parameter name="rSide" inherits_from_parent="0" content_type="2" value="0" default_value="0" min="-1" max="1" tooltip="" id="9" /><Parameter name="bTrackFace" inherits_from_parent="0" content_type="0" value="0" default_value="0" tooltip="Mario use face tracking to look at human" id="10" /><Parameter name="astrJointsToExclude" inherits_from_parent="0" content_type="3" value="[]" default_value='[&quot;RArm&quot;]' custom_choice="1" tooltip="a string to evaluate as an array: it&apos;s a list of obstacles" id="11"><Choice value="[]" /><Choice value='[&quot;RHand&quot;]' /><Choice value='[&quot;RArm&quot;]' /></Parameter><Parameter name="astrObstacles" inherits_from_parent="0" content_type="3" value="[]" default_value='[&quot;Table&quot;]' custom_choice="0" tooltip="a string to evaluate as an array: it&apos;s a list of obstacles" id="12"><Choice value="[]" /><Choice value='[&quot;Table&quot;]' /></Parameter><Parameter name="bWaitEndOfRestMovement" inherits_from_parent="0" content_type="0" value="0" default_value="1" tooltip="The box will wait for the rest movement to be finished. So when the stop is triggered, no movement is on the stack. (default)" id="13" /></Box><Box name="GetTextMultiLang" id="6" localization="8" tooltip="" x="598" y="0"><bitmap>media/images/box/box-python-script.png</bitmap><script language="4"><content><![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+
+    def onLoad(self):
+        #put initialization code here
+        pass
+
+    def onUnload(self):
+        #put clean-up code here
+        pass
+
+    def onInput_onStart(self):
+        self.onStopped(theGame.getTextMultiLang(self.getParameter("TextId"))) #activate the output of the box
+
+    def onInput_onStop(self):
+        self.onUnload() #it is recommended to reuse the clean-up as the box is stopped]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="3" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Parameter name="TextId" inherits_from_parent="0" content_type="3" value="PASS" default_value="" custom_choice="0" tooltip="Text id of the localized string to retrieve" id="5" /></Box><Link inputowner="11" indexofinput="2" outputowner="0" indexofoutput="4" /><Link inputowner="1" indexofinput="2" outputowner="11" indexofoutput="4" /><Link inputowner="13" indexofinput="5" outputowner="1" indexofoutput="4" /><Link inputowner="2" indexofinput="2" outputowner="0" indexofoutput="1" /><Link inputowner="3" indexofinput="5" outputowner="1" indexofoutput="5" /><Link inputowner="4" indexofinput="2" outputowner="3" indexofoutput="6" /><Link inputowner="5" indexofinput="5" outputowner="6" indexofoutput="4" /><Link inputowner="6" indexofinput="2" outputowner="2" indexofoutput="10" /><Link inputowner="4" indexofinput="2" outputowner="5" indexofoutput="6" /></Diagram></BehaviorKeyframe><BehaviorKeyframe name="results" index="53"><Diagram /></BehaviorKeyframe></BehaviorLayer></Timeline></Box><Box name="CardGameClass" id="5" localization="8" tooltip="" x="488" y="31"><bitmap>media/images/box/box-python-script.png</bitmap><script language="4"><content><![CDATA[
 tts = naoqi.ALProxy("ALTextToSpeech")
 
 class CardGame:
@@ -810,6 +911,9 @@ class CardGame:
             "WELCOME": ("Welcome to the airbus quizz","Bienvenue dans le qouizz airbus."),
             "CORRECT": ("todo","Bravo, c'est bien le %s !"),
             "WRONG": ("todo","Non ce n'est pas ça. Essaye encore"),
+            "PASS": ("Anyway","Passons"),
+            "LETS_START": ("Let's start:","C'est parti:"),
+            "NEW_QUESTION": ("New question:","Nouvelle question:"),
         }
         self.questions = [] # a list of name => skull of questions
 
@@ -818,7 +922,10 @@ class CardGame:
 
     def loadQuestions(self,strBehaviorPath):
         print("INF: CardGame.loadQuestions: strBehaviorPath: %s" % strBehaviorPath )
-        lines = abcdk.filetools.loadCsv(strBehaviorPath + "/../" + "Airbus_airplane_questions - Feuille 1.csv",bSkipHeader=True)
+        strFileName = "Airbus_airplane_questions - Feuille 1.csv"
+        if self.getLangIndex() == 0:
+            strFileName = "Airbus_airplane_questions_en - Feuille 1.csv"
+        lines = abcdk.filetools.loadCsv(strBehaviorPath + "/../" + strFileName,bSkipHeader=True)
         print("DBG: CardGame.loadQuestions: loaded = " + str(lines))
         for line in lines:
             if line[0] == "":
@@ -848,12 +955,21 @@ class CardGame:
         q = self.questions[idx]
         self.strAnswer = q[0]
         idxq = random.randint(1,len(q)-1)
-        strAeronef = "l'avion"
+
         num = abcdk.aruco_global_tools.findByName(self.strAnswer)
         strCateg = abcdk.aruco_global_tools.getArucoCategory(num)
-        if "copter" in strCateg:
-            strAeronef = "l'hélicoptère"
-        self.strQuestion = "quel est " + strAeronef + " " + q[idxq] + "?"
+
+        if self.getLangIndex() == 1:
+            strAeronef = "l'avion"
+            if "copter" in strCateg:
+                strAeronef = "l'hélicoptère"
+            self.strQuestion = "quel est " + strAeronef + " " + q[idxq] + "?"
+        else:
+            strAeronef = "airplane"
+            if "copter" in strCateg:
+                strAeronef = "helicopter"
+            self.strQuestion = "what is the " + strAeronef + " " + q[idxq] + "?"
+
         print("INF: chooseQuestion: QUESTION(%d,%d): %s" % (idx,idxq,self.strQuestion))
         print("INF: chooseQuestion: ANSWER: " + self.strAnswer)
 
@@ -861,9 +977,13 @@ class CardGame:
     def getQuestion( self ):
         o = ""
         if self.nNumQuestion == 0:
-            o += "C'est parti: \\PAU=500\\ "
+            o += self.getTextMultiLang("LETS_START")
+        else:
+            o += self.getTextMultiLang("NEW_QUESTION")
+        o += " \\PAU=500\\ "
         self.chooseQuestion()
         o += self.strQuestion
+        self.nNumQuestion += 1
         return o
 
     def receiveAnswer(self,a):

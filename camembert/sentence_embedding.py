@@ -203,7 +203,22 @@ def getBests(s,listEmbed,bVerbose=0,listWordForVerbose = []):
     if bComputeAverage:
         rAvg = rSumNotePonderate/rSumSimi
         rRef = rSumAll/len(listEmbed)
-        rDiff = (rAvg - rRef)*10
+        #~ rDiff = (rAvg - rRef)*10
+        if rAvg>rRef:
+            rDiff = rRef/rAvg
+        else:
+            rDiff = -rAvg/rRef
+            
+        # rDiff is fine, but not good for PosNeg (results looks inverted in that case!?!):
+        
+        # INF: PosNeg for 'J'ai adoré ce restaurant':
+        # => avg value: 0.15, diff: -0.94 (ref: -0.14)
+        # => J'ai adoré ce restaurant ref: 1.00,  posneg: 0.90, diff: 0.10 (conf: 0.97)
+        # INF: PosNeg for 'J'ai pas aimé du tout cette pièce de théatre':
+        # DBG: => avg value: -0.07, diff: 1.90 (ref: -0.14)
+        # => J'ai pas aimé du tout cette pièce de théatre ref: -0.70,  posneg: -1.00, diff: 0.30 (conf: 0.78)
+
+
         print("DBG: => avg value: %.2f, diff: %.2f (ref: %.2f)" % (rAvg,rDiff,rRef) )
         
             

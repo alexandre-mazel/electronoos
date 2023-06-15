@@ -159,13 +159,19 @@ def getBests(s,listEmbed,bVerbose=0,listWordForVerbose = []):
     simiMax2 = 0
     imax2 = -1
     e = camEmbed(s)
+    if bVerbose:
+        sortedDebug = []
     for i,v in enumerate(listEmbed):
         simi = np.dot(e,v)
         if bVerbose: 
             sEmb = ""
             if listWordForVerbose != []:
                 sEmb = listWordForVerbose[i]
-            print("DBG: getBests: %d, simi: %.3f %s" % (i,simi,sEmb)) 
+            print("DBG: getBests: %d, simi: %.3f %s" % (i,simi,sEmb))
+            sEmbStr = sEmb
+            if isinstance(sEmbStr,list):
+                sEmbStr = sEmbStr[0]
+            sortedDebug.append((simi,sEmbStr))
         if simi > simiMax:
             if bVerbose: print("DBG: getBests: new best!")
             simiMax2 = simiMax
@@ -177,6 +183,11 @@ def getBests(s,listEmbed,bVerbose=0,listWordForVerbose = []):
             imax2 = i
         else:
             if bVerbose: print("DBG: getBests: new best!")
+            
+    if bVerbose:
+        print("DBG: sortedDebug:")
+        for v in sorted(sortedDebug,reverse=True):
+            print("  %s: %.2f" % (v[1],v[0]))
             
     return [(imax,simiMax),(imax2,simiMax2)]
     

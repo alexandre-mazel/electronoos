@@ -946,6 +946,7 @@ pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0"
 tts = naoqi.ALProxy("ALTextToSpeech")
 try:
     import abcdk.display
+    reload(abcdk.display)
 except BaseException as err:
     print("ERR: Loading error: %s" % err)
 
@@ -968,14 +969,15 @@ class CardGame:
         self.questions = [] # a list of name => skull of questions
 
     def reset(self,strBehaviorPath):
-        self.loadQuestions(strBehaviorPath)
+        self.strBehaviorPath = strBehaviorPath
+        self.loadQuestions()
 
-    def loadQuestions(self,strBehaviorPath):
-        print("INF: CardGame.loadQuestions: strBehaviorPath: %s" % strBehaviorPath )
+    def loadQuestions(self):
+        print("INF: CardGame.loadQuestions: strBehaviorPath: %s" % self.strBehaviorPath )
         strFileName = "Airbus_airplane_questions - en.csv"
         if self.getLangIndex() == 1:
             strFileName = "Airbus_airplane_questions - fr.csv"
-        lines = abcdk.filetools.loadCsv(strBehaviorPath + "/../" + strFileName,bSkipHeader=True)
+        lines = abcdk.filetools.loadCsv(self.strBehaviorPath + "/../" + strFileName,bSkipHeader=True)
         print("DBG: CardGame.loadQuestions: loaded = " + str(lines))
         for line in lines:
             if line[0] == "":
@@ -1017,20 +1019,30 @@ class CardGame:
             strAeronef = "l'avion"
             if "copter" in strCateg:
                 strAeronef = "l'hélicoptère"
-            self.strQuestion = "quel est " + strAeronef + " " + q[idxq] + "?"
+            strStartQuestion = "Quel est " + strAeronef
         else:
             strAeronef = "airplane"
             if "copter" in strCateg:
                 strAeronef = "helicopter"
-            self.strQuestion = "what is the " + strAeronef + " " + q[idxq] + " ?"
+            strStartQuestion = "What is the " + strAeronef
+
+        self.strQuestion = strStartQuestion + " " + q[idxq] + " ?"
 
         print("INF: chooseQuestion: QUESTION(%d,%d): %s" % (idx,idxq,self.strQuestion))
         print("INF: chooseQuestion: ANSWER: " + self.strAnswer)
 
+        # ecris sur la tablette.
         #abcdk.display.writeMessageFullScreen(self.strQuestion)
         s = q[idxq]+" ?"
         s = s.replace("é","e").replace("ç","c").replace("à","a") # beurk !
-        abcdk.display.writeMessageFullScreen(s)
+        strStartQuestion = strStartQuestion.replace("é","e").replace("è","e")
+        if len(s)>16:
+            # cut second part of the line
+            words = s.split(" ")
+            mid = len(words)//2
+            s = " ".join(words[:mid])+ "\n" + " ".join(words[mid:])
+        background = self.strBehaviorPath + "/../tablet_screen_empty.png"
+        abcdk.display.writeMessageFullScreen(strStartQuestion+"\n"+s,strBackgroundImage=background)
 
 
     def getQuestion( self ):

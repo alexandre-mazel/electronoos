@@ -8,6 +8,7 @@
     <Resources>
         <File name="Airbus_airplane_questions - en" src="Airbus_airplane_questions - en.csv" />
         <File name="Airbus_airplane_questions - fr" src="Airbus_airplane_questions - fr.csv" />
+        <File name="tablet_screen_empty" src="tablet_screen_empty.png" />
     </Resources>
     <Topics />
     <IgnoredPaths />

@@ -109,7 +109,7 @@ class Bumper:
 # Load the cascade
 face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
-cap = cv2.VideoCapture(0) #ouvre la webcam
+cap = cv2.VideoCapture(3) #ouvre la webcam # 3: camera en usb
 
 bumper = Bumper(radius=9)
 

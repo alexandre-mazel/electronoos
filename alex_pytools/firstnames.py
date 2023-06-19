@@ -6,6 +6,8 @@ import time
 
 import stringtools
 
+import firstnames_extralist
+
 def assert_equal(a,b):
     if a == b:
         print("(%s==%s) => ok" % (a,b))
@@ -132,19 +134,20 @@ class Firstnames:
             
         # ajout de certains prénoms normaux, mais oublié
         rDefaultOcc = 3
-        listForgot = [
+        listForgot = (
                             ("Karine", True, ["fr"]),
                             ("Nadège", True, ["fr"]),
                             ("Marise", True, ["fr"]),
                             ("Maryse", True, ["fr"]),
                             ("Murielle", True, ["fr"]),
+                            ("Brittany", True, ["fr"]),
                             # marocain temp
                             ("Aissa", True, ["fr"]),
                             ("Chahinez", True, ["fr"]),
                             ("Cherazade", True, ["fr"]),
                             ("Ahmed", False, ["fr"]),
                             
-                        ]
+                        )
         
         for data in listForgot:
             strFirstname, bFemale, listCountries = data[:3]
@@ -156,6 +159,14 @@ class Firstnames:
             k = simpleString(strFirstname)
             self.dictFirstname[k] = (strFirstname, bFemale, tuple(listCountries), rOccurence)
                 
+        # add from firstnames_extra
+        if 1:
+            for strFirstname,nbr,rOccurence in firstnames_extralist.listExtra:
+                k = simpleString(strFirstname)
+                self.dictFirstname[k] = (strFirstname, False, ("?",), rOccurence)
+                if "ehdi" in strFirstname:
+                    print("el mehdi: %s" % str(self.dictFirstname[k]) )
+            
             
     def get( self, strFirstname ):
         """
@@ -174,6 +185,10 @@ class Firstnames:
         return a construction with minimal of less use firstname div by number of firstname
         return None if at least one firstname is not a known one
         """
+        
+        # specific case for firstname containing a space
+        if strFirstname.lower() in ["el mehdi"]:
+            return self.dictFirstname[strFirstname.lower()]
         listFirstName = strFirstname.replace('-', ' ')
         listFirstName = listFirstName.split(' ')
         minOcc = 150

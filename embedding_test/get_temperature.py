@@ -378,3 +378,4 @@ def interactiveLoop():
 if __name__ == "__main__":
     autotest()
     interactiveLoop()
+    # a voir, pouvoir dire top!

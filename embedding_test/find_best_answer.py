@@ -580,8 +580,8 @@ if 0:
     print("answer: %s" % faq[maxIdx][1])
     
     
-if 0:
-    # test sur faq en vrac
+if 1:
+    print("\n\n Test sur faq en vrac\n\n")
     sys.path.append("../camembert")
     import sentence_embedding
 
@@ -591,15 +591,23 @@ if 0:
     faq2 = chatbot_simple3.loadFaqSimple("./faq_drh.txt")
     faq3 = chatbot_simple3.loadFaqSimple("./faq_vrac.txt")
     faq = faq1+faq2+faq3
+    faq = faq2
 
     listQ = [item[0] for item in faq]
+    
+    for n,qa in enumerate(listQ):
+        print("%d: %s" % (n,qa))
     
     listQTest = [
                         "J'ai besoin d'envoyer un email",
                         "Je suis handicapé.",
+                        "J'ai 50 ans",
                         "Je suis végétarien.",
-                        "Quels sont les limitations sur la pose de congés?",
-                        "Quels sont les limitations sur la pose de vacances?",
+                        "Quelles sont les limitations sur la pose de congés?",
+                        "Quelles sont les limitations sur la pose de vacances?",
+                        "Quel sont les limitaton sur la pause de vacance?",
+                        "J'aurai des responsabilitées?"
+
                     ]
     
     listEmb = sentence_embedding.generateEmbedListCached(listQ,"faq_vrac_embed_camembert.txt")
@@ -673,7 +681,7 @@ Le Temps partagé : Ce terme désigne une organisation du travail d’une personne (
 
 """
 
-if 1:
+if 0:
     # generation de simi et de proximité pour des presentations:
     sys.path.append("../camembert")
     import sentence_embedding

@@ -193,6 +193,8 @@ def loopDialog(strHumanName):
         # model cl100k_base 	gpt-4, gpt-3.5-turbo, text-embedding-ada-002
         enc_tiktoken = tiktoken.get_encoding("cl100k_base") # count token in sentence
         
+    bUseVoice = 0
+        
     
     while 1:
         msg = ""
@@ -237,6 +239,8 @@ def loopDialog(strHumanName):
         
         # pricing:
         https://openai.com/pricing
+        mes depenses:
+        https://platform.openai.com/account/usage
         """
 
         if os.name == "nt":

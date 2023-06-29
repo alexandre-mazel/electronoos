@@ -17,5 +17,11 @@ dictDesc = {
   117: {'categ':'helicopter', 'en': 'H225', 'fr': 'H225'},
   120: {'categ':'airplane', 'en': 'A340', 'fr': 'A340'},
   121: {'categ':'airplane', 'en': 'Concorde', 'fr': 'Concorde'},
+  200: {'categ':'action', 'en': 'like', 'fr': 'aime'},
+  201: {'categ':'action', 'en': "don't like", 'fr': "n'aime pas"},
+  210: {'categ':'choice', 'en': 'A', 'fr': 'A'},
+  211: {'categ':'choice', 'en': 'B', 'fr': 'B'},
+  212: {'categ':'choice', 'en': 'C', 'fr': 'C'},
+  213: {'categ':'choice', 'en': 'D', 'fr': 'D'},
 }
 nDictionaryType = 7

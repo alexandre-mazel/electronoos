@@ -377,7 +377,15 @@ def pdf_full_page_to_img(src,dst):
                 listImg.append(output)
                 break; # exit of the for dpi
             except BaseException as err:
-                print("WRN: pdf_full_page_to_img: err occurs, trying with smaller def (dpi:%d), err:%s" % (dpi, err))
+                print("WRN: pdf_full_page_to_img: err occurs, trying with smaller def (dpi:%d), err: %s" % (dpi, err))
+                if "such file or directory" in str(err):
+                    print("\n"*5)
+                    print("ERR: Tu dois enlever et remettre la carte sur d:")
+                    print("waiting...")
+                    import misctools
+                    import time
+                    misctools.beepError(4)
+                    time.sleep(10)
     return listImg
 
 if __name__ == "__main__":

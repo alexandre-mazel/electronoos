@@ -166,12 +166,17 @@ def generateImage( nNumMark, strName, strDstPath = "./generated/", strSrcPath = 
     llgrey = 223,223,223
     black = 0,0,0
     
-    strImgIn = strSrcPath + strName + "."
-    if os.path.exists(strImgIn+"png"):
-        strImgIn += "png"
-    else:
-        strImgIn += "jpg"
+    for strSrcPathTest in [strSrcPath,"./imgs/"]:
+        strImgInNoExt = strSrcPathTest + strName + "."
         
+        strImgIn = strImgInNoExt+"png"        
+        if os.path.exists(strImgIn):
+            break
+        
+        strImgIn = strImgInNoExt+"jpg"        
+        if os.path.exists(strImgIn):
+            break
+            
     pic = cv2.imread(strImgIn,cv2.IMREAD_UNCHANGED) # also read potential alpha layer
     if pic is None:
         print("ERR: img '%s' not found" % strImgIn)
@@ -262,7 +267,7 @@ def generateImage( nNumMark, strName, strDstPath = "./generated/", strSrcPath = 
         #im[h-hlf-nMarginBorder-nAddedMargin:h-nMarginBorder-nAddedMargin,w-wlf-nMarginBorder-nAddedMargin:w-nMarginBorder-nAddedMargin] = logo
         im[h-hlf-nMarginBorder-nAddedMargin:h-nMarginBorder-nAddedMargin,nMarginBorder+nAddedMargin+10:nMarginBorder+nAddedMargin+wlf+10] = logo
     
-    if bPrintName:
+    if bPrintName and nNumMark < 200:
         nFontScale = 2
         nFontThickness = 3
         nMarginH = 30
@@ -303,7 +308,7 @@ def genereatePdfFromImages( listImgs, strOutPdfFilename, nOuputType=0 ):
         if bDoubleForVerso:
             pdf.add_page()
             for i in range(nNbrImagePerPage):
-                if nNumImage+i >= len(listImgs):
+                if nNumImage+i >= len(listImgs): # faire -1 ici si on veut mettre une photo que en recto en dernier (ajout de corto et gaia pour test)
                     break
                 pdf.image(listImgs[nNumImage+i],x=int(nImageW*((i+1)%2)), y=int(nImageH*(i//2)), w=nImageW)
             
@@ -354,6 +359,9 @@ def generateFromCsv(strCsvFile,strImgPath="./imgs/", strLogoFilename = "logo_sbr
         
         #~ if nCpt > 8:
             #~ break
+            
+    #~ listFiles.append("./generated/corto_gaia.png")
+    #~ print(listFiles)
     
     genereatePdfFromImages(listFiles, "generated.pdf")
     

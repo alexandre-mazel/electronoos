@@ -146,6 +146,7 @@ class Firstnames:
                             ("Chahinez", True, ["fr"]),
                             ("Cherazade", True, ["fr"]),
                             ("Ahmed", False, ["fr"]),
+                            ("Franky", False, ["fr"]),
                             
                         )
         

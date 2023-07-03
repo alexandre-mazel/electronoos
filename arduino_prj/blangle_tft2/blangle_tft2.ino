@@ -271,28 +271,67 @@ int render_bubble(int x,int y)
 
 float readFloatFromEeprom( int nOffset )
 {
-    float val;
-    byte *p = (byte*)&val;
-    for( int i = 0; i < 4; ++i)
-    {
-        p = EEPROM.read(nOffset);
-        ++nOffset;
-        ++p;
-    }
-    Serial.print( "readFloatFromEeprom: " );
-    Serial.println( val );
-    return val;
+  float val;
+  byte *p = (byte*)&val;
+  for( int i = 0; i < sizeof(float); ++i)
+  {
+      (*p) = EEPROM.read(nOffset);
+      ++nOffset;
+      ++p;
+  }
+  Serial.print( "readFloatFromEeprom: " );
+  Serial.println( val );
+  return val;
+}
+
+double readDoubleFromEeprom( int nOffset )
+{
+  Serial.print( "nOffset: " );
+  Serial.println( nOffset );
+  float val;
+  byte *p = (byte*)&val;
+  for( int i = 0; i < sizeof(double); ++i)
+  {
+      (*p) = EEPROM.read(nOffset);
+      ++nOffset;
+      ++p;
+  }
+  Serial.print( "readDoubleFromEeprom: " );
+  Serial.println( val );
+  return val;
 }
 
 void writeFloatToEeprom( int nOffset, float val )
 {
-    const byte *p = (byte*)&val;
-    for( int i = 0; i < 4; ++i)
-    {
-        EEPROM.write(nOffset,p);
-        ++nOffset;
-        ++p;
-    }
+  Serial.print("sizeof float: ");
+  Serial.println(sizeof(float));
+
+  const byte *p = (byte*)&val;
+  for( int i = 0; i < sizeof(float); ++i)
+  {
+      EEPROM.write(nOffset,*p);
+      ++nOffset;
+      ++p;
+  }
+}
+
+void writeDoubleToEeprom( int nOffset, double val )
+{
+  Serial.print( "writeDoubleToEeprom: " );
+  Serial.println( val );
+  Serial.print( "nOffset: " );
+  Serial.println( nOffset );
+
+  Serial.print("sizeof double: "); // on Mega2560, float=double=32bits
+  Serial.println(sizeof(double));
+
+  const byte *p = (byte*)&val;
+  for( int i = 0; i < sizeof(double); ++i)
+  {
+      EEPROM.write(nOffset,*p);
+      ++nOffset;
+      ++p;
+  }
 }
 
 
@@ -300,39 +339,42 @@ const int nNbrSettings = 8;
 int nNumSettingsSelected = 0; // 0 to nNbrSettings-1
 
 
-float presetCirc[nNbrSettings];
+double presetCirc[nNbrSettings] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
 
 const byte nEepromVersion = 100; // to differentiate from other program (arome...)
 void loadConfigFromEeprom()
 {
-    int nOffset = 0;
-    byte nEepromCurrent = EEPROM.read( nOffset );  nOffset += 1;
-    Serial.print( "eeprom current version: " );
-    Serial.println( nEepromCurrent );
-    if( nEepromVersion != nEepromCurrent )
-    {
-        // eg: first read
-        return;
-    }
-    Serial.println( "Loading eeprom..." );
-    
-    nNumSettingsSelected = EEPROM.read( nOffset );  nOffset += 1;
-    
-    for( int i = 0; i < nNbrSettings; ++i)
-    {
-        presetCirc[i] = readFloatFromEeprom( nOffset ); nOffset += 4;
-    }
+  int nOffset = 0;
+  byte nEepromCurrent = EEPROM.read( nOffset );  nOffset += 1;
+  Serial.print( "eeprom current version: " );
+  Serial.println( nEepromCurrent );
+  if( nEepromVersion != nEepromCurrent )
+  {
+      // eg: first read
+      return;
+  }
+  Serial.println( "Loading eeprom..." );
+  
+  nNumSettingsSelected = EEPROM.read( nOffset );  nOffset += 1;
+  Serial.print( "nNumSettingsSelected: " );
+  Serial.println( nNumSettingsSelected );
+  
+  for( int i = 0; i < nNbrSettings; ++i)
+  {
+      presetCirc[i] = readDoubleFromEeprom( nOffset ); nOffset += sizeof(double);
+  }
 }
 
-void saveConfigFromEeprom()
+void saveConfigToEeprom()
 {
-    int nOffset = 0;
-    EEPROM.write( nOffset, nEepromVersion ); nOffset += 1;
-    EEPROM.write( nOffset, nNumSettingsSelected ); nOffset += 1;
-    for( int i = 0; i < nNbrSettings; ++i)
-    {
-        writeFloatToEeprom( nOffset,presetCirc[i] ); nOffset += 4;
-    }
+  int nOffset = 0;
+  Serial.println("INF: saveConfigToEeprom");
+  EEPROM.write( nOffset, nEepromVersion ); nOffset += 1;
+  EEPROM.write( nOffset, nNumSettingsSelected ); nOffset += 1;
+  for( int i = 0; i < nNbrSettings; ++i)
+  {
+      writeDoubleToEeprom( nOffset,presetCirc[i] ); nOffset += sizeof(double);
+  }
 }
 
 
@@ -367,6 +409,7 @@ int render_screen(int nPresel, int nip, int db, int bubble, double circ,int bLoc
   static int nPrevDb = 9999;
   static int nPrevNip = 9999;
   static int nPrevBubble = 9999;
+  char buf[8];
   
   // dessine l'interface, ne redessinne que ce qui est utile
 
@@ -454,7 +497,10 @@ int render_screen(int nPresel, int nip, int db, int bubble, double circ,int bLoc
   tft.print("C=");
   tft.setCursor(tft.getCursorX()+8, tft.getCursorY()); // half space
   tft.setTextColor(WHITE, BLACK);
-  tft.print(circ,1);
+  //tft.print(circ,1);
+
+  snprintf(buf,8,"%4d.%1d", int(circ),int( 0.5+(circ-int(circ))*10 ) );
+  tft.print(buf);
   tft.setTextColor(WHITE);
   tft.print("mm");
 
@@ -502,8 +548,8 @@ int render_screen(int nPresel, int nip, int db, int bubble, double circ,int bLoc
     else
     {
       // cache les fleches
-      tft.fillRect( xArrow, yArrow,144,16,BLACK );
-      tft.fillRect( xArrow, yArrowBottom+8,144,16,BLACK );
+      tft.fillRect( xArrow, yArrow,144+32,16,BLACK );
+      tft.fillRect( xArrow, yArrowBottom+8,144+32,16,BLACK );
     }
   }
 
@@ -512,25 +558,25 @@ int render_screen(int nPresel, int nip, int db, int bubble, double circ,int bLoc
 void loop()
 {
     static uint8_t aspect = 0;
-    static int nPresel = 0; // num of preselection 0..7
     static int nLocked = 1;
-    static double arCirc[8] = {5550.5}; // mm
+    //static double arCirc[8] = {5550.5}; // mm
     //static double rCirc = 628.3; // proto de Vincent
     int y = 0;
     int dy = 0;
     int nip; //cm
     int db;
-    int bubble;
+    int bubble=0;
     //Serial.println("loop... blangle2");
 
 
     // update sensors
     bjy_update();
 
-    bubble = bjy_getAngle(0);
-    db = bjy_getAngle(1);
+    //bubble = bjy_getAngle(0);
+    // db = bjy_getAngle(1);
+    db = -bjy_getAngle(0);
     //nip = 2*rCirc*3.14159265358979323846264*db/360;
-    nip = (arCirc[nPresel]*db/360)/10/10; // /10 for angle, then /10 for cm
+    nip = (presetCirc[nNumSettingsSelected]*db/360)/10/10; // /10 for angle, then /10 for cm
     
 
     if(0)
@@ -644,7 +690,7 @@ void loop()
         }
 
         // debug: render touch point
-        if(1)
+        if(0)
         {
           for( int i = 0; i < sizeof(listPos)/2/2; ++i ) // /2(short) /2(x & y)
           {
@@ -685,6 +731,10 @@ void loop()
           {
             Serial.println("press lock !");
             nLocked = ! nLocked;
+            if(nLocked)
+            {
+              saveConfigToEeprom();
+            }
           }
           else if( i < 11 )
           {
@@ -698,29 +748,38 @@ void loop()
               if( i < 6 )
               {
                 //nAdd = pow(10,4-i)+0.5; // i = 1 => +1000 (pow 3), i = 4 => +1 (pow 0) - probleme d'arrondi, pow(10,4) => 999 !
-                rAdd = pow(10,4-i);
+                rAdd = pow(10,4-i)+0.01;
               }
               else
               {
-                rAdd = -pow(10,4-(i-5));
+                rAdd = -pow(10,4-(i-5))-0.01;
               }
               Serial.print("rAdd: ");
-              Serial.println(rAdd);
-              arCirc[nPresel] += rAdd;
+              Serial.println(rAdd,6);
+              presetCirc[nNumSettingsSelected] += rAdd;
+
+              // kill after centile
+              presetCirc[nNumSettingsSelected] = long(0.5+presetCirc[nNumSettingsSelected]*10)/10.;
+
+              if( presetCirc[nNumSettingsSelected] < 0 )
+                presetCirc[nNumSettingsSelected] = 0;
+              if( presetCirc[nNumSettingsSelected] > 9999.9 )
+                presetCirc[nNumSettingsSelected] = 9999.9;
+
               Serial.print("new circ: ");
-              Serial.println(arCirc[nPresel]);
+              Serial.println(presetCirc[nNumSettingsSelected],6);
             }
           }
           else
           {
             // presel
-            nPresel = i-11;
+            nNumSettingsSelected = i-11;
           }
         } // if idx_element != -1
         
       } // if bPressed
 
-      render_screen(nPresel,nip,db,bubble,arCirc[nPresel],nLocked);
+      render_screen(nNumSettingsSelected,nip,db,bubble,presetCirc[nNumSettingsSelected],nLocked);
 
     } // detect touch
 

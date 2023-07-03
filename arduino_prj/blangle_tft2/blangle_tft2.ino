@@ -250,6 +250,8 @@ int render_lock(int x,int y)
 
   // generated from electronoos\generate_img.py:
   // python C:\Users\alexa\dev\git\electronoos\generate_img\generate_img.py "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\just_lock.png" "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\just_arrow.png" "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\bubble.png" 4
+  // snas la bubble
+  // python C:\Users\alexa\dev\git\electronoos\generate_img\generate_img.py "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\just_lock.png" "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\just_arrow.png" 4
   // copy \tmp\imgs.* C:\Users\alexa\dev\git\electronoos\arduino_prj\blangle_tft2\ /Y
 
   render_img(x,y,IMG_1_SIZE_X,IMG_1_SIZE_Y,aImgs_1,aPalette_1);
@@ -263,7 +265,7 @@ int render_arrow(int x,int y,int flip=0)
 int render_bubble(int x,int y)
 {
   //render_img(x,y,IMG_3_SIZE_X,IMG_3_SIZE_Y,aImgs_3,aPalette_3,0,1); // trait noir
-  render_img(x,y,IMG_3_SIZE_X,IMG_3_SIZE_Y,aImgs_3,aPalette_3,0,0); // trait blanc (palette changé a la main dans le fichier généré)
+  //render_img(x,y,IMG_3_SIZE_X,IMG_3_SIZE_Y,aImgs_3,aPalette_3,0,0); // trait blanc (palette changé a la main dans le fichier généré)
 }
 
 
@@ -357,7 +359,7 @@ const int yArrowBottom = nAreaH+80+30;
 const int wArrow = 20;
 const int wInterArrow = 10;
 
-int render_screen(int nip, int db, int bubble, double circ,int bLocked)
+int render_screen(int nPresel, int nip, int db, int bubble, double circ,int bLocked)
 {
   static uint8_t bDrawed = 0;
   static uint8_t bPrevLocked = 2;
@@ -398,10 +400,19 @@ int render_screen(int nip, int db, int bubble, double circ,int bLocked)
 
     for( int i = 0; i < nNbrSettings; ++i)
     {
+      if( i == nPresel )
+      {
+       tft.setTextColor(BLUE); 
+      }
+      else
+      {
+        tft.setTextColor(WHITE);
+      }
       tft.setCursor(10, 6+i*h/nNbrSettings);
       tft.setTextSize(3);
       tft.print(i+1);
     }
+    tft.setTextColor(WHITE);
   }
 
 
@@ -496,6 +507,7 @@ int render_screen(int nip, int db, int bubble, double circ,int bLocked)
 void loop()
 {
     static uint8_t aspect = 0;
+    static int nPresel = 0; // num of preselection 0..7
     static int nLocked = 1;
     static double rCirc = 5550.5; // mm
     //static double rCirc = 628.3; // proto de Vincent
@@ -597,24 +609,51 @@ void loop()
       {
         const int dw_arrow = wArrow+wInterArrow;
         const int dh_arrow = 58;
-        short int listPos[(1+5*2)*2] = {
+        short int listPos[(1+5*2)*2+8*2] = {
                     xLock+wLock/2,yLock+hLock/2, // lock // 370/200 // 360/182
                     // 80,120, // first arrow
         };
         // add 10 arrows
         for( int i = 0; i < 5; ++i )
         {
-          listPos[2+i*2+0] = xArrow+i*dw_arrow;
-          listPos[2+i*2+1] = yArrow+i*dh_arrow;
+          listPos[2+i*2+0] = xArrow+i*dw_arrow+wArrow/2+1;
+          listPos[2+i*2+1] = yArrow+8;
+
+          if( i == 4)
+          {
+            // apres la virgule
+            listPos[2+i*2+0] += dw_arrow;
+          }
 
           // fleches du bas
           listPos[2+(i+5)*2+0] = listPos[2+(i+0)*2+0];
-          listPos[2+(i+5)*2+1] = listPos[2+(i+0)*2+1] + 61;
+          listPos[2+(i+5)*2+1] = listPos[2+(i+0)*2+1] + 86;
+
+        }
+
+        // add preselection menu
+        for( int i = 0; i < 8; ++i )
+        {
+          listPos[22+i*2+0] = nMenuW/2;
+          listPos[22+i*2+1] = (nMenuH/8)*i+16;
+        }
+
+        // debug: render touch point
+        if(1)
+        {
+          for( int i = 0; i < sizeof(listPos)/2/2; ++i ) // /2(short) /2(x & y)
+          {
+            for( int j =-2; j < 3; ++j )
+            {
+              tft.drawPixel(listPos[2+i*2+0]+j,listPos[2+i*2+1],GREEN);
+              tft.drawPixel(listPos[2+i*2+0]+j,listPos[2+i*2+1]+1,GREEN);
+            }
+          }
         }
 
         int nDistMin = 999999;
         int idx_element = -1;
-        for( int i = 0; i < 11; ++i )
+        for( int i = 0; i < 11+8; ++i )
         {
           // search hit, and choose nearest if many hits (enable overlap of area (when margin bigger than object))
           int posx = listPos[i*2];
@@ -646,8 +685,9 @@ void loop()
             Serial.println("press lock !");
             nLocked = ! nLocked;
           }
-          else
+          else if( i < 12 )
           {
+            // arrow
             double rAdd;
             // i = 1 to 5 pour fleches basses et 6 to 10 for low
             Serial.print("press arrow i: ");
@@ -655,7 +695,7 @@ void loop()
             if( i < 6 )
             {
               //nAdd = pow(10,4-i)+0.5; // i = 1 => +1000 (pow 3), i = 4 => +1 (pow 0) - probleme d'arrondi, pow(10,4) => 999 !
-              rAdd = pow(10,4-i)
+              rAdd = pow(10,4-i);
             }
             else
             {
@@ -667,11 +707,16 @@ void loop()
             Serial.print("new circ: ");
             Serial.println(rCirc);
           }
+          else
+          {
+            // presel
+            nPresel = i-11;
+          }
         } // if idx_element != -1
         
       } // if bPressed
 
-      render_screen(nip,db,bubble,rCirc,nLocked);
+      render_screen(nPresel,nip,db,bubble,rCirc,nLocked);
 
     } // detect touch
 

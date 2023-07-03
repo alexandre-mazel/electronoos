@@ -1,3 +1,5 @@
+#include <EEPROM.h>
+
 // install tft_espi using the library manager
 // or  copy TFT_eSPI-2.5.0.zip into 
 // to C:\Users\alexa\Documents\Arduino\libraries
@@ -168,6 +170,7 @@ void setup()
 
   Serial.println("DBG: Blangle v0.7");  
   Serial.println("Starting...");
+  loadConfigFromEeprom();
 }
 
 int render_img( const int x, const int y, const int w, const int h, const unsigned char* pImg, const unsigned char* pPalette, int flip=0, int neg=0)
@@ -270,10 +273,12 @@ float readFloatFromEeprom( int nOffset )
     byte *p = (byte*)&val;
     for( int i = 0; i < 4; ++i)
     {
-        p = EEPROM.read(nOffset)
+        p = EEPROM.read(nOffset);
         ++nOffset;
         ++p;
     }
+    Serial.print( "readFloatFromEeprom: " );
+    Serial.println( val );
     return val;
 }
 
@@ -282,7 +287,7 @@ void writeFloatToEeprom( int nOffset, float val )
     const byte *p = (byte*)&val;
     for( int i = 0; i < 4; ++i)
     {
-        p = EEPROM.write(nOffset,p)
+        EEPROM.write(nOffset,p);
         ++nOffset;
         ++p;
     }
@@ -334,22 +339,25 @@ const int h_screen = 320; // 240
 const int nMenuW = 36;
 const int nMenuH = h_screen;
 
-const int nBubbleW = 32; // bubble level
+const int nBubbleW = 0; // bubble level (was 32 to render it)
 const int nBubbleH = h_screen;
 const int nAreaW = (w_screen-nMenuW-nBubbleW)/2; // width of an area
 const int nAreaH = h_screen/2;
 const int nLineH = 8;
 
-const int xLock = nMenuW+304;
-const int yLock = nAreaH+32;
+const int xLock = nMenuW+342;
+const int yLock = nAreaH+20;
 
-const int xArrow = nMenuW+75;
-const int yArrow = nAreaH+22;
-const int yArrowBottom = nAreaH+80+3;
-const int wArrow = 16;
-const int wInterArrow = 8;
+const int wLock = 88;
+const int hLock = 124;
 
-int render_screen(int nip, int db, int bubble, float circ,int bLocked)
+const int xArrow = nMenuW+88;
+const int yArrow = nAreaH+32;
+const int yArrowBottom = nAreaH+80+30;
+const int wArrow = 20;
+const int wInterArrow = 10;
+
+int render_screen(int nip, int db, int bubble, double circ,int bLocked)
 {
   static uint8_t bDrawed = 0;
   static uint8_t bPrevLocked = 2;
@@ -380,7 +388,7 @@ int render_screen(int nip, int db, int bubble, float circ,int bLocked)
   if( ! bDrawed )
   {
     bDrawed = 1;
-    tft.setRotation(LANDSCAPE);
+    tft.setRotation(LANDSCAPE+2); // +2 => revert haut bas
     //tft.fillScreen(BLACK);
     tft.setTextColor(WHITE);
     tft.fillRect(0,0,nMenuW,nMenuH,GRAY);
@@ -425,8 +433,8 @@ int render_screen(int nip, int db, int bubble, float circ,int bLocked)
     tft.print("o");
   }
 
-  tft.setTextSize(4);
-  tft.setCursor(nMenuW+22, nAreaH+48);
+  tft.setTextSize(5);
+  tft.setCursor(nMenuW+20, nAreaH+64);
   tft.print("C=");
   tft.setCursor(tft.getCursorX()+8, tft.getCursorY()); // half space
   tft.setTextColor(WHITE, BLACK);
@@ -434,7 +442,7 @@ int render_screen(int nip, int db, int bubble, float circ,int bLocked)
   tft.setTextColor(WHITE);
   tft.print("mm");
 
-  if(nPrevBubble != bubble )
+  if(nPrevBubble != bubble && 0 )
   {
     // render bubble
     const int nBubbleSize2=32/2;
@@ -463,7 +471,7 @@ int render_screen(int nip, int db, int bubble, float circ,int bLocked)
     if( ! bLocked )
     {
       // cache le haut du verrou
-      tft.fillRect(nMenuW+304, nAreaH+32,40,30,BLACK);
+      tft.fillRect(xLock, yLock,80,48,BLACK);
 
       // affiche les fleches
       
@@ -489,14 +497,15 @@ void loop()
 {
     static uint8_t aspect = 0;
     static int nLocked = 1;
-    static float rCirc = 5550.5; // mm
+    static double rCirc = 5550.5; // mm
+    //static double rCirc = 628.3; // proto de Vincent
     int y = 0;
     int dy = 0;
     int nip; //cm
     int db;
     int bubble;
     //Serial.println("loop... blangle2");
-    rCirc = 628.3;
+
 
     // update sensors
     bjy_update();
@@ -581,7 +590,7 @@ void loop()
     
     if( (nCptFrame % 100)==0 ) // reading every frame prevent serial reading ?!?
     {
-      // detect touch
+      // detect touch - center of the point
       int x,y,z;
       bool bPressed = std_getPressed(&x,&y,&z);
       if( bPressed )
@@ -589,7 +598,7 @@ void loop()
         const int dw_arrow = wArrow+wInterArrow;
         const int dh_arrow = 58;
         short int listPos[(1+5*2)*2] = {
-                    xLock,yLock, // lock // 370/200 // 360/182
+                    xLock+wLock/2,yLock+hLock/2, // lock // 370/200 // 360/182
                     // 80,120, // first arrow
         };
         // add 10 arrows
@@ -610,7 +619,7 @@ void loop()
           // search hit, and choose nearest if many hits (enable overlap of area (when margin bigger than object))
           int posx = listPos[i*2];
           int posy = listPos[i*2+1];
-          int nMargin = 30;
+          int nMargin = 60;
           if(     posx - nMargin < x && posx + nMargin > x 
               &&  posy - nMargin < y && posy + nMargin > y
           )
@@ -634,21 +643,29 @@ void loop()
           //Serial.println(idx_element);
           if( i == 0 )
           {
+            Serial.println("press lock !");
             nLocked = ! nLocked;
           }
           else
           {
-            int nAdd;
+            double rAdd;
             // i = 1 to 5 pour fleches basses et 6 to 10 for low
+            Serial.print("press arrow i: ");
+            Serial.println(i);
             if( i < 6 )
             {
-              nAdd = pow(10,4-i); // i = 1 => +1000 (pow 3), i = 4 => +1 (pow 0)   
+              //nAdd = pow(10,4-i)+0.5; // i = 1 => +1000 (pow 3), i = 4 => +1 (pow 0) - probleme d'arrondi, pow(10,4) => 999 !
+              rAdd = pow(10,4-i)
             }
             else
             {
-              nAdd = -pow(10,4-(i-5));
+              rAdd = -pow(10,4-(i-5));
             }
-            rCirc += nAdd;
+            Serial.print("rAdd: ");
+            Serial.println(rAdd);
+            rCirc += rAdd;
+            Serial.print("new circ: ");
+            Serial.println(rCirc);
           }
         } // if idx_element != -1
         

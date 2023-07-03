@@ -203,8 +203,8 @@ int std_getPressed(int * px, int * py, int * pz, bool bDebug )
     int ymax = 935;
     int w = 480;
     int h = 320;
-    int invert_x=1;
-    int invert_y=1;
+    int invert_x=0; // was 1 before rotating screen
+    int invert_y=0; // was 1 before rotating screen
 
     int x = xraw;
     int y = yraw;

@@ -363,6 +363,7 @@ int render_screen(int nPresel, int nip, int db, int bubble, double circ,int bLoc
 {
   static uint8_t bDrawed = 0;
   static uint8_t bPrevLocked = 2;
+  static int nPrevPresel = -1;
   static int nPrevDb = 9999;
   static int nPrevNip = 9999;
   static int nPrevBubble = 9999;
@@ -397,7 +398,11 @@ int render_screen(int nPresel, int nip, int db, int bubble, double circ,int bLoc
     tft.fillRect(nMenuW,0,nAreaW,nAreaH,BLUE);
     tft.fillRect(nMenuW+nAreaW,0,nAreaW,nAreaH,RED);
     tft.fillRect(nMenuW,nAreaH,nAreaW*2,nAreaH,BLACK);
+  }
 
+  if( nPrevPresel != nPresel)
+  {
+    nPrevPresel = nPresel;
     for( int i = 0; i < nNbrSettings; ++i)
     {
       if( i == nPresel )
@@ -509,7 +514,7 @@ void loop()
     static uint8_t aspect = 0;
     static int nPresel = 0; // num of preselection 0..7
     static int nLocked = 1;
-    static double rCirc = 5550.5; // mm
+    static double arCirc[8] = {5550.5}; // mm
     //static double rCirc = 628.3; // proto de Vincent
     int y = 0;
     int dy = 0;
@@ -525,7 +530,7 @@ void loop()
     bubble = bjy_getAngle(0);
     db = bjy_getAngle(1);
     //nip = 2*rCirc*3.14159265358979323846264*db/360;
-    nip = (rCirc*db/360)/10/10; // /10 for angle, then /10 for cm
+    nip = (arCirc[nPresel]*db/360)/10/10; // /10 for angle, then /10 for cm
     
 
     if(0)
@@ -670,42 +675,41 @@ void loop()
               idx_element = i;
             }
           }
-          if( i == 0 && nLocked )
-          {
-            break; // don't test if locked!
-          }
         }
         if( idx_element != -1 )
         {
           int i = idx_element;
-          //Serial.print("hit: ");
-          //Serial.println(idx_element);
+          Serial.print("hit: ");
+          Serial.println(idx_element);
           if( i == 0 )
           {
             Serial.println("press lock !");
             nLocked = ! nLocked;
           }
-          else if( i < 12 )
+          else if( i < 11 )
           {
             // arrow
-            double rAdd;
-            // i = 1 to 5 pour fleches basses et 6 to 10 for low
-            Serial.print("press arrow i: ");
-            Serial.println(i);
-            if( i < 6 )
+            if( !nLocked)
             {
-              //nAdd = pow(10,4-i)+0.5; // i = 1 => +1000 (pow 3), i = 4 => +1 (pow 0) - probleme d'arrondi, pow(10,4) => 999 !
-              rAdd = pow(10,4-i);
+              double rAdd;
+              // i = 1 to 5 pour fleches basses et 6 to 10 for low
+              Serial.print("press arrow i: ");
+              Serial.println(i);
+              if( i < 6 )
+              {
+                //nAdd = pow(10,4-i)+0.5; // i = 1 => +1000 (pow 3), i = 4 => +1 (pow 0) - probleme d'arrondi, pow(10,4) => 999 !
+                rAdd = pow(10,4-i);
+              }
+              else
+              {
+                rAdd = -pow(10,4-(i-5));
+              }
+              Serial.print("rAdd: ");
+              Serial.println(rAdd);
+              arCirc[nPresel] += rAdd;
+              Serial.print("new circ: ");
+              Serial.println(arCirc[nPresel]);
             }
-            else
-            {
-              rAdd = -pow(10,4-(i-5));
-            }
-            Serial.print("rAdd: ");
-            Serial.println(rAdd);
-            rCirc += rAdd;
-            Serial.print("new circ: ");
-            Serial.println(rCirc);
           }
           else
           {
@@ -716,7 +720,7 @@ void loop()
         
       } // if bPressed
 
-      render_screen(nPresel,nip,db,bubble,rCirc,nLocked);
+      render_screen(nPresel,nip,db,bubble,arCirc[nPresel],nLocked);
 
     } // detect touch
 

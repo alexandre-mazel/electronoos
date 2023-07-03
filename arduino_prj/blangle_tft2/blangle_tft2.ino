@@ -1,5 +1,17 @@
 #include <EEPROM.h>
 
+/*
+Le croquis utilise 31158 octets (12%) de l'espace de stockage de programmes. Le maximum est de 253952 octets.
+Les variables globales utilisent 7293 octets (89%) de mémoire dynamique, ce qui laisse 899 octets pour les variables locales. Le maximum est de 8192 octets.
+La mémoire disponible faible, des problèmes de stabilité pourraient survenir.
+
+En enlevant des prints, on arrive a:
+- 30944
+- 7201
+
+
+*/
+
 // install tft_espi using the library manager
 // or  copy TFT_eSPI-2.5.0.zip into 
 // to C:\Users\alexa\Documents\Arduino\libraries
@@ -10,6 +22,7 @@
 //#define TFT_PARALLEL_8_BIT
 //#define ILI9486_DRIVER
 // try TFT_HX8357
+
 /*
 TFT_eSPI tft = TFT_eSPI();
 
@@ -279,15 +292,15 @@ float readFloatFromEeprom( int nOffset )
       ++nOffset;
       ++p;
   }
-  Serial.print( "readFloatFromEeprom: " );
-  Serial.println( val );
+  //Serial.print( "readFloatFromEeprom: " );
+  //Serial.println( val );
   return val;
 }
 
 double readDoubleFromEeprom( int nOffset )
 {
-  Serial.print( "nOffset: " );
-  Serial.println( nOffset );
+  //Serial.print( "nOffset: " );
+  //Serial.println( nOffset );
   float val;
   byte *p = (byte*)&val;
   for( int i = 0; i < sizeof(double); ++i)
@@ -296,15 +309,15 @@ double readDoubleFromEeprom( int nOffset )
       ++nOffset;
       ++p;
   }
-  Serial.print( "readDoubleFromEeprom: " );
-  Serial.println( val );
+  //Serial.print( "readDoubleFromEeprom: " );
+  //Serial.println( val );
   return val;
 }
 
 void writeFloatToEeprom( int nOffset, float val )
 {
-  Serial.print("sizeof float: ");
-  Serial.println(sizeof(float));
+  //Serial.print("sizeof float: ");
+  //Serial.println(sizeof(float));
 
   const byte *p = (byte*)&val;
   for( int i = 0; i < sizeof(float); ++i)
@@ -317,13 +330,13 @@ void writeFloatToEeprom( int nOffset, float val )
 
 void writeDoubleToEeprom( int nOffset, double val )
 {
-  Serial.print( "writeDoubleToEeprom: " );
-  Serial.println( val );
-  Serial.print( "nOffset: " );
-  Serial.println( nOffset );
+  //Serial.print( "writeDoubleToEeprom: " );
+  //Serial.println( val );
+  //Serial.print( "nOffset: " );
+  //Serial.println( nOffset );
 
-  Serial.print("sizeof double: "); // on Mega2560, float=double=32bits
-  Serial.println(sizeof(double));
+  //Serial.print("sizeof double: "); // on Mega2560, float=double=32bits
+  //Serial.println(sizeof(double));
 
   const byte *p = (byte*)&val;
   for( int i = 0; i < sizeof(double); ++i)
@@ -356,8 +369,8 @@ void loadConfigFromEeprom()
   Serial.println( "Loading eeprom..." );
   
   nNumSettingsSelected = EEPROM.read( nOffset );  nOffset += 1;
-  Serial.print( "nNumSettingsSelected: " );
-  Serial.println( nNumSettingsSelected );
+  //Serial.print( "nNumSettingsSelected: " );
+  //Serial.println( nNumSettingsSelected );
   
   for( int i = 0; i < nNbrSettings; ++i)
   {
@@ -559,6 +572,7 @@ void loop()
 {
     static uint8_t aspect = 0;
     static int nLocked = 1;
+    static int nMustSave = 0;
     //static double arCirc[8] = {5550.5}; // mm
     //static double rCirc = 628.3; // proto de Vincent
     int y = 0;
@@ -731,8 +745,9 @@ void loop()
           {
             Serial.println("press lock !");
             nLocked = ! nLocked;
-            if(nLocked)
+            if(nLocked && nMustSave)
             {
+              nMustSave = 0;
               saveConfigToEeprom();
             }
           }
@@ -757,6 +772,7 @@ void loop()
               Serial.print("rAdd: ");
               Serial.println(rAdd,6);
               presetCirc[nNumSettingsSelected] += rAdd;
+              nMustSave = 1;
 
               // kill after centile
               presetCirc[nNumSettingsSelected] = long(0.5+presetCirc[nNumSettingsSelected]*10)/10.;

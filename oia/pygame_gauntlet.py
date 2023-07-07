@@ -65,7 +65,7 @@ class Player:
         self.life = self.lifemax
         self.bDead = 0
         self.color = color
-        self.bAccelerating = Falseff
+        self.bAccelerating = False
     
     def update(self,ws,hs):
         self.x += self.vx

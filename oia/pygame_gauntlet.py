@@ -198,7 +198,7 @@ class Planet:
 
 class Game:
     def __init__(self):
-        self.screen = pg.display.set_mode((1024, 768))
+        self.screen = pg.display.set_mode((1380, 920))
         self.ws = self.screen.get_width()
         self.hs = self.screen.get_height()
         
@@ -237,7 +237,7 @@ class Game:
         self.players = []
         self.players.append(Player(x=self.ws-200,angle=math.pi))
         self.players.append(Player(color=greenl))
-        self.players.append(Player(x=self.ws-500,y=600, angle=-math.pi/2,color=yellow))
+        self.players.append(Player(x=self.ws/2,y=600, angle=-math.pi/2,color=yellow))
         self.nNumPlayerRemaining = len(self.players)
         
         self.bEndOfGame = 0

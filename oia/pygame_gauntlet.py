@@ -65,8 +65,7 @@ class Player:
         self.life = self.lifemax
         self.bDead = 0
         self.color = color
-        self.bAccelerating = False
-        self.pts = 0 # pts each game
+        self.bAccelerating = Falseff
     
     def update(self,ws,hs):
         self.x += self.vx
@@ -228,6 +227,8 @@ class Game:
         
         self.startNewGame()
         
+        self.score = [0]*len(self.players)
+        
     def loadSound(self):
         self.sound_missile = pg.mixer.Sound("weird_laser.wav")
         self.sound_crash = pg.mixer.Sound("crash.wav")
@@ -283,7 +284,7 @@ class Game:
                             # accelerate, decelerate, left, right, shoot
                             [pg.K_UP,pg.K_DOWN,pg.K_LEFT,pg.K_RIGHT,pg.K_EXCLAIM], # player 1  # pg.K_SPACE
                             [pg.K_z,pg.K_s,pg.K_q,pg.K_d,pg.K_a], # player 2
-                            [pg.K_h,pg.K_b,pg.K_v,pg.K_n,pg.K_g], # player 3
+                            [pg.K_g,pg.K_b,pg.K_v,pg.K_n,pg.K_f], # player 3
                       ]
                       
                       
@@ -462,7 +463,7 @@ class Game:
                     for num_player,p in enumerate(self.players):
                         if not p.bDead:
                             break
-                    self.players[num_player].pts += 1
+                    self.score[num_player] += 1
                     
                         
     def render(self):
@@ -498,9 +499,10 @@ class Game:
             
             offsety = 0
             for num_player,p in enumerate(self.players):
-                text_surface = self.fontTitle.render('Player %d: %d' % (num_player+1,p.pts), False, color)
-                self.screen.blit(text_surface, (rectMessage[0]+300,rectMessage[1]+300+offsety))         
-                offsety += 20
+                color = p.color
+                text_surface = self.fontTitle.render('Player %d: %d' % (num_player+1,self.score[num_player]), False, color)
+                self.screen.blit(text_surface, (rectMessage[0]+300,rectMessage[1]+260+offsety))         
+                offsety += 30
                 
             if time.time() > self.timeRestartGame:
                 self.startNewGame()

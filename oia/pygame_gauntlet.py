@@ -1,6 +1,7 @@
 import math
 import pygame as pg
 import random
+import time
 
 successes, failures = pg.init()
 print("INF: pygame int: %s successes and %s failure(s)" % (successes, failures))
@@ -65,6 +66,7 @@ class Player:
         self.bDead = 0
         self.color = color
         self.bAccelerating = False
+        self.pts = 0 # pts each game
     
     def update(self,ws,hs):
         self.x += self.vx
@@ -204,18 +206,10 @@ class Game:
         self.clock = pg.time.Clock()
         self.fps = 60  # Frames per second.
         
-        self.players = []
-        self.players.append(Player(x=self.ws-200,angle=math.pi))
-        self.players.append(Player(color=greenl))
-        self.players.append(Player(x=self.ws-520,y=600, angle=-math.pi/2,color=yellow))
-        self.nNumPlayerRemaining = len(self.players)
-        
         self.projectiles = []
         self.planets = []
         
         self.bOpponentIsAi = 0 # turn to one to activate AI
-        
-        self.bEndOfGame = 0
         
         pg.font.init() # you have to call this at the start, 
                    # if you want to use this module.
@@ -232,9 +226,21 @@ class Game:
         
         self.loadSound()
         
+        self.startNewGame()
+        
     def loadSound(self):
         self.sound_missile = pg.mixer.Sound("weird_laser.wav")
         self.sound_crash = pg.mixer.Sound("crash.wav")
+        
+    def startNewGame(self):
+        self.players = []
+        self.players.append(Player(x=self.ws-200,angle=math.pi))
+        self.players.append(Player(color=greenl))
+        self.players.append(Player(x=self.ws-500,y=600, angle=-math.pi/2,color=yellow))
+        self.nNumPlayerRemaining = len(self.players)
+        
+        self.bEndOfGame = 0
+        
         
     def getCommandIA(self):
         nFront=nTurn=bShoot=0
@@ -450,6 +456,13 @@ class Game:
                 self.nNumPlayerRemaining -= 1
                 if self.nNumPlayerRemaining == 1:
                     self.bEndOfGame = 1
+                    self.timeRestartGame = time.time()+5
+                    
+                    # find winner number
+                    for num_player,p in enumerate(self.players):
+                        if not p.bDead:
+                            break
+                    self.players[num_player].pts += 1
                     
                         
     def render(self):
@@ -482,6 +495,16 @@ class Game:
             color = self.players[num_player].color
             text_surface = self.fontTitle.render('Player %d is the winner' % (num_player+1), False, color)
             self.screen.blit(text_surface, (rectMessage[0]+300,rectMessage[1]+200))
+            
+            offsety = 0
+            for num_player,p in enumerate(self.players):
+                text_surface = self.fontTitle.render('Player %d: %d' % (num_player+1,p.pts), False, color)
+                self.screen.blit(text_surface, (rectMessage[0]+300,rectMessage[1]+300+offsety))         
+                offsety += 20
+                
+            if time.time() > self.timeRestartGame:
+                self.startNewGame()
+                
         pg.display.update()  # or .display.flip()
         
         

@@ -66,10 +66,12 @@ class Player:
         self.bDead = 0
         self.color = color
         self.bAccelerating = False
+        self.timeFrozen = time.time()
     
     def update(self,ws,hs):
-        self.x += self.vx
-        self.y += self.vy
+        if time.time() > self.timeFrozen:
+            self.x += self.vx
+            self.y += self.vy
         
         rCoefFrot = 0.995
         self.vx *= rCoefFrot
@@ -168,6 +170,50 @@ class Projectile:
         pg.draw.circle(surface,color,(self.x,self.y),2,width=2)
         
         
+class Bonus:
+    def __init__(self,x,y):
+        self.x = x
+        self.y = y
+        self.w = 30
+        self.h = 30
+        #~ self.v = v
+        #~ self.angle = angle
+        self.ttl = 1000
+        self.color = white
+        self.fontTitle = pg.font.SysFont('Arial', 24)
+        self.text_surface = self.fontTitle.render('?', False, self.color)
+    
+    def update(self,ws,hs):
+        """
+        return false if this object is dead
+        """
+        self.ttl -= 1
+        return self.ttl > 0
+            
+    
+    def render(self, surface):
+        
+        color = self.color
+        pos = [self.x,self.y,self.w,self.h]
+        pg.draw.rect(surface,color,pos,width=2)
+        
+        surface.blit(self.text_surface, (pos[0]+self.w//3+1,pos[1]))       
+        
+        # 2 squares in corner
+        nSizeCorner = 8
+        pos[2] = nSizeCorner
+        pos[3] = nSizeCorner
+        
+        pos[0] = self.x+self.w-nSizeCorner
+        pg.draw.rect(surface,color,pos,width=2)
+        pos[0] = self.x
+        pos[1] = self.y+self.h-nSizeCorner
+        pg.draw.rect(surface,color,pos,width=2)
+        
+        
+
+        
+        
 class Planet:
     def __init__(self,x=0,y=0,r=50,angle=0):
         self.x = x
@@ -207,6 +253,7 @@ class Game:
         
         self.projectiles = []
         self.planets = []
+        self.bonuses = []
         
         self.bOpponentIsAi = 0 # turn to one to activate AI
         
@@ -415,6 +462,22 @@ class Game:
                         cpt+= 1
                         if cpt > 100:
                             break
+                            
+                            
+                            
+        # collision player / bonuses
+        for p in self.players:
+            for b in self.bonuses:
+                if distSquared(p,b)<math.pow(p.r,2)+math.pow(b.w,2):
+                    b.ttl = 0
+                    if random.random()>0.6:
+                        p.life += 3
+                        if p.life>p.lifemax:
+                            p.life = p.lifemax
+                    else:
+                        p.timeFrozen = time.time()+5.
+                        p.vx = 0
+                        p.vy = 0
                 
 
         i = 0
@@ -423,6 +486,17 @@ class Game:
                 del self.projectiles[i]
                 continue
             i += 1
+            
+        i = 0
+        while i < len(self.bonuses):
+            if not self.bonuses[i].update(self.ws,self.hs):
+                del self.bonuses[i]
+                continue
+            i += 1
+            
+        if random.random()>0.995:
+            b = Bonus(random.randint(0,self.ws-1),random.randint(0,self.hs-1))
+            self.bonuses.append(b)
             
             
         for proj in self.projectiles:
@@ -475,8 +549,12 @@ class Game:
         for p in self.planets:
             p.render(self.screen)
             
+        for p in self.bonuses:
+            p.render(self.screen)
+            
         for p in self.players:
             p.render(self.screen)
+
             
         for p in self.projectiles:
             p.render(self.screen)

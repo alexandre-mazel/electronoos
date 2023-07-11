@@ -24,7 +24,12 @@ class Progression:
     def __init__( self, strSaveFilename = "" ):
         self.strSaveFilename = strSaveFilename # not saved in file
         if self.strSaveFilename == "": 
-            self.strSaveFilename = misctools.getPathSave() + "progress.dat"
+            strPath = misctools.getPathSave()
+            try:
+                os.makedirs(strPath)
+            except FileExistsError:
+                pass
+            self.strSaveFilename = strPath + "progress.dat"
             
         self.timeLastLoaded = 0.0 # not saved in file
             

@@ -1,5 +1,23 @@
 import os
 import random
+"""
+pi@pimeteo:~ $ cat  /usr/lib/systemd/system/alexserv.service
+[Unit]
+Description=AlexServ
+After=multi-user.target
+
+[Service]
+Type=simple
+#ExecStart=/usr/bin/python3 /home/pi/startup/playmp3.py
+StandardOutput=file:/home/pi/logs/alexserv_output.log
+StandardError=file:/home/pi/logs/alexserv_error.log
+Restart=on-abort
+WorkingDirectory=/home/pi/startup/
+
+[Install]
+WantedBy=multi-user.target
+
+"""
 
 
 class ShufflePlayer():
@@ -48,6 +66,6 @@ shufflePlayer = ShufflePlayer()
 
 
 if __name__ == "__main__":
-	shufflePlayer.findAllSongs("/home/pi/hdj_musique_classique_et_film/")	
+	shufflePlayer.findAllSongs("/home/pi/hdj_musique_classique_et_film/")
 	while 1:
 		shufflePlayer.playShuffle()

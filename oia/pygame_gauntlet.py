@@ -1,11 +1,13 @@
 import math
 import pygame as pg
 import random
+import time
 
 successes, failures = pg.init()
 print("INF: pygame int: %s successes and %s failure(s)" % (successes, failures))
 
 black = (0, 0, 0)
+gray = (127, 127, 127)
 white = (255, 255, 255)
 red = (255, 0, 0)
 green = (0, 255, 0)
@@ -61,6 +63,7 @@ class Player:
         self.angle = angle
         self.lifemax = 10
         self.life = self.lifemax
+        self.bDead = 0
         self.color = color
         self.bAccelerating = False
     
@@ -91,20 +94,24 @@ class Player:
     
     def render(self, surface):
         color = self.color
+        if self.bDead:
+            color = gray
         pg.draw.circle(surface,color,(self.x,self.y),self.r,width=2)
         x2 = self.x+math.cos(self.angle)*(self.r+5)
         y2 = self.y+math.sin(self.angle)*(self.r+5)
         pg.draw.line(surface,color,(self.x,self.y),(x2,y2),width=1)
-        # life bar
-        barw2 = 30
-        barh2 = 4
-        barcolor = green
-        if self.life <= self.lifemax*0.7:
-            barcolor = yellowd
-        if self.life <= self.lifemax*0.35:
-            barcolor = red
-        pg.draw.rect(surface,white,(self.x-barw2,self.y+self.r+12-barh2,barw2*2,barh2*2))
-        pg.draw.rect(surface,barcolor,(self.x-barw2+2,self.y+self.r+12-barh2+2,(barw2*2-4)*(self.life/self.lifemax),barh2*2-4))
+        
+        if not self.bDead:
+            # life bar
+            barw2 = 30
+            barh2 = 4
+            barcolor = green
+            if self.life <= self.lifemax*0.7:
+                barcolor = yellowd
+            if self.life <= self.lifemax*0.35:
+                barcolor = red
+            pg.draw.rect(surface,white,(self.x-barw2,self.y+self.r+12-barh2,barw2*2,barh2*2))
+            pg.draw.rect(surface,barcolor,(self.x-barw2+2,self.y+self.r+12-barh2+2,(barw2*2-4)*(self.life/self.lifemax),barh2*2-4))
         
         if self.bAccelerating:
             x1 = self.x-math.cos(self.angle)*(self.r-1)
@@ -191,21 +198,17 @@ class Planet:
 
 class Game:
     def __init__(self):
-        self.screen = pg.display.set_mode((1024, 768))
+        self.screen = pg.display.set_mode((1380, 920))
         self.ws = self.screen.get_width()
         self.hs = self.screen.get_height()
         
         self.clock = pg.time.Clock()
         self.fps = 60  # Frames per second.
         
-        self.players = []
-        self.players.append(Player())
-        self.players.append(Player(x=self.ws-200,angle=math.pi,color=greenl))
-        
         self.projectiles = []
         self.planets = []
         
-        self.bEndOfGame = 0
+        self.bOpponentIsAi = 0 # turn to one to activate AI
         
         pg.font.init() # you have to call this at the start, 
                    # if you want to use this module.
@@ -222,9 +225,23 @@ class Game:
         
         self.loadSound()
         
+        self.startNewGame()
+        
+        self.score = [0]*len(self.players)
+        
     def loadSound(self):
         self.sound_missile = pg.mixer.Sound("weird_laser.wav")
         self.sound_crash = pg.mixer.Sound("crash.wav")
+        
+    def startNewGame(self):
+        self.players = []
+        self.players.append(Player(x=self.ws-200,angle=math.pi))
+        self.players.append(Player(color=greenl))
+        self.players.append(Player(x=self.ws/2,y=600, angle=-math.pi/2,color=yellow))
+        self.nNumPlayerRemaining = len(self.players)
+        
+        self.bEndOfGame = 0
+        
         
     def getCommandIA(self):
         nFront=nTurn=bShoot=0
@@ -262,10 +279,12 @@ class Game:
         return True if user want to quit
         """
         # define keys for each player
+        
         listConfigKeys = [
                             # accelerate, decelerate, left, right, shoot
-                            [pg.K_UP,pg.K_DOWN,pg.K_LEFT,pg.K_RIGHT,pg.K_SPACE], # player 1
+                            [pg.K_UP,pg.K_DOWN,pg.K_LEFT,pg.K_RIGHT,pg.K_EXCLAIM], # player 1  # pg.K_SPACE
                             [pg.K_z,pg.K_s,pg.K_q,pg.K_d,pg.K_a], # player 2
+                            [pg.K_g,pg.K_b,pg.K_v,pg.K_n,pg.K_f], # player 3
                       ]
                       
                       
@@ -278,6 +297,8 @@ class Game:
                 self.keypressed[event.key] = 1
                                     
                 for numplayer,configkey in enumerate(listConfigKeys):
+                    if self.players[numplayer].bDead:
+                        continue
                     key_shoot = configkey[4]
                     if event.key == key_shoot:
                         self.addProjectile(numplayer)
@@ -286,27 +307,28 @@ class Game:
             if event.type == pg.KEYUP:
                 self.keypressed[event.key] = 0
                 
-        if not self.bEndOfGame:
-            # AI emulate keys:
-            # to rewrite: badly programmed
-            nFrontAI, nTurnAI,bShootAI = self.getCommandIA()
-            print("nFrontAI, nTurnAI,bShootAI: %s,%s,%s" % (nFrontAI, nTurnAI,bShootAI) )
-            self.keypressed[listConfigKeys[1][0]] = 0
-            self.keypressed[listConfigKeys[1][1]] = 0
-            if nFrontAI == 1: self.keypressed[listConfigKeys[1][0]] = 1
-            elif nFrontAI == -1: self.keypressed[listConfigKeys[1][1]] = 1
+        if self.bOpponentIsAi:
+            if not self.bEndOfGame:
+                # AI emulate keys:
+                # to rewrite: badly programmed
+                nFrontAI, nTurnAI,bShootAI = self.getCommandIA()
+                print("nFrontAI, nTurnAI,bShootAI: %s,%s,%s" % (nFrontAI, nTurnAI,bShootAI) )
+                self.keypressed[listConfigKeys[1][0]] = 0
+                self.keypressed[listConfigKeys[1][1]] = 0
+                if nFrontAI == 1: self.keypressed[listConfigKeys[1][0]] = 1
+                elif nFrontAI == -1: self.keypressed[listConfigKeys[1][1]] = 1
 
-            self.keypressed[listConfigKeys[1][2]] = 0
-            self.keypressed[listConfigKeys[1][3]] = 0
+                self.keypressed[listConfigKeys[1][2]] = 0
+                self.keypressed[listConfigKeys[1][3]] = 0
+                    
+                if nTurnAI == 1: self.keypressed[listConfigKeys[1][2]] = 1
+                elif nTurnAI == -1: self.keypressed[listConfigKeys[1][3]] = 1
+
                 
-            if nTurnAI == 1: self.keypressed[listConfigKeys[1][2]] = 1
-            elif nTurnAI == -1: self.keypressed[listConfigKeys[1][3]] = 1
-
-            
-            if bShootAI == 1: 
-                # ugly: cut and paste! don't do that please
-                self.addProjectile(1)
-                pg.mixer.Sound.play(self.sound_missile)
+                if bShootAI == 1: 
+                    # ugly: cut and paste! don't do that please
+                    self.addProjectile(1)
+                    pg.mixer.Sound.play(self.sound_missile)
 
         for key, bPressed in self.keypressed.items():
             if bPressed:
@@ -424,10 +446,25 @@ class Game:
                     proj.angle += 180 + (random.random()*2)-1
                     
                     
+        nCountRemaining = 0
         for num_player,p in enumerate(self.players):
+            if p.bDead:
+                continue
             if p.life <= 0:
                 print("player %d lose" % num_player)
-                self.bEndOfGame = 1
+                #~ self.bEndOfGame = 1
+                p.bDead = 1
+                self.nNumPlayerRemaining -= 1
+                if self.nNumPlayerRemaining == 1:
+                    self.bEndOfGame = 1
+                    self.timeRestartGame = time.time()+5
+                    
+                    # find winner number
+                    for num_player,p in enumerate(self.players):
+                        if not p.bDead:
+                            break
+                    self.score[num_player] += 1
+                    
                         
     def render(self):
         """
@@ -451,13 +488,25 @@ class Game:
             text_surface = self.fontTitle.render('Game Over', False, color)
             self.screen.blit(text_surface, (rectMessage[0]+320,rectMessage[1]+100))
             
-            num_player = 1
-            color = red
-            if self.players[1].life <= 0:
-                num_player = 2
-                color = green
-            text_surface = self.fontTitle.render('Player %d is dead' % num_player, False, color)
+            # find winner number
+            for num_player,p in enumerate(self.players):
+                if not p.bDead:
+                    break
+
+            color = self.players[num_player].color
+            text_surface = self.fontTitle.render('Player %d is the winner' % (num_player+1), False, color)
             self.screen.blit(text_surface, (rectMessage[0]+300,rectMessage[1]+200))
+            
+            offsety = 0
+            for num_player,p in enumerate(self.players):
+                color = p.color
+                text_surface = self.fontTitle.render('Player %d: %d' % (num_player+1,self.score[num_player]), False, color)
+                self.screen.blit(text_surface, (rectMessage[0]+300,rectMessage[1]+260+offsety))         
+                offsety += 30
+                
+            if time.time() > self.timeRestartGame:
+                self.startNewGame()
+                
         pg.display.update()  # or .display.flip()
         
         

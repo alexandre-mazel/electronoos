@@ -51,6 +51,17 @@ def limit(val,maxval):
         return -maxval
     return maxval
 
+def norm2pi(a):
+    if a<0: a+=math.pi*2
+    elif a > math.pi*2: a-=math.pi*2
+    return a
+    
+def normpi(a):
+    print("DBG:normpi (1): %s" % a)
+    if a < -math.pi: a+=math.pi*2
+    elif a > math.pi: a-=math.pi*2
+    print("DBG:normpi (2): %s" % a)
+    return a
 
 class Player:
     def __init__(self,x=200,y=200,r=10,angle=0,color=bluel):
@@ -67,6 +78,8 @@ class Player:
         self.color = color
         self.bAccelerating = False
         self.timeFrozen = time.time()
+        
+        self.bMulti = 0
     
     def update(self,ws,hs):
         if time.time() > self.timeFrozen:
@@ -244,7 +257,13 @@ class Planet:
 
 class Game:
     def __init__(self):
-        self.screen = pg.display.set_mode((1380, 920))
+        w = 1380
+        h = 920
+        if 0:
+            # reduce screen to see debug
+            w = 640
+            h = 480
+        self.screen = pg.display.set_mode((w,h))
         self.ws = self.screen.get_width()
         self.hs = self.screen.get_height()
         
@@ -255,7 +274,8 @@ class Game:
         self.planets = []
         self.bonuses = []
         
-        self.bOpponentIsAi = 0 # turn to one to activate AI
+        self.bOpponentIsAi = 1 # turn to one to activate AI
+        self.bOpponentIsAi = 0
         
         pg.font.init() # you have to call this at the start, 
                    # if you want to use this module.
@@ -284,40 +304,89 @@ class Game:
         self.players = []
         self.players.append(Player(x=self.ws-200,angle=math.pi))
         self.players.append(Player(color=greenl))
-        self.players.append(Player(x=self.ws/2,y=600, angle=-math.pi/2,color=yellow))
+        #~ self.players.append(Player(x=self.ws/2,y=600, angle=-math.pi/2,color=yellow))
         self.nNumPlayerRemaining = len(self.players)
         
         self.bEndOfGame = 0
         
+        self.players[0].bMulti = 1
+        self.players[0].life *= 5
         
-    def getCommandIA(self):
-        nFront=nTurn=bShoot=0
+        
+    def getCommandAI(self):
+        
+        nFront = nTurn = bShoot = 0
+        
+        playerAi = self.players[1]
+        
+        #
+        # dodge missile
+        #
+        
+        # find nearest one
+        nDistNearest = 9999*9999
+        projNearest = None
+        for proj in self.projectiles:
+            d = distSquared(proj,playerAi)
+            if d < nDistNearest:
+                nDistNearest = d
+                projNearest = proj
+                
+        if nDistNearest < 16000:
+            print("DBG: getCommandAI: proj near!")
+            
+            dx = projNearest.x - playerAi.x
+            dy = projNearest.y - playerAi.y
+            dangle = normpi(math.atan2(dy,dx))
+            diffangle = dangle-playerAi.angle
+            print("DBG: getCommandAI: diffangle: %.3f, dist: %s" % (diffangle,nDistNearest) )
+            
+            # near and facing => rear
+            if abs(diffangle) < 0.2 and nDistNearest < 8000:
+                nFront = -1
+            else:
+                # change dir then accelerate
+                if 0 <= diffangle < 1.:
+                    nTurn = 1
+                elif 0 > diffangle > -1:
+                    nTurn = -1
+                else:
+                    nFront = 1
+                
+            # freine ?
+            #~ if nTurn != 0:
+                #~ if playerAi.vx > 0:
+                    #~ nFront = -1
 
-        dx = self.players[0].x-self.players[1].x
-        dy = self.players[0].y-self.players[1].y
-        dist = dx*dx+dy*dy
-        #~ print("dist: %s" % dist )
-        if dist<80000:
-            if random.random()>0.95:
-                print("shoot")
-                bShoot = 1
         else:
-            nFront=1
-        
-        
-        dangle = math.atan2(dy,dx)
-        #~ print("dangle: %.2f" % dangle)
-        if dangle<0: dangle+=math.pi*2
-        diffangle = dangle-self.players[1].angle
-        print("dangle: %.2f, angle:%.2f, diff: %.2f" % (dangle,self.players[1].angle,diffangle))
-        if diffangle<-0.05:
-            nTurn=1
-            nFront=0
-        elif diffangle>0.05:
-            nTurn=-1
-            nFront=0
-        #~ elif math.atan2(dy,dx)-self.players[1].angle<-0.1
-            #~ nTurn=-1
+            #
+            #  chase other
+            #
+            dx = self.players[0].x-playerAi.x
+            dy = self.players[0].y-playerAi.y
+            dist = dx*dx+dy*dy
+            #~ print("dist: %s" % dist )
+            if dist < 80000:
+                if random.random()>0.95:
+                    print("shoot")
+                    bShoot = 1
+            else:
+                nFront=1
+            
+            
+            dangle = norm2pi(math.atan2(dy,dx))
+            #~ print("dangle: %.2f" % dangle)
+            diffangle = dangle-playerAi.angle
+            print("dangle: %.2f, angle:%.2f, diff: %.2f" % (dangle,playerAi.angle,diffangle))
+            if diffangle < -0.05:
+                nTurn = 1
+                nFront = 0
+            elif diffangle > 0.05:
+                nTurn = -1
+                nFront = 0
+            #~ elif math.atan2(dy,dx)-playerAi.angle<-0.1
+                #~ nTurn=-1
+                
         return nFront,nTurn,bShoot
         
     def handleInput(self):
@@ -335,31 +404,12 @@ class Game:
                       ]
                       
                       
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                return True
-                
-            if event.type == pg.KEYDOWN:     
-                #~ print("DBG: key '%s' pressed" % event.key )
-                self.keypressed[event.key] = 1
-                                    
-                for numplayer,configkey in enumerate(listConfigKeys):
-                    if self.players[numplayer].bDead:
-                        continue
-                    key_shoot = configkey[4]
-                    if event.key == key_shoot:
-                        self.addProjectile(numplayer)
-                        pg.mixer.Sound.play(self.sound_missile)
-                
-            if event.type == pg.KEYUP:
-                self.keypressed[event.key] = 0
-                
         if self.bOpponentIsAi:
             if not self.bEndOfGame:
                 # AI emulate keys:
                 # to rewrite: badly programmed
-                nFrontAI, nTurnAI,bShootAI = self.getCommandIA()
-                print("nFrontAI, nTurnAI,bShootAI: %s,%s,%s" % (nFrontAI, nTurnAI,bShootAI) )
+                nFrontAI, nTurnAI,bShootAI = self.getCommandAI()
+                #~ print("nFrontAI, nTurnAI,bShootAI: %s,%s,%s" % (nFrontAI, nTurnAI,bShootAI) )
                 self.keypressed[listConfigKeys[1][0]] = 0
                 self.keypressed[listConfigKeys[1][1]] = 0
                 if nFrontAI == 1: self.keypressed[listConfigKeys[1][0]] = 1
@@ -376,6 +426,30 @@ class Game:
                     # ugly: cut and paste! don't do that please
                     self.addProjectile(1)
                     pg.mixer.Sound.play(self.sound_missile)
+                    
+                      
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                return True
+                
+            if event.type == pg.KEYDOWN:     
+                #~ print("DBG: key '%s' pressed" % event.key )
+                self.keypressed[event.key] = 1
+                                    
+                for numplayer,configkey in enumerate(listConfigKeys):
+                    if numplayer >= len(self.players):
+                        break
+                        
+                    if self.players[numplayer].bDead:
+                        continue
+                    key_shoot = configkey[4]
+                    if event.key == key_shoot:
+                        self.addProjectile(numplayer)
+                        pg.mixer.Sound.play(self.sound_missile)
+                
+            if event.type == pg.KEYUP:
+                self.keypressed[event.key] = 0
+
 
         for key, bPressed in self.keypressed.items():
             if bPressed:
@@ -404,7 +478,26 @@ class Game:
     def addProjectile(self, numPlayer):
         newProj = self.players[numPlayer].shoot()
         self.projectiles.append(newProj)
-    
+        if self.players[numPlayer].bMulti and 1:
+            rAngleInc = 0.2
+            for i in range(9):
+                newProj = self.players[numPlayer].shoot()
+                newProj.angle += rAngleInc*(i-4)
+                self.projectiles.append(newProj)       
+
+        if self.players[numPlayer].bMulti and 0:
+            # feu d'artifices
+            n = 100
+            rAngleInc = 0.1
+            for i in range(n):
+                newProj = self.players[numPlayer].shoot()
+                newProj.angle += rAngleInc*(i-n//2)
+                newProj.x -= 400
+                self.projectiles.append(newProj)      
+                
+        #~ self.projectiles = self.projectiles[-1000:]
+
+            
     def update(self):
         """
         Update internal state of the world

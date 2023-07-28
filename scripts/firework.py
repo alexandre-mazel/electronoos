@@ -10,6 +10,7 @@ black = (0, 0, 0)
 gray = (127, 127, 127)
 white = (255, 255, 255)
 red = (255, 0, 0)
+pink = (255, 127, 127)
 green = (0, 255, 0)
 greenl = (127, 255, 127)
 yellow = (255, 255, 0)
@@ -154,7 +155,10 @@ class Projectile:
         self.y = y
         self.v = v
         self.angle = angle
-        self.life = 800
+        self.color = red
+        self.life = 200
+        self.explo = 0
+        
     
     def update(self,ws,hs):
         """
@@ -175,12 +179,25 @@ class Projectile:
             self.y+=hs
             
         self.life -= 1
+        
+        if self.life <= 0 and self.explo:
+            global global_theGame
+            rAngleInc = 0.1
+            n = 63
+            color = [pink,red,blue,green,yellow][random.randint(0,4)]
+            for i in range(n):
+                newProj = Projectile()
+                newProj.angle += rAngleInc*(i-n//2)
+                newProj.x = self.x
+                newProj.y = self.y
+                newProj.v = 1+random.random()*0.1
+                newProj.color = color
+                global_theGame.projectiles.append(newProj)      
 
         return self.life > 0
     
     def render(self, surface):
-        color = red
-        pg.draw.circle(surface,color,(self.x,self.y),2,width=2)
+        pg.draw.circle(surface,self.color,(self.x,self.y),2,width=2)
         
         
 class Bonus:
@@ -297,8 +314,8 @@ class Game:
         self.score = [0]*len(self.players)
         
     def loadSound(self):
-        self.sound_missile = pg.mixer.Sound("weird_laser.wav")
-        self.sound_crash = pg.mixer.Sound("crash.wav")
+        self.sound_missile = pg.mixer.Sound("../data/weird_laser.wav")
+        self.sound_crash = pg.mixer.Sound("../data/crash.wav")
         
     def startNewGame(self):
         self.players = []
@@ -477,25 +494,28 @@ class Game:
         
     def addProjectile(self, numPlayer):
         newProj = self.players[numPlayer].shoot()
+        newProj.explo = 1
         self.projectiles.append(newProj)
-        if self.players[numPlayer].bMulti and 1:
-            rAngleInc = 0.2
-            for i in range(9):
-                newProj = self.players[numPlayer].shoot()
-                newProj.angle += rAngleInc*(i-4)
-                self.projectiles.append(newProj)       
+        #~ if self.players[numPlayer].bMulti and 1:
+            #~ rAngleInc = 0.2
+            #~ for i in range(9):
+                #~ newProj = self.players[numPlayer].shoot()
+                #~ newProj.angle += rAngleInc*(i-4)
+                #~ self.projectiles.append(newProj)       
 
-        if self.players[numPlayer].bMulti and 0:
-            # feu d'artifices
-            n = 100
-            rAngleInc = 0.1
-            for i in range(n):
-                newProj = self.players[numPlayer].shoot()
-                newProj.angle += rAngleInc*(i-n//2)
-                newProj.x -= 400
-                self.projectiles.append(newProj)      
+        #~ if self.players[numPlayer].bMulti and 0:
+            #~ # feu d'artifices
+            #~ n = 100
+            #~ rAngleInc = 0.1
+            #~ for i in range(n):
+                #~ newProj = self.players[numPlayer].shoot()
+                #~ newProj.angle += rAngleInc*(i-n//2)
+                #~ newProj.x -= 400
+                #~ self.projectiles.append(newProj)      
                 
         #~ self.projectiles = self.projectiles[-1000:]
+        
+        
 
             
     def update(self):
@@ -684,8 +704,11 @@ class Game:
 # class Game - end
 
 
+global_theGame = None
 def runGame():
+    global global_theGame
     game = Game()
+    global_theGame = game
     while 1:
         bQuit = game.handleInput()
         if bQuit:

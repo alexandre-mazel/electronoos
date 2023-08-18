@@ -44,6 +44,8 @@ class Stat:
         self.nbrWetDay = 0 # day with more than 15min of rain # day is >= 8 and < 22
         self.nbrWetNight = 0 # night with more than 15min of rain
         
+        self.score = 0 # nbr points for this location
+        
     def __str__(self):
         o  = ""
         #~ o += " min: %s, max: %s, hotnight: %s" % (self.min,self.max,self.nbrHotNight)
@@ -57,6 +59,7 @@ class Stat:
         o += "  hot night: %s\n" % self.nbrHotNight
         o += "  wet day: %s\n" % self.nbrWetDay
         o += "  wet night: %s\n" % self.nbrWetNight
+        o += "  score: %s\n" % self.score
         return o
         
 def isListIn(word,list):
@@ -196,13 +199,10 @@ def analyse(strFilename):
                 dicoHelper[strCity].bStatDinnerDone = 1
                 dicoStat[key].nbrDinner += 1
                 
-        if bRainOrSnow:
-            print("rain")
         if bDay and not dicoHelper[strCity].bStatWetDayDone:
             if bRainOrSnow:
                 dicoHelper[strCity].bStatWetDayDone = 1
                 dicoStat[key].nbrWetDay += 1
-                print("wet")
 
         if bNight and not dicoHelper[strCity].bStatWetNightDone:
             if bRainOrSnow:
@@ -218,6 +218,12 @@ def analyse(strFilename):
     
     occCity.printRes()
     occWeather.printRes()
+    
+    # compute score
+    for k,v in dicoStat.items():
+        n = 0
+        n = v.nbrBreakfast + v.nbrLunch + v.nbrDinner
+        dicoStat[k].score = v
     
     for k,v in dicoStat.items():
         print("%s:\n%s" % (k,str(v)))

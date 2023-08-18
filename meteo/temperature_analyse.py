@@ -15,6 +15,7 @@ class HelperStat:
     """
     def __init__( self ):
         self.minNight = 999 # min of the night of the current analysed day
+        self.maxDay = -999
         
         self.strPrevDay = ""
         
@@ -39,12 +40,16 @@ class Stat:
         
         self.nbrDinner = 0 # nbr dinner at 19.30 >= 20
         
+        self.nbrHotDay = 0 # nbr max > 33, 32 is unconfortable, if it raise to 34 it means a lot of hour are > 32
+        
         self.nbrHotNight = 0 # nbr min night >= 20
         self.nbrColdNight = 0 # nbr min night < 13
         self.nbrWetDay = 0 # day with more than 15min of rain # day is >= 8 and < 22
         self.nbrWetNight = 0 # night with more than 15min of rain
         
         self.score = 0 # nbr points for this location
+        self.score_bonus = 0 # detail of bonus
+        self.score_malus = 0 # detail of malus
         
     def __str__(self):
         o  = ""
@@ -55,8 +60,9 @@ class Stat:
         o += "  breakfast: %s\n" % self.nbrBreakfast
         o += "  lunch: %s\n" % self.nbrLunch
         o += "  dinner: %s\n" % self.nbrDinner
-        o += "  cold night: %s\n" % self.nbrColdNight
+        o += "  hot day: %s\n" % self.nbrHotDay
         o += "  hot night: %s\n" % self.nbrHotNight
+        o += "  cold night: %s\n" % self.nbrColdNight
         o += "  wet day: %s\n" % self.nbrWetDay
         o += "  wet night: %s\n" % self.nbrWetNight
         o += "  score: %s\n" % self.score
@@ -81,6 +87,9 @@ def analyse(strFilename):
     dicoHelper = {} # city => HelperStat
     
     dicoStat = {} # dico per city and month => stat
+    
+    strStartDate = ""
+    strStopDate = ""
 
     
     nNumLine = 0
@@ -96,9 +105,11 @@ def analyse(strFilename):
             datas[i] = datas[i].strip()
         
         strDate, strTime, strCity, strTemp = datas[:4]
+        strDate = strDate.decode()
+        strTime = strTime.decode()
         strCity = strCity.decode()
-        strMonth = strDate.decode()[5:7]
-        strHour = strTime.decode()[0:2]
+        strMonth = strDate[5:7]
+        strHour = strTime[0:2]
         nHour = int(strHour)
         if bVerbose: print("nHour: %s" % nHour)
         
@@ -106,6 +117,10 @@ def analyse(strFilename):
         
         bNight = nHour >= 22 or nHour <= 7
         bDay = not bNight
+        
+        if strStartDate == "":
+            strStartDate = strDate
+        strStopDate = strDate
         
         # analyse conditions
         strWeather = "?"
@@ -147,7 +162,12 @@ def analyse(strFilename):
                     dicoStat[key].nbrHotNight += 1
                 if dicoHelper[strCity].minNight < 13:
                     dicoStat[key].nbrColdNight += 1
-            
+
+            if strCity in dicoHelper and dicoHelper[strCity].maxDay > -999:
+                if bVerbose: print("maxday: %s" % dicoHelper[strCity].maxDay)
+                if  dicoHelper[strCity].maxDay > 33:
+                    if bVerbose: print("hot day!")
+                    dicoStat[key].nbrHotDay+= 1
         
         
         occCity.add(strCity)
@@ -175,6 +195,10 @@ def analyse(strFilename):
             if bVerbose: print("min night: %s" % dicoHelper[strCity].minNight)
             if dicoHelper[strCity].minNight > nTemp:
                 dicoHelper[strCity].minNight = nTemp
+                
+        if bDay:
+            if dicoHelper[strCity].maxDay < nTemp:
+                dicoHelper[strCity].maxDay = nTemp
             
             
         if dicoStat[key].min > nTemp:
@@ -218,14 +242,38 @@ def analyse(strFilename):
     
     occCity.printRes()
     occWeather.printRes()
-    
+
     # compute score
     for k,v in dicoStat.items():
-        n = 0
-        n = v.nbrBreakfast + v.nbrLunch + v.nbrDinner
-        dicoStat[k].score = v
+        b = 0
+        m = 0
+        b = v.nbrBreakfast + v.nbrLunch + v.nbrDinner
+        m += v.nbrHotDay + v.nbrHotNight + v.nbrColdNight
+        m += v.nbrWetDay + v.nbrWetNight
+        
+        dicoStat[k].score = b-m
+        dicoStat[k].score_bonus = b
+        dicoStat[k].score_malus = m
+        
+    
+    scorePerCity = {} # score, bonus, malus
     
     for k,v in dicoStat.items():
+        strCity = k.split("__")[0]
+        if strCity not in scorePerCity:
+            scorePerCity[strCity] = [0,0,0]
+        scorePerCity[strCity][0] += dicoStat[k].score
+        scorePerCity[strCity][1] += dicoStat[k].score_bonus
+        scorePerCity[strCity][2] += dicoStat[k].score_malus
+    
+    for k,v in dicoStat.items():
+        print("%s:\n%s" % (k,str(v)))
+        
+    print("start: %s" % strStartDate)
+    print("stop: %s" % strStopDate)
+    print("")
+        
+    for k,v in sorted(scorePerCity.items(),key=lambda a:a[1], reverse=True):
         print("%s:\n%s" % (k,str(v)))
     
     f.close()
@@ -233,7 +281,41 @@ def analyse(strFilename):
 # analyse - end
         
         
-    
+"""
+start: 2022/12/06
+stop: 2023/08/14
+
+Las Palmas:
+[379, 455, 76]
+Tavira:
+[151, 368, 217]
+Bonifacio:
+[79, 251, 172]
+VN Gaia:
+[52, 267, 215]
+Catanzaro:
+[41, 234, 193]
+Beziers:
+[-52, 282, 334]
+Bordeaux:
+[-70, 255, 325]
+Biarritz:
+[-82, 251, 333]
+Vacheres:
+[-143, 193, 336]
+Le Kremlin-Bicetre:
+[-180, 183, 363]
+Paris:
+[-190, 182, 372]
+Annecy:
+[-206, 205, 411]
+Bort-les-Orgues:
+[-239, 169, 408]
+Saint-bonnet-pret-bort:
+[-282, 140, 422]
+St Malo:
+[-283, 101, 384]
+"""
     
     
     

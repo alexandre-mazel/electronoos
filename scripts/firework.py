@@ -489,7 +489,13 @@ class Game:
                     
                 self.players[0].vx = limit(self.players[0].vx,3)
                 self.players[0].vy = limit(self.players[0].vy,3)
-                    
+                            
+        #~ if self.clock.tick() == 3:
+        #~ if self.clock.get_fps() > 30:
+        if int(time.time()) % 5 == 0:
+            self.addProjectile(0)
+            self.addProjectile(1)
+        
         return False
         
     def addProjectile(self, numPlayer):

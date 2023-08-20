@@ -10,6 +10,7 @@ black = (0, 0, 0)
 gray = (127, 127, 127)
 white = (255, 255, 255)
 red = (255, 0, 0)
+pink = (255, 127, 127)
 green = (0, 255, 0)
 greenl = (127, 255, 127)
 yellow = (255, 255, 0)
@@ -80,6 +81,8 @@ class Player:
         self.timeFrozen = time.time()
         
         self.bMulti = 0
+        self.bExplode = 0
+        self.bDiaree = 0
     
     def update(self,ws,hs):
         if time.time() > self.timeFrozen:
@@ -155,6 +158,8 @@ class Projectile:
         self.v = v
         self.angle = angle
         self.life = 800
+        self.color = red
+        self.bExplode = 0
     
     def update(self,ws,hs):
         """
@@ -175,12 +180,27 @@ class Projectile:
             self.y+=hs
             
         self.life -= 1
+        
+        if self.life <= 700 and self.bExplode:
+            self.life = 0
+            global global_theGame
+            rAngleInc = 0.1
+            n = 63
+            color = [pink,red,blue,green,yellow][random.randint(0,4)]
+            for i in range(n):
+                newProj = Projectile()
+                newProj.angle += rAngleInc*(i-n//2)
+                newProj.x = self.x
+                newProj.y = self.y
+                newProj.v = 1+random.random()*0.1
+                newProj.life //= 4
+                newProj.color = color
+                global_theGame.projectiles.append(newProj)      
 
         return self.life > 0
     
     def render(self, surface):
-        color = red
-        pg.draw.circle(surface,color,(self.x,self.y),2,width=2)
+        pg.draw.circle(surface,self.color,(self.x,self.y),2,width=2)
         
         
 class Bonus:
@@ -309,8 +329,8 @@ class Game:
         
         self.bEndOfGame = 0
         
-        self.players[0].bMulti = 1
-        self.players[0].life *= 5
+        #~ self.players[0].bMulti = 1
+        #~ self.players[0].life *= 5
         
         
     def getCommandAI(self):
@@ -477,23 +497,15 @@ class Game:
         
     def addProjectile(self, numPlayer):
         newProj = self.players[numPlayer].shoot()
+        newProj.bExplode = self.players[numPlayer].bExplode
         self.projectiles.append(newProj)
         if self.players[numPlayer].bMulti and 1:
-            rAngleInc = 0.2
-            for i in range(9):
-                newProj = self.players[numPlayer].shoot()
-                newProj.angle += rAngleInc*(i-4)
-                self.projectiles.append(newProj)       
-
-        if self.players[numPlayer].bMulti and 0:
-            # feu d'artifices
-            n = 100
             rAngleInc = 0.1
-            for i in range(n):
+            for i in range(5):
                 newProj = self.players[numPlayer].shoot()
-                newProj.angle += rAngleInc*(i-n//2)
-                newProj.x -= 400
-                self.projectiles.append(newProj)      
+                newProj.bExplode = self.players[numPlayer].bExplode
+                newProj.angle += rAngleInc*(i-2)
+                self.projectiles.append(newProj)         
                 
         #~ self.projectiles = self.projectiles[-1000:]
 
@@ -511,8 +523,11 @@ class Game:
         for p in self.planets:
             p.update(self.ws,self.hs)
         
-        for p in self.players:
+        for num_player,p in enumerate(self.players):
+            if p.bDiaree and int(time.time()) % 6 == 0 and self.clock.get_fps() > 30:
+                self.addProjectile(num_player)
             p.update(self.ws,self.hs)
+
             
         # collision interplayer
         for i in range(len(self.players)):
@@ -563,10 +578,15 @@ class Game:
             for b in self.bonuses:
                 if distSquared(p,b)<math.pow(p.r,2)+math.pow(b.w,2):
                     b.ttl = 0
-                    if random.random()>0.6:
-                        p.life += 3
-                        if p.life>p.lifemax:
-                            p.life = p.lifemax
+                    if random.random() > 0.5:
+                        if random.random() > 0.5 and not p.bMulti:
+                            p.bMulti = 1
+                        elif random.random() > 0.5 and not p.bExplode:
+                            p.bExplode = 1
+                        else:
+                            p.life += 3
+                            if p.life>p.lifemax:
+                                p.life = p.lifemax
                     else:
                         p.timeFrozen = time.time()+5.
                         p.vx = 0
@@ -684,8 +704,11 @@ class Game:
 # class Game - end
 
 
+global_theGame = None
 def runGame():
+    global global_theGame
     game = Game()
+    global_theGame = game
     while 1:
         bQuit = game.handleInput()
         if bQuit:

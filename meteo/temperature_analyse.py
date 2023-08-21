@@ -113,6 +113,7 @@ def analyse(strFilename):
         strDate = strDate.decode()
         strTime = strTime.decode()
         strCity = strCity.decode()
+        strYear = strDate[0:4]
         strMonth = strDate[5:7]
         strHour = strTime[0:2]
         nHour = int(strHour)
@@ -146,7 +147,7 @@ def analyse(strFilename):
             
         bNewDay = 0 # new matinee
         
-        key = strCity + "__" + strMonth
+        key = strCity + "__" + strYear + "/" + strMonth
 
         if strCity not in dicoHelper:
             if bVerbose: print("create new helper was not")
@@ -265,23 +266,34 @@ def analyse(strFilename):
         
     
     scorePerCity = {} # score, bonus, malus
+    scorePerMonth = {} # (ville, score)
     
     for k,v in dicoStat.items():
         strCity = k.split("__")[0]
+        strMonth = k.split("__")[1]
         if strCity not in scorePerCity:
             scorePerCity[strCity] = [0,0,0]
         scorePerCity[strCity][0] += dicoStat[k].score
         scorePerCity[strCity][1] += dicoStat[k].score_bonus
         scorePerCity[strCity][2] += dicoStat[k].score_malus
+        if strMonth not in scorePerMonth:
+            scorePerMonth[strMonth] = []
+        scorePerMonth[strMonth].append( (strCity,dicoStat[k].score) )
     
     for k,v in dicoStat.items():
         print("%s:\n%s" % (k,str(v)))
+        
+    print("palmares par mois:")
+    for k,v in sorted(scorePerMonth.items()):
+        v = sorted(v,key=lambda a:a[1], reverse=True)
+        print("%s:\n%s" % (k,str(v)))
+    
         
     print("start: %s" % strStartDate)
     print("stop: %s" % strStopDate)
     print("")
         
-    for k,v in sorted(scorePerCity.items(),key=lambda a:a[1], reverse=True):
+    for k,v in sorted(scorePerCity.items(),key=lambda a:a[1][0], reverse=True):
         print("%s:\n%s" % (k,str(v)))
     
     f.close()

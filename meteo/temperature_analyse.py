@@ -30,6 +30,9 @@ class HelperStat:
 
 class Stat:
     def __init__( self ):
+        self.nbrMeasures = 0
+        self.sumTemperature = 0
+        
         self.nbrDay = 0
         self.min = 999
         self.max = -40
@@ -54,8 +57,10 @@ class Stat:
     def __str__(self):
         o  = ""
         #~ o += " min: %s, max: %s, hotnight: %s" % (self.min,self.max,self.nbrHotNight)
+        o += "  nbr measures: %s\n" % self.nbrMeasures
         o += "  nbr day: %s\n" % self.nbrDay
         o += "  min: %s\n" % self.min
+        o += "  med: %.1f\n" % (self.sumTemperature/self.nbrMeasures)
         o += "  max: %s\n" % self.max
         o += "  breakfast: %s\n" % self.nbrBreakfast
         o += "  lunch: %s\n" % self.nbrLunch
@@ -65,7 +70,7 @@ class Stat:
         o += "  cold night: %s\n" % self.nbrColdNight
         o += "  wet day: %s\n" % self.nbrWetDay
         o += "  wet night: %s\n" % self.nbrWetNight
-        o += "  score: %s\n" % self.score
+        o += "  score: %s (%s,%s)\n" % (self.score,self.score_bonus,self.score_malus)
         return o
         
 def isListIn(word,list):
@@ -201,6 +206,9 @@ def analyse(strFilename):
                 dicoHelper[strCity].maxDay = nTemp
             
             
+        dicoStat[key].nbrMeasures += 1
+        dicoStat[key].sumTemperature += nTemp
+        
         if dicoStat[key].min > nTemp:
            dicoStat[key].min = nTemp
 

@@ -142,6 +142,9 @@ def analyse(strFilename):
         bRainOrSnow = bRain or bSnow
         occWeather.add(strWeather)
         
+        if "Beziers" in strCity:
+            print(datas)
+        
         
         if bVerbose: print("bNight: %s" % bNight)
             
@@ -156,6 +159,13 @@ def analyse(strFilename):
         if nHour >= 8 and dicoHelper[strCity].strPrevDay != strDate:
             if bVerbose: print("new day")
             bNewDay = 1
+            
+            # affiche les infos sur une ville particuliere
+                                 
+            if "Beziers" in strCity and 0:
+                # ne fontionne pas!
+                if strCity in dicoHelper and dicoHelper[strCity].minNight < 999:
+                    print("Beziers %s: %s" % (dicoHelper[strCity].strPrevDay, dicoStat[key]) )
             
 
             dicoHelper[strCity].strPrevDay = strDate
@@ -263,6 +273,7 @@ def analyse(strFilename):
         dicoStat[k].score = b-m
         dicoStat[k].score_bonus = b
         dicoStat[k].score_malus = m
+    
         
     
     scorePerCity = {} # score, bonus, malus
@@ -337,6 +348,7 @@ St Malo:
 [-283, 101, 384]
 """
     
+# a faire: par equipe de 2: quel est la meilleur combinaison par mois
     
     
     

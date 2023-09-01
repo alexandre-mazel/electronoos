@@ -19,6 +19,14 @@ orange = (255, 135, 0)
 blue = (0, 0, 255)
 bluel = (127, 127, 255)
 
+def blendColor(color,alpha,backColor = (0,0,0)):
+    """
+    Dim a color (make it blend with background)
+    - alpha: 0: totally transparent, 1: opaque
+    """
+    return int(color[0]*alpha+backColor[0]*(1-alpha)),int(color[1]*alpha+backColor[1]*(1-alpha)),int(color[2]*alpha+backColor[2]*(1-alpha))
+    
+
 """
 Exemple de collision entre 2 rectangles
 """
@@ -63,6 +71,36 @@ def normpi(a):
     elif a > math.pi: a-=math.pi*2
     print("DBG:normpi (2): %s" % a)
     return a
+    
+class Effect:
+    def __init__(self,x,y,text="",color=white):
+        self.x = x
+        self.y = y
+        self.text = text
+        self.color = color
+        self.lifemax = 60
+        self.life = self.lifemax
+        self.size = 24
+        self.fontTitle = pg.font.SysFont('Arial', self.size)
+        
+    def update(self):
+        self.life -= 1
+        nPrevSize = self.size
+        self.size = self.life
+        self.y -= 3
+        #~ self.x -= (self.life%7)-3
+        if self.size != nPrevSize and 0:
+            self.fontTitle = pg.font.SysFont('Arial', self.size)
+            
+        return self.life>0
+        
+    def render(self, surface):
+        color = blendColor(self.color,min(1,self.life/(self.lifemax//3)))
+        text_surface = self.fontTitle.render(self.text, False, color)
+        surface.blit(text_surface, (self.x,self.y))
+        
+# class Effect - end        
+    
 
 class Player:
     def __init__(self,x=200,y=200,r=10,angle=0,color=bluel):
@@ -293,6 +331,7 @@ class Game:
         self.projectiles = []
         self.planets = []
         self.bonuses = []
+        self.effects = []
         
         self.bOpponentIsAi = 1 # turn to one to activate AI
         self.bOpponentIsAi = 0
@@ -331,6 +370,8 @@ class Game:
         
         #~ self.players[0].bMulti = 1
         #~ self.players[0].life *= 5
+        
+        self.effects.append(Effect(self.ws//2,self.hs//2,"Let's Fight !!!"))
         
         
     def getCommandAI(self):
@@ -522,6 +563,13 @@ class Game:
         
         for p in self.planets:
             p.update(self.ws,self.hs)
+            
+        i = 0
+        while i < len(self.effects):
+            if not self.effects[i].update():
+                del self.effects[i]
+                continue
+            i += 1
         
         for num_player,p in enumerate(self.players):
             if p.bDiaree and int(time.time()) % 6 == 0 and self.clock.get_fps() > 30:
@@ -577,20 +625,29 @@ class Game:
         for p in self.players:
             for b in self.bonuses:
                 if distSquared(p,b)<math.pow(p.r,2)+math.pow(b.w,2):
+                    txt = ""
+                    color = green
                     b.ttl = 0
                     if random.random() > 0.5:
                         if random.random() > 0.5 and not p.bMulti:
                             p.bMulti = 1
+                            txt = "multi"
                         elif random.random() > 0.5 and not p.bExplode:
                             p.bExplode = 1
+                            txt = "explode"
                         else:
                             p.life += 3
                             if p.life>p.lifemax:
                                 p.life = p.lifemax
+                            txt = "life up"
                     else:
                         p.timeFrozen = time.time()+5.
                         p.vx = 0
                         p.vy = 0
+                        txt = "frozen"
+                        color = red
+                        
+                    self.effects.append(Effect(p.x-20,p.y,txt,color))
                 
 
         i = 0
@@ -663,6 +720,9 @@ class Game:
             p.render(self.screen)
             
         for p in self.bonuses:
+            p.render(self.screen)
+            
+        for p in self.effects:
             p.render(self.screen)
             
         for p in self.players:

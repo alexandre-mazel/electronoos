@@ -544,7 +544,7 @@ class Game:
             rAngleInc = 0.1
             for i in range(5):
                 newProj = self.players[numPlayer].shoot()
-                newProj.bExplode = self.players[numPlayer].bExplode
+                newProj.bExplode = self.players[numPlayer].bExplode and random.random()>0.7 # quand multi il
                 newProj.angle += rAngleInc*(i-2)
                 self.projectiles.append(newProj)         
                 
@@ -639,7 +639,7 @@ class Game:
                             p.life += 3
                             if p.life>p.lifemax:
                                 p.life = p.lifemax
-                            txt = "life up"
+                            txt = "life"
                     else:
                         p.timeFrozen = time.time()+5.
                         p.vx = 0

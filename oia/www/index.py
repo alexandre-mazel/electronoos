@@ -1,4 +1,6 @@
-# l'indx pour oia
+# -*- coding: cp1252 -*-
+
+# l'index pour oia
 
 def outputJs():
     return """
@@ -63,7 +65,7 @@ def index(req):
     strOut += "Bienvenue sur l'espace de l'option IA<br>"
     strOut += "<br>Rappels de syntaxes / Python Cheat Sheets: &nbsp; %s &nbsp;  <a href='OIA_Python_CheatSheets.pdf'>T&eacute;l&eacute;charger</a>" % generateCodeToViewPdf("OIA_Python_CheatSheets.pdf","Consulter en ligne")
     strOut += "<br>"
-    strOut += "<br>Exercices pour les plus avancés: %s  &nbsp;  <a href='OIA_Cycle1_et_2_exercices_bonus.pdf'>T&eacute;l&eacute;charger</a>" % generateCodeToViewPdf("OIA_Cycle1_et_2_exercices_bonus.pdf","Consulter en ligne")
+    strOut += "<br>Exercices pour les plus avanc&eacute;s: %s  &nbsp;  <a href='OIA_Cycle1_et_2_exercices_bonus.pdf'>T&eacute;l&eacute;charger</a>" % generateCodeToViewPdf("OIA_Cycle1_et_2_exercices_bonus.pdf","Consulter en ligne")
     strOut += "<br>"
     strOut += "<br><a href='src/'>Les sources de base</a>"
     strOut += "<br>"

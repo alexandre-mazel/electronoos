@@ -41,6 +41,8 @@ void get_network_info(){
         Serial.println((String)"[+] RSSI : " + WiFi.RSSI() + " dB");
         Serial.print("[+] ESP32 IP : ");
         Serial.println(WiFi.localIP());
+        Serial.print("[+] RRSI (dB): ");
+        Serial.println(WiFi.RSSI());
     }
 }
 
@@ -100,19 +102,37 @@ void setup(){
     //WiFi.disconnect(); // if you want to disconnect, then WiFi.reconnect();
 }
 
-void sendInfoToRpi(void)
+void sendInfoUsingSocket(void)
 {
+  // you need to have scripts/socket_listen.py running on your computer
   WiFiClient client;
-  if (!client.connect("192.168.0.11", 1032)) 
+  if (!client.connect("192.168.0.46", 1032)) 
   {
-   Serial.println("Connection to host failed");
+   Serial.println("ERR: Connection to host failed");
+   return;
   }
-  client.print("Hello from ESP32!");
+  Serial.println("Sending data thru network...");
+
+  client.print(hostname.c_str());
+  client.print(": Hello from ESP32!");
   client.stop();
 }
 
 void loop()
 {
-   delay(5000);
-   return;
+  sendInfoUsingSocket();
+  if(1)
+  {
+    delay(5000);
+    //delay(1); // to measure power consumption
+  }
+  else
+  {
+    // deep sleep (ennuyeux car fait new device dans windows chaque 10 sec)
+    esp_sleep_enable_timer_wakeup(5 * 1000000);
+    esp_deep_sleep_start();
+    // WiFi.reconnect(); // pas utile
+  }
+  
+  return;
 }

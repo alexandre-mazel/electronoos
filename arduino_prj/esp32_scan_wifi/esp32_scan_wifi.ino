@@ -22,9 +22,19 @@ void setup(){
     WiFi.mode(WIFI_STA);
 }
 
-const char* intToChar(const uint_8 buf)
+char* intBufferToChar(const uint8_t * buf)
 {
-
+  const int nSizeBufMax = 32;
+  static char bufConverted[nSizeBufMax];
+  int i;
+  for( i = 0; i < nSizeBufMax; ++i )
+  {
+    if( buf[i] == 0)
+      break;
+    bufConverted[i] = '0' + buf[i];
+  }
+  bufConverted[i] = '\0';
+  return bufConverted;
 }
 
 void loop() {
@@ -48,7 +58,7 @@ void loop() {
                 Serial.print(" dB) [");
                 Serial.print(get_encryption_type(WiFi.encryptionType(i)));
                 Serial.print("] [");
-                Serial.print(intToChar(WiFi.BSSID(i)));
+                Serial.print(intBufferToChar(WiFi.BSSID(i)));
                 Serial.println("]");
                 delay(20);
             }

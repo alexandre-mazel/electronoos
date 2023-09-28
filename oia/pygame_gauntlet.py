@@ -789,5 +789,14 @@ puis 3 dernier mois un gros projets.
 premiere:
 la partie sur les classe va trop vite
 plusse de  cours
+
+demander a google un mot clé.
+analyser les réponses:
+- chercher les phrases qui reviennenet le plus (word embedding)
+- faire une clusterisation des réponses
+
+demander les photos d'un mot clé
+- faire un apprentissage du visage de chaque photo ?
+- clusterisation des photos
 """
 

@@ -24,16 +24,23 @@ void setup(){
 
 char* intBufferToChar(const uint8_t * buf)
 {
-  const int nSizeBufMax = 32;
+  // quick and dirty way to concert a buffer of short int to printable data
+  const int nSizeBufMax = 128;
   static char bufConverted[nSizeBufMax];
   int i;
+  int j = 0;
   for( i = 0; i < nSizeBufMax; ++i )
   {
-    if( buf[i] == 0)
+    if( buf[i] == 0 || i >= nSizeBufMax/3)
       break;
-    bufConverted[i] = '0' + buf[i];
+    bufConverted[j] = '0' + buf[i]/10;
+    ++j;
+    bufConverted[j] = '0' + buf[i]%10;
+    ++j;
+    bufConverted[j] = ' ';
+    ++j;
   }
-  bufConverted[i] = '\0';
+  bufConverted[j] = '\0';
   return bufConverted;
 }
 

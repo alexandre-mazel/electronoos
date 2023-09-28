@@ -3,6 +3,31 @@
 const char* ssid = "Liberte";
 const char* password = "lagrosseliberte666!"; // to do: write it in rom once then load it from rom
 
+String hostname = "ESP32_Alex";
+
+/*
+Use wifi multi to connect to the strongest from a long list
+
+#include <WiFiMulti.h>
+
+WiFiMulti wifiMulti;
+
+// WiFi connect timeout per AP. Increase when connecting takes longer.
+const uint32_t connectTimeoutMs = 10000;
+
+void setup(){
+  Serial.begin(115200);
+  delay(10);
+  WiFi.mode(WIFI_STA);
+  
+  // Add list of wifi networks
+  wifiMulti.addAP("ssid_from_AP_1", "your_password_for_AP_1");
+  wifiMulti.addAP("ssid_from_AP_2", "your_password_for_AP_2");
+  wifiMulti.addAP("ssid_from_AP_3", "your_password_for_AP_3");
+  
+
+*/
+
 void get_network_info(){
     if(WiFi.status() == WL_CONNECTED) {
         Serial.print("[*] Network information for ");
@@ -56,6 +81,8 @@ void setup(){
       Serial.print("DBG Forcing IP fixe");
       WiFi.config(ip, gateway, subnet, dns);
     }
+
+    // set a specific hostname: WiFi.setHostname(hostname.c_str()); //define hostname
 
     WiFi.begin(ssid, password);
     Serial.println("\nConnecting");

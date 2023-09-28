@@ -96,6 +96,23 @@ void setup(){
     Serial.print("Local ESP32 IP: ");
     Serial.println(WiFi.localIP());
     get_network_info();
+
+    //WiFi.disconnect(); // if you want to disconnect, then WiFi.reconnect();
 }
 
-void loop(){}
+void sendInfoToRpi(void)
+{
+  WiFiClient client;
+  if (!client.connect("192.168.0.11", 1032)) 
+  {
+   Serial.println("Connection to host failed");
+  }
+  client.print("Hello from ESP32!");
+  client.stop();
+}
+
+void loop()
+{
+   delay(5000);
+   return;
+}

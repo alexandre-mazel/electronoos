@@ -67,11 +67,20 @@ void loop() {
                 Serial.print("] [");
                 Serial.print(intBufferToChar(WiFi.BSSID(i)));
                 Serial.println("]");
-                delay(20);
+                delay(10);
             }
         }
         Serial.println("");
 
         // Wait a bit before scanning again
-        delay(5000);
+        if(1)
+        {
+          delay(10000);
+        }
+        else
+        {
+          // deep sleep (ennuyeux car fait new device dans windows chaque 10 sec)
+          esp_sleep_enable_timer_wakeup(30 * 1000000);
+          esp_deep_sleep_start();
+        }
 }

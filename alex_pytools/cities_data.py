@@ -705,6 +705,28 @@ class Cities:
         self.cacheLastFindByRealName = (strCityName,bPartOf,-1)
         return -1
         
+    def findByLongLat( self, rLong, rLat ):
+        """
+        find nearest city of a gps point.
+        return slug name
+        """
+        # for each slug: (strDept,strZip,strCitySimple,strCityReal,float(strLong),float(strLat))
+        strMinSlug = ""
+        rMinDist = 999
+        for slug,data in self.cityPerSlug.items():
+            citylong = data[4]
+            citylat = data[5]
+            diff = (citylong-rLong)*(citylong-rLong)+(citylat-rLat)*(citylat-rLat)
+            if diff < rMinDist:
+                rMinDist = diff
+                strMinSlug = slug
+                print("DBG: findByLongLat: diff: %.3f, slug: %s" % (diff,slug))
+        print("DBG: findByLongLat: exiting with: diff: %.3f, slug: %s" % (rMinDist,strMinSlug))
+        return strMinSlug
+            
+        
+        
+        
     def isValidAdress( self, zip, strCityName ):
         """
         is this zip correpond roughly to this city.
@@ -1381,6 +1403,9 @@ def autotest_cities():
     
     dist = cities.distTwoZip("98000","06500",bVerbose=True) # Menton et Monaco
     assert_diff(dist,11,4)
+    
+    val = cities.findByLongLat(2.345418299722222,48.80381479972222)
+    assert_equal( val, "le kb" )
     
 # autotest_cities - end
 

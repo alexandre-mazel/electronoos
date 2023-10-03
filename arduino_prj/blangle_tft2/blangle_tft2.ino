@@ -489,7 +489,7 @@ int render_screen(int nPresel, int nip, int db, int bubble, double circ,int bLoc
     tft.setCursor(nMenuW+50, yText+nLineH*5);
     
     tft.print(nip);
-    tft.print("cm");
+    tft.print("mm");
   }
 
   if(nPrevDb != db )
@@ -579,6 +579,7 @@ void loop()
     int dy = 0;
     int nip; //cm
     int db;
+    int angle_nip;
     int bubble=0;
     //Serial.println("loop... blangle2");
 
@@ -588,9 +589,13 @@ void loop()
 
     //bubble = bjy_getAngle(0);
     // db = bjy_getAngle(1);
-    db = -bjy_getAngle(0);
+    db = bjy_getAngle(1);
+    angle_nip = -bjy_getAngle(0);
+    angle_nip -= 41; // calibration en hard todo: => eeprom
     //nip = 2*rCirc*3.14159265358979323846264*db/360;
-    nip = (presetCirc[nNumSettingsSelected]*db/360)/10/10; // /10 for angle, then /10 for cm
+    nip = (presetCirc[nNumSettingsSelected]*angle_nip/360)/10/1; // /10 for angle, then /10 for cm
+    //if(nip<0)
+    nip += 43; // demi largeur du capteur - (distance des 2 extremites de contacts)
     
 
     if(0)

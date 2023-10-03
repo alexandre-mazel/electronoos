@@ -352,7 +352,7 @@ const int nNbrSettings = 8;
 int nNumSettingsSelected = 0; // 0 to nNbrSettings-1
 
 
-double presetCirc[nNbrSettings] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+double presetCirc[nNbrSettings] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}; // en mm
 
 const byte nEepromVersion = 100; // to differentiate from other program (arome...)
 void loadConfigFromEeprom()
@@ -595,11 +595,11 @@ void loop()
     // db = bjy_getAngle(1);
     angle_db = -bjy_getAngle(1);
     angle_nip = -bjy_getAngle(0);
-    angle_nip -= 41; // calibration en hard todo: => eeprom
-    angle_db -= 4; // sur la tranche on doit avoir 90, calibration en hard todo: => eeprom
+    angle_nip -= 41; // calibration en hard (lecture du zero quand posé a plat) todo stocke dans eeprom
+    angle_db -= 7; // sur la tranche on doit avoir 90, calibration en hard todo: => eeprom
     //angle_db -= 900; // offset face=>tranche - pas la peine, car on veut la difference par rapport a la verticaile et pas l'horizontale
     //nip = 2*rCirc*3.14159265358979323846264*db/360;
-    nip = (presetCirc[nNumSettingsSelected]*angle_nip/360)/10/1; // /10 for angle, then /10 for cm
+    nip = (presetCirc[nNumSettingsSelected]*angle_nip/360)/10/1; // /10 for angle, then /10 for cm or /1 for mm
 
     nip += nHalfBoitierMM;
 

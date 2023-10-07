@@ -606,6 +606,8 @@ void loop()
     db = angle_db - ( angle_nip + 3600*(nHalfBoitierMM / presetCirc[nNumSettingsSelected]));
     //db = angle_db; // pour afficher le capteur brut apres calib
 
+    db = analogRead(A15)*(5.0*8 / 1023.0);
+
     if(0)
     { // code de test/debug
       const char *aspectname[] = 

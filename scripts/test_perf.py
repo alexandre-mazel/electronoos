@@ -1252,6 +1252,23 @@ disk_read     1KB: ####################  12.23s (327.03 Mo/s)
 disk_write 1024KB: ####################  60.98s (65.59 Mo/s)
 disk_read  1024KB: ####################   1.47s (2718.76 Mo/s)
 
+microsd Sandisk Extreme Pro 256 dans slot microsd:
+disk_write    1KB: ####################  17.76s (56.32 Mo/s)
+disk_read     1KB: ####################   3.38s (295.91 Mo/s)
+disk_write 1024KB: ####################  15.08s (66.32 Mo/s)
+disk_read  1024KB: ####################   0.38s (2660.04 Mo/s)
+sur 4000MB:
+disk_write    1KB: ####################  59.47s (67.26 Mo/s)
+disk_read     1KB: ####################  12.91s (309.82 Mo/s)
+disk_write 1024KB: ####################  61.63s (64.90 Mo/s)
+disk_read  1024KB: ####################   1.35s (2973.70 Mo/s)
+
+new sandisk fit mini usb 256Go sur port usb (depuis anyplus c'est kifkif):
+disk_write    1KB: ####################  16.45s (60.78 Mo/s)
+disk_read     1KB: ####################   3.20s (312.69 Mo/s)
+disk_write 1024KB: ####################   9.80s (102.09 Mo/s)
+disk_read  1024KB: ####################   0.35s (2830.65 Mo/s)
+
 
 Sandisk Ultra 1To sur lecteur USB
 sur 4000MB:

@@ -439,8 +439,8 @@ def test_perf(nDiskTestSizeMB=200,bTestMultiThreading=True):
     print_cpu()
     print_ram()
     rTotalTime = 0;
-    #~ rTotalTime += test_cpu_int();
-    #~ rTotalTime += test_cpu_float();
+    rTotalTime += test_cpu_int();
+    rTotalTime += test_cpu_float();
     rTotalTime += test_ram(2);
     rTotalTime += test_ram(4);
     rTotalTime += test_ram(6);
@@ -1171,6 +1171,8 @@ python version   : 3.9.5 (64bits) (8 core(s))
 cpu              : Intel(R) Core(TM) i7-1065G7 CPU @ 1.30GHz
 ram              : 11.02 / 15.60 GB
 ram              : 10.73 / 15.60 GB
+test_cpu_int2    : ####################   0.46s
+test_cpu_float2  : ####################   0.07s
 test_cpu_ram 2G  : ####################   0.37s
 test_cpu_ram 4G  : ####################   0.65s
 test_cpu_ram 6G  : ####################   0.94s
@@ -1179,8 +1181,6 @@ test_cpu_ram10G  : ####################   2.29s
 test_cpu_ram12G  : ####################   3.77s
 test_cpu_ram14G  : ####################   5.76s
 test_cpu_ram16G  : ####################   7.93s  # require some of empty spaces (for swap)
-test_cpu_int2    : ####################   0.46s
-test_cpu_float2  : ####################   0.07s
 test_scipy_xxt   : ####################   0.89s (449.65x)
 test_orb4.5.2    : ####################   0.20s (490.18fps)
 test_orbcv imgs  : ####################   1.10s (91.16fps)
@@ -1189,6 +1189,31 @@ disk_write    1KB: ####################  20.61s (48.51 Mo/s)
 disk_read     1KB: ####################   5.24s (190.85 Mo/s)
 disk_write 1024KB: ####################   4.75s (210.67 Mo/s)
 disk_read  1024KB: ####################   0.27s (3640.21 Mo/s)
+
+
+# same 23/10/2023 after fresh reboot
+
+python version   : 3.9.5 (64bits) (8 core(s))
+cpu              : Intel(R) Core(TM) i7-1065G7 CPU @ 1.30GHz
+ram              : 11.96 / 15.60 GB
+test_cpu_int2    : ####################   0.42s
+test_cpu_float2  : ####################   0.06s
+test_cpu_ram 2G  : ####################   0.36s
+test_cpu_ram 4G  : ####################   0.68s
+test_cpu_ram 6G  : ####################   0.95s
+test_cpu_ram 8G  : ####################   1.23s
+test_cpu_ram10G  : ####################   1.77s
+test_cpu_ram12G  : ####################   1.91s
+test_cpu_ram14G  : ####################   4.43s
+test_cpu_ram16G  : ####################   6.93s
+test_scipy_xxt   : ####################   0.85s (468.08x)
+test_orb4.5.5    : ####################   0.27s (376.54fps)
+test_orbcv imgs  : ####################   0.90s (110.98fps)
+test_orbcv bis   : ####################   0.64s (157.29fps)
+disk_write    1KB: ####################   9.46s (105.73 Mo/s)
+disk_read     1KB: ####################   5.77s (173.38 Mo/s)
+disk_write 1024KB: ####################   4.76s (210.16 Mo/s)
+disk_read  1024KB: ####################   0.33s (3047.28 Mo/s)
 
 
 comparison test writing on ms tab 4:
@@ -1370,4 +1395,22 @@ disk_write    1KB: ####################  24.98s (40.03 Mo/s)
 disk_read     1KB: ####################   8.25s (121.24 Mo/s)
 disk_write 1024KB: ####################  17.95s (55.71 Mo/s)
 disk_read  1024KB: ####################   0.33s (3049.87 Mo/s)
+
+*** don de la region petit ordi de Corto
+python version   : 3.12.0 (64bits) (2 core(s))
+cpu              : Intel(R) Celeron(R) N5100 @ 1.10GHz
+test_cpu_int2    : ####################   0.71s
+test_cpu_float2  : ####################   0.13s
+test_cpu_ram 2G  : ####################   0.47s
+test_cpu_ram 4G  : ####################   0.98s
+test_cpu_ram 6G  : ####################   2.57s
+test_cpu_ram 8G  : ####################   3.79s
+test_cpu_ram10G  : ####################   5.35s
+test_cpu_ram12G  : ####################   7.00s
+test_cpu_ram14G  : ####################   10.51s
+test_cpu_ram16G  : ####################   12.65s
+disk_read     1KB: ####################   7.00s (142.92 Mo/s)
+disk_read  1024KB: ####################   1.38s (726.17 Mo/s)
+
+
 """

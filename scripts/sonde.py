@@ -4,9 +4,9 @@ import time
 
 """
 copy from pimeteo
-scp pi@192.168.0.38:/home/pi/save/local_temperature.txt C:\Users\alexa\dev\git\electronoos\meteo\pimeteo_local_temperature.txt
+scp pi@192.168.0.38:/home/pi/save/local_temperature.txt C:/Users/alexa/dev/git/electronoos/meteo/pimeteo_local_temperature.txt
 ou
-scp pi@192.168.0.38:/home/pi/save/local_temperature.txt C:\save\pimeteo_local_temperature.txt
+scp pi@192.168.0.38:/home/pi/save/local_temperature.txt C:/save/pimeteo_local_temperature.txt
 """
 
 
@@ -32,7 +32,8 @@ def getTemperatureFrom1wire(strDeviceID):
     #        t -= 1.5 # seems to be a bit higher than real
         else:
             t = -127
-    except FileNotFoundError:
+    except FileNotFoundError as err:
+        print("WRN: getTemperatureFrom1wire: file not found err: " + str(err))
         t = -127
     return t
     

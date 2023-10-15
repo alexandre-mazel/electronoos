@@ -352,7 +352,7 @@ const int nNbrSettings = 8;
 int nNumSettingsSelected = 0; // 0 to nNbrSettings-1
 
 
-double presetCirc[nNbrSettings] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+double presetCirc[nNbrSettings] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}; // en mm
 
 const byte nEepromVersion = 100; // to differentiate from other program (arome...)
 void loadConfigFromEeprom()
@@ -489,7 +489,7 @@ int render_screen(int nPresel, int nip, int db, int bubble, double circ,int bLoc
     tft.setCursor(nMenuW+50, yText+nLineH*5);
     
     tft.print(nip);
-    tft.print("cm");
+    tft.print("mm");
   }
 
   if(nPrevDb != db )
@@ -579,7 +579,12 @@ void loop()
     int dy = 0;
     int nip; //cm
     int db;
+    int angle_db;
+    int angle_nip;
     int bubble=0;
+    const int nHalfBoitierMM = 43; // demi largeur du capteur - (distance des 2 extremites de contacts)
+
+
     //Serial.println("loop... blangle2");
 
 
@@ -588,10 +593,20 @@ void loop()
 
     //bubble = bjy_getAngle(0);
     // db = bjy_getAngle(1);
-    db = -bjy_getAngle(0);
+    angle_db = -bjy_getAngle(1);
+    angle_nip = -bjy_getAngle(0);
+    angle_nip -= 41; // calibration en hard (lecture du zero quand posé a plat) todo stocke dans eeprom
+    angle_db -= 7; // sur la tranche on doit avoir 90, calibration en hard todo: => eeprom
+    //angle_db -= 900; // offset face=>tranche - pas la peine, car on veut la difference par rapport a la verticaile et pas l'horizontale
     //nip = 2*rCirc*3.14159265358979323846264*db/360;
-    nip = (presetCirc[nNumSettingsSelected]*db/360)/10/10; // /10 for angle, then /10 for cm
-    
+    nip = (presetCirc[nNumSettingsSelected]*angle_nip/360)/10/1; // /10 for angle, then /10 for cm or /1 for mm
+
+    nip += nHalfBoitierMM;
+
+    db = angle_db - ( angle_nip + 3600*(nHalfBoitierMM / presetCirc[nNumSettingsSelected]));
+    //db = angle_db; // pour afficher le capteur brut apres calib
+
+    db = analogRead(A15)*(5.0*8 / 1023.0);
 
     if(0)
     { // code de test/debug

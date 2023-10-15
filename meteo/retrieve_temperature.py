@@ -63,6 +63,12 @@ def retrieveTemp():
         cond = stringtools.findSubString(buf,start_cond,stop_cond)
         # beau: soleil avec un peu de nuage
         # ensoleillé: plein soleil
+        
+        if len(temp)>4:
+            # recemment il reste un tag dans la temp, on l'enleve.
+            idx = temp.find('<')
+            if idx != -1:
+                temp = temp[:idx]
         print("DBG: retrieveTemp: %s: temp: '%s' cond: '%s'" % (city,temp,cond) )
         try:
             if len(temp) < 3:

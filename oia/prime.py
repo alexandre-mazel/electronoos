@@ -20,7 +20,6 @@ def countPrime(n):
     
         
 def countPrimeSmart(n):
-    cpt = 0
     listPrime = []
     listPrime.extend(range(1,min(n,3)+1))
     #~ print(listPrime)
@@ -34,6 +33,7 @@ def countPrimeSmart(n):
             #~ print("  div by %d" % p )
             if (i % p) == 0:
                 bPrime = False
+                break # si on l'oublie ca fait x2 sur le temps d'execution
         if bPrime:
             # i is prime
             #~ print("=>found %d" % i)
@@ -59,3 +59,4 @@ print("duration: %.3f" % (time.time()-timeBegin))
 # without sqrt: 1329s (22min9s)
 # with sqrt: 2.35s
 # countPrimeSmart: 103s
+# countPrimeSmart: (ajout du break apres bIsprime = False; ligne 37

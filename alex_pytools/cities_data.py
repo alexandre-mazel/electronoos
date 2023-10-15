@@ -167,6 +167,8 @@ def isRepresentInt(s):
         
 def distLongLat( lo1, la1, lo2, la2 ):
     """
+    return dist in km
+    
     Source: http://villemin.gerard.free.fr/aGeograp/Distance.htm
     Pour de petites distances la methode utilisant le theoreme de Pythagore marche bien.
     
@@ -175,6 +177,7 @@ def distLongLat( lo1, la1, lo2, la2 ):
     
     Le facteur k retablit l'echelle en kilometre en sachant que 1 minute d'arc = 1 mille marin  = 1852 m; 
     a multiplier par 60 pour passer aux degres.
+    
     """
     #~ print(lo1, la1, lo2, la2)
     x = (lo2-lo1)*math.cos(((la2+la1)/2)*math.pi/180)
@@ -704,6 +707,30 @@ class Cities:
         if bVerbose: print("WRN: Cities.findByRealName: city '%s' not found (bPartOf:%d)" % (strCityName,bPartOf))
         self.cacheLastFindByRealName = (strCityName,bPartOf,-1)
         return -1
+        
+    def findByLongLat( self, rLong, rLat ):
+        """
+        find nearest city of a gps point.
+        return slug name
+        """
+        # for each slug: (strDept,strZip,strCitySimple,strCityReal,float(strLong),float(strLat))
+        strMinSlug = ""
+        rMinDist = 999
+        for slug,data in self.cityPerSlug.items():
+            citylong,citylat = data[4:6]
+            diff = (citylong-rLong)*(citylong-rLong)+(citylat-rLat)*(citylat-rLat)
+            if diff < rMinDist:
+                rMinDist = diff
+                strMinSlug = slug
+                #~ print("DBG: findByLongLat: diff: %.3f, slug: %s" % (diff,slug))
+        
+        city = self.cityPerSlug[strMinSlug]
+        dist = distLongLat(rLong, rLat,city[4],city[5])
+        print("DBG: findByLongLat: exiting with: diff: %.3f, slug: %s (dist: %.3f)" % (rMinDist,strMinSlug,dist))
+        return strMinSlug,dist
+            
+        
+        
         
     def isValidAdress( self, zip, strCityName ):
         """
@@ -1381,6 +1408,22 @@ def autotest_cities():
     
     dist = cities.distTwoZip("98000","06500",bVerbose=True) # Menton et Monaco
     assert_diff(dist,11,4)
+    
+    val,dist = cities.findByLongLat(2.345418299722222,48.80381479972222) # ma maison
+    assert_equal( val, "arcueil" )
+    assert_diff( dist, 0.9, 10.2 )
+    
+    val,dist = cities.findByLongLat(6.163830555555556,45.897038888888886) # les chaises longues prés d'annecy
+    assert_equal( val, "veyrier-du-lac" )
+    assert_diff( dist, 1.5, 0.2 )
+    
+    val,dist = cities.findByLongLat(6.163830555555556,45.897038888888886) # les chaises longues prés d'annecy
+    assert_equal( val, "veyrier-du-lac" )
+    assert_diff( dist, 1.5, 0.2 )
+
+    val,dist = cities.findByLongLat(2.324166835348288,48.84538969379644) # rue littre
+    assert_equal( val, "paris" )
+    assert_diff( dist, 2.2, 0.2 )
     
 # autotest_cities - end
 

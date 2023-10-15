@@ -722,7 +722,7 @@ class Cities:
             if diff < rMinDist:
                 rMinDist = diff
                 strMinSlug = slug
-                print("DBG: findByLongLat: diff: %.3f, slug: %s" % (diff,slug))
+                #~ print("DBG: findByLongLat: diff: %.3f, slug: %s" % (diff,slug))
         
         city = self.cityPerSlug[strMinSlug]
         dist = distLongLat(rLong, rLat,city[4],city[5])

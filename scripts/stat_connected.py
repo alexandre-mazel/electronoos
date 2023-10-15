@@ -200,6 +200,8 @@ class Stater:
             "20:C1:9B:F3:F2:0A": "Kakashi",
             
             "84:CF:BF:95:4A:88": "FairCorto",
+            "9E:DF:71:E1:AE:0E": "FairCorto2",
+
             "74:DA:38:F6:D8:DB": "Edimax_meteo",
             
             

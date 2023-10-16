@@ -63,5 +63,6 @@ def run_loop_send(strDeviceID):
         time.sleep(5*60)
         
 if __name__ == "__main__":
-    run_loop_send("28-3c09f64897a2")
+    #~ run_loop_send("28-3c09f64897a2")
+    run_loop_send("28-3cb1f649c835")
     

@@ -3,7 +3,8 @@
 # sympathic stuffs for cv2
 
 import cv2
-print("INF: cv2_tools: using CV2 version: %s" % cv2. __version__ )
+#~ print("INF: cv2_tools: using CV2 version: %s" % cv2. __version__ )
+import math
 import numpy as np
 import os
 
@@ -23,7 +24,7 @@ def drawHighligthedText(im,txt, position, fontface=cv2.FONT_HERSHEY_SIMPLEX, fon
     cv2.putText(im,txt, position, fontface, fontscale,color,thickness)
     
 
-def putTextCentered( image, text, bottomCenteredPosition, fontface=cv2.FONT_HERSHEY_SIMPLEX, fontscale = 1, color = (255,255,255), thickness = 1):
+def putTextCentered( image, text, bottomCenteredPosition, fontface=cv2.FONT_HERSHEY_SIMPLEX, fontscale = 1, color = (255,255,255), thickness = 1, bOutline=1):
     """
     Find a location in image to render a text from it's bottom centered position.
     handle out of image case.
@@ -47,8 +48,8 @@ def putTextCentered( image, text, bottomCenteredPosition, fontface=cv2.FONT_HERS
     if yd > h:
         yd = h
     
-    cv2.putText( image, text, (xd,yd), fontface, fontscale, (0,0,0), thickness+1 ) # black outline        
-    cv2.putText( image, text, (xd,yd), fontface, fontscale, color, thickness )
+    if bOutline: cv2.putText( image, text, (xd,yd), fontface, fontscale, (0,0,0), thickness+1, cv2.LINE_AA ) # black outline        
+    cv2.putText( image, text, (xd,yd), fontface, fontscale, color, thickness, cv2.LINE_AA )
         
     return xd,yd
     
@@ -76,7 +77,26 @@ def saveImage_JpgWithSpecificSize( filename, img, nSizeMaxKo, nSizeMinKo = 0, nQ
             # it's ok
             return nSize
 # saveImage_JpgWithSpecificSize - end
-    
+
+def drawRoundCorner(im, center, radius, color, nAngleStart=0, bDrawOuter=0):
+    """
+    draw a round corner (an half plain circle)
+    - rAngleStart: which quarter? 0, 90, 180 or 270 (0 is the top left part, 90 is the next Counterclock Wise)
+    - bDrawOuter: if set, instead of drawing the inside of the circle, draw the outside
+    """
+    for j in range(radius):
+        for i in range(radius):
+            if      (not bDrawOuter and math.sqrt(i*i+j*j) <= radius) \
+                or (bDrawOuter and math.sqrt(i*i+j*j) >= radius) \
+                :
+                if nAngleStart == 0:
+                    im[center[1]-j,center[0]-i] = color
+                elif nAngleStart == 90:
+                    im[center[1]-j,center[0]+i] = color
+                elif nAngleStart == 180:
+                    im[center[1]+j,center[0]+i] = color    
+                else: # nAngleStart == 180:
+                    im[center[1]+j,center[0]-i] = color    
     
 def autoTest():
     im = np.zeros((600,800,3),dtype=np.uint8)
@@ -93,6 +113,19 @@ def autoTest():
     putTextCentered( im, "Toto de centre.", (400,580),fontscale=1, thickness=1)
     putTextCentered( im, "Toto de gauche.", (00,580),fontscale=1, thickness=1)
     putTextCentered( im, "Toto de droite.", (1000,580),fontscale=1, thickness=1)
+    
+
+    centerCorner = (150,150)
+    drawRoundCorner( im, centerCorner,30, (0,255,0),0)
+    drawRoundCorner( im, centerCorner,30, (0,255,0),90)
+    drawRoundCorner( im, centerCorner,30, (0,255,0),180)
+    drawRoundCorner( im, centerCorner,30, (0,255,0),270)
+    
+    centerCorner = (220,150)
+    drawRoundCorner( im, centerCorner,30, (0,255,0),0,bDrawOuter=1)
+    drawRoundCorner( im, centerCorner,30, (0,255,0),90,bDrawOuter=1)
+    drawRoundCorner( im, centerCorner,30, (0,255,0),180,bDrawOuter=1)
+    drawRoundCorner( im, centerCorner,30, (0,255,0),270,bDrawOuter=1)
     
     cv2.imshow("cv2_tools",im)
     key=cv2.waitKey(1) # time for image to refresh even if continuously pressing a key

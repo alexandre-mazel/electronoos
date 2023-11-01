@@ -155,7 +155,13 @@ dumpHexa data len: 4
             i += 1
             strFormat = chr(msg[i])
             print("strFormat: '%s'" % strFormat)
-            i += 3
+            i += 1
+            strFormat2 = ""
+            if msg[i] != 0:
+                # a second format is following
+                strFormat2 = chr(msg[i])
+                print("strFormat2: '%s'" % strFormat2)
+            i += 1
             
             value = msg[i:i+4]
             print(dumpHexa(value))
@@ -194,5 +200,7 @@ dumpHexa data len: 4
     socket_server.close()
     print( "INF: versatile.runServer: stopped." )
         
+# pour tester, lancer : send_one_value_using_osclib.py en paralelle
+
 runServer(8002)
    

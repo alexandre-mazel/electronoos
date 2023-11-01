@@ -4,6 +4,18 @@ import threading
 import struct
 import time
 
+def decodeOscValue(strFormat, value, bVerbose = 0 ):
+    if strFormat == 'i':
+        val = struct.unpack(">i", value)[0]
+        #~ print("val: " + str(val))
+        #~ val = val/float(0x7FFFFFFF)
+        #~ val = ord(msg[12]) <<24 + ord(msg[13]) <<16 + ord(msg[14]) <<8 + ord(msg[15]);
+        if bVerbose: print("  int: " + str(val))
+    else:
+        val = struct.unpack(">f", value)[0]
+        if bVerbose: print("float: %.2f" % val)
+    return val
+
 def dumpHexaArray( anArray, nNbrByte = 1, bSigned = False ):
     """
     Dump an array
@@ -87,7 +99,7 @@ def manageClientRequests( lient ):
         client.close()
     handleClientLeft(client)
     
-def runServer( nPort ):
+def runServer( nPort, bVerbose=0 ):
     """
     run an infinite server
     """
@@ -136,10 +148,10 @@ dumpHexa data len: 4
     while not bMustStop:
         #~ try:
         if 1:
-            print("receiving...")
+            print("\nreceiving...")
             msg, add = socket_server.recvfrom(nBufferSize)
-            print("ip: %s, msg: %s" % (str(add),str(msg)))
-            print(dumpHexa(msg))
+            if bVerbose: print("ip: %s, msg: %s" % (str(add),str(msg)))
+            if bVerbose: print(dumpHexa(msg))
             
             # the message is finished after 0x0000 00002C (2C is a comma ',')
             # then 4 bytes with the format: 0x690000 => i => integer
@@ -153,28 +165,37 @@ dumpHexa data len: 4
             print("strName: '%s'" % strName)
             i += 4
             i += 1
-            strFormat = chr(msg[i])
-            print("strFormat: '%s'" % strFormat)
+            strFormat1 = chr(msg[i])
+            if bVerbose: print("strFormat1: '%s'" % strFormat1)
             i += 1
             strFormat2 = ""
             if msg[i] != 0:
                 # a second format is following
                 strFormat2 = chr(msg[i])
-                print("strFormat2: '%s'" % strFormat2)
+                if bVerbose: print("strFormat2: '%s'" % strFormat2)
+            i += 1
+            strFormat3 = ""
+            if msg[i] != 0:
+                # a third format is following
+                strFormat3 = chr(msg[i])
+                if bVerbose: print("strFormat3: '%s'" % strFormat3)
+                i += 4 # when we have 3 params, 4 zeros are added
             i += 1
             
             value = msg[i:i+4]
-            print(dumpHexa(value))
+            if bVerbose: print(dumpHexa(value))
             
-            if strFormat == 'i':
-                val = struct.unpack(">i", value)[0]
-                #~ print("val: " + str(val))
-                #~ val = val/float(0x7FFFFFFF)
-                #~ val = ord(msg[12]) <<24 + ord(msg[13]) <<16 + ord(msg[14]) <<8 + ord(msg[15]);
-                print("val: " + str(val))
-            else:
-                val = struct.unpack(">f", value)[0]
-                print("float: %.2f" % val)
+            v1 = decodeOscValue(strFormat1,value)
+            v2 = None
+            if strFormat2 != "":
+                v2 = decodeOscValue(strFormat2,msg[i+4:i+8])
+            v3 = None
+            if strFormat3 != "":
+                v3 = decodeOscValue(strFormat3,msg[i+8:i+12])
+                
+            print("INF: v1: %s" % v1)
+            print("INF: v2: %s" % v2)
+            print("INF: v3: %s" % v3)
             
             #~ client, address = socket_server.accept()
             #~ print( "Versatile: client connect from %s" % str(address) )

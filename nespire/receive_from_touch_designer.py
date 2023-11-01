@@ -1,3 +1,4 @@
+# -*- coding: cp1252 -*-
 import socket
 import threading
 import struct
@@ -33,10 +34,19 @@ def dumpHexa( anArray ):
     i = 0;
     strAsciiLine = "";
     strTxt += "%03d: " % i;
-    while( i < len( anArray ) ):        
-        strTxt += "%02x " % ord( anArray[i] );
-        if( ord( anArray[i] ) >= 32 and ord( anArray[i] ) <= 127 ):
-            strAsciiLine += "%s" % anArray[i];
+    while( i < len( anArray ) ):
+        if isinstance(anArray,str):
+            nOrdChar = ord( anArray[i] )
+            ch = anArray[i]
+        elif isinstance(anArray,bytes):
+            nOrdChar = anArray[i]
+            ch = chr(nOrdChar)
+        else:
+            nOrdChar = anArray[i]
+            ch = chr(nOrdChar)
+        strTxt += "%02x " % nOrdChar;
+        if( nOrdChar >= 32 and nOrdChar <= 127 ):
+            strAsciiLine += "%s" % ch;
         else:
             strAsciiLine += "_";
         i += 1;
@@ -130,13 +140,35 @@ dumpHexa data len: 4
             msg, add = socket_server.recvfrom(nBufferSize)
             print("ip: %s, msg: %s" % (str(add),str(msg)))
             print(dumpHexa(msg))
-            print(dumpHexa(msg[12:16]))
-            val = struct.unpack("i", msg[12:16])[0]
-            #~ print("val: " + str(val))
-            #~ val = val/float(0x7FFFFFFF)
-            val = ord(msg[12]) <<24 + ord(msg[13]) <<16 + ord(msg[14]) <<8 + ord(msg[15]);
-            print("val: " + str(val))
-            #~ print("float: %.2f" % val)
+            
+            # the message is finished after 0x0000 00002C (2C is a comma ',')
+            # then 4 bytes with the format: 0x690000 => i => integer
+            # or then 4 bytes with the format: 0x660000 => f => float
+            i = 0
+            while msg[i] != 0x00:
+                i +=1
+            strName = ""
+            for j in range(i):
+                strName += chr(msg[j])
+            print("strName: '%s'" % strName)
+            i += 4
+            i += 1
+            strFormat = chr(msg[i])
+            print("strFormat: '%s'" % strFormat)
+            i += 3
+            
+            value = msg[i:i+4]
+            print(dumpHexa(value))
+            
+            if strFormat == 'i':
+                val = struct.unpack(">i", value)[0]
+                #~ print("val: " + str(val))
+                #~ val = val/float(0x7FFFFFFF)
+                #~ val = ord(msg[12]) <<24 + ord(msg[13]) <<16 + ord(msg[14]) <<8 + ord(msg[15]);
+                print("val: " + str(val))
+            else:
+                val = struct.unpack(">f", value)[0]
+                print("float: %.2f" % val)
             
             #~ client, address = socket_server.accept()
             #~ print( "Versatile: client connect from %s" % str(address) )

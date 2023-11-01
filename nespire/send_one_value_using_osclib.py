@@ -1,6 +1,7 @@
 import time
-from pythonosc.osc_server import BlockingOSCUDPServer
 from pythonosc.udp_client import SimpleUDPClient
+
+# cf https://python-osc.readthedocs.io/en/latest/dispatcher.html#example
 
 client = SimpleUDPClient("127.0.0.1", 8002)
 

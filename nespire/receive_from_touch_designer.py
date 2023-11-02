@@ -173,8 +173,8 @@ dumpHexa data len: 4
 
     """
     while not bMustStop:
-        #~ try:
-        if 1:
+        try:
+        #~ if 1:
             print("\nreceiving...")
             msg, add = socket_server.recvfrom(nBufferSize)
             if bVerbose: print("ip: %s, msg: %s" % (str(add),str(msg)))
@@ -191,6 +191,7 @@ dumpHexa data len: 4
                 if bVerbose: print("loop search '/': i: %d, msg[i]: 0x%x" % (i,intFromCharOrInt(msg[i])))
                 i += 1
             
+            nStartMessage = i
             # the message is finished after 0x0000 00002C (2C is a comma ',')
             # then 4 bytes with the format: 0x690000 => i => integer
             # or then 4 bytes with the format: 0x660000 => f => float
@@ -198,10 +199,14 @@ dumpHexa data len: 4
                 if bVerbose: print("loop search 0: i: %d, msg[i]: 0x%x" % (i,intFromCharOrInt(msg[i])))
                 i +=1
             strName = ""
-            for j in range(i):
+            for j in range(nStartMessage,i):
                 strName += charFromCharOrInt(msg[j])
             print("strName: '%s'" % strName)
-            i += 4
+            #~ i += 4 # from the mac, it's 2 so let's find the comma
+            
+            while charFromCharOrInt(msg[i]) != ',':
+                if bVerbose: print("loop search ',': i: %d, msg[i]: 0x%x" % (i,intFromCharOrInt(msg[i])))
+                i += 1
             i += 1 # skip the ','
             
             strFormat1 = charFromCharOrInt(msg[i])
@@ -243,14 +248,19 @@ dumpHexa data len: 4
             #manageClientRequests(client) # only one at a time !
             #~ threading.Thread( target=manageClientRequests, args=(client,) ).start() # the ',' after 'client' is important else it's not a tuple
             
+        except UnicodeEncodeError as err:
+            print("WRN: UnicodeEncodeError: message error, err: %s" % str(err))
         #~ except socket.error as err:
             #~ print( "ERR: when working with client, received error: %s" % err )
             #~ client.close()
             
         
-        time.sleep(1)
+        # ensure flush all missed data
+        
+        #~ time.sleep(0.1)
         # flush all data
         socket_server.setblocking(0)
+        
         while 1:
             try:
                 msg, add = socket_server.recvfrom(nBufferSize)

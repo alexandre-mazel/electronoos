@@ -25,6 +25,23 @@ aDns = {
     "212.27.40.240" : "Free SAS",
 }
 
+def outputAllFields(o):
+    out = ""
+    fields = dir(o)
+    for field in fields:
+        try:
+            f = getattr(o,field)
+            if callable( f ):
+                #~ v = f()
+                out += "field %s type: function\n" % field
+            else:
+                v = f
+                out += "field %s (type:%s): %s\n" % (field, type(v),str(v) )
+        except AttributeError:
+            out += "field %s attribute error\n"% field
+    return out
+        
+
 """
 https://stackoverflow.com/questions/74721184/decoding-https-traffic-with-scapy
 
@@ -86,6 +103,30 @@ print("conf contents:\n%s" % conf)
 send_https_request_and_analyze()
 """
 
+"""
+import scapy.all as scapy
+from scapy_http import http
+
+def sniff(interface):
+    scapy.sniff(iface=interface, store=False, prn=process_packets)
+
+def process_packets(packet):
+    if packet.haslayer(http.HTTPRequest):
+        url = packet[http.HTTPRequest].Host + packet[http.HTTPRequest].Path
+        print('URL: ' + url.decode())
+        if packet.haslayer(scapy.Raw):
+            load = packet[scapy.Raw].load
+            for i in words:
+                if i in str(load):
+                    print('Load: ' + load.decode())
+                    break
+
+
+
+words = ["password", "user", "username", "login", "pass", "Username", "Password", "User", "Email"]
+sniff("WiFi 2")
+"""
+
 def http_header(packet):
         http_packet=str(packet)
         if http_packet.find('GET'):
@@ -142,7 +183,7 @@ def monitor_callback(pkt):
     
     #~ print(dir(pkt))
     print("*"*40)
-    if bVerbose: print("DBG: pkt: '%s' len: %s" % (str(pkt),len(pkt)))
+    if bVerbose: print("DBG: pkt: '%s' len: %s time: %.2f" % (str(pkt),len(pkt),pkt.time))
     #~ print("DBG: pkt[scapy.all.ARP]: %s" % str(pkt[scapy.all.ARP]))
     if ARP in pkt:
         #~ if bShowARP: print("ARP")
@@ -173,7 +214,13 @@ def monitor_callback(pkt):
         print("INF: IP: %s:%s > %s:%s" % (ip_src,port_src,ip_dst,port_dst))
         
         methods=[b'GET',b'POST',b'HEAD',b'PUT',b'DELETE',b'CONNECT',b'OPTIONS',b'TRACE']
+        words = ["password", "user", "username", "login", "pass", "Username", "Password", "User", "Email"]
         if pkt.haslayer(TCP):#Checks for TCP protocol
+            print("DBG: tcp time (at senders): " + str(pkt[TCP].options))
+            print("DBG: tcp time (at senders): " + str(pkt[TCP].sent_time))
+            print("DBG: tcp time (at senders): " + str(dir(pkt[TCP])))
+            print("DBG: tcp time (at senders): " + outputAllFields(pkt[TCP]))
+            #~ print("DBG: tcp time (at senders): " + str(pkt[TCP].keys()))
             if port_src == 80 or port_dst == 80:#Checks for http port 80
                 if pkt.haslayer(http.HTTPRequest):
                     http_layer = pkt.getlayer(http.HTTPRequest)
@@ -185,14 +232,17 @@ def monitor_callback(pkt):
                 if pkt.haslayer(Raw):#Checks if packet has payload
                     print("DBG: raw")
                     r = pkt[0][Raw].load
-                    print("DBG: raw load: %s" % str(r))
+                    print("DBG: raw load: %s" % str(r)) #r.decode()
+                    #~ decoded_data = base64.b64decode(r)
+                    #~ print(decoded_data)
                     for meth in methods:#Checks if any of the http methods are present in load, if there are it prints to screen
                         #~ print("meth: %s" % str(meth))
                         #~ print("r: %s" % str(r))
                         if meth in r:
                             print("meth: %s found in\n%s" % (meth,str(r)))
                         #~ s = http_header(pkt)
-                        #~ print(ascii(s))
+                        #~ print(ascii(s
+                    scapy.all.hexdump(pkt)
                 else:
                     print("DBG: no raw")
                     i = 0

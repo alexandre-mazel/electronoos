@@ -5,9 +5,9 @@ import struct
 import time
 
 def decodeOscValue(strFormat, value, bVerbose = 0 ):
-    print("DBG: type of strFormat: %s" % type(strFormat))
-    print("DBG: type of strFormat[0]: %s" % type(strFormat[0]))
-    print("DBG: len of strFormat: %s" % len(strFormat[0]))
+    #~ print("DBG: type of strFormat: %s" % type(strFormat))
+    #~ print("DBG: type of strFormat[0]: %s" % type(strFormat[0]))
+    #~ print("DBG: len of strFormat: %s" % len(strFormat[0]))
     if strFormat == 'i':
         val = struct.unpack(">i", value)[0]
         #~ print("val: " + str(val))
@@ -126,10 +126,14 @@ def manageClientRequests( lient ):
         client.close()
     handleClientLeft(client)
     
-def runServer( nPort, bVerbose=0 ):
+def runServer( nPort, bIsOnNao = 0, bVerbose=0 ):
     """
     run an infinite server
     """
+    mem = None
+    if bIsOnNao:
+        import naoqi
+        mem = naoqi.ALProxy("ALMemory", "localhost",9559)
     socket_server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # DGRAM => UDP
     while True:
         try:
@@ -177,6 +181,7 @@ dumpHexa data len: 4
         #~ if 1:
             print("\nreceiving...")
             msg, add = socket_server.recvfrom(nBufferSize)
+            print("INF: Time: %.3f" % time.time() )
             if bVerbose: print("ip: %s, msg: %s" % (str(add),str(msg)))
             if bVerbose: print(dumpHexa(msg))
             
@@ -201,7 +206,7 @@ dumpHexa data len: 4
             strName = ""
             for j in range(nStartMessage,i):
                 strName += charFromCharOrInt(msg[j])
-            print("strName: '%s'" % strName)
+            print("INF: strName: '%s'" % strName)
             #~ i += 4 # from the mac, it's 2 so let's find the comma
             
             while charFromCharOrInt(msg[i]) != ',':
@@ -243,6 +248,9 @@ dumpHexa data len: 4
             print("INF: v2: %s" % v2)
             print("INF: v3: %s" % v3)
             
+            if mem:
+                mem.raiseMicroEvent(strName,v1)
+            
             #~ client, address = socket_server.accept()
             #~ print( "Versatile: client connect from %s" % str(address) )
             #manageClientRequests(client) # only one at a time !
@@ -255,9 +263,9 @@ dumpHexa data len: 4
             #~ client.close()
             
         
-        # ensure flush all missed data
+        # ensure flush all missed or incomplete data
         
-        #~ time.sleep(0.1)
+        time.sleep(0.1)
         # flush all data
         socket_server.setblocking(0)
         
@@ -274,5 +282,5 @@ dumpHexa data len: 4
         
 # pour tester, lancer : send_one_value_using_osclib.py en paralelle
 
-runServer(8002,bVerbose=1)
+runServer(8002,bIsOnNao=1,bVerbose=0)
    

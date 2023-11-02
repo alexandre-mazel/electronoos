@@ -180,10 +180,20 @@ dumpHexa data len: 4
             if bVerbose: print("ip: %s, msg: %s" % (str(add),str(msg)))
             if bVerbose: print(dumpHexa(msg))
             
+            # NB: in TouchDesigner, set the DataFormat to "sample" (instead of timeslice)
+            # when coming from TouchDesigner, the message start with: #bundle
+            # 000: 23 62 75 6e 64 6c 65 00   e8 ed ee 92 f5 17 90 e2     #bundle_________
+            # 016: 00 00 00 10 2f 63 68 61   6e 31 00 00 2c 66 00 00     ____/chan1__,f__
+            # 032: 3e 0a ec e8 __ __ __ __   __ __ __ __ __ __ __ __     >___
+            # so we'll skip all that is before the /
+            i = 0
+            while charFromCharOrInt(msg[i]) != '/':
+                if bVerbose: print("loop search '/': i: %d, msg[i]: 0x%x" % (i,intFromCharOrInt(msg[i])))
+                i += 1
+            
             # the message is finished after 0x0000 00002C (2C is a comma ',')
             # then 4 bytes with the format: 0x690000 => i => integer
             # or then 4 bytes with the format: 0x660000 => f => float
-            i = 0
             while intFromCharOrInt(msg[i]) != 0x00:
                 if bVerbose: print("loop search 0: i: %d, msg[i]: 0x%x" % (i,intFromCharOrInt(msg[i])))
                 i +=1

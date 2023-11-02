@@ -207,7 +207,9 @@ dumpHexa data len: 4
             for j in range(nStartMessage,i):
                 strName += charFromCharOrInt(msg[j])
             print("INF: strName: '%s'" % strName)
-            #~ i += 4 # from the mac, it's 2 so let's find the comma
+            #~ i += 4 # from pc it's 4, from the mac, it's 2 so let's find the comma to work on both platform
+            
+            # todo: check strName only printable char and len>2 else skip
             
             while charFromCharOrInt(msg[i]) != ',':
                 if bVerbose: print("loop search ',': i: %d, msg[i]: 0x%x" % (i,intFromCharOrInt(msg[i])))

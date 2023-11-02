@@ -5,6 +5,9 @@ import struct
 import time
 
 def decodeOscValue(strFormat, value, bVerbose = 0 ):
+    print("DBG: type of strFormat: %s" % type(strFormat))
+    print("DBG: type of strFormat[0]: %s" % type(strFormat[0]))
+    print("DBG: len of strFormat: %s" % len(strFormat[0]))
     if strFormat == 'i':
         val = struct.unpack(">i", value)[0]
         #~ print("val: " + str(val))
@@ -15,6 +18,30 @@ def decodeOscValue(strFormat, value, bVerbose = 0 ):
         val = struct.unpack(">f", value)[0]
         if bVerbose: print("float: %.2f" % val)
     return val
+    
+def charFromCharOrInt(c):
+    """
+    on some platform we receive a list of bytes and on other a list of string
+    => use this method to ensure it's a char
+    NB: we could convert the complete buffer first but it could mess the struct.unpack function
+    """
+    #~ print("DBG: charFromCharOrInt:%s" % c)
+    #~ print("DBG: charFromCharOrInt:type: %s" % type(c))
+    if isinstance(c,str):
+        return c
+    if isinstance(c,bytes) or isinstance(c,int):
+        c = chr(c)
+    return c
+    
+def intFromCharOrInt(n):
+    """
+    => use this method to ensure it's an int
+    """
+    #~ print("DBG: intFromCharOrInt:%s" % n)
+    #~ print("DBG: intFromCharOrInt:type: %s" % type(n))
+    if isinstance(n,str):
+        return ord(n)
+    return n
 
 def dumpHexaArray( anArray, nNbrByte = 1, bSigned = False ):
     """
@@ -157,27 +184,31 @@ dumpHexa data len: 4
             # then 4 bytes with the format: 0x690000 => i => integer
             # or then 4 bytes with the format: 0x660000 => f => float
             i = 0
-            while msg[i] != 0x00:
+            while intFromCharOrInt(msg[i]) != 0x00:
+                if bVerbose: print("loop search 0: i: %d, msg[i]: 0x%x" % (i,intFromCharOrInt(msg[i])))
                 i +=1
             strName = ""
             for j in range(i):
-                strName += chr(msg[j])
+                strName += charFromCharOrInt(msg[j])
             print("strName: '%s'" % strName)
             i += 4
-            i += 1
-            strFormat1 = chr(msg[i])
+            i += 1 # skip the ','
+            
+            strFormat1 = charFromCharOrInt(msg[i])
             if bVerbose: print("strFormat1: '%s'" % strFormat1)
             i += 1
+            
             strFormat2 = ""
-            if msg[i] != 0:
+            if intFromCharOrInt(msg[i]) != 0:
                 # a second format is following
-                strFormat2 = chr(msg[i])
+                strFormat2 = charFromCharOrInt(msg[i])
                 if bVerbose: print("strFormat2: '%s'" % strFormat2)
             i += 1
+            
             strFormat3 = ""
-            if msg[i] != 0:
+            if intFromCharOrInt(msg[i]) != 0:
                 # a third format is following
-                strFormat3 = chr(msg[i])
+                strFormat3 = charFromCharOrInt(msg[i])
                 if bVerbose: print("strFormat3: '%s'" % strFormat3)
                 i += 4 # when we have 3 params, 4 zeros are added
             i += 1
@@ -223,5 +254,5 @@ dumpHexa data len: 4
         
 # pour tester, lancer : send_one_value_using_osclib.py en paralelle
 
-runServer(8002)
+runServer(8002,bVerbose=1)
    

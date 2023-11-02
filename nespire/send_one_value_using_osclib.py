@@ -3,7 +3,10 @@ from pythonosc.udp_client import SimpleUDPClient
 
 # cf https://python-osc.readthedocs.io/en/latest/dispatcher.html#example
 
-client = SimpleUDPClient("127.0.0.1", 8002)
+strServerIP = "127.0.0.1"
+strServerIP = "192.168.158.40"
+
+client = SimpleUDPClient(strServerIP, 8002)
 
 # Send message and receive exactly one message (blocking)
 print("sending message...")

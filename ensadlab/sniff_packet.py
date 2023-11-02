@@ -1,5 +1,12 @@
 import scapy
 import scapy.all
+import base64
+#~ from scapy_http import http
+#~ import scapy_http.http
+from scapy.layers import http
+
+
+
 #~ a = scapy.all.sniff(count=10)
 #~ a.nsummary()
 
@@ -7,6 +14,7 @@ ARP = scapy.all.ARP
 IP = scapy.all.IP
 TCP = scapy.all.TCP
 UDP = scapy.all.UDP
+DNS = scapy.all.DNS
 Raw = scapy.all.Raw
 #~ A = scapy.all.A # don't exist
 
@@ -78,6 +86,45 @@ print("conf contents:\n%s" % conf)
 send_https_request_and_analyze()
 """
 
+def http_header(packet):
+        http_packet=str(packet)
+        if http_packet.find('GET'):
+                return GET_print(packet)
+
+def GET_print(packet1):
+    ret = "***************************************GET PACKET****************************************************\n"
+    ret += "\n".join(packet1.sprintf("{Raw:%Raw.load%}\n").split(r"\r\n"))
+    ret += "*****************************************************************************************************\n"
+    return ret
+    
+"""
+should print sth like (but not for me):
+
+***************************************GET PACKET****************************************************
+'GET /projects/scapy/doc/usage.html HTTP/1.1
+Host: www.secdev.org
+Connection: keep-alive
+Cache-Control: max-age=0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.65 Safari/537.36
+Referer: https://www.google.co.uk/
+Accept-Encoding: gzip, deflate, sdch
+Accept-Language: en-GB,en;q=0.8,en-US;q=0.6
+If-None-Match: "28c84-48498d5654df67640-gzip"
+If-Modified-Since: Mon, 19 Apr 2010 15:44:17 GMT
+
+'
+*
+"""
+
+def arp_display(pkt):
+    if pkt[ARP].op == 1: #who-has (request)
+        return f"Request: {pkt[ARP].psrc} is asking about {pkt[ARP].pdst}"
+    if pkt[ARP].op == 2: #is-at (response)
+        return f"*Response: {pkt[ARP].hwsrc} has address {pkt[ARP].psrc}"
+
+#~ sniff(iface='eth0', prn=http_header, filter="tcp port 80")
+
 def toHostname(ip):
     try:
         return aDns[ip]
@@ -88,17 +135,25 @@ def toHostname(ip):
 def monitor_callback(pkt):
     bVerbose = 1
     bShowARP = 1
+    bShowDNS = 1
     
     #~ return pkt.sprintf("%ARP.hwsrc% %ARP.psrc%")
     #~ if scapy.all.ARP in pkt and pkt[scapy.all.ARP].op in (1,2): #who-has or is-at
     
     #~ print(dir(pkt))
-    if bVerbose: print("DBG: pkt: %s" % str(pkt))
+    print("*"*40)
+    if bVerbose: print("DBG: pkt: '%s' len: %s" % (str(pkt),len(pkt)))
     #~ print("DBG: pkt[scapy.all.ARP]: %s" % str(pkt[scapy.all.ARP]))
     if ARP in pkt:
         #~ if bShowARP: print("ARP")
         if bShowARP:  print(pkt.sprintf("recv: ARP: %ARP.hwsrc% %ARP.psrc% => %ARP.pdst%"))
-            
+        
+    if DNS in pkt:
+        if bShowDNS: print("DNS")
+        #~ if bShowDNS:  print(pkt.sprintf("recv: ARP: %ARP.hwsrc% %ARP.psrc% => %ARP.pdst%"))
+        #~ decoded_data = base64.b64decode(str(pkt[DNS].an.rdata)) 
+        #~ print(decoded_data)
+        
     if IP in pkt: 
         #~ print("DBG: IP: pkt: %s" % str(pkt))
         #~ print(pkt[IP])
@@ -115,26 +170,43 @@ def monitor_callback(pkt):
             port_src = pkt[UDP].sport
             port_dst = pkt[UDP].dport
             
-        print("%s:%s > %s:%s" % (ip_src,port_src,ip_dst,port_dst))
+        print("INF: IP: %s:%s > %s:%s" % (ip_src,port_src,ip_dst,port_dst))
         
         methods=[b'GET',b'POST',b'HEAD',b'PUT',b'DELETE',b'CONNECT',b'OPTIONS',b'TRACE']
         if pkt.haslayer(TCP):#Checks for TCP protocol
-            if pkt.dport == 80:#Checks for http port 80
+            if port_src == 80 or port_dst == 80:#Checks for http port 80
+                if pkt.haslayer(http.HTTPRequest):
+                    http_layer = pkt.getlayer(http.HTTPRequest)
+                    print("DBG: keys: " + str(http_layer.fields.keys()))
+                    print("DBG: " + str(http_layer.fields))
+
+                    url = http_layer.fields['Host'] + http_layer.fields['Path']
+                    print("HTTP url: %s" % url)
                 if pkt.haslayer(Raw):#Checks if packet has payload
+                    print("DBG: raw")
                     r = pkt[0][Raw].load
+                    print("DBG: raw load: %s" % str(r))
                     for meth in methods:#Checks if any of the http methods are present in load, if there are it prints to screen
                         #~ print("meth: %s" % str(meth))
                         #~ print("r: %s" % str(r))
                         if meth in r:
                             print("meth: %s found in\n%s" % (meth,str(r)))
+                        #~ s = http_header(pkt)
+                        #~ print(ascii(s))
                 else:
+                    print("DBG: no raw")
                     i = 0
                     while 1:
                         layer = pkt.getlayer(i)
                         if layer == None:
                             break
-                        print("layer: %d:%s" % (i,str(layer)))
+                        print("layer %d: %s" % (i,str(layer)))
                         i += 1
+                    #~ print(str(pkt)[:(pkt[IP].ihl * 4)])
+                    print(pkt.show(dump=True))
+                    print(dir(pkt[TCP]))
+                    #~ decoded_data = base64.b64decode(str(pkt[TCP].original)) 
+                    scapy.all.hexdump(pkt)
                     
                 if 0:
                     if pkt.haslayer(A):#Checks if packet has payload
@@ -149,7 +221,20 @@ def monitor_callback(pkt):
 
 def startPacketAnalyse():
     #~ scapy.all.sniff(prn=monitor_callback, filter="arp", store=0)
-    scapy.all.sniff(prn=monitor_callback, filter="", store=0) # filter="ip" pour avoir que ip
+    scapy.all.sniff(prn=monitor_callback, filter="", store=0) # filter="ip" pour avoir que ip # iface='eth0' pour interface
+    """
+    count: number of packets to capture. 0 means infinity
+      store: wether to store sniffed packets or discard them
+        prn: function to apply to each packet. If something is returned,
+             it is displayed. Ex:
+             ex: prn = lambda x: x.summary()
+    lfilter: python function applied to each packet to determine
+             if further action may be done
+             ex: lfilter = lambda x: x.haslayer(Padding)
+    offline: pcap file to read packets from, instead of sniffing them
+    timeout: stop sniffing after a given time (default: None)
+    L2socket: use the provided L2socket
+    """
     
     
 startPacketAnalyse()

@@ -25,7 +25,7 @@ aDns = {
     "212.27.40.240" : "Free SAS",
 }
 
-def outputAllFields(o):
+def outputAllFields(o,bLimitToInteresting=1):
     out = ""
     fields = dir(o)
     for field in fields:
@@ -33,10 +33,11 @@ def outputAllFields(o):
             f = getattr(o,field)
             if callable( f ):
                 #~ v = f()
-                out += "field %s type: function\n" % field
+                if not bLimitToInteresting: out += "field %s type: function\n" % field
             else:
                 v = f
-                out += "field %s (type:%s): %s\n" % (field, type(v),str(v) )
+                if not bLimitToInteresting or v != None:
+                    out += "field %s (type:%s): %s\n" % (field, type(v),str(v) )
         except AttributeError:
             out += "field %s attribute error\n"% field
     return out
@@ -220,6 +221,7 @@ def monitor_callback(pkt):
             print("DBG: tcp time (at senders): " + str(pkt[TCP].sent_time))
             print("DBG: tcp time (at senders): " + str(dir(pkt[TCP])))
             print("DBG: tcp time (at senders): " + outputAllFields(pkt[TCP]))
+            print("DBG: tcp time (at senders): %.4f (diff to send:%.4f)" % (pkt[TCP].time,pkt.time-pkt[TCP].time))
             #~ print("DBG: tcp time (at senders): " + str(pkt[TCP].keys()))
             if port_src == 80 or port_dst == 80:#Checks for http port 80
                 if pkt.haslayer(http.HTTPRequest):

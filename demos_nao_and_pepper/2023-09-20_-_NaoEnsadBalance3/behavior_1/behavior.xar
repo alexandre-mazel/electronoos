@@ -204,7 +204,7 @@ class MyClass(GeneratedClass):
                             <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
                             <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
                         </Box>
-                        <Box name="Set Stiffness" id="5" localization="8" tooltip="Stiffen the motors selected in parameters." x="233" y="129">
+                        <Box name="Set Stiffness" id="5" localization="8" tooltip="Stiffen the motors selected in parameters." x="412" y="156">
                             <bitmap>media/images/box/movement/stiffness.png</bitmap>
                             <script language="4">
                                 <content>
@@ -1065,6 +1065,7 @@ class MyClass(GeneratedClass):
     def __init__(self):
         GeneratedClass.__init__(self)
         self.mot = ALProxy("ALMotion")
+        self.ap = ALProxy("ALAudioPlayer")
 
     def onLoad(self):
         #put initialization code here
@@ -1105,16 +1106,26 @@ class MyClass(GeneratedClass):
         rTimeElbowR = 3.5
 
         astrJointHips = ["RHipPitch","LHipPitch"]
-        rMoveHips = +0.
-        rTimeHips = 2.5
+        rMoveHips = +0.1
+        rTimeHips = 2.5+1.5
 
         astrJointHead = ["HeadPitch"]
         rMoveHead = -0.3
+        rMoveHead *= 0.6 # reduce for Thomas
         rTimeHead = 3.5
 
         astrJointFeet = ["LAnklePitch","RAnklePitch"]
-        rMoveFeet = -0.2
+        rMoveFeet = +0.2
         rTimeFeet = 3.5
+
+        astrWristY = ["LWristYaw","RWristYaw"]
+        rMoveWristY = +0.12
+        rTimeWristY = 3.5
+
+        astrJointHand = ["LHand","RHand"]
+        rMoveHand = 0.03
+        rTimeHand = 3.5
+        rOffsetHand = 0.6
 
 
 
@@ -1125,7 +1136,11 @@ class MyClass(GeneratedClass):
         self.mot.post.angleInterpolation(astrJointShoulderPitch,[-rMoveShoulderPitch,-rMoveShoulderPitch],rTimeShoulderPitch,False)
         self.mot.post.angleInterpolation(astrJointElbowR,[-rMoveElbowR,+rMoveElbowR],rTimeElbowR,False)
         self.mot.post.angleInterpolation(astrJointHead,[+rMoveHead],rTimeHead,False)
+        self.mot.post.angleInterpolation(astrWristY,[-rMoveWristY,+rMoveWristY],rTimeWristY,False)
+        self.mot.post.angleInterpolation(astrJointHand,[rOffsetHand+rMoveHand,rOffsetHand+rMoveHand],rTimeHand,True)
 
+        #self.ap.post.playFile("/home/nao/breath/selected_intake/breath_0112.wav", 0.5, 0.) # vol, pan
+        self.ap.post.playFile("/home/nao/breath_0112_slowed_delayed_nespire.wav", 0.5, 0.)
         time.sleep(rTimeMove)
         time.sleep(rTimePause)
 
@@ -1135,6 +1150,11 @@ class MyClass(GeneratedClass):
         self.mot.post.angleInterpolation(astrJointShoulderPitch,[+rMoveShoulderPitch,+rMoveShoulderPitch],rTimeShoulderPitch,False)
         self.mot.post.angleInterpolation(astrJointElbowR,[+rMoveElbowR,-rMoveElbowR],rTimeElbowR,False)
         self.mot.post.angleInterpolation(astrJointHead,[-rMoveHead],rTimeHead,False)
+        self.mot.post.angleInterpolation(astrWristY,[+rMoveWristY,-rMoveWristY],rTimeWristY,False)
+        self.mot.post.angleInterpolation(astrJointHand,[rOffsetHand-rMoveHand,rOffsetHand-rMoveHand],rTimeHand,True)
+
+        self.ap.post.playFile("/home/nao/breath/selected_outtake/out_19.wav", 1., 0.)
+
         time.sleep(rTimeMove)
         print("%.3f: Move presque " % time.time())
         time.sleep(rTimePause)
@@ -1495,16 +1515,171 @@ pass]]>
                                 </BehaviorLayer>
                             </Timeline>
                         </Box>
+                        <Box name="Set Stiffness (1)" id="11" localization="8" tooltip="Stiffen the motors selected in parameters." x="321" y="22">
+                            <bitmap>media/images/box/movement/stiffness.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[import time
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.bIsRunning = False
+        self.motion = ALProxy("ALMotion")
+
+    def onUnload(self):
+        self.bIsRunning = False
+
+    def setStiffness(self, stiffness):
+        self.bIsRunning = True
+        duration = self.getParameter("Duration (s)")
+        if(self.getParameter("Head")):
+            self.motion.post.stiffnessInterpolation("Head", stiffness, duration)
+        if(self.getParameter("Left arm")):
+            self.motion.post.stiffnessInterpolation("LArm", stiffness, duration)
+        if(self.getParameter("Right arm")):
+            self.motion.post.stiffnessInterpolation("RArm", stiffness, duration)
+        if(self.getParameter("Left leg")):
+            self.motion.post.stiffnessInterpolation("LLeg", stiffness, duration)
+        if(self.getParameter("Right leg")):
+            self.motion.post.stiffnessInterpolation("RLeg", stiffness, duration)
+        time.sleep(duration)
+        self.bIsRunning = False
+
+    def onInput_onSet(self):
+        if( self.bIsRunning ):
+            return
+        self.setStiffness(self.getParameter("Motors stiffness (%)")/100.)
+        self.onReady() #~ activate output of the box]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onSet" type="1" type_size="1" nature="1" inner="0" tooltip="When this input is stimulated, the stiffness of the selected motors is set to&#x0A;the stiffness parameter value." id="2" />
+                            <Output name="onReady" type="1" type_size="1" nature="2" inner="0" tooltip="Signal sent when stiffness has been set." id="3" />
+                            <Parameter name="Head" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Do we want to modify the head stiffness?" id="4" />
+                            <Parameter name="Left arm" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Do we want to modify the left arm stiffness?" id="5" />
+                            <Parameter name="Right arm" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Do we want to modify the right arm stiffness?" id="6" />
+                            <Parameter name="Left leg" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Do we want to modify the left leg stiffness?" id="7" />
+                            <Parameter name="Right leg" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Do we want to modify the right leg stiffness?" id="8" />
+                            <Parameter name="Motors stiffness (%)" inherits_from_parent="0" content_type="1" value="100" default_value="100" min="0" max="100" tooltip="Stiffness value the motors are set to." id="9" />
+                            <Parameter name="Duration (s)" inherits_from_parent="0" content_type="2" value="1" default_value="1" min="0.02" max="10" tooltip="How much time to go to the max/min stiffness in seconds." id="10" />
+                        </Box>
+                        <Box name="Set Stiffness (2)" id="15" localization="8" tooltip="Stiffen the motors selected in parameters." x="786" y="81">
+                            <bitmap>media/images/box/movement/stiffness.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[import time
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.bIsRunning = False
+        self.motion = ALProxy("ALMotion")
+
+    def onUnload(self):
+        self.bIsRunning = False
+
+    def setStiffness(self, stiffness):
+        self.bIsRunning = True
+        duration = self.getParameter("Duration (s)")
+        if(self.getParameter("Head")):
+            self.motion.post.stiffnessInterpolation("Head", stiffness, duration)
+        if(self.getParameter("Left arm")):
+            self.motion.post.stiffnessInterpolation("LArm", stiffness, duration)
+        if(self.getParameter("Right arm")):
+            self.motion.post.stiffnessInterpolation("RArm", stiffness, duration)
+        if(self.getParameter("Left leg")):
+            self.motion.post.stiffnessInterpolation("LLeg", stiffness, duration)
+        if(self.getParameter("Right leg")):
+            self.motion.post.stiffnessInterpolation("RLeg", stiffness, duration)
+        time.sleep(duration)
+        self.bIsRunning = False
+
+    def onInput_onSet(self):
+        if( self.bIsRunning ):
+            return
+        self.setStiffness(self.getParameter("Motors stiffness (%)")/100.)
+        self.onReady() #~ activate output of the box]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onSet" type="1" type_size="1" nature="1" inner="0" tooltip="When this input is stimulated, the stiffness of the selected motors is set to&#x0A;the stiffness parameter value." id="2" />
+                            <Output name="onReady" type="1" type_size="1" nature="2" inner="0" tooltip="Signal sent when stiffness has been set." id="3" />
+                            <Parameter name="Head" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Do we want to modify the head stiffness?" id="4" />
+                            <Parameter name="Left arm" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Do we want to modify the left arm stiffness?" id="5" />
+                            <Parameter name="Right arm" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Do we want to modify the right arm stiffness?" id="6" />
+                            <Parameter name="Left leg" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Do we want to modify the left leg stiffness?" id="7" />
+                            <Parameter name="Right leg" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Do we want to modify the right leg stiffness?" id="8" />
+                            <Parameter name="Motors stiffness (%)" inherits_from_parent="0" content_type="1" value="100" default_value="100" min="0" max="100" tooltip="Stiffness value the motors are set to." id="9" />
+                            <Parameter name="Duration (s)" inherits_from_parent="0" content_type="2" value="1" default_value="1" min="0.02" max="10" tooltip="How much time to go to the max/min stiffness in seconds." id="10" />
+                        </Box>
+                        <Box name="Set Stiffness (3)" id="16" localization="8" tooltip="Stiffen the motors selected in parameters." x="319" y="103">
+                            <bitmap>media/images/box/movement/stiffness.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[import time
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.bIsRunning = False
+        self.motion = ALProxy("ALMotion")
+
+    def onUnload(self):
+        self.bIsRunning = False
+
+    def setStiffness(self, stiffness):
+        self.bIsRunning = True
+        duration = self.getParameter("Duration (s)")
+        if(self.getParameter("Head")):
+            self.motion.post.stiffnessInterpolation("Head", stiffness, duration)
+        if(self.getParameter("Left arm")):
+            self.motion.post.stiffnessInterpolation("LArm", stiffness, duration)
+        if(self.getParameter("Right arm")):
+            self.motion.post.stiffnessInterpolation("RArm", stiffness, duration)
+        if(self.getParameter("Left leg")):
+            self.motion.post.stiffnessInterpolation("LLeg", stiffness, duration)
+        if(self.getParameter("Right leg")):
+            self.motion.post.stiffnessInterpolation("RLeg", stiffness, duration)
+        time.sleep(duration)
+        self.bIsRunning = False
+
+    def onInput_onSet(self):
+        if( self.bIsRunning ):
+            return
+        self.setStiffness(self.getParameter("Motors stiffness (%)")/100.)
+        self.onReady() #~ activate output of the box]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onSet" type="1" type_size="1" nature="1" inner="0" tooltip="When this input is stimulated, the stiffness of the selected motors is set to&#x0A;the stiffness parameter value." id="2" />
+                            <Output name="onReady" type="1" type_size="1" nature="2" inner="0" tooltip="Signal sent when stiffness has been set." id="3" />
+                            <Parameter name="Head" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Do we want to modify the head stiffness?" id="4" />
+                            <Parameter name="Left arm" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Do we want to modify the left arm stiffness?" id="5" />
+                            <Parameter name="Right arm" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Do we want to modify the right arm stiffness?" id="6" />
+                            <Parameter name="Left leg" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Do we want to modify the left leg stiffness?" id="7" />
+                            <Parameter name="Right leg" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Do we want to modify the right leg stiffness?" id="8" />
+                            <Parameter name="Motors stiffness (%)" inherits_from_parent="0" content_type="1" value="10" default_value="100" min="0" max="100" tooltip="Stiffness value the motors are set to." id="9" />
+                            <Parameter name="Duration (s)" inherits_from_parent="0" content_type="2" value="1" default_value="1" min="0.02" max="10" tooltip="How much time to go to the max/min stiffness in seconds." id="10" />
+                        </Box>
                         <Link inputowner="8" indexofinput="2" outputowner="8" indexofoutput="4" />
                         <Link inputowner="1" indexofinput="2" outputowner="1" indexofoutput="4" />
                         <Link inputowner="2" indexofinput="2" outputowner="2" indexofoutput="4" />
                         <Link inputowner="2" indexofinput="2" outputowner="14" indexofoutput="4" />
-                        <Link inputowner="7" indexofinput="2" outputowner="6" indexofoutput="8" />
-                        <Link inputowner="7" indexofinput="3" outputowner="6" indexofoutput="10" />
                         <Link inputowner="3" indexofinput="2" outputowner="5" indexofoutput="3" />
                         <Link inputowner="6" indexofinput="2" outputowner="0" indexofoutput="2" />
                         <Link inputowner="9" indexofinput="2" outputowner="12" indexofoutput="4" />
                         <Link inputowner="12" indexofinput="2" outputowner="13" indexofoutput="6" />
+                        <Link inputowner="13" indexofinput="3" outputowner="6" indexofoutput="10" />
+                        <Link inputowner="11" indexofinput="2" outputowner="6" indexofoutput="8" />
+                        <Link inputowner="16" indexofinput="2" outputowner="6" indexofoutput="10" />
+                        <Link inputowner="13" indexofinput="2" outputowner="6" indexofoutput="8" />
                     </Diagram>
                 </BehaviorKeyframe>
             </BehaviorLayer>

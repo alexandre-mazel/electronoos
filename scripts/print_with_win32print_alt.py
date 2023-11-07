@@ -2,6 +2,9 @@ import win32print
 import win32ui
 from PIL import Image, ImageWin
 
+""" ref: 
+https://stackoverflow.com/questions/38178454/python27-on-windows-10-how-can-i-tell-printing-paper-size-is-50-8mm-x-25-4mm
+"""
 #
 # Constants for GetDeviceCaps
 #
@@ -27,6 +30,7 @@ PHYSICALOFFSETX = 112
 PHYSICALOFFSETY = 113
 
 printer_name = win32print.GetDefaultPrinter()
+printer_name = "Microsoft Print to PDF"
 print("printer_name: " + printer_name)
 
 #
@@ -64,14 +68,36 @@ else:
     devmode = win32print.GetPrinter(hprinter, 2)["pDevMode"]
     print("dir devmode: " + str(dir(devmode)))
     #interestingField = 'DisplayOrientation', 'Orientation', 'PanningHeight', 'PanningWidth', 'PaperLength', 'PaperSize', 'PaperWidth', 'PelsHeight'
+    #Color=1 or 2 if color
     print("DisplayOrientation: " + str(devmode.DisplayOrientation))
     print("Orientation: " + str(devmode.Orientation))
     print("PaperSize: " + str(devmode.PaperSize))
     print("PaperWidth: " + str(devmode.PaperWidth))
     print("PaperLength: " + str(devmode.PaperLength))
-    devmode.PaperWidth = 200
-    devmode.PaperLength = 200
+    devmode.PaperWidth = 1040
+    devmode.PaperLength = 760
     devmode.Orientation = 2 # try also 0
+    print("== modified")
+    print("Orientation: " + str(devmode.Orientation))
+    print("PaperWidth: " + str(devmode.PaperWidth))
+    print("PaperLength: " + str(devmode.PaperLength))
+    
+    forms = win32print.EnumForms(hprinter) 
+    strWantedForm = "stickers_ochateau"
+    #~ print("forms: " + str(forms))
+    for f in forms:
+        strName = f["Name"]
+        #~ print(strName)
+        if strName == strWantedForm:
+            selected_form = f
+            break
+    print("selected_form:" + str(selected_form)) # and so, what to do with that ?
+        
+            
+    print("== apres forms")
+    print("Orientation: " + str(devmode.Orientation))
+    print("PaperWidth: " + str(devmode.PaperWidth))
+    print("PaperLength: " + str(devmode.PaperLength))
     
     import win32gui
     hDC = win32gui.CreateDC("WINSPOOL", printer_name, devmode)
@@ -105,7 +131,7 @@ bmp = Image.open( file_name )
 print("bmp.size (1): %s" % str(bmp.size))
 realBmpSize = (bmp.size[0],bmp.size[1])
 
-if bmp.size[0] < bmp.size[1]:
+if bmp.size[0] < bmp.size[1] or 0:
     realBmpSize = (bmp.size[1],bmp.size[0])
     bmp = bmp.rotate(90)
   
@@ -120,9 +146,10 @@ scale = min (ratios)
 # Start the print job, and draw the bitmap to
 #  the printer device at the scaled size.
 #
-exit(0)
+#~ exit(0)
 
-hDC.StartDoc (file_name)
+#~ DocInfo = {"output":"c:/tmp/out.pdf"}
+hDC.StartDoc (file_name,"c:/tmp/out.pdf")
 hDC.StartPage ()
 
 dib = ImageWin.Dib (bmp)

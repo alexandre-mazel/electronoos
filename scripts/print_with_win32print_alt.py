@@ -53,17 +53,29 @@ if 0:
     attributes = win32print.GetPrinter(handle, level)
     attributes['pDevMode'].PaperWidth = 600  
     attributes['pDevMode'].PaperLength = 30  
-    attributes['pDevMode'].PaperSize =0 
+    attributes['pDevMode'].PaperSize = 1
 
 
 hDC = win32ui.CreateDC ()
-if 1:
-    hDC.CreatePrinterDC (printer_name)
+if 0:
+    hDC.CreatePrinterDC( printer_name )
 else:
-    hprinter = win32print.OpenPrinter(printer)
-devmode = win32print.GetPrinter(hprinter, 2)["pDevMode"]
-devmode.PaperSize = 20
-devmode.Orientation = 2
+    hprinter = win32print.OpenPrinter(printer_name)
+    devmode = win32print.GetPrinter(hprinter, 2)["pDevMode"]
+    print("dir devmode: " + str(dir(devmode)))
+    #interestingField = 'DisplayOrientation', 'Orientation', 'PanningHeight', 'PanningWidth', 'PaperLength', 'PaperSize', 'PaperWidth', 'PelsHeight'
+    print("DisplayOrientation: " + str(devmode.DisplayOrientation))
+    print("Orientation: " + str(devmode.Orientation))
+    print("PaperSize: " + str(devmode.PaperSize))
+    print("PaperWidth: " + str(devmode.PaperWidth))
+    print("PaperLength: " + str(devmode.PaperLength))
+    devmode.PaperWidth = 200
+    devmode.PaperLength = 200
+    devmode.Orientation = 2 # try also 0
+    
+    import win32gui
+    hDC = win32gui.CreateDC("WINSPOOL", printer_name, devmode)
+    hDC = win32ui.CreateDCFromHandle(hDC)
 
 printable_area = hDC.GetDeviceCaps (HORZRES), hDC.GetDeviceCaps (VERTRES)
 printer_size = hDC.GetDeviceCaps (PHYSICALWIDTH), hDC.GetDeviceCaps (PHYSICALHEIGHT)

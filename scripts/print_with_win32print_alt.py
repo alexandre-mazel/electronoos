@@ -196,13 +196,15 @@ if 1:
     strLongText = "A very big long and boring text" # note the A and very are stuck together on print
     hDC.DrawText(strLongText, (10, 100, 900, 200), win32con.DT_CENTER)
     hDC.DrawText(strLongText, (10, 200, 900, 300), win32con.DT_CENTER|win32con.DT_WORD_ELLIPSIS)
+    # change background
     win32gui.SetBkColor(handleDC, 0xAAAAAA)
     hDC.DrawText(strLongText, (10, 300, 1200, 400), win32con.DT_CENTER)
     hDC.DrawText(strLongText, (1000, 400, 2200, 500), win32con.DT_CENTER)
     win32gui.SetBkMode(handleDC, 0) # 0: transparent (and 1)
     hDC.DrawText(strLongText, (1000, 500, 2200, 600), win32con.DT_CENTER)
     win32gui.SetBkMode(handleDC, 2) # 2: opaque 
-    hDC.DrawText(strLongText, (1000, 600, 2200, 700), win32con.DT_CENTER)  
+    hDC.DrawText(strLongText, (1000, 600, 2200, 700), win32con.DT_CENTER)
+    
     # change font, thus text size
     fontSize = 120
     lf = win32gui.LOGFONT()
@@ -222,6 +224,9 @@ if 1:
     
     sizeTextRect = win32gui.GetTextExtentPoint32(handleDC,strLongText) # Works !
     print("sizeTextRect (4): %s" % str(sizeTextRect))
+    wText,hText = win32gui.GetTextExtentPoint32(handleDC,strLongText)
+    print("wText: %s" % str(wText))
+    print("hText: %s" % str(hText))
     
     lf.lfWeight = 800
     hf = win32gui.CreateFontIndirect(lf)

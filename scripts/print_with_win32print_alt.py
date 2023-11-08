@@ -82,14 +82,17 @@ else:
     print("PaperSize: " + str(devmode.PaperSize))
     print("PaperWidth: " + str(devmode.PaperWidth))
     print("PaperLength: " + str(devmode.PaperLength))
-    devmode.PaperWidth = 1040
-    devmode.PaperLength = 760
-    devmode.Orientation = 0 # 0 or 2 for landscape
+    if 1:
+        # force paper to be smaller (not sure it works)
+        devmode.PaperWidth = 1040
+        devmode.PaperLength = 760
+    devmode.Orientation = 2 # 0 or 2 for landscape
     print("== modified")
     print("Orientation: " + str(devmode.Orientation))
     print("PaperWidth: " + str(devmode.PaperWidth))
     print("PaperLength: " + str(devmode.PaperLength))
     
+    # explore forms, but don't know how to use it
     forms = win32print.EnumForms(hprinter) 
     strWantedForm = "stickers_ochateau"
     #~ print("forms: " + str(forms))
@@ -119,7 +122,9 @@ print("printer_size: %s" % str(printer_size))
 print("printable_area: %s" % str(printable_area))
 print("printer_margins: %s" % str(printer_margins))
 
-printer_size = (printer_size[0],1795)
+if 0:
+    # reduce papersize
+    printer_size = (printer_size[0],1795)
 printable_area = (printer_size[0]-2*printer_margins[0],printer_size[1]-2*printer_margins[1])
 print("apres modification")
 print("printer_size: %s" % str(printer_size))
@@ -139,16 +144,19 @@ bmp = Image.open( file_name )
 print("bmp.size (1): %s" % str(bmp.size))
 realBmpSize = (bmp.size[0],bmp.size[1])
 
-if bmp.size[0] < bmp.size[1] or 0:
+if bmp.size[0] < bmp.size[1]:
     realBmpSize = (bmp.size[1],bmp.size[0])
-    bmp = bmp.rotate(90)
+    bmp = bmp.rotate(90, expand=True) # expand: change size of destination image (and so no more black band) 
   
 print("bmp.size (2): %s" % str(bmp.size))
 print("realBmpSize: %s" % str(realBmpSize))
+assert(realBmpSize==bmp.size) # assert expand do its job
 
 
 ratios = [1.0 * printable_area[0] / realBmpSize[0], 1.0 * printable_area[1] / realBmpSize[1]]
-scale = min (ratios)
+print("scale: %s" % (ratios))
+scale = min(ratios)
+#~ scale = 1
 
 #
 # Start the print job, and draw the bitmap to
@@ -163,7 +171,8 @@ hDC.StartPage ()
 
 dib = ImageWin.Dib (bmp)
 scaled_width, scaled_height = [int (scale * i) for i in realBmpSize]
-x1 = int ((printer_size[0] - scaled_width) / 2)
+print("scaled_width: %s, scaled_height: %s" % (scaled_width,scaled_height))
+x1 = int ((printer_size[0] - scaled_width) / 2) # center on screen
 y1 = int ((printer_size[1] - scaled_height) / 2)
 x2 = x1 + scaled_width
 y2 = y1 + scaled_height

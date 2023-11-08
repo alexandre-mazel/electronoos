@@ -214,8 +214,14 @@ if 1:
     hf = win32gui.CreateFontIndirect(lf)
     win32gui.SelectObject(handleDC, hf)
     hDC.DrawText(strLongText, (1000, 700, 2800, 800), win32con.DT_CENTER)
-    sizeTextRect = hDC.DrawText("TESTOR", (10, 10, 200, 200), win32con.DT_CENTER|win32con.DT_CALCRECT)
-    print("sizeTextRect: %s" % str(sizeTextRect)) # seems not working  (or only height!)
+    sizeTextRect = hDC.DrawText(strLongText, (10, 10, 200, 200), win32con.DT_CENTER|win32con.DT_CALCRECT)
+    print("sizeTextRect (2): %s" % str(sizeTextRect)) # seems not working  (or only height!)
+    
+    sizeTextRect = hDC.DrawText(strLongText, (10, 10, 200, 200), win32con.DT_CALCRECT|win32con.DT_SINGLELINE)
+    print("sizeTextRect (3): %s" % str(sizeTextRect))
+    
+    sizeTextRect = win32gui.GetTextExtentPoint32(handleDC,strLongText) # Works !
+    print("sizeTextRect (4): %s" % str(sizeTextRect))
     
     lf.lfWeight = 800
     hf = win32gui.CreateFontIndirect(lf)

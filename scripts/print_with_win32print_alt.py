@@ -82,11 +82,12 @@ else:
     print("PaperSize: " + str(devmode.PaperSize))
     print("PaperWidth: " + str(devmode.PaperWidth))
     print("PaperLength: " + str(devmode.PaperLength))
+    print("FormName: " + str(devmode.FormName))
     if 1:
         # force paper to be smaller (not sure it works)
         devmode.PaperWidth = 1040
         devmode.PaperLength = 760
-    devmode.Orientation = 2 # 0 or 2 for landscape
+    devmode.Orientation = 2 # 2 for landscape; 0 or 1 for portrait ?!?
     print("== modified")
     print("Orientation: " + str(devmode.Orientation))
     print("PaperWidth: " + str(devmode.PaperWidth))
@@ -103,6 +104,8 @@ else:
             selected_form = f
             break
     print("selected_form:" + str(selected_form)) # and so, what to do with that ?
+    devmode.FormName = strWantedForm
+    print("FormName: " + str(devmode.FormName))
         
             
     print("== apres forms")

@@ -1,6 +1,7 @@
 import win32print
 import win32ui
 from PIL import Image, ImageWin
+import os
 
 """ ref: 
 https://stackoverflow.com/questions/38178454/python27-on-windows-10-how-can-i-tell-printing-paper-size-is-50-8mm-x-25-4mm
@@ -30,7 +31,12 @@ PHYSICALOFFSETX = 112
 PHYSICALOFFSETY = 113
 
 printer_name = win32print.GetDefaultPrinter()
-printer_name = "Microsoft Print to PDF"
+
+bPrintToPdf = 0
+bPrintToPdf = 1
+if bPrintToPdf: printer_name = "Microsoft Print to PDF"
+
+
 print("printer_name: " + printer_name)
 
 #
@@ -60,10 +66,12 @@ if 0:
     attributes['pDevMode'].PaperSize = 1
 
 
-hDC = win32ui.CreateDC ()
+hDC = win32ui.CreateDC()
+
 if 0:
     hDC.CreatePrinterDC( printer_name )
 else:
+    # configure printer
     hprinter = win32print.OpenPrinter(printer_name)
     devmode = win32print.GetPrinter(hprinter, 2)["pDevMode"]
     print("dir devmode: " + str(dir(devmode)))
@@ -76,7 +84,7 @@ else:
     print("PaperLength: " + str(devmode.PaperLength))
     devmode.PaperWidth = 1040
     devmode.PaperLength = 760
-    devmode.Orientation = 2 # try also 0
+    devmode.Orientation = 0 # 0 or 2 for landscape
     print("== modified")
     print("Orientation: " + str(devmode.Orientation))
     print("PaperWidth: " + str(devmode.PaperWidth))
@@ -148,8 +156,9 @@ scale = min (ratios)
 #
 #~ exit(0)
 
-#~ DocInfo = {"output":"c:/tmp/out.pdf"}
-hDC.StartDoc (file_name,"c:/tmp/out.pdf")
+dstFile = None
+if bPrintToPdf: dstFile = "c:/tmp/out.pdf"
+hDC.StartDoc (file_name,dstFile)
 hDC.StartPage ()
 
 dib = ImageWin.Dib (bmp)
@@ -164,3 +173,5 @@ dib.draw (hDC.GetHandleOutput (), (x1, y1, x2, y2))
 hDC.EndPage ()
 hDC.EndDoc ()
 hDC.DeleteDC ()
+
+if bPrintToPdf: os.system( "start " + dstFile )

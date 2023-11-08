@@ -114,8 +114,8 @@ else:
     print("PaperLength: " + str(devmode.PaperLength))
     
     import win32gui
-    hDC = win32gui.CreateDC("WINSPOOL", printer_name, devmode)
-    hDC = win32ui.CreateDCFromHandle(hDC)
+    handleDC = win32gui.CreateDC("WINSPOOL", printer_name, devmode)
+    hDC = win32ui.CreateDCFromHandle(handleDC) # WRN: hDC is no more the handle but a python object representing the DC
 
 printable_area = hDC.GetDeviceCaps (HORZRES), hDC.GetDeviceCaps (VERTRES)
 printer_size = hDC.GetDeviceCaps (PHYSICALWIDTH), hDC.GetDeviceCaps (PHYSICALHEIGHT)
@@ -169,10 +169,10 @@ scale = min(ratios)
 
 dstFile = None
 if bPrintToPdf: dstFile = "c:/tmp/out.pdf"
-hDC.StartDoc (file_name,dstFile)
-hDC.StartPage ()
+hDC.StartDoc(file_name,dstFile)
+hDC.StartPage()
 
-dib = ImageWin.Dib (bmp)
+dib = ImageWin.Dib(bmp)
 scaled_width, scaled_height = [int (scale * i) for i in realBmpSize]
 print("scaled_width: %s, scaled_height: %s" % (scaled_width,scaled_height))
 x1 = int ((printer_size[0] - scaled_width) / 2) # center on screen
@@ -180,10 +180,50 @@ y1 = int ((printer_size[1] - scaled_height) / 2)
 x2 = x1 + scaled_width
 y2 = y1 + scaled_height
 print("x1: %s, y1: %s, x2: %s, y2: %s" % (x1,y1,x2,y2))
-dib.draw (hDC.GetHandleOutput (), (x1, y1, x2, y2))
+dib.draw (hDC.GetHandleOutput(), (x1, y1, x2, y2))
 
-hDC.EndPage ()
-hDC.EndDoc ()
-hDC.DeleteDC ()
+if 1:
+    import win32con
+    import win32api
+    #~ win32gui.SetTextColor(handleDC, win32api.RGB(255,0,0)) # RGB
+    win32gui.SetTextColor(handleDC, 0xFF0000) # BGR
+    sizeTextRect = hDC.DrawText("TESTOR", (10, 10, 200, 200), win32con.DT_CENTER|win32con.DT_CALCRECT)
+    print("sizeTextRect: %s" % str(sizeTextRect)) # seems not working (or only height!)
+    
+    # left top corner, right bottom corner
+    hDC.DrawText("TEST", (10, 10, 300, 100), win32con.DT_CENTER)
+    
+    strLongText = "A very big long and boring text" # note the A and very are stuck together on print
+    hDC.DrawText(strLongText, (10, 100, 900, 200), win32con.DT_CENTER)
+    hDC.DrawText(strLongText, (10, 200, 900, 300), win32con.DT_CENTER|win32con.DT_WORD_ELLIPSIS)
+    win32gui.SetBkColor(handleDC, 0xAAAAAA)
+    hDC.DrawText(strLongText, (10, 300, 1200, 400), win32con.DT_CENTER)
+    hDC.DrawText(strLongText, (1000, 400, 2200, 500), win32con.DT_CENTER)
+    win32gui.SetBkMode(handleDC, 0) # 0: transparent (and 1)
+    hDC.DrawText(strLongText, (1000, 500, 2200, 600), win32con.DT_CENTER)
+    win32gui.SetBkMode(handleDC, 2) # 2: opaque 
+    hDC.DrawText(strLongText, (1000, 600, 2200, 700), win32con.DT_CENTER)  
+    # change font, thus text size
+    fontSize = 120
+    lf = win32gui.LOGFONT()
+    lf.lfFaceName = "Stencil"
+    lf.lfHeight = fontSize
+    lf.lfWeight = 100
+
+    lf.lfQuality = win32con.NONANTIALIASED_QUALITY
+    hf = win32gui.CreateFontIndirect(lf)
+    win32gui.SelectObject(handleDC, hf)
+    hDC.DrawText(strLongText, (1000, 700, 2800, 800), win32con.DT_CENTER)
+    sizeTextRect = hDC.DrawText("TESTOR", (10, 10, 200, 200), win32con.DT_CENTER|win32con.DT_CALCRECT)
+    print("sizeTextRect: %s" % str(sizeTextRect)) # seems not working  (or only height!)
+    
+    lf.lfWeight = 800
+    hf = win32gui.CreateFontIndirect(lf)
+    win32gui.SelectObject(handleDC, hf)
+    hDC.DrawText(strLongText, (1000, 800, 2800, 900), win32con.DT_CENTER)
+
+hDC.EndPage()
+hDC.EndDoc()
+hDC.DeleteDC()
 
 if bPrintToPdf: os.system( "start " + dstFile )

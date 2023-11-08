@@ -16,7 +16,7 @@ printer_size = hDC.GetDeviceCaps (PHYSICALWIDTH), hDC.GetDeviceCaps (PHYSICALHEI
 
 print("printer_size: " + str(printer_size))
 
-file_name = "c:/users/alexa/downloads/stickers.jpg"
+#~ file_name = "c:/users/alexa/downloads/stickers.jpg"
 file_name = "C:/Users/alexa/perso/docs/2023-10_cdl_photosbooths/stickers.jpg"
 
 bmp = Image.open (file_name)

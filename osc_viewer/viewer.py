@@ -40,9 +40,9 @@ def runLoopOscHandler(game, ip = "127.0.0.1", port = 8002):
 # runLoopOscHandler - end
     
     
-import pygame
+import pygame as pg
 
-successes, failures = pygame.init()
+successes, failures = pg.init()
 print("INF: pygame int: %s successes and %s failure(s)" % (successes, failures))
 
 black = (0, 0, 0)
@@ -50,6 +50,43 @@ white = (255, 255, 255)
 red = (255, 0, 0)
 green = (0, 255, 0) 
 blue = (0, 0, 255)
+
+fontTitleViewer = pg.font.SysFont('Arial', 16)
+
+class Viewer:
+    """
+    An oscilloscope like to view a value over time
+    """
+    def __init__(self,x=10,y=10,w=200,h=100,title="Viewer"):
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+        self.title = title
+        self.color = (255,244,255)
+        self.text_surface = fontTitleViewer.render(self.title, True, self.color)
+    
+    def update(self,rVal):
+        self.value.append(rVal)
+        
+    def render(self, surf):
+        color = self.color
+        x,y = self.x,self.y
+        x2 = self.x+self.w
+        y2 = self.y+self.h
+        w = 1
+        htitle=24
+        titlemargin = 4
+        pg.draw.line(surf,color,(x,y),(x2,y),width=w)
+        pg.draw.line(surf,color,(x,y+htitle),(x2,y+htitle),width=w)
+        pg.draw.line(surf,color,(x,y),(x,y2),width=w)
+        pg.draw.line(surf,color,(x,y2),(x2,y2),width=w)
+        pg.draw.line(surf,color,(x2,y),(x2,y2),width=w) 
+        surf.blit(self.text_surface, (x+titlemargin,y+titlemargin))    
+        
+        surf.set_at((x+10, y+htitle+4), (255,255,233)) 
+        
+    
 
 class Object:
     def __init__(self,x=10,y=10,w=32,h=32):
@@ -64,12 +101,12 @@ class Object:
 
 class Game:
     def __init__(self):
-        self.screen = pygame.display.set_mode((720, 480))
-        self.clock = pygame.time.Clock()
+        self.screen = pg.display.set_mode((720, 480))
+        self.clock = pg.time.Clock()
         self.fps = 60  # Frames per second.
         
         self.square = Object()
-        self.square.img = pygame.Surface((self.square.w, self.square.h))
+        self.square.img = pg.Surface((self.square.w, self.square.h))
         self.square.img.fill(white)
         self.square.x = 0
         self.square.y = 0
@@ -78,30 +115,34 @@ class Game:
         
         self.keypressed={} # will store current keyboard pressed
         
+        self.viewers = []
+        self.viewers.append(Viewer())
+        
+        
     def handleInput(self):
         """
         Analyse user command
         return True if user want to quit
         """
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
                 return True
                 
-            if event.type == pygame.KEYDOWN:     
+            if event.type == pg.KEYDOWN:     
                 print("DBG: key '%s' pressed" % event.key )
                 self.keypressed[event.key] = 1
                 
-            if event.type == pygame.KEYUP:
+            if event.type == pg.KEYUP:
                 self.keypressed[event.key] = 0
                 
         for key, bPressed in self.keypressed.items():
             if bPressed:
-                if key == pygame.K_a or key == pygame.K_UP:
+                if key == pg.K_a or key == pg.K_UP:
                     #~ self.square.y -= 1
                     self.square.vy -= 1
-                elif key == pygame.K_q or key == pygame.K_DOWN:
+                elif key == pg.K_q or key == pg.K_DOWN:
                     self.square.y += 1
-                elif key == pygame.K_ESCAPE:
+                elif key == pg.K_ESCAPE:
                     return True
                     
         return False
@@ -143,10 +184,13 @@ class Game:
         self.screen.blit(self.square.img, [self.square.x,self.square.y,self.square.x+self.square.w,
                                                                                                 self.square.y+self.square.h] )
                                                                                                 
-        self.screen.set_at((100, 100), (255,255,233)) 
-        self.screen.set_at((110, 100), (255,255,233)) 
+        self.screen.set_at((100, 300), (255,255,233)) 
+        self.screen.set_at((110, 300), (255,255,233)) 
         
-        pygame.display.update()  # or pygame.display.flip()
+        for v in self.viewers:
+            v.render(self.screen)
+        
+        pg.display.update()  # or pg.display.flip()
         
 # class Game - end
 

@@ -25,6 +25,6 @@ while 1:
     rFrameVolUdp = 0
 
     client.send_message("/global", [rSumVolTotal, rSumVolHttp, rSumVolHttps, rSumVolArp, rSumVolUdp,rFrameVolTotal, rFrameVolHttp, rFrameVolHttps, rFrameVolArp, rFrameVolUdp])
-    time.sleep(2)
+    time.sleep(0.1)
 
 print("done")

@@ -6,6 +6,7 @@ def runLoopOscHandler(game, ip = "127.0.0.1", port = 8002):
     
     def filter_handler(address, *args):
         print(f"{address}: {args}")
+        game.receiveValue(address,args)
 
 
     dispatcher = Dispatcher()
@@ -65,27 +66,43 @@ class Viewer:
         self.title = title
         self.color = (255,244,255)
         self.text_surface = fontTitleViewer.render(self.title, True, self.color)
+        self.values  = []
     
     def update(self,rVal):
-        self.value.append(rVal)
+        self.values.append(rVal)
         
     def render(self, surf):
         color = self.color
         x,y = self.x,self.y
         x2 = self.x+self.w
         y2 = self.y+self.h
-        w = 1
+        th = 1 # thickness of the line
         htitle=24
         titlemargin = 4
-        pg.draw.line(surf,color,(x,y),(x2,y),width=w)
-        pg.draw.line(surf,color,(x,y+htitle),(x2,y+htitle),width=w)
-        pg.draw.line(surf,color,(x,y),(x,y2),width=w)
-        pg.draw.line(surf,color,(x,y2),(x2,y2),width=w)
-        pg.draw.line(surf,color,(x2,y),(x2,y2),width=w) 
+        pg.draw.line(surf,color,(x,y),(x2,y),width=th)
+        pg.draw.line(surf,color,(x,y+htitle),(x2,y+htitle),width=th)
+        pg.draw.line(surf,color,(x,y),(x,y2),width=th)
+        pg.draw.line(surf,color,(x,y2),(x2,y2),width=th)
+        pg.draw.line(surf,color,(x2,y),(x2,y2),width=th) 
         surf.blit(self.text_surface, (x+titlemargin,y+titlemargin))    
         
-        surf.set_at((x+10, y+htitle+4), (255,255,233)) 
-        
+        if len(self.values)<1:
+            return
+            
+        if len(self.values)>=self.w:
+            self.values = self.values[-self.w:]
+            
+        maxrange = (self.h-htitle)//2
+        yzero = y+htitle+4+maxrange
+        maxval = max(self.values)
+        print("maxval:%s" % maxval)
+        if maxval>0.:
+            zoomy = maxrange/maxval
+        for i,val in enumerate(self.values):
+            xv = i
+            yv = int((val)*zoomy)
+            #print("DBG: val: %s, yv: %s" % (val,yv))
+            surf.set_at((x+xv, yzero-yv), color)
     
 
 class Object:
@@ -146,6 +163,10 @@ class Game:
                     return True
                     
         return False
+        
+    def receiveValue(self,strName, values):
+        print("DBG: receiveValue: '%s': %s" % (strName,values) )
+        self.viewers[0].update(values[0])
     
     def update(self):
         """

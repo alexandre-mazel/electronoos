@@ -16,8 +16,8 @@ def runLoopOscHandler(game, ip = "127.0.0.1", port = 8002):
     async def loop(game):
         """Example main loop that only runs for 10 iterations before finishing"""
         while 1:
-            print(f"Loop {i}")
-            await asyncio.sleep(1)
+            #~ print(f"Loop...")
+            await asyncio.sleep(0.04) # 25fps
             bQuit = game.handleInput()
             game.update()
             if bQuit:
@@ -25,7 +25,7 @@ def runLoopOscHandler(game, ip = "127.0.0.1", port = 8002):
             game.render()
 
 
-    async def init_main():
+    async def init_main(game):
         print("Running OSC Server on %s:%s" % (ip,port))
         server = AsyncIOOSCUDPServer((ip, port), dispatcher, asyncio.get_event_loop())
         transport, protocol = await server.create_serve_endpoint()  # Create datagram endpoint and start serving
@@ -142,6 +142,9 @@ class Game:
         self.screen.fill(black)
         self.screen.blit(self.square.img, [self.square.x,self.square.y,self.square.x+self.square.w,
                                                                                                 self.square.y+self.square.h] )
+                                                                                                
+        self.screen.set_at((100, 100), (255,255,233)) 
+        self.screen.set_at((110, 100), (255,255,233)) 
         
         pygame.display.update()  # or pygame.display.flip()
         

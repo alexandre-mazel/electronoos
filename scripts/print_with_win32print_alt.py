@@ -182,7 +182,7 @@ y2 = y1 + scaled_height
 print("x1: %s, y1: %s, x2: %s, y2: %s" % (x1,y1,x2,y2))
 dib.draw (hDC.GetHandleOutput(), (x1, y1, x2, y2))
 
-if 1:
+if 0:
     import win32con
     import win32api
     #~ win32gui.SetTextColor(handleDC, win32api.RGB(255,0,0)) # RGB

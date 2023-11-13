@@ -132,8 +132,18 @@ def runServer( nPort, bIsOnNao = 0, bVerbose=0 ):
     """
     mem = None
     if bIsOnNao:
-        import naoqi
-        mem = naoqi.ALProxy("ALMemory", "localhost",9559)
+        while 1:
+            try:
+                print("INF: Connecting to ALMemory...")
+                import naoqi
+                mem = naoqi.ALProxy("ALMemory", "localhost",9559)
+                if mem != None:
+                    print("INF: GOOD: ALMemory is connected")
+                    break
+            except RuntimeError as err:
+                print("INF: BAD: ALMemory not found, waiting...")
+                time.sleep(5)
+            
     socket_server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # DGRAM => UDP
     while True:
         try:

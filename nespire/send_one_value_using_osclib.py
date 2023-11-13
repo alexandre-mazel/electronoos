@@ -4,7 +4,7 @@ from pythonosc.udp_client import SimpleUDPClient
 # cf https://python-osc.readthedocs.io/en/latest/dispatcher.html#example
 
 strServerIP = "127.0.0.1"
-strServerIP = "192.168.158.40"
+#~ strServerIP = "192.168.158.40"
 
 client = SimpleUDPClient(strServerIP, 8002)
 

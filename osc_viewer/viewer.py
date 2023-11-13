@@ -79,6 +79,7 @@ class Viewer:
         th = 1 # thickness of the line
         htitle=24
         titlemargin = 4
+        pg.draw.rect(surf,(32,32,32),(x,y,self.w,htitle),0)
         pg.draw.line(surf,color,(x,y),(x2,y),width=th)
         pg.draw.line(surf,color,(x,y+htitle),(x2,y+htitle),width=th)
         pg.draw.line(surf,color,(x,y),(x,y2),width=th)
@@ -98,6 +99,8 @@ class Viewer:
         print("maxval:%s" % maxval)
         if maxval>0.:
             zoomy = maxrange/maxval
+        else:
+            zoomy = 1
         for i,val in enumerate(self.values):
             xv = i
             yv = int((val)*zoomy)
@@ -118,7 +121,13 @@ class Object:
 
 class Game:
     def __init__(self):
-        self.screen = pg.display.set_mode((720, 480))
+        w = 1380
+        h = 920
+        if 0:
+            # reduce screen to see debug
+            w = 640
+            h = 480
+        self.screen = pg.display.set_mode((w,h))
         self.clock = pg.time.Clock()
         self.fps = 60  # Frames per second.
         
@@ -132,8 +141,7 @@ class Game:
         
         self.keypressed={} # will store current keyboard pressed
         
-        self.viewers = []
-        self.viewers.append(Viewer())
+        self.viewers = {} # key => viewer
         
         
     def handleInput(self):
@@ -166,7 +174,16 @@ class Game:
         
     def receiveValue(self,strName, values):
         print("DBG: receiveValue: '%s': %s" % (strName,values) )
-        self.viewers[0].update(values[0])
+        #self.viewers[0].update(values[0])
+        for i,v in enumerate(values):
+            key = strName + "_" + ("%02d"%i)
+            try:
+                self.viewers[key].update(v)
+            except KeyError as err:
+                x = (len(self.viewers)%5)*200
+                y = (len(self.viewers)//5)*100
+                self.viewers[key] = Viewer(x=x,y=y,title=key)
+                self.viewers[key].update(v)
     
     def update(self):
         """
@@ -205,10 +222,10 @@ class Game:
         self.screen.blit(self.square.img, [self.square.x,self.square.y,self.square.x+self.square.w,
                                                                                                 self.square.y+self.square.h] )
                                                                                                 
-        self.screen.set_at((100, 300), (255,255,233)) 
-        self.screen.set_at((110, 300), (255,255,233)) 
+        #~ self.screen.set_at((100, 300), (255,255,233)) 
+        #~ self.screen.set_at((110, 300), (255,255,233)) 
         
-        for v in self.viewers:
+        for k,v in self.viewers.items():
             v.render(self.screen)
         
         pg.display.update()  # or pg.display.flip()

@@ -79,7 +79,8 @@ class Viewer:
         th = 1 # thickness of the line
         htitle=24
         titlemargin = 4
-        pg.draw.rect(surf,(32,32,32),(x,y,self.w,htitle),0)
+        softcolor = (64,64,64)
+        pg.draw.rect(surf,softcolor,(x,y,self.w,htitle),0)
         pg.draw.line(surf,color,(x,y),(x2,y),width=th)
         pg.draw.line(surf,color,(x,y+htitle),(x2,y+htitle),width=th)
         pg.draw.line(surf,color,(x,y),(x,y2),width=th)
@@ -93,19 +94,28 @@ class Viewer:
         if len(self.values)>=self.w:
             self.values = self.values[-self.w:]
             
-        maxrange = (self.h-htitle)//2
-        yzero = y+htitle+4+maxrange
+        hutil = (self.h-htitle)
+        yzero = y+htitle+4+hutil//2
         maxval = max(self.values)
-        print("maxval:%s" % maxval)
-        if maxval>0.:
-            zoomy = maxrange/maxval
+        minval = min(self.values)
+        variationmax = maxval-minval
+        offset = minval + variationmax / 2.
+        
+        if variationmax > 0:
+            zoomy = (hutil/variationmax)*0.5
         else:
             zoomy = 1
+            
+        offsety = int(offset*zoomy)
+            
+        print("DBG: title: %s, min: %.2f, max: %.2f, variationmax:%.2f, zoomy: %.2f, offset: %.2f" % (self.title,minval, maxval, variationmax,zoomy,offset) )
         for i,val in enumerate(self.values):
             xv = i
-            yv = int((val)*zoomy)
+            yv = int((val-variationmax/2.)*zoomy)
             #print("DBG: val: %s, yv: %s" % (val,yv))
-            surf.set_at((x+xv, yzero-yv), color)
+            if abs(offsety)<hutil/2:
+                surf.set_at((x+xv, yzero+offsety), softcolor)
+            surf.set_at((x+xv, yzero-yv-hutil//4+offsety), color)
     
 
 class Object:

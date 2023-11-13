@@ -1,3 +1,4 @@
+import math
 import time
 from pythonosc.udp_client import SimpleUDPClient
 
@@ -14,15 +15,15 @@ client = SimpleUDPClient(strServerIP, nPort)
 print("sending message to %s:%s..." % (strServerIP,nPort))
 while 1:
     rSumVolTotal = time.time()%10.
-    rSumVolHttp = 0
-    rSumVolHttps = 0
-    rSumVolArp = 0
-    rSumVolUdp = 0
-    rFrameVolTotal = 0
-    rFrameVolHttp = 0
-    rFrameVolHttps = 0
-    rFrameVolArp = 0
-    rFrameVolUdp = 0
+    rSumVolHttp = math.sin(time.time()*10)+2
+    rSumVolHttps = math.sin(time.time()*10)+1
+    rSumVolArp = math.sin(time.time()*10)-1
+    rSumVolUdp = math.sin(time.time()*10)
+    rFrameVolTotal = math.sin(time.time()*10)*10
+    rFrameVolHttp = math.sin(time.time()*10)*0.1
+    rFrameVolHttps = int(time.time()%11)-5
+    rFrameVolArp = int(time.time()%10)
+    rFrameVolUdp = math.sin(time.time())
 
     client.send_message("/global", [rSumVolTotal, rSumVolHttp, rSumVolHttps, rSumVolArp, rSumVolUdp,rFrameVolTotal, rFrameVolHttp, rFrameVolHttps, rFrameVolArp, rFrameVolUdp])
     time.sleep(0.01)

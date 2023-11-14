@@ -48,6 +48,13 @@ class Stater:
         self.rFrameVolHttp += v
         self.rFrameVolTotal += v
         
+        
+    def addVolHttps(self,v):
+        self.rSumVolHttps += v
+        self.rSumVolTotal += v
+        self.rFrameVolHttps += v
+        self.rFrameVolTotal += v
+        
     def addVolArp(self,v):
         self.rSumVolArp += v
         self.rSumVolTotal += v
@@ -58,7 +65,7 @@ class Stater:
         #~ print("update")
         if time.time()-self.lastSend > self.rRefreshTimeSec:
             values = [ self.rSumVolTotal, self.rSumVolHttp, self.rSumVolHttps, self.rSumVolArp, self.rSumVolUdp,
-                            self.rFrameVolTotal, self.rFrameVolHttp, self.rFrameVolHttps, self.rFrameVolArp, self.rFrameVolArp,
+                            self.rFrameVolTotal, self.rFrameVolHttp, self.rFrameVolHttps, self.rFrameVolArp, self.rFrameVolUdp,
                         ]
             print("INF: Stater.update: sending")
             self.lastSend = time.time()

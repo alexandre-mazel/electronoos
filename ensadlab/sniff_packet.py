@@ -277,7 +277,8 @@ def monitor_callback(pkt):
             print("DBG: tcp time (at senders): " + outputAllFields(pkt[TCP]))
             print("DBG: tcp time (at senders): %.4f (diff to send:%.4f)" % (pkt[TCP].time,pkt.time-pkt[TCP].time))
             #~ print("DBG: tcp time (at senders): " + str(pkt[TCP].keys()))
-            if port_src == 80 or port_dst == 80:#Checks for http port 80
+            if port_src == 80 or port_dst == 80: #Checks for http port 80
+                stats.addVolHttp(len(pkt))
                 if pkt.haslayer(http.HTTPRequest):
                     http_layer = pkt.getlayer(http.HTTPRequest)
                     print("DBG: keys: " + str(http_layer.fields.keys()))
@@ -330,7 +331,21 @@ def monitor_callback(pkt):
         ip_src = toHostnameV6(pkt[IPV6].src)
         ip_dst = toHostnameV6(pkt[IPV6].dst)
         print("DBG: IPv6: %s > %s" % (ip_src,ip_dst))
-        stats.addVolArp(len(pkt))
+        #~ stats.addVolArp(len(pkt))
+        if TCP in pkt:
+            port_src = pkt[TCP].sport
+            port_dst = pkt[TCP].dport
+        elif UDP in pkt:
+            port_src = pkt[UDP].sport
+            port_dst = pkt[UDP].dport
+        else:
+            print("no port?")
+            port_src = -1
+            port_dst = -1
+        if port_src == 443 or port_dst == 443:
+            print("https!")
+            stats.addVolHttps(len(pkt))
+    # ipv6 in pkt
         
     return "" # pkt.sprintf("%ARP.hwsrc% %ARP.psrc%")
 

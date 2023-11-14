@@ -72,158 +72,6 @@ def changeToDefaultIfNotExist( strDir, strOriginalPath, strNewPath="" ):
         strNewPath = strOriginalPath + "/index.htm"
     return strNewPath
 
-
-class Access:
-    """
-    logger for access and referer dedicated to AlexServ
-    """
-    def __init__(self):
-        if os.name != "nt": 
-            self.savefilename = "/home/na/logs/webaccess.log"
-        else:
-            self.savefilename = "c:/logs/webaccess.log"
-            
-        self.records = []
-        
-    def save( self ):
-        try:
-            f = open(self.savefilename,"a+t")
-        except FileNotFoundError as err:
-            if os.name != "nt": 
-                assert(0)
-            return
-        for r in self.records:
-            f.write(";".join(r)+"\n")
-        self.records = []
-        f.close()
-        
-    def addVisitor(self, strSiteName,strPage,strRef,strMachine,strIp,strXForward,username):
-        stamp = getTimeStamp()
-        strSiteName = strSiteName.replace(";",",")
-        strPage = strPage.replace(";",",")
-        strRef = strRef.replace(";",",")
-        strMachine = strMachine.replace(";",",")
-        strIp = strIp.replace(";",",")
-        strXForward = strXForward.replace(";",",")
-        username = username.replace(";",",")
-        r = [stamp,strSiteName,strPage,strRef,strMachine,strIp,strXForward,username]
-        self.records.append(r)
-        self.save()
-        
-#class Acccess - end
-
-access = Access()
-        
-
-class WebFunctionChanger:
-    """
-    receive all .js and .html and replace function name by f1, f2, ...
-    """
-    def __init__( self, bVerbose = 0 ):
-        self.functionDict = {}
-        self.alreadyUsedFunction = set() # very sad: html is loaded first so all call to future js function can't be scrambled!
-        self.bVerbose = bVerbose
-        
-    def printTransTable(self):
-        for k,v in self.functionDict.items():
-            print("%s=>%s" % (k,v))
-        
-    def transform(self,s:str) -> str: # if error here, it's because python has been used instead of python3!
-        """
-        buf
-        """
-        words = []
-        o = ""
-        i = 0
-        ibegin = 0
-        lens = len(s)
-        bPrevIsFunction = 0
-        sepaFunctionBody = "({"
-        while i < lens:
-            c = s[i]
-            if c in " ,:;.'\"!?-(){}<>+*/=\n":
-                if i-ibegin>0:
-                    new_word=s[ibegin:i]
-                    #~ if self.bVerbose: print("DBG: WebFunctionChanger.transform: new_word: '%s'" % new_word)
-                    words.append(new_word)
-                    if new_word == "function":
-                        bPrevIsFunction = 1
-                    elif bPrevIsFunction:
-                        bPrevIsFunction = 0
-                        if self.bVerbose: print("DBG: WebFunctionChanger.transform: got at %4d function definition: '%s'\ncontext:\n------\n%s\n------" % (i,new_word,s[i-80:i+40]))
-                        if new_word in self.alreadyUsedFunction or "run_filter" in new_word: # l'appel a run_filter est du code genere a la volee donc pas trouvable au moment du parse
-                            if self.bVerbose: print("DBG: WebFunctionChanger.transform: not changing this one, as already called")
-                        else:
-                            if new_word not in self.functionDict:
-                                new_function_name = "f"+str(len(self.functionDict)+1)
-                                if self.bVerbose: print("DBG: WebFunctionChanger.transform: => '%s'" % new_function_name)
-                                self.functionDict[new_word] = new_function_name
-                                new_word = new_function_name
-                            else:
-                                print("ERR: redefinition of a function ? context:\n------\n'%s'\n------" % o[-80:])
-                                #~ assert(0)
-                    else:
-                        #~ if self.bVerbose: print("DBG: WebFunctionChanger.transform: is a function to replace ? %s, sepa: '%c'" % (new_word,c))
-                        #~ print("dict:\n%s" % str(self.functionDict))
-                        if c == '(' or c == ',' or c == ')' or (  i+1<lens and (s[i+1] == '('or s[i+1] == ',' or s[i+1] == ')')  ): # appel de fonction ou fonction passe en parametre de fonction
-                            #~ print("seems like function name!")
-                            if new_word in self.functionDict:
-                                if self.bVerbose: print("DBG: WebFunctionChanger.transform: in place of '%s', using '%s'" % (new_word,self.functionDict[new_word]))
-                                new_word = self.functionDict[new_word]
-                            else:
-                                #~ if self.bVerbose: print("DBG: WebFunctionChanger.transform: adding '%s' to alreadyUsedFunction" % new_word)
-                                self.alreadyUsedFunction.add(new_word)
-                    o += new_word + c
-                    if c in sepaFunctionBody:
-                        bPrevIsFunction = 0                    
-                else:
-                    o += c
-                    #~ if self.bVerbose: print("DBG: WebFunctionChanger.transform: c: '%s'" % c) 
-                    if c in sepaFunctionBody:
-                        bPrevIsFunction = 0
-                        
-                ibegin = i+1
-            i += 1
-        if ibegin < i:
-            words.append(s[ibegin:i])
-        return o
-   
-# class WebFunctionChanger - end
-
-webFunctionChanger = WebFunctionChanger(bVerbose=1)
-
-if 0:
-    strSourceExample = """
-    setTimeout( store_referer, 200 );
-    function toto(x,y)
-    {
-        return x+y;
-    }
-    setTimeout(function() { select_last_req() }, 200);
-    toto(3,5)
-    function isMobile()
-    {
-      let check = false;
-      (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|te\-/i.test(a.substr(0,4))) check = true;})(navigator.userAgent||navigator.vendor||window.opera);
-      return check;
-    }
-    let a = 35;
-    function demo()
-    {
-        let toto = 35;
-    }
-    <span id="req_created"> <script>demo("Cree le 11.02.2023 a 12h54")</script></span></p>
-    let demo = 56;
-    setTimeout( demo, 200 );
-    function store_referer()
-    {
-        // une fonction defini apres son appel, on ne doit pas la changer.
-    }
-    """
-    ret  = webFunctionChanger.transform(strSourceExample)
-    print("=>\n"+ret)
-    exit(1)
-
 class MyServer:
     def __init__(self):
         #~ self.strName = "AlexServ"
@@ -313,17 +161,6 @@ class MyServer:
     def logInfo(self,txt):
         return self.log("INF: " + txt)
         
-    def preloadJs(self):
-        if len(myServer.loadedFiles) > 0:
-            return # already done
-        self.loadPage("./vitrine/common.js")
-        self.loadPage("./www/dashboard2.js")
-        self.loadPage("./www/request.js")
-        self.loadPage("./vitrine/header.js")
-        self.loadPage("./vitrine/footer.js")
-        print("DBG: preloadJs: transTable:")
-        webFunctionChanger.printTransTable()
-        
         
     def loadPage(self,path):
         if not os.path.isfile(path):
@@ -382,6 +219,28 @@ class MyServer:
 myServer = MyServer()
     
     
+def analyseArgs( args, emptyValue = None ):
+    """
+    return a dictionnary avec pour chaque cle (arg) la valeur qu'elle prend ou une liste si plusieurs parametres pour la meme valeur
+    """
+    print( "INF: analyseArgs: received %s" % str(args) )
+    dOut = dict()
+    if args != None:
+        args = args.replace("%20", " ")
+        listArgs = args.split('&')
+        for a in listArgs:
+            v=a.split('=')
+            if len(v)<2 or v[1] == '':
+                dOut[v[0]] = emptyValue
+            else:
+                if v[0] in dOut.keys():
+                    if not isinstance(dOut[v[0]], list):
+                        dOut[v[0]] = [dOut[v[0]]]
+                    dOut[v[0]].append(v[1])
+                else:
+                    dOut[v[0]] = v[1]
+    print( "INF: analyseArgs: returning %s" % str(dOut) )
+    return dOut
     
 
 def decodeBytes(buf):
@@ -771,105 +630,8 @@ Accept-Language: fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7
         if bVerbose or 1: print("%.3f: DBG: handleReq: path: '%s'" % (time.time(),self.path))
         self.analyseRequestHeader()
         
-        # strSiteName,strPage,strRef,strMachine,strIp,strXForward,username
-        try:
-            cookie_access_token = self.getCookie("access_token","unk")
-            if bVerbose: print("cookie_access_token:%s" % cookie_access_token)
-            if bVerbose: print("cookie_access_token.value:%s" % cookie_access_token.value)
-            username = str(cookie_access_token.value).split("__")[0]
-            if bVerbose: print("username: %s" % username)
-        except IndexError as err: username = "unke"
+
         strHostname = self.headers.get('Host')
-        access.addVisitor(strHostname,self.path,self.strReferer,self.strUserAgent,"",self.strXForwardFor,username)
-        
-        if "/?fbclid=" in self.path:
-            # cas particulier depuis instagram, ou le path vaut juste /?fbclid=PAAaahA0zpEcmmqJKLfG5i9JZuo9xIEOnBjUpi4X_EmBUlQKR-rsLNHjgSxEA
-            self.path = "index.html"
-            
-        if "engrenage.studio" in strHostname:
-            print("DBG: got eng")
-            strDir = "./altwww/engrenage.studio/"
-            if self.path == '/':
-                self.path = "/eng_index.py"
-            else:
-                # comme on  ne peut pas avoir 2 fichiers de meme nom (index.py, on va generer des noms de dossiers parent_index
-                print("DBG: path: %s" % self.path )
-                strLast = os.path.basename(self.path)
-                print("DBG: strLast: %s" % strLast )
-                if "." not in strLast:
-                    strNewPath = self.path + "/" + strLast + "_index.py"
-                    self.path = changeToDefaultIfNotExist(strDir,self.path,strNewPath)
-            self.path = strDir + self.path
-
-            
-        if "human-machine-interaction.org" in strHostname:
-            print("DBG: got hmi")
-            print("DBG: path: %s" % self.path )
-            strDir = "./altwww/human-machine-interaction.org/"
-            if self.path == '/':
-                self.path = "/index.htm"
-            else:
-                self.path = changeToDefaultIfNotExist(strDir,self.path)
-            self.path = strDir + self.path
-            
-        if "wellbeing.paris" in strHostname:
-            print("DBG: got wellbeing")
-            print("DBG: path: %s" % self.path )
-            if self.path == '/':
-                self.path = "/index.html"
-            self.path = "./altwww/wellbeing.paris/" + self.path
-            
-        
-            
-        if "itw." == strHostname[:4]:
-            print("DBG: got itw.")
-            if "/?id=" == self.path[:5]:
-                print("DBG: got request for an interview")
-                self.path = "./www/agent/index.html"+self.path[1:]
-            elif "/sound/" == self.path[:7] or "/getdiag" == self.path[:8]:
-                self.path = "./www/"+self.path
-            elif "/vitrine/" in self.path:
-                pass
-            else:
-                self.path = "./www/agent/."+self.path
-        else:
-            if "/getdiag" == self.path[:8]:
-                self.path = "./www/"+self.path
-            
-            
-            
-        if self.path == '/':
-            self.path = "index.html"
-            #~ self.path = "/vitrine/index.html"
-        if self.path == '/vitrine/':
-            self.path = "/vitrine/index.html"
-            
-        if "/vitrine/" == self.path[:9]:
-            self.path = "." + self.path
-            
-        if "/www/" == self.path[:5]:
-            self.path = "." + self.path
-
-        if "/sound/" == self.path[:7]:
-            self.path = "./www" + self.path
-
-        if "/index.py" == self.path[:9]:
-            #~ self.path = "./www" + self.path
-            self.path = "./files_in_apache_root_copy/" + self.path
-            
-        if "/cvs_blurred" == self.path[:12]:
-            self.path = "/home/na/cvs/cvs_pool_blurred" + self.path.replace("/cvs_blurred","")
-
-        if "/o?" == self.path[:3]:
-            self.path = "./vitrine/offers.htm?o=" + self.path[3:]
-            print("DBG: handleReq: offer shortcut => exploding real address to '%s'" % self.path)
-            
-        # quand on vient de o, ensuite tout est pourri: /img/   /header.js ...
-        if "/" == self.path[0]:
-            self.path = "./vitrine/" + self.path
-            
-        if "/index.py" == self.path[:9]:
-            self.path = "./www" + self.path
 
             
         self.path = self.path.replace("%20"," ")
@@ -904,8 +666,7 @@ Accept-Language: fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7
                 req.form[k].value = v[2] # le binary
             # put all params in form also for compat (argh)
             sys.path.append("./vitrine")
-            import common_vitrine # argh d'importer ca ici
-            argsfrompost = common_vitrine.analyseArgs(params, "")
+            argsfrompost = analyseArgs(params, "")
             for k,v in argsfrompost.items():
                 if k not in req.form:
                     req.form[k] = v
@@ -915,53 +676,13 @@ Accept-Language: fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7
         
         self.send_response(200)
         
-        #~ self.wfile.write(b'Hello, world!')
-        # attention, on ne peut pas avoir 2 fichiers python avec le meme nom !!!
-        if ".py" == self.path[-3:]:
-            if bVerbose: print( "DBG: handleReq: python script!" )
-            req.args = params
-            pathname, filename = os.path.split(self.path)
-            filename_without_ext = filename.replace(".py","")
-
-            if bVerbose: print( "DBG: handleReq: self.path: %s" % self.path )
-            if bVerbose: print( "DBG: handleReq: req.args: %s" % req.args )
-            if bVerbose: print( "DBG: handleReq: filename: %s" % filename )
-            #~ mod = importlib.import_module(self.path,filename)
-            sys.path.append(pathname)
-            mod = importlib.import_module(filename_without_ext) # too bad we can't pass globals=globals()
+        if "print_image.htm" in self.path:
+            #~ strFilename = "c:\stickers\" + argsfrompost[
             
-            # force a reload if in dev:
-            if myServer.bDev and 0: # attention ca ne fonctionne pas de recharger pour les trucs sans save comme le imageviewerscrambler
-                print("WRN: reloading %s" % filename_without_ext)
-                importlib.reload(mod)
+            ret = "print_image.htm: success !"
             
-            timeBegin = time.time()
-            
-            if myServer.bDev:
-                ret = mod.index(req) # crash to see errors
-            else:                
-                try:
-                    ret = mod.index(req)
-                except BaseException as err:
-                    myServer.logError("During execution of %s, err: %s" % (self.path,err))
-                    return
-            
-            if myServer.bDev:
-                bar = "#"*40
-                print(bar)
-                print("# python answer:")
-                if ret == None: 
-                    print("# set to 1")
-                    ret = "1"
-                else:
-                    if type(ret)==str or type(ret)==bytes:
-                        print(ret[:400])
-                        if(len(ret)>400): print("...")
-                    else:
-                        print("WRN: handleReq: type of ret is different: %s" % type(ret))
-                        print("%s"%ret)
-                print(bar)
                 
+            # format answers
             self.contents_type = ""
             if type(ret)==str and ("<html>" == ret[:6].lower() or "<!doctype html>" == ret[:15].lower()):
                 if bVerbose: print("DBG: handleReq: setting contents type to html")
@@ -1128,8 +849,6 @@ class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
         #~ super().handle()
 
 def runServer(nPort,bThreaded=False):
-    
-    myServer.preloadJs()
 
     print("#"*40)
     print("INF: launching server binded to %d" % nPort )

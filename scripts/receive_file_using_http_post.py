@@ -28,6 +28,7 @@ import os
 import importlib
 import sys
 import time
+import datetime
 try: from jsmin import jsmin
 except: pass
 
@@ -38,6 +39,20 @@ sys.path.append("./www/") # to help finding js_request, when called from agent/
 
 def writeBuf(theself,buf):
     theself.wfile.write(buf)
+    
+def makeDirs(strPath):
+    try:
+        os.makedirs(strPath)
+    except FileExistsError as err:
+        pass
+    
+    
+def getDay():
+    """
+    return (year, month, day)
+    """
+    datetimeObject = datetime.datetime.now()
+    return datetimeObject.year, datetimeObject.month, datetimeObject.day 
 
 def getTimeStamp():
     """
@@ -680,7 +695,16 @@ Accept-Language: fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7
         self.send_response(200)
         
         if "print_image.htm" in self.path:
-            #~ strFilename = "c:\stickers\" + argsfrompost[
+            strFilename ,contentstype,filedata = dictBinary['image']
+            y,m,d = getDay()
+            strFolder = "c:/stickers/%4d_%02d_%02d/" % (y,m,d)
+            makeDirs(strFolder)
+            strAbsFilename = strFolder + strFilename
+            print("INF: writing %dB to '%s'" % (len(filedata), strAbsFilename) )
+            f = open(strAbsFilename,"wb")
+            f.write(filedata)
+            f.close()
+            
             
             ret = "print_image.htm: success !"
             

@@ -12,6 +12,7 @@ from scapy.layers import http
 
 ARP = scapy.all.ARP
 IP = scapy.all.IP
+IPV6 = scapy.all.IPv6
 TCP = scapy.all.TCP
 UDP = scapy.all.UDP
 DNS = scapy.all.DNS
@@ -24,6 +25,50 @@ aDns = {
     "78.199.86.189" : "MaFreebox",
     "212.27.40.240" : "Free SAS",
 }
+
+aDnsV6 = {
+    "192.168.0.46" : "mstab7",
+    "216.58.214.170" : "Google",
+    "78.199.86.189" : "MaFreebox",
+    "212.27.40.240" : "Free SAS",
+}
+
+def getLocalIP():
+    import socket
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("8.8.8.8", 80))
+    print(s.getsockname()[0])
+    s.close()    
+    
+def getLocalIP6():
+        """
+        Get's local ipv6 address
+        TODO: What if more than one interface present ?
+
+        :return: IPv6 address as a string
+        :rtype: string
+        """
+        import socket
+        try:
+            s = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
+            s.connect(('2001:4860:4860::8888', 1))
+            IP = s.getsockname()[0]
+        except BaseException as err:
+            print("ERR: getLocalIP6: " + str(err))
+            IP = '::1'
+        finally:
+            if 's' in locals():
+                s.close()
+        print(IP)
+        return IP
+
+
+def cacheDns():
+    ip = getLocalIP()
+    aDns[ip] = "Me"
+    ip = getLocalIP6()
+    aDnsV6[ip] = "Me6"
+
 
 def outputAllFields(o,bLimitToInteresting=1):
     out = ""
@@ -173,6 +218,13 @@ def toHostname(ip):
     except KeyError as err:
         pass
     return ip
+    
+def toHostnameV6(ip):
+    try:
+        return aDnsV6[ip]
+    except KeyError as err:
+        pass
+    return ip
 
 
 def monitor_callback(pkt):
@@ -190,6 +242,7 @@ def monitor_callback(pkt):
     if ARP in pkt:
         #~ if bShowARP: print("ARP")
         if bShowARP:  print(pkt.sprintf("recv: ARP: %ARP.hwsrc% %ARP.psrc% => %ARP.pdst%"))
+        stats.addVolArp(len(pkt))
         
     if DNS in pkt:
         if bShowDNS: print("DNS")
@@ -270,6 +323,15 @@ def monitor_callback(pkt):
                             if meth in r:
                                 print("meth: %s found in\n%s" % (meth,str(r)))
         
+    # ip in pkt
+    
+    if IPV6 in pkt: 
+        print("DBG: IPV6: pkt: %s" % str(pkt))
+        ip_src = toHostnameV6(pkt[IPV6].src)
+        ip_dst = toHostnameV6(pkt[IPV6].dst)
+        print("DBG: IPv6: %s > %s" % (ip_src,ip_dst))
+        stats.addVolArp(len(pkt))
+        
     return "" # pkt.sprintf("%ARP.hwsrc% %ARP.psrc%")
 
 def startPacketAnalyse():
@@ -288,6 +350,9 @@ def startPacketAnalyse():
     timeout: stop sniffing after a given time (default: None)
     L2socket: use the provided L2socket
     """
-    
-stater = Stater(5, "localhost")
+
+cacheDns()
+import stater
+stats = stater.Stater(1)
+stats.startUpdateLoopInTheBackground()
 startPacketAnalyse()

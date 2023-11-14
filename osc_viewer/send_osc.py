@@ -13,7 +13,8 @@ class Sender:
         self.client = SimpleUDPClient(strServerIP, nPort)
         
     def sendMessage( self, strChannel, values ):
-        print("DBG: Sender.sendMessage: self.client: %s" % str(self.client))
+        #~ print("DBG: Sender.sendMessage: self.client: %s" % str(self.client))
         if self.client != None: 
+            print("DBG: Sender.sendMessage: sending: %s: %s" % (strChannel, values))
             self.client.send_message(strChannel, values)
 # class Sender - end

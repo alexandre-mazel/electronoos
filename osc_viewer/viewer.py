@@ -108,7 +108,7 @@ class Viewer:
             
         offsety = int(offset*zoomy)
             
-        print("DBG: title: %s, min: %.2f, max: %.2f, variationmax:%.2f, zoomy: %.2f, offset: %.2f" % (self.title,minval, maxval, variationmax,zoomy,offset) )
+        #~ print("DBG: title: %s, min: %.2f, max: %.2f, variationmax:%.2f, zoomy: %.2f, offset: %.2f" % (self.title,minval, maxval, variationmax,zoomy,offset) )
         for i,val in enumerate(self.values):
             xv = i
             yv = int((val-variationmax/2.)*zoomy)

@@ -9,13 +9,18 @@ import time
 
 class Stater:
     
-    def __init__( self, rPeriodSec = 1., viewer_ip="127.0.0.1" ):
-        self.period = rPeriodSec
+    def __init__( self, rRefreshTimeSec = 1, rFrameSec = 5., viewer_ip="127.0.0.1" ):
+        self.rRefreshTimeSec = rRefreshTimeSec # time to send infos
+        self.period = rFrameSec # time of a frame
         self.viewer_ip = viewer_ip
         self.sender = send_osc.Sender()
         self.sender.connect(viewer_ip)
+        self.stop_thread = False
         
         self.reset()
+        
+    def __del__( self ):
+        self.stopThread()
         
     def reset( self ):
         print("INF: Stater.reset")
@@ -26,6 +31,7 @@ class Stater:
         self.rSumVolUdp = 0.
         self.startNewFrame()
         self.lastSend = time.time()-10000 # time last send in epoch
+        self.lastStartFrame = time.time()-10000 # time in epoch
 
         
     def startNewFrame( self ):
@@ -42,22 +48,49 @@ class Stater:
         self.rFrameVolHttp += v
         self.rFrameVolTotal += v
         
+    def addVolArp(self,v):
+        self.rSumVolArp += v
+        self.rSumVolTotal += v
+        self.rFrameVolArp += v
+        self.rFrameVolTotal += v
+        
     def update( self ):
-        if time.time()-self.lastSend > self.period:
+        #~ print("update")
+        if time.time()-self.lastSend > self.rRefreshTimeSec:
             values = [ self.rSumVolTotal, self.rSumVolHttp, self.rSumVolHttps, self.rSumVolArp, self.rSumVolUdp,
                             self.rFrameVolTotal, self.rFrameVolHttp, self.rFrameVolHttps, self.rFrameVolArp, self.rFrameVolArp,
                         ]
             print("INF: Stater.update: sending")
-            self.sender.sendMessage("/global",values)
             self.lastSend = time.time()
+            self.sender.sendMessage("/global",values)
+            
+        if time.time()-self.lastStartFrame > self.period:
+            self.lastStartFrame = time.time()
             self.startNewFrame()
+            
+    def startUpdateLoopInTheBackground(self):
+        def threaded_function(arg):
+            """
+            arg is the stater object
+            """
+            while not self.stop_thread:
+                arg.update()
+                time.sleep(min(arg.period,arg.rRefreshTimeSec)/10.)
+            
+        import threading
+        self.stop_thread = False
+        thread = threading.Thread(target = threaded_function, args = (self, ))
+        thread.start()
         
+    def stopThread( self ):
+        self.stop_thread = True
         
-        
-stater = Stater()
+# class Stater - end
 
 if __name__ == "__main__":
+    aStater = Stater()
+    aStater.startUpdateLoopInTheBackground()
     for i in range(50):
-        stater.addVolHttp(0.1)
-        stater.update()
+        aStater.addVolHttp(0.1)
         time.sleep(0.1)
+    aStater.stopThread()

@@ -223,7 +223,7 @@ def analyseArgs( args, emptyValue = None ):
     """
     return a dictionnary avec pour chaque cle (arg) la valeur qu'elle prend ou une liste si plusieurs parametres pour la meme valeur
     """
-    print( "INF: analyseArgs: received %s" % str(args) )
+    print( "INF: analyseArgs: received %s" % str(args)[:300] )
     dOut = dict()
     if args != None:
         args = args.replace("%20", " ")
@@ -239,7 +239,7 @@ def analyseArgs( args, emptyValue = None ):
                     dOut[v[0]].append(v[1])
                 else:
                     dOut[v[0]] = v[1]
-    print( "INF: analyseArgs: returning %s" % str(dOut) )
+    print( "INF: analyseArgs: returning %s" % str(dOut)[:300] )
     return dOut
     
 
@@ -256,6 +256,9 @@ def decodeBytes(buf):
         params: a string containing name1=value1&name2=value2, eg: l=demo&p=letest
         dictBinary: dictionnary of binary buffer with information related to some fields, eg: cv=filename.pdf will be followed by a dict
         {"cv": [filename, filetype, binary_data]}
+        
+        
+    Bug connu: il faut un espace entre le ; et filename
     """
     dictBinary = {}
     
@@ -264,15 +267,19 @@ def decodeBytes(buf):
     
     print("DBG: decodeBytes: buf first bytes: %d (0x%x), %d(0x%x), %d(0x%x)" % (buf[0],buf[0],buf[1],buf[1],buf[2],buf[2]) )
 
-    if buf[0] != 45 and buf[1] != 45  and buf[2] != 45 : # different de --------- (chr(45) == '_'
-        print("INF: decodeBytes: analysing connection data")
-        buf = str(buf).strip("'")
-        splitted = buf.split("=")
+    binEndMark = b"\r\n-----------------------------"
+    binEndMarkAlt = b"\r\n------WebKitFormBoundary" # ipad de mathieu
+    
+    idxstart = 0
+    if buf[idxstart+0] != 45 and buf[idxstart+1] != 45  and buf[idxstart+2] != 45 : # different de --------- (chr(45) == '-'
+        print("INF: decodeBytes: analysing text values - this code won't work!")
+        buf2 = str(buf[idxstart:]).strip("'")
+        splitted = buf2.split("=")
         #~ print(splitted)
         s = ""
         for e in splitted[1:]: # first is 0=
             s += e.split('&')[0]
-        decoded = s.replace('%3D','=').replace('%26','&')
+        decoded += s.replace('%3D','=').replace('%26','&')
     else:
         print("INF: decodeBytes: analysing candidate form data or drop")
         
@@ -364,8 +371,6 @@ def decodeBytes(buf):
                     break
                 idx1 = idx2+4
                 # find the end of binary, how to do that properly ?
-                binEndMark = b"\r\n-----------------------------"
-                binEndMarkAlt = b"\r\n------WebKitFormBoundary" # ipad de mathieu
                 idx2 = buf[idx1:].find(binEndMark)
                 if idx2 == -1:
                     try:
@@ -382,8 +387,6 @@ def decodeBytes(buf):
                 idx2 += idx1
                 print("INF: decodeBytes: binary size: %d" % (idx2-idx1))
                 dictBinary[strName] = [strFilename,strFileType,buf[idx1:idx2]]
-        
-                
         
     return decoded,dictBinary
     
@@ -657,7 +660,7 @@ Accept-Language: fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7
             body = self.rfile.read(content_length)
             if bVerbose or 1: print("DBG: handleReq: post: body: %s" % body[:300] )
             decoded_body_params, dictBinary = decodeBytes(body)
-            if bVerbose or 1: print("DBG: handleReq: post: decoded_body: %s - dictBinary len: %s, keys: %s" % (decoded_body_params,len(dictBinary),str(dictBinary.keys()) ) )
+            if bVerbose or 1: print("DBG: handleReq: post: decoded_body: %s\n - dictBinary len: %s, keys: %s" % (decoded_body_params[:300],len(dictBinary),str(dictBinary.keys()) ) )
             if len(params)>0 and params[-1] != '&': params += '&'
             params += decoded_body_params
             for k,v in dictBinary.items():

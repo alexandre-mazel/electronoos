@@ -67,7 +67,7 @@ if 0:
     attributes['pDevMode'].PaperSize = 1
 
 
-hDC = win32ui.CreateDC()
+#~ hDC = win32ui.CreateDC()
 
 if 0:
     hDC.CreatePrinterDC( printer_name )
@@ -87,7 +87,7 @@ else:
     print("PaperWidth: " + str(devmode.PaperWidth))
     print("PaperLength: " + str(devmode.PaperLength))
     print("FormName: " + str(devmode.FormName))
-    if 1:
+    if 0:
         # force paper to be smaller (not sure it works)
         devmode.PaperWidth = 1040
         devmode.PaperLength = 760
@@ -97,25 +97,30 @@ else:
     print("PaperWidth: " + str(devmode.PaperWidth))
     print("PaperLength: " + str(devmode.PaperLength))
     
-    # explore forms, but don't know how to use it
-    forms = win32print.EnumForms(hprinter) 
-    strWantedForm = "stickers_ochateau"
-    #~ print("forms: " + str(forms))
-    for f in forms:
-        strName = f["Name"]
-        #~ print(strName)
-        if strName == strWantedForm:
-            selected_form = f
-            break
-    print("selected_form:" + str(selected_form)) # and so, what to do with that ?
-    devmode.FormName = strWantedForm
-    print("FormName: " + str(devmode.FormName))
-    
-    # setting printer mode
-    print("printer_attr: %s" % str(printer_attr))
-    print("printer_attr: %s" % str(printer_attr["pDevMode"].FormName))
-    win32print.SetPrinter(hprinter, 2,printer_attr,0)
+    # explore forms and set them
+    # I change that: I put this settings as default in the window printer settings
+    if 0:
+        forms = win32print.EnumForms(hprinter) 
+        strWantedForm = "stickers_bouteille"
+        strWantedForm = "stickers_ochateau" # bizarre, c'est pas ce nom la dans les form!
+        #~ print("forms: " + str(forms))
+        for f in forms:
+            strName = f["Name"]
+            if "tick" in strName: print("DBG: found form looks like: " + strName)
+            if strName == strWantedForm:
+                selected_form = f
+                break
+        else:
+            print("WRN: form %s not found" % strWantedForm)
+        print("selected_form:" + str(selected_form)) # and so, what to do with that ?
+        devmode.FormName = strWantedForm
+        print("FormName: " + str(devmode.FormName))
         
+        # setting printer mode
+        print("printer_attr: %s" % str(printer_attr))
+        print("printer_attr.FormName: %s" % str(printer_attr["pDevMode"].FormName))
+        print("printer_attr.PaperLength: %s" % str(printer_attr["pDevMode"].PaperLength))
+        win32print.SetPrinter(hprinter, 2,printer_attr,0)
             
     print("== apres forms")
     print("Orientation: " + str(devmode.Orientation))
@@ -177,16 +182,19 @@ assert(realBmpSize==bmp.size) # assert expand do its job
 ratios = [1.0 * printable_area[0] / realBmpSize[0], 1.0 * printable_area[1] / realBmpSize[1]]
 print("scale: %s" % (ratios))
 scale = min(ratios)
+scale *= 1.03 # zoom un peu car on sait que les etiquettes ont un peu de blanc autour
 #~ scale = 1
 
 #
 # Start the print job, and draw the bitmap to
 #  the printer device at the scaled size.
 #
+
 #~ exit(0)
 
 dstFile = None
 if bPrintToPdf: dstFile = "c:/tmp/out.pdf"
+
 hDC.StartDoc(file_name,dstFile)
 hDC.StartPage()
 
@@ -197,10 +205,11 @@ x1 = int ((printer_size[0] - scaled_width) / 2) # center on screen
 y1 = int ((printer_size[1] - scaled_height) / 2)
 x1 = printer_margins[0] # don't want to center on this printer
 x1 = 0
+y1 = 0 # pas sur de celui la
 x2 = x1 + scaled_width
 y2 = y1 + scaled_height
 print("x1: %s, y1: %s, x2: %s, y2: %s" % (x1,y1,x2,y2))
-#~ dib.draw (hDC.GetHandleOutput(), (x1, y1, x2, y2))
+dib.draw (hDC.GetHandleOutput(), (x1, y1, x2, y2))
 
 if 0:
     import win32con

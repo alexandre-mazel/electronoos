@@ -32,6 +32,9 @@ import datetime
 try: from jsmin import jsmin
 except: pass
 
+try: import print_stickers
+except: print("WRN: Can't import print_stickers")
+
 import threading
 
 sys.path.append("./www/") # to help finding js_request, when called from agent/
@@ -704,6 +707,7 @@ Accept-Language: fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7
             f = open(strAbsFilename,"wb")
             f.write(filedata)
             f.close()
+            print_stickers.printImg(strAbsFilename)
             
             
             ret = "print_image.htm: success !"

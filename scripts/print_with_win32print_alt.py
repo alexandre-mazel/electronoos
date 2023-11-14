@@ -1,6 +1,6 @@
-import win32print
+import win32print # pip install pywin32
 import win32ui
-from PIL import Image, ImageWin
+from PIL import Image, ImageWin # pip install Pillow
 import os
 
 """ ref: 

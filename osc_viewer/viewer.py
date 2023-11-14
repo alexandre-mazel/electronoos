@@ -242,7 +242,6 @@ class Game:
         
 # class Game - end
 
-game = Game()
-
-
-runLoopOscHandler(game)
+if __name__ == "__main__":
+    game = Game()
+    runLoopOscHandler(game)

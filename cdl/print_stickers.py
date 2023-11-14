@@ -173,6 +173,6 @@ def printImg(strFilename):
 # printImg - end
 
 
-if __name__ == "__main__":        
+if __name__ == "__main__":
     strFilename = "C:/Users/alexa/perso/docs/2023-10_cdl_photosbooths/stickers.jpg"
     printImg(strFilename)

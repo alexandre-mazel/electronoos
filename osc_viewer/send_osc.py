@@ -9,9 +9,11 @@ class Sender:
     def __init__( self ):
         self.client = None
         
-    def connect(strServerIP = "127.0.0.1", nPort = 8002)
+    def connect( self, strServerIP = "127.0.0.1", nPort = 8002 ):
         self.client = SimpleUDPClient(strServerIP, nPort)
         
-    def sendMessage( strChannel, values ):
-        if self.client != None: self.client.send_message(strChannel, values)
+    def sendMessage( self, strChannel, values ):
+        print("DBG: Sender.sendMessage: self.client: %s" % str(self.client))
+        if self.client != None: 
+            self.client.send_message(strChannel, values)
 # class Sender - end

@@ -290,5 +290,4 @@ def startPacketAnalyse():
     """
     
 stater = Stater(5, "localhost")
-sender.connect()
 startPacketAnalyse()

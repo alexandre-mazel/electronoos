@@ -33,7 +33,8 @@ PHYSICALOFFSETY = 113
 printer_name = win32print.GetDefaultPrinter()
 
 bPrintToPdf = 0
-bPrintToPdf = 1
+#~ bPrintToPdf = 1
+
 if bPrintToPdf: printer_name = "Microsoft Print to PDF"
 
 
@@ -57,12 +58,12 @@ if 0:
     temprint=printer_name
     print("printers: %s" % str(printers))
     print("temprint: %s" % temprint)
-    handle = win32print.OpenPrinter(temprint, PRINTER_DEFAULTS)
+    #~ handle = win32print.OpenPrinter(temprint, PRINTER_DEFAULTS)
     level = 2
     handle = win32print.OpenPrinter(temprint, PRINTER_DEFAULTS)
     attributes = win32print.GetPrinter(handle, level)
     attributes['pDevMode'].PaperWidth = 600  
-    attributes['pDevMode'].PaperLength = 30  
+    attributes['pDevMode'].PaperLength = 30
     attributes['pDevMode'].PaperSize = 1
 
 
@@ -72,8 +73,11 @@ if 0:
     hDC.CreatePrinterDC( printer_name )
 else:
     # configure printer
-    hprinter = win32print.OpenPrinter(printer_name)
-    devmode = win32print.GetPrinter(hprinter, 2)["pDevMode"]
+    PRINTER_DEFAULTS = {"DesiredAccess":win32print.PRINTER_ALL_ACCESS}
+    hprinter = win32print.OpenPrinter(printer_name,PRINTER_DEFAULTS)
+    printer_attr = win32print.GetPrinter(hprinter, 2)
+    devmode = printer_attr["pDevMode"]
+    
     print("dir devmode: " + str(dir(devmode)))
     #interestingField = 'DisplayOrientation', 'Orientation', 'PanningHeight', 'PanningWidth', 'PaperLength', 'PaperSize', 'PaperWidth', 'PelsHeight'
     #Color=1 or 2 if color
@@ -106,6 +110,11 @@ else:
     print("selected_form:" + str(selected_form)) # and so, what to do with that ?
     devmode.FormName = strWantedForm
     print("FormName: " + str(devmode.FormName))
+    
+    # setting printer mode
+    print("printer_attr: %s" % str(printer_attr))
+    print("printer_attr: %s" % str(printer_attr["pDevMode"].FormName))
+    win32print.SetPrinter(hprinter, 2,printer_attr,0)
         
             
     print("== apres forms")
@@ -125,10 +134,18 @@ print("printer_size: %s" % str(printer_size))
 print("printable_area: %s" % str(printable_area))
 print("printer_margins: %s" % str(printer_margins))
 
+if 1:
+    # reduce papersize to match PaperLength
+    length_in_dot = int(devmode.PaperLength*600/254) # size to dot
+    printer_size = (length_in_dot,printer_size[1])
+    
 if 0:
     # reduce papersize
     printer_size = (printer_size[0],1795)
 printable_area = (printer_size[0]-2*printer_margins[0],printer_size[1]-2*printer_margins[1])
+
+
+
 print("apres modification")
 print("printer_size: %s" % str(printer_size))
 print("printable_area: %s" % str(printable_area))
@@ -147,7 +164,8 @@ bmp = Image.open( file_name )
 print("bmp.size (1): %s" % str(bmp.size))
 realBmpSize = (bmp.size[0],bmp.size[1])
 
-if bmp.size[0] < bmp.size[1]:
+if bmp.size[0] < bmp.size[1] and 0:
+    print("Rotating image")
     realBmpSize = (bmp.size[1],bmp.size[0])
     bmp = bmp.rotate(90, expand=True) # expand: change size of destination image (and so no more black band) 
   
@@ -177,10 +195,12 @@ scaled_width, scaled_height = [int (scale * i) for i in realBmpSize]
 print("scaled_width: %s, scaled_height: %s" % (scaled_width,scaled_height))
 x1 = int ((printer_size[0] - scaled_width) / 2) # center on screen
 y1 = int ((printer_size[1] - scaled_height) / 2)
+x1 = printer_margins[0] # don't want to center on this printer
+x1 = 0
 x2 = x1 + scaled_width
 y2 = y1 + scaled_height
 print("x1: %s, y1: %s, x2: %s, y2: %s" % (x1,y1,x2,y2))
-dib.draw (hDC.GetHandleOutput(), (x1, y1, x2, y2))
+#~ dib.draw (hDC.GetHandleOutput(), (x1, y1, x2, y2))
 
 if 0:
     import win32con

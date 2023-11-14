@@ -174,6 +174,7 @@ def toHostname(ip):
         pass
     return ip
 
+
 def monitor_callback(pkt):
     bVerbose = 1
     bShowARP = 1
@@ -288,5 +289,6 @@ def startPacketAnalyse():
     L2socket: use the provided L2socket
     """
     
-    
+stater = Stater(5, "localhost")
+sender.connect()
 startPacketAnalyse()

@@ -63,6 +63,7 @@ green = (0, 255, 0)
 blue = (0, 0, 255)
 
 fontTitleViewer = pg.font.SysFont('Arial', 16)
+fontScaleViewer = pg.font.SysFont('Arial', 11)
 
 class Viewer:
     """
@@ -102,7 +103,7 @@ class Viewer:
         pg.draw.line(surf,color,(x,y),(x,y2),width=th)
         pg.draw.line(surf,color,(x,y2),(x2,y2),width=th)
         pg.draw.line(surf,color,(x2,y),(x2,y2),width=th) 
-        surf.blit(self.text_surface, (x+titlemargin,y+titlemargin))    
+        surf.blit(self.text_surface, (x+titlemargin,y+titlemargin))
         
         if bVerbose: print("Viewer.render: title: '%s', value: %s" % (self.title,self.values))
         
@@ -135,6 +136,16 @@ class Viewer:
         offset_pixels = -int(offset*zoomy)
         offset_pixels = 0 # pas la peine de calculer l'offset car il est deja inclus dans le calcul
             
+            
+        if 1:
+            # write scales
+            s = "%.2g" % maxval #  "+%.2g" is nice also
+            scale = fontScaleViewer.render(s, True, self.color)
+            surf.blit(scale, (x+titlemargin,y+titlemargin+22))
+            s = "%.2g" % minval
+            scale = fontScaleViewer.render(s, True, self.color)
+            surf.blit(scale, (x+titlemargin,y+self.h-15))
+            
         if bVerbose: print("DBG: title: %s, min: %.2f, max: %.2f, variationmax:%.2f, zoomy: %.2f, offset: %.2f, offset_pixels: %.2f" % (self.title,minval, maxval, variationmax,zoomy,offset,offset_pixels) )
         for i,val in enumerate(self.values):
             xv = i
@@ -150,7 +161,14 @@ class Viewer:
             
             y_rendered = ycenter_pixels-val_pixels #+offset_pixels
             if bVerbose: print("DBG: y_rendered: %s" % (y_rendered))
-            surf.set_at((x+xv, y_rendered), color)
+            #surf.set_at((x+xv, y_rendered), color) # just one point
+            # fill to zero
+            yfill_rendered = ycenter_pixels-yzero_pixels
+            if yfill_rendered>y2:
+                yfill_rendered = y2
+            if yfill_rendered<y+htitle+1:
+                yfill_rendered = y+htitle+1
+            pg.draw.line(surf, color, (x+xv, yfill_rendered), (x+xv, y_rendered) )
     
 
 class Object:

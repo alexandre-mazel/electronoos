@@ -29,8 +29,9 @@ while 1:
     rFrameVolArp = int(time.time()%10)
     rFrameVolUdp = math.sin(time.time())
     rSlowSin = math.sin(time.time()/10)
+    rNegSin = math.sin(time.time()/2)-100
 
-    client.send_message("/global", [rSumVolTotal, rSumVolHttp, rSumVolHttps, rSumVolArp, rSumVolUdp,rFrameVolTotal, rFrameVolHttp, rFrameVolHttps, rFrameVolArp, rFrameVolUdp,rSlowSin,0,1,-1,1000,-1000])
+    client.send_message("/global", [rSumVolTotal, rSumVolHttp, rSumVolHttps, rSumVolArp, rSumVolUdp,rFrameVolTotal, rFrameVolHttp, rFrameVolHttps, rFrameVolArp, rFrameVolUdp,rSlowSin,rNegSin,0,1,-1,1000,-1000])
     #~ client.send_message("/global", [rFrameVolArp])
     time.sleep(0.01)
     #~ break

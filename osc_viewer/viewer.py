@@ -86,7 +86,7 @@ class Viewer:
         
     def render(self, surf):
         bVerbose = 1
-        #~ bVerbose = 0
+        bVerbose = 0
         
         color = self.color
         x,y = self.x,self.y
@@ -112,32 +112,43 @@ class Viewer:
         if len(self.values)>=self.w:
             self.values = self.values[-self.w:]
             
-        hutil = (self.h-htitle)
-        ycenter = y+htitle+4+hutil//2
+        hutil = (self.h-htitle)-5 # 5 for a bit of margin around max
+        
+        # variable finishing by pixels are exprimed in pixels from the center of the graph (ycenter_pixels)
+        
+        ycenter_pixels = y+htitle+4+hutil//2 # hauteur de trace du milieu du graph en pixel
         maxval = max(self.values)
         minval = min(self.values)
         variationmax = maxval-minval
-        offset = minval + variationmax / 2.
-        
+        offset = minval + variationmax / 2.  # average value (we will offset the graph so this value will be rendered at the center of the graph)
+ 
         if variationmax > 0:
             zoomy = (hutil/variationmax)*0.5
         else:
-            zoomy = 1
+            # minval == maxval
+            if minval == 0:
+                zoomy = 1
+            else:
+                zoomy = abs((hutil/minval))*0.4 # it should take only half the screen with the zero visible
+                offset = 0 # we want to see the zero
+                
+        offset_pixels = -int(offset*zoomy)
+        offset_pixels = 0 # pas la peine de calculer l'offset car il est deja inclus dans le calcul
             
-        offsety = int(offset*zoomy)
-            
-        if bVerbose: print("DBG: title: %s, min: %.2f, max: %.2f, variationmax:%.2f, zoomy: %.2f, offset: %.2f, offsety: %.2f" % (self.title,minval, maxval, variationmax,zoomy,offset,offsety) )
+        if bVerbose: print("DBG: title: %s, min: %.2f, max: %.2f, variationmax:%.2f, zoomy: %.2f, offset: %.2f, offset_pixels: %.2f" % (self.title,minval, maxval, variationmax,zoomy,offset,offset_pixels) )
         for i,val in enumerate(self.values):
             xv = i
-            yv = int((val-variationmax/2.)*zoomy)
-            if bVerbose: print("DBG: val: %s, yv: %s, ycenter: %s" % (val,yv,ycenter))
+            val_pixels = int((val-offset)*zoomy)
+            if bVerbose: print("DBG: val: %s, val_pixels: %s, ycenter_pixels: %s" % (val,val_pixels,ycenter_pixels))
             
-            if abs(offsety)<hutil/2:
-                yzero_rendered = ycenter+offsety
+            yzero_pixels = int((0-offset)*zoomy)
+            if bVerbose: print("DBG: yzero_pixels: %s" % (yzero_pixels))
+            if abs(yzero_pixels)<=hutil/2:
+                yzero_rendered = ycenter_pixels-yzero_pixels #+offset_pixels
                 if bVerbose: print("DBG: yzero_rendered: %s" % (yzero_rendered))
                 surf.set_at((x+xv, yzero_rendered), softcolor)
             
-            y_rendered = ycenter-yv-hutil//4+offsety
+            y_rendered = ycenter_pixels-val_pixels #+offset_pixels
             if bVerbose: print("DBG: y_rendered: %s" % (y_rendered))
             surf.set_at((x+xv, y_rendered), color)
     

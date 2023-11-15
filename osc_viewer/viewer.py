@@ -110,8 +110,8 @@ class Viewer:
         if len(self.values)<1:
             return
             
-        if len(self.values)>=self.w:
-            self.values = self.values[-self.w:]
+        if len(self.values) >= self.w-2:
+            self.values = self.values[-(self.w-2):]
             
         hutil = (self.h-htitle)-5 # 5 for a bit of margin around max
         
@@ -147,6 +147,8 @@ class Viewer:
             surf.blit(scale, (x+titlemargin,y+self.h-15))
             
         if bVerbose: print("DBG: title: %s, min: %.2f, max: %.2f, variationmax:%.2f, zoomy: %.2f, offset: %.2f, offset_pixels: %.2f" % (self.title,minval, maxval, variationmax,zoomy,offset,offset_pixels) )
+        
+        x += 1 # small decayt
         for i,val in enumerate(self.values):
             xv = i
             val_pixels = int((val-offset)*zoomy)
@@ -161,14 +163,20 @@ class Viewer:
             
             y_rendered = ycenter_pixels-val_pixels #+offset_pixels
             if bVerbose: print("DBG: y_rendered: %s" % (y_rendered))
-            #surf.set_at((x+xv, y_rendered), color) # just one point
+            surf.set_at((x+xv, y_rendered), color) # just one point
             # fill to zero
             yfill_rendered = ycenter_pixels-yzero_pixels
-            if yfill_rendered>y2:
-                yfill_rendered = y2
-            if yfill_rendered<y+htitle+1:
-                yfill_rendered = y+htitle+1
-            pg.draw.line(surf, color, (x+xv, yfill_rendered), (x+xv, y_rendered) )
+            if yfill_rendered != y_rendered:
+                if yfill_rendered>y2:
+                    yfill_rendered = y2
+                if yfill_rendered<y+htitle+1:
+                    yfill_rendered = y+htitle+1
+                
+                if yfill_rendered<y_rendered:
+                    y_rendered -= 1
+                else:
+                    y_rendered += 1
+                pg.draw.line(surf, softcolor, (x+xv, yfill_rendered), (x+xv, y_rendered) )
     
 
 class Object:

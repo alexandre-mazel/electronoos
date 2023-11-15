@@ -61,6 +61,13 @@ class Stater:
         self.rFrameVolArp += v
         self.rFrameVolTotal += v
         
+    def sendLabels(self):
+        labels = [      "rSumVolTotal", "rSumVolHttp", "rSumVolHttps", "rSumVolArp", "rSumVolUdp",
+                            "rFrameVolTotal", "rFrameVolHttp", "rFrameVolHttps", "rFrameVolArp", "rFrameVolUdp"
+        ]
+        #~ 
+        self.sender.sendMessage("/global_labels",labels)
+        
     def update( self ):
         #~ print("update")
         if time.time()-self.lastSend > self.rRefreshTimeSec:
@@ -96,6 +103,7 @@ class Stater:
 
 if __name__ == "__main__":
     aStater = Stater()
+    aStater.sendLabels()
     aStater.startUpdateLoopInTheBackground()
     for i in range(50):
         aStater.addVolHttp(0.1)

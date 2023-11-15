@@ -13,6 +13,10 @@ client = SimpleUDPClient(strServerIP, nPort)
 
 # Send message and receive exactly one message (blocking)
 print("sending message to %s:%s..." % (strServerIP,nPort))
+
+client.send_message("/global_labels", ["rSumVolTotal", "rSumVolHttp", "rSumVolHttps", "rSumVolArp", "rSumVolUdp","rFrameVolTotal", "rFrameVolHttp", "rFrameVolHttps", "rFrameVolArp", "rFrameVolUdp","0","1","-1","1000","-1000"])
+time.sleep(0.1)
+
 while 1:
     rSumVolTotal = time.time()%10.
     rSumVolHttp = math.sin(time.time()*10)+2
@@ -25,7 +29,8 @@ while 1:
     rFrameVolArp = int(time.time()%10)
     rFrameVolUdp = math.sin(time.time())
 
-    client.send_message("/global", [rSumVolTotal, rSumVolHttp, rSumVolHttps, rSumVolArp, rSumVolUdp,rFrameVolTotal, rFrameVolHttp, rFrameVolHttps, rFrameVolArp, rFrameVolUdp])
+    client.send_message("/global", [rSumVolTotal, rSumVolHttp, rSumVolHttps, rSumVolArp, rSumVolUdp,rFrameVolTotal, rFrameVolHttp, rFrameVolHttps, rFrameVolArp, rFrameVolUdp,0,1,-1,1000,-1000])
     time.sleep(0.01)
+    break
 
 print("done")

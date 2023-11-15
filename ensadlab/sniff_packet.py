@@ -369,5 +369,6 @@ def startPacketAnalyse():
 cacheDns()
 import stater
 stats = stater.Stater(1)
+stats.sendLabels()
 stats.startUpdateLoopInTheBackground()
 startPacketAnalyse()

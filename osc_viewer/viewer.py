@@ -6,11 +6,21 @@ def runLoopOscHandler(game, ip = "127.0.0.1", port = 8002):
     
     def filter_handler(address, *args):
         print(f"{address}: {args}")
+        
+        if "_labels" in address:
+            # it's a label  => following values are name of values
+            # eg: /global/label ["nom de la premiere valeur", "nom de la deuxieme valeur", ...]
+            print("It's a label...")
+            real_address = address.replace("_labels", "")
+            game.receiveLabels(real_address,args)
+            return
         game.receiveValue(address,args)
+    # filter_handler - end
 
 
     dispatcher = Dispatcher()
     dispatcher.map("/global", filter_handler)
+    dispatcher.map("/global_labels", filter_handler)
     dispatcher.map("/u1", filter_handler)
     dispatcher.map("/u2", filter_handler)
 
@@ -68,10 +78,16 @@ class Viewer:
         self.text_surface = fontTitleViewer.render(self.title, True, self.color)
         self.values  = []
     
+    def setTitle(self, s ):
+        self.title = s
+        
     def update(self,rVal):
         self.values.append(rVal)
         
     def render(self, surf):
+        bVerbose = 1
+        #~ bVerbose = 0
+        
         color = self.color
         x,y = self.x,self.y
         x2 = self.x+self.w
@@ -88,6 +104,8 @@ class Viewer:
         pg.draw.line(surf,color,(x2,y),(x2,y2),width=th) 
         surf.blit(self.text_surface, (x+titlemargin,y+titlemargin))    
         
+        if bVerbose: print("Viewer.render: title: '%s', value: %s" % (self.title,self.values))
+        
         if len(self.values)<1:
             return
             
@@ -95,7 +113,7 @@ class Viewer:
             self.values = self.values[-self.w:]
             
         hutil = (self.h-htitle)
-        yzero = y+htitle+4+hutil//2
+        ycenter = y+htitle+4+hutil//2
         maxval = max(self.values)
         minval = min(self.values)
         variationmax = maxval-minval
@@ -108,14 +126,20 @@ class Viewer:
             
         offsety = int(offset*zoomy)
             
-        #~ print("DBG: title: %s, min: %.2f, max: %.2f, variationmax:%.2f, zoomy: %.2f, offset: %.2f" % (self.title,minval, maxval, variationmax,zoomy,offset) )
+        if bVerbose: print("DBG: title: %s, min: %.2f, max: %.2f, variationmax:%.2f, zoomy: %.2f, offset: %.2f, offsety: %.2f" % (self.title,minval, maxval, variationmax,zoomy,offset,offsety) )
         for i,val in enumerate(self.values):
             xv = i
             yv = int((val-variationmax/2.)*zoomy)
-            #print("DBG: val: %s, yv: %s" % (val,yv))
+            if bVerbose: print("DBG: val: %s, yv: %s, ycenter: %s" % (val,yv,ycenter))
+            
             if abs(offsety)<hutil/2:
-                surf.set_at((x+xv, yzero+offsety), softcolor)
-            surf.set_at((x+xv, yzero-yv-hutil//4+offsety), color)
+                yzero_rendered = ycenter+offsety
+                if bVerbose: print("DBG: yzero_rendered: %s" % (yzero_rendered))
+                surf.set_at((x+xv, yzero_rendered), softcolor)
+            
+            y_rendered = ycenter-yv-hutil//4+offsety
+            if bVerbose: print("DBG: y_rendered: %s" % (y_rendered))
+            surf.set_at((x+xv, y_rendered), color)
     
 
 class Object:
@@ -194,6 +218,18 @@ class Game:
                 y = (len(self.viewers)//5)*100
                 self.viewers[key] = Viewer(x=x,y=y,title=key)
                 self.viewers[key].update(v)
+                
+    def receiveLabels( self, strName, labels):
+        print("DBG: receiveLabels: '%s': %s" % (strName,labels) )
+        #self.viewers[0].update(values[0])
+        for i,s in enumerate(labels):
+            key = strName + "_" + ("%02d"%i)
+            try:
+                self.viewers[key].setTitle(s)
+            except KeyError as err:
+                x = (len(self.viewers)%5)*200
+                y = (len(self.viewers)//5)*100
+                self.viewers[key] = Viewer(x=x,y=y,title=s)
     
     def update(self):
         """

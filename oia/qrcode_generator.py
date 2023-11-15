@@ -7,7 +7,7 @@ data = "mailto:alexandre.zelma@gmail.com?subject=Location%20Studio%20Sceaux.&bod
 data = "mailto:alexandre.zelma@gmail.com?subject=Location%20Studio%20Sceaux."
 data = "tel:+33610601979"
 data = "https://obo-world.com/presence.htm?c=kendo&b=champs_elysee" # moved to obo/spider
-data = "mailto:photobooth.cdl@gmail.com?subject=photobooth1&body=plase%20attach%20your%20photo%20to%20this%20email"
+data = "mailto:photobooth.cdl+1@gmail.com?subject=My picture at the Caves du Louvre&body=Please%20attach%20your%20photo%20to%20this%20email.%0D%0A%0D%0ATips%3A%20Select%20%22large%20image%22%20size%20but%20not%20%22real%20size%22."
 # output file name
 filename = "oia_cycle_x.png"
 # generate qr code

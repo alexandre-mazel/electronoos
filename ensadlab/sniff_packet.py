@@ -270,7 +270,7 @@ def monitor_callback(pkt):
         
         methods=[b'GET',b'POST',b'HEAD',b'PUT',b'DELETE',b'CONNECT',b'OPTIONS',b'TRACE']
         words = ["password", "user", "username", "login", "pass", "Username", "Password", "User", "Email"]
-        if pkt.haslayer(TCP):#Checks for TCP protocol
+        if pkt.haslayer(TCP): #Checks for TCP protocol
             print("DBG: tcp time (at senders): " + str(pkt[TCP].options))
             print("DBG: tcp time (at senders): " + str(pkt[TCP].sent_time))
             print("DBG: tcp time (at senders): " + str(dir(pkt[TCP])))
@@ -323,6 +323,10 @@ def monitor_callback(pkt):
                             #~ print("test: : %s" % str(r))
                             if meth in r:
                                 print("meth: %s found in\n%s" % (meth,str(r)))
+        # layer tcp
+        if pkt.haslayer(UDP):
+            stats.addVolUdp(len(pkt))
+        # layer udp
         
     # ip in pkt
     

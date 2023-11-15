@@ -24,11 +24,19 @@ class Stater:
         
     def reset( self ):
         print("INF: Stater.reset")
+        
         self.rSumVolTotal = 0.
         self.rSumVolHttp = 0.
         self.rSumVolHttps = 0.
         self.rSumVolArp = 0.
         self.rSumVolUdp = 0.
+        
+        self.nSumCptTotal = 0
+        self.nSumCptHttp = 0
+        self.nSumCptHttps = 0
+        self.nSumCptArp = 0
+        self.nSumCptUdp = 0
+
         self.startNewFrame()
         self.lastSend = time.time()-10000 # time last send in epoch
         self.lastStartFrame = time.time()-10000 # time in epoch
@@ -40,13 +48,24 @@ class Stater:
         self.rFrameVolHttp = 0.
         self.rFrameVolHttps = 0.
         self.rFrameVolArp = 0.
-        self.rFrameVolUdp = 0.   
+        self.rFrameVolUdp = 0.  
+
+        self.nFrameCptTotal = 0
+        self.nFrameCptHttp = 0
+        self.nFrameCptHttps = 0
+        self.nFrameCptArp = 0
+        self.nFrameCptUdp = 0           
 
     def addVolHttp(self,v):
         self.rSumVolHttp += v
         self.rSumVolTotal += v
         self.rFrameVolHttp += v
         self.rFrameVolTotal += v
+        
+        self.nSumCptHttp += 1
+        self.nSumCptTotal += 1
+        self.nFrameCptHttp += 1
+        self.nFrameCptTotal += 1
         
         
     def addVolHttps(self,v):
@@ -55,15 +74,39 @@ class Stater:
         self.rFrameVolHttps += v
         self.rFrameVolTotal += v
         
+        self.nSumCptHttps += 1
+        self.nSumCptTotal += 1
+        self.nFrameCptHttps += 1
+        self.nFrameCptTotal += 1
+        
     def addVolArp(self,v):
         self.rSumVolArp += v
         self.rSumVolTotal += v
         self.rFrameVolArp += v
         self.rFrameVolTotal += v
         
+        self.nSumCptArp += 1
+        self.nSumCptTotal += 1
+        self.nFrameCptArp += 1
+        self.nFrameCptTotal += 1
+        
+    def addVolUdp(self,v):
+        self.rSumVolUdp += v
+        self.rSumVolTotal += v
+        self.rFrameVolUdp += v
+        self.rFrameVolTotal += v
+        
+        self.nSumCptUdp += 1
+        self.nSumCptTotal += 1
+        self.nFrameCptUdp += 1
+        self.nFrameCptTotal += 1
+        
     def sendLabels(self):
-        labels = [      "rSumVolTotal", "rSumVolHttp", "rSumVolHttps", "rSumVolArp", "rSumVolUdp",
-                            "rFrameVolTotal", "rFrameVolHttp", "rFrameVolHttps", "rFrameVolArp", "rFrameVolUdp"
+        labels = [      
+                            "rSumVolTotal", "rSumVolHttp", "rSumVolHttps", "rSumVolArp", "rSumVolUdp",
+                            "nSumCptTotal", "nSumCptHttp", "nSumCptHttps", "nSumCptArp", "nSumCptUdp",
+                            "rFrameVolTotal", "rFrameVolHttp", "rFrameVolHttps", "rFrameVolArp", "rFrameVolUdp",
+                            "nFrameCptTotal", "nFrameCptHttp", "nFrameCptHttps", "nFrameCptArp", "nFrameCptUdp",
         ]
         #~ 
         self.sender.sendMessage("/global_labels",labels)
@@ -71,8 +114,11 @@ class Stater:
     def update( self ):
         #~ print("update")
         if time.time()-self.lastSend > self.rRefreshTimeSec:
-            values = [ self.rSumVolTotal, self.rSumVolHttp, self.rSumVolHttps, self.rSumVolArp, self.rSumVolUdp,
+            values = [ 
+                            self.rSumVolTotal, self.rSumVolHttp, self.rSumVolHttps, self.rSumVolArp, self.rSumVolUdp,
+                            self.nSumCptTotal, self.nSumCptHttp, self.nSumCptHttps, self.nSumCptArp, self.nSumCptUdp,
                             self.rFrameVolTotal, self.rFrameVolHttp, self.rFrameVolHttps, self.rFrameVolArp, self.rFrameVolUdp,
+                            self.nFrameCptTotal, self.nFrameCptHttp, self.nFrameCptHttps, self.nFrameCptArp, self.nFrameCptUdp,
                         ]
             print("INF: Stater.update: sending")
             self.lastSend = time.time()

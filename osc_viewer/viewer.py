@@ -97,6 +97,7 @@ class Viewer:
         htitle=24
         titlemargin = 4
         softcolor = (64,64,64)
+        fillcolor = (20,64,20)
         pg.draw.rect(surf,softcolor,(x,y,self.w,htitle),0)
         pg.draw.line(surf,color,(x,y),(x2,y),width=th)
         pg.draw.line(surf,color,(x,y+htitle),(x2,y+htitle),width=th)
@@ -110,8 +111,8 @@ class Viewer:
         if len(self.values)<1:
             return
             
-        if len(self.values) >= self.w-2:
-            self.values = self.values[-(self.w-2):]
+        if len(self.values) >= self.w-1:
+            self.values = self.values[-(self.w-1):]
             
         hutil = (self.h-htitle)-5 # 5 for a bit of margin around max
         
@@ -137,15 +138,6 @@ class Viewer:
         offset_pixels = 0 # pas la peine de calculer l'offset car il est deja inclus dans le calcul
             
             
-        if 1:
-            # write scales
-            s = "%.2g" % maxval #  "+%.2g" is nice also
-            scale = fontScaleViewer.render(s, True, self.color)
-            surf.blit(scale, (x+titlemargin,y+titlemargin+22))
-            s = "%.2g" % minval
-            scale = fontScaleViewer.render(s, True, self.color)
-            surf.blit(scale, (x+titlemargin,y+self.h-15))
-            
         if bVerbose: print("DBG: title: %s, min: %.2f, max: %.2f, variationmax:%.2f, zoomy: %.2f, offset: %.2f, offset_pixels: %.2f" % (self.title,minval, maxval, variationmax,zoomy,offset,offset_pixels) )
         
         x += 1 # small decayt
@@ -156,14 +148,11 @@ class Viewer:
             
             yzero_pixels = int((0-offset)*zoomy)
             if bVerbose: print("DBG: yzero_pixels: %s" % (yzero_pixels))
-            if abs(yzero_pixels)<=hutil/2:
-                yzero_rendered = ycenter_pixels-yzero_pixels #+offset_pixels
-                if bVerbose: print("DBG: yzero_rendered: %s" % (yzero_rendered))
-                surf.set_at((x+xv, yzero_rendered), softcolor)
             
             y_rendered = ycenter_pixels-val_pixels #+offset_pixels
             if bVerbose: print("DBG: y_rendered: %s" % (y_rendered))
-            surf.set_at((x+xv, y_rendered), color) # just one point
+            
+            
             # fill to zero
             yfill_rendered = ycenter_pixels-yzero_pixels
             if yfill_rendered != y_rendered:
@@ -176,8 +165,27 @@ class Viewer:
                     y_rendered -= 1
                 else:
                     y_rendered += 1
-                pg.draw.line(surf, softcolor, (x+xv, yfill_rendered), (x+xv, y_rendered) )
+                pg.draw.line(surf, fillcolor, (x+xv, yfill_rendered), (x+xv, y_rendered) )
+                
+            # render zero line
+            if abs(yzero_pixels)<=hutil/2:
+                yzero_rendered = ycenter_pixels-yzero_pixels #+offset_pixels
+                if bVerbose: print("DBG: yzero_rendered: %s" % (yzero_rendered))
+                surf.set_at((x+xv, yzero_rendered), softcolor)
+                
+            # render value
+            surf.set_at((x+xv, y_rendered), color) # just one point
     
+        if 1:
+            # write scales
+            s = "%.2g" % maxval #  "+%.2g" is nice also
+            scale = fontScaleViewer.render(s, True, self.color)
+            surf.blit(scale, (x+titlemargin,y+titlemargin+22))
+            s = "%.2g" % minval
+            scale = fontScaleViewer.render(s, True, self.color)
+            surf.blit(scale, (x+titlemargin,y+self.h-15))
+            
+            
 
 class Object:
     def __init__(self,x=10,y=10,w=32,h=32):

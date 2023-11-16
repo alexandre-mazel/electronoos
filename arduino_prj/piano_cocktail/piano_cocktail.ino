@@ -3,14 +3,24 @@
 
 
 // HX711 circuit wiring
+
+
+#if 0
+// digital ?
 const int LOADCELL_DOUT_PIN = 2;
 const int LOADCELL_SCK_PIN = 3;
+#else
 
+// or analogic ?
 //#define CLK A0
 //#define DOUT A1
+const int LOADCELL_DOUT_PIN = A1;
+const int LOADCELL_SCK_PIN = A0;
+
+#endif
 
 HX711 scale;
-float calibration_factor = 1.;
+float calibration_factor = 207; // when set to 1, it's = read/known value
 
 /*
 long read_average(byte times = 10); // Average 'times' raw readings
@@ -65,12 +75,12 @@ void loop() {
       Serial.print("Place a known weight on the scale...");
       delay(5000);
     }
-    float reading = scale.get_units(10);
+    float reading = scale.get_units(20);
     Serial.print("Result: ");
     Serial.println(reading);
-    reading = scale.read_average();
-    Serial.print("Result avg: ");
-    Serial.println(reading);
+    long raw = scale.read_average();
+    Serial.print("Result raw avg: ");
+    Serial.println(raw);
     if(1)
     {
       Serial.println("press key to change calibration factor");

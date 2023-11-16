@@ -98,7 +98,7 @@ void check_if_must_stop_verse()
   float diff = target_verse-last_measured;
   Serial.print("INF: check_if_must_stop_verse: diff: ");
   Serial.println(diff);
-  if(diff<2)
+  if(diff<1)
   {
     digitalWrite(VANNE_1_PIN, HIGH);
     if(0)
@@ -109,8 +109,18 @@ void check_if_must_stop_verse()
       delay(100);
       digitalWrite(VANNE_1_PIN, HIGH);
     }
+    
+    Serial.print("INF: check_if_must_stop_verse: finished, target was ");
+    Serial.println(target_verse);
     target_verse = -1001;
   }
+}
+
+void force_stop_verse()
+{
+  Serial.println("INF: force stop verse");
+  digitalWrite(VANNE_1_PIN, HIGH);
+  target_verse = -1001;
 }
 
 void loop() {
@@ -141,7 +151,7 @@ void loop() {
       Serial.print("Place a known weight on the scale...");
       delay(5000);
     }
-    float reading = scale.get_units(10);
+    float reading = scale.get_units(2);
     last_measured = reading;
     Serial.print("Result: ");
     Serial.print(reading);
@@ -169,8 +179,9 @@ void loop() {
         else if(input == 'c'){  calibration_factor -= 1; }
         else if(input == 'r'){  calibration_factor = 1; }
         else if(input == 't'){  Serial.println("re-taring..."); scale.tare();}
-        else if(input == 'v'){  digitalWrite(VANNE_1_PIN, LOW); delay(1000); digitalWrite(VANNE_1_PIN, HIGH);	 }
-        else if(input == '1'){  verse_quantite(10);	 }
+        else if(input == 'v'){  digitalWrite(VANNE_1_PIN, LOW); delay(1000); digitalWrite(VANNE_1_PIN, HIGH);	 } // a bit of
+        else if(input == '1'){  verse_quantite(10);	 } // asservissement sur poids
+        else if(input == 'f'){  force_stop_verse();	 } // force stop verse
       }
     }
   }

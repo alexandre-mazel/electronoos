@@ -5,7 +5,7 @@
 // HX711 circuit wiring
 
 // digital or analogic, quand ca fonctionne ca fonctionne...
-#if 1
+#if 0
 // digital ?
 const int LOADCELL_DOUT_PIN = 2;
 const int LOADCELL_SCK_PIN = 3;
@@ -22,14 +22,20 @@ const int LOADCELL_SCK_PIN = A0;
 HX711 scale;
 // si plus petit, ca surcote un peu (les poids affiché semblent etre plus lourd que la réalité)
 
-// reglage pour la barre de 50:
+// reglage pour la barre de 10kg:
 
-float calibration_factor = 205; // when set to 1, it's = read/known value // poid de 1kg: 206.9, poid de 20g: 193.68
+//float calibration_factor = 205; // when set to 1, it's = read/known value // poid de 1kg: 206.9, poid de 20g: 193.68
 // avec 200:
 // poids de gym, l'une a 1041 et l'autre a 1036
 // poids de 20g+10g, entre 29.10 et 29.38
 
+// reglage pour barre de 3kg:
+
+float calibration_factor = 733; // 30g => 22000: 733 [une bouteille vide (celle de blanc orschwiller) peserait 448g]
+
+
 float old_calibration_factor = calibration_factor;
+
 
 /*
 long read_average(byte times = 10); // Average 'times' raw readings

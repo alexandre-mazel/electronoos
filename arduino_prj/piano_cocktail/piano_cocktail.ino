@@ -98,7 +98,7 @@ void check_if_must_stop_verse()
   float diff = target_verse-last_measured;
   Serial.print("INF: check_if_must_stop_verse: diff: ");
   Serial.println(diff);
-  if(diff<1)
+  if(diff<1+4) // couramment on prend 5 apres coupure
   {
     digitalWrite(VANNE_1_PIN, HIGH);
     if(0)
@@ -151,9 +151,10 @@ void loop() {
       Serial.print("Place a known weight on the scale...");
       delay(5000);
     }
-    float reading = scale.get_units(2);
+    float reading = scale.get_units(2); // chaque mesure en plus, c'est prend 88ms
     last_measured = reading;
-    Serial.print("Result: ");
+    Serial.print(millis());
+    Serial.print(", weight: ");
     Serial.print(reading);
     Serial.print(" => ");
     Serial.print(int(round(reading)));
@@ -181,9 +182,13 @@ void loop() {
         else if(input == 't'){  Serial.println("re-taring..."); scale.tare();}
         else if(input == 'v'){  digitalWrite(VANNE_1_PIN, LOW); delay(1000); digitalWrite(VANNE_1_PIN, HIGH);	 } // a bit of
         else if(input == '1'){  verse_quantite(10);	 } // asservissement sur poids
+        else if(input == '2'){  verse_quantite(20);	 }
+        else if(input == '3'){  verse_quantite(50);	 }
+        else if(input == '4'){  verse_quantite(100); }
+        else if(input == '5'){  verse_quantite(200); }
         else if(input == 'f'){  force_stop_verse();	 } // force stop verse
       }
     }
   }
-  delay(100);
+  delay(100); // en tout, ca loop actuel prend a peu pres 176ms (avec un getunits de 2)
 }

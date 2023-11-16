@@ -5,7 +5,7 @@
 // HX711 circuit wiring
 
 
-#if 1
+#if 0
 // digital ?
 const int LOADCELL_DOUT_PIN = 2;
 const int LOADCELL_SCK_PIN = 3;

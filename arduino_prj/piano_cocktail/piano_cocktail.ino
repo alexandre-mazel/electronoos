@@ -4,7 +4,7 @@
 
 // HX711 circuit wiring
 
-// digital or analogic, quand ca fonctionne ca fonctionne...
+// digital or analogic, quand tout est bien branché ca fonctionne avec les 2 types...
 #if 0
 // digital ?
 const int LOADCELL_DOUT_PIN = 2;
@@ -46,11 +46,15 @@ void tare(byte times = 10); // OFFSET = read_average(times);
 So, get_units() returns (read_average(1) - OFFSET) / SCALE;
 */
 
+const int VANNE_1_PIN = 7;
 
 void setup() {
   
   Serial.begin(9600);
   //pinMode(resetPin, INPUT);
+
+  pinMode(VANNE_1_PIN, OUTPUT);
+  digitalWrite(VANNE_1_PIN, HIGH); // high don't send voltage !?!
 
 
   scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
@@ -68,6 +72,45 @@ void setup() {
   Serial.print("Zero factor: ");
   Serial.println(zero_factor);
   delay(500);
+}
+
+float last_measured = 0;
+
+
+// ask to verse x grammes
+float target_verse = -1001; // negative when no current
+void verse_quantite(float rGrammes)
+{
+  target_verse = last_measured + rGrammes;
+  Serial.print("INF: verse_quantite: current: ");
+  Serial.print(last_measured);
+  Serial.print(", target: ");
+  Serial.println(target_verse);
+  digitalWrite(VANNE_1_PIN, LOW);
+}
+
+void check_if_must_stop_verse()
+{
+  if(target_verse<-1000)
+  {
+    return;
+  }
+  float diff = target_verse-last_measured;
+  Serial.print("INF: check_if_must_stop_verse: diff: ");
+  Serial.println(diff);
+  if(diff<2)
+  {
+    digitalWrite(VANNE_1_PIN, HIGH);
+    if(0)
+    {
+      // fait un petit on/off pour bien la fermer (non ca marche pas)
+      delay(100);
+      digitalWrite(VANNE_1_PIN, LOW);
+      delay(100);
+      digitalWrite(VANNE_1_PIN, HIGH);
+    }
+    target_verse = -1001;
+  }
 }
 
 void loop() {
@@ -98,18 +141,23 @@ void loop() {
       Serial.print("Place a known weight on the scale...");
       delay(5000);
     }
-    float reading = scale.get_units(20);
+    float reading = scale.get_units(10);
+    last_measured = reading;
     Serial.print("Result: ");
     Serial.print(reading);
     Serial.print(" => ");
     Serial.print(int(round(reading)));
     Serial.println(" g");
-    long raw = scale.read_average();
-    Serial.print("Result raw avg: ");
-    Serial.println(raw);
+    check_if_must_stop_verse();
+    if(0)
+    {
+      long raw = scale.read_average();
+      Serial.print("Result raw avg: ");
+      Serial.println(raw);
+    }
     if(1)
     {
-      Serial.println("press key to change calibration factor");
+      //Serial.println("press key to change calibration factor");
       if(Serial.available())
       {
         char input = Serial.read();
@@ -121,8 +169,10 @@ void loop() {
         else if(input == 'c'){  calibration_factor -= 1; }
         else if(input == 'r'){  calibration_factor = 1; }
         else if(input == 't'){  Serial.println("re-taring..."); scale.tare();}
+        else if(input == 'v'){  digitalWrite(VANNE_1_PIN, LOW); delay(1000); digitalWrite(VANNE_1_PIN, HIGH);	 }
+        else if(input == '1'){  verse_quantite(10);	 }
       }
     }
   }
-  delay(1000);
+  delay(100);
 }

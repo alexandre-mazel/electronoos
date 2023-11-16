@@ -4,8 +4,8 @@
 
 // HX711 circuit wiring
 
-
-#if 0
+// digital or analogic, quand ca fonctionne ca fonctionne...
+#if 1
 // digital ?
 const int LOADCELL_DOUT_PIN = 2;
 const int LOADCELL_SCK_PIN = 3;

@@ -20,6 +20,7 @@ def constructNGram(txt,n=2):
         addStat(ngram, seqw, seqsuiv)
         i += 1        
     
+    # affiche les 10 premiers (pour tester)
     cpt = 1
     for k,v in sorted(ngram.items(),key=lambda x:x[1][0],reverse=True):
         occ = v[0]
@@ -53,7 +54,33 @@ def generateSentence(ng, startWord,deep=1):
     #~ except: pass
     generateSentence(ng,word,deep+1)
     
-    
+"""
+Structure recommanded:
+Un dictionnaire avec pour chaque mot,
+un dictionnaire des mots suivants.
+
+par exemple:
+{
+    "le": {"chat": 14, "chien": 12}, 
+    # 14: nombre de fois que le mot "chat" suit le mot "le"
+    # 12: nombre de fois que le mot "chien" suit le mot "le"
+    "la": {"voiture": 13, "chevre": 2},
+    # 13: nombre de fois que le mot "voiture" suit le mot "la"
+}
+
+# ou pour aider a faire des stats:
+{
+    "le": (26, {"chat": 14, "chien": 12}),
+    # 26: nombre de fois que le mot le apparait dans le texte
+    "la": (15, {"voiture": 13, "chevre": 2}),
+}
+
+
+d = {}
+d["toto"] = "Un super bonhomme"
+
+"""
+
 
 textfile = "La_guerre_et_la_paix_tolstoi_pg17949.txt"
 f = open(textfile,"rt",encoding="utf-8")
@@ -64,3 +91,4 @@ ng = constructNGram(buf)
 generateSentence(ng, "le")
 generateSentence(ng, "La")
 generateSentence(ng, "Ensuite")
+generateSentence(ng, "email")

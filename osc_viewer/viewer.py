@@ -199,7 +199,7 @@ class ListViewer:
     """
     Render a list of information and values
     """
-    def __init__(self,x=10,y=10,w=200,h=100,title="Value"):
+    def __init__(self,x=10,y=10,w=400,h=100,title="Value"):
         self.x = x
         self.y = y
         self.w = w
@@ -207,8 +207,8 @@ class ListViewer:
         self.title = title
         self.htitle = 24
         self.xOffColumn0 = 0
-        self.xOffColumn1 = 100
-        self.xOffColumn2 = 140
+        self.xOffColumn1 = 200
+        self.xOffColumn2 = 240
         self.color = (255,244,255)
         self.text_surface = fontTitleViewer.render(self.title, True, self.color)
         self.values  = []
@@ -421,7 +421,7 @@ class World:
         try:
             self.lviewers[key].update(values)
         except KeyError as err:
-            x = (len(self.lviewers)%5)*200
+            x = (len(self.lviewers)%5)*400
             y = 400-(len(self.lviewers)//5)*100
             self.lviewers[key] = ListViewer(x=x,y=y,title=key)
             self.lviewers[key].update(values)

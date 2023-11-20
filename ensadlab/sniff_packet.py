@@ -330,6 +330,13 @@ def monitor_callback(pkt):
             if port_src == 443 or port_dst == 443:
                 print("https!")
                 stats.addVolHttps(len(pkt))
+                if pkt.haslayer(http.HTTPRequest):
+                    http_layer = pkt.getlayer(http.HTTPRequest)
+                    print("DBG: keys: " + str(http_layer.fields.keys()))
+                    print("DBG: " + str(http_layer.fields))
+
+                    url = http_layer.fields['Host'] + http_layer.fields['Path']
+                    print("HTTP url: %s" % url)
         # layer tcp - end
         
         if pkt.haslayer(UDP):
@@ -343,6 +350,10 @@ def monitor_callback(pkt):
         ip_src = toHostnameV6(pkt[IPV6].src)
         ip_dst = toHostnameV6(pkt[IPV6].dst)
         print("DBG: IPv6: %s > %s" % (ip_src,ip_dst))
+        
+        stats.addSrc(ip_src,len(pkt))
+        stats.addDst(ip_dst,len(pkt))
+
         #~ stats.addVolArp(len(pkt))
         if TCP in pkt:
             port_src = pkt[TCP].sport
@@ -357,6 +368,14 @@ def monitor_callback(pkt):
         if port_src == 443 or port_dst == 443:
             print("https!")
             stats.addVolHttps(len(pkt))
+            if pkt.haslayer(http.HTTPRequest):
+                http_layer = pkt.getlayer(http.HTTPRequest)
+                print("DBG: keys: " + str(http_layer.fields.keys()))
+                print("DBG: " + str(http_layer.fields))
+
+                url = http_layer.fields['Host'] + http_layer.fields['Path']
+                print("HTTP url: %s" % url)
+            
     # ipv6 in pkt
         
     return "" # pkt.sprintf("%ARP.hwsrc% %ARP.psrc%")

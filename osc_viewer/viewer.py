@@ -145,7 +145,7 @@ class ValueViewer:
         offset_pixels = 0 # pas la peine de calculer l'offset car il est deja inclus dans le calcul
             
             
-        if bVerbose: print("DBG: title: %s, min: %.2f, max: %.2f, variationmax:%.2f, zoomy: %.2f, offset: %.2f, offset_pixels: %.2f" % (self.title,minval, maxval, variationmax,zoomy,offset,offset_pixels) )
+        if bVerbose: print("DBG: ValueViewer: title: %s, min: %.2f, max: %.2f, variationmax:%.2f, zoomy: %.2f, offset: %.2f, offset_pixels: %.2f" % (self.title,minval, maxval, variationmax,zoomy,offset,offset_pixels) )
         
         x += 1 # small decayt
         for i,val in enumerate(self.values):
@@ -194,6 +194,71 @@ class ValueViewer:
             
 #class ValueViewer - end
             
+class ListViewer:
+    """
+    Render a list of information and values
+    """
+    def __init__(self,x=10,y=10,w=200,h=100,title="Value"):
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+        self.title = title
+        self.color = (255,244,255)
+        self.text_surface = fontTitleViewer.render(self.title, True, self.color)
+        self.values  = []
+    
+    def setTitle(self, s ):
+        self.title = s
+        
+    def update(self,rVal):
+        self.values.append(rVal)
+        
+    def render(self, surf):
+        bVerbose = 1
+        bVerbose = 0
+        
+        color = self.color
+        x,y = self.x,self.y
+        x2 = self.x+self.w
+        y2 = self.y+self.h
+        th = 1 # thickness of the line
+        htitle=24
+        titlemargin = 4
+        softcolor = (64,64,64)
+        fillcolor = (40,128,40)
+        pg.draw.rect(surf,softcolor,(x,y,self.w,htitle),0)
+        pg.draw.line(surf,color,(x,y),(x2,y),width=th)
+        pg.draw.line(surf,color,(x,y+htitle),(x2,y+htitle),width=th)
+        pg.draw.line(surf,color,(x,y),(x,y2),width=th)
+        pg.draw.line(surf,color,(x,y2),(x2,y2),width=th)
+        pg.draw.line(surf,color,(x2,y),(x2,y2),width=th) 
+        surf.blit(self.text_surface, (x+titlemargin,y+titlemargin))
+        
+        if bVerbose: print("ListViewer.render: title: '%s', value: %s" % (self.title,self.values))
+        
+        if len(self.values)<1:
+            return
+            
+            
+        hutil = (self.h-htitle)-5 # 5 for a bit of margin around max
+        
+        # variable finishing by pixels are exprimed in pixels from the center of the graph (ycenter_pixels)
+        
+            
+        if bVerbose: print("DBG: ListViewer: title: %s, min: %.2f, max: %.2f, variationmax:%.2f, zoomy: %.2f, offset: %.2f, offset_pixels: %.2f" % (self.title,minval, maxval, variationmax,zoomy,offset,offset_pixels) )
+        
+        x += 1 # small decayt
+        for i, v in enumerate(self.values):
+            xv = i
+            lib = v[0]
+            s = "%s" % lib
+            libr = fontScaleViewer.render(s, True, self.color)
+            surf.blit(libr, (x+titlemargin,y+self.h+i))
+
+            
+#class ValueViewer - end
+
 
 class Object:
     def __init__(self,x=10,y=10,w=32,h=32):

@@ -33,6 +33,18 @@ aDnsV6 = {
     "212.27.40.240" : "Free SAS",
 }
 
+def addKnownSites():
+    sites = {
+                    "youtube.com",
+                    "google.com",
+                    "obo-world.com",
+                    "stack-overflow.com",
+                    
+                    "2a00:1450:4007:80d::200a",
+                    "2a02:26f0:2b00:12::5f64:5545",
+                    
+            }
+
 def getLocalIP():
     import socket
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

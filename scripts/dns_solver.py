@@ -83,6 +83,8 @@ def getAllPossible(x):
 def autotest():
 
     getAllPossible("obo-world.com")
+    getAllPossible("engrenage.studio")
+    getAllPossible("human-machine-interaction.org")
     getAllPossible("78.199.86.189")
     getAllPossible("192.168.158.51")
     getAllPossible("172.217.20.74")
@@ -90,6 +92,61 @@ def autotest():
     getAllPossible("youtube.com")
     getAllPossible("2a00:1450:4007:80d::200a")
     getAllPossible("2a02:26f0:2b00:12::5f64:5545")
+    
+"""
+# current output on 2023-11-20:
+
+obo-world.com:
+    IP  '78.199.86.189'
+    IPx  ['78.199.86.189']
+    Host  False
+    Alias  []
+engrenage.studio:
+    IP  '78.199.86.189'
+    IPx  ['78.199.86.189']
+    Host  False
+    Alias  []
+human-machine-interaction.org:
+    IP  '78.199.86.189'
+    IPx  ['78.199.86.189']
+    Host  False
+    Alias  []
+78.199.86.189:
+    IP  '78.199.86.189'
+    IPx  ['78.199.86.189']
+    Host  'cap33-1_migr-78-199-86-189.fbx.proxad.net'
+    Alias  []
+192.168.158.51:
+    IP  '192.168.158.51'
+    IPx  ['192.168.158.51']
+    Host  'MSTAB7'
+    Alias  []
+172.217.20.74:
+    IP  '172.217.20.74'
+    IPx  ['172.217.20.74']
+    Host  'sof02s49-in-f10.1e100.net'
+    Alias  []
+stackoverflow.com:
+    IP  '104.18.32.7'
+    IPx  ['104.18.32.7', '172.64.155.249']
+    Host  False
+    Alias  []
+youtube.com:
+    IP  '142.250.178.142'
+    IPx  ['142.250.178.142']
+    Host  'par10s49-in-x0e.1e100.net'
+    Alias  []
+2a00:1450:4007:80d::200a:
+    IP  False
+    IPx  False
+    Host  'par10s21-in-x0a.1e100.net'
+    Alias  False
+2a02:26f0:2b00:12::5f64:5545:
+    IP  False
+    IPx  False
+    Host  'g2a02-26f0-2b00-0012-0000-0000-5f64-5545.deploy.static.akamaitechnologies.com'
+    Alias  False
+"""
 
 
 if __name__ == "__main__":

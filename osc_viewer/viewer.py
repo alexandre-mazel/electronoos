@@ -31,6 +31,8 @@ def runLoopOscHandler(world, ip = "127.0.0.1", port = 8002):
     dispatcher.map("/u2", filter_handler)
     dispatcher.map("/src", filter_handler_list)
     dispatcher.map("/dst", filter_handler_list)
+    dispatcher.map("/src_frame", filter_handler_list)
+    dispatcher.map("/dst_frame", filter_handler_list)
 
     async def loop(world):
         """Example main loop that only runs for 10 iterations before finishing"""
@@ -199,7 +201,7 @@ class ListViewer:
     """
     Render a list of information and values
     """
-    def __init__(self,x=10,y=10,w=400,h=100,title="Value"):
+    def __init__(self,x=10,y=10,w=300,h=100,title="Value"):
         self.x = x
         self.y = y
         self.w = w
@@ -291,7 +293,7 @@ class ListViewer:
             cpt = v[1]
             vol = v[2]
             s = "%s" % lib
-            yline = i*12
+            yline = i*11
             if bVerbose: print( "DBG: ListViewer: i: %d, lib: %s" % (i,lib))
             libr = fontScaleViewer.render(s, True, self.color)
             surf.blit(libr, (x+titlemargin+self.xOffColumn0,y+htitle+yline))
@@ -421,7 +423,7 @@ class World:
         try:
             self.lviewers[key].update(values)
         except KeyError as err:
-            x = (len(self.lviewers)%5)*400
+            x = (len(self.lviewers)%5)*300
             y = 400-(len(self.lviewers)//5)*100
             self.lviewers[key] = ListViewer(x=x,y=y,title=key)
             self.lviewers[key].update(values)

@@ -90,8 +90,11 @@ def autotest():
     getAllPossible("172.217.20.74")
     getAllPossible("stackoverflow.com")
     getAllPossible("youtube.com")
+    getAllPossible("2a00:1450:4007:80a::200a")
+    getAllPossible("2a00:1450:4007:80b::200a")
     getAllPossible("2a00:1450:4007:80d::200a")
     getAllPossible("2a02:26f0:2b00:12::5f64:5545")
+    
     
 """
 # current output on 2023-11-20:

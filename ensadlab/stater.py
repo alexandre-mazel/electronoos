@@ -9,7 +9,7 @@ import time
 
 class Stater:
     
-    def __init__( self, rRefreshTimeSec = 1, rFrameSec = 5., viewer_ip="127.0.0.1" ):
+    def __init__( self, rRefreshTimeSec = 1, rFrameSec = 30., viewer_ip="127.0.0.1" ):
         self.rRefreshTimeSec = rRefreshTimeSec # time to send infos
         self.period = rFrameSec # time of a frame
         self.viewer_ip = viewer_ip
@@ -57,7 +57,10 @@ class Stater:
         self.nFrameCptHttp = 0
         self.nFrameCptHttps = 0
         self.nFrameCptArp = 0
-        self.nFrameCptUdp = 0           
+        self.nFrameCptUdp = 0        
+
+        self.listFrameHostDst = {} # for each ip, cpt, vol
+        self.listFrameHostSrc = {}        
 
     def addVolHttp(self,v):
         self.rSumVolHttp += v
@@ -108,25 +111,28 @@ class Stater:
         """
         add src and volume in bytes
         """
-        while 1:
-            try:
-                self.listTotalHostSrc[strIP][0] = self.listTotalHostSrc[strIP][0] + 1
-                self.listTotalHostSrc[strIP][1] = self.listTotalHostSrc[strIP][1] + vol
-                return
-            except KeyError as err:
-                self.listTotalHostSrc[strIP] = [0,0]
+        for d in [self.listTotalHostSrc,self.listFrameHostSrc]:
+            while 1:
+                try:
+                    d[strIP][0] = d[strIP][0] + 1
+                    d[strIP][1] = d[strIP][1] + vol
+                    break
+                except KeyError as err:
+                    d[strIP] = [0,0]
+
                 
     def addDst( self, strIP, vol ):
         """
         add src and volume in bytes
         """
-        while 1:
-            try:
-                self.listTotalHostDst[strIP][0] = self.listTotalHostDst[strIP][0] + 1
-                self.listTotalHostDst[strIP][1] = self.listTotalHostDst[strIP][1] + vol
-                return
-            except KeyError as err:
-                self.listTotalHostDst[strIP] = [0,0]
+        for d in [self.listTotalHostDst,self.listFrameHostDst]:
+            while 1:
+                try:
+                    d[strIP][0] = d[strIP][0] + 1
+                    d[strIP][1] = d[strIP][1] + vol
+                    break
+                except KeyError as err:
+                    d[strIP] = [0,0]
         
     def sendLabels(self):
         labels = [      
@@ -162,6 +168,17 @@ class Stater:
             for k,v in self.listTotalHostDst.items():
                 aList.append([k,v[0],v[1]])
             self.sender.sendMessage("/dst",aList)    
+            
+            aList = []
+            for k,v in self.listFrameHostSrc.items():
+                aList.append([k,v[0],v[1]])
+            self.sender.sendMessage("/src_frame",aList)    
+            
+            # dst
+            aList = []
+            for k,v in self.listFrameHostDst.items():
+                aList.append([k,v[0],v[1]])
+            self.sender.sendMessage("/dst_frame",aList)    
             
         if time.time()-self.lastStartFrame > self.period:
             self.lastStartFrame = time.time()

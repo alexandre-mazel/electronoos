@@ -30,6 +30,7 @@ def runLoopOscHandler(world, ip = "127.0.0.1", port = 8002):
     dispatcher.map("/u1", filter_handler)
     dispatcher.map("/u2", filter_handler)
     dispatcher.map("/src", filter_handler_list)
+    dispatcher.map("/dst", filter_handler_list)
 
     async def loop(world):
         """Example main loop that only runs for 10 iterations before finishing"""
@@ -204,15 +205,40 @@ class ListViewer:
         self.w = w
         self.h = h
         self.title = title
+        self.htitle = 24
+        self.xOffColumn0 = 0
+        self.xOffColumn1 = 100
+        self.xOffColumn2 = 140
         self.color = (255,244,255)
         self.text_surface = fontTitleViewer.render(self.title, True, self.color)
         self.values  = []
+        self.numSort = 2 # wich colum to use for sort
     
     def setTitle(self, s ):
         self.title = s
         
     def update(self,rVal):
-        self.values.append(rVal)
+        self.values = rVal
+        
+    def reactToClick(self,click_pos):
+        """
+        return True if click has been handled
+        """
+        x,y = click_pos
+        if x<self.x or x>self.x+self.w:
+            return False
+        if y<self.y or y>self.y+self.h:
+            return False
+        offsety = y-self.y
+        if offsety < self.htitle:
+            offsetx = x-self.x
+            if offsetx < self.xOffColumn1:
+                self.numSort = 0
+            elif offsetx < self.xOffColumn2:
+                self.numSort = 1
+            else:
+                self.numSort = 2                
+            
         
     def render(self, surf):
         bVerbose = 1
@@ -222,8 +248,9 @@ class ListViewer:
         x,y = self.x,self.y
         x2 = self.x+self.w
         y2 = self.y+self.h
+        
         th = 1 # thickness of the line
-        htitle=24
+        htitle=self.htitle
         titlemargin = 4
         softcolor = (64,64,64)
         fillcolor = (40,128,40)
@@ -234,6 +261,14 @@ class ListViewer:
         pg.draw.line(surf,color,(x,y2),(x2,y2),width=th)
         pg.draw.line(surf,color,(x2,y),(x2,y2),width=th) 
         surf.blit(self.text_surface, (x+titlemargin,y+titlemargin))
+        
+        self.xSort = self.xOffColumn0
+        if self.numSort == 1:
+            self.xSort = self.xOffColumn1
+        elif self.numSort == 2:
+            self.xSort = self.xOffColumn2
+            
+        pg.draw.rect(surf,fillcolor,(x+self.xSort+10,y+8,10,10),0)
         
         if bVerbose: print("ListViewer.render: title: '%s', value: %s" % (self.title,self.values))
         
@@ -246,15 +281,28 @@ class ListViewer:
         # variable finishing by pixels are exprimed in pixels from the center of the graph (ycenter_pixels)
         
             
-        if bVerbose: print("DBG: ListViewer: title: %s, min: %.2f, max: %.2f, variationmax:%.2f, zoomy: %.2f, offset: %.2f, offset_pixels: %.2f" % (self.title,minval, maxval, variationmax,zoomy,offset,offset_pixels) )
+        if bVerbose: print("DBG: ListViewer: title: %s, values: %s" % (self.title, str(self.values)))
+
+        vSorted = sorted(self.values,key=lambda x:x[self.numSort], reverse=1)
         
-        x += 1 # small decayt
-        for i, v in enumerate(self.values):
+        for i, v in enumerate(vSorted):
             xv = i
             lib = v[0]
+            cpt = v[1]
+            vol = v[2]
             s = "%s" % lib
+            yline = i*12
+            if bVerbose: print( "DBG: ListViewer: i: %d, lib: %s" % (i,lib))
             libr = fontScaleViewer.render(s, True, self.color)
-            surf.blit(libr, (x+titlemargin,y+self.h+i))
+            surf.blit(libr, (x+titlemargin+self.xOffColumn0,y+htitle+yline))
+            
+            s = "%s" % cpt
+            libr = fontScaleViewer.render(s, True, self.color)
+            surf.blit(libr, (x+titlemargin+self.xOffColumn1,y+htitle+yline))
+            
+            s = "%s" % vol
+            libr = fontScaleViewer.render(s, True, self.color)
+            surf.blit(libr, (x+titlemargin+self.xOffColumn2,y+htitle+yline))
 
             
 #class ValueViewer - end
@@ -314,6 +362,12 @@ class World:
             if event.type == pg.KEYUP:
                 self.keypressed[event.key] = 0
                 
+                    
+            if event.type == pg.MOUSEBUTTONDOWN:
+                pos = pg.mouse.get_pos()
+                for k,v in self.lviewers.items():
+                    v.reactToClick(pos)
+                
         for key, bPressed in self.keypressed.items():
             if bPressed:
                 if key == pg.K_a or key == pg.K_UP:
@@ -365,12 +419,12 @@ class World:
         
         key = strName
         try:
-            self.lviewers[key] = values
+            self.lviewers[key].update(values)
         except KeyError as err:
             x = (len(self.lviewers)%5)*200
             y = 400-(len(self.lviewers)//5)*100
             self.lviewers[key] = ListViewer(x=x,y=y,title=key)
-            self.lviewers[key] = values
+            self.lviewers[key].update(values)
     
     def update(self):
         """
@@ -414,6 +468,10 @@ class World:
         
         for k,v in self.vviewers.items():
             v.render(self.screen)
+            
+        for k,v in self.lviewers.items():
+            v.render(self.screen)
+        
         
         pg.display.update()  # or pg.display.flip()
         

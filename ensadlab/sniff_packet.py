@@ -269,6 +269,7 @@ def monitor_callback(pkt):
         print("INF: IP: %s:%s > %s:%s" % (ip_src,port_src,ip_dst,port_dst))
         
         stats.addSrc(ip_src,len(pkt))
+        stats.addDst(ip_dst,len(pkt))
         
         methods=[b'GET',b'POST',b'HEAD',b'PUT',b'DELETE',b'CONNECT',b'OPTIONS',b'TRACE']
         words = ["password", "user", "username", "login", "pass", "Username", "Password", "User", "Email"]

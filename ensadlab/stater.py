@@ -104,7 +104,19 @@ class Stater:
         self.nFrameCptUdp += 1
         self.nFrameCptTotal += 1
         
-    def addSrc( self, strIp, vol ):
+    def addSrc( self, strIP, vol ):
+        """
+        add src and volume in bytes
+        """
+        while 1:
+            try:
+                self.listTotalHostSrc[strIP][0] = self.listTotalHostSrc[strIP][0] + 1
+                self.listTotalHostSrc[strIP][1] = self.listTotalHostSrc[strIP][1] + vol
+                return
+            except KeyError as err:
+                self.listTotalHostSrc[strIP] = [0,0]
+                
+    def addDst( self, strIP, vol ):
         """
         add src and volume in bytes
         """
@@ -141,9 +153,15 @@ class Stater:
             
             # src
             aList = []
+            for k,v in self.listTotalHostSrc.items():
+                aList.append([k,v[0],v[1]])
+            self.sender.sendMessage("/src",aList)    
+            
+            # dst
+            aList = []
             for k,v in self.listTotalHostDst.items():
-                aList.append(k,v[:])
-            self.sender.sendMessage("/src",values)    
+                aList.append([k,v[0],v[1]])
+            self.sender.sendMessage("/dst",aList)    
             
         if time.time()-self.lastStartFrame > self.period:
             self.lastStartFrame = time.time()

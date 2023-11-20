@@ -5,7 +5,7 @@ import asyncio
 def runLoopOscHandler(world, ip = "127.0.0.1", port = 8002):
     
     def filter_handler(address, *args):
-        print(f"{address}: {args}")
+        print(f"filter_handler:{address}: {args}")
         
         if "_labels" in address:
             # it's a label  => following values are name of values
@@ -14,7 +14,13 @@ def runLoopOscHandler(world, ip = "127.0.0.1", port = 8002):
             real_address = address.replace("_labels", "")
             world.receiveLabels(real_address,args)
             return
-        world.receiveValue(address,args)
+        world.receiveValues(address,args)
+    # filter_handler - end
+    
+    def filter_handler_list(address, *args):
+        print(f"filter_handler_list:{address}: {args}")
+        world.receiveList(address,args)
+        
     # filter_handler - end
 
 
@@ -23,6 +29,7 @@ def runLoopOscHandler(world, ip = "127.0.0.1", port = 8002):
     dispatcher.map("/global_labels", filter_handler)
     dispatcher.map("/u1", filter_handler)
     dispatcher.map("/u2", filter_handler)
+    dispatcher.map("/src", filter_handler_list)
 
     async def loop(world):
         """Example main loop that only runs for 10 iterations before finishing"""
@@ -65,11 +72,11 @@ blue = (0, 0, 255)
 fontTitleViewer = pg.font.SysFont('Arial', 16)
 fontScaleViewer = pg.font.SysFont('Arial', 11)
 
-class Viewer:
+class ValueViewer:
     """
     An oscilloscope like to view a value over time
     """
-    def __init__(self,x=10,y=10,w=200,h=100,title="Viewer"):
+    def __init__(self,x=10,y=10,w=200,h=100,title="Value"):
         self.x = x
         self.y = y
         self.w = w
@@ -106,7 +113,7 @@ class Viewer:
         pg.draw.line(surf,color,(x2,y),(x2,y2),width=th) 
         surf.blit(self.text_surface, (x+titlemargin,y+titlemargin))
         
-        if bVerbose: print("Viewer.render: title: '%s', value: %s" % (self.title,self.values))
+        if bVerbose: print("ValueViewer.render: title: '%s', value: %s" % (self.title,self.values))
         
         if len(self.values)<1:
             return
@@ -185,7 +192,7 @@ class Viewer:
             scale = fontScaleViewer.render(s, True, self.color)
             surf.blit(scale, (x+titlemargin,y+self.h-15))
             
-#class Viewer - end
+#class ValueViewer - end
             
 
 class Object:
@@ -221,7 +228,9 @@ class World:
         
         self.keypressed={} # will store current keyboard pressed
         
-        self.viewers = {} # key => viewer
+        self.vviewers = {} # key => ValueViewer
+        
+        self.lviewers = {} # key => ListViewer
         
         
     def handleInput(self):
@@ -252,30 +261,51 @@ class World:
                     
         return False
         
-    def receiveValue(self,strName, values):
-        print("DBG: receiveValue: '%s': %s" % (strName,values) )
-        #self.viewers[0].update(values[0])
+    def receiveValues(self,strName, values):
+        """
+        for each tag strName, receive a list of values, each of them will be added to one ValueViewer
+        """
+        
+        print("DBG: receiveValues: '%s': %s" % (strName,values) )
+        #self.vviewers[0].update(values[0])
         for i,v in enumerate(values):
             key = strName + "_" + ("%02d"%i)
             try:
-                self.viewers[key].update(v)
+                self.vviewers[key].update(v)
             except KeyError as err:
-                x = (len(self.viewers)%5)*200
-                y = (len(self.viewers)//5)*100
-                self.viewers[key] = Viewer(x=x,y=y,title=key)
-                self.viewers[key].update(v)
+                x = (len(self.vviewers)%5)*200
+                y = (len(self.vviewers)//5)*100
+                self.vviewers[key] = ValueViewer(x=x,y=y,title=key)
+                self.vviewers[key].update(v)
                 
     def receiveLabels( self, strName, labels):
         print("DBG: receiveLabels: '%s': %s" % (strName,labels) )
-        #self.viewers[0].update(values[0])
+        #self.vviewers[0].update(values[0])
         for i,s in enumerate(labels):
             key = strName + "_" + ("%02d"%i)
             try:
-                self.viewers[key].setTitle(s)
+                self.vviewers[key].setTitle(s)
             except KeyError as err:
-                x = (len(self.viewers)%5)*200
-                y = (len(self.viewers)//5)*100
-                self.viewers[key] = Viewer(x=x,y=y,title=s)
+                x = (len(self.vviewers)%5)*200
+                y = (len(self.vviewers)//5)*100
+                self.vviewers[key] = ValueViewer(x=x,y=y,title=s)
+                
+    def receiveList( self, strName, values):
+        """
+        receive stat relative to one type of information strName
+        - values is a list of [nbr_event, sum data]
+        """
+            
+        print("DBG: receiveList: '%s': %s" % (strName,values) )
+        
+        key = strName
+        try:
+            self.lviewers[key] = values
+        except KeyError as err:
+            x = (len(self.lviewers)%5)*200
+            y = 400-(len(self.lviewers)//5)*100
+            self.lviewers[key] = ListViewer(x=x,y=y,title=key)
+            self.lviewers[key] = values
     
     def update(self):
         """
@@ -317,7 +347,7 @@ class World:
         #~ self.screen.set_at((100, 300), (255,255,233)) 
         #~ self.screen.set_at((110, 300), (255,255,233)) 
         
-        for k,v in self.viewers.items():
+        for k,v in self.vviewers.items():
             v.render(self.screen)
         
         pg.display.update()  # or pg.display.flip()

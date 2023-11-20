@@ -268,6 +268,8 @@ def monitor_callback(pkt):
             
         print("INF: IP: %s:%s > %s:%s" % (ip_src,port_src,ip_dst,port_dst))
         
+        stats.addSrc(ip_src,len(pkt))
+        
         methods=[b'GET',b'POST',b'HEAD',b'PUT',b'DELETE',b'CONNECT',b'OPTIONS',b'TRACE']
         words = ["password", "user", "username", "login", "pass", "Username", "Password", "User", "Email"]
         if pkt.haslayer(TCP): #Checks for TCP protocol
@@ -323,10 +325,15 @@ def monitor_callback(pkt):
                             #~ print("test: : %s" % str(r))
                             if meth in r:
                                 print("meth: %s found in\n%s" % (meth,str(r)))
-        # layer tcp
+            # if port_src == 80 - end
+            if port_src == 443 or port_dst == 443:
+                print("https!")
+                stats.addVolHttps(len(pkt))
+        # layer tcp - end
+        
         if pkt.haslayer(UDP):
             stats.addVolUdp(len(pkt))
-        # layer udp
+        # layer udp - end
         
     # ip in pkt
     

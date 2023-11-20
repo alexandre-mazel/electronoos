@@ -40,6 +40,9 @@ class Stater:
         self.startNewFrame()
         self.lastSend = time.time()-10000 # time last send in epoch
         self.lastStartFrame = time.time()-10000 # time in epoch
+        
+        self.listTotalHostDst = {} # for each ip, cpt, vol
+        self.listTotalHostSrc = {}
 
         
     def startNewFrame( self ):
@@ -101,6 +104,18 @@ class Stater:
         self.nFrameCptUdp += 1
         self.nFrameCptTotal += 1
         
+    def addSrc( self, strIp, vol ):
+        """
+        add src and volume in bytes
+        """
+        while 1:
+            try:
+                self.listTotalHostDst[strIP][0] = self.listTotalHostDst[strIP][0] + 1
+                self.listTotalHostDst[strIP][1] = self.listTotalHostDst[strIP][1] + vol
+                return
+            except KeyError as err:
+                self.listTotalHostDst[strIP] = [0,0]
+        
     def sendLabels(self):
         labels = [      
                             "rSumVolTotal", "rSumVolHttp", "rSumVolHttps", "rSumVolArp", "rSumVolUdp",
@@ -123,6 +138,12 @@ class Stater:
             print("INF: Stater.update: sending")
             self.lastSend = time.time()
             self.sender.sendMessage("/global",values)
+            
+            # src
+            aList = []
+            for k,v in self.listTotalHostDst.items():
+                aList.append(k,v[:])
+            self.sender.sendMessage("/src",values)    
             
         if time.time()-self.lastStartFrame > self.period:
             self.lastStartFrame = time.time()

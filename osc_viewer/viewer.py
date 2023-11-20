@@ -2,7 +2,7 @@ from pythonosc.osc_server import AsyncIOOSCUDPServer
 from pythonosc.dispatcher import Dispatcher
 import asyncio
 
-def runLoopOscHandler(game, ip = "127.0.0.1", port = 8002):
+def runLoopOscHandler(world, ip = "127.0.0.1", port = 8002):
     
     def filter_handler(address, *args):
         print(f"{address}: {args}")
@@ -12,9 +12,9 @@ def runLoopOscHandler(game, ip = "127.0.0.1", port = 8002):
             # eg: /global/label ["nom de la premiere valeur", "nom de la deuxieme valeur", ...]
             print("It's a label...")
             real_address = address.replace("_labels", "")
-            game.receiveLabels(real_address,args)
+            world.receiveLabels(real_address,args)
             return
-        game.receiveValue(address,args)
+        world.receiveValue(address,args)
     # filter_handler - end
 
 
@@ -24,29 +24,29 @@ def runLoopOscHandler(game, ip = "127.0.0.1", port = 8002):
     dispatcher.map("/u1", filter_handler)
     dispatcher.map("/u2", filter_handler)
 
-    async def loop(game):
+    async def loop(world):
         """Example main loop that only runs for 10 iterations before finishing"""
         while 1:
             #~ print(f"Loop...")
             await asyncio.sleep(0.04) # 25fps
-            bQuit = game.handleInput()
-            game.update()
+            bQuit = world.handleInput()
+            world.update()
             if bQuit:
                 break
-            game.render()
+            world.render()
 
 
-    async def init_main(game):
+    async def init_main(world):
         print("Running OSC Server on %s:%s" % (ip,port))
         server = AsyncIOOSCUDPServer((ip, port), dispatcher, asyncio.get_event_loop())
         transport, protocol = await server.create_serve_endpoint()  # Create datagram endpoint and start serving
 
-        await loop(game)  # Enter main loop of program
+        await loop(world)  # Enter main loop of program
 
         transport.close()  # Clean up serve endpoint
 
 
-    asyncio.run(init_main(game))
+    asyncio.run(init_main(world))
     
 # runLoopOscHandler - end
     
@@ -97,7 +97,7 @@ class Viewer:
         htitle=24
         titlemargin = 4
         softcolor = (64,64,64)
-        fillcolor = (20,64,20)
+        fillcolor = (40,128,40)
         pg.draw.rect(surf,softcolor,(x,y,self.w,htitle),0)
         pg.draw.line(surf,color,(x,y),(x2,y),width=th)
         pg.draw.line(surf,color,(x,y+htitle),(x2,y+htitle),width=th)
@@ -185,6 +185,7 @@ class Viewer:
             scale = fontScaleViewer.render(s, True, self.color)
             surf.blit(scale, (x+titlemargin,y+self.h-15))
             
+#class Viewer - end
             
 
 class Object:
@@ -198,7 +199,7 @@ class Object:
 
 # class Object - end
 
-class Game:
+class World:
     def __init__(self):
         w = 1380
         h = 920
@@ -321,8 +322,8 @@ class Game:
         
         pg.display.update()  # or pg.display.flip()
         
-# class Game - end
+# class World - end
 
 if __name__ == "__main__":
-    game = Game()
-    runLoopOscHandler(game)
+    world = World()
+    runLoopOscHandler(world)

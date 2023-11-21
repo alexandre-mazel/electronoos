@@ -6,7 +6,6 @@ Resolve the DNS/IP address of a given domain or ip
 @version 1.6 (python ver 2.7.3 and python v3)
 @author LoanWolffe + A. Mazel
 """
-import socket
 import sys
 sys.path.append("../alex_pytools")
 import nettools
@@ -46,6 +45,7 @@ def autotest():
     getAllPossible("2a00:1450:4007:80d::200a")
     getAllPossible("2a02:26f0:2b00:12::5f64:5545")
     getAllPossible("fe80::20c4:b6f:84d5:565c")
+    getAllPossible("2a01:e34:ec75:6bd0:f8ff:fa45:f8ae:4086")
     getAllPossible("ff02::1:3")
     getAllPossible("13.248.212.111")
     

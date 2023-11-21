@@ -9,6 +9,9 @@ import sys
 sys.path.append("../alex_pytools")
 import nettools
 
+bDeactivateToHostname = 1
+bDeactivateToHostname = 0
+
 
 
 #~ a = scapy.all.sniff(count=10)
@@ -243,6 +246,7 @@ def arp_display(pkt):
 #~ sniff(iface='eth0', prn=http_header, filter="tcp port 80")
 
 def toHostname(ip):
+    if bDeactivateToHostname: return ip
     try:
         return aDns[nettools.reduceIPV6ToDomainSubPart(ip)]
     except KeyError as err:

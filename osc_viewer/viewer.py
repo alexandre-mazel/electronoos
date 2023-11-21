@@ -282,7 +282,7 @@ class ListViewer:
         pg.draw.line(surf,color,(x2,y),(x2,y2),width=th) 
         surf.blit(self.text_surface, (x+titlemargin,y+titlemargin))
         
-        self.xSort = self.xOffColumn0
+        self.xSort = (self.xOffColumn0 + self.xOffColumn1 ) //2
         if self.numSort == 1:
             self.xSort = self.xOffColumn1
         elif self.numSort == 2:

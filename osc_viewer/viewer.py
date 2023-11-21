@@ -75,6 +75,24 @@ blue = (0, 0, 255)
 fontTitleViewer = pg.font.SysFont('Arial', 16)
 fontScaleViewer = pg.font.SysFont('Arial', 11)
 
+def smart(n):
+    """
+    convert to string in a compact form
+    """
+    units = [
+                    [1024*1024*1024*1024, "T"],
+                    [1024*1024*1024, "G"],
+                    [1024*1024, "M"],
+                    [1024, "k"],
+                ]
+    for mul,unit in units:
+        if n > mul:
+            return "%.1f %s" % (n/mul,unit)
+    if isinstance(n,int):
+        return "%s" % n
+    return "%.2f" % n
+    
+
 class ValueViewer:
     """
     An oscilloscope like to view a value over time
@@ -302,7 +320,7 @@ class ListViewer:
             libr = fontScaleViewer.render(s, True, self.color)
             surf.blit(libr, (x+titlemargin+self.xOffColumn1,y+htitle+yline))
             
-            s = "%s" % vol
+            s = smart(vol)
             libr = fontScaleViewer.render(s, True, self.color)
             surf.blit(libr, (x+titlemargin+self.xOffColumn2,y+htitle+yline))
 
@@ -324,7 +342,7 @@ class Object:
 class World:
     def __init__(self):
         w = 1380
-        h = 920
+        h = 1024
         if 0:
             # reduce screen to see debug
             w = 640

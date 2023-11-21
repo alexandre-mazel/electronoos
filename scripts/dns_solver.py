@@ -1,15 +1,13 @@
-
-
 #!/user/bin/env python
 """
-Resolve the DNS/IP address of a given domain
-data returned is in the format:
-(name, aliaslist, addresslist)
+Resolve the DNS/IP address of a given domain or ip
+
 @filename resolveDNS.py
-@version 1.01 (python ver 2.7.3)
-@author LoanWolffe
+@version 1.6 (python ver 2.7.3 and python v3)
+@author LoanWolffe + A. Mazel
 """
 import socket
+import sys
 
 def getIP(d):
     """
@@ -23,7 +21,7 @@ def getIP(d):
     except Exception:
         # fail gracefully!
         return False
-#
+        
 def getIPx(d):
     """
     This method returns an array containing
@@ -37,7 +35,10 @@ def getIPx(d):
     except Exception:
         # fail gracefully!
         return False
-#
+        
+def getIPV6(d):
+    socket.getaddrinfo("example.com", None, socket.AF_INET6)
+        
 def getHost(ip):
     """
     This method returns the 'True Host' name for a
@@ -50,7 +51,7 @@ def getHost(ip):
     except Exception:
         # fail gracefully
         return False
-#
+
 def getAlias(d):
     """
     This method returns an array containing
@@ -64,7 +65,7 @@ def getAlias(d):
     except Exception:
         # fail gracefully
         return False
-#
+
 
 # test it
 
@@ -90,10 +91,15 @@ def autotest():
     getAllPossible("172.217.20.74")
     getAllPossible("stackoverflow.com")
     getAllPossible("youtube.com")
+    getAllPossible("web.whatsapp.com")
+    getAllPossible("whatsapp.com")
     getAllPossible("2a00:1450:4007:80a::200a")
     getAllPossible("2a00:1450:4007:80b::200a")
     getAllPossible("2a00:1450:4007:80d::200a")
     getAllPossible("2a02:26f0:2b00:12::5f64:5545")
+    getAllPossible("fe80::20c4:b6f:84d5:565c")
+    getAllPossible("ff02::1:3")
+    getAllPossible("13.248.212.111")
     
     
 """
@@ -153,4 +159,7 @@ youtube.com:
 
 
 if __name__ == "__main__":
-    autotest()
+    if len(sys.argv)<2:
+        autotest()
+        exit(1)
+    getAllPossible(sys.argv[1])

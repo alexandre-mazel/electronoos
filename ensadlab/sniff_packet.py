@@ -4,6 +4,7 @@ import base64
 #~ from scapy_http import http
 #~ import scapy_http.http
 from scapy.layers import http
+import socket
 
 
 
@@ -26,31 +27,14 @@ aDns = {
     "212.27.40.240" : "Free SAS",
 }
 
-aDnsV6 = {
-    "192.168.0.46" : "mstab7",
-    "216.58.214.170" : "Google",
-    "78.199.86.189" : "MaFreebox",
-    "212.27.40.240" : "Free SAS",
-}
-
-def addKnownSites():
-    sites = {
-                    "youtube.com",
-                    "google.com",
-                    "obo-world.com",
-                    "stack-overflow.com",
-                    
-                    "2a00:1450:4007:80d::200a",
-                    "2a02:26f0:2b00:12::5f64:5545",
-                    
-            }
 
 def getLocalIP():
-    import socket
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.connect(("8.8.8.8", 80))
-    print(s.getsockname()[0])
+    IP = s.getsockname()[0]
     s.close()    
+    print("DBG: getLocalIP: " + IP)
+    return IP
     
 def getLocalIP6():
         """
@@ -59,8 +43,12 @@ def getLocalIP6():
 
         :return: IPv6 address as a string
         :rtype: string
+        
+        ipv6: 8 champs:
+            - 3 pour le prefixe de site
+            - 1 pour id de sous reseau
+            - 4 pour id d'interface
         """
-        import socket
         try:
             s = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
             s.connect(('2001:4860:4860::8888', 1))
@@ -71,15 +59,142 @@ def getLocalIP6():
         finally:
             if 's' in locals():
                 s.close()
-        print(IP)
+        print("DBG: getLocalIP6: " + IP)
         return IP
+        
+def getIP(d):
+    """
+    This method returns the first IP address string
+    that responds as the given domain name
+    """
+    try:
+        data = socket.gethostbyname(d)
+        ip = data
+        return ip
+    except socket.gaierror as err:
+        pass
+    return False
+        
+def getIPx(d):
+    """
+    This method returns an array containing
+    one or more IP address strings that respond
+    as the given domain name
+    """
+    try:
+        data = socket.gethostbyname_ex(d)
+        ipx = data[2]
+        return ipx
+    except socket.gaierror as err:
+        pass
+    return False
+        
+def getHost(ip):
+    """
+    This method returns the 'True Host' name for a
+    given IP address
+    """
+    try:
+        data = socket.gethostbyaddr(ip)
+        host = data[0]
+        return host
+    except (socket.herror,socket.gaierror) as err:
+        pass
+    return False
+
+def getAlias(d):
+    """
+    This method returns an array containing
+    a list of aliases for the given domain
+    """
+    try:
+        data = socket.gethostbyname_ex(d)
+        alias = data[1]
+        #print repr(data)
+        return alias
+    except socket.gaierror as err:
+        pass
+    return False
 
 
 def cacheDns():
+    preloadCacheDns()
     ip = getLocalIP()
     aDns[ip] = "Me"
-    ip = getLocalIP6()
-    aDnsV6[ip] = "Me6"
+    ip6 = getLocalIP6()
+    aDns[ip6] = "Me6"
+    printCacheDns()
+
+        
+def printCacheDns():
+    print("")
+    print("DBG: cacheDns: aDns: ")
+    for k,v in sorted(aDns.items()):
+        print("%s => %s" % (k,v))    
+    
+def reduceIPV6ToDomainSubPart(ip):
+    """
+    2a00:1450:4007:80c::200a => 2a00:1450:4007
+    """
+    if not ":" in ip:
+        # c'est un ip v4
+        return ip
+    splitted = ip.split(":")
+    return ":".join(splitted[:3])
+    
+def reduceDomainToMasterDomain(domain):
+    """
+    g2a02-26f0-2b00-0012-0000-0000-5f64-5545.deploy.static.akamaitechnologies.com => akamaitechnologies.com
+    """
+    splitted = domain.split(".")
+    return ".".join(splitted[-2:])
+    
+def addToCacheDns(s):
+    """
+    add an ip or a domain to CacheDns
+    """
+    print( "DBG: addToCacheDns: site: %s" % s )
+    ips = getIPx(s)
+    if ips != False and ips[0] != s: # ip => [ip]
+        print( "DBG:    addToCacheDns: ips: %s (len:%d)" % ( ips, len(ips) ) )
+        for ip in ips:
+            aDns[ip] = s
+    else: # (1)
+        domain = getHost(s)
+        if domain != False:
+            print( "DBG:    addToCacheDns: domain: %s" % domain )
+            s = reduceIPV6ToDomainSubPart(s)
+            domain = reduceDomainToMasterDomain(domain)
+            aDns[s] = domain
+                
+        """
+        (1):
+            # si on ne met pas le else, il y a une piste, interessante: savoir quel site sont sur les memes reseau
+            google.com => par21s22-in-x0e.1e100.net
+            obo-world.com => cap33-1_migr-78-199-86-189.fbx.proxad.net
+            youtube.com => par21s20-in-x0e.1e100.net
+        """    
+
+def preloadCacheDns():
+    sites = [
+                    "youtube.com",
+                    "google.com",
+                    "obo-world.com",
+                    "stackoverflow.com",
+                    
+                    "2a00:1450:4007:80a::200a",
+                    "2a00:1450:4007:810::200a",
+                    "2a00:1450:4007:81a::200a",
+                    "2a00:1450:4007:80c::200a",
+                    "2a00:1450:4007:80d::200a",
+                    "2a02:26f0:2b00:12::5f64",
+                    "2a02:26f0:2b00:12::5f64:5545",
+                    "2a01:e34:ec75:6bd0:f8ff:fa45:f8ae:4086",
+                    "2a02:26f0:2b00",
+                    "2620:11a:a01f::1b",
+            ]
+    for s in sites:
+        addToCacheDns(s)
 
 
 def outputAllFields(o,bLimitToInteresting=1):
@@ -226,16 +341,16 @@ def arp_display(pkt):
 
 def toHostname(ip):
     try:
-        return aDns[ip]
+        return aDns[reduceIPV6ToDomainSubPart(ip)]
     except KeyError as err:
-        pass
-    return ip
-    
-def toHostnameV6(ip):
-    try:
-        return aDnsV6[ip]
-    except KeyError as err:
-        pass
+        print("WRN: toHostname: ip '%s' not found, adding to the cache..." % ip)
+        addToCacheDns(ip)
+        printCacheDns()
+        try:
+            return aDns[reduceIPV6ToDomainSubPart(ip)]
+        except KeyError as err:
+            print("WRN: toHostname: ip '%s' is an unknown domain ip (reduced: %s)." % (ip,reduceIPV6ToDomainSubPart(ip)) )
+            aDns[reduceIPV6ToDomainSubPart(ip)] = reduceIPV6ToDomainSubPart(ip) # to gain time next time, we add them to the cache
     return ip
 
 
@@ -359,8 +474,8 @@ def monitor_callback(pkt):
     
     if IPV6 in pkt: 
         print("DBG: IPV6: pkt: %s" % str(pkt))
-        ip_src = toHostnameV6(pkt[IPV6].src)
-        ip_dst = toHostnameV6(pkt[IPV6].dst)
+        ip_src = toHostname(pkt[IPV6].src)
+        ip_dst = toHostname(pkt[IPV6].dst)
         print("DBG: IPv6: %s > %s" % (ip_src,ip_dst))
         
         stats.addSrc(ip_src,len(pkt))
@@ -410,6 +525,11 @@ def startPacketAnalyse():
     """
 
 cacheDns()
+toHostname("fe80::20c4:b6f:84d5:565c")
+toHostname("ff02::1:3")
+toHostname("13.248.212.111")
+printCacheDns()
+#~ exit(1)
 import stater
 stats = stater.Stater(1)
 stats.sendLabels()

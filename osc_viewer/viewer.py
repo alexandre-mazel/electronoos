@@ -234,6 +234,7 @@ class ListViewer:
         self.text_surface = fontTitleViewer.render(self.title, True, self.color)
         self.values  = []
         self.numSort = 2 # wich colum to use for sort
+        self.bSortReverse = True
     
     def setTitle(self, s ):
         self.title = s
@@ -251,14 +252,21 @@ class ListViewer:
         if y<self.y or y>self.y+self.h:
             return False
         offsety = y-self.y
+        nClickOnColumn = -1
         if offsety < self.htitle:
             offsetx = x-self.x
             if offsetx < self.xOffColumn1:
-                self.numSort = 0
+                nClickOnColumn = 0
             elif offsetx < self.xOffColumn2:
-                self.numSort = 1
+                nClickOnColumn = 1
             else:
-                self.numSort = 2                
+                nClickOnColumn = 2  
+        if nClickOnColumn != -1:
+            if nClickOnColumn != self.numSort:
+                self.numSort = nClickOnColumn
+                self.bSortReverse = True
+            else:
+                self.bSortReverse = not self.bSortReverse
             
         
     def render(self, surf):
@@ -283,13 +291,19 @@ class ListViewer:
         pg.draw.line(surf,color,(x2,y),(x2,y2),width=th) 
         surf.blit(self.text_surface, (x+titlemargin,y+titlemargin))
         
-        self.xSort = (self.xOffColumn0 + self.xOffColumn1 ) //2
-        if self.numSort == 1:
-            self.xSort = self.xOffColumn1
-        elif self.numSort == 2:
-            self.xSort = self.xOffColumn2
-            
-        pg.draw.rect(surf,fillcolor,(x+self.xSort+10,y+8,10,10),0)
+        if 1:
+            # render sort sign
+            self.xSort = (self.xOffColumn0 + self.xOffColumn1 ) //2
+            if self.numSort == 1:
+                self.xSort = self.xOffColumn1
+            elif self.numSort == 2:
+                self.xSort = self.xOffColumn2
+                
+            #pg.draw.rect(surf,fillcolor,(x+self.xSort+10,y+8,10,10),0)
+            if self.bSortReverse: dir=6
+            else: dir = -6
+                
+            pg.draw.polygon(surf,fillcolor,( (x+self.xSort+10,y+12),(x+self.xSort+10+10,y+12),(x+self.xSort+10+5,y+12+dir) ),0)
         
         if bVerbose: print("ListViewer.render: title: '%s', value: %s" % (self.title,self.values))
         
@@ -304,7 +318,7 @@ class ListViewer:
             
         if bVerbose: print("DBG: ListViewer: title: %s, values: %s" % (self.title, str(self.values)))
 
-        vSorted = sorted(self.values,key=lambda x:x[self.numSort], reverse=1)
+        vSorted = sorted(self.values,key=lambda x:x[self.numSort], reverse=self.bSortReverse)
         
         for i, v in enumerate(vSorted):
             xv = i

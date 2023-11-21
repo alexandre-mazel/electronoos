@@ -212,7 +212,7 @@ def reduceIPV6ToDomainSubPart(ip):
         # c'est un ip v4
         return ip
     splitted = ip.split(":")
-    return ":".join(splitted[:3])
+    return ":".join(splitted[:4]) # :3, mais en fait avec :4, ca différencie mieux les services
     
 def reduceDomainToMasterDomain(domain):
     """
@@ -221,6 +221,55 @@ def reduceDomainToMasterDomain(domain):
     splitted = domain.split(".")
     return ".".join(splitted[-2:])
 
+"""
+Pourquoi 47.246.146.94 ne se resoud pas en alibaba ?
+
+NetRange:       47.235.0.0 - 47.246.255.255
+CIDR:           47.244.0.0/15, 47.240.0.0/14, 47.235.0.0/16, 47.236.0.0/14, 47.246.0.0/16
+NetName:        AL-3
+NetHandle:      NET-47-235-0-0-1
+Parent:         NET47 (NET-47-0-0-0-0)
+NetType:        Direct Allocation
+OriginAS:
+Organization:   Alibaba Cloud LLC (AL-3)
+RegDate:        2016-04-15
+Updated:        2017-04-26
+Ref:            https://rdap.arin.net/registry/ip/47.235.0.0
+
+47.246.146.94:
+    IP  47.246.146.94
+    IPx  ['47.246.146.94']
+    IPV6  []
+    IPV6Sub  []
+    Host  False
+    Alias  []
+
+
+alibaba.com:
+    IP  47.246.131.55
+    IPx  ['47.246.131.55', '47.246.131.30']
+    IPV6  []
+    IPV6Sub  []
+    Host  False
+    Alias  []
+
+aliexpress.com:
+    IP  47.246.173.30
+    IPx  ['47.246.173.30', '47.246.173.237']
+    IPV6  []
+    IPV6Sub  []
+    Host  False
+    Alias  []
+
+fr.aliexpress.com:
+    IP  47.246.146.94
+    IPx  ['47.246.146.94']
+    IPV6  []
+    IPV6Sub  []
+    Host  False
+    Alias  ['fr.aliexpress.com', 'global.aserver-ae.aliexpress.com', 'global.aserver-ae.aliexpress.com.gds.alibabadns.com', 'eu.aserver-ae.aliexpress.com']
+
+"""
     
 def autoTest():
     sendDataToEngServer("dummy", 1.23)

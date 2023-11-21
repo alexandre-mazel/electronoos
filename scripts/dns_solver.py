@@ -8,76 +8,24 @@ Resolve the DNS/IP address of a given domain or ip
 """
 import socket
 import sys
-
-def getIP(d):
-    """
-    This method returns the first IP address string
-    that responds as the given domain name
-    """
-    try:
-        data = socket.gethostbyname(d)
-        ip = repr(data)
-        return ip
-    except Exception:
-        # fail gracefully!
-        return False
-        
-def getIPx(d):
-    """
-    This method returns an array containing
-    one or more IP address strings that respond
-    as the given domain name
-    """
-    try:
-        data = socket.gethostbyname_ex(d)
-        ipx = repr(data[2])
-        return ipx
-    except Exception:
-        # fail gracefully!
-        return False
-        
-def getIPV6(d):
-    socket.getaddrinfo("example.com", None, socket.AF_INET6)
-        
-def getHost(ip):
-    """
-    This method returns the 'True Host' name for a
-    given IP address
-    """
-    try:
-        data = socket.gethostbyaddr(ip)
-        host = repr(data[0])
-        return host
-    except Exception:
-        # fail gracefully
-        return False
-
-def getAlias(d):
-    """
-    This method returns an array containing
-    a list of aliases for the given domain
-    """
-    try:
-        data = socket.gethostbyname_ex(d)
-        alias = repr(data[1])
-        #print repr(data)
-        return alias
-    except Exception:
-        # fail gracefully
-        return False
-
+sys.path.append("../alex_pytools")
+import nettools
 
 # test it
 
 def getAllPossible(x):
     print("%s:"% x)
-    a = getIP(x)
-    b = getIPx(x)
-    c = getHost(x)
-    d = getAlias(x)
+    a = nettools.getIP(x)
+    b = nettools.getIPx(x)
+    b2 = nettools.getIPV6x(x)
+    b3 = nettools.getIPV6Sub(x)
+    c = nettools.getHost(x)
+    d = nettools.getAlias(x)
 
     print("    IP ", a)
     print("    IPx ", b)
+    print("    IPV6 ", b2)
+    print("    IPV6Sub ", b3)
     print("    Host ", c)
     print("    Alias ", d)    
 

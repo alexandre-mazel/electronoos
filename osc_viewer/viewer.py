@@ -312,6 +312,8 @@ class ListViewer:
             vol = v[2]
             s = "%s" % lib
             yline = i*11
+            if yline>self.h-htitle:
+                break
             if bVerbose: print( "DBG: ListViewer: i: %d, lib: %s" % (i,lib))
             libr = fontScaleViewer.render(s, True, self.color)
             surf.blit(libr, (x+titlemargin+self.xOffColumn0,y+htitle+yline))
@@ -443,7 +445,7 @@ class World:
         except KeyError as err:
             x = (len(self.lviewers)%5)*300
             y = 400-(len(self.lviewers)//5)*100
-            self.lviewers[key] = ListViewer(x=x,y=y,title=key)
+            self.lviewers[key] = ListViewer(x=x,y=y,title=key,h=600)
             self.lviewers[key].update(values)
     
     def update(self):

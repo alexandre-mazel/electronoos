@@ -40,6 +40,7 @@ class Stater:
         self.startNewFrame()
         self.lastSend = time.time()-10000 # time last send in epoch
         self.lastStartFrame = time.time()-10000 # time in epoch
+        self.lastSendLabels = time.time()-10000
         
         self.listTotalHostDst = {} # for each ip, cpt, vol
         self.listTotalHostSrc = {}
@@ -183,6 +184,10 @@ class Stater:
         if time.time()-self.lastStartFrame > self.period:
             self.lastStartFrame = time.time()
             self.startNewFrame()
+            
+        if time.time()-self.lastSendLabels > 60:
+            self.lastSendLabels = time.time()
+            self.sendLabels()
             
     def startUpdateLoopInTheBackground(self):
         def threaded_function(arg):

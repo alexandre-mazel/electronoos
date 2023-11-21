@@ -109,6 +109,7 @@ class ValueViewer:
     
     def setTitle(self, s ):
         self.title = s
+        self.text_surface = fontTitleViewer.render(self.title, True, self.color)
         
     def update(self,rVal):
         self.values.append(rVal)
@@ -312,7 +313,7 @@ class ListViewer:
             vol = v[2]
             s = "%s" % lib
             yline = i*11
-            if yline>self.h-htitle:
+            if yline>=self.h-htitle-10:
                 break
             if bVerbose: print( "DBG: ListViewer: i: %d, lib: %s" % (i,lib))
             libr = fontScaleViewer.render(s, True, self.color)
@@ -420,10 +421,11 @@ class World:
                 self.vviewers[key].update(v)
                 
     def receiveLabels( self, strName, labels):
-        print("DBG: receiveLabels: '%s': %s" % (strName,labels) )
+        #~ print("DBG: receiveLabels: '%s': %s" % (strName,labels) )
         #self.vviewers[0].update(values[0])
         for i,s in enumerate(labels):
             key = strName + "_" + ("%02d"%i)
+            #~ print("DBG: receiveLabels: %s => %s" % (key,s))
             try:
                 self.vviewers[key].setTitle(s)
             except KeyError as err:

@@ -79,7 +79,7 @@ def sendDataToEngServer( dataname, value, timestamp = None ):
         req = "?h=%s&dn=%s&dv=%s" % (hostname,dataname,value)
         if timestamp != None:
             req += "&t=%s" % timestamp
-        fullreq = "http://engrenage.studio/index.py" + req
+        fullreq = "http://engrenage.studio/record_data.py" + req
         print("DBG: sendDataToEngServer: req: " + str(req) )
         requests.get(fullreq)
         print("INF: sendDataToEngServer: done")

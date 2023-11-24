@@ -212,7 +212,7 @@ def reduceIPV6ToDomainSubPart(ip):
         # c'est un ip v4
         return ip
     splitted = ip.split(":")
-    return ":".join(splitted[:4]) # :3, mais en fait avec :4, ca différencie mieux les services
+    return ":".join(splitted[:4]) # :3, mais en fait avec :4, ca differencie mieux les services
     
 def reduceDomainToMasterDomain(domain):
     """

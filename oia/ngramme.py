@@ -62,16 +62,17 @@ un dictionnaire des mots suivants.
 par exemple:
 {
     "le": {"chat": 14, "chien": 12}, 
-    # 14: nombre de fois que le mot "chat" suit le mot "le"
-    # 12: nombre de fois que le mot "chien" suit le mot "le"
+            # 14: nombre de fois que le mot "chat" suit le mot "le"
+            # 12: nombre de fois que le mot "chien" suit le mot "le"
     "la": {"voiture": 13, "chevre": 2},
-    # 13: nombre de fois que le mot "voiture" suit le mot "la"
+            # 13: nombre de fois que le mot "voiture" suit le mot "la"
 }
 
 # ou pour aider a faire des stats:
 {
     "le": (26, {"chat": 14, "chien": 12}),
-    # 26: nombre de fois que le mot le apparait dans le texte
+            # cf ci dessus +
+            # 26: nombre de fois que le mot le apparait dans le texte
     "la": (15, {"voiture": 13, "chevre": 2}),
 }
 
@@ -88,6 +89,9 @@ buf = f.read()
 f.close()
 
 ng = constructNGram(buf)
+print("stat de le:")
+print(ng["le"])
+exit(0)
 generateSentence(ng, "le")
 generateSentence(ng, "La")
 generateSentence(ng, "Ensuite")

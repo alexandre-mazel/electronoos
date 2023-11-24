@@ -74,6 +74,8 @@ blue = (0, 0, 255)
 
 fontTitleViewer = pg.font.SysFont('Arial', 16)
 fontScaleViewer = pg.font.SysFont('Arial', 11)
+fontListViewerBig = pg.font.SysFont('Arial', 15)
+fontListViewerSmall = pg.font.SysFont('Arial', 11)
 
 def smart(n):
     """
@@ -291,6 +293,13 @@ class ListViewer:
         pg.draw.line(surf,color,(x2,y),(x2,y2),width=th) 
         surf.blit(self.text_surface, (x+titlemargin,y+titlemargin))
         
+        if len(self.values) < 20:
+            fontToUse = fontListViewerBig
+            hfont = 17
+        else:
+            fontToUse = fontListViewerSmall
+            hfont = 11
+        
         if 1:
             # render sort sign
             self.xSort = (self.xOffColumn0 + self.xOffColumn1 ) //2
@@ -326,19 +335,19 @@ class ListViewer:
             cpt = v[1]
             vol = v[2]
             s = "%s" % lib
-            yline = i*11
+            yline = i*hfont
             if yline>=self.h-htitle-10:
                 break
             if bVerbose: print( "DBG: ListViewer: i: %d, lib: %s" % (i,lib))
-            libr = fontScaleViewer.render(s, True, self.color)
+            libr = fontToUse.render(s, True, self.color)
             surf.blit(libr, (x+titlemargin+self.xOffColumn0,y+htitle+yline))
             
             s = "%s" % cpt
-            libr = fontScaleViewer.render(s, True, self.color)
+            libr = fontToUse.render(s, True, self.color)
             surf.blit(libr, (x+titlemargin+self.xOffColumn1,y+htitle+yline))
             
             s = smart(vol)
-            libr = fontScaleViewer.render(s, True, self.color)
+            libr = fontToUse.render(s, True, self.color)
             surf.blit(libr, (x+titlemargin+self.xOffColumn2,y+htitle+yline))
 
             

@@ -1668,6 +1668,22 @@ class ExclusiveLock:
         self.acquired = False
         return True
         
+    def isLocked(self):
+        return self.acquired
+        
+    def isLockedBySomeone(self):
+        """
+        someone or me
+        """
+        return os.path.isdir(self.lockname)
+        
+    def isLockedBySomeoneElse(self):
+        """
+        someone but not me
+        """
+        return not self.acquired and self.isLockedBySomeone()
+        
+        
 # class ExclusiveLock - end
 
     

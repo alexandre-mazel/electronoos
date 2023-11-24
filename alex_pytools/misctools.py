@@ -1629,11 +1629,11 @@ class ExclusiveLock:
 
             try:
                 os.mkdir(self.lockname)
-                if bVerbose: print("DBG: Lock.acquire: %s: locking '%s'" % (threading.current_thread().ident,self.lockname))
+                if bVerbose: print("%s: DBG: Lock.acquire: %s: locking '%s'" % ( getTimeStamp(), threading.current_thread().ident,self.lockname))
                 self.acquired = True
                 return True
             except BaseException as err:
-                if bVerbose: print("DBG: Lock.acquire: %s: normal err: %s" % (threading.current_thread().ident,str(err) ) )
+                if bVerbose: print("%s: DBG: Lock.acquire: %s: normal err: %s" % ( getTimeStamp(), threading.current_thread().ident,str(err) ) )
                 pass
                 
             if timeout > 0 and time.time()-timeStart > timeout:
@@ -1641,7 +1641,7 @@ class ExclusiveLock:
                 
             time.sleep(0.05)
             cptLoop += 1
-            if(cptLoop % 100) == 99: print("WRN: Lock.acquire: self.lockname: %s, seems locked for a longtime?" % self.lockname )
+            if(cptLoop % 100) == 99: print("%s: WRN: Lock.acquire: self.lockname: %s, seems locked for a longtime?" % ( getTimeStamp(), self.lockname ) )
             
         return False
         
@@ -1654,19 +1654,35 @@ class ExclusiveLock:
         
         if not self.acquired and not bForceReleaseAny:
             import threading
-            print("ERR: Lock.release: %s: can't release an unacquired lock %s" % (threading.current_thread().ident,self.lockname))
+            print("%s: ERR: Lock.release: %s: can't release an unacquired lock %s" % ( getTimeStamp(), threading.current_thread().ident,self.lockname))
             return False
         if bVerbose:
-            print("INF: Lock.release: %s: removing %s" % (threading.current_thread().ident,self.lockname) ) 
+            print("%s: INF: Lock.release: %s: removing %s" % ( getTimeStamp(), threading.current_thread().ident,self.lockname) ) 
         try:
             os.rmdir(self.lockname)
         except (FileNotFoundError,OSError) as err:
-            print("WRN: Lock.release: %s: while removing %s: the lock is not locked" % (threading.current_thread().ident,self.lockname) ) 
+            print("%s: WRN: Lock.release: %s: while removing %s: the lock is not locked" % ( getTimeStamp(), threading.current_thread().ident,self.lockname) ) 
             if not bForceReleaseAny:
-                print("ERR: Lock.release: Fatal in this case")
+                print("%s: ERR: Lock.release: Fatal in this case" % getTimeStamp())
                 assert(0)
         self.acquired = False
         return True
+        
+    def isLocked(self):
+        return self.acquired
+        
+    def isLockedBySomeone(self):
+        """
+        someone or me
+        """
+        return os.path.isdir(self.lockname)
+        
+    def isLockedBySomeoneElse(self):
+        """
+        someone but not me
+        """
+        return not self.acquired and self.isLockedBySomeone()
+        
         
 # class ExclusiveLock - end
 

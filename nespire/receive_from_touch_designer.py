@@ -1,7 +1,47 @@
+# -*- coding: cp1252 -*-
 import socket
 import threading
 import struct
 import time
+
+def decodeOscValue(strFormat, value, bVerbose = 0 ):
+    #~ print("DBG: type of strFormat: %s" % type(strFormat))
+    #~ print("DBG: type of strFormat[0]: %s" % type(strFormat[0]))
+    #~ print("DBG: len of strFormat: %s" % len(strFormat[0]))
+    if strFormat == 'i':
+        val = struct.unpack(">i", value)[0]
+        #~ print("val: " + str(val))
+        #~ val = val/float(0x7FFFFFFF)
+        #~ val = ord(msg[12]) <<24 + ord(msg[13]) <<16 + ord(msg[14]) <<8 + ord(msg[15]);
+        if bVerbose: print("  int: " + str(val))
+    else:
+        val = struct.unpack(">f", value)[0]
+        if bVerbose: print("float: %.2f" % val)
+    return val
+    
+def charFromCharOrInt(c):
+    """
+    on some platform we receive a list of bytes and on other a list of string
+    => use this method to ensure it's a char
+    NB: we could convert the complete buffer first but it could mess the struct.unpack function
+    """
+    #~ print("DBG: charFromCharOrInt:%s" % c)
+    #~ print("DBG: charFromCharOrInt:type: %s" % type(c))
+    if isinstance(c,str):
+        return c
+    if isinstance(c,bytes) or isinstance(c,int):
+        c = chr(c)
+    return c
+    
+def intFromCharOrInt(n):
+    """
+    => use this method to ensure it's an int
+    """
+    #~ print("DBG: intFromCharOrInt:%s" % n)
+    #~ print("DBG: intFromCharOrInt:type: %s" % type(n))
+    if isinstance(n,str):
+        return ord(n)
+    return n
 
 def dumpHexaArray( anArray, nNbrByte = 1, bSigned = False ):
     """
@@ -33,10 +73,19 @@ def dumpHexa( anArray ):
     i = 0;
     strAsciiLine = "";
     strTxt += "%03d: " % i;
-    while( i < len( anArray ) ):        
-        strTxt += "%02x " % ord( anArray[i] );
-        if( ord( anArray[i] ) >= 32 and ord( anArray[i] ) <= 127 ):
-            strAsciiLine += "%s" % anArray[i];
+    while( i < len( anArray ) ):
+        if isinstance(anArray,str):
+            nOrdChar = ord( anArray[i] )
+            ch = anArray[i]
+        elif isinstance(anArray,bytes):
+            nOrdChar = anArray[i]
+            ch = chr(nOrdChar)
+        else:
+            nOrdChar = anArray[i]
+            ch = chr(nOrdChar)
+        strTxt += "%02x " % nOrdChar;
+        if( nOrdChar >= 32 and nOrdChar <= 127 ):
+            strAsciiLine += "%s" % ch;
         else:
             strAsciiLine += "_";
         i += 1;
@@ -77,10 +126,24 @@ def manageClientRequests( lient ):
         client.close()
     handleClientLeft(client)
     
-def runServer( nPort ):
+def runServer( nPort, bIsOnNao = 0, bVerbose=0 ):
     """
     run an infinite server
     """
+    mem = None
+    if bIsOnNao:
+        while 1:
+            try:
+                print("INF: Connecting to ALMemory...")
+                import naoqi
+                mem = naoqi.ALProxy("ALMemory", "localhost",9559)
+                if mem != None:
+                    print("INF: GOOD: ALMemory is connected")
+                    break
+            except RuntimeError as err:
+                print("INF: BAD: ALMemory not found, waiting...")
+                time.sleep(5)
+            
     socket_server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # DGRAM => UDP
     while True:
         try:
@@ -124,33 +187,100 @@ dumpHexa data len: 4
 
     """
     while not bMustStop:
-        #~ try:
-        if 1:
-            print("receiving...")
+        try:
+        #~ if 1:
+            print("\nreceiving...")
             msg, add = socket_server.recvfrom(nBufferSize)
-            print("ip: %s, msg: %s" % (str(add),str(msg)))
-            print(dumpHexa(msg))
-            print(dumpHexa(msg[12:16]))
-            val = struct.unpack("i", msg[12:16])[0]
-            #~ print("val: " + str(val))
-            #~ val = val/float(0x7FFFFFFF)
-            val = ord(msg[12]) <<24 + ord(msg[13]) <<16 + ord(msg[14]) <<8 + ord(msg[15]);
-            print("val: " + str(val))
-            #~ print("float: %.2f" % val)
+            print("INF: Time: %.3f" % time.time() )
+            if bVerbose: print("ip: %s, msg: %s" % (str(add),str(msg)))
+            if bVerbose: print(dumpHexa(msg))
+            
+            # NB: in TouchDesigner, set the DataFormat to "sample" (instead of timeslice)
+            # when coming from TouchDesigner, the message start with: #bundle
+            # 000: 23 62 75 6e 64 6c 65 00   e8 ed ee 92 f5 17 90 e2     #bundle_________
+            # 016: 00 00 00 10 2f 63 68 61   6e 31 00 00 2c 66 00 00     ____/chan1__,f__
+            # 032: 3e 0a ec e8 __ __ __ __   __ __ __ __ __ __ __ __     >___
+            # so we'll skip all that is before the /
+            i = 0
+            while charFromCharOrInt(msg[i]) != '/':
+                if bVerbose: print("loop search '/': i: %d, msg[i]: 0x%x" % (i,intFromCharOrInt(msg[i])))
+                i += 1
+            
+            nStartMessage = i
+            # the message is finished after 0x0000 00002C (2C is a comma ',')
+            # then 4 bytes with the format: 0x690000 => i => integer
+            # or then 4 bytes with the format: 0x660000 => f => float
+            while intFromCharOrInt(msg[i]) != 0x00:
+                if bVerbose: print("loop search 0: i: %d, msg[i]: 0x%x" % (i,intFromCharOrInt(msg[i])))
+                i +=1
+            strName = ""
+            for j in range(nStartMessage,i):
+                strName += charFromCharOrInt(msg[j])
+            print("INF: strName: '%s'" % strName)
+            #~ i += 4 # from pc it's 4, from the mac, it's 2 so let's find the comma to work on both platform
+            
+            # todo: check strName only printable char and len>2 else skip
+            
+            while charFromCharOrInt(msg[i]) != ',':
+                if bVerbose: print("loop search ',': i: %d, msg[i]: 0x%x" % (i,intFromCharOrInt(msg[i])))
+                i += 1
+            i += 1 # skip the ','
+            
+            strFormat1 = charFromCharOrInt(msg[i])
+            if bVerbose: print("strFormat1: '%s'" % strFormat1)
+            i += 1
+            
+            strFormat2 = ""
+            if intFromCharOrInt(msg[i]) != 0:
+                # a second format is following
+                strFormat2 = charFromCharOrInt(msg[i])
+                if bVerbose: print("strFormat2: '%s'" % strFormat2)
+            i += 1
+            
+            strFormat3 = ""
+            if intFromCharOrInt(msg[i]) != 0:
+                # a third format is following
+                strFormat3 = charFromCharOrInt(msg[i])
+                if bVerbose: print("strFormat3: '%s'" % strFormat3)
+                i += 4 # when we have 3 params, 4 zeros are added
+            i += 1
+            
+            value = msg[i:i+4]
+            if bVerbose: print(dumpHexa(value))
+            
+            v1 = decodeOscValue(strFormat1,value)
+            v2 = None
+            if strFormat2 != "":
+                v2 = decodeOscValue(strFormat2,msg[i+4:i+8])
+            v3 = None
+            if strFormat3 != "":
+                v3 = decodeOscValue(strFormat3,msg[i+8:i+12])
+                
+            print("INF: v1: %s" % v1)
+            print("INF: v2: %s" % v2)
+            print("INF: v3: %s" % v3)
+            
+            if mem:
+                mem.raiseMicroEvent(strName,v1)
             
             #~ client, address = socket_server.accept()
             #~ print( "Versatile: client connect from %s" % str(address) )
             #manageClientRequests(client) # only one at a time !
             #~ threading.Thread( target=manageClientRequests, args=(client,) ).start() # the ',' after 'client' is important else it's not a tuple
             
+        except UnicodeEncodeError as err:
+            print("WRN: UnicodeEncodeError: message error, err: %s" % str(err))
         #~ except socket.error as err:
             #~ print( "ERR: when working with client, received error: %s" % err )
             #~ client.close()
             
         
-        time.sleep(1)
+        # ensure flush all missed or incomplete data
+        
+        time.sleep(0.1)
         # flush all data
         socket_server.setblocking(0)
+        
         while 1:
             try:
                 msg, add = socket_server.recvfrom(nBufferSize)
@@ -162,5 +292,7 @@ dumpHexa data len: 4
     socket_server.close()
     print( "INF: versatile.runServer: stopped." )
         
-runServer(8002)
+# pour tester, lancer : send_one_value_using_osclib.py en paralelle
+
+runServer(8002,bIsOnNao=1,bVerbose=0)
    

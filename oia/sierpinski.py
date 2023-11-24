@@ -17,7 +17,7 @@ def sierpin(im, p1,p2,p3,color=(255,255,255)):
         cv2.circle(im,((p1c[0]*2+p2c[0]+p3c[0])//4,(p1c[1]*2+p2c[1]+p3c[1])//4), abs(p1c[0]-p2c[0])//12, (0,0,0), -1)
         cv2.circle(im,((p1c[0]+p2c[0]*2+p3c[0])//4,(p1c[1]*2+p2c[1]+p3c[1])//4), abs(p1c[0]-p2c[0])//12, (0,0,0), -1)
     
-    if p1[0]%4==0 and 0:
+    if p1[0]%4==0 and 1:
         time.sleep(0.1)
         cv2.imshow("painting", im)
         k = cv2.waitKey(1)
@@ -28,7 +28,6 @@ def sierpin(im, p1,p2,p3,color=(255,255,255)):
         sierpin(im,p1c, p1, p2c,(116,90,118))
         sierpin(im,p1c, p2, p3c,(120,97,163))
         sierpin(im,p2c, p3, p3c,(121,102,195))
-
         
 
 

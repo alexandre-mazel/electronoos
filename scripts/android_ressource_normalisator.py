@@ -14,13 +14,20 @@ def androidRessourceNormalise(strPath):
         absf = strPath + os.sep + f
         if not os.path.isfile(absf):
             continue
+        nNbrTotalFile += 1
+        
         new = f.lower()
         new = new.replace(" ", "_").replace("-","_")
-        nNbrTotalFile += 1
+        
+        absnew = strPath + os.sep + new
         if new != f:
-            absnew = strPath + os.sep + new
             print("INF: androidRessourceNormalise: '%s' => '%s'" % (f,new))
             os.rename(absf,new)
+            nNbrRenammed += 1
+        if ".otf" in new:
+            print("INF: androidRessourceNormalise: transforming '%s' to ttf (you'll need to delete otf manually if succeed)" % new )
+            # pip instal otf2ttf
+            os.system("otf2ttf " + absnew)
             nNbrRenammed += 1
             
     print( "INF: %d file(s) on a %d file(s)" % (nNbrRenammed, nNbrTotalFile))

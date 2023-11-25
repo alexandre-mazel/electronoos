@@ -243,7 +243,7 @@ def isRPI():
         global_bIsRaspberry = False
         return global_bIsRaspberry
     print(buf)
-    global_bIsRaspberry = "Raspberry Pi" in buf
+    global_bIsRaspberry = "Raspberry Pi" in buf or "ARMv7 Processor rev 4 (v7l)" in buf # v4 or v3
     print("DBG: isRPI: %s" %  global_bIsRaspberry )
     return global_bIsRaspberry
 
@@ -822,7 +822,13 @@ def beep(frequency, duration):
     # duration in ms
     if isRPI():
         print("WRN: beep replaced by aplay on RPI")
-        os.system("aplay /home/pi/saw_440_100ms.wav")
+        strDirHome = os.path.expanduser("~")
+        print(strDirHome)
+        if not os.path.isdir(strDirHome):
+            strDirHome = "/home/pi"
+            
+        
+        os.system("aplay %s/saw_440_100ms.wav" % strDirHome) # scp d:/sounds/saw_440_100ms.wav ...
         return
     import winsound
     winsound.Beep(frequency, duration)
@@ -966,7 +972,7 @@ def tic(rSoundVolume=0.10,bWaitEnd = True):
     if playWav(getPathData()+"tic.wav",bWaitEnd=bWaitEnd,rSoundVolume=rSoundVolume):
         return
     beep(1800, 100)
-    time.sleep(110)
+    if bWaitEnd: time.sleep(0.110)
         
 def bell():
     """

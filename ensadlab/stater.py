@@ -9,7 +9,7 @@ import time
 
 class Stater:
     
-    def __init__( self, rRefreshTimeSec = 1, rFrameSec = 30., viewer_ip="127.0.0.1" ):
+    def __init__( self, rRefreshTimeSec = 1, rFrameSec = 1., viewer_ip="127.0.0.1" ):
         self.rRefreshTimeSec = rRefreshTimeSec # time to send infos
         self.period = rFrameSec # time of a frame
         self.viewer_ip = viewer_ip

@@ -2,6 +2,7 @@ from pythonosc.osc_server import AsyncIOOSCUDPServer
 from pythonosc.dispatcher import Dispatcher
 import asyncio
 
+import os
 def runLoopOscHandler(world, ip = "127.0.0.1", port = 8002):
     
     def filter_handler(address, *args):
@@ -374,6 +375,7 @@ class World:
             w = 640
             h = 480
         self.screen = pg.display.set_mode((w,h))
+        os.environ['SDL_VIDEO_WINDOW_POS'] = '%i,%i' % (100,100)
         self.clock = pg.time.Clock()
         self.fps = 60  # Frames per second.
         

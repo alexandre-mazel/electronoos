@@ -74,7 +74,8 @@ def associateRects(listRect1,listRect2, bReduceToSize4):
     return -1 if it seems like a new rect
     bReduceToSize4: reduce all rects to remove extra information (extra info could be useful for matching)
     """
-    print("DBG: associateRects: %s, %s" % (str(listRect1),str(listRect2) ) )
+    bVerbose=0
+    if bVerbose: print("DBG: associateRects: %s, %s" % (str(listRect1),str(listRect2) ) )
     if len(listRect2) < 1:
         return []
         
@@ -98,15 +99,15 @@ def associateRects(listRect1,listRect2, bReduceToSize4):
     
     #if len(listRect1)>=len(listRect2)
     if len(set(r))==len(r): # on peut avoir des doublons meme si les listes avait la meme longueur
-        print("INF: associateRects: %s" % r)
+        if bVerbose: print("INF: associateRects: %s" % r)
     else:
-        print("INF: associateRects: before kill: %s" % r)
+        if bVerbose: print("INF: associateRects: before kill: %s" % r)
         # two or more are pointing the same or sames
         simiTable = [0]*len(listRect2)
         for i in range(len(listRect2)):
             c = similarity(listRect2[i],listRect1[r[i]])
             simiTable[i] = c
-        print("DBG: associateRects: costTable: %s" % simiTable )
+        if bVerbose: print("DBG: associateRects: costTable: %s" % simiTable )
         j = 0
         while j < len(r):
             # find other pointer to r[j]
@@ -122,7 +123,7 @@ def associateRects(listRect1,listRect2, bReduceToSize4):
                                 break
                     i += 1
             j += 1
-        print("INF: associateRects: %s" % r)
+        if bVerbose: print("INF: associateRects: %s" % r)
 
     return r.tolist()
     

@@ -1,5 +1,6 @@
 import sys
 sys.path.insert(0,"../alex_pytools")
+import os
 import nettools
     
 import json
@@ -10,7 +11,8 @@ import json
 class ReverseDnsCache:
     def __init__(self):
         self.dictRDNS = {} # ip => set(name1,name2,...)
-        self.strSaveFilename = "rdns.json"
+        strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
+        self.strSaveFilename = strLocalPath + '/' + "rdns.json"
         
     def isInCache(self,strIP):
         return strIP in self.dictRDNS
@@ -115,18 +117,35 @@ def generateCacheReverseDns(filename):
                 reverseDnsCache.addSite(ip,site)
             
         nNbrProcessed += 1
-        
+
+        if n > 20:
+            break
+            
         #~ if nNbrProcessed > 20:
             #~ break
             
         if (nNbrProcessed % 50) == 0:
             reverseDnsCache.save()
             
+    hardTable = [
+        ["20.44.229.112","microsoft(windows).com"],
+        ["170.114.15.95","zoom(daemon).us"]
+    ]
+    for ip,site in hardTable:
+        reverseDnsCache.addSite(ip,site)
+        
+            
     reverseDnsCache.save()
     
-    
+
+def getIP(strName):
+    return reverseDnsCache.getIP(strName)
+
 def getName(strIP,bVerbose=0):
     return reverseDnsCache.getName(strIP,bVerbose)
+    
+def getNames(strIP,bVerbose=0):
+    return reverseDnsCache.getNames(strIP,bVerbose)
     
 
 
@@ -144,5 +163,5 @@ def autotest():
         print("DNS: %s: %s" % (site,reverseDnsCache.getIP(site)))
         
 if __name__ == "__main__":
-    #~ createRDNS_DB()
+    createRDNS_DB()
     autotest()

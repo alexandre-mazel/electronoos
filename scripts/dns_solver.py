@@ -10,6 +10,11 @@ import sys
 sys.path.append("../alex_pytools")
 import nettools
 
+sys.path.append("../reverse_dns")
+try: import reversedns
+except: pass
+
+
 # test it
 
 def getAllPossible(x):
@@ -20,13 +25,26 @@ def getAllPossible(x):
     b3 = nettools.getIPV6Sub(x)
     c = nettools.getHost(x)
     d = nettools.getAlias(x)
+    try:
+        import reversedns
+        e = reversedns.getIP(x)
+        f = reversedns.getNames(x)
+        g = reversedns.getNames(e)
+    except BaseException as err:
+        print("DBG: getAllPossible: err (1): %s" % str(err))
+        e = False
+        f = False
 
     print("    IP ", a)
     print("    IPx ", b)
     print("    IPV6 ", b2)
     print("    IPV6Sub ", b3)
     print("    Host ", c)
-    print("    Alias ", d)    
+    print("    Alias ", d)
+    
+    print("    rdns.getIP ", e)
+    print("    rdns.getNames ", f)
+    print("    rdns.getNames(ip) ", g)
 
 def autotest():
 

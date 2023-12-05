@@ -1,9 +1,7 @@
 import sys
-sys.path.append("../alex_pytools")
-import csv_loader
+sys.path.insert(0,"../alex_pytools")
 import nettools
-import misctools
-
+    
 import json
 
 # en fait, impossible de trouver une base de donnees ou service ip => name (car ca permettrait de faire un mega spammer)
@@ -59,6 +57,7 @@ class ReverseDnsCache:
         
     def save( self ):
         print("DBG: ReverseDnsCache.save: saving %d record(s) to '%s'" % (len(self.dictRDNS),str(self.strSaveFilename)))
+        import misctools
         misctools.backupFile(self.strSaveFilename)
         f = open(self.strSaveFilename,"wt")
         # can't save dict of set, so converting before saving
@@ -71,7 +70,7 @@ class ReverseDnsCache:
     def load(self):
         try:
             f = open(self.strSaveFilename,"rt")
-        except misctools.FileNotFoundError:
+        except FileNotFoundError:
             print("WRN: ReverseDnsCache.load: file not found: '%s'" % self.strSaveFilename)
             return 0
         try:
@@ -92,6 +91,8 @@ reverseDnsCache.load()
         
 
 def generateCacheReverseDns(filename):
+    import csv_loader
+
     datas = csv_loader.load_csv(filename,sepa=',')
     bSkipAlreadyIn = True
     nNbrProcessed = 0
@@ -123,9 +124,13 @@ def generateCacheReverseDns(filename):
             
     reverseDnsCache.save()
     
+    
+def getName(strIP,bVerbose=0):
+    return reverseDnsCache.getName(strIP,bVerbose)
+    
+
 
 def createRDNS_DB():
-    
     filename = "websites_1000.csv"
     generateCacheReverseDns(filename)
     

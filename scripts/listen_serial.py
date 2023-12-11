@@ -9,6 +9,7 @@ def listPorts():
     Return the first found
     """
     bVerbose = 1
+    
     # chose an implementation, depending on os
     #~ if sys.platform == 'cli':
     #~ else:
@@ -25,7 +26,8 @@ def listPorts():
     iterator = sorted(comports())
     # list them
     for n, (port, desc, hwid) in enumerate(iterator, 1):
-        if strFirstOpenPort == "": strFirstOpenPort = port
+        if strFirstOpenPort == "": 
+            strFirstOpenPort = port
         sys.stdout.write("listPorts: open port: {:20}\n".format(port))
         if bVerbose:
             sys.stdout.write("    desc: {}\n".format(desc))
@@ -34,8 +36,19 @@ def listPorts():
     return strFirstOpenPort
         
         
-def monitorPort(strPortName):
+def monitorPort(strPortName, nBaudRate=9600):
     ser = serial.Serial(strPortName)
+    """
+    strPortName,
+        baudrate=9600, 
+    timeout=1,
+    parity=serial.PARITY_NONE,
+    stopbits=serial.STOPBITS_ONE,
+    bytesize=serial.EIGHTBITS
+    """
+    if nBaudRate != 9600: # default
+        ser.baudrate = nBaudRate
+    
     try:
         print("INF: %s is open: %s" % (ser.name,ser.is_open) )
         #~ for i in range(100):
@@ -51,14 +64,21 @@ def monitorPort(strPortName):
             #~ buf = buf.decode(encoding='utf-8', errors='strict')
             if buf != prevPrint:
                 prevPrint = buf
-                print(buf)
+                print("buf: " + buf)
     except BaseException as err: # including KeyboardInterrupt
-        print("ERR: monitorPort: %s" % err )
+        print("ERR: monitorPort: %s" % str(err) )
         pass
     ser.close()
 
 #~ listPorts()
 strPortName = '/dev/ttyUSB0'
 strPortName = 'COM7'
-strPortName = listPorts()
-monitorPort(strPortName)
+strPortName = 'COM6'
+nBaudRate = 9600
+nBaudRate = 57600
+nBaudRate = 115200
+strPortNameAutodetect = listPorts()
+if 0:
+    print("using autodetected port: %s" % strPortNameAutodetect )
+    strPortName = strPortNameAutodetect
+monitorPort(strPortName,nBaudRate)

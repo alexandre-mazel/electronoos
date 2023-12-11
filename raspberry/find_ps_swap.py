@@ -1,26 +1,43 @@
 import os
 
-def findInfoInFile(filename,word):
+def findInfoInFile(filename,word, listExcludeString = []):
     """
     output all line containing word
     """
-    s = ""
+    word = word.lower()
+    out = ""
     f = open(filename,"r")
     while 1:
         line = f.readline()
+        if len(line)<1:
+            break
         if word in line.lower():
-            s += line
-    return s
+            #~ print("hit on word: '%s'" % word)
+            if len(listExcludeString)>0:
+                for ex in listExcludeString:
+                    if ex.lower() in line.lower():
+                        #~ print("hit ex")
+                        break
+                else:
+                    # ex not found
+                    out += line
+            else:
+                # nothing in listExclude
+                out += line
+    f.close()
+    return out
             
 
 def findProcessWithSwap():
     strPath = "/proc/"
     aFiles = sorted(os.listdir(strPath))
     for f in aFiles:
-        if not isdigit(f):
+        if not f.isdigit():
             continue
-        s = findInfoInFile(strPath+f,"swap")
-        print("%s: %s" % f, s)
-        
+        filename = strPath+f + "/status"
+        s = findInfoInFile(filename,"swap",["0 kB","Name"])
+        if len(s)>0:
+            name = findInfoInFile(filename,"Name").replace("\n","").replace("\t" ,"").replace( "  ", " ")
+            print("%s: %s: %s" % (f, name, s), end="" ) # a lancer en python3
         
 findProcessWithSwap()

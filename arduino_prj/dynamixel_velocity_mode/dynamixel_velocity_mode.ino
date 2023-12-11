@@ -43,8 +43,8 @@ void setup() {
   DEBUG_SERIAL.begin(115200);
   
   // Set Port baudrate to 57600bps. This has to match with DYNAMIXEL baudrate.
-  //dxl.begin(57600);
-  dxl.begin(1000000); // I use 1 Mbps for my XL430s
+  dxl.begin(57600);
+  //dxl.begin(1000000); // I use 1 Mbps for my XL430s
   
 
   // Set Port Protocol Version. This has to match with DYNAMIXEL protocol version.
@@ -68,10 +68,13 @@ void setup() {
   DEBUG_SERIAL.print("ping: ");
   DEBUG_SERIAL.println(ret);
 
-    // Get DYNAMIXEL information
   ret = dxl.scan();
   DEBUG_SERIAL.print("scan: ");
   DEBUG_SERIAL.println(ret);
+
+
+  DEBUG_SERIAL.print("model number: ");
+  DEBUG_SERIAL.println(dxl.getModelNumber(DXL_ID));
 
 
   // Turn off torque when configuring items in EEPROM area

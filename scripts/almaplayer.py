@@ -27,6 +27,16 @@ def playSongInterruptible(strFilename):
         #~ pg.time.Clock().tick(1) #too long => block to 1fps
         #~ time.sleep(0.1)
         pg.time.Clock().tick(100) 
+        
+        # spectrum analysis
+        if 0:
+            import numpy as np
+            raw_data = pg.mixer.music.get_raw()
+            audio_array = np.frombuffer(raw_data, dtype=np.int16)
+            max = np.max(audio_array)
+            print(max)
+            #~ spectrum = np.fft.fft(audio_array)
+            
         if msvcrt.kbhit():
             pressedKey = msvcrt.getch()
             print("pressedKey: %s" % (pressedKey))
@@ -58,6 +68,10 @@ def playSongInterruptible(strFilename):
                         print("vol down")
                         pg.mixer.music.set_volume(pg.mixer.music.get_volume()-0.1)
                         print("new vol: %s" % pg.mixer.music.get_volume())
+                    if key == 'M':
+                        print("advance")
+                        #pg.mixer.music.set_pos(pg.mixer.music.get_pos()+3000) # force skip ?
+                        print("new pos: %s" % pg.mixer.music.get_pos())
                 except BaseException as err:
                     print("ERR: playSongInterruptible: catched %s" % err )
     return 0

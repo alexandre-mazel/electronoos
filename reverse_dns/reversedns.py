@@ -90,36 +90,48 @@ class ReverseDnsCache:
 
 reverseDnsCache = ReverseDnsCache()
 reverseDnsCache.load()
+
+def _addSiteToReverseDns(site):
+    print("\n"+site)
+    ips = nettools.getIPx(site)
+    print(ips)
+    ipv6s = nettools.getIPV6x(site)
+    print(ipv6s)
+    ipv6sub = nettools.getIPV6Sub(site)
+    print(ipv6sub)
+        
+    if ips != False:
+        for ip in ips:
+            reverseDnsCache.addSite(ip,site)
+
+    if ipv6s != False:
+        for ip in ipv6s:
+            reverseDnsCache.addSite(ip,site)
+        
+    if ipv6sub != False:
+        for ip in ipv6sub:
+            reverseDnsCache.addSite(ip,site)
         
 
-def generateCacheReverseDns(filename):
+def generateCacheReverseDns(filename,bForceRecompute=False):
     import csv_loader
 
     datas = csv_loader.load_csv(filename,sepa=',')
-    bSkipAlreadyIn = True
+    bSkipAlreadyIn = not bForceRecompute
     nNbrProcessed = 0
     for record in datas:
+        print("n: %d" % n)
         n,site,rank = record
         if bSkipAlreadyIn:
             if reverseDnsCache.isKnownSite(site):
                 continue
         #site = "signal.org"
-        print("\n"+site)
-        ips = nettools.getIPx(site)
-        print(ips)
-        ipv6s = nettools.getIPV6x(site)
-        print(ipv6s)
-        ipv6sub = nettools.getIPV6Sub(site)
-        print(ipv6sub)
-            
-        if ips != False:
-            for ip in ips:
-                reverseDnsCache.addSite(ip,site)
-            
+        _addSiteToReverseDns(site)
+
         nNbrProcessed += 1
 
-        if n > 20:
-            break
+        #~ if n > 20:
+            #~ break
             
         #~ if nNbrProcessed > 20:
             #~ break
@@ -149,19 +161,20 @@ def getNames(strIP,bVerbose=0):
     
 
 
-def createRDNS_DB():
+def createRDNS_DB(bForceRecompute=False):
     filename = "websites_1000.csv"
-    generateCacheReverseDns(filename)
+    generateCacheReverseDns(filename,bForceRecompute=bForceRecompute)
     
 def autotest():
     # some test:
-    for ip in ["127.0.0.1","13.107.42.14","142.250.179.78","216.58.214.170","162.159.128.61"]:
-        print("RDNS: %s: %s" % (ip,reverseDnsCache.getNames(ip)))
-        print("RDNS: %s: %s" % (ip,reverseDnsCache.getName(ip)))
+    for ip in ["127.0.0.1","13.107.42.14","142.250.179.78","216.58.214.170","162.159.128.61","2a00:1450:4007:80c"]:
+        print("RDNS: %s: %s %s" % (ip,reverseDnsCache.getName(ip),reverseDnsCache.getNames(ip)))
         
     for site in ["vimeo.com"]:
         print("DNS: %s: %s" % (site,reverseDnsCache.getIP(site)))
         
 if __name__ == "__main__":
-    createRDNS_DB()
+    #~ createRDNS_DB()
+    createRDNS_DB(bForceRecompute=True)
+    #_addSiteToReverseDns("google.com")
     autotest()

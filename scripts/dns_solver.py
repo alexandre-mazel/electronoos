@@ -25,11 +25,21 @@ def getAllPossible(x):
     b3 = nettools.getIPV6Sub(x)
     c = nettools.getHost(x)
     d = nettools.getAlias(x)
+    
+    
+
     try:
         import reversedns
         e = reversedns.getIP(x)
+        if e != False:
+            ip_to_use = e
         f = reversedns.getNames(x)
-        g = reversedns.getNames(e)
+        if a != False:
+            g1 = reversedns.getName(a)
+            h1 = reversedns.getNames(a)
+        if e != "":
+            g2 = reversedns.getName(e)
+            h2 = reversedns.getNames(e)
     except BaseException as err:
         print("DBG: getAllPossible: err (1): %s" % str(err))
         e = False
@@ -44,7 +54,12 @@ def getAllPossible(x):
     
     print("    rdns.getIP ", e)
     print("    rdns.getNames ", f)
-    print("    rdns.getNames(ip) ", g)
+    if a != False:
+        print("    rdns.getName(%s): %s" %(a,g1) )
+        print("    rdns.getNames(%s): %s" %(a,h1) )
+    if e != "":
+        print("    rdns.getName(%s): %s" %(e,g2) )
+        print("    rdns.getNames(%s): %s" %(e,h2) )
 
 def autotest():
 

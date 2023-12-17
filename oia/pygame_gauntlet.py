@@ -1,3 +1,5 @@
+# -*- coding: cp1252 -*-
+
 import math
 import pygame as pg
 import random
@@ -363,7 +365,7 @@ class Game:
         self.players = []
         self.players.append(Player(x=self.ws-200,angle=math.pi))
         self.players.append(Player(color=greenl))
-        #~ self.players.append(Player(x=self.ws/2,y=600, angle=-math.pi/2,color=yellow))
+        self.players.append(Player(x=self.ws/2,y=600, angle=-math.pi/2,color=yellow))
         self.nNumPlayerRemaining = len(self.players)
         
         self.bEndOfGame = 0

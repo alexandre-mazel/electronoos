@@ -65,6 +65,7 @@ def load_csv_multiline(filename, sepa = ';', bSkipFirstLine = 0, encoding =  'ut
     
 def load_csv(filename, sepa = ';', bSkipFirstLine = 0, encoding =  'utf-8', bVerbose=0 ):
 
+    timeBegin = time.time()
     data = []
     try:
         file = openWithEncoding(filename, "rt", encoding = encoding)
@@ -153,6 +154,7 @@ def load_csv(filename, sepa = ';', bSkipFirstLine = 0, encoding =  'utf-8', bVer
         else:
             nNumLine += 1
             
+    print("INF: load_csv: file '%s' loaded in 5.2%fs" % (filename,time.time()-timeBegin))
     return data
 # load_csv - end
 

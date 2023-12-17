@@ -115,13 +115,15 @@ def _addSiteToReverseDns(site):
 
 def generateCacheReverseDns(filename,bForceRecompute=False):
     import csv_loader
+    
+    print("INF: generateCacheReverseDns: %s,%s" % (filename,bForceRecompute))
 
     datas = csv_loader.load_csv(filename,sepa=',')
     bSkipAlreadyIn = not bForceRecompute
     nNbrProcessed = 0
     for record in datas:
-        print("n: %d" % n)
-        n,site,rank = record
+        n,site = record[:2]
+        print("n: %d, nNbrProcessed: %d" % (n,nNbrProcessed))
         if bSkipAlreadyIn:
             if reverseDnsCache.isKnownSite(site):
                 continue
@@ -162,12 +164,16 @@ def getNames(strIP,bVerbose=0):
 
 
 def createRDNS_DB(bForceRecompute=False):
-    filename = "websites_1000.csv"
-    generateCacheReverseDns(filename,bForceRecompute=bForceRecompute)
+    #filename = "websites_1000.csv"
+    filename = "top-1m.csv"
+    #~ generateCacheReverseDns(filename,bForceRecompute=bForceRecompute)
+    for s in ["obo-world.com","engrenage.studio","presence.obo-world.com"]:
+        _addSiteToReverseDns(s)
+    reverseDnsCache.save()
     
 def autotest():
     # some test:
-    for ip in ["127.0.0.1","13.107.42.14","142.250.179.78","216.58.214.170","162.159.128.61","2a00:1450:4007:80c"]:
+    for ip in ["127.0.0.1","13.107.42.14","142.250.179.78","216.58.214.170","162.159.128.61","2a00:1450:4007:80c","72.21.206.80"]:
         print("RDNS: %s: %s %s" % (ip,reverseDnsCache.getName(ip),reverseDnsCache.getNames(ip)))
         
     for site in ["vimeo.com"]:
@@ -175,6 +181,7 @@ def autotest():
         
 if __name__ == "__main__":
     #~ createRDNS_DB()
-    createRDNS_DB(bForceRecompute=True)
+    #~ createRDNS_DB(bForceRecompute=True)
+    createRDNS_DB(bForceRecompute=False)
     #_addSiteToReverseDns("google.com")
     autotest()

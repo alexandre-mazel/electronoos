@@ -30,20 +30,21 @@ void loop() {
   // (note: line 1 is the second row, since counting begins with 0):
   lcd.setCursor(0, 1);// set the cursor to column 0, line 1
   // print the number of seconds since reset:
-  lcd.print("Counter: ");~
+  lcd.print("Counter: ");
   int counter = millis() / 1000;
   lcd.print(counter);
   lcd.print("/");
-  int val = analogRead(A3)
+  int val = analogRead(A3);
   lcd.print(val); // ajoute une valeur juste pour voir
   int flipflop = (millis()/1000)%10;
   int bLight = flipflop>4;
 
+/*
   Serial.print("##");
   Serial.print(counter);
   Serial.print("/");
   Serial.print(val);
-  
+*/
   
   // every x00ms
   if(millis()-timeLastScroll>700)

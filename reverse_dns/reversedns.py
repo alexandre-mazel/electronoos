@@ -166,14 +166,14 @@ def getNames(strIP,bVerbose=0):
 def createRDNS_DB(bForceRecompute=False):
     #filename = "websites_1000.csv"
     filename = "top-1m.csv"
-    #~ generateCacheReverseDns(filename,bForceRecompute=bForceRecompute)
+    generateCacheReverseDns(filename,bForceRecompute=bForceRecompute)
     for s in ["obo-world.com","engrenage.studio","presence.obo-world.com"]:
         _addSiteToReverseDns(s)
     reverseDnsCache.save()
     
 def autotest():
     # some test:
-    for ip in ["127.0.0.1","13.107.42.14","142.250.179.78","216.58.214.170","162.159.128.61","2a00:1450:4007:80c","72.21.206.80"]:
+    for ip in ["127.0.0.1","13.107.42.14","142.250.179.78","216.58.214.170","162.159.128.61","2a00:1450:4007:80c","72.21.206.80","78.199.86.189","92.132.247.102",""]:
         print("RDNS: %s: %s %s" % (ip,reverseDnsCache.getName(ip),reverseDnsCache.getNames(ip)))
         
     for site in ["vimeo.com"]:

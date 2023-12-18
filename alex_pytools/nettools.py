@@ -149,7 +149,7 @@ def getIPx(d):
         data = socket.gethostbyname_ex(d)
         ipx = data[2]
         return ipx
-    except socket.gaierror as err:
+    except (socket.gaierror,socket.herror) as err:
         pass
     return False
     

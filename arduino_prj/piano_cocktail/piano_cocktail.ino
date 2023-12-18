@@ -48,6 +48,11 @@ So, get_units() returns (read_average(1) - OFFSET) / SCALE;
 
 const int VANNE_1_PIN = 7;
 
+#include <LiquidCrystal_I2C.h>
+
+// initialize the library with the numbers of the interface pins
+LiquidCrystal_I2C lcd(0x3F, 16, 2);
+
 void setup() {
   
   Serial.begin(9600);
@@ -55,8 +60,13 @@ void setup() {
 
   pinMode(VANNE_1_PIN, OUTPUT);
   digitalWrite(VANNE_1_PIN, HIGH); // high don't send voltage !?!
+  
+  lcd.init();                // initialize the lcd
+  lcd.backlight();           // Turn on backlight // sans eclairage on voit rien...
+  lcd.setCursor(0, 0);
+  lcd.print("taring...");
 
-
+  
   scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
   while(!scale.is_ready())
   {
@@ -72,6 +82,7 @@ void setup() {
   Serial.print("Zero factor: ");
   Serial.println(zero_factor);
   delay(500);
+  lcd.clear();
 }
 
 float last_measured = 0;
@@ -89,15 +100,18 @@ void verse_quantite(float rGrammes)
   digitalWrite(VANNE_1_PIN, LOW);
 }
 
-void check_if_must_stop_verse()
+int check_if_must_stop_verse()
 {
+  // return 0 if not versing, 1 if versing, 2 if done
   if(target_verse<-1000)
   {
-    return;
+    return 0;
   }
   float diff = target_verse-last_measured;
   Serial.print("INF: check_if_must_stop_verse: diff: ");
   Serial.println(diff);
+  lcd.print(" => ");
+  lcd.print(diff);
   if(diff<1+4) // couramment on prend 5 apres coupure
   {
     digitalWrite(VANNE_1_PIN, HIGH);
@@ -113,7 +127,9 @@ void check_if_must_stop_verse()
     Serial.print("INF: check_if_must_stop_verse: finished, target was ");
     Serial.println(target_verse);
     target_verse = -1001;
+    return 2;
   }
+  return 1;
 }
 
 void force_stop_verse()
@@ -121,6 +137,52 @@ void force_stop_verse()
   Serial.println("INF: force stop verse");
   digitalWrite(VANNE_1_PIN, HIGH);
   target_verse = -1001;
+}
+
+#define LEN_COMMAND_MAX 32
+char lastCommand[LEN_COMMAND_MAX+1] = "\0";
+
+int handleSerialCommand()
+{
+  // receive command using the form ##cmd
+  // return 1 if a new command has been received
+  char command[LEN_COMMAND_MAX];
+  int ichar = 0;
+  while( Serial.available() && ichar < LEN_COMMAND_MAX )
+  {
+    command[ichar] = Serial.read();
+    if(command[ichar] != '\n')
+    {
+      Serial.print("DBG: handleSerialCommand: received: ");
+      Serial.print( command[ichar] );
+      Serial.print( ", 0x" );
+      Serial.println( command[ichar], HEX );
+      ++ichar;
+    }
+  }
+  if(command[0] != '#')
+  {
+    return 0;
+  }
+  if(strncmp(command,lastCommand,ichar))
+  {
+    // new command
+    strncpy(lastCommand,command,ichar);
+    lastCommand[ichar] = '\0';
+    Serial.print("DBG: handleSerialCommand: new command received: ");
+    Serial.println( lastCommand );
+    return 1;
+  }
+
+  return 0;
+}
+
+void sendSerialCommand()
+{
+  Serial.print("##coucou/1/2/3/");
+  //char buf[32];
+  //snprintf
+  Serial.println(millis());
 }
 
 void loop() {
@@ -153,13 +215,25 @@ void loop() {
     }
     float reading = scale.get_units(2); // chaque mesure en plus, c'est prend 88ms
     last_measured = reading;
-    Serial.print(millis());
-    Serial.print(", weight: ");
-    Serial.print(reading);
-    Serial.print(" => ");
-    Serial.print(int(round(reading)));
-    Serial.println(" g");
-    check_if_must_stop_verse();
+    if(1)
+    {
+      Serial.print(millis());
+      Serial.print(", weight: ");
+      Serial.print(reading);
+      Serial.print(" => ");
+      Serial.print(int(round(reading)));
+      Serial.println(" g");
+    }
+
+    lcd.home();
+    lcd.print(int(round(reading)));
+    lcd.print(" g");
+
+    if(check_if_must_stop_verse()==2)
+    {
+      sendSerialCommand();
+    }
+
     if(0)
     {
       long raw = scale.read_average();
@@ -172,6 +246,8 @@ void loop() {
       if(Serial.available())
       {
         char input = Serial.read();
+        Serial.print("simple letter received: ");
+        Serial.println(input);
         if(input == 'a'){ calibration_factor += 100; }
         else if(input == 'z'){  calibration_factor -= 100; }
         else if(input == 's'){  calibration_factor += 10; }
@@ -187,6 +263,11 @@ void loop() {
         else if(input == '4'){  verse_quantite(100); }
         else if(input == '5'){  verse_quantite(200); }
         else if(input == 'f'){  force_stop_verse();	 } // force stop verse
+        if(handleSerialCommand())
+        {
+          lcd.setCursor(0, 1);
+          lcd.print(lastCommand);
+        }
       }
     }
   }

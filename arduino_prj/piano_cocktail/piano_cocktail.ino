@@ -232,6 +232,7 @@ void loop() {
     if(check_if_must_stop_verse()==2)
     {
       sendSerialCommand();
+      lcd.clear();
     }
 
     if(0)
@@ -262,6 +263,7 @@ void loop() {
         else if(input == '3'){  verse_quantite(50);	 }
         else if(input == '4'){  verse_quantite(100); }
         else if(input == '5'){  verse_quantite(200); }
+        else if(input == 'd'){  sendSerialCommand(); } // debug
         else if(input == 'f'){  force_stop_verse();	 } // force stop verse
         if(handleSerialCommand())
         {

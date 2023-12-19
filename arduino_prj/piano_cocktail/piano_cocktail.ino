@@ -210,8 +210,13 @@ int nNbrQueueOrder = 0; // nbr data in queue order (nbr of data pair)
 // return 0 on error
 int handleOrder( const char * command)
 {
+  Serial.print( "INF: handleOrder: Receiving: " );
+  Serial.println( command );
+
   if(command[1]=='A' && command[2]=='s')
   {
+    Serial.println("INF: handleOrder: Assemble." );
+    // Assemble
     int args[5];
     int nNbrArgs = retrieveIntArguments(command,args,5);
     if(1)
@@ -241,8 +246,22 @@ int handleOrder( const char * command)
       queueOrder[nNbrQueueOrder*2+1] = args[i];
       ++nNbrQueueOrder;
     }
-
+  } // assemble
+  else if(command[1]=='O' && command[2]=='n')
+  {
+    verse_quantite(750,command[4]-'0');
   }
+  else if(command[1]=='O' && command[2]=='f')
+  {
+    force_stop_verse();
+  }
+  else if(command[1]=='S' && command[2]=='T')
+  {
+    // STOP
+    Serial.println("INF: handleOrder: STOP !" );
+    nNbrQueueOrder = 0;
+    force_stop_verse();
+  } // STOP
 
   return 1;
 }
@@ -264,19 +283,40 @@ int handleSerialCommand()
       Serial.println( command[ichar], HEX );
       ++ichar;
     }
+    command[ichar]='\0';
   }
   if(command[0] != '#')
   {
     return 0;
   }
-  if(strncmp(command,lastCommand,ichar))
+  //if(strncmp(command,lastCommand,ichar)) // ce test ne sert a rien! on ne recoit jamais une commande en double par erreur
+  if(1)
   {
     // new command
-    strncpy(lastCommand,command,ichar);
-    lastCommand[ichar] = '\0';
-    Serial.print("DBG: handleSerialCommand: new command received: ");
-    Serial.println( lastCommand );
+    // attention, certain cas, on recoit 2 commandes a la suite, par exemple #on##off
+    // test me in the serial monitor message line, by typing ##On_1##Off_1
+    const char * p = command;
+    char * d = lastCommand;
+    while(*p)
+    {
+      *d=*p;
+      ++d;
+      ++p;
+      if(*p=='#') // we test here because we don't want to test on the first char
+        break;
+    }
+    
+    *d = '\0';
+    //Serial.print("DBG: handleSerialCommand: new command received: ");
+    //Serial.println( lastCommand );
     handleOrder(lastCommand);
+    if(*p=='#')
+    {
+      // a second command is here
+      ++p;
+      strcpy(lastCommand,p);
+      handleOrder(lastCommand);
+    }
     return 1;
   }
 

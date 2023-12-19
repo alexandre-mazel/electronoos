@@ -207,6 +207,7 @@ int queueOrder[LEN_QUEUE_ORDER*2]; // a list of [numcuve,ml,numcuve,ml,...]
 int nNbrQueueOrder = 0; // nbr data in queue order (nbr of data pair)
 
 // receive order format #string
+// return 0 on error
 int handleOrder( const char * command)
 {
   if(command[1]=='A' && command[2]=='s')
@@ -228,6 +229,11 @@ int handleOrder( const char * command)
     }
 
     // add to queue
+    if( nNbrQueueOrder > 0 )
+    {
+      Serial.println("ERR: handleOrder: queue not cleared!" );
+      return 0;
+    }
     ASSERT(nNbrArgs<=LEN_QUEUE_ORDER)
     for( int i=nNbrArgs-1; i >= 0; --i )
     {
@@ -237,6 +243,8 @@ int handleOrder( const char * command)
     }
 
   }
+
+  return 1;
 }
 
 int handleSerialCommand()
@@ -376,6 +384,7 @@ void loop() {
         }
         if(handleSerialCommand())
         {
+          lcd.clear();
           lcd.setCursor(0, 1);
           lcd.print(lastCommand);
         }

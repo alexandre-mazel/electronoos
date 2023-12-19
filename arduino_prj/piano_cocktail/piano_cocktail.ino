@@ -277,14 +277,17 @@ int handleSerialCommand()
     command[ichar] = Serial.read();
     if(command[ichar] != '\n')
     {
-      Serial.print("DBG: handleSerialCommand: received: ");
-      Serial.print( command[ichar] );
-      Serial.print( ", 0x" );
-      Serial.println( command[ichar], HEX );
+      if(0)
+      {
+        Serial.print("DBG: handleSerialCommand: received: ");
+        Serial.print( command[ichar] );
+        Serial.print( ", 0x" );
+        Serial.println( command[ichar], HEX );
+      }
       ++ichar;
     }
-    command[ichar]='\0';
   }
+  command[ichar]='\0';
   if(command[0] != '#')
   {
     return 0;

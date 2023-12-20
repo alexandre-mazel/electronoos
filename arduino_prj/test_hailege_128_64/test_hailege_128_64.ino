@@ -1,6 +1,6 @@
 #include "oled.h"       // **** OLED ****
 
-OLED display(20,21,NO_RESET_PIN,OLED::W_128,OLED::H_64,OLED::CTRL_SH1106,0x3C);
+OLED display(20,21,NO_RESET_PIN,OLED::W_128,OLED::H_64,OLED::CTRL_SH1106,0x3D);
 
 #define DISP(x,y,z) display.drawString(x,y,z);display.display()
 

@@ -23,14 +23,17 @@ void loop()
   //Serial.println("looping...");
 
   int nVoltRead = analogRead(PIN_VOLT_MEASURE);
-  float rVoltResult = nVoltRead * 85/10;
+  float rVoltResult = nVoltRead*5/1024 * 85/10;
 
   char result[8];
-  char line[16] = "";
+  char line[24] = "";
   dtostrf(rVoltResult, 6, 2, result);
   strcat(line," Puis:");
   strcat(line, result);
-  strcat(line, "V");
+  strcat(line, "V        ");
+
+  //disp.clear();
+  disp.draw_rectangle(32,8,90,20,OLED::SOLID,OLED::BLACK); // au lieu d'effacer tout l'ecran on efface juste cette zone
 
   DISP(0,0,"- Solar Manager -");
   DISP(0,1,line);

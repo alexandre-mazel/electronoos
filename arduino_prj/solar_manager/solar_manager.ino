@@ -9,6 +9,8 @@ OLED disp(20,21,NO_RESET_PIN,OLED::W_128,OLED::H_64,OLED::CTRL_SH1106,0x3C);
 void setup()
 {
   Serial.begin(9600);
+  Serial.println("- Solar Manager -");
+  Serial.println("v0.3");
   Serial.println("Setup start");
   disp.begin();
   disp.set_contrast(8); // the eye doesn't register big difference, but power consumptions is

@@ -1,6 +1,9 @@
 #include "oled.h"       // **** OLED ****
+#include "historic.h"
 
 OLED disp(20,21,NO_RESET_PIN,OLED::W_132,OLED::H_64,OLED::CTRL_SH1106,0x3C); // si je met CTRL_SSD1306 ca scroll tout le temps, et si je met CTRL_SH1106 ya du garbage a droite
+
+Historic hist(120);
 
 /*
 //U8X8_SSD1306_128X64_NONAME_HW_I2C disp(U8X8_PIN_NONE);    //use this line for standard 0.96" SSD1306
@@ -66,7 +69,7 @@ void setup()
 }
 
 unsigned long timeEnoughPower = 0; // en millis (wrap around after 49 days)
-unsigned long timeStartEnough = 0; // start time with enough power (usefull to compute duration), set to 0 if not enough power 
+unsigned long timeStartEnough = 0; // start time with enough power (usefull to compute duration), set to 0 if not enough power
 
 void loop()
 {
@@ -136,5 +139,5 @@ void loop()
 
 
   //Serial.println("sleeping...");
-  delay(10);
+  delay(1000); // 1000 is nice for historisation
 }

@@ -1,6 +1,9 @@
 #include "historic.h"
 #include <Arduino.h> // for malloc
 
+// here all device that will need to be used by this method
+#include "oled.h"
+
 Historic::Historic(int w)
 {
   w_ = w;
@@ -20,10 +23,33 @@ void Historic::append(int v)
   ++n_;
 }
 
-void Historic::sendToOled(int x, int y, void * pOledObject)
+void Historic::drawGraphicOled( int x, int y, void * pOledObject, int hmax )
 {
-  #include "oled.h"
+  //Serial.print("in disp, histo len: " );
+  //Serial.println(n_);
+
   OLED * pOled = (OLED*) pOledObject;
-  Serial.print("in disp, histo len: " );
-  Serial.println(n_);
+
+  int valmax = 4; // min value
+  for( int i = 0; i < n_; ++i )
+  {
+    if( valmax < values_[i] )
+    {
+      valmax = values_[i];
+    } 
+  }
+
+  //Serial.print("valmax: " );
+  //Serial.println(valmax);
+
+  int xval = x;
+  for( int i = 0; i < n_; ++i )
+  { 
+    int yval = y - (values_[i]*hmax/valmax);
+    //pOled->draw_line(xval,y-hmax,xval,y,OLED::BLACK); // efface le previous
+    //pOled->draw_pixel(xval,yval,OLED::WHITE); // dessine le point
+    //pOled->draw_line(xval,yval,xval,y,OLED::WHITE); // dessine une ligne pleine
+    ++xval;
+  }
+
 }

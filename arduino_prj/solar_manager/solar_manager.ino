@@ -71,13 +71,16 @@ void setup()
 unsigned long timeEnoughPower = 0; // en millis (wrap around after 49 days)
 unsigned long timeStartEnough = 0; // start time with enough power (usefull to compute duration), set to 0 if not enough power
 
+int nFpsCpt = 0;
+unsigned long timeFpsBegin = 0;
+
 void loop()
 {
   //Serial.println("looping...");
 
   // computing
   int nVoltRead = analogRead(PIN_VOLT_MEASURE);
-  float rVoltResult = nVoltRead*5/1024 * 85/10;
+  float rVoltResult = (nVoltRead*5.*85)/(1024*10);
   unsigned long timeEnoughPowerEstimated = timeEnoughPower;
 
   hist.append(int(rVoltResult));
@@ -139,13 +142,28 @@ void loop()
   DISP(0,7,"Bas de l'ecran");
 
 
-  hist.sendToOled(0,32,&disp);
+  hist.drawGraphicOled(0,64,&disp,32);
 
   disp.display();
 
 
-
-
   //Serial.println("sleeping...");
-  delay(1000); // 1000 is nice for historisation
+  delay(10); // 1000 is nice for historisation
+
+  ++nFpsCpt;
+  const int nNbrFrameToCompute = 10;
+  if( nFpsCpt == nNbrFrameToCompute )
+  {
+    unsigned long nNow = micros();
+    unsigned long nDuration = nNow - timeFpsBegin;
+    
+    Serial.print( "frame: " );
+    Serial.print( nDuration/nNbrFrameToCompute );
+    Serial.print( "us, fps: " );
+    Serial.println( 1000000.*nNbrFrameToCompute/nDuration );
+    timeFpsBegin = nNow;
+    nFpsCpt = 0;
+    
+    // a simple analog read is running at 5413fps (184us per frame)
+  }
 }

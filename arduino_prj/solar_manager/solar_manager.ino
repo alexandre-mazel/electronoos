@@ -25,8 +25,32 @@ void loop()
 {
   //Serial.println("looping...");
 
+  // computing
   int nVoltRead = analogRead(PIN_VOLT_MEASURE);
   float rVoltResult = nVoltRead*5/1024 * 85/10;
+  unsigned long timeEnoughPowerEstimated = timeEnoughPower;
+  if(rVoltResult>10)
+  {
+    if(timeStartEnough == 0)
+    {
+      timeStartEnough = millis();
+    }
+    else
+    {
+      // do nothing
+      timeEnoughPowerEstimated += millis()-timeStartEnough;
+    }
+  }
+  else
+  {
+    
+    if(timeStartEnough != 0)
+    {
+      // first time without enough power
+      timeEnoughPower += millis()-timeStartEnough; // we want to be quite accurate on adding time, so we dont inc every time
+      timeStartEnough = 0;
+    }
+  }
 
   
 
@@ -43,10 +67,11 @@ void loop()
   DISP(0,1,line);
 
   line[0] = '\0';
-  ltoa(timeEnoughPower/1000, result, 10);
+  ltoa(timeEnoughPowerEstimated/1000, result, 10);
   strcat(line,"Enough: ");
   strcat(line, result);
   strcat(line, "s        ");
+  disp.draw_rectangle(40,16,90,23,OLED::SOLID,OLED::BLACK);
   DISP(0,2,line);
 
   line[0] = '\0';
@@ -54,7 +79,7 @@ void loop()
   strcat(line,"Elapsed: ");
   strcat(line, result);
   strcat(line, "s        ");
-  disp.draw_rectangle(32,8,90,20,OLED::SOLID,OLED::WHITE);
+  disp.draw_rectangle(40,24,90,32,OLED::SOLID,OLED::BLACK);
   DISP(0,3,line);
 
   DISP(0,7,"Bas de l'ecran");

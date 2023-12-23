@@ -50,7 +50,7 @@ def monitorPort(strPortName, nBaudRate=9600):
         ser.baudrate = nBaudRate
     
     try:
-        print("INF: %s is open: %s" % (ser.name,ser.is_open) )
+        print("INF: %s is open: %s at %s" % (ser.name,ser.is_open,nBaudRate) )
         #~ for i in range(100):
         prevPrint = ""
         while 1:

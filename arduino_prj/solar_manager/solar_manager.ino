@@ -79,6 +79,8 @@ void loop()
   int nVoltRead = analogRead(PIN_VOLT_MEASURE);
   float rVoltResult = nVoltRead*5/1024 * 85/10;
   unsigned long timeEnoughPowerEstimated = timeEnoughPower;
+
+  hist.append(int(rVoltResult));
   if(rVoltResult>10)
   {
     if(timeStartEnough == 0)
@@ -135,7 +137,13 @@ void loop()
   DISP(0,3,line);
 
   DISP(0,7,"Bas de l'ecran");
+
+
+  hist.sendToLcd(0,32,disp);
+
   disp.display();
+
+
 
 
   //Serial.println("sleeping...");

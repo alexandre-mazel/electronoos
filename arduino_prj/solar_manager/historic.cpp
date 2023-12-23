@@ -1,9 +1,10 @@
 #include "historic.h"
+#include <Arduino.h> // for malloc
 
 Historic::Historic(int w)
 {
   w_ = w;
-  values_ = (int*)malloc(w_*sizeofint));
+  values_ = (int*)malloc(w_*sizeof(int));
   n_ = 0;
 }
 

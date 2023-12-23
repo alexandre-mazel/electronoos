@@ -9,7 +9,7 @@ class Historic
     void append(int v);
 
   private:
-    int values_[];
+    int * values_;
     int w_; // size max
     int n_; // current values
 };

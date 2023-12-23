@@ -122,16 +122,19 @@ void loop()
   DISP(0,1,line);
 
   line[0] = '\0';
-  ltoa(timeEnoughPowerEstimated/1000, result, 10);
+  
   strcat(line,"Enough: ");
+  //ltoa(timeEnoughPowerEstimated/1000, result, 10);
+  //strcat(line, result);
+  //strcat(line, "s        ");
+  smartMillisToString(timeEnoughPowerEstimated,result);  // not longer than ltoa(timeEnoughPowerEstimated/1000, result, 10) (even less!?!)
   strcat(line, result);
-  strcat(line, "s        ");
   disp.draw_rectangle(40,16,90,23,OLED::SOLID,OLED::BLACK);
   DISP(0,2,line);
 
   line[0] = '\0';
-  ltoa(millis()/1000, result, 10);
   strcat(line,"Elapsed: ");
+  //ltoa(millis()/1000, result, 10);
   //strcat(line, result);
   //strcat(line, "s        ");
   smartMillisToString(millis(),result);
@@ -148,7 +151,7 @@ void loop()
 
 
   //Serial.println("sleeping...");
-  delay(10); // 1000 is nice for historisation
+  delay(10); // 1s is nice for historisation, rendering takes 380 so...
 
   ++nFpsCpt;
   const int nNbrFrameToCompute = 10;

@@ -11,12 +11,53 @@ U8X8_SH1106_128X64_NONAME_HW_I2C disp(U8X8_PIN_NONE);       //use this line for 
 
 #define PIN_VOLT_MEASURE A0
 
+char * smartMillisToString(unsigned long millisec, char * dst)
+{
+  // convert secong to a smart string
+  if(millisec < 1000)
+  {
+    ltoa(millisec,dst,10);
+    strcat(dst,"ms");
+    return dst;
+  }
+  millisec /= 1000;
+  if(millisec < 60)
+  {
+    ltoa(millisec,dst,10);
+    strcat(dst,"s");
+    return dst;
+  }
+
+  // now we want 1 figure after commat
+  float t = millisec/60.;
+  if(t<60)
+  {
+    dtostrf(t, 0, 1, dst);
+    strcat(dst,"m");
+    return dst;
+  }
+
+  t = millisec/60.;
+  if(t<60)
+  {
+    dtostrf(t, 0, 1, dst);
+    strcat(dst,"h");
+    return dst;
+  }
+
+  t = millisec/60.;
+  dtostrf(t, 0, 1, dst);
+  strcat(dst,"day");
+  return dst;
+}
+
 void setup()
 {
   Serial.begin(9600);
   Serial.println("- Solar Manager -");
   Serial.println("v0.3");
   Serial.println("Setup start");
+  disp.useOffset(1);
   disp.begin();
   disp.set_contrast(8); // the eye doesn't register big difference, but power consumptions is
   //disp.set_scrolling(OLED::NO_SCROLLING);
@@ -63,7 +104,7 @@ void loop()
   //disp.clear();
 
   DISP(0,0,"- Solar Manager -");
-    char result[8];
+  char result[10];
   char line[24] = "";
   dtostrf(rVoltResult, 6, 2, result);
   strcat(line,"Puis:");
@@ -83,8 +124,10 @@ void loop()
   line[0] = '\0';
   ltoa(millis()/1000, result, 10);
   strcat(line,"Elapsed: ");
+  //strcat(line, result);
+  //strcat(line, "s        ");
+  smartMillisToString(millis(),result);
   strcat(line, result);
-  strcat(line, "s        ");
   disp.draw_rectangle(40,24,90,32,OLED::SOLID,OLED::BLACK);
   DISP(0,3,line);
 

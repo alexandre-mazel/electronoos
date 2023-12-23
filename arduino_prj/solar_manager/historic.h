@@ -8,6 +8,8 @@ class Historic
     Historic(int w); // historic: nbr of value to memorize
     void append(int v);
 
+    void sendToOled(int x, int y, void * pOledObject);
+
   private:
     int * values_;
     int w_; // size max

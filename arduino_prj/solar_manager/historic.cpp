@@ -19,3 +19,11 @@ void Historic::append(int v)
   values_[n_] = v;
   ++n_;
 }
+
+void Historic::sendToOled(int x, int y, void * pOledObject)
+{
+  #include "oled.h"
+  OLED * pOled = (OLED*) pOledObject;
+  Serial.print("in disp, histo len: " );
+  Serial.println(n_);
+}

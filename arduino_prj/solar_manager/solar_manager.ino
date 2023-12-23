@@ -139,7 +139,7 @@ void loop()
   DISP(0,7,"Bas de l'ecran");
 
 
-  hist.sendToLcd(0,32,disp);
+  hist.sendToOled(0,32,&disp);
 
   disp.display();
 

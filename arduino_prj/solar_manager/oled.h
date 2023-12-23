@@ -77,7 +77,7 @@ public:
     enum tScrollEffect { NO_SCROLLING=0, HORIZONTAL_RIGHT=0x26, HORIZONTAL_LEFT=0x27, DIAGONAL_RIGHT=0x29, DIAGONAL_LEFT=0x2A };
 
     /** Possible display width values **/
-    enum tWidth { W_96=96, W_128=128 };
+    enum tWidth { W_96=96, W_128=128, W_132=132 };
 
     /** Possible display height values **/
     enum tHeight { H_16=16, H_32=32, H_64=64 };

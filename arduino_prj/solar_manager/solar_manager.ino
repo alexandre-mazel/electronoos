@@ -1,6 +1,11 @@
 #include "oled.h"       // **** OLED ****
 
-OLED disp(20,21,NO_RESET_PIN,OLED::W_128,OLED::H_64,OLED::CTRL_SH1106,0x3C);
+OLED disp(20,21,NO_RESET_PIN,OLED::W_132,OLED::H_64,OLED::CTRL_SH1106,0x3C); // si je met CTRL_SSD1306 ca scroll tout le temps, et si je met CTRL_SH1106 ya du garbage a droite
+
+/*
+//U8X8_SSD1306_128X64_NONAME_HW_I2C disp(U8X8_PIN_NONE);    //use this line for standard 0.96" SSD1306
+U8X8_SH1106_128X64_NONAME_HW_I2C disp(U8X8_PIN_NONE);       //use this line for 1.3" OLED often sold as 1.3" SSD1306
+*/
 
 #define DISP(x,y,z) disp.drawString(x,y,z)
 
@@ -14,7 +19,8 @@ void setup()
   Serial.println("Setup start");
   disp.begin();
   disp.set_contrast(8); // the eye doesn't register big difference, but power consumptions is
-  disp.set_scrolling(OLED::NO_SCROLLING);
+  //disp.set_scrolling(OLED::NO_SCROLLING);
+  disp.clear();
   Serial.println("Setup end");
 }
 

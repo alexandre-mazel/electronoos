@@ -7,7 +7,7 @@
 // You may change the communication speed here
 //#define OLED_I2C_DELAY delayMicroseconds(3) //  68kHz@80Mhz or  83kHz@160Mhz
 //#define OLED_I2C_DELAY delayMicroseconds(2) //  85kHz@80Mhz or 110kHz@160Mhz
-  #define OLED_I2C_DELAY delayMicroseconds(1) // 110kHz@80Mhz or 170kHz@160Mhz
+#define OLED_I2C_DELAY delayMicroseconds(1) // 110kHz@80Mhz or 170kHz@160Mhz
 //#define OLED_I2C_DELAY delayMicroseconds(0) // 150kHz@80Mhz or 300kHz@160Mhz
 //#define OLED_I2C_DELAY                      // 250kHz@80Mhz or 500kHz@160Mhz
 

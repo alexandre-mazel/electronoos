@@ -144,7 +144,7 @@ void loop()
 
   hist.drawGraphicOled(0,64,&disp,32);
 
-  disp.display();
+  disp.display(); // takes around 340ms on a mega2560!
 
 
   //Serial.println("sleeping...");

@@ -74,13 +74,22 @@ unsigned long timeStartEnough = 0; // start time with enough power (usefull to c
 int nFpsCpt = 0;
 unsigned long timeFpsBegin = 0;
 
+// measure input and return filtered value (on 4)
+float rVoltResultAvg = 0.f;
+float measureSolarVolt()
+{
+  // computing
+  int nVoltRead = analogRead(PIN_VOLT_MEASURE);
+  float rVoltResult = (nVoltRead*5.*85)/(1024*10);
+  rVoltResultAvg = rVoltResultAvg * 0.75 + rVoltResult * 0.25;
+  return rVoltResultAvg;
+}
+
 void loop()
 {
   //Serial.println("looping...");
 
-  // computing
-  int nVoltRead = analogRead(PIN_VOLT_MEASURE);
-  float rVoltResult = (nVoltRead*5.*85)/(1024*10);
+  float rVoltResult = measureSolarVolt();
   unsigned long timeEnoughPowerEstimated = timeEnoughPower;
 
   hist.append(int(rVoltResult));
@@ -151,7 +160,15 @@ void loop()
 
 
   //Serial.println("sleeping...");
-  delay(10); // 1s is nice for historisation, rendering takes 380 so...
+  //delay(10); 
+  // the goal is to cut the wait in 3 parts, measuring between each part
+  const int nTotalWait = 620; // 1s is nice for historisation, rendering takes 380 so putting 620 is nice...
+  const int nNbrMeasures = 3;
+  for( int i = 0; i < nNbrMeasures; i += 1)
+  {
+    measureSolarVolt();
+    delay(nTotalWait/nNbrMeasures); 
+  }
 
   ++nFpsCpt;
   const int nNbrFrameToCompute = 10;

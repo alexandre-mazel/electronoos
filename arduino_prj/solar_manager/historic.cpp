@@ -17,7 +17,7 @@ void Historic::append(int v)
   {
     // eat one value
     --n_;
-    memcpy(values_,values_+1,n_);
+    memcpy(values_,values_+1,n_*sizeof(int));
   }
   values_[n_] = v;
   ++n_;
@@ -46,6 +46,12 @@ void Historic::drawGraphicOled( int x, int y, void * pOledObject, int hmax )
   for( int i = 0; i < n_; ++i )
   { 
     int yval = y - (values_[i]*hmax/valmax);
+    /*
+    Serial.print( "val: " );
+    Serial.print( values_[i] );
+    Serial.print( ", yval: " );
+    Serial.println( yval );
+    */
     pOled->draw_line(xval,y-hmax,xval,y,OLED::BLACK); // efface le previous // 120 lines with hmax 32 => 20ms (arduino mega)
     //pOled->draw_pixel(xval,yval,OLED::WHITE); // dessine le point
     pOled->draw_line(xval,yval,xval,y,OLED::WHITE); // dessine une ligne pleine // 120 lines with constant value => 21ms (white is slighly longer?)

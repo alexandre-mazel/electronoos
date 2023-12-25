@@ -3,7 +3,7 @@
 
 OLED disp(20,21,NO_RESET_PIN,OLED::W_132,OLED::H_64,OLED::CTRL_SH1106,0x3C); // si je met CTRL_SSD1306 ca scroll tout le temps, et si je met CTRL_SH1106 ya du garbage a droite
 
-Historic hist(120);
+Historic hist(128); // good to put screen resolution
 
 /*
 //U8X8_SSD1306_128X64_NONAME_HW_I2C disp(U8X8_PIN_NONE);    //use this line for standard 0.96" SSD1306

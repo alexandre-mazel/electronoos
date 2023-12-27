@@ -13,6 +13,9 @@ U8X8_SH1106_128X64_NONAME_HW_I2C disp(U8X8_PIN_NONE);       //use this line for 
 #define DISP(x,y,z) disp.drawString(x,y,z)
 
 #define PIN_VOLT_MEASURE A0
+#define PIN_CURRENT_MEASURE A1
+
+#define ACS712_MAX_CURRENT 25
 
 char * smartMillisToString(unsigned long millisec, char * dst)
 {
@@ -76,21 +79,40 @@ unsigned long timeFpsBegin = 0;
 
 // measure input and return filtered value (on 4)
 float rVoltResultAvg = 0.f;
-float measureSolarVolt()
+float rVoltResultAvg5 = 0.f;
+
+// A 4 measures per sec, 1200 => 5min 
+// (sauf que je me souviens plus pourquoi mais vu ma formule, ca prend plutot 20min a atteindre la cible, alors on va diviser tout ca)
+const int nNbrFor5 = 1200/5;
+
+float rVoltResultAvg20 = 0.f;
+const int nNbrFor20 = nNbrFor5*4;
+float measureSolarOutput()
 {
-  // computing
   int nVoltRead = analogRead(PIN_VOLT_MEASURE);
   float rVoltResult = (nVoltRead*5.*85)/(1024*10);
+  rVoltResult *= 1.013; // avec les resistances 750k a 5% que j'ai prise, j'ai cette modif a appliquer (mesure calculé sur 31V)
   rVoltResultAvg = rVoltResultAvg * 0.75 + rVoltResult * 0.25;
+  rVoltResultAvg5 = (rVoltResultAvg5 * (nNbrFor5-1)/nNbrFor5) + (rVoltResult * (1)/nNbrFor5);
+  rVoltResultAvg20 = (rVoltResultAvg20 * (nNbrFor20-1)/nNbrFor20) + (rVoltResult * (1)/nNbrFor20);
   return rVoltResultAvg;
+}
+
+float measureAmp()
+{
+  int nVoltRead = analogRead(PIN_CURRENT_MEASURE);
+  float rAmpResult = (nVoltRead*ACS712_MAX_CURRENT)/(1024.);
+  return rAmpResult;
 }
 
 void loop()
 {
   //Serial.println("looping...");
 
-  float rVoltResult = measureSolarVolt();
+  float rVoltResult = measureSolarOutput();
   unsigned long timeEnoughPowerEstimated = timeEnoughPower;
+
+  float rAmpResult = measureAmp();
 
   hist.append(int(rVoltResult));
   if(rVoltResult>10)
@@ -122,12 +144,24 @@ void loop()
 
   DISP(0,0,"- Solar Manager -");
   char result[10];
-  char line[24] = "";
-  dtostrf(rVoltResult, 6, 2, result);
+  char line[48] = "";
+  dtostrf(rVoltResult, 5, 2, result);
   strcat(line,"Puis:");
   strcat(line, result);
-  strcat(line, "V        ");
-  disp.draw_rectangle(32,8,90,20,OLED::SOLID,OLED::BLACK); // au lieu d'effacer tout l'ecran on efface juste cette zone
+  strcat(line, "V");
+  if(1)
+  {
+    // add avg 5 et 20min
+    strcat(line, "/");
+    dtostrf(rVoltResultAvg5, 0, 1, result);
+    strcat(line, result);
+
+    strcat(line, "/");
+    dtostrf(rVoltResultAvg20, 0, 1, result);
+    strcat(line, result);
+
+  }
+  disp.draw_rectangle(32,8,90+38,15,OLED::SOLID,OLED::BLACK); // au lieu d'effacer tout l'ecran on efface juste cette zone
   DISP(0,1,line);
 
   line[0] = '\0';
@@ -151,7 +185,7 @@ void loop()
   disp.draw_rectangle(40,24,90,32,OLED::SOLID,OLED::BLACK);
   DISP(0,3,line);
 
-  DISP(0,7,"Bas de l'ecran");
+  //DISP(0,7,"Bas de l'ecran");
 
 
   hist.drawGraphicOled(0,64,&disp,32);
@@ -166,7 +200,7 @@ void loop()
   const int nNbrMeasures = 3;
   for( int i = 0; i < nNbrMeasures; i += 1)
   {
-    measureSolarVolt();
+    measureSolarOutput();
     delay(nTotalWait/nNbrMeasures); 
   }
 

@@ -582,7 +582,8 @@ void loop()
     int angle_db;
     int angle_nip;
     int bubble=0;
-    const int nHalfBoitierMM = 43; // demi largeur du capteur - (distance des 2 extremites de contacts)
+    //const int nHalfBoitierMM = 43; // demi largeur du capteur - (distance des 2 extremites de contacts)
+    const int nHalfBoitierMM = 24; // taille du boitier satelitte: distance des 2 extremites de contacts / 2
 
 
     //Serial.println("loop... blangle2");
@@ -597,7 +598,7 @@ void loop()
     angle_nip = -bjy_getAngle(0);
     angle_nip -= 41; // calibration en hard (lecture du zero quand posé a plat) todo stocke dans eeprom
     angle_db -= 7; // sur la tranche on doit avoir 90, calibration en hard todo: => eeprom
-    //angle_db -= 900; // offset face=>tranche - pas la peine, car on veut la difference par rapport a la verticaile et pas l'horizontale
+    //angle_db -= 900; // offset face=>tranche - pas la peine, car on veut la difference par rapport a la verticale et pas l'horizontale
     //nip = 2*rCirc*3.14159265358979323846264*db/360;
     nip = (presetCirc[nNumSettingsSelected]*angle_nip/360)/10/1; // /10 for angle, then /10 for cm or /1 for mm
 

@@ -15,7 +15,7 @@ U8X8_SH1106_128X64_NONAME_HW_I2C disp(U8X8_PIN_NONE);       //use this line for 
 #define PIN_VOLT_MEASURE A0
 #define PIN_CURRENT_MEASURE A1
 
-#define ACS712_MAX_CURRENT 25
+#define ACS712_MAX_CURRENT 30
 
 char * smartMillisToString(unsigned long millisec, char * dst)
 {
@@ -65,7 +65,7 @@ void setup()
   Serial.println("Setup start");
   disp.useOffset(1);
   disp.begin();
-  disp.set_contrast(8); // the eye doesn't register big difference, but power consumptions is
+  disp.set_contrast(16); // the eye doesn't register big difference, but power consumptions is => set low (8 or 16)
   //disp.set_scrolling(OLED::NO_SCROLLING);
   disp.clear();
   Serial.println("Setup end");
@@ -92,17 +92,26 @@ float measureSolarOutput()
   int nVoltRead = analogRead(PIN_VOLT_MEASURE);
   float rVoltResult = (nVoltRead*5.*85)/(1024*10);
   rVoltResult *= 1.013; // avec les resistances 750k a 5% que j'ai prise, j'ai cette modif a appliquer (mesure calculé sur 31V)
-  rVoltResultAvg = rVoltResultAvg * 0.75 + rVoltResult * 0.25;
+  //rVoltResultAvg = rVoltResultAvg * 0.75 + rVoltResult * 0.25;
+  rVoltResultAvg = rVoltResultAvg * 0.5 + rVoltResult * 0.5; // avec 0.5 et 0.5, ca met a peu pres 4 ou 5 fois pour arriver a 3% de l'original
   rVoltResultAvg5 = (rVoltResultAvg5 * (nNbrFor5-1)/nNbrFor5) + (rVoltResult * (1)/nNbrFor5);
   rVoltResultAvg20 = (rVoltResultAvg20 * (nNbrFor20-1)/nNbrFor20) + (rVoltResult * (1)/nNbrFor20);
   return rVoltResultAvg;
 }
 
+float rAmpResultAvg = 0.f;
 float measureAmp()
 {
-  int nVoltRead = analogRead(PIN_CURRENT_MEASURE);
-  float rAmpResult = (nVoltRead*ACS712_MAX_CURRENT)/(1024.);
-  return rAmpResult;
+  int nRead = analogRead(PIN_CURRENT_MEASURE);
+  //float rAmpResult = (nVoltRead*ACS712_MAX_CURRENT)/(1024.);
+  //Serial.print( "measureAmp: nRead: " );
+  //Serial.println( nRead );
+  float rAmpResult = ((nRead-512)*ACS712_MAX_CURRENT)/(512.);
+  rAmpResult *= 1.25; // coef empirique mesured sur 1A
+
+  rAmpResultAvg = rAmpResultAvg * 0.5 + rAmpResult * 0.5;
+  
+  return rAmpResultAvg;
 }
 
 void loop()
@@ -113,6 +122,8 @@ void loop()
   unsigned long timeEnoughPowerEstimated = timeEnoughPower;
 
   float rAmpResult = measureAmp();
+
+  float rWatt = rVoltResult*rAmpResult;
 
   hist.append(int(rVoltResult));
   if(rVoltResult>10)
@@ -140,7 +151,7 @@ void loop()
 
   
 
-  //disp.clear();
+  disp.clear();
 
   DISP(0,0,"- Solar Manager -");
   char result[10];
@@ -161,8 +172,19 @@ void loop()
     strcat(line, result);
 
   }
-  disp.draw_rectangle(32,8,90+38,15,OLED::SOLID,OLED::BLACK); // au lieu d'effacer tout l'ecran on efface juste cette zone
+  //disp.draw_rectangle(32,8,90+38,15,OLED::SOLID,OLED::BLACK); // au lieu d'effacer tout l'ecran on efface juste cette zone
   DISP(0,1,line);
+
+  line[0] = '\0';
+  dtostrf(rAmpResult, 0, 2, result);
+  strcat(line,"Amp:");
+  strcat(line, result);
+  strcat(line, "A");
+  strcat(line, " ");
+  dtostrf(rWatt, 0, 2, result);
+  strcat(line, result);
+  strcat(line, "W");
+  DISP(0,2,line);
 
   line[0] = '\0';
   
@@ -172,8 +194,8 @@ void loop()
   //strcat(line, "s        ");
   smartMillisToString(timeEnoughPowerEstimated,result);  // not longer than ltoa(timeEnoughPowerEstimated/1000, result, 10) (even less!?!)
   strcat(line, result);
-  disp.draw_rectangle(40,16,90,23,OLED::SOLID,OLED::BLACK);
-  DISP(0,2,line);
+  //disp.draw_rectangle(40,16,90,23,OLED::SOLID,OLED::BLACK);
+  DISP(0,3,line);
 
   line[0] = '\0';
   strcat(line,"Elapsed: ");
@@ -182,13 +204,13 @@ void loop()
   //strcat(line, "s        ");
   smartMillisToString(millis(),result);
   strcat(line, result);
-  disp.draw_rectangle(40,24,90,32,OLED::SOLID,OLED::BLACK);
-  DISP(0,3,line);
+  //disp.draw_rectangle(40,24,90,32,OLED::SOLID,OLED::BLACK);
+  DISP(0,4,line);
 
   //DISP(0,7,"Bas de l'ecran");
 
 
-  hist.drawGraphicOled(0,64,&disp,32);
+  hist.drawGraphicOled(0,64,&disp,24);
 
   disp.display(); // takes around 340ms on a mega2560!
 
@@ -201,6 +223,7 @@ void loop()
   for( int i = 0; i < nNbrMeasures; i += 1)
   {
     measureSolarOutput();
+    measureAmp();
     delay(nTotalWait/nNbrMeasures); 
   }
 

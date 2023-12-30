@@ -972,6 +972,9 @@ disk_write 1024KB: #################### 305.95s ( 3.27 Mo/s)
 disk_read  1024KB: ####################  22.97s (43.54 Mo/s)
 pi@thenardier:~/dev/git/electronoos/scripts $
 
+*** RPI4 ***
+(recomputed)
+
 
 *** RPI5 ***
 

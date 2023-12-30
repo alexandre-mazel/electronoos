@@ -10,11 +10,18 @@ import sound_player
 
 timeLastNext = time.time()-100
 
+def playM4a(strFilename):
+    os.system('C:\\Progra~2\\VideoLAN\\VLC\\vlc.exe --play-and-exit "%s"' % strFilename)
+    return 0
+
 def playSongInterruptible(strFilename):
     """
     return -1 on error, 0 if finished, 1 if skipped, 2 if want to exit
     """
     print("INF: playing '%s'" % strFilename )
+    if ".m4a" in strFilename:
+        return playM4a(strFilename)
+        
     global timeLastNext
     try:
         sound_player.playFile(strFilename,bWaitEnd=False)
@@ -84,8 +91,9 @@ def playAllFileFromFolder( strPath, listToExclude=[], strStartFrom = "" ):
     bSearchStart = strStartFrom != ""
     
     listFiles = sorted(os.listdir(strPath))
+
     for f in listFiles:
-        if ".mp3" not in f and ".mp4" not in f :
+        if ".mp3" not in f and ".mp4" not in f and ".m4a" not in f :
             continue
         if bSearchStart:
             if f != strStartFrom:

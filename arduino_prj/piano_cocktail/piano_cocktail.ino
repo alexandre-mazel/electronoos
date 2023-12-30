@@ -135,9 +135,10 @@ int check_if_must_stop_verse()
   Serial.print(nCurrentVanne);
   Serial.print(", diff: ");
   Serial.println(diff);
+  lcd.setCursor(5, 0);
   lcd.print(" => ");
-  lcd.print(diff);
-  lcd.print("   ");
+  lcd.print(int(diff));
+  lcd.print(" C");
   lcd.print(nCurrentVanne+1);
   if(diff<1+4) // couramment on prend 5 apres coupure
   {
@@ -372,12 +373,12 @@ void loop() {
       Serial.print(reading);
       Serial.print(" => ");
       Serial.print(int(round(reading)));
-      Serial.println(" g");
+      Serial.println(" g    ");
     }
 
     lcd.home();
     lcd.print(int(round(reading)));
-    lcd.print(" g");
+    lcd.print(" g    ");
 
     int nResVerse = check_if_must_stop_verse();
     if(nResVerse==2)

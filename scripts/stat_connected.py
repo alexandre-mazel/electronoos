@@ -2,7 +2,7 @@
 
 def logDebug(txt):
     pass
-    #file = open("/home/pi/pi_error.log", "at" )
+    #file = open("/home/na/pi_error.log", "at" )
     #file.write(txt + "\n")
     #file.close()
     
@@ -177,6 +177,7 @@ class Stater:
             "BC:83:85:00:24:35": "TabPro4",
             "E0:2B:E9:D7:DE:8A": "TabPro7",
             "B8:8A:EC:C7:73:14": "SwitchCorto",
+            "1C:45:86:94:FB:6F": "SwitchGaia",
             "48:4B:AA:68:E4:41": "IphoneAlex",
             "B8:FF:61:54:81:FA": "IpadAlex",
             "90:21:81:27:D5:58": "TabletGaia",
@@ -196,6 +197,7 @@ class Stater:
             "2C:F0:5D:9F:BF:DE": "XeniaDev",
             "A0:32:99:D1:52:CA": "LenovoYoga",
             "8A:E2:56:9A:7D:6A": "IphoneXAlex",
+            "3A:E6:D8:43:04:B5": "Iphone14",
             "72:1C:0D:52:39:39": "A52_Alex",
             "20:C1:9B:F3:F2:0A": "Kakashi",
             
@@ -305,7 +307,7 @@ sys.path.append(strLocalPath+"/../crypto_prono/")
 import scrap
 def updateScrap():
     strPath = os.path.expanduser("~/")+"/records/"
-    strPath = "/home/pi/records/"
+    strPath = "/home/na/records/"
     scrap.scrapAndSaveCryptoCurrency(strPath)
     
 def getTemperatureFrom1wire(strDeviceID):
@@ -336,7 +338,7 @@ def updateTemperature():
         dest = "c:/save/office_temperature.txt"
     else:
         #~ dest = os.path.expanduser("~/save/office_temperature.txt")
-        dest = "/home/pi/save/office_temperature.txt" # here we want to save there, even if running as root
+        dest = "/home/na/save/office_temperature.txt" # here we want to save there, even if running as root
     
     f = open(dest,"a+")
     f.write("%s: %s: %.1f\n" % (timestamp,"armoire",t) )

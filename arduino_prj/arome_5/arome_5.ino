@@ -313,7 +313,7 @@ char buf2[nMaxSizeBuf]; int nCpt2 = 0;
 char buf3[nMaxSizeBuf]; int nCpt3 = 0;
 
 int nFpsCpt = 0;
-unsigned long timeFpsBegin;
+unsigned long timeFpsBegin = 0;
 
 void loop()
 {

@@ -415,7 +415,7 @@ def test_multithreading():
         sys.stdout.write( "multiprocess x%-2d:" % nNbrProcessInParalell  )    
         bFirstInLine = True
         all_process = []
-        for func_to_test in (test_cpu_int,test_cpu_float,test_ram,test_numpy,test_opencv_orb,test_opencv_orb_realcase,test_opencv_orb_realcase):
+        for func_to_test in (test_cpu_int,test_cpu_float,test_numpy,test_opencv_orb,test_opencv_orb_realcase,test_opencv_orb_realcase):
             if not bFirstInLine: sys.stdout.write(" /" )
             bFirstInLine = False
             timeBegin = time.time()        
@@ -971,6 +971,40 @@ disk_read     1KB: ####################  28.29s (35.35 Mo/s)
 disk_write 1024KB: #################### 305.95s ( 3.27 Mo/s)
 disk_read  1024KB: ####################  22.97s (43.54 Mo/s)
 pi@thenardier:~/dev/git/electronoos/scripts $
+
+*** RPI4 ***
+(recomputed)
+
+
+*** RPI5 ***
+
+python version   : 3.11.2 (64bits) (4 core(s))
+cpu              : Raspberry Pi 5 Model B Rev 1.0
+ram              : 7.36 / 7.86 GB
+test_cpu_int2    : ####################   0.40s
+test_cpu_float2  : ####################   0.08s
+test_cpu_ram 2G  : ####################   0.68s
+test_cpu_ram 4G  : ####################   1.37s
+test_cpu_ram 6G  : ####################   2.04s
+test_cpu_ram 8G  : ####################   2.74s
+test_cpu_ram10G  : ####################   3.43s
+test_cpu_ram12G  : ####################   4.11s
+test_cpu_ram14G  : ####################   5.86s
+test_cpu_ram16G  :  Memory Error...
+test_scipy_xxt   : ####################   3.20s (124.89x)
+test_orb4.6.0    : ####################   0.27s (365.58fps)
+test_orbcv imgs  : ####################   1.28s (78.07fps)
+test_orbcv bis   : ####################   1.28s (78.15xfps)
+multiprocess x1 :  0.42s /  0.09s /  3.21s /  0.47s /  1.59s /  1.59s =>    7.36s (per thread:7.36s)
+multiprocess x4 :  0.43s /  0.11s / 13.81s /  0.72s /  2.09s /  2.09s =>   26.60s (per thread:6.65s)
+multiprocess x8 :  0.85s /  0.20s / 27.95s /  1.44s /  4.26s /  4.55s =>   65.84s (per thread:8.23s)
+multiprocess x32:  3.97s /  0.89s /111.97s /  6.66s / 20.86s / 21.01s =>  231.21s (per thread:7.23s)
+disk_write    1KB: ####################  16.24s (61.59 Mo/s)
+disk_read     1KB: ####################  12.49s (80.09 Mo/s)
+disk_write 1024KB: ####################  15.98s (62.58 Mo/s)
+disk_read  1024KB: ####################  10.63s (94.11 Mo/s)
+
+
 
 
 

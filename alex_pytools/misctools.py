@@ -524,6 +524,9 @@ def getCpuModel(bShort=False):
             #~ print("DBG: line: '%s'" % line )
             strLineToSearch = "model name"
             idx = line.find(strLineToSearch)
+            if idx == -1:
+                strLineToSearch = "Model\t"
+                idx = line.find(strLineToSearch)
             if idx != -1:
                 name1 = line[idx+len(strLineToSearch)+1:].strip()
                 if name1[0] == ':':

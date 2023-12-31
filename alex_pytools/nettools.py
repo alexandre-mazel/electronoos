@@ -149,7 +149,7 @@ def getIPx(d):
         data = socket.gethostbyname_ex(d)
         ipx = data[2]
         return ipx
-    except socket.gaierror as err:
+    except (socket.gaierror,socket.herror) as err:
         pass
     return False
     
@@ -219,7 +219,10 @@ def reduceDomainToMasterDomain(domain):
     g2a02-26f0-2b00-0012-0000-0000-5f64-5545.deploy.static.akamaitechnologies.com => akamaitechnologies.com
     """
     splitted = domain.split(".")
-    return ".".join(splitted[-2:])
+    out = ".".join(splitted[-2:])
+    if len(out)<6: # "co.nz"
+        out = ".".join(splitted[-3:])
+    return out
 
 """
 Pourquoi 47.246.146.94 ne se resoud pas en alibaba ?
@@ -272,7 +275,8 @@ fr.aliexpress.com:
 """
     
 def autoTest():
-    sendDataToEngServer("dummy", 1.23)
+    #~ sendDataToEngServer("dummy", 1.23)
+    print(reduceDomainToMasterDomain("maps.google.co.nz"))
 
 
 if __name__ == "__main__":

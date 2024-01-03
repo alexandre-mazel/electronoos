@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 
 import serial # pip install pyserial
 
@@ -37,7 +38,19 @@ def listPorts():
         
         
 def monitorPort(strPortName, nBaudRate=9600):
-    ser = serial.Serial(strPortName)
+    """
+    return 2 if user want to stop
+    """
+    
+    retVal = 1
+    
+    try:
+        ser = serial.Serial(strPortName) # pb: ca gele tant que rien n'est recu... c'est dommage...
+        
+    except BaseException as err: # including KeyboardInterrupt
+        print("ERR: monitorPort (1): %s" % str(err) )
+        return 1
+    
     """
     strPortName,
         baudrate=9600, 
@@ -48,7 +61,7 @@ def monitorPort(strPortName, nBaudRate=9600):
     """
     if nBaudRate != 9600: # default
         ser.baudrate = nBaudRate
-    
+
     try:
         print("INF: %s is open: %s at %s" % (ser.name,ser.is_open,nBaudRate) )
         #~ for i in range(100):
@@ -66,9 +79,12 @@ def monitorPort(strPortName, nBaudRate=9600):
                 prevPrint = buf
                 print("buf: " + buf)
     except BaseException as err: # including KeyboardInterrupt
-        print("ERR: monitorPort: %s" % str(err) )
-        pass
+        print("ERR: monitorPort (2): %s" % str(err) )
+        if "ClearCommError" not in str(err):
+            retVal = 2
     ser.close()
+    print("INF: monitorPort: exiting with code %s" % str(retVal) )
+    return retVal
 
 #~ listPorts()
 strPortName = '/dev/ttyUSB0'
@@ -81,4 +97,7 @@ strPortNameAutodetect = listPorts()
 if 0:
     print("using autodetected port: %s" % strPortNameAutodetect )
     strPortName = strPortNameAutodetect
-monitorPort(strPortName,nBaudRate)
+while 2 != monitorPort(strPortName,nBaudRate):
+    time.sleep(1.)
+    print("Reconnecting...")
+print("INF: script finished...")

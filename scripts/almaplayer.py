@@ -16,7 +16,7 @@ def playM4a(strFilename):
 
 def playSongInterruptible(strFilename):
     """
-    return -1 on error, 0 if finished, 1 if skipped, 2 if want to exit
+    return -1 on error, 0 if finished, 1 if skipped, 2 for prev, 10 if want to exit
     """
     print("INF: playing '%s'" % strFilename )
     if ".m4a" in strFilename:
@@ -52,7 +52,7 @@ def playSongInterruptible(strFilename):
                 pass
             if pressedKey == b'\x1b':
                 print("esc")
-                return 2
+                return 10
             else:
                 try:
                     # decode key as char
@@ -67,6 +67,15 @@ def playSongInterruptible(strFilename):
                             time.sleep(1) #fadout is not blocking
                         pg.mixer.music.stop()
                         return 1
+                    if key == 'b':
+                        print("goto prev song...")
+                        if time.time()-timeLastNext > 3: # we dont want to fade if in a rapid series of next
+                            print("fading...")
+                            timeLastNext = time.time()
+                            pg.mixer.music.fadeout(1000)
+                            time.sleep(1) #fadout is not blocking
+                        pg.mixer.music.stop()
+                        return 2
                     if key == 'H':
                         print("vol up")
                         pg.mixer.music.set_volume(pg.mixer.music.get_volume()+0.1)
@@ -105,8 +114,11 @@ def playAllFileFromFolder( strPath, listToExclude=[], strStartFrom = "" ):
             continue
         print("Playing '%s'" % f)
         absf = strPath + f
-        if(playSongInterruptible(absf)==2):
+        ret = playSongInterruptible(absf)
+        if( ret == 10 ):
             return
+        if( ret == 2 ):
+            # todo: pre: filter la liste au démarrage puis la parcourir...
     #~ input("press a key")
     
 
@@ -115,7 +127,7 @@ if __name__ == "__main__":
         #print(sys.argv)
         if len(sys.argv)>1:
             mp3file = sys.argv[1]
-            if playSongInterruptible(mp3file) != 2:
+            if playSongInterruptible(mp3file) != 10:
                 # trouve les autre chansons du dossier et les joue (mais que les suivantes)
                 strPath, strFilename = os.path.split(mp3file)
                 playAllFileFromFolder(strPath+os.sep, [strFilename],strStartFrom=strFilename)

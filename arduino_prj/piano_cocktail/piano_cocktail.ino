@@ -106,6 +106,7 @@ float last_measured = 0;
 // ask to verse x grammes
 float target_verse = -1001; // negative when no current
 int nCurrentVanne = -1;
+unsigned long timeNextQueueOrder = 0; // we want to wait a bit before handling next queue
 void verse_quantite(float rGrammes,int nNumVanne)
 {
   target_verse = last_measured + rGrammes;
@@ -140,6 +141,7 @@ int check_if_must_stop_verse()
   lcd.print(int(diff));
   lcd.print(" C");
   lcd.print(nCurrentVanne+1);
+  lcd.print("  "); // clean eol
   if(diff<1+4) // couramment on prend 5 apres coupure
   {
     digitalWrite(VANNE_1_PIN, HIGH);
@@ -155,6 +157,7 @@ int check_if_must_stop_verse()
     Serial.print("INF: check_if_must_stop_verse: finished, target was ");
     Serial.println(target_verse);
     target_verse = -1001;
+    timeNextQueueOrder = millis() + 2000; // wait 2 sec so the tuyau se vide avant de passer a la commande d'apres
     return 2;
   }
   return 1;
@@ -240,12 +243,18 @@ int handleOrder( const char * command)
       Serial.println("ERR: handleOrder: queue not cleared!" );
       return 0;
     }
+    scale.tare(); // remet a zero c'est mieux pour valider la pesée de la bouteille
+    last_measured = 0;
+    timeNextQueueOrder = millis();
     ASSERT(nNbrArgs<=LEN_QUEUE_ORDER)
     for( int i=nNbrArgs-1; i >= 0; --i )
     {
-      queueOrder[nNbrQueueOrder*2+0] = i;
-      queueOrder[nNbrQueueOrder*2+1] = args[i];
-      ++nNbrQueueOrder;
+      if(args[i]>0)
+      {
+        queueOrder[nNbrQueueOrder*2+0] = i;
+        queueOrder[nNbrQueueOrder*2+1] = args[i];
+        ++nNbrQueueOrder;
+      }
     }
   } // assemble
   else if(command[1]=='O' && command[2]=='n')
@@ -273,6 +282,7 @@ int handleSerialCommand()
   // return 1 if a new command has been received
   char command[LEN_COMMAND_MAX];
   int ichar = 0;
+  delay(20); // for all characters to arrive at 1200chr/sec => 24 chr
   while( Serial.available() && ichar < LEN_COMMAND_MAX )
   {
     command[ichar] = Serial.read();
@@ -441,8 +451,11 @@ void loop() {
         // handle queue
         if(!isTargetDefined())
         {
-          --nNbrQueueOrder;
-          verse_quantite(queueOrder[nNbrQueueOrder*2+1],queueOrder[nNbrQueueOrder*2+0]);
+          if( millis() >= timeNextQueueOrder )
+          {
+            --nNbrQueueOrder;
+            verse_quantite(queueOrder[nNbrQueueOrder*2+1],queueOrder[nNbrQueueOrder*2+0]);
+          }
         }
       }
     }

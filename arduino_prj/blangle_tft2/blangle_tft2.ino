@@ -594,9 +594,9 @@ void loop()
 
     //bubble = bjy_getAngle(0);
     // db = bjy_getAngle(1);
-    angle_db = -bjy_getAngle(1);
-    angle_nip = -bjy_getAngle(0);
-    angle_nip -= 41; // calibration en hard (lecture du zero quand posé a plat) todo stocke dans eeprom
+    angle_db = bjy_getAngle(1);
+    angle_nip = bjy_getAngle(0);
+    angle_nip -= 6; // calibration en hard (lecture du zero quand posé a plat) todo stocke dans eeprom
     angle_db -= 7; // sur la tranche on doit avoir 90, calibration en hard todo: => eeprom
     //angle_db -= 900; // offset face=>tranche - pas la peine, car on veut la difference par rapport a la verticale et pas l'horizontale
     //nip = 2*rCirc*3.14159265358979323846264*db/360;
@@ -607,7 +607,7 @@ void loop()
     db = angle_db - ( angle_nip + 3600*(nHalfBoitierMM / presetCirc[nNumSettingsSelected]));
     //db = angle_db; // pour afficher le capteur brut apres calib
 
-    db = analogRead(A15)*(5.0*8 / 1023.0);
+    //db = analogRead(A15)*(5.0*8 / 1023.0);
 
     if(0)
     { // code de test/debug

@@ -24,11 +24,12 @@
 
 #if 0
   #define MAX_BAUD 5
-  const int32_t buad[MAX_BAUD] = {57600, 115200, 1000000, 2000000, 3000000};
+  const int32_t buad[MAX_BAUD] = {57600, 115200, 1000000, 2000000, 3000000}; //  on my board it stuck at 2M id0
 #else
-  #define MAX_BAUD 3
-  const int32_t buad[MAX_BAUD] = {57600, 115200, 1000000}; // on my board it stuck at 2M id0
+  #define MAX_BAUD 4
+  const int32_t buad[MAX_BAUD] = {9600, 57600, 115200, 1000000}; // default for 430 is 57600
 #endif
+
 
 Dynamixel2Arduino dxl(DXL_SERIAL, DXL_DIR_PIN);
 
@@ -40,9 +41,24 @@ void setup() {
   // Use UART port of DYNAMIXEL Shield to debug.
   DEBUG_SERIAL.begin(115200);   //set debugging port baudrate to 115200bps
   while(!DEBUG_SERIAL);         //Wait until the serial port is opened
+
     
   for(int8_t protocol = 1; protocol < 3; protocol++) {
     // Set Port Protocol Version. This has to match with DYNAMIXEL protocol version.
+
+    DEBUG_SERIAL.print("Serial: ");
+    DEBUG_SERIAL.println(Serial);
+
+  //  DEBUG_SERIAL.print("Serial1: ");
+  //  DEBUG_SERIAL.println(Serial1);
+
+    DEBUG_SERIAL.print("DXL_SERIAL: ");
+    DEBUG_SERIAL.println(DXL_SERIAL);
+
+
+    DEBUG_SERIAL.print("DXL_DIR_PIN: ");
+    DEBUG_SERIAL.println(DXL_DIR_PIN);
+
     dxl.setPortProtocolVersion((float)protocol);
     DEBUG_SERIAL.print("SCAN PROTOCOL ");
     DEBUG_SERIAL.println(protocol);
@@ -61,12 +77,15 @@ void setup() {
           dxl.setOperatingMode(id, OP_POSITION);
           dxl.torqueOn(id);
 
-          dxl.ledOn(id);
-          delay(500);
-          dxl.ledOff(id);
-          delay(500);
+          for(int i = 0; i < 3; ++i)
+          {
+            dxl.ledOn(id);
+            delay(500);
+            dxl.ledOff(id);
+            delay(500);
+          }
           
-          DEBUG_SERIAL.print("ID : ");
+          DEBUG_SERIAL.print("ID: ");
           DEBUG_SERIAL.print(id);
           DEBUG_SERIAL.print(", Model Number: ");
           DEBUG_SERIAL.println(dxl.getModelNumber(id));

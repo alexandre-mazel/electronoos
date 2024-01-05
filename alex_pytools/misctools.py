@@ -829,7 +829,6 @@ def beep(frequency, duration):
         print(strDirHome)
         if not os.path.isdir(strDirHome):
             strDirHome = "/home/pi"
-            
         
         os.system("aplay %s/saw_440_100ms.wav" % strDirHome) # scp d:/sounds/saw_440_100ms.wav ...
         return

@@ -1,5 +1,6 @@
 #~ import audioread
 import librosa
+import time
 
 def test():
     f = "c:/tmp/poker-face-medieval-style.mp3"
@@ -25,11 +26,19 @@ def test():
 import pygame
 pg=pygame
 
+import numpy as np
+
+import sys
+sys.path.append("../alex_pytools/")
+sys.path.append("C:/Users/alexa/dev/git/electronoos/alex_pytools/")
+import sound_player
+
 successes, failures = pygame.init()
 print("INF: pygame int: %s successes and %s failure(s)" % (successes, failures))
 
 black = (0, 0, 0)
 white = (255, 255, 255)
+gray = (128, 128, 128)
 red = (255, 0, 0)
 green = (0, 255, 0) 
 blue = (0, 0, 255)
@@ -48,33 +57,93 @@ class Object:
 class Sound:
     def __init__(self):
         self.datas = []
+        self.pos = 0 # in s
+        self.maxf = [0]*1000 # memorize old maxis for each freq
+        self.timemaxf = [0]*1000
+        self.maxcur = 0
+        self.bPause = False
         
     def load(self):
         print("load sound...")
-        f = "c:/tmp/poker-face-medieval-style.mp3"
+        f = "c:/tmp/poker-face-medieval-style.mp3"        
+        #~ f = "c:/tmp/theme-from-the-shawshank-redemption (double bass).mp3"
         self.datas,self.samplerate = librosa.load(f,sr=None)
         print("load sound - end")
         
-    def update(self,surface):
+        # so sad to read the music elsewhere
+        pg.mixer.music.load(f)
+        self.timeBegin = time.time()-0.5 # time for the stuff to load (beurk)
+        pg.mixer.music.play()
         
+    def pause(self):
+        self.bPause = not self.bPause
+        if self.bPause:
+            pg.mixer.music.pause()
+        else:
+            pg.mixer.music.unpause()
+        
+    def update(self):
+        self.pos = time.time()-self.timeBegin
+        #~ print("DBG: Sound.update: current time: %.2fs" % self.pos)
+        #~ self.pos = pg.mixer.music.get_pos()
+        #~ print(pg.mixer.music.get_pos())
+        self.pos = (pg.mixer.music.get_pos()/1000.)-0.5 # there's a slight difference due to buffering?
+        if self.pos < 0:
+            self.pos = 0
+            
     def render(self,surface):
-        bw = 32
+        bw = 4
         x = 0
-        y = 200
+        y = 400
         
-        n = 0
-        windowsize = 4096*2
+        windowsize = 2048
+        n = int(self.pos * self.samplerate)#+windowsize//2 # heard sound is centered to window
+        
         m_block = librosa.feature.melspectrogram(self.datas[n:n+windowsize], sr=self.samplerate,n_fft=2048,hop_length=2048,center=False)
-        print(m_block)
-        for i in range(4):
-            pg.draw.rect(surface,white,(x,y,bw,5+int(10*m_block[0][i])))
+        #~ print(m_block)
+        S_dB = librosa.power_to_db(m_block, ref=np.max)
+        #~ print(S_dB)
+        for i in range(len(S_dB)):
+            vol = 5+int(abs(1*m_block[i][0]))
+            #~ vol = int( 500-abs(500.*S_dB[i][0]) )
+            
+            if self.bPause:
+                vol = 0
+                
+            if vol < 0:
+                vol = 0
+                
+            pg.draw.rect(surface,white,(x,y-vol,bw,vol))
+            
+            
+            if self.maxf[i] < vol:
+                self.maxf[i] = vol
+                self.timemaxf[i] = time.time()
+            elif self.maxf[i] > 0:
+                self.maxf[i] -= (time.time()-self.timemaxf[i])*(time.time()-self.timemaxf[i])
+                pg.draw.rect(surface,gray,(x,y-self.maxf[i],bw,2))
+                
             x += bw
 
+                
+            
+        
+        
+            
+        x += 100
+        vol = self.datas[n]*500
+        pg.draw.rect(surface,white,(x,y-vol,bw,vol))
+        if self.maxcur < vol:
+            self.maxcur = vol
+        else:
+            self.maxcur -= 2
+            pg.draw.rect(surface,gray,(x,y-self.maxcur,bw,2))
+        
 class Game:
     def __init__(self):
         self.screen = pygame.display.set_mode((720, 480))
         self.clock = pygame.time.Clock()
-        self.fps = 60  # Frames per second.
+        self.fps = 24  # Frames per second.
         
         self.square = Object()
         self.square.img = pygame.Surface((self.square.w, self.square.h))
@@ -102,6 +171,9 @@ class Game:
             if event.type == pygame.KEYDOWN:     
                 print("DBG: key '%s' pressed" % event.key )
                 self.keypressed[event.key] = 1
+                
+                if event.key == 112: # p
+                    self.sounds[0].pause()
                 
             if event.type == pygame.KEYUP:
                 self.keypressed[event.key] = 0
@@ -132,6 +204,9 @@ class Game:
             or (self.square.vx < 0 and self.square.x < 0) \
             :
             self.square.vx *= -1
+            
+            
+        self.sounds[0].update()
 
     def render(self):
         """

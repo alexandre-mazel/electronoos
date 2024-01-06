@@ -34,7 +34,8 @@ def playSongInterruptible(strFilename):
         return -1
         
     print("press n to next of up and down for vol up and vol down")
-    while pg.mixer.music.get_busy():
+    bInPause = False
+    while pg.mixer.music.get_busy() or bInPause:
         #~ pg.time.Clock().tick(1) #too long => block to 1fps
         #~ time.sleep(0.1)
         pg.time.Clock().tick(100) 
@@ -80,6 +81,15 @@ def playSongInterruptible(strFilename):
                             time.sleep(1) #fadout is not blocking
                         pg.mixer.music.stop()
                         return 2
+                    if key == 'p':
+                        if not bInPause:
+                            print("pause song")
+                            pg.mixer.music.pause()
+                            bInPause = True
+                        else:
+                            print("resume song")
+                            pg.mixer.music.unpause()
+                            bInPause = False
                     if key == 'H':
                         print("vol up")
                         pg.mixer.music.set_volume(pg.mixer.music.get_volume()+0.1)

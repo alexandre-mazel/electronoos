@@ -99,7 +99,7 @@ class SoundPlayer:
 soundPlayer = SoundPlayer()
 
 def playFile(strFilename, bWaitEnd = True, rSoundVolume = 1.):
-    soundPlayer.playFile(strFilename, bWaitEnd = bWaitEnd, rSoundVolume = rSoundVolume)
+    return soundPlayer.playFile(strFilename, bWaitEnd = bWaitEnd, rSoundVolume = rSoundVolume)
 
 def testPlay():
     import time

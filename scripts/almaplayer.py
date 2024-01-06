@@ -11,8 +11,9 @@ import sound_player
 timeLastNext = time.time()-100
 
 def playM4a(strFilename):
-    os.system('C:\\Progra~2\\VideoLAN\\VLC\\vlc.exe --play-and-exit "%s"' % strFilename)
-    return 0
+    ret = os.system('C:\\Progra~2\\VideoLAN\\VLC\\vlc.exe --play-and-exit "%s"' % strFilename)
+    print(dir(os))
+    return ret
 
 def playSongInterruptible(strFilename):
     """
@@ -24,9 +25,12 @@ def playSongInterruptible(strFilename):
         
     global timeLastNext
     try:
-        sound_player.playFile(strFilename,bWaitEnd=False)
+        ret = sound_player.playFile(strFilename,bWaitEnd=False)
+        print("DBG: playSongInterruptible: ret: %s" % ret )
+        if ret == False:
+            return -1
     except BaseException as err:
-        print("ERR: song not playable: %s (err: %s)" % (strFilename,err))
+        print("ERR: playSongInterruptible: song not playable: %s (err: %s)" % (strFilename,err))
         return -1
         
     print("press n to next of up and down for vol up and vol down")
@@ -100,6 +104,9 @@ def playAllFileFromFolder( strPath, listToExclude=[], strStartFrom = "" ):
     bSearchStart = strStartFrom != ""
     
     listFiles = sorted(os.listdir(strPath))
+    listMusics = []
+    
+    print( "DBG: playAllFileFromFolder: strPath: %s" % strPath )
 
     for f in listFiles:
         if ".mp3" not in f and ".mp4" not in f and ".m4a" not in f :
@@ -112,14 +119,34 @@ def playAllFileFromFolder( strPath, listToExclude=[], strStartFrom = "" ):
         
         if listToExclude != [] and f in listToExclude:
             continue
-        print("Playing '%s'" % f)
+            
+        listMusics.append(f)
+        
+    print( "INF: playAllFileFromFolder: %d songs next to play"%len(listMusics))
+    n = 0
+    while n < len(listMusics):
+        f = listMusics[n]
+        print("Playing %d: '%s'" % (n,f))
         absf = strPath + f
         ret = playSongInterruptible(absf)
-        if( ret == 10 ):
+        print( "DBG: playAllFileFromFolder: ret: %d" % ret )
+        if ret == 10:
             return
-        if( ret == 2 ):
-            # todo: pre: filter la liste au démarrage puis la parcourir...
-    #~ input("press a key")
+        if ret == 2:
+            n -= 1
+            if n < 0:
+                n = len(listMusics)-1
+        elif ret == -1:
+            # music not playable
+            print( "DBG: playAllFileFromFolder: removing song from playlist..." )
+            del listMusics[n]
+            if n >= len(listMusics):
+                n = len(listMusics)-1
+            print( "DBG: playAllFileFromFolder: removing song from playlist, now n:%d and len: %d" % (n,len(listMusics) ))
+        else:
+            n += 1
+        #~ input("press a key")
+        
     
 
 if __name__ == "__main__":
@@ -130,11 +157,13 @@ if __name__ == "__main__":
             if playSongInterruptible(mp3file) != 10:
                 # trouve les autre chansons du dossier et les joue (mais que les suivantes)
                 strPath, strFilename = os.path.split(mp3file)
+                if os.sep not in mp3file:
+                    strPath = "."+os.sep
                 playAllFileFromFolder(strPath+os.sep, [strFilename],strStartFrom=strFilename)
              
     except BaseException as err:
         print("ERR: Almaplayer, catched error: %s" % str(err))
-        input("press a key")
+        #input("press a key")
         exit(-1)
 exit(0)
     

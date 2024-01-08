@@ -61,12 +61,14 @@ class Sound:
         self.maxf = [0]*1000 # memorize old maxis for each freq
         self.timemaxf = [0]*1000
         self.maxcur = 0
+        self.timemaxcur = 0
         self.bPause = False
         
     def load(self):
         print("load sound...")
         f = "c:/tmp/poker-face-medieval-style.mp3"        
-        #~ f = "c:/tmp/theme-from-the-shawshank-redemption (double bass).mp3"
+        f = "c:/tmp/theme-from-the-shawshank-redemption (double bass).mp3"
+        f = "c:/tmp/Eminem - Mockingbird (Blasterjaxx Remix).mp3"
         self.datas,self.samplerate = librosa.load(f,sr=None)
         print("load sound - end")
         
@@ -94,7 +96,7 @@ class Sound:
     def render(self,surface):
         bw = 4
         x = 0
-        y = 400
+        y = 440
         
         windowsize = 2048
         n = int(self.pos * self.samplerate)#+windowsize//2 # heard sound is centered to window
@@ -104,7 +106,7 @@ class Sound:
         S_dB = librosa.power_to_db(m_block, ref=np.max)
         #~ print(S_dB)
         for i in range(len(S_dB)):
-            vol = 5+int(abs(1*m_block[i][0]))
+            vol = 5+int(abs(0.5*m_block[i][0]))
             #~ vol = int( 500-abs(500.*S_dB[i][0]) )
             
             if self.bPause:
@@ -120,23 +122,21 @@ class Sound:
                 self.maxf[i] = vol
                 self.timemaxf[i] = time.time()
             elif self.maxf[i] > 0:
-                self.maxf[i] -= (time.time()-self.timemaxf[i])*(time.time()-self.timemaxf[i])
+                self.maxf[i] -= 5*(time.time()-self.timemaxf[i])*(time.time()-self.timemaxf[i])
                 pg.draw.rect(surface,gray,(x,y-self.maxf[i],bw,2))
                 
             x += bw
 
-                
-            
-        
-        
-            
+
         x += 100
         vol = self.datas[n]*500
+        vol = max(self.datas[n:n+windowsize])*200
         pg.draw.rect(surface,white,(x,y-vol,bw,vol))
         if self.maxcur < vol:
             self.maxcur = vol
+            self.timemaxcur = time.time()
         else:
-            self.maxcur -= 2
+            self.maxcur -= 5*(time.time()-self.timemaxcur)*(time.time()-self.timemaxcur)
             pg.draw.rect(surface,gray,(x,y-self.maxcur,bw,2))
         
 class Game:

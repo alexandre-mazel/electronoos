@@ -142,7 +142,7 @@ int check_if_must_stop_verse()
   lcd.print(" C");
   lcd.print(nCurrentVanne+1);
   lcd.print("  "); // clean eol
-  if(diff<1+4) // couramment on prend 5 apres coupure
+  if(diff<1+4+3+1) // couramment on prend 8 apres coupure
   {
     digitalWrite(VANNE_1_PIN, HIGH);
     if(0)
@@ -157,7 +157,7 @@ int check_if_must_stop_verse()
     Serial.print("INF: check_if_must_stop_verse: finished, target was ");
     Serial.println(target_verse);
     target_verse = -1001;
-    timeNextQueueOrder = millis() + 2000; // wait 2 sec so the tuyau se vide avant de passer a la commande d'apres
+    timeNextQueueOrder = millis() + 5000; // wait some sec so the tuyau se vide avant de passer a la commande d'apres
     return 2;
   }
   return 1;

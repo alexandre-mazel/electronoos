@@ -1,10 +1,14 @@
+#include <Encoder.h> // by Paul Stoffregen
 
+Encoder enc1(18,19);
 
-void setup() {
-  pinMode(ledPin, OUTPUT);  // declare the ledPin as as OUTPUT
+void setup() 
+{
   Serial.begin(9600);       // use the serial port
 }
 
-void loop() {
-  
+void loop() 
+{
+  int val = enc1.read();
+  Serial.println(val);
 }

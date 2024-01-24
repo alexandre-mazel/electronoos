@@ -67,14 +67,16 @@ class Sound:
     def load(self):
         print("load sound...")
         f = "c:/tmp/poker-face-medieval-style.mp3"        
-        f = "c:/tmp/theme-from-the-shawshank-redemption (double bass).mp3"
+        #~ f = "c:/tmp/theme-from-the-shawshank-redemption (double bass).mp3"
         f = "c:/tmp/Eminem - Mockingbird (Blasterjaxx Remix).mp3"
         self.datas,self.samplerate = librosa.load(f,sr=None)
         print("load sound - end")
         
         # so sad to read the music elsewhere
         pg.mixer.music.load(f)
-        self.timeBegin = time.time()-0.5 # time for the stuff to load (beurk)
+        #~ offset = 0.5 # 0.5: time for the stuff to load (beurk) it was related to the BT !
+        #~ offset = 1.5
+        self.timeBegin = time.time()
         pg.mixer.music.play()
         
     def pause(self):
@@ -89,19 +91,28 @@ class Sound:
         #~ print("DBG: Sound.update: current time: %.2fs" % self.pos)
         #~ self.pos = pg.mixer.music.get_pos()
         #~ print(pg.mixer.music.get_pos())
-        self.pos = (pg.mixer.music.get_pos()/1000.)-0.5 # there's a slight difference due to buffering?
+        
+        # there's a slight difference due to buffering?
+        offset = 0.5 # Tme for the stuff to load (beurk), no it was related to the BT !
+        offset = -0.2
+        self.pos = (pg.mixer.music.get_pos()/1000.) - offset
         if self.pos < 0:
             self.pos = 0
             
     def render(self,surface):
-        bw = 4
-        x = 0
-        y = 440
+        bw = 8 # width of one band
+        x = 20
+        y = 840+30 # bottom of graph
         
         windowsize = 2048
         n = int(self.pos * self.samplerate)#+windowsize//2 # heard sound is centered to window
         
-        m_block = librosa.feature.melspectrogram(self.datas[n:n+windowsize], sr=self.samplerate,n_fft=2048,hop_length=2048,center=False)
+        try:
+            m_block = librosa.feature.melspectrogram(self.datas[n:n+windowsize], sr=self.samplerate,n_fft=2048,hop_length=2048,center=False)
+        except librosa.util.exceptions.ParameterError as err:
+            print("WRN: Sound.render: err: %s" % str(err))
+            return
+        
         #~ print(m_block)
         S_dB = librosa.power_to_db(m_block, ref=np.max)
         #~ print(S_dB)
@@ -141,7 +152,7 @@ class Sound:
         
 class Game:
     def __init__(self):
-        self.screen = pygame.display.set_mode((720, 480))
+        self.screen = pygame.display.set_mode((1280+80, 840+48))
         self.clock = pygame.time.Clock()
         self.fps = 24  # Frames per second.
         

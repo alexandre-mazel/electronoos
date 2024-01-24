@@ -152,7 +152,7 @@ class Sound:
         
 class Game:
     def __init__(self):
-        self.screen = pygame.display.set_mode((1280+80, 840+48))
+        self.screen = pygame.display.set_mode((1280+80, 840+40))
         self.clock = pygame.time.Clock()
         self.fps = 24  # Frames per second.
         

@@ -11,15 +11,20 @@
 # http://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_heavy/float16/1/pose_landmarker_heavy.task
 
 
+import time
+
+timeBegin = time.time()
+
 from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
 import numpy as np
-import time
 
 import cv2
 import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
+
+print("Imports takes %.3fs" % (time.time()-timeBegin))
 
 # if errors occurs:
 # ImportError: cannot import name 'builder' from 'google.protobuf.internal' (C:\Python39\lib\site-packages\google\protobuf\internal\__init__.py)
@@ -57,8 +62,8 @@ def draw_landmarks_on_image(rgb_image, detection_result):
 
 def init( strModelPath = "../models/" ):
     strModelFileName = "pose_landmarker_heavy.task"
-    strModelFileName = "pose_landmarker_full.task"
-    strModelFileName = "pose_landmarker_lite.task"
+    #~ strModelFileName = "pose_landmarker_full.task"
+    #~ strModelFileName = "pose_landmarker_lite.task"
     
     strModelPathFileName = strModelPath + strModelFileName
     
@@ -85,16 +90,33 @@ def bokeh( detector, img ):
     print("Detect takes %.3fs" % (time.time()-timeBegin))
 
     # STEP 5: Process the detection result. In this case, visualize it.
-    timeBegin = time.time()
-    annotated_image = draw_landmarks_on_image(imagebuf.numpy_view(), detection_result)
-    print("draw_landmarks_on_image takes %.3fs" % (time.time()-timeBegin))
-    cv2.imshow("test2",cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR))
-    
-
+    if 0:
+        timeBegin = time.time()
+        annotated_image = draw_landmarks_on_image(imagebuf.numpy_view(), detection_result)
+        print("draw_landmarks_on_image takes %.3fs" % (time.time()-timeBegin))
+        cv2.imshow("test2",cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR))
 
     segmentation_mask = detection_result.segmentation_masks[0].numpy_view()
-    visualized_mask = np.repeat(segmentation_mask[:, :, np.newaxis], 3, axis=2) * 255
-    return visualized_mask
+    #~ visualized_mask = np.repeat(segmentation_mask[:, :, np.newaxis], 3, axis=2)
+    
+    imr = cv2.GaussianBlur(img,(9,9),cv2.BORDER_DEFAULT)
+    print("shape imr: %s (%s)" % (str(imr.shape),imr.dtype))
+    print("shape img: %s (%s)" % (str(img.shape),img.dtype))
+    
+    #~ img.copyTo(imr, segmentation_mask);
+    print("shape seg: %s (%s)" % (str(segmentation_mask.shape),segmentation_mask.dtype))
+    segmentation_mask = segmentation_mask.astype(np.uint8)
+    print("shape seg: %s (%s)" % (str(segmentation_mask.shape),segmentation_mask.dtype))
+    
+    #~ mask = cv2.cvtColor(segmentation_mask,cv2.cv2.COLOR_BGR2GRAY)
+    #~ print("shape mask: %s" % str(mask.shape))
+
+    img_fg = cv2.bitwise_and(img, img, mask=segmentation_mask)
+    segmentation_mask_inv = cv2.bitwise_not(segmentation_mask)
+    imr_bg = cv2.bitwise_and(img, img, mask=segmentation_mask_inv)
+    imr = cv2.add(imr_bg,img_fg)
+    #~ imr[segmentation_mask] = 0
+    return imr
  
  
 def test():

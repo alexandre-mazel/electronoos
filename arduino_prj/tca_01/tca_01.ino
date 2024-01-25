@@ -18,11 +18,13 @@ void setup()
 
 unsigned long timeChange = millis();
 
+const float rSecondToPrim = 31.2; // theorically 31 for fast motor // a bigger value count more turn than reality
 void loop() 
 {
   int val1 = enc1.read();
   int val2 = 0;
-  float rRev = val1/(31*4.);
+  float rRev = val1/(rSecondToPrim*4.);
+  float rTurnToDo = 10;
 
   if(0)
   {
@@ -33,7 +35,7 @@ void loop()
   }
 
 
-  if( timeChange <= millis() || (rRev>0. && rRev>=2.) || (rRev<0. && rRev<=-2.) )
+  if( timeChange <= millis() || (rRev>0. && rRev>=rTurnToDo) || (rRev<0. && rRev<=-rTurnToDo) )
   {
     analogWrite(PWM_TWIST, 0);
     delay(500);
@@ -41,7 +43,7 @@ void loop()
     if(1)
     {
       int val1 = enc1.read();
-      float rRev = val1/(31*4.);
+      float rRev = val1/(rSecondToPrim*4.);
       
       Serial.print("at stop: enc1: ");
       Serial.print(val1);
@@ -53,13 +55,13 @@ void loop()
     enc1.write(0);
     delay(500);
 
-    timeChange = millis()+10000;
+    timeChange = millis()+30000;
     analogWrite(PWM_TWIST, 25); // 25 => 10% // en dessous de 12 ca demarre pas toujours
     digitalWrite(PHASE_TWIST, bTwistDir);
     //bTwistDir = !bTwistDir;
   }
 
-  delay(10);
+  // delay(10);
 
   // quand on affiche la valeur a l'arret (on lit la meme erreur dans les 2 sens)
 

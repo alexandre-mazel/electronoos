@@ -6,7 +6,7 @@ Encoder enc1(2,3);
 
 #define PWM_TWIST      8
 #define PHASE_TWIST   41
-int bTwistDir = 1;
+int bTwistDir = 1; // il y a une difference selon le sens du moteur !!!
 
 void setup() 
 {
@@ -58,7 +58,7 @@ void loop()
     timeChange = millis()+30000;
     analogWrite(PWM_TWIST, 25); // 25 => 10% // en dessous de 12 ca demarre pas toujours
     digitalWrite(PHASE_TWIST, bTwistDir);
-    //bTwistDir = !bTwistDir;
+    bTwistDir = !bTwistDir;
   }
 
   // delay(10);

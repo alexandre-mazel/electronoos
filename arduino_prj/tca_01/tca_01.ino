@@ -1,6 +1,8 @@
+#define ENCODER_USE_INTERRUPTS // then really need to use pin compatible with interruption (cf my doc)
+
 #include <Encoder.h> // by Paul Stoffregen
 
-Encoder enc1(18,19);
+Encoder enc1(2,3);
 
 #define PWM_TWIST      8
 #define PHASE_TWIST   41
@@ -14,17 +16,30 @@ void setup()
   pinMode(PHASE_TWIST, OUTPUT);
 }
 
+unsigned long timeChange = millis();
+
 void loop() 
 {
-  int val = enc1.read();
-  Serial.println("enc1: ");
-  Serial.println(val);
+  int val1 = enc1.read();
+  int val2 = 0;
+  float rRev = val1/(31.*4);
 
-  analogWrite(PWM_TWIST, 127); // 25 => 10%
-  digitalWrite(PHASE_TWIST, bTwistDir);
-  bTwistDir = !bTwistDir;
+  if( timeChange <= millis() || (rRev>0. && rRev>=2.) || (rRev<0. && rRev<=-2.) )
+  {
+    analogWrite(PWM_TWIST, 0);
+    delay(500);
+    enc1.write(0);
 
-  delay(1000);
+    timeChange = millis()+5000;
+    analogWrite(PWM_TWIST, 25); // 25 => 10%
+    digitalWrite(PHASE_TWIST, bTwistDir);
+    bTwistDir = !bTwistDir;
+  }
 
+  Serial.print("enc1: ");
+  Serial.print(val1);
+  Serial.print(", rev: ");
+  Serial.println(rRev);
 
+  delay(100);
 }

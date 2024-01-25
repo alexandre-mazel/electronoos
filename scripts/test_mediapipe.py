@@ -1,8 +1,21 @@
+# lien framapad:
+# https://mensuel.framapad.org/p/dbhhf3tied-a5p4
+
 # cf https://developers.google.com/mediapipe/solutions/vision/pose_landmarker/python
+
+# install lib:
+# EduPython: outils/outils/pip
+# install pip install mediapipe
+
+# get datas from:
+# http://cdn.pixabay.com/photo/2019/03/12/20/39/girl-4051811_960_720.jpg # a sauver en "girl.jpg"
+# http://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_heavy/float16/1/pose_landmarker_heavy.task
+
 
 from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
 import numpy as np
+import time
 
 # if errors occurs:
 # ImportError: cannot import name 'builder' from 'google.protobuf.internal' (C:\Python39\lib\site-packages\google\protobuf\internal\__init__.py)
@@ -35,7 +48,14 @@ def draw_landmarks_on_image(rgb_image, detection_result):
   return annotated_image
   
   
-model_path = "../models/pose_landmarker.task"
+model_path = "../models/pose_landmarker_heavy.task"
+#~ model_path = "../models/pose_landmarker_full.task"
+#~ model_path = "../models/pose_landmarker_lite.task"
+
+# mstab7:
+# lite: 0.040s # second 0.030
+# full: 0.050s # second 0.035
+# heavy: 0.087s # second 0.070
 
 def test():
     fn = "../test/girl-4051811_960_720.jpg"
@@ -66,10 +86,15 @@ def test():
     image = mp.Image.create_from_file(fn)
 
     # STEP 4: Detect pose landmarks from the input image.
+    #~ detection_result = detector.detect(image)
+    timeBegin = time.time()
     detection_result = detector.detect(image)
+    print("Detect takes %.3fs" % (time.time()-timeBegin))
 
     # STEP 5: Process the detection result. In this case, visualize it.
+    timeBegin = time.time()
     annotated_image = draw_landmarks_on_image(image.numpy_view(), detection_result)
+    print("draw_landmarks_on_image takes %.3fs" % (time.time()-timeBegin))
     cv2.imshow("test2",cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR))
     
 

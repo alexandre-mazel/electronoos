@@ -19,8 +19,13 @@ class MotorInterpolator
     public:
         
         MotorInterpolator( int nSpeedPin, int nReversePin );
-        int setNewGoal( float rNewGoal, float rTime = 0.0f );  // rTime: time to reach the goal, 0. => best effort
+        int setNewGoal( float rNewGoal, float rTimeSec = 0.0f );  // rTime: time to reach the goal, 0. => best effort
         
+        
+        // return true when goal reached
+        bool update( float rCurrentPos );
+    
+    
         // gentle stop
         // return true if was and moving
         bool brake();
@@ -29,10 +34,11 @@ class MotorInterpolator
         // emergency stop
         // return true if was moving
         bool stop();
-        
-        // return 1 when goal reached
-        bool update( float rCurPos );
-    
+
+
+        bool isMoving(void) {return nLastPwm_ > 0;}
+        bool getPos(void) {return rLastPos_;}
+
     private:
         void _sendPwm( uint8 nVal );
         void _sendReverse( bool bReverse );
@@ -42,7 +48,7 @@ class MotorInterpolator
     float   rGoal_;
     float   rGoalTimeMs_; // ideal time in ms to reach the goal
     float   rLastPos_;
-    float   rLastPwm_;
+    uint8   nLastPwm_;
 }; // class MotorInterpolator
 
     

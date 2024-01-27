@@ -22,12 +22,8 @@ void setup()
 unsigned long timeChange = millis();
 
 const float rSecondToPrim = 31.2; // theorically 31 for fast motor // a bigger value count more turn than reality
-void test10turn();
+void test10turn()
 {
-}
-void loop() 
-{
-  test10turn();
   int val1 = enc1.read();
   int val2 = 0;
   float rRev = val1/(rSecondToPrim*4.);
@@ -80,4 +76,19 @@ void loop()
   
   // a pwm 255, avec une loop sans delay, on a 0.13 d'erreur entre la lecture et l'arret.
   // a pwm 255, avec une loop a 100, on a 0.70 d'erreur entre la lecture et l'arret, c'est assez constant.
+}
+
+void loop() 
+{
+  //test10turn();
+
+  if(!mot1.isMoving())
+  {
+    delay(1000);
+    mot1.setNewGoal(mot1.getPos()+10,5);
+  }
+  float rMot1Pos = enc1.read()/(rSecondToPrim*4.);
+  mot1.update(rMot1Pos);
+  delay(10);
+
 }

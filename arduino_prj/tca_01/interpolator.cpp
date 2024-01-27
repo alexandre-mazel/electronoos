@@ -25,7 +25,18 @@ MotorInterpolator::MotorInterpolator( int nSpeedPin, int nReversePin )
 {
     nSpeedPin_ = nSpeedPin;
     nReversePin_ = nReversePin;
-    rLastPwm_ = 0;
+    nLastPwm_ = 0;
+    this->stop();
+}
+
+int MotorInterpolator::setNewGoal( float rNewGoal, float rTimeSec )
+{
+  rGoal_ = rNewGoal;
+  if(rTimeSec < 0.1)
+  {
+    rTimeSec = 0.1;
+  }
+  rGoalTimeMs_ = millis()+rTimeSec*1000;
 }
 
 bool MotorInterpolator::stop()
@@ -34,6 +45,11 @@ bool MotorInterpolator::stop()
     rGoalTimeMs_ = millis();
     rLastPos_ = rGoal_;
     _sendPwm(0);
+}
+
+bool MotorInterpolator::update(float rCurrentPos)
+{
+
 }
 
 void MotorInterpolator::_sendPwm( uint8 nVal )

@@ -1,6 +1,7 @@
 #define ENCODER_USE_INTERRUPTS // then really need to use pin compatible with interruption (cf my doc)
-
 #include <Encoder.h> // by Paul Stoffregen
+
+#include "interpolator.h"
 
 Encoder enc1(2,3);
 

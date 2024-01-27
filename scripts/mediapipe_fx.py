@@ -99,22 +99,38 @@ def bokeh( detector, img ):
     segmentation_mask = detection_result.segmentation_masks[0].numpy_view()
     #~ visualized_mask = np.repeat(segmentation_mask[:, :, np.newaxis], 3, axis=2)
     
+    print("segmentation_mask[0][0]: %s" % segmentation_mask[0][0] )
+    print("segmentation_mask[320][480]: %s" % segmentation_mask[320][480] )
+    
+    #~ return segmentation_mask
+    
     imr = cv2.GaussianBlur(img,(9,9),cv2.BORDER_DEFAULT)
     print("shape imr: %s (%s)" % (str(imr.shape),imr.dtype))
     print("shape img: %s (%s)" % (str(img.shape),img.dtype))
     
     #~ img.copyTo(imr, segmentation_mask);
     print("shape seg: %s (%s)" % (str(segmentation_mask.shape),segmentation_mask.dtype))
-    segmentation_mask = segmentation_mask.astype(np.uint8)
+    segmentation_mask = (segmentation_mask*255).astype(np.uint8)
     print("shape seg: %s (%s)" % (str(segmentation_mask.shape),segmentation_mask.dtype))
+    # todo: faire un threshold sur le calque
+    
+    print("segmentation_mask[0][0]: %s" % segmentation_mask[0][0] )
+    print("segmentation_mask[320][480]: %s" % segmentation_mask[320][480] )
     
     #~ mask = cv2.cvtColor(segmentation_mask,cv2.cv2.COLOR_BGR2GRAY)
     #~ print("shape mask: %s" % str(mask.shape))
 
     img_fg = cv2.bitwise_and(img, img, mask=segmentation_mask)
-    segmentation_mask_inv = cv2.bitwise_not(segmentation_mask)
-    imr_bg = cv2.bitwise_and(img, img, mask=segmentation_mask_inv)
-    imr = cv2.add(imr_bg,img_fg)
+    #~ segmentation_mask_inv = segmentation_mask[:]
+    segmentation_mask_inv = 255-segmentation_mask
+    #~ segmentation_mask_inv = cv2.bitwise_not(segmentation_mask) # != 255-segmentation_mask
+    print("shape seg inv: %s (%s)" % (str(segmentation_mask_inv.shape),segmentation_mask_inv.dtype))
+    print("segmentation_mask[0][0]: %s" % segmentation_mask[0][0] )
+    print("segmentation_mask[320][480]: %s" % segmentation_mask[320][480] )
+    print("segmentation_mask_inv[0][0]: %s" % segmentation_mask_inv[0][0] )
+    print("segmentation_mask_inv[320][480]: %s" % segmentation_mask_inv[320][480] )
+    imr_bg = cv2.bitwise_and(imr, imr, mask=segmentation_mask_inv)
+    imr = cv2.add(img_fg,imr_bg)
     #~ imr[segmentation_mask] = 0
     return imr
  

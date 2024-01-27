@@ -1,8 +1,11 @@
-#include "interpolator.h"
+#include "interpolator.hpp"
+
+#include <Arduino.h>
 
 #define sq(x) ( (x)*(x) )
-//#define pow(x,y) (x) // TODO
+#define pow(x,y) ((x)+(y)) // TODO
 #define sqrt(x) (x) // TODO
+
 
 float gaussian(float x)
 {
@@ -18,7 +21,7 @@ float gaussian(float x)
 }
 
 
-MotorInterpolator( int nSpeedPin, int nReversePin )
+MotorInterpolator::MotorInterpolator( int nSpeedPin, int nReversePin )
 {
     nSpeedPin_ = nSpeedPin;
     nReversePin_ = nReversePin;
@@ -33,7 +36,7 @@ bool MotorInterpolator::stop()
     _sendPwm(0);
 }
 
-void MotorInterpolator::_sendPwm(nVal)
+void MotorInterpolator::_sendPwm( uint8 nVal )
 {
     analogWrite(nSpeedPin_, nVal);
 }

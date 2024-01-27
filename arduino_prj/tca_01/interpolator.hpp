@@ -1,7 +1,9 @@
 #ifndef INTERPOLATOR_H
 #define INTERPOLATOR_H
 
-#include "Arduino.h"
+// de temps en temps, erase C:\Users\alexa\AppData\Local\Temp\arduino-language-server*
+// et aussi C:\Users\alexa\AppData\Local\Temp\arduino\sketches\
+
 
 //#define uint8 unsigned char
 typedef unsigned char uint8;
@@ -14,7 +16,7 @@ float gaussian( float x );
 
 class MotorInterpolator
 {
-//    public:
+    public:
         
         MotorInterpolator( int nSpeedPin, int nReversePin );
         int setNewGoal( float rNewGoal, float rTime = 0.0f );  // rTime: time to reach the goal, 0. => best effort

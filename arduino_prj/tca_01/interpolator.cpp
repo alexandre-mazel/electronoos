@@ -54,9 +54,14 @@ bool MotorInterpolator::stop()
 
 bool MotorInterpolator::update(float rCurrentRev)
 {
+  if (this->isArrived() && ! this->isMoving()) // need to update even if arrived if still moving (just send a pwm=0)
+  {
+    return;
+  }
   int nNewPwm = 0;
   const int rTurnToBrake = 5.f;
   const int rTimeToAccelerateSec = 2.f;
+  const int rThreshold = 0.1;
   //int nMaxSpeed = 
   if( rCurrentRev < rGoal_ - rTurnToBrake )
   {
@@ -74,14 +79,20 @@ bool MotorInterpolator::update(float rCurrentRev)
     }
 
   }
-  else if( rCurrentRev < rGoal_ )
+  else if( rCurrentRev < rGoal_ - rThreshold )
   {
     // slowing
     nNewPwm = (int)( ((rGoal_ - rCurrentRev)*255)/rTurnToBrake );
-    if(nNewPwm < 25) nNewPwm = 25; // need to continue to turn but at lower than 30 it stops
+    if(nNewPwm < 12) nNewPwm = 12; // need to continue to turn but at lower than 30 it stops
+  }
+  else
+  {
+    // arrived !
+    Serial.println("INF: update: Arrived !");
+    nNewPwm = 0;
   }
 
-  if( nNewPwm < 20) nNewPwm = 0; // prevent sending nearly 0
+  if( nNewPwm < 10) nNewPwm = 0; // prevent sending nearly 0
 
   if( nLastPwm_ != nNewPwm )
   {

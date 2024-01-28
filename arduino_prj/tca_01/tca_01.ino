@@ -78,17 +78,28 @@ void test10turn()
   // a pwm 255, avec une loop a 100, on a 0.70 d'erreur entre la lecture et l'arret, c'est assez constant.
 }
 
+void test3sec()
+{
+  analogWrite(PWM_TWIST, 200);
+  delay(3*1000);
+  analogWrite(PWM_TWIST, 0);
+  delay(3*1000);
+}
+
+
 void loop() 
 {
   //test10turn();
+  //test3sec();
+  //return;
 
-  if(!mot1.isMoving())
+  if(!mot1.isMoving() && !mot1.isArrived())
   {
-    delay(1000);
-    mot1.setNewGoal(mot1.getPos()+10,5);
+    delay(2000);
+    mot1.setNewGoal(mot1.getPos()+20,5);
   }
-  float rMot1Pos = enc1.read()/(rSecondToPrim*4.);
-  mot1.update(rMot1Pos);
-  delay(10);
+  float rMotRev1 = enc1.read()/(rSecondToPrim*4.);
+  mot1.update(rMotRev1);
+  delay(100);
 
 }

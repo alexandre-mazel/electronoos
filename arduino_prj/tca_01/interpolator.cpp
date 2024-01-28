@@ -26,6 +26,7 @@ MotorInterpolator::MotorInterpolator( int nSpeedPin, int nReversePin )
     nSpeedPin_ = nSpeedPin;
     nReversePin_ = nReversePin;
     nLastPwm_ = 0;
+    rLastPos_ = 0.f;
     this->stop();
 }
 
@@ -46,24 +47,23 @@ int MotorInterpolator::setNewGoal( float rNewGoal, float rTimeSec )
 
 bool MotorInterpolator::stop()
 {
-    rGoal_ = 0;
     rGoalTimeMs_ = millis();
-    rLastPos_ = rGoal_;
+    rGoal_ = rLastPos_;
     _sendPwm(0);
 }
 
 bool MotorInterpolator::update(float rCurrentRev)
 {
   int nNewPwm = 0;
-  const int rTurnToBrake = 2.f;
-  const int rTimeToAccelerate = 2.f;
+  const int rTurnToBrake = 5.f;
+  const int rTimeToAccelerateSec = 2.f;
   if( rCurrentRev < rGoal_ - rTurnToBrake )
   {
     // acceleration or full throttle
-    if(millis()-nTimeStartMove_ < rTimeToAccelerate)
+    if(millis()-nTimeStartMove_ < rTimeToAccelerateSec*1000)
     {
       // accelerate
-      nNewPwm = (int) ( ((millis()-nTimeStartMove_)*255) / rTimeToAccelerate);
+      nNewPwm = (int) ( ((millis()-nTimeStartMove_)*255) / (rTimeToAccelerateSec*1000));
       if( nNewPwm > 255) nNewPwm = 255;
     }
     else
@@ -78,12 +78,16 @@ bool MotorInterpolator::update(float rCurrentRev)
     nNewPwm = (int)( ((rGoal_ - rCurrentRev)*255)/rTurnToBrake );
   }
 
+  if( nNewPwm < 20) nNewPwm = 0;
+
   if( nLastPwm_ != nNewPwm )
   {
     nLastPwm_ = nNewPwm;
     analogWrite(nSpeedPin_, nLastPwm_);
   }
-  Serial.print("INF: update: rev: ");
+  Serial.print("INF: update: time: ");
+  Serial.print(millis());
+  Serial.print(", rev: ");
   Serial.print(rCurrentRev);
   Serial.print(", goal: ");
   Serial.print(rGoal_);
@@ -93,6 +97,13 @@ bool MotorInterpolator::update(float rCurrentRev)
   Serial.print(rGoalTimeMs_);
   Serial.print(", nNewPwm: ");
   Serial.println(nNewPwm);
+
+  rLastPos_ = rCurrentRev;
+  if( nNewPwm == 0 && abs(rCurrentRev-rGoal_) < 0.4 && millis()-nTimeStartMove_ > 1000 )
+  {
+    // we will never reach the target, let's says the move is finished
+    rGoal_ = rLastPos_;
+  }
 }
 
 void MotorInterpolator::_sendPwm( uint8 nVal )
@@ -107,5 +118,5 @@ void MotorInterpolator::_sendReverse( bool bReverse )
 
 bool MotorInterpolator::isArrived(void) 
 {
-  return abs(rGoal_-rLastPos_)<0.02;
+  return abs(rGoal_-rLastPos_) < 0.1;
 }

@@ -93,9 +93,9 @@ void loop()
   //test3sec();
   //return;
 
-  if(!mot1.isMoving() && !mot1.isArrived())
+  if(!mot1.isMoving() && mot1.isArrived() && mot1.getPos()<59) // start 3 times
   {
-    delay(2000);
+    delay(4000);
     mot1.setNewGoal(mot1.getPos()+20,5);
   }
   float rMotRev1 = enc1.read()/(rSecondToPrim*4.);

@@ -39,7 +39,7 @@ class MotorInterpolator
 
         bool isMoving(void) {return nLastPwm_ > 0;}
         bool isArrived(void);
-        bool getPos(void) {return rLastPos_;}
+        float getPos(void) {return rLastPos_;}
 
     private:
         void _sendPwm( uint8 nVal );

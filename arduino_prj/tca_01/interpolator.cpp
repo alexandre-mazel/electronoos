@@ -57,8 +57,10 @@ bool MotorInterpolator::update(float rCurrentRev)
   int nNewPwm = 0;
   const int rTurnToBrake = 5.f;
   const int rTimeToAccelerateSec = 2.f;
+  //int nMaxSpeed = 
   if( rCurrentRev < rGoal_ - rTurnToBrake )
   {
+
     // acceleration or full throttle
     if(millis()-nTimeStartMove_ < rTimeToAccelerateSec*1000)
     {
@@ -76,9 +78,10 @@ bool MotorInterpolator::update(float rCurrentRev)
   {
     // slowing
     nNewPwm = (int)( ((rGoal_ - rCurrentRev)*255)/rTurnToBrake );
+    if(nNewPwm < 25) nNewPwm = 25; // need to continue to turn but at lower than 30 it stops
   }
 
-  if( nNewPwm < 20) nNewPwm = 0;
+  if( nNewPwm < 20) nNewPwm = 0; // prevent sending nearly 0
 
   if( nLastPwm_ != nNewPwm )
   {
@@ -99,7 +102,13 @@ bool MotorInterpolator::update(float rCurrentRev)
   Serial.println(nNewPwm);
 
   rLastPos_ = rCurrentRev;
-  if( nNewPwm == 0 && abs(rCurrentRev-rGoal_) < 0.4 && millis()-nTimeStartMove_ > 1000 )
+  if( nNewPwm == 0 && 
+        ( 
+            ( abs(rCurrentRev-rGoal_) < 0.4 && millis()-nTimeStartMove_ > 1000 )
+            || ( abs(rCurrentRev-rGoal_) < 1. && millis()-nTimeStartMove_ > 5000 )
+        )
+  )
+
   {
     // we will never reach the target, let's says the move is finished
     rGoal_ = rLastPos_;

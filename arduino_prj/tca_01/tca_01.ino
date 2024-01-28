@@ -13,7 +13,7 @@ MotorInterpolator mot1(PWM_TWIST,PHASE_TWIST);
 
 void setup() 
 {
-  Serial.begin(9600);       // use the serial port
+  Serial.begin(57600);       // use the serial port // fast to not slowdown the program even with lot of trace
 
   pinMode(PWM_TWIST, OUTPUT);
   pinMode(PHASE_TWIST, OUTPUT);
@@ -93,13 +93,17 @@ void loop()
   //test3sec();
   //return;
 
-  if(!mot1.isMoving() && mot1.isArrived() && mot1.getPos()<59) // start 3 times
+  if(!mot1.isMoving() && mot1.isArrived() )
   {
     delay(4000);
-    mot1.setNewGoal(mot1.getPos()+20,5);
+    if( mot1.getPos()<59 )  // start only 3 times
+    {
+      mot1.setNewGoal(mot1.getPos()+20,5);
+    }
   }
   float rMotRev1 = enc1.read()/(rSecondToPrim*4.);
   mot1.update(rMotRev1);
-  delay(100);
+  
+  delay(10);
 
 }

@@ -95,13 +95,23 @@ void loop()
 
   if(!mot1.isMoving() && mot1.isArrived() )
   {
+    /*
     delay(4000);
     if( mot1.getPos()<59 )  // start only 3 times
     {
       mot1.setNewGoal(mot1.getPos()+20,5);
     }
+    */
+    delay(3000);
+    if( mot1.getPos()<59 )  // start only 1 time
+    {
+      mot1.setNewGoal(mot1.getPos()+1092,1000);
+    }
   }
   float rMotRev1 = enc1.read()/(rSecondToPrim*4.);
+  rMotRev1 = rMotRev1 * 40 / 12; // gear ratio
+  // result is 5 times too much, why ?
+  rMotRev1 /= 5;
   mot1.update(rMotRev1);
   
   delay(10);

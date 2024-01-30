@@ -99,8 +99,11 @@ def drawRoundCorner(im, center, radius, color, nAngleStart=0, bDrawOuter=0):
                     im[center[1]+j,center[0]-i] = color    
                     
 def hisEqulColor(img):
-    ycrcb=cv2.cvtColor(img,cv2.COLOR_BGR2YCR_CB)
-    channels=cv2.split(ycrcb)
+    """
+    histogram equalization while maintaining (as much as possible) colors
+    """
+    ycrcb = cv2.cvtColor(img,cv2.COLOR_BGR2YCR_CB)
+    channels = cv2.split(ycrcb)
     #~ print(len(channels))
     cv2.equalizeHist(channels[0],channels[0])
     cv2.merge(channels,ycrcb)

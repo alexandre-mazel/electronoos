@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 
+# from https://learnopencv.com/automatic-document-scanner-using-opencv/
+
 def order_points(pts):
     '''Rearrange coordinates to order:
       top-left, top-right, bottom-right, bottom-left'''

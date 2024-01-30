@@ -97,6 +97,101 @@ def drawRoundCorner(im, center, radius, color, nAngleStart=0, bDrawOuter=0):
                     im[center[1]+j,center[0]+i] = color    
                 else: # nAngleStart == 180:
                     im[center[1]+j,center[0]-i] = color    
+                    
+def hisEqulColor(img):
+    ycrcb=cv2.cvtColor(img,cv2.COLOR_BGR2YCR_CB)
+    channels=cv2.split(ycrcb)
+    #~ print(len(channels))
+    cv2.equalizeHist(channels[0],channels[0])
+    cv2.merge(channels,ycrcb)
+    cv2.cvtColor(ycrcb,cv2.COLOR_YCR_CB2BGR,img)
+    return img
+                    
+def listCameras( bShowImages = True, bLiveFeed = False ):
+    """
+    Test the ports and returns a tuple with the available ports and the ones that are working.
+    - bShowImages: render one image for each found devices
+    """
+    non_working_ports = []
+    dev_port = 0
+    working_ports = []
+    available_ports = []
+    xpos = 0
+    ypos = 0
+    ymax = 0
+    listWorkingCameraObj = []
+    while len(non_working_ports) < 6: # if there are more than 5 non working ports stop the testing. 
+        camera = cv2.VideoCapture( dev_port, cv2.CAP_DSHOW ) # cv.CAP_DSHOW: to remove the warning
+        if not camera.isOpened():
+            non_working_ports.append(dev_port)
+            print("Port %s is not working." %dev_port)
+        else:
+            w = camera.get(cv2.CAP_PROP_FRAME_WIDTH)
+            h = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
+            if 1:
+                if w == 1920 and h == 1080:
+                    print("WRN: skipping read gopro pourri driver")
+                    dev_port +=1
+                    continue
+            is_reading, img = camera.read()
+            if is_reading:
+                print("Port %s is working and reads images (%s x %s)" %(dev_port,w,h))
+                working_ports.append(dev_port)
+                if bLiveFeed: listWorkingCameraObj.append(camera)
+                if bShowImages:
+                    strWinName = "port %d" % dev_port
+                    while img.shape[0]>500:
+                        img = cv2.resize(img,(0,0),fx=0.5,fy=0.5)
+                    cv2.imshow(strWinName,img)
+                    #~ print("DBG: list_ports: move windows: %d, %d" % (xpos,ypos))
+                    cv2.moveWindow(strWinName,xpos,ypos)
+                    xpos += img.shape[1]+2
+                    ymax = max(ymax,img.shape[0])
+                    if xpos > 1300:
+                        xpos = 0
+                        ypos += ymax+24
+                        ymax = 0
+                    cv2.waitKey(100)
+            else:
+                print("Port %s for camera ( %s x %s) is present but does not reads." %(dev_port,h,w))
+                available_ports.append(dev_port)
+                
+        if not bLiveFeed: camera.release()
+        
+        dev_port +=1
+        
+    if bLiveFeed:
+        print("INF: live feeding...")
+        while 1:
+            for i,cam in enumerate(listWorkingCameraObj):
+                #~ print("DBG: retrieve image from numcamera: %d" % numcamera )
+                numcam = working_ports[i]
+                strWinName = "port %d" % numcam
+                is_reading, img = cam.read()
+                if is_reading:
+                    img = hisEqulColor(img)
+                    cv2.imshow(strWinName,img)
+                else:
+                    print("ERR: image not ready for camera port %d" % numcam)
+            k = cv2.waitKey(100)
+            if k == 27:
+                break
+        for cam in listWorkingCameraObj:
+            cam.release()
+            
+        
+    return available_ports,working_ports,non_working_ports
+    
+def computeImageDifference( im1, im2 ):
+    """
+    return difference between two images expressed in a [0..1] coefficient
+    """
+    err = np.sum( ( im1.astype("uint16") - im2.astype("uint16") ) ** 2 ) # astype("float"): 0.28s in HD astype("int"): 0.15s astype("int16"): 0.11s
+    #~ print("err1:%s"%err)
+    err /= float(im1.shape[0] * im1.shape[1])
+    err=math.sqrt(err)/512.
+    #~ print("err2:%s"%err)
+    return err
     
 def autoTest():
     im = np.zeros((600,800,3),dtype=np.uint8)
@@ -134,4 +229,5 @@ def autoTest():
 
 if __name__ == "__main__":
     pass
-    autoTest()
+    #~ autoTest()
+    listCameras(bLiveFeed=1)

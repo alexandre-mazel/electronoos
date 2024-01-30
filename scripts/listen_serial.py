@@ -90,9 +90,10 @@ def monitorPort(strPortName, nBaudRate=9600):
 strPortName = '/dev/ttyUSB0'
 strPortName = 'COM7'
 strPortName = 'COM6'
+strPortName = 'COM8'
 nBaudRate = 9600
 nBaudRate = 57600
-nBaudRate = 115200
+#~ nBaudRate = 115200
 strPortNameAutodetect = listPorts()
 if 0:
     print("using autodetected port: %s" % strPortNameAutodetect )

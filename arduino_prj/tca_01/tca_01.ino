@@ -1,5 +1,8 @@
 #define ENCODER_USE_INTERRUPTS // then really need to use pin compatible with interruption (cf my doc)
 #include <Encoder.h> // by Paul Stoffregen
+#include <LiquidCrystal_I2C.h>
+// initialize the library with the numbers of the interface pins
+LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 #include "interpolator.hpp"
 
@@ -7,6 +10,7 @@ Encoder enc1(2,3);
 
 #define PWM_TWIST      8
 #define PHASE_TWIST   41
+
 int bTwistDir = 1; // il y a une difference selon le sens du moteur !!!
 
 MotorInterpolator mot1(PWM_TWIST,PHASE_TWIST);
@@ -16,11 +20,68 @@ MotorInterpolator mot1(PWM_TWIST,PHASE_TWIST);
 #define dirPin 11 //direction
 #define stepPin 12 //step-pulse
 
+#define switchTwistGoPin 51 // button go +
+#define switchTwistRevPin 53 // button go -
+
 #define STPR 200 //steps-per-revolution
+
+
+unsigned long fpsTimeStart = 0;
+unsigned long fpsCpt = 0;
+void countFps()
+{
+  fpsCpt += 1;
+
+  // optim: don't read millis at everycall
+  // gain 1.1micros per call (averaged)
+  // an empty loop takes 67.15micros on mega2560 (just this function)
+
+  if((fpsCpt&7)!=7)
+  {
+    return;
+  }  
+
+  unsigned long diff = millis() - fpsTimeStart;
+  if (diff > 5000)
+  {
+    float fps = (float)(fpsCpt*1000)/diff;
+    Serial.print("fps: ");
+    Serial.print(fps);
+    Serial.print(", dt: ");
+    if(0)
+    {
+      Serial.print(1000.f/fps);
+      Serial.println("ms");
+    }
+    else
+    {
+      Serial.print(1000000.f/fps);
+      Serial.println("micros");
+    }
+
+    fpsTimeStart = millis();
+    fpsCpt = 0;
+  }
+
+}
+
+bool i2CAddrTest(uint8_t addr) {
+  Wire.begin();
+  Wire.beginTransmission(addr);
+  if (Wire.endTransmission() == 0) {
+    return true;
+  }
+  return false;
+}
+
+int bTwistGoButtonPushed = 0; // state of the button (so we detect it changes)
+int bTwistRevButtonPushed = 0; // state of the button (so we detect it changes)
+int nTwistMove = 0; // 0: stop, 1: positive direction, -1: reverse
 
 void setup() 
 {
   Serial.begin(57600);       // use the serial port // fast to not slowdown the program even with lot of trace
+  Serial.println("setup starting...");
 
   pinMode(PWM_TWIST, OUTPUT);
   pinMode(PHASE_TWIST, OUTPUT);
@@ -28,6 +89,26 @@ void setup()
   pinMode(enaPin, OUTPUT);
   pinMode(dirPin, OUTPUT);
   pinMode(stepPin, OUTPUT);
+
+  pinMode(switchTwistGoPin, INPUT);
+  pinMode(switchTwistRevPin, INPUT);
+
+  digitalWrite(enaPin ,LOW);
+  digitalWrite(dirPin ,LOW);
+
+  if( i2CAddrTest(0x27) ) 
+  {
+    Serial.println("LCD: ok");
+  }
+  else
+  {
+    Serial.println("LCD: Alternate init on 0x3F");
+    lcd = LiquidCrystal_I2C(0x3F, 20, 4);
+  }
+  lcd.init();                // initialize the lcd
+  lcd.backlight();           // Turn on backlight // sans eclairage on voit rien...
+  lcd.print("Ready...");// Print a message to the LCD
+  Serial.println("setup finished");
 }
 
 unsigned long timeChange = millis();
@@ -111,7 +192,7 @@ void asservTwist()
     delay(3000);
     if( mot1.getPos()<59 )  // start only 1 time
     {
-      mot1.setNewGoal(mot1.getPos()+1092,1000);
+      mot1.setNewGoal(mot1.getPos()+990,1000); // was 1092
     }
   }
   float rMotRev1 = enc1.read()/(rSecondToPrim*4.);
@@ -119,48 +200,61 @@ void asservTwist()
   // result is 5 times too much, why ?
   rMotRev1 /= 5;
   mot1.update(rMotRev1);
+  lcd.home();
+  //lcd.setCursor(0, 1);// set the cursor to column 0, line 1
+  lcd.print("Rev: ");
+  lcd.print(rMotRev1);
+  lcd.print("  "); // clean remaining char when number are off
   delay(10);
-  digitalWrite(dirPin ,LOW);
-  digitalWrite(enaPin ,LOW);
 }
 
-unsigned long fpsTimeStart = 0;
-unsigned long fpsCpt = 0;
-void countFps()
+
+void testStepper()
 {
-  fpsCpt += 1;
+  digitalWrite( stepPin, HIGH ); // takes 6micros
+  //delayMicroseconds(5);
 
-  // optim: don't read millis at everycall
-  // gain 1.1micros per call (averaged)
-  // an empty loop takes 67.15micros on mega2560 (just this function)
+  digitalWrite( stepPin,LOW );
+  //delayMicroseconds(5);
+}
 
-  if((fpsCpt&7)!=7)
+void commandByButton()
+{
+  int pushed = digitalRead(switchTwistGoPin) == HIGH;
+  if( bTwistGoButtonPushed != pushed )
   {
-    return;
-  }  
-
-  unsigned long diff = millis() - fpsTimeStart;
-  if (diff > 5000)
-  {
-    float fps = (float)(fpsCpt*1000)/diff;
-    Serial.print("fps: ");
-    Serial.print(fps);
-    Serial.print(", dt: ");
-    if(0)
+    bTwistGoButtonPushed = pushed;
+    if(pushed)
     {
-      Serial.print(1000.f/fps);
-      Serial.println("ms");
+      if( nTwistMove == 1 ) nTwistMove = 0;
+      else nTwistMove = 1;
     }
-    else
-    {
-      Serial.print(1000000.f/fps);
-      Serial.println("micros");
-    }
-
-    fpsTimeStart = millis();
-    fpsCpt = 0;
   }
-
+  
+  pushed = digitalRead(switchTwistRevPin) == HIGH;
+  if( bTwistRevButtonPushed != pushed )
+  {
+    bTwistRevButtonPushed = pushed;
+    if(pushed)
+    {
+      if( nTwistMove == -1 ) nTwistMove = 0;
+      else nTwistMove = -1;
+    }
+  }
+  
+  float rMotRev1 = enc1.read()/(rSecondToPrim*4.);
+  rMotRev1 = rMotRev1 * 40 / 12; // gear ratio
+  // result is 5 times too much, why ?
+  rMotRev1 /= 5;
+  mot1.update(rMotRev1);
+  lcd.home();
+  //lcd.setCursor(0, 1);// set the cursor to column 0, line 1
+  lcd.print("Rev: ");
+  lcd.print(rMotRev1);
+  lcd.print(", twist: ");
+  lcd.print(nTwistMove);
+  lcd.print("  "); // clean remaining char when number are off
+  delay(10);
 }
 
 void loop() 
@@ -169,14 +263,12 @@ void loop()
 
   //test10turn();
   //test3sec();
-  //asservTwist
-  //return;
+  //asservTwist();
+  commandByButton();
 
-  digitalWrite( stepPin, HIGH ); // takes 6micros
-  //delayMicroseconds(5);
+  //testStepper();
 
-  digitalWrite( stepPin,LOW );
-  //delayMicroseconds(5);
+
 
   countFps();
 

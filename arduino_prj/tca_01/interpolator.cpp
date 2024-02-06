@@ -43,13 +43,54 @@ int MotorInterpolator::setNewGoal( float rNewGoal, float rTimeSec )
   }
   nTimeStartMove_ = millis();
   rGoalTimeMs_ = nTimeStartMove_+rTimeSec*1000;
+  bIsInBrake_ = false;
+  nTimeSinceMotorNotMovingAndPwm_ = millis();
+
+  _sendReverse(rGoal_<rLastPos_);
 }
 
 bool MotorInterpolator::stop()
 {
-    rGoalTimeMs_ = millis();
-    rGoal_ = rLastPos_;
-    _sendPwm(0);
+  Serial.println("INF: stop");
+  rGoalTimeMs_ = millis();
+  rGoal_ = rLastPos_;
+  nLastPwm_ = 0;
+  bIsInBrake_ = false;
+
+  _sendPwm(0);
+}
+bool MotorInterpolator::brake()
+{
+  
+  const float rRotToBrake = 0.5;
+
+  if(bIsInBrake_)
+  {
+    return;
+  }
+
+  Serial.println("INF: brake");
+
+  if( nLastPwm_ == 0 || abs(rGoal_ - rLastPos_) < rRotToBrake / 3 )
+  {
+    stop();
+    return;
+  }
+  // was moving
+  bIsInBrake_ = true;
+  if( abs(rGoal_ - rLastPos_) < rRotToBrake )
+  {
+    // nothing to do
+    return;
+  }
+  if( rGoal_ > rLastPos_ )
+  {
+    rGoal_ = rLastPos_ + rRotToBrake;
+  }
+  else
+  {
+    rGoal_ = rLastPos_ - rRotToBrake;
+  }
 }
 
 bool MotorInterpolator::update(float rCurrentRev)
@@ -63,7 +104,7 @@ bool MotorInterpolator::update(float rCurrentRev)
   const int rTimeToAccelerateSec = 2.f;
   const int rThreshold = 0.1;
   //int nMaxSpeed = 
-  if( rCurrentRev < rGoal_ - rTurnToBrake )
+  if( abs(rCurrentRev - rGoal_) > rTurnToBrake )
   {
 
     // acceleration or full throttle
@@ -79,10 +120,11 @@ bool MotorInterpolator::update(float rCurrentRev)
     }
 
   }
-  else if( rCurrentRev < rGoal_ - rThreshold )
+  //else if( rCurrentRev < rGoal_ - rThreshold )
+  else if( abs(rCurrentRev - rGoal_) > rThreshold )
   {
     // slowing
-    nNewPwm = (int)( ((rGoal_ - rCurrentRev)*255)/rTurnToBrake );
+    nNewPwm = (int)( (abs(rGoal_ - rCurrentRev)*255)/rTurnToBrake );
     if(nNewPwm < 12) nNewPwm = 12; // need to continue to turn but at lower than 30 it stops
   }
   else
@@ -96,6 +138,12 @@ bool MotorInterpolator::update(float rCurrentRev)
 
   if( nLastPwm_ != nNewPwm )
   {
+    if( bIsInBrake_ && nNewPwm > nLastPwm_ )
+    {
+      Serial.println("INF: update: in brake and depassed, stopping !");
+      stop();
+      return;
+    }
     nLastPwm_ = nNewPwm;
     analogWrite(nSpeedPin_, nLastPwm_);
   }
@@ -112,7 +160,21 @@ bool MotorInterpolator::update(float rCurrentRev)
   Serial.print(", nNewPwm: ");
   Serial.println(nNewPwm);
 
-  rLastPos_ = rCurrentRev;
+  if(rLastPos_ != rCurrentRev )
+  {
+    rLastPos_ = rCurrentRev;
+    nTimeSinceMotorNotMovingAndPwm_ = millis();
+  }
+  else
+  {
+    // not moving
+    if(nLastPwm_ > 0 && millis()-nTimeSinceMotorNotMovingAndPwm_> 3000 )
+    {
+      Serial.println("INF: update: looks stalled, stopping...");
+      stop(); // stop forcing !
+      return;
+    }
+  }
   if( nNewPwm == 0 && 
         ( 
             ( abs(rCurrentRev-rGoal_) < 0.4 && millis()-nTimeStartMove_ > 1000 )
@@ -133,7 +195,7 @@ void MotorInterpolator::_sendPwm( uint8 nVal )
 
 void MotorInterpolator::_sendReverse( bool bReverse )
 {
-    analogWrite(nReversePin_, bReverse?1:0);
+    digitalWrite(nReversePin_, bReverse?HIGH:LOW);
 }
 
 bool MotorInterpolator::isArrived(void) 

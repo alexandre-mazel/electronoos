@@ -74,7 +74,7 @@ bool i2CAddrTest(uint8_t addr) {
   return false;
 }
 
-int bTwistGoButtonPushed = 0; // state of the button (so we detect it changes)
+int bTwistGoButtonPushed = 1; // state of the button (so we detect it changes) // let's pretend it was on at startup as there's a spurious on this one
 int bTwistRevButtonPushed = 0; // state of the button (so we detect it changes)
 int nTwistMove = 0; // 0: stop, 1: positive direction, -1: reverse
 
@@ -107,7 +107,12 @@ void setup()
   }
   lcd.init();                // initialize the lcd
   lcd.backlight();           // Turn on backlight // sans eclairage on voit rien...
+
   lcd.print("Ready...");// Print a message to the LCD
+
+//  delay(2000); // for button to be ready (why go always trig once at startup?)
+//  digitalRead(switchTwistGoPin); // permit to clear it !?!
+  
   Serial.println("setup finished");
 }
 
@@ -226,8 +231,17 @@ void commandByButton()
     bTwistGoButtonPushed = pushed;
     if(pushed)
     {
-      if( nTwistMove == 1 ) nTwistMove = 0;
-      else nTwistMove = 1;
+      Serial.println("button go pin pushed");
+      if( nTwistMove == 1 ) 
+      {
+        nTwistMove = 0;
+        mot1.brake();
+      }
+      else
+      {
+        nTwistMove = 1;
+        mot1.setNewGoal(mot1.getPos()+1000,1000);
+      }
     }
   }
   
@@ -237,11 +251,32 @@ void commandByButton()
     bTwistRevButtonPushed = pushed;
     if(pushed)
     {
-      if( nTwistMove == -1 ) nTwistMove = 0;
-      else nTwistMove = -1;
+      Serial.println("button rev pin pushed");
+      if( nTwistMove == -1 ) 
+      {
+        nTwistMove = 0;
+        mot1.brake();
+      }
+      else
+      {
+        nTwistMove = -1;
+        mot1.setNewGoal(mot1.getPos()-1000,1000);
+      }
     }
   }
-  
+
+  if(nTwistMove!=0 && mot1.getPos())
+  {
+    if(nTwistMove==1)
+    {
+      
+    }
+    else // if(nTwistMove==-1)
+    {
+      
+    }
+  }
+    
   float rMotRev1 = enc1.read()/(rSecondToPrim*4.);
   rMotRev1 = rMotRev1 * 40 / 12; // gear ratio
   // result is 5 times too much, why ?
@@ -251,7 +286,7 @@ void commandByButton()
   //lcd.setCursor(0, 1);// set the cursor to column 0, line 1
   lcd.print("Rev: ");
   lcd.print(rMotRev1);
-  lcd.print(", twist: ");
+  lcd.print(", twst: ");
   lcd.print(nTwistMove);
   lcd.print("  "); // clean remaining char when number are off
   delay(10);

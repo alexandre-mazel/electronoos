@@ -50,8 +50,11 @@ class MotorInterpolator
     float     rGoal_;
     long int  nTimeStartMove_; // time receive current goal
     float     rGoalTimeMs_; // ideal time in ms to reach the goal
+    long int  nTimeSinceMotorNotMovingAndPwm_; // time without moving and there's pwm!
     float     rLastPos_;
     uint8     nLastPwm_;
+    bool      bIsInBrake_; // do we already received a brake command ?
+
 
 }; // class MotorInterpolator
 

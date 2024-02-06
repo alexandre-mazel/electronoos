@@ -1,4 +1,5 @@
 import cv2
+import math
 import numpy as np
 import time
 
@@ -20,8 +21,18 @@ def getRatioWB(im):
     total = im.shape[0]*im.shape[1]
     return n_white_pix/total,n_black_pix/total
     
-
     
+    continuer a etudier la difference uint16, int16, float, sur des images assez differentes.
+def computeImageDifference( im1, im2 ):
+    """
+    return difference between two images expressed in a [0..1] coefficient
+    """
+    err = np.sum( ( im1.astype("uint16") - im2.astype("uint16") ) ** 2 ) # astype("float"): 0.28s in HD astype("int"): 0.15s astype("int16"): 0.11s
+    #~ print("err1:%s"%err)
+    err /= float(im1.shape[0] * im1.shape[1])
+    err=math.sqrt(err)/512.
+    #~ print("err2:%s"%err)
+    return err
 
 def countNbrDifferentColorsPix(pix):
     """
@@ -474,6 +485,67 @@ if 0:
     exit(0)
 
 
+def computeImageHash(img):
+    """
+    compute an unique hash related to an image (should be different on every images)
+    BUT Don't assume they are all different: if two hashes are the same, then compute the exact diff of the two images
+    (or similitude)
+    
+    Don't assume two ipmages with near hash are looking alike
+    """
+    nHash = 0
+    for j in range(img.shape[0]):
+        nHash += j*np.sum(img[j:j+1,])
+    nHash *= img.shape[1]*img.shape[0]
+    nHash %= pow(2,64)
+    return nHash;
+    
+def computeImageHashFromFile(strFilename):
+    img = cv2.imread(strFilename)
+    return computeImageHash(img)
+    
+def testDiffAndHash():
+    # weird: those 2 images are quite different (people at first plane is moving)
+    # but the diff is quite identical <0.009
+    # is it because it's the same object that moved and nothing else change?
+    strPath = "c:/img_tech_and_fest/"
+    im1 = cv2.imread(strPath+"2024_02_01-11h41m59s390212ms.jpg")
+    im2 = cv2.imread(strPath+"2024_02_01-11h41m59s621931ms.jpg")
+    print("diff two image with people: %s" % computeImageDifference(im1,im2))
+    print("diff two image with people: %s" % computeImageDifference(im2,im1)) # should be same
+    print("hash1: %s" % computeImageHash(im1))
+    print("hash2: %s" % computeImageHash(im2))
+    
+    strPath = "./autotest_data/"
+    im3 = cv2.imread(strPath+"grabouille1.jpg")
+    im4 = cv2.imread(strPath+"grabouille1.png")
+    im5 = cv2.imread(strPath+"grabouille2.jpg")
+    im6 = cv2.imread(strPath+"grabouille2.png")
+    print("diff jpg & png 1: %s" % computeImageDifference(im3,im4))  # 0.009588535727161772
+    print("diff jpg & png 2: %s" % computeImageDifference(im5,im6))  # 0.009556729730615056
+    print("diff two jpg - same figure displaced: %s" % computeImageDifference(im3,im5)) # 0.0864253593999991
+    print("diff two png - same figure displaced: %s" % computeImageDifference(im4,im6))  # 0.08976204280383894
+    hash3 = computeImageHash(im3)
+    hash4 = computeImageHash(im4)
+    hash5 = computeImageHash(im5)
+    hash6 = computeImageHash(im6)
+    print("hash3: %s" % hash3)
+    print("hash4: %s" % hash4)
+    print("hash5: %s" % hash5)
+    print("hash6: %s" % hash6)
+    
+    assert(hash3 != hash4)
+    assert(hash3 != hash5)
+    assert(hash3 != hash6)
+    
+    assert(hash4 != hash5)
+    assert(hash4 != hash6)
+    
+    assert(hash5 != hash6)
+    
+#~ testDiffAndHash()
+#~ exit(0)
+
 
 def autoTest():
     bDebug = 1
@@ -519,13 +591,46 @@ def autoTest():
     bRet = isLookLikePhoto(im,None,bDebug=bDebug)
     if bAssert: assert(bRet==0)
     
-    
-    
-    
     if 0:
         cv2.imshow("image_tools",im)
         key=cv2.waitKey(1) # time for image to refresh even if continuously pressing a key
         key=cv2.waitKey(0)
+        
+        
+    hash1 = computeImageHashFromFile("autotest_data/groot.jpg")
+    print( "hash1: %s" % hash1 )
+    hash2 = computeImageHashFromFile("autotest_data/HDRtoneMapping_memorialSample.jpg")
+    print( "hash2: %s" % hash2 )
+    hash3 = computeImageHashFromFile("autotest_data/spoon.jpg")
+    print( "hash3: %s" % hash3 )
+    assert(hash1 != hash2)
+    assert(hash1 != hash2)
+    assert(hash2 != hash3)
+    
+    hash4 = computeImageHashFromFile("autotest_data/illustration_bonhomme.jpg")
+    print( "hash4: %s" % hash4 )
+    hash5 = computeImageHashFromFile("autotest_data/illustration_bonhomme_p0.jpg")
+    print( "hash5: %s" % hash5 )
+    hash6 = computeImageHashFromFile("autotest_data/illustration_bonhomme_p1.jpg")
+    print( "hash6: %s" % hash6 )
+    hash7 = computeImageHashFromFile("autotest_data/illustration_bonhomme_p2.jpg")
+    print( "hash6: %s" % hash7 )
+    
+    assert(hash1 != hash4)
+    assert(hash1 != hash5)
+    assert(hash1 != hash6)
+    assert(hash1 != hash7)
+    
+    assert(hash4 != hash5)
+    assert(hash4 != hash6)
+    assert(hash4 != hash7)
+    
+    assert(hash5 != hash6)
+    assert(hash5 != hash7)
+    
+    assert(hash6 != hash7)
+    
+    testDiffAndHash()
 
 
 if __name__ == "__main__":

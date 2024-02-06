@@ -186,15 +186,8 @@ def listCameras( bShowImages = True, bLiveFeed = False ):
     return available_ports,working_ports,non_working_ports
     
 def computeImageDifference( im1, im2 ):
-    """
-    return difference between two images expressed in a [0..1] coefficient
-    """
-    err = np.sum( ( im1.astype("uint16") - im2.astype("uint16") ) ** 2 ) # astype("float"): 0.28s in HD astype("int"): 0.15s astype("int16"): 0.11s
-    #~ print("err1:%s"%err)
-    err /= float(im1.shape[0] * im1.shape[1])
-    err=math.sqrt(err)/512.
-    #~ print("err2:%s"%err)
-    return err
+    import image_tools
+    return image_tools.computeImageDifference(im1,im2)
     
 def autoTest():
     im = np.zeros((600,800,3),dtype=np.uint8)

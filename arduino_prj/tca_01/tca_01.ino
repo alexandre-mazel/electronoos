@@ -11,12 +11,23 @@ int bTwistDir = 1; // il y a une difference selon le sens du moteur !!!
 
 MotorInterpolator mot1(PWM_TWIST,PHASE_TWIST);
 
+
+#define enaPin 10 //enable-motor
+#define dirPin 11 //direction
+#define stepPin 12 //step-pulse
+
+#define STPR 200 //steps-per-revolution
+
 void setup() 
 {
   Serial.begin(57600);       // use the serial port // fast to not slowdown the program even with lot of trace
 
   pinMode(PWM_TWIST, OUTPUT);
   pinMode(PHASE_TWIST, OUTPUT);
+
+  pinMode(enaPin, OUTPUT);
+  pinMode(dirPin, OUTPUT);
+  pinMode(stepPin, OUTPUT);
 }
 
 unsigned long timeChange = millis();
@@ -86,13 +97,8 @@ void test3sec()
   delay(3*1000);
 }
 
-
-void loop() 
+void asservTwist()
 {
-  //test10turn();
-  //test3sec();
-  //return;
-
   if(!mot1.isMoving() && mot1.isArrived() )
   {
     /*
@@ -113,7 +119,67 @@ void loop()
   // result is 5 times too much, why ?
   rMotRev1 /= 5;
   mot1.update(rMotRev1);
-  
   delay(10);
+  digitalWrite(dirPin ,LOW);
+  digitalWrite(enaPin ,LOW);
+}
+
+unsigned long fpsTimeStart = 0;
+unsigned long fpsCpt = 0;
+void countFps()
+{
+  fpsCpt += 1;
+
+  // optim: don't read millis at everycall
+  // gain 1.1micros per call (averaged)
+  // an empty loop takes 67.15micros on mega2560 (just this function)
+
+  if((fpsCpt&7)!=7)
+  {
+    return;
+  }  
+
+  unsigned long diff = millis() - fpsTimeStart;
+  if (diff > 5000)
+  {
+    float fps = (float)(fpsCpt*1000)/diff;
+    Serial.print("fps: ");
+    Serial.print(fps);
+    Serial.print(", dt: ");
+    if(0)
+    {
+      Serial.print(1000.f/fps);
+      Serial.println("ms");
+    }
+    else
+    {
+      Serial.print(1000000.f/fps);
+      Serial.println("micros");
+    }
+
+    fpsTimeStart = millis();
+    fpsCpt = 0;
+  }
+
+}
+
+void loop() 
+{
+ // Serial.println("loop...");
+
+  //test10turn();
+  //test3sec();
+  //asservTwist
+  //return;
+
+  digitalWrite( stepPin, HIGH ); // takes 6micros
+  //delayMicroseconds(5);
+
+  digitalWrite( stepPin,LOW );
+  //delayMicroseconds(5);
+
+  countFps();
+
+  //delay(100);
 
 }

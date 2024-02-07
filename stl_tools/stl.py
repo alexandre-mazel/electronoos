@@ -31,7 +31,7 @@ def print_grey(s):
         from colorama import Fore, Back, Style, init
         init()
         print( Fore.BLACK + Style.BRIGHT + s ) # bright blacks looks like grey
-    except BaseException, err:
+    except BaseException as err:
         # print( "DBG: err: %s" % err) # to debug this method
         print( s ) # no colorama => no color, it's ok...
         
@@ -294,15 +294,15 @@ class Stl:
                             colors.append(['y','y','y'])
                         #~ if nNumTriangle > 2:
                             #~ break
-                print x
-                print y
-                print z
-                print colors
+                print(x)
+                print(y)
+                print(z)
+                print(colors)
                 x = np.array(x)
                 y = np.array(y)
                 z = np.array(z)
                 colors = np.array(colors)
-                print colors.shape
+                print(colors.shape)
                 #~ ax.plot_surface(x, y, z, cmap=cm.coolwarm, linewidth=0, antialiased=False)
                 ax.plot_trisurf(x, y, z, linewidth=0.2, antialiased=True) # , color=colors
             else:

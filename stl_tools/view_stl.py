@@ -9,10 +9,18 @@ import panda3d
 #~ myModel.reparentTo(render)
 #~ myModel.detachNode() # to remove from scene
 
+#cf https://arsthaumaturgis.github.io/Panda3DTutorial.io/tutorial/tut_lesson02.html
 
 
+import direct
 from direct.showbase.ShowBase import ShowBase
-from direct.task import Task
+
+from direct.actor.Actor import Actor
+
+from direct.interval.IntervalGlobal import Sequence
+
+from panda3d.core import Point3
+from panda3d.core import WindowProperties
 
 
 class MyApp(ShowBase):
@@ -20,33 +28,112 @@ class MyApp(ShowBase):
     def __init__(self):
         ShowBase.__init__(self)
         
+        if 0:
+            properties = WindowProperties()
+            properties.setSize(1400, 750)
+            self.win.requestProperties(properties)
+        
         # Load the environment model.
-
-        self.scene = self.loader.loadModel("models/environment")
-
-        # Reparent the model to render.
-
-        self.scene.reparentTo(self.render)
-
-        # Apply scale and position transforms on the model.
-
-        self.scene.setScale(0.25, 0.25, 0.25)
-
-        self.scene.setPos(-8, 42, 0)
         
-        myNodePath = loader.loadModel("MovingWeight_with_roller.stl")
-        myNodePath.reparentTo(self.render)
-        myNodePath.detachNode() # to remove from scene
-        myNodePath.setScale(10., 10., 10.)
-        
-        # Add the spinCameraTask procedure to the task manager.
+        if 0:
+            #~ self.scene = self.loader.loadModel("models/environment") # load the .egg or the .bam or the egg.pz
+            #~ self.scene = self.loader.loadModel("models/misc/camera") 
 
-        if 1:
-            # start spin task
+            for i in range(3):
+                print(self.scene.getChild(i))
+
+            # Reparent the model to render.
+
+            self.scene.reparentTo(self.render)
+
+            # Apply scale and position transforms on the model.
+
+            self.scene.setScale(0.25, 0.25, 0.25)
+
+            self.scene.setPos(-8, 42, 0)
+        
+        # play with the camera position
+        self.camera.setPos(0, 0, 32) # change nothing !?!
+        self.camera.setP(-90)
+        
+        #~ self.disableMouse()
+        
+        if 1:        
+            #~ myNodePath = loader.loadModel("MovingWeight_with_roller.stl")
+            myNodePath = loader.loadModel("movingweight")
+            myNodePath.reparentTo(self.render)
+            # myNodePath.detachNode() # to remove from scene
+            scale_coef = 10000
+            myNodePath.setScale(scale_coef, scale_coef, scale_coef)
+            myNodePath.setPos(-8, 7, 0)
+            myNodePath.setRenderModeWireframe()
+            #~ for i in range(3):
+                #~ print(myNodePath.getChild(i))
+        
+        
+    
+
+        if 0:
+            # Add the spinCameraTask procedure to the task manager.
             self.taskMgr.add(self.spinCameraTask, "SpinCameraTask")
 
+        # Load and transform the panda actor.
 
-    # Define a procedure to move the camera.
+        self.pandaActor = direct.actor.Actor.Actor("models/panda-model",
+
+                                {"walk": "models/panda-walk4"})
+
+        self.pandaActor.setScale(0.005, 0.005, 0.005)
+
+        self.pandaActor.reparentTo(self.render)
+
+        # Loop its animation.
+
+        self.pandaActor.loop("walk")
+
+
+        if 1:
+            # make the panda translates
+            
+            # Create the four lerp intervals needed for the panda to
+
+            # walk back and forth.
+
+            posInterval1 = self.pandaActor.posInterval(13, # 13s of walk front
+
+                                                       Point3(0, -10, 0),
+
+                                                       startPos=Point3(0, 10, 0))
+
+            posInterval2 = self.pandaActor.posInterval(13,
+
+                                                       Point3(0, 10, 0),
+
+                                                       startPos=Point3(0, -10, 0))
+
+            hprInterval1 = self.pandaActor.hprInterval(3,
+
+                                                       Point3(180, 0, 0),
+
+                                                       startHpr=Point3(0, 0, 0))
+
+            hprInterval2 = self.pandaActor.hprInterval(3,
+
+                                                       Point3(0, 0, 0),
+
+                                                       startHpr=Point3(180, 0, 0))
+
+
+            # Create and play the sequence that coordinates the intervals.
+
+            self.pandaPace = Sequence(posInterval1, hprInterval1,
+
+                                      posInterval2, hprInterval2,
+
+                                      name="pandaPace")
+
+            self.pandaPace.loop()
+            
 
     def spinCameraTask(self, task):
 
@@ -58,7 +145,7 @@ class MyApp(ShowBase):
 
         self.camera.setHpr(angleDegrees, 0, 0)
 
-        return Task.cont
+        return direct.task.Task.cont
 
 
 

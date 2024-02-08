@@ -159,7 +159,7 @@ def showStl(filename, bAnimate=True, bDrawingTechnic = True):
                         (0,0,0),
                         (0,90,0),
                         (90,0,0),
-                        (-45,-45,0),
+                        (30,-35,0),
                     )
         rBackgroundColor = 0.9
         for i in range(4):

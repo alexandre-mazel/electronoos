@@ -1,7 +1,23 @@
 import vtk # pip install vtk # tested with vtk-9.3.0-cp39-cp39-win_amd64.whl
 
-def showStl(filename):
+def showStl(filename, bAnimate=True):
     
+    class MyInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
+
+        def __init__(self,parent=None):
+            self.parent = renderWindowInteractor
+
+            self.AddObserver("KeyPressEvent",self.keyPressEvent)
+
+        def keyPressEvent(self,obj,event):
+            key = self.parent.GetKeySym()
+            print("key: %s" % key)
+            if key == 'Escape':
+                print("Exiting!")
+                renderWindow.Finalize()
+                self.parent.TerminateApp()
+            return
+            
         
     def callback_func_animate(caller, timer_event):
         actor.RotateX(1)
@@ -47,11 +63,15 @@ def showStl(filename):
     rBackgroundColor = 0.75
     renderer.SetBackground(rBackgroundColor, rBackgroundColor, rBackgroundColor)
     
-    # animate
-    renderWindowInteractor.Initialize()
-    refresh_rate = 25 # ms
-    renderWindowInteractor.CreateRepeatingTimer(int(refresh_rate))
-    renderWindowInteractor.AddObserver("TimerEvent", callback_func_animate)
+    if bAnimate:
+        # animate
+        renderWindowInteractor.Initialize()
+        refresh_rate = 25 # ms
+        renderWindowInteractor.CreateRepeatingTimer(int(refresh_rate))
+        renderWindowInteractor.AddObserver("TimerEvent", callback_func_animate)
+        
+    # keyboard interaction
+    renderWindowInteractor.SetInteractorStyle(MyInteractorStyle())
 
     # Render and interact
     renderWindow.Render()

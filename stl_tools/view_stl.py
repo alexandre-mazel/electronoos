@@ -36,7 +36,7 @@ class MyApp(ShowBase):
         # Load the environment model.
         
         if 0:
-            #~ self.scene = self.loader.loadModel("models/environment") # load the .egg or the .bam or the egg.pz
+            self.scene = self.loader.loadModel("models/environment") # load the .egg or the .bam or the egg.pz
             #~ self.scene = self.loader.loadModel("models/misc/camera") 
 
             for i in range(3):
@@ -70,6 +70,29 @@ class MyApp(ShowBase):
             #~ for i in range(3):
                 #~ print(myNodePath.getChild(i))
         
+        
+        if 0:
+            plight = panda3d.core.PointLight('plight')
+            plight.setColor((0.2, 0.2, 0.2, 1))
+            #~ plight.setColor((10.2, 10.2, 10.2, 1))
+            plnp = self.render.attachNewNode(plight)
+            plnp.setPos(10, 20, 0)
+            self.render.setLight(plnp)
+            
+            if 1:
+                # Use a 512x512 resolution shadow map
+                plight.setShadowCaster(True, 512, 512)
+                # Enable the shader generator for the receiving nodes
+                self.render.setShaderAuto()
+            
+        if 0:
+            # Create Ambient Light
+            ambientLight = panda3d.core.AmbientLight('ambientLight')
+            ambientLight.setColor((0.1, 0.1, 0.1, 1))
+            ambientLightNP = self.render.attachNewNode(ambientLight)
+            self.render.setLight(ambientLightNP)
+            
+
         
     
 

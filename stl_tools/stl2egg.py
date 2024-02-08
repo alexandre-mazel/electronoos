@@ -86,6 +86,7 @@ class STL2EGG():
             self.poly.addVertex(self.vertexPool.addVertex(w))
             self.poly.recomputePolygonNormal()
             self.poly.setColor( VBase4( 0.0, 0.0, 0.5, 0.5) )
+            #~ print("u: %s, v: %s, w: %s" % (u,v,w))
             
 
     def parseASCII(self,f ):       

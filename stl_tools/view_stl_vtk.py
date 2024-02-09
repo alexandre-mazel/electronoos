@@ -78,6 +78,14 @@ def WriteCartouche(filename_generated, filename_original, nbr_faces = 0):
     
     #~ cv2.line( im, (leCart,toCart), (wi,toCart), black, 1 )
     #~ cv2.line( im, (leCart,toCart), (leCart,hi), black, 1 )
+    
+    if 1:
+        # puttext front left ...
+        margin = 10
+        hmargin = margin+20
+        cv2.putText( im, "Front",  ( 0+margin, 0+hmargin ), font, 1, fontColor, 1 )
+        cv2.putText( im, "Right",  ( 0+margin+wi//2, 0+hmargin ), font, 1, fontColor, 1 )
+        cv2.putText( im, "Top",  ( 0+margin, 0+hmargin+hi//2 ), font, 1, fontColor, 1 )
 
     strDateFile = getDate(os.path.getmtime(filename_original))
     strDateNow = getDate()
@@ -86,6 +94,7 @@ def WriteCartouche(filename_generated, filename_original, nbr_faces = 0):
     
     nSize = os. path. getsize(filename_original)
     strInfo = "Format: STL, size: %dkB" % (nSize/1024) 
+    
     
     nbrTotalLine = 5
     line = 0
@@ -101,7 +110,7 @@ def WriteCartouche(filename_generated, filename_original, nbr_faces = 0):
     cv2_tools.putTextBox( im, "File : " + strDateFile,  (leCart,toCart+hCart*line//nbrTotalLine,leCart+wCart,toCart+hCart*(line+1)//nbrTotalLine), font, fontColor, thickness//2, bOutline=0, bRenderBox=1 ); line += 1
     cv2_tools.putTextBox( im, "Render: " + strDateNow,  (leCart,toCart+hCart*line//nbrTotalLine,leCart+wCart,toCart+hCart*(line+1)//nbrTotalLine), font, fontColor, thickness//2, bOutline=0, bRenderBox=1 ); line += 1
     cv2.imwrite( filename_generated, im )
-    if 0:
+    if 1:
         cv2.imshow("cartouche", im)
         cv2.waitKey(0)
     

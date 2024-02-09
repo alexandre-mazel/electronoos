@@ -89,15 +89,16 @@ def bokeh( detector, img ):
     detection_result = detector.detect(imagebuf)
     print("Detect takes %.3fs" % (time.time()-timeBegin))
 
+    segmentation_mask = detection_result.segmentation_masks[0].numpy_view()
+    #~ visualized_mask = np.repeat(segmentation_mask[:, :, np.newaxis], 3, axis=2)
+
     # STEP 5: Process the detection result. In this case, visualize it.
-    if 0:
+    if 1:
         timeBegin = time.time()
         annotated_image = draw_landmarks_on_image(imagebuf.numpy_view(), detection_result)
         print("draw_landmarks_on_image takes %.3fs" % (time.time()-timeBegin))
         cv2.imshow("test2",cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR))
-
-    segmentation_mask = detection_result.segmentation_masks[0].numpy_view()
-    #~ visualized_mask = np.repeat(segmentation_mask[:, :, np.newaxis], 3, axis=2)
+        cv2.imshow("mask",cv2.cvtColor(segmentation_mask, cv2.COLOR_RGB2BGR))
     
     print("segmentation_mask[0][0]: %s" % segmentation_mask[0][0] )
     print("segmentation_mask[320][480]: %s" % segmentation_mask[320][480] )
@@ -112,7 +113,10 @@ def bokeh( detector, img ):
     print("shape seg: %s (%s)" % (str(segmentation_mask.shape),segmentation_mask.dtype))
     segmentation_mask = (segmentation_mask*255).astype(np.uint8)
     print("shape seg: %s (%s)" % (str(segmentation_mask.shape),segmentation_mask.dtype))
-    # todo: faire un threshold sur le calque
+    
+    # threshold on mask
+    #~ ret,segmentation_mask = cv2.threshold(segmentation_mask, 200,255,cv2.THRESH_TOZERO)
+    ret,segmentation_mask = cv2.threshold(segmentation_mask, 200,255,cv2.THRESH_BINARY)
     
     print("segmentation_mask[0][0]: %s" % segmentation_mask[0][0] )
     print("segmentation_mask[320][480]: %s" % segmentation_mask[320][480] )
@@ -132,6 +136,17 @@ def bokeh( detector, img ):
     imr_bg = cv2.bitwise_and(imr, imr, mask=segmentation_mask_inv)
     imr = cv2.add(img_fg,imr_bg)
     #~ imr[segmentation_mask] = 0
+    #~ return imr_bg
+    #~ return img_fg
+    
+    if 1:
+        # save all steps
+        path = "/tmp/"
+        cv2.imwrite(path+"mask.jpg", segmentation_mask)
+        cv2.imwrite(path+"skel.jpg", cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR))
+        cv2.imwrite(path+"bg.jpg", imr_bg)
+        cv2.imwrite(path+"fg.jpg", img_fg)
+        cv2.imwrite(path+"res_bokeh.jpg", imr)
     return imr
  
  
@@ -141,6 +156,7 @@ def test():
     print("Init takes %.3fs" % (time.time()-timeBegin))
     
     fn = "../test/girl-4051811_960_720.jpg"
+    fn = "/tmp_frames/WIN_20240208_18_26_08_Pro-00116.jpg"
 
     img = cv2.imread(fn)
     imresult = bokeh(detector, img)

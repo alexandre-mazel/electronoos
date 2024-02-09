@@ -1,7 +1,56 @@
 import vtk # pip install vtk # tested with vtk-9.3.0-cp39-cp39-win_amd64.whl
 import sys
 
+sys.path.append("../alex_pytools")
+import cv2_tools
+
 from vtkmodules.vtkRenderingCore import vtkRenderer
+
+def WriteCartouche(filename_generated, filename_original):
+    """
+    Add cartouche to the image in filename_generated.
+    Info are related to filename_original (the stl)
+    """
+    print("INF: WriteCartouche: Writing to '%s'" % filename_generated)
+    import cv2
+    im = cv2.imread(filename_generated,cv2.IMREAD_UNCHANGED) # handle RGBA
+    
+    black = (0,0,0)
+        
+    hi,wi = im.shape[:2]
+    
+    # image separators
+    cv2.line( im, (wi//2,0), (wi//2,hi), black, 1 )
+    cv2.line( im, (0,hi//2), (wi,hi//2), black, 1 )
+    
+    """
+    ------------------------------------------
+    | repr logo  |                   | date stl
+    _________ | piece name  |
+    | Stl           |                   | date render
+    """
+    
+    leCart = wi-200
+    toCart = hi-80
+
+    
+    font           = cv2.FONT_HERSHEY_SIMPLEX
+    fontScale   = 1
+    fontColor   = (0,0,0,255) # 255 for alpha, else it's not visible in the output
+    thickness   = 2
+    lineType     = 2
+    
+    cv2.line( im, (leCart,toCart), (wi,toCart), black, 1 )
+    cv2.line( im, (leCart,toCart), (leCart,hi), black, 1 )
+
+    
+    strName = filename_original.replace(".stl","")
+    cv2_tools.putTextRA( im, strName,  (wi-20,hi-20), font, fontScale, fontColor, thickness, bOutline=0 )
+    cv2.imwrite( filename_generated, im )
+    if 1:
+        cv2.imshow("cartouche", im)
+        cv2.waitKey(0)
+    
 
 def WriteImage(fileName, renWin, rgba=True):
     '''
@@ -116,7 +165,7 @@ def showStl(filename, bAnimate=True, bDrawingTechnic = True):
     # A renderer and render window
     renderer = vtk.vtkRenderer()
     renderWindow = vtk.vtkRenderWindow()
-    renderWindow.SetSize(768,768)
+    renderWindow.SetSize(1024,1024)
     renderWindow.SetWindowName(filename)
 
     renderWindow.AddRenderer(renderer)
@@ -155,22 +204,49 @@ def showStl(filename, bAnimate=True, bDrawingTechnic = True):
         xmaxs = [0.5, 1, 0.5, 1]
         ymins = [.5, .5, 0, 0]
         ymaxs = [1, 1,0.5, 0.5]
+        # sympa pour des impressions a plat genre le logo gaia
         rots =  (
                         (0,0,0),
                         (0,90,0),
                         (90,0,0),
                         (30,-35,0),
                     )
+        # plus respectueux de la maniere de les dessiner (par exemple scene des cuves du louvres)
+        rots =  (
+                (-90,0,0),
+                (-90,0,-90),
+                (0,0,0),
+                (-40,0,-20),
+            )
         rBackgroundColor = 0.9
         for i in range(4):
             ren = vtkRenderer()
             renderWindow.AddRenderer(ren)
             ren.SetViewport(xmins[i], ymins[i], xmaxs[i], ymaxs[i])
             ren.AddActor(actors[i])
+            # order matters
             actors[i].RotateX(rots[i][0])
             actors[i].RotateY(rots[i][1])
             actors[i].RotateZ(rots[i][2])
             ren.SetBackground(rBackgroundColor, rBackgroundColor, rBackgroundColor)
+            if i < 3:
+                # flat mode
+                #~ actors[i].GetProperty().SetColor(1,1,1)
+                # next lines change nothing
+                actors[i].GetProperty().SetRepresentationToSurface()
+                actors[i].GetProperty().EdgeVisibilityOff()
+                actors[i].GetProperty().SetEdgeColor(0,1,0)
+                actors[i].GetProperty().SetLineWidth(1.5)
+                pass
+            else:
+                # shaded mode
+                # just getting the activecamera change it!
+                #~ cam = ren.GetActiveCamera()
+                #~ print(cam.GetFocalPoint())
+                #~ cam.SetFocalPoint(0.,0.,0.)
+                #~ cam.SetPosition(0.,0.,0.)
+                actor.GetProperty().SetColor(0.5,0.5,1)
+                
             
         # try to add text (not working)
         txtActor = vtk.vtkActor2D()
@@ -256,8 +332,10 @@ def showStl(filename, bAnimate=True, bDrawingTechnic = True):
     renderWindowInteractor.Start()
     
     if bDrawingTechnic:
-        outfn = filename.lower().replace(".stl","_tech.") + "png"
+        print("actor rot: %s" % str(actor.GetOrientationWXYZ()) )
+        outfn = filename.lower().replace(".stl","_technical_drawing.") + "png"
         WriteImage(outfn, renderWindow, rgba=True)
+        WriteCartouche(outfn, filename)
         # todo: write cartouche in 2nd pass using opencv2 !!!
 
 

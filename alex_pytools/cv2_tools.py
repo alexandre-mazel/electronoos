@@ -53,6 +53,36 @@ def putTextCentered( image, text, bottomCenteredPosition, fontface=cv2.FONT_HERS
         
     return xd,yd
     
+def putTextRA( image, text, bottomRightPosition, fontface=cv2.FONT_HERSHEY_SIMPLEX, fontscale = 1, color = (255,255,255), thickness = 1, bOutline=1):
+    """
+    putTextRightAlign
+    Find a location in image to render a text from it's bottom right position.
+    Adjust to fit image (if too big)
+    render it and return the location
+    """
+    tsx,tsy = cv2.getTextSize( text, fontface, fontscale, thickness )[0]
+    #~ print(tsx,tsy)
+    h,w = image.shape[:2]
+    
+    xd = bottomRightPosition[0]-(tsx)
+    yd = bottomRightPosition[1]
+    
+    if xd < 0:
+        xd = 0
+    if xd+tsx > w:
+        xd = w - tsx
+        
+    if yd-tsy < 0:
+        yd = tsy
+        
+    if yd > h:
+        yd = h
+    
+    if bOutline: cv2.putText( image, text, (xd,yd), fontface, fontscale, (0,0,0), thickness+1, cv2.LINE_AA ) # black outline        
+    cv2.putText( image, text, (xd,yd), fontface, fontscale, color, thickness, cv2.LINE_AA )
+        
+    return xd,yd
+    
 def saveImage_JpgWithSpecificSize( filename, img, nSizeMaxKo, nSizeMinKo = 0, nQualityStart = 80 ): 
     """
     return -1 if on error, or size in ko of saved file

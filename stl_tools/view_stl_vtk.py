@@ -281,7 +281,7 @@ def showStl(filename, bAnimate=True, bDrawingTechnic = True):
                 (0,0,0),
                 (-40,0,-20),
             )
-        rBackgroundColor = 0.9
+        rBackgroundColor = 0.8
         for i in range(4):
             ren = vtkRenderer()
             renderWindow.AddRenderer(ren)
@@ -294,7 +294,7 @@ def showStl(filename, bAnimate=True, bDrawingTechnic = True):
             ren.SetBackground(rBackgroundColor, rBackgroundColor, rBackgroundColor)
             if i < 3:
                 # flat mode
-                #~ actors[i].GetProperty().SetColor(1,1,1)
+                actors[i].GetProperty().SetColor(0.9,0.9,0.9)
                 # next lines change nothing
                 actors[i].GetProperty().SetRepresentationToSurface()
                 actors[i].GetProperty().EdgeVisibilityOff()

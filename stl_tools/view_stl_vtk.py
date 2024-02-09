@@ -1,12 +1,40 @@
-import vtk # pip install vtk # tested with vtk-9.3.0-cp39-cp39-win_amd64.whl
+import datetime
+import os
 import sys
+import time
 
-sys.path.append("../alex_pytools")
+import vtk # pip install vtk # tested with vtk-9.3.0-cp39-cp39-win_amd64.whl
+
+def getElectronoosPath():
+    if os.name == "nt":
+        strElectroPath = "C:/Users/alexa/dev/git/electronoos/"
+        if not os.path.isdir(strElectroPath):
+            strElectroPath = "c:/dev/git/electronoos/"
+    else:
+        if os.path.expanduser("~") == "/var/www": # from modpython
+            strElectroPath = os.path.expanduser("/home/na/dev/git/electronoos/")
+        else:
+            strElectroPath = os.path.expanduser("~/dev/git/electronoos/")
+            strElectroPath = os.path.expanduser("/home/na/dev/git/electronoos/") # when started in root
+    return strElectroPath
+        
+sys.path.append(getElectronoosPath()+"alex_pytools/")
 import cv2_tools
 
 from vtkmodules.vtkRenderingCore import vtkRenderer
 
-def WriteCartouche(filename_generated, filename_original):
+def getDate( timeepoch = -1 ):
+    """
+    return a string describing in french the date.
+    - timeepoch: if -1: return now
+    """
+    if timeepoch == -1:
+        timeepoch = time.time()
+    datetimeObject = datetime.datetime.fromtimestamp(timeepoch)
+    strStamp = datetimeObject.strftime( "%d %b %Y") # %B or %b
+    return strStamp
+
+def WriteCartouche(filename_generated, filename_original, nbr_faces = 0):
     """
     Add cartouche to the image in filename_generated.
     Info are related to filename_original (the stl)
@@ -15,13 +43,20 @@ def WriteCartouche(filename_generated, filename_original):
     import cv2
     im = cv2.imread(filename_generated,cv2.IMREAD_UNCHANGED) # handle RGBA
     
-    black = (0,0,0)
+    black = (0,0,0,255)
         
     hi,wi = im.shape[:2]
     
     # image separators
-    cv2.line( im, (wi//2,0), (wi//2,hi), black, 1 )
     cv2.line( im, (0,hi//2), (wi,hi//2), black, 1 )
+    cv2.line( im, (wi//2,0), (wi//2,hi), black, 1 )
+
+    
+    # image border
+    cv2.line( im, (0,0), (wi,0), black, 1 )
+    cv2.line( im, (0,hi-1), (wi,hi-1), black, 1 )
+    cv2.line( im, (0,0), (0,hi-1), black, 1 )
+    cv2.line( im, (wi-1,0), (wi-1,hi-1), black, 1 )
     
     """
     ------------------------------------------
@@ -29,9 +64,10 @@ def WriteCartouche(filename_generated, filename_original):
     _________ | piece name  |
     | Stl           |                   | date render
     """
-    
-    leCart = wi-200
-    toCart = hi-80
+    wCart = 200
+    hCart = 80
+    leCart = wi-wCart-1 # -1 for the border
+    toCart = hi-hCart-1
 
     
     font           = cv2.FONT_HERSHEY_SIMPLEX
@@ -40,14 +76,32 @@ def WriteCartouche(filename_generated, filename_original):
     thickness   = 2
     lineType     = 2
     
-    cv2.line( im, (leCart,toCart), (wi,toCart), black, 1 )
-    cv2.line( im, (leCart,toCart), (leCart,hi), black, 1 )
+    #~ cv2.line( im, (leCart,toCart), (wi,toCart), black, 1 )
+    #~ cv2.line( im, (leCart,toCart), (leCart,hi), black, 1 )
 
+    strDateFile = getDate(os.path.getmtime(filename_original))
+    strDateNow = getDate()
     
-    strName = filename_original.replace(".stl","")
-    cv2_tools.putTextRA( im, strName,  (wi-20,hi-20), font, fontScale, fontColor, thickness, bOutline=0 )
+    strName = os.path.basename(filename_original).replace(".stl","")
+    
+    nSize = os. path. getsize(filename_original)
+    strInfo = "Format: STL, size: %dkB" % (nSize/1024) 
+    
+    nbrTotalLine = 5
+    line = 0
+    if nbr_faces > 0:
+        nbrTotalLine += 1
+        
+    cv2_tools.putTextBox( im, strName,  (leCart,toCart,leCart+wCart,toCart+hCart*2//nbrTotalLine), font, fontColor, thickness, bOutline=0, bRenderBox=1 ); line += 2
+    
+    if nbr_faces > 0:
+        cv2_tools.putTextBox( im, "Nbr Triangle: " + str(nbr_faces),  (leCart,toCart+hCart*line//nbrTotalLine,leCart+wCart,toCart+hCart*(line+1)//nbrTotalLine), font, fontColor, thickness//2, bOutline=0, bRenderBox=1 ); line += 1
+    
+    cv2_tools.putTextBox( im, strInfo,  (leCart,toCart+hCart*line//nbrTotalLine,leCart+wCart,toCart+hCart*(line+1)//nbrTotalLine), font, fontColor, thickness//2, bOutline=0, bRenderBox=1 ); line += 1
+    cv2_tools.putTextBox( im, "File : " + strDateFile,  (leCart,toCart+hCart*line//nbrTotalLine,leCart+wCart,toCart+hCart*(line+1)//nbrTotalLine), font, fontColor, thickness//2, bOutline=0, bRenderBox=1 ); line += 1
+    cv2_tools.putTextBox( im, "Render: " + strDateNow,  (leCart,toCart+hCart*line//nbrTotalLine,leCart+wCart,toCart+hCart*(line+1)//nbrTotalLine), font, fontColor, thickness//2, bOutline=0, bRenderBox=1 ); line += 1
     cv2.imwrite( filename_generated, im )
-    if 1:
+    if 0:
         cv2.imshow("cartouche", im)
         cv2.waitKey(0)
     
@@ -335,7 +389,11 @@ def showStl(filename, bAnimate=True, bDrawingTechnic = True):
         print("actor rot: %s" % str(actor.GetOrientationWXYZ()) )
         outfn = filename.lower().replace(".stl","_technical_drawing.") + "png"
         WriteImage(outfn, renderWindow, rgba=True)
-        WriteCartouche(outfn, filename)
+        
+        nbr_faces = 0
+        #~ nbr_faces = actor.GetMapper().GetNumberOfFaces()
+        
+        WriteCartouche( outfn, filename, nbr_faces = nbr_faces )
         # todo: write cartouche in 2nd pass using opencv2 !!!
 
 
@@ -344,6 +402,10 @@ if __name__ == "__main__":
     #~ fn = "CameraFishEye_p1.stl"
     fn = "CameraFishEye_p2.stl"
     fn = "gaia_logo.stl"
+    if 0:
+        WriteCartouche("gaia_logo_technical_drawing.png","gaia_logo.stl",123)
+        exit(2)
+
     if len(sys.argv)>1:
         fn = sys.argv[1]
     showStl(fn,bDrawingTechnic=1)

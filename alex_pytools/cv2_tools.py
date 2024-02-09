@@ -83,6 +83,47 @@ def putTextRA( image, text, bottomRightPosition, fontface=cv2.FONT_HERSHEY_SIMPL
         
     return xd,yd
     
+def putTextBox( image, text, box, fontface=cv2.FONT_HERSHEY_SIMPLEX, color = (255,255,255), thickness = 1, bOutline = 1, bRenderBox = 0 ):
+    """
+    putTextBoxed
+    Center a text in a box, adjust to fit size box (if too small or too big)
+    render it and return the location and size
+    - box: a xleft,ytop,xright,ybottom in image where to draw
+    """
+    fontscale = 10;
+    wb = box[2]-box[0]
+    hb = box[3]-box[1]
+    while 1:
+        (tsx,tsy),baseline = cv2.getTextSize( text, fontface, fontscale, thickness )
+        print( "DBG: putTextBox: tsx: %s,tsy: %s, baseline: %s" % (tsx,tsy,baseline) )
+        tsy += baseline
+        if ( tsx < wb or tsx < 6 ) and ( tsy < hb or tsy < 5):
+            break
+        fontscale *= 0.8
+        
+    print( "DBG: putTextBox: fontscale: %s" % fontscale )
+    if fontscale < 0.6 and thickness > 1:
+        thickness = 1
+        
+    #~ if fontscale < 0.5 and thickness > 0.7:
+        #~ thickness = 0.7 # thickness is an int!
+        
+    h,w = image.shape[:2]
+    
+    xd = box[0]+wb//2-tsx//2
+    yd = box[1]+hb//2+tsy//2
+        
+    if bRenderBox:
+        cv2.line( image, (box[0],box[1]), (box[2],box[1]), color, 1 )
+        cv2.line( image, (box[0],box[3]), (box[2],box[3]), color, 1 )
+        cv2.line( image, (box[0],box[1]), (box[0],box[3]), color, 1 )
+        cv2.line( image, (box[2],box[1]), (box[2],box[3]), color, 1 )
+    
+    if bOutline: cv2.putText( image, text, (xd,yd-baseline+2), fontface, fontscale, (0,0,0), thickness+1, cv2.LINE_AA ) # black outline        
+    cv2.putText( image, text, (xd,yd-baseline+2), fontface, fontscale, color, thickness, cv2.LINE_AA )
+        
+    return xd,yd
+    
 def saveImage_JpgWithSpecificSize( filename, img, nSizeMaxKo, nSizeMinKo = 0, nQualityStart = 80 ): 
     """
     return -1 if on error, or size in ko of saved file
@@ -256,4 +297,4 @@ def autoTest():
 if __name__ == "__main__":
     pass
     #~ autoTest()
-    listCameras(bLiveFeed=1)
+    #~ listCameras(bLiveFeed=1)

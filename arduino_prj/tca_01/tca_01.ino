@@ -20,6 +20,10 @@ MotorInterpolator mot1(PWM_TWIST,PHASE_TWIST);
 #define dirPin 11 //direction
 #define stepPin 12 //step-pulse
 
+#define enaPin2 31 //enable-motor
+#define dirPin2 33 //direction
+#define stepPin2 35 //step-pulse
+
 #define switchTwistGoPin 51 // button go +
 #define switchTwistRevPin 53 // button go -
 
@@ -75,7 +79,7 @@ bool i2CAddrTest(uint8_t addr) {
 }
 
 int bTwistGoButtonPushed = 1; // state of the button (so we detect it changes) // let's pretend it was on at startup as there's a spurious on this one
-int bTwistRevButtonPushed = 0; // state of the button (so we detect it changes)
+int bTwistRevButtonPushed = 1; // state of the button (so we detect it changes) // spurious here also now!
 int nTwistMove = 0; // 0: stop, 1: positive direction, -1: reverse
 
 void setup() 
@@ -89,6 +93,10 @@ void setup()
   pinMode(enaPin, OUTPUT);
   pinMode(dirPin, OUTPUT);
   pinMode(stepPin, OUTPUT);
+
+  pinMode(enaPin2, OUTPUT);
+  pinMode(dirPin2, OUTPUT);
+  pinMode(stepPin2, OUTPUT);
 
   pinMode(switchTwistGoPin, INPUT);
   pinMode(switchTwistRevPin, INPUT);
@@ -223,6 +231,15 @@ void testStepper()
   //delayMicroseconds(5);
 }
 
+void testStepperA4988()
+{
+  digitalWrite( stepPin2, HIGH ); // takes 6micros
+  delayMicroseconds(500); // 500 was ok
+
+  digitalWrite( stepPin2,LOW );
+  delayMicroseconds(500); // 500 was ok
+}
+
 void commandByButton()
 {
   int pushed = digitalRead(switchTwistGoPin) == HIGH;
@@ -299,9 +316,10 @@ void loop()
   //test10turn();
   //test3sec();
   //asservTwist();
-  commandByButton();
+  //commandByButton();
 
   //testStepper();
+  testStepperA4988();
 
 
 

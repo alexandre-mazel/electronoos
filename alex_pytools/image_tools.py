@@ -22,7 +22,7 @@ def getRatioWB(im):
     return n_white_pix/total,n_black_pix/total
     
     
-    continuer a etudier la difference uint16, int16, float, sur des images assez differentes.
+#~ TODO continuer a etudier la difference uint16, int16, float, sur des images assez differentes.
 def computeImageDifference( im1, im2 ):
     """
     return difference between two images expressed in a [0..1] coefficient

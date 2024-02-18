@@ -279,6 +279,20 @@ def getDay():
     datetimeObject = datetime.datetime.now()
     return datetimeObject.year, datetimeObject.month, datetimeObject.day 
     
+def getYMD(strDate):
+    """
+    separate a date "YYYY/MM/DD" to year, month, day
+    return (year, month, day) as tuple of int
+    REM: work with any separators
+    """
+    y = int(strDate[:4])
+    m = int(strDate[5:7])
+    d = int(strDate[8:10])
+    
+    return y,m,d
+#~ print(getYMD("1974/08/19"))
+#~ exit(0)
+
 def getDayStamp():
     """
     return a string representing the date "YYYY_MM_DD"

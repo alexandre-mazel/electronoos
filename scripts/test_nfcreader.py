@@ -22,11 +22,17 @@ def readContinuously(reader):
             print("data: " + str(data))
             #~ reader.print_data(data)
             reader.info()
+            
+            #~ dataread = read(reader, 0x01, 0x20)
+            #~ print("read: %s" % str(dataread))
         except py122u.error.NoCommunication as err:
             #~ print("DBG: py122u.error.NoCommunication: %s" % str(err) )
             pass
         except smartcard.Exceptions.NoCardException:
             pass
+        except smartcard.Exceptions.CardConnectionException:
+            pass
+            
         except py122u.error.InstructionFailed as err:
             print("DBG: py122u.error.InstructionFailed: %s" % str(err) )
         time.sleep(1)
@@ -91,9 +97,11 @@ def read_16(r, position, number):
     
 def writeOnceCardIsOn(reader):
     reader.connect()
+    #~ reader.mute_buzzer() # remove buzzer sound
+    reader.unmute_buzzer()
     reader.load_authentication_data(0x01, [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])
     reader.authentication(0x00, 0x61, 0x01)
-    write(reader, 0x01, 0x20, [0x00 for i in range(16)])
+    #~ write(reader, 0x01, 0x20, [i for i in range(16)])
     print(read(reader, 0x01, 0x20))
 
 

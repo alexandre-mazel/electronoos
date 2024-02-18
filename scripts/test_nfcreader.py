@@ -20,7 +20,7 @@ def readContinuously(reader):
             reader.connect()
             data = reader.get_uid()
             print("data: " + str(data))
-            reader.print_data(data.decode())
+            #~ reader.print_data(data)
             reader.info()
         except py122u.error.NoCommunication as err:
             #~ print("DBG: py122u.error.NoCommunication: %s" % str(err) )
@@ -90,6 +90,7 @@ def read_16(r, position, number):
     return r.read_binary_blocks(position, number)
     
 def writeOnceCardIsOn(reader):
+    reader.connect()
     reader.load_authentication_data(0x01, [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])
     reader.authentication(0x00, 0x61, 0x01)
     write(reader, 0x01, 0x20, [0x00 for i in range(16)])
@@ -102,5 +103,5 @@ def writeOnceCardIsOn(reader):
 
 if __name__ == "__main__":
     reader = nfc.Reader()
-    readContinuously(reader)
-    #~ writeOnceCardIsOn(reader)
+    #~ readContinuously(reader)
+    writeOnceCardIsOn(reader)

@@ -71,6 +71,50 @@ Card Name: MIFARE Classic 1K
 
 """
 
+"""
+from so: https://stackoverflow.com/questions/74038986/write-password-to-ntag213-using-python-and-acr122u
+
+from smartcard.System import readers
+from smartcard.CardConnection import CardConnection
+from smartcard.scard import SCARD_SHARE_DIRECT
+
+reader = readers()[0]
+connection = reader.createConnection()
+connection.connect()
+
+def createPseudoAPDU(payload, nBytes):
+    #nBytes+0x2 to add the 0xd4 and 0x42 two bytes
+    return np.concatenate(([0xff, 0x00, 0x00, 0x00, nBytes+0x2,0xd4,0x42], payload), axis=0).tolist() 
+
+
+setPwd = createPseudoAPDU([0xa2, 0x2b,0x32,0x30,0x32,0x32],0x06)
+setPack = createPseudoAPDU([0xa2, 0x2c,0x00,0x00,0x00,0x00],0x06)
+
+setAuthLimAndProt = createPseudoAPDU([0xa2, 0x2a,0x00,0x05,0x00,0x00],0x06)
+
+setauth0 = createPseudoAPDU([0xa2, 0x29,0x04,0x00,0x00,0x00],0x06)
+
+r, sw1, sw2 = connection.transmit(setPwd)
+print(r)
+print(sw1)
+print(sw2)
+
+r, sw1, sw2 = connection.transmit(setPack)
+print(r)
+print(sw1)
+print(sw2)
+
+r, sw1, sw2 = connection.transmit(setAuthLimAndProt)
+print(r)
+print(sw1)
+print(sw2)
+
+r, sw1, sw2 = connection.transmit(setauth0)
+print(r)
+print(sw1)
+print(sw2)
+"""
+
 
 def write(r, position, number, data):
     while number >= 16:

@@ -1,8 +1,9 @@
 #define ENCODER_USE_INTERRUPTS // then really need to use pin compatible with interruption (cf my doc)
 #include <Encoder.h> // by Paul Stoffregen
-#include <LiquidCrystal_I2C.h>
+//#include <LiquidCrystal_I2C.h>
+#include "LiquidCrystal_I2C_alma.h"
 // initialize the library with the numbers of the interface pins
-LiquidCrystal_I2C lcd(0x27, 20, 4);
+LiquidCrystal_I2C_Alma lcd(0x27, 20, 4);
 
 #include "interpolator.hpp"
 
@@ -48,23 +49,28 @@ void countFps()
   unsigned long diff = millis() - fpsTimeStart;
   if (diff > 5000)
   {
+    //unsigned long timeprintbegin = micros();
     float fps = (float)(fpsCpt*1000)/diff;
     Serial.print("fps: ");
     Serial.print(fps);
     Serial.print(", dt: ");
-    if(0)
+  #if 1
     {
-      Serial.print(1000.f/fps);
+      Serial.print(1000.f/fps,3);
       Serial.println("ms");
     }
-    else
+#else
     {
       Serial.print(1000000.f/fps);
       Serial.println("micros");
     }
+#endif
 
     fpsTimeStart = millis();
     fpsCpt = 0;
+    //unsigned long durationprint = micros()-timeprintbegin;
+    //Serial.print("duration fps micros: "); // 1228micros at 57600baud !!!, 1280 at 115200 (change nothing, it's more the time to compute)
+    //Serial.println(durationprint);
   }
 
 }
@@ -111,7 +117,7 @@ void setup()
   else
   {
     Serial.println("LCD: Alternate init on 0x3F");
-    lcd = LiquidCrystal_I2C(0x3F, 20, 4);
+    lcd = LiquidCrystal_I2C_Alma(0x3F, 20, 4);
   }
   lcd.init();                // initialize the lcd
   lcd.backlight();           // Turn on backlight // sans eclairage on voit rien...
@@ -122,6 +128,12 @@ void setup()
 //  digitalRead(switchTwistGoPin); // permit to clear it !?!
   
   Serial.println("setup finished");
+
+  unsigned long timeprintbegin = micros();
+  Serial.println("BLABLALBALBLALBLABLABLA"); // 252micros at 115200
+  unsigned long durationprint = micros()-timeprintbegin;
+  Serial.print("durationprint blabla fps micros:"); // at 9600: 240micros, at 19200: 240micros, at 57600: 252micros, seems to be buffered ?
+  Serial.println(durationprint);
 }
 
 unsigned long timeChange = millis();
@@ -233,11 +245,18 @@ void testStepper()
 
 void testStepperA4988()
 {
-  digitalWrite( stepPin2, HIGH ); // takes 6micros
-  delayMicroseconds(500); // 500 was ok
+  const int nNbrStepPerTurn = 200;
+  const int nSleepMicroSec = 500;  // 500 was ok // 300 also for 17HE15-1504S without charge // with 314g charge, set 500
 
-  digitalWrite( stepPin2,LOW );
-  delayMicroseconds(500); // 500 was ok
+  for(int i = 0; i < nNbrStepPerTurn; ++i )
+  {
+    digitalWrite( stepPin2, HIGH ); // takes 6micros
+    delayMicroseconds(nSleepMicroSec);
+
+    digitalWrite( stepPin2,LOW );
+    delayMicroseconds(nSleepMicroSec);
+  }
+  delay(2000);
 }
 
 void commandByButton()
@@ -309,6 +328,135 @@ void commandByButton()
   delay(10);
 }
 
+
+long nNbrStepMotor1 = 0;
+int bSendCmdMotor1 = 0;
+int bFlipFlopMotor1 = 0;
+void updateMachine1b()
+{
+  // the goal is to loop at 400microsec, so anytime we could decide to activate one motor or other motor or not
+  const int target_frameduration_micros = 400;
+
+  const int nNbrStepPerTurnMotor1 = 200;
+
+  unsigned long framestart = micros();
+
+
+  if(0)
+  {
+    digitalWrite( stepPin, HIGH ); // entre 4 et 8 micros
+    digitalWrite( stepPin, LOW );
+    int pushed = digitalRead(switchTwistGoPin) == HIGH; // entre 4 et 8 micros pour 2 lectures
+    pushed = digitalRead(switchTwistRevPin) == HIGH;
+  }
+  
+  int pushed = digitalRead(switchTwistGoPin) == HIGH;
+  if( bTwistGoButtonPushed != pushed )
+  {
+    bTwistGoButtonPushed = pushed;
+    if(pushed)
+    {
+      Serial.println("button go pin pushed");
+      if( nTwistMove == 1 ) 
+      {
+        nTwistMove = 0;
+        bSendCmdMotor1 = 0;
+      }
+      else
+      {
+        nTwistMove = 1;
+        bSendCmdMotor1 = 1;
+        digitalWrite(dirPin2,LOW);
+      }
+    }
+  }
+  
+  pushed = digitalRead(switchTwistRevPin) == HIGH;
+  if( bTwistRevButtonPushed != pushed )
+  {
+    bTwistRevButtonPushed = pushed;
+    if(pushed)
+    {
+      Serial.println("button rev pin pushed");
+      if( nTwistMove == -1 ) 
+      {
+        nTwistMove = 0;
+        bSendCmdMotor1 = 0;
+      }
+      else
+      {
+        nTwistMove = -1;
+        bSendCmdMotor1 = 1;
+        digitalWrite(dirPin2,HIGH);
+      }
+    }
+  }
+
+  if(bSendCmdMotor1)
+  {
+    digitalWrite(stepPin2,bFlipFlopMotor1);
+    bFlipFlopMotor1 = ! bFlipFlopMotor1;
+    if(bFlipFlopMotor1)
+    {
+      nNbrStepMotor1 += nTwistMove;
+    }
+  }
+
+  //nNbrStepMotor1++; // just for debug lcd
+    
+
+  float rMotRev1 = nNbrStepMotor1 / (float)nNbrStepPerTurnMotor1;
+  if(0)
+  {
+    if(1)
+    {
+      lcd.home(); // 3.5ms !!! (without the alma lib)
+      //lcd.setCursor(0, 1);// set the cursor to column 0, line 1 // 
+      lcd.print("Rev: "); // 7.5ms!
+      lcd.print(rMotRev1);
+      lcd.print(", twst: ");
+      lcd.print(nTwistMove);
+      lcd.print("  "); // clean remaining char when number are off
+    }
+    else
+    {
+      // partial rendering
+      lcd.setCursor(5, 0);  // 1.5ms (Alma version)
+      lcd.print(rMotRev1); // 5ms  (Alma version)
+      
+      //lcd.print("A"); // 1.5ms  (Alma version)
+      //lcd.print("ABCD"); // 5.6ms  (Alma version)
+      //static char s[] = "A";
+      //s[0] = 'A'+((nNbrStepMotor1/100)%26);
+      //lcd.print(s); // 1.5ms  (Alma version)
+    }
+  }
+
+
+
+  // maintain constant loop time
+
+  unsigned long duration_micros = micros() - framestart;
+  if( duration_micros < 1000000L ) // after 70min it loops, so it could become a very high number
+  {
+    unsigned long nTimeMiss = target_frameduration_micros - duration_micros;
+    if( nTimeMiss < 1000000L ) // else overflow
+    {
+      delayMicroseconds( nTimeMiss-68 ); // the loop loose around 68ms for fps or system or ? (seems not to be fps printing, as a print every 15000 doesn't spare time)
+      //Serial.print("DBG: margin (micros): ");
+      //Serial.println(nTimeMiss);
+    }
+    else
+    {
+      if(1)
+      {
+        Serial.print("WRN: out of time frame (micros): ");
+        Serial.println((signed long)((unsigned long)(-1)-nTimeMiss));
+      }
+    }
+  }
+}
+
 void loop() 
 {
  // Serial.println("loop...");
@@ -319,7 +467,9 @@ void loop()
   //commandByButton();
 
   //testStepper();
-  testStepperA4988();
+  //testStepperA4988();
+
+  updateMachine1b();
 
 
 

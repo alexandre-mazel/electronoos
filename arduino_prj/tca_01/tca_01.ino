@@ -1,9 +1,25 @@
 #define ENCODER_USE_INTERRUPTS // then really need to use pin compatible with interruption (cf my doc)
 #include <Encoder.h> // by Paul Stoffregen
-//#include <LiquidCrystal_I2C.h>
-#include "LiquidCrystal_I2C_alma.h"
-// initialize the library with the numbers of the interface pins
-LiquidCrystal_I2C_Alma lcd(0x27, 20, 4);
+
+#define USE_HD44780
+
+#ifndef USE_HD44780
+  #if 0
+    #include <LiquidCrystal_I2C.h>
+  #else
+    #include "LiquidCrystal_I2C_alma.h"
+    // initialize the library with the numbers of the interface pins
+    #define LiquidCrystal_I2C LiquidCrystal_I2C_Alma
+  #endif
+  LiquidCrystal_I2C lcd(0x27, 20, 4);
+  
+
+#else // USE_HD44780
+  #include <Wire.h>
+  #include <hd44780.h>
+  #include <hd44780ioClass/hd44780_I2Cexp.h> // i2c LCD i/o class header
+  hd44780_I2Cexp lcd(0x27);
+#endif // USE_HD44780
 
 #include "interpolator.hpp"
 
@@ -110,6 +126,7 @@ void setup()
   digitalWrite(enaPin ,LOW);
   digitalWrite(dirPin ,LOW);
 
+#ifndef USE_HD44780
   if( i2CAddrTest(0x27) ) 
   {
     Serial.println("LCD: ok");
@@ -117,8 +134,19 @@ void setup()
   else
   {
     Serial.println("LCD: Alternate init on 0x3F");
-    lcd = LiquidCrystal_I2C_Alma(0x3F, 20, 4);
+    lcd = LiquidCrystal_I2C(0x3F, 20, 4);
   }
+#else
+	int status = lcd.begin(20, 4);
+	if(status) // non zero status means it was unsuccesful
+  {
+   Serial.println("ERR: LCD not ready"); 
+  }
+  else
+  {
+    lcd.print("Ready HD44780...");// Print a message to the LCD
+  }
+#endif
   lcd.init();                // initialize the lcd
   lcd.backlight();           // Turn on backlight // sans eclairage on voit rien...
 
@@ -402,14 +430,17 @@ void updateMachine1b()
     }
   }
 
-  //nNbrStepMotor1++; // just for debug lcd
+  nNbrStepMotor1++; // just for debug lcd
     
 
   float rMotRev1 = nNbrStepMotor1 / (float)nNbrStepPerTurnMotor1;
-  if(0)
+  if(1)
   {
     if(1)
     {
+      // the whole loop takes 34.2ms with liquid
+      // the whole loop takes 30.0ms with liquid (Alma version)
+
       lcd.home(); // 3.5ms !!! (without the alma lib)
       //lcd.setCursor(0, 1);// set the cursor to column 0, line 1 // 
       lcd.print("Rev: "); // 7.5ms!

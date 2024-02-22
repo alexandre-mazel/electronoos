@@ -1,7 +1,16 @@
 #define ENCODER_USE_INTERRUPTS // then really need to use pin compatible with interruption (cf my doc)
 #include <Encoder.h> // by Paul Stoffregen
 
-#define USE_HD44780
+//#define DEBUG_BUFFERED // doesn't seem to work fine: burst of 1480micros instead of 1150micros
+#ifdef DEBUG_BUFFERED
+  #include <BufferedOutput.h> // install SafeString Library
+  createBufferedOutput(bufferedOut, 160, DROP_UNTIL_EMPTY);
+  #define DEBUG bufferedOut
+#else
+  #define DEBUG Serial
+#endif // DEBUG_BUFFERED
+
+#define USE_HD44780 // c'est gentil, mais ca fait grave ramer en tache de fond !!! on passe d'une boucle a 1ms a 17ms! - si on envoie tout le temps des chars! => ne pas envoyer a chaque frame)
 
 #ifndef USE_HD44780
   #if 0
@@ -68,26 +77,26 @@ void countFps()
   {
     //unsigned long timeprintbegin = micros();
     float fps = (float)(fpsCpt*1000)/diff;
-    Serial.print("fps: ");
-    Serial.print(fps);
-    Serial.print(", dt: ");
+    DEBUG.print("fps: ");
+    DEBUG.print(fps);
+    DEBUG.print(", dt: ");
   #if 1
     {
-      Serial.print(1000.f/fps,3);
-      Serial.println("ms");
+      DEBUG.print(1000.f/fps,3);
+      DEBUG.println("ms");
     }
 #else
     {
-      Serial.print(1000000.f/fps);
-      Serial.println("micros");
+      DEBUG.print(1000000.f/fps);
+      DEBUG.println("micros");
     }
 #endif
 
     fpsTimeStart = millis();
     fpsCpt = 0;
     //unsigned long durationprint = micros()-timeprintbegin;
-    //Serial.print("duration fps micros: "); // 1228micros at 57600baud !!!, 1280 at 115200 (change nothing, it's more the time to compute)
-    //Serial.println(durationprint);
+    //DEBUG.print("duration fps micros: "); // 1228micros at 57600baud !!!, 1280 at 115200 (change nothing, it's more the time to compute)
+    //DEBUG.println(durationprint);
   }
 
 }
@@ -108,7 +117,12 @@ int nTwistMove = 0; // 0: stop, 1: positive direction, -1: reverse
 void setup() 
 {
   Serial.begin(57600);       // use the serial port // fast to not slowdown the program even with lot of trace
-  Serial.println("setup starting...");
+
+#ifdef DEBUG_BUFFERED
+  bufferedOut.connect(Serial,57600);  // connect buffered stream to Serial
+#endif
+
+  DEBUG.println("setup starting...");
 
   pinMode(PWM_TWIST, OUTPUT);
   pinMode(PHASE_TWIST, OUTPUT);
@@ -130,11 +144,11 @@ void setup()
 #ifndef USE_HD44780
   if( i2CAddrTest(0x27) ) 
   {
-    Serial.println("LCD: ok");
+    DEBUG.println("LCD: ok");
   }
   else
   {
-    Serial.println("LCD: Alternate init on 0x3F");
+    DEBUG.println("LCD: Alternate init on 0x3F");
     lcd = LiquidCrystal_I2C(0x3F, 20, 4);
   }
 #else
@@ -142,7 +156,7 @@ void setup()
 	int status = lcd.begin(20, 4);
 	if(status) // non zero status means it was unsuccesful
   {
-   Serial.println("ERR: LCD not ready"); 
+   DEBUG.println("ERR: LCD not ready"); 
   }
   else
   {
@@ -157,13 +171,13 @@ void setup()
 //  delay(2000); // for button to be ready (why go always trig once at startup?)
 //  digitalRead(switchTwistGoPin); // permit to clear it !?!
   
-  Serial.println("setup finished");
+  DEBUG.println("setup finished");
 
   unsigned long timeprintbegin = micros();
-  Serial.println("BLABLALBALBLALBLABLABLA"); // 252micros at 115200
+  DEBUG.println("BLABLALBALBLALBLABLABLA"); // 252micros at 115200, 216 with bufferedoutput
   unsigned long durationprint = micros()-timeprintbegin;
-  Serial.print("durationprint blabla fps micros:"); // at 9600: 240micros, at 19200: 240micros, at 57600: 252micros, seems to be buffered ?
-  Serial.println(durationprint);
+  DEBUG.print("durationprint blabla fps micros:"); // at 9600: 240micros, at 19200: 240micros, at 57600: 252micros, seems to be buffered ?
+  DEBUG.println(durationprint);
 }
 
 unsigned long timeChange = millis();
@@ -180,10 +194,10 @@ void test10turn()
 
   if(0)
   {
-    Serial.print("enc1: ");
-    Serial.print(val1);
-    Serial.print(", rev: ");
-    Serial.println(rRev);
+    DEBUG.print("enc1: ");
+    DEBUG.print(val1);
+    DEBUG.print(", rev: ");
+    DEBUG.println(rRev);
   }
 
 
@@ -197,10 +211,10 @@ void test10turn()
       int val1 = enc1.read();
       float rRev = val1/(rSecondToPrim*4.);
       
-      Serial.print("at stop: enc1: ");
-      Serial.print(val1);
-      Serial.print(", rev: ");
-      Serial.println(rRev);
+      DEBUG.print("at stop: enc1: ");
+      DEBUG.print(val1);
+      DEBUG.print(", rev: ");
+      DEBUG.println(rRev);
     }
 
 
@@ -297,7 +311,7 @@ void commandByButton()
     bTwistGoButtonPushed = pushed;
     if(pushed)
     {
-      Serial.println("button go pin pushed");
+      DEBUG.println("button go pin pushed");
       if( nTwistMove == 1 ) 
       {
         nTwistMove = 0;
@@ -317,7 +331,7 @@ void commandByButton()
     bTwistRevButtonPushed = pushed;
     if(pushed)
     {
-      Serial.println("button rev pin pushed");
+      DEBUG.println("button rev pin pushed");
       if( nTwistMove == -1 ) 
       {
         nTwistMove = 0;
@@ -359,17 +373,26 @@ void commandByButton()
 }
 
 
+
+
 long nNbrStepMotor1 = 0;
 int bSendCmdMotor1 = 0;
 int bFlipFlopMotor1 = 0;
+long nFrame = 0;
 void updateMachine1b()
 {
   // the goal is to loop at 400microsec, so anytime we could decide to activate one motor or other motor or not
-  const int target_frameduration_micros = 400;
+  const int target_frameduration_micros = 600;
 
   const int nNbrStepPerTurnMotor1 = 200;
 
   unsigned long framestart = micros();
+
+  ++nFrame;
+  if( nFrame < 0 )
+  {
+    nFrame = 0;
+  }
 
 
   if(0)
@@ -386,7 +409,7 @@ void updateMachine1b()
     bTwistGoButtonPushed = pushed;
     if(pushed)
     {
-      Serial.println("button go pin pushed");
+      DEBUG.println("button go pin pushed");
       if( nTwistMove == 1 ) 
       {
         nTwistMove = 0;
@@ -407,7 +430,7 @@ void updateMachine1b()
     bTwistRevButtonPushed = pushed;
     if(pushed)
     {
-      Serial.println("button rev pin pushed");
+      DEBUG.println("button rev pin pushed");
       if( nTwistMove == -1 ) 
       {
         nTwistMove = 0;
@@ -434,10 +457,13 @@ void updateMachine1b()
 
   nNbrStepMotor1++; // just for debug lcd
     
-
-  float rMotRev1 = nNbrStepMotor1 / (float)nNbrStepPerTurnMotor1;
-  if(0)
+  
+  
+  //if( (nFrame&0x2FF)==0 ) // 1 on 256 or more
+  if( (nFrame%512)==0 )
   {
+    // lcd update
+    float rMotRev1 = nNbrStepMotor1 / (float)nNbrStepPerTurnMotor1;
     if(0)
     {
       // the whole loop takes 34.2ms with liquid
@@ -460,10 +486,10 @@ void updateMachine1b()
       // setcursor + one float takes 3.6ms with hd44780
       // setcursor + one float takes 3.1ms with hd44780 and i2c clock at 400kHz
 
-      lcd.setCursor(5, 0);  // 1.5ms (Alma version) // 0.4ms with hd44780 and i2c clock at 400kHz
-      //lcd.print(rMotRev1); // 5ms  (Alma version)
+      //lcd.setCursor(5, 0);  // 1.5ms (Alma version) // 0.4ms with hd44780 and i2c clock at 400kHz
+      //lcd.print(rMotRev1); // 5ms  (Alma version)  // 3.2ms with hd44780 and i2c clock at 400kHz
       
-      //lcd.print("A"); // 1.5ms  (Alma version) // 0.4ms with hd44780 and i2c clock at 400kHz
+      lcd.print("A"); // 1.5ms  (Alma version) // 0.4ms with hd44780 and i2c clock at 400kHz
       //lcd.print("ABCD"); // 5.6ms  (Alma version)
       //static char s[] = "A";
       //s[0] = 'A'+((nNbrStepMotor1/100)%26);
@@ -471,26 +497,66 @@ void updateMachine1b()
     }
   }
 
+#ifdef DEBUG_BUFFERED
+  //unsigned long timeprintbegin = micros();
+  DEBUG.nextByteOut(); // call at least once per loop to release chars // between 3 and 40micros
+  //unsigned long durationprint = micros()-timeprintbegin;
+  //DEBUG.print("duration nextByteOut micros:"); // at 9600: 240micros, at 19200: 240micros, at 57600: 252micros, seems to be buffered ?
+  //DEBUG.println(durationprint);
+#endif
 
 
-  // maintain constant loop time
+  countFps();
+
+  // maintain constant loop time - to have a good idea of the fps
 
   unsigned long duration_micros = micros() - framestart;
-  if( duration_micros < 1000000L ) // after 70min it loops, so it could become a very high number
+  //DEBUG.println(duration_micros);
+  if( duration_micros < 1000000UL ) // after 70min it loops, so it could become a very high number
   {
     unsigned long nTimeMiss = target_frameduration_micros - duration_micros;
     if( nTimeMiss < 1000000L ) // else overflow
     {
-      delayMicroseconds( nTimeMiss-68 ); // the loop loose around 68ms for fps or system or ? (seems not to be fps printing, as a print every 15000 doesn't spare time)
-      //Serial.print("DBG: margin (micros): ");
-      //Serial.println(nTimeMiss);
+      const int nMargin = 5; // was 68
+      if(nTimeMiss>nMargin)
+      {
+        delayMicroseconds( nTimeMiss-nMargin ); // the loop loose around 68ms for fps or system or ? (seems not to be fps printing, as a print every 15000 doesn't spare time)
+        //DEBUG.print("DBG: margin (micros): ");
+        //DEBUG.println(nTimeMiss);
+      }
     }
     else
     {
       if(1)
       {
-        Serial.print("WRN: out of time frame (micros): ");
-        Serial.println((signed long)((unsigned long)(-1)-nTimeMiss));
+        if(1)
+        {
+          // print every out of time
+          DEBUG.print("WRN: out of time frame (micros): ");
+          DEBUG.println((signed long)((unsigned long)(-1)-nTimeMiss));
+        }
+
+        if(0)
+        {
+          // reduce level of print
+          static unsigned long nLastMiss = 0;
+          static int nCptSameMiss = 0;
+          static int timeLastOutput = 0;
+          if( (nTimeMiss-nLastMiss) > 50 || millis()-timeLastOutput > 4000 )
+          {
+            DEBUG.print("WRN: out of time frame: ");
+            DEBUG.print((signed long)((unsigned long)(-1)-nLastMiss));
+            DEBUG.print(" micros, times: ");
+            DEBUG.println(nCptSameMiss);
+            nLastMiss = nTimeMiss;
+            nCptSameMiss = 1;
+            timeLastOutput = millis();
+          }
+          else
+          {
+            nCptSameMiss += 1;
+          }
+        }
       }
     }
   }
@@ -498,7 +564,7 @@ void updateMachine1b()
 
 void loop() 
 {
- // Serial.println("loop...");
+ // DEBUG.println("loop...");
 
   //test10turn();
   //test3sec();
@@ -512,7 +578,7 @@ void loop()
 
 
 
-  countFps();
+  //countFps(); // ne pas le faire si on est dans updateMachine1b
 
   //delay(100);
 

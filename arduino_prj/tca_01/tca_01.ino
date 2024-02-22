@@ -18,7 +18,8 @@
   #include <Wire.h>
   #include <hd44780.h>
   #include <hd44780ioClass/hd44780_I2Cexp.h> // i2c LCD i/o class header
-  hd44780_I2Cexp lcd(0x27);
+  hd44780_I2Cexp lcd;
+
 #endif // USE_HD44780
 
 #include "interpolator.hpp"
@@ -137,6 +138,7 @@ void setup()
     lcd = LiquidCrystal_I2C(0x3F, 20, 4);
   }
 #else
+  Wire.setClock( 400000UL); // change the i2c clock to 400kHz // more doesn't change anything
 	int status = lcd.begin(20, 4);
 	if(status) // non zero status means it was unsuccesful
   {
@@ -434,12 +436,14 @@ void updateMachine1b()
     
 
   float rMotRev1 = nNbrStepMotor1 / (float)nNbrStepPerTurnMotor1;
-  if(1)
+  if(0)
   {
-    if(1)
+    if(0)
     {
       // the whole loop takes 34.2ms with liquid
       // the whole loop takes 30.0ms with liquid (Alma version)
+      // the whole loop takes 20.0ms with hd44780
+      // the whole loop takes 14.0ms with hd44780 and i2c clock at 400kHz
 
       lcd.home(); // 3.5ms !!! (without the alma lib)
       //lcd.setCursor(0, 1);// set the cursor to column 0, line 1 // 
@@ -451,11 +455,15 @@ void updateMachine1b()
     }
     else
     {
-      // partial rendering
-      lcd.setCursor(5, 0);  // 1.5ms (Alma version)
-      lcd.print(rMotRev1); // 5ms  (Alma version)
+      // partial rendering:
+      //
+      // setcursor + one float takes 3.6ms with hd44780
+      // setcursor + one float takes 3.1ms with hd44780 and i2c clock at 400kHz
+
+      lcd.setCursor(5, 0);  // 1.5ms (Alma version) // 0.4ms with hd44780 and i2c clock at 400kHz
+      //lcd.print(rMotRev1); // 5ms  (Alma version)
       
-      //lcd.print("A"); // 1.5ms  (Alma version)
+      //lcd.print("A"); // 1.5ms  (Alma version) // 0.4ms with hd44780 and i2c clock at 400kHz
       //lcd.print("ABCD"); // 5.6ms  (Alma version)
       //static char s[] = "A";
       //s[0] = 'A'+((nNbrStepMotor1/100)%26);

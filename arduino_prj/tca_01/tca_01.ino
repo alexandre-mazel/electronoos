@@ -393,7 +393,7 @@ long nFrame = 0;
 void updateMachine1b()
 {
   // the goal is to loop at 400microsec, so anytime we could decide to activate one motor or other motor or not
-  const int target_frameduration_micros = 600;
+  const int target_frameduration_micros = 600+6;
 
   const int nNbrStepPerTurnMotor1 = 200;
 
@@ -466,12 +466,13 @@ void updateMachine1b()
     }
   }
 
-  nNbrStepMotor1++; // just for debug lcd
+  // nNbrStepMotor1++; // just to debug lcd
     
   
   
   //if( (nFrame&0x2FF)==0 ) // 1 on 256 or more
   if( (nFrame%64)==0 )
+  //if( (nFrame%4)==0 ) // on pourrait le faire souvent, mais il y a peu d'interet a le faire trop souvent car c'est long d'écrire completement l'ecran
   {
     // lcd update
     float rMotRev1 = nNbrStepMotor1 / (float)nNbrStepPerTurnMotor1;
@@ -517,7 +518,10 @@ void updateMachine1b()
 #endif
 
 #ifdef DELAYED_LCD
-  LCD.update();
+  if( ((nFrame+7)%64)==0 )
+  {
+    LCD.update();
+  }
 #endif
 
   countFps();
@@ -579,12 +583,24 @@ void updateMachine1b()
 void testDelayedLcd()
 {
   LCD.home();
-  LCD.print("Coucou ca va?");
+  if(millis()<15000)
+  {
+    LCD.print("Coucou, ca va?");
+  }
+  else
+  {
+    // test overflow
+    for(int i = 0; i< 40; ++i)
+    {
+      LCD.print("GATO ");
+    }
+  }
   for(int i = 0; i < 5; ++i)
   {
     LCD.update();
+    delay(50);
   }
-  delay(2000);
+  delay(20);
 }
 
 void loop() 
@@ -599,9 +615,9 @@ void loop()
   //testStepper();
   //testStepperA4988();
 
-  testDelayedLcd();
+  //testDelayedLcd();
 
-  //updateMachine1b();
+  updateMachine1b();
 
 
 

@@ -1,0 +1,44 @@
+#ifndef DELAYED_LCD_H
+#define DELAYED_LCD_H
+
+#include <Print.h>
+
+
+
+class DelayedLcd
+{
+    /*
+      The idea is to render on the lcd screen one char per one char: 
+        once a full screen has been sent by user, 
+        one char will be wrotten.
+        home and following  chars are rejected since the current screen hasn't been rendered
+    */
+
+    public:
+        
+        DelayedLcd(int row, int column, Print* pHwLcd); // pHwLcd is a pointer on the real lcd to send chars
+        void home(void);
+        void print(const char * s);
+        void print(float f) {};
+        void update(void);
+
+        void init(void);
+        void backlight(void){};
+
+        void printState();
+
+    private:
+      Print * pHwLcd_;
+      int     row_;
+      int     column_;
+      char    buf_[20*4];       // store current char to write
+      int     nNextAdd_;        // next place to add char
+      int     nNextDraw_;       // next char to draw on lcd
+      int     bInReject_;       // Are we rejecting ?
+        
+}; // class DelayedLcd
+
+
+
+
+#endif DELAYED_LCD_H

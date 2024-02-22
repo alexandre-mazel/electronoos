@@ -24,12 +24,22 @@
   
 
 #else // USE_HD44780
+
   #include <Wire.h>
   #include <hd44780.h>
   #include <hd44780ioClass/hd44780_I2Cexp.h> // i2c LCD i/o class header
   hd44780_I2Cexp lcd;
 
 #endif // USE_HD44780
+
+#define DELAYED_LCD
+
+#ifdef DELAYED_LCD
+  #include "DelayedLcd.hpp"
+  
+  #define LCD delayed_lcd
+  DelayedLcd delayed_lcd(20,4,&lcd);
+#endif // DELAYED_LCD
 
 #include "interpolator.hpp"
 
@@ -163,10 +173,11 @@ void setup()
     lcd.print("Ready HD44780...");// Print a message to the LCD
   }
 #endif
-  lcd.init();                // initialize the lcd
-  lcd.backlight();           // Turn on backlight // sans eclairage on voit rien...
 
-  lcd.print("Ready...");// Print a message to the LCD
+  LCD.init();                // initialize the lcd
+  LCD.backlight();           // Turn on backlight // sans eclairage on voit rien...
+
+  LCD.print("Ready...");// Print a message to the LCD
 
 //  delay(2000); // for button to be ready (why go always trig once at startup?)
 //  digitalRead(switchTwistGoPin); // permit to clear it !?!
@@ -269,11 +280,11 @@ void asservTwist()
   // result is 5 times too much, why ?
   rMotRev1 /= 5;
   mot1.update(rMotRev1);
-  lcd.home();
-  //lcd.setCursor(0, 1);// set the cursor to column 0, line 1
-  lcd.print("Rev: ");
-  lcd.print(rMotRev1);
-  lcd.print("  "); // clean remaining char when number are off
+  LCD.home();
+  //LCD.setCursor(0, 1);// set the cursor to column 0, line 1
+  LCD.print("Rev: ");
+  LCD.print(rMotRev1);
+  LCD.print("  "); // clean remaining char when number are off
   delay(10);
 }
 
@@ -362,13 +373,13 @@ void commandByButton()
   // result is 5 times too much, why ?
   rMotRev1 /= 5;
   mot1.update(rMotRev1);
-  lcd.home();
-  //lcd.setCursor(0, 1);// set the cursor to column 0, line 1
-  lcd.print("Rev: ");
-  lcd.print(rMotRev1);
-  lcd.print(", twst: ");
-  lcd.print(nTwistMove);
-  lcd.print("  "); // clean remaining char when number are off
+  LCD.home();
+  //LCD.setCursor(0, 1);// set the cursor to column 0, line 1
+  LCD.print("Rev: ");
+  LCD.print(rMotRev1);
+  LCD.print(", twst: ");
+  LCD.print(nTwistMove);
+  LCD.print("  "); // clean remaining char when number are off
   delay(10);
 }
 
@@ -460,24 +471,24 @@ void updateMachine1b()
   
   
   //if( (nFrame&0x2FF)==0 ) // 1 on 256 or more
-  if( (nFrame%512)==0 )
+  if( (nFrame%64)==0 )
   {
     // lcd update
     float rMotRev1 = nNbrStepMotor1 / (float)nNbrStepPerTurnMotor1;
-    if(0)
+    if(1)
     {
       // the whole loop takes 34.2ms with liquid
       // the whole loop takes 30.0ms with liquid (Alma version)
       // the whole loop takes 20.0ms with hd44780
       // the whole loop takes 14.0ms with hd44780 and i2c clock at 400kHz
 
-      lcd.home(); // 3.5ms !!! (without the alma lib)
-      //lcd.setCursor(0, 1);// set the cursor to column 0, line 1 // 
-      lcd.print("Rev: "); // 7.5ms!
-      lcd.print(rMotRev1);
-      lcd.print(", twst: ");
-      lcd.print(nTwistMove);
-      lcd.print("  "); // clean remaining char when number are off
+      LCD.home(); // 3.5ms !!! (without the alma lib)
+      //LCD.setCursor(0, 1);// set the cursor to column 0, line 1 // 
+      LCD.print("Rev: "); // 7.5ms!
+      LCD.print(rMotRev1);
+      LCD.print(", twst: ");
+      LCD.print(nTwistMove);
+      LCD.print("  "); // clean remaining char when number are off
     }
     else
     {
@@ -486,14 +497,14 @@ void updateMachine1b()
       // setcursor + one float takes 3.6ms with hd44780
       // setcursor + one float takes 3.1ms with hd44780 and i2c clock at 400kHz
 
-      //lcd.setCursor(5, 0);  // 1.5ms (Alma version) // 0.4ms with hd44780 and i2c clock at 400kHz
-      //lcd.print(rMotRev1); // 5ms  (Alma version)  // 3.2ms with hd44780 and i2c clock at 400kHz
+      //LCD.setCursor(5, 0);  // 1.5ms (Alma version) // 0.4ms with hd44780 and i2c clock at 400kHz
+      //LCD.print(rMotRev1); // 5ms  (Alma version)  // 3.2ms with hd44780 and i2c clock at 400kHz
       
-      lcd.print("A"); // 1.5ms  (Alma version) // 0.4ms with hd44780 and i2c clock at 400kHz
-      //lcd.print("ABCD"); // 5.6ms  (Alma version)
+      //LCD.print("A"); // 1.5ms  (Alma version) // 0.4ms with hd44780 and i2c clock at 400kHz
+      //LCD.print("ABCD"); // 5.6ms  (Alma version)
       //static char s[] = "A";
       //s[0] = 'A'+((nNbrStepMotor1/100)%26);
-      //lcd.print(s); // 1.5ms  (Alma version)
+      //LCD.print(s); // 1.5ms  (Alma version)
     }
   }
 
@@ -505,6 +516,9 @@ void updateMachine1b()
   //DEBUG.println(durationprint);
 #endif
 
+#ifdef DELAYED_LCD
+  LCD.update();
+#endif
 
   countFps();
 
@@ -562,6 +576,17 @@ void updateMachine1b()
   }
 }
 
+void testDelayedLcd()
+{
+  LCD.home();
+  LCD.print("Coucou ca va?");
+  for(int i = 0; i < 5; ++i)
+  {
+    LCD.update();
+  }
+  delay(2000);
+}
+
 void loop() 
 {
  // DEBUG.println("loop...");
@@ -574,7 +599,9 @@ void loop()
   //testStepper();
   //testStepperA4988();
 
-  updateMachine1b();
+  testDelayedLcd();
+
+  //updateMachine1b();
 
 
 

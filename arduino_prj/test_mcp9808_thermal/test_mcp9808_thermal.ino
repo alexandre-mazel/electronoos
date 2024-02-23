@@ -1,4 +1,4 @@
-#include "Adafruit_MCP9808.h" // MCP9808 library by Adafruit
+#include <Adafruit_MCP9808.h> // MCP9808 library by Adafruit
 
 // Create the MCP9808 temperature sensor object
 Adafruit_MCP9808 tempsensor = Adafruit_MCP9808();
@@ -56,7 +56,7 @@ void loop()
   float c = tempsensor.readTempC();
   float f = tempsensor.readTempF();
   Serial.print("Temp: "); 
-  Serial.print(c, 4); Serial.print("*C and "); 
+  Serial.print(c, 4); Serial.print("*C and ");
   Serial.print(f, 4); Serial.println("*F.");
 
   delay(1000);

@@ -1,4 +1,5 @@
 #include <EEPROM.h>
+#include <Adafruit_MCP9808.h> // MCP9808 library by Adafruit
 
 /*
 Le croquis utilise 31158 octets (12%) de l'espace de stockage de programmes. Le maximum est de 253952 octets.
@@ -82,15 +83,24 @@ MCUFRIEND_kbv tft;
 #define WHITE   0xFFFF
 #define GRAY    0x8410
 
+#define PIN_PHOTORES 43
+
+
 uint16_t version = MCUFRIEND_KBV_H_;
 
 long int nCptFrame = 0;
 unsigned long timeBegin = millis();
 float fps = 60.;
+
+// Create the MCP9808 temperature sensor object
+Adafruit_MCP9808 tempsensor = Adafruit_MCP9808();
+
 void setup()
 {
-    Serial.begin(9600);
-    if (!Serial) delay(5000);           //allow some time for Leonardo
+  int nNumError = 0;
+
+  Serial.begin(9600);
+  if (!Serial) delay(5000);           //allow some time for Leonardo
     
 
 #if 1
@@ -181,10 +191,35 @@ void setup()
   Serial.println("");
   bjy_init();
 
-  Serial.println("DBG: Blangle v0.7");  
-  Serial.println("Starting...");
+
+  if (!tempsensor.begin(0x18)) 
+  {
+    Serial.println("ERR: Can't find temperature sensor MCP9808!");
+    ++nNumError;
+  }
+  else
+  {
+    Serial.println("INF: Found temperature sensor MCP9808!");
+    tempsensor.setResolution(1); // 0: 30ms, 1: 65 ms
+  }
+
+  pinMode( PIN_PHOTORES, INPUT );
+
+  Serial.println("INF: Blangle v0.8");  
+  Serial.println("INF: Starting...");
+  if( nNumError == 0 )
+  {
+    Serial.println("INF: Everything looks GOOD !");
+  }
+  else
+  {
+    Serial.print("INF: error(s) detected nbr: ");
+    Serial.println(nNumError);
+  }
+
   loadConfigFromEeprom();
-}
+
+} // setup
 
 int render_img( const int x, const int y, const int w, const int h, const unsigned char* pImg, const unsigned char* pPalette, int flip=0, int neg=0)
 {
@@ -568,6 +603,52 @@ int render_screen(int nPresel, int nip, int db, int bubble, double circ,int bLoc
 
 }
 
+unsigned long fpsTimeStart = 0;
+unsigned long fpsCpt = 0;
+void countFps()
+{
+  fpsCpt += 1;
+
+  // optim: don't read millis at everycall
+  // gain 1.1micros per call (averaged)
+  // an empty loop takes 67.15micros on mega2560 (just this function)
+
+  if((fpsCpt&7)!=7)
+  {
+    return;
+  }  
+
+  unsigned long diff = millis() - fpsTimeStart;
+  if (diff > 5000)
+  {
+    //unsigned long timeprintbegin = micros();
+    float fps = (float)(fpsCpt*1000)/diff;
+    Serial.print("INF: fps: ");
+    Serial.print(fps);
+    Serial.print(", dt: ");
+  #if 1
+    {
+      Serial.print(1000.f/fps,3);
+      Serial.println("ms");
+    }
+#else
+    {
+      Serial.print(1000000.f/fps);
+      Serial.println("micros");
+    }
+#endif
+
+    fpsTimeStart = millis();
+    fpsCpt = 0;
+    //unsigned long durationprint = micros()-timeprintbegin;
+    //DEBUG.print("duration fps micros: "); // 1228micros at 57600baud !!!, 1280 at 115200 (change nothing, it's more the time to compute)
+    //DEBUG.println(durationprint);
+  }
+
+}
+
+float rTemperature = -1.f;
+
 void loop()
 {
     static uint8_t aspect = 0;
@@ -584,6 +665,7 @@ void loop()
     int bubble=0;
     //const int nHalfBoitierMM = 43; // demi largeur du capteur - (distance des 2 extremites de contacts)
     const int nHalfBoitierMM = 24; // taille du boitier satelitte: distance des 2 extremites de contacts / 2
+    const int nLuminoLimit = 300; // to detect opening of the box
 
 
     //Serial.println("loop... blangle2");
@@ -591,6 +673,14 @@ void loop()
 
     // update sensors
     bjy_update();
+    int photores = analogRead(PIN_PHOTORES);
+
+    if( nCptFrame%100==0 )
+    {
+      tempsensor.wake();   // wake up, ready to read!
+      rTemperature = tempsensor.readTempC();
+      tempsensor.shutdown_wake(1);
+    }
 
     //bubble = bjy_getAngle(0);
     // db = bjy_getAngle(1);
@@ -836,5 +926,9 @@ void loop()
       Serial.print("fps: ");
       Serial.println(fps);
       bjy_displayLastAngles();
+      Serial.print("Temperature (C): "); Serial.println(rTemperature, 1);
+      Serial.print("Luminosity: "); Serial.println(photores);
     }
+
+    countFps();
 }

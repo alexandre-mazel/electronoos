@@ -83,7 +83,7 @@ MCUFRIEND_kbv tft;
 #define WHITE   0xFFFF
 #define GRAY    0x8410
 
-#define PIN_PHOTORES 43
+#define PIN_PHOTORES A14
 
 
 uint16_t version = MCUFRIEND_KBV_H_;
@@ -99,7 +99,7 @@ void setup()
 {
   int nNumError = 0;
 
-  Serial.begin(9600);
+  Serial.begin(57600);
   if (!Serial) delay(5000);           //allow some time for Leonardo
     
 
@@ -449,7 +449,7 @@ const int yArrowBottom = nAreaH+80+30;
 const int wArrow = 20;
 const int wInterArrow = 10;
 
-int render_screen(int nPresel, int nip, int db, int bubble, double circ,int bLocked)
+int render_screen(int nPresel, int nip, int db, int bubble, double circ,int bLocked, float rTemperature, int nLuminosity)
 {
   static uint8_t bDrawed = 0;
   static uint8_t bPrevLocked = 2;
@@ -599,6 +599,24 @@ int render_screen(int nPresel, int nip, int db, int bubble, double circ,int bLoc
       tft.fillRect( xArrow, yArrow,144+32,16,BLACK );
       tft.fillRect( xArrow, yArrowBottom+8,144+32,16,BLACK );
     }
+  }
+
+  if(1)
+  {
+    
+    const int nOffsetY = -20;
+
+
+    tft.setTextSize(2);
+    tft.fillRect( nMenuW+50+46, yText+nOffsetY,48, 16, BLUE );
+    tft.setCursor( nMenuW+50, yText+nOffsetY );
+    tft.print("temp:");
+    tft.print(rTemperature, 2);
+
+    tft.fillRect( nMenuW+nAreaW+50+46, yText+nOffsetY,48, 16, RED );
+    tft.setCursor( nMenuW+nAreaW+50, yText+nOffsetY );
+    tft.print("lum:");
+    tft.print(nLuminosity);
   }
 
 }
@@ -901,7 +919,7 @@ void loop()
         
       } // if bPressed
 
-      render_screen(nNumSettingsSelected,nip,db,bubble,presetCirc[nNumSettingsSelected],nLocked);
+      render_screen(nNumSettingsSelected,nip,db,bubble,presetCirc[nNumSettingsSelected],nLocked,rTemperature,photores);
 
     } // detect touch
 
@@ -909,7 +927,7 @@ void loop()
 
     //delay(1); // ! L'appel a delay nique la lecture du capteur !?!
     ++nCptFrame;
-    if( nCptFrame > 4000) // 400
+    if( nCptFrame > 400) // 400
     {
       // sur uno, avec loop delay 1 => 44fps, 43 avec un println
       // avec text size 1 => 103fps // 188 si affichÃ© en int
@@ -927,7 +945,7 @@ void loop()
       Serial.println(fps);
       bjy_displayLastAngles();
       Serial.print("Temperature (C): "); Serial.println(rTemperature, 1);
-      Serial.print("Luminosity: "); Serial.println(photores);
+      Serial.print("Luminosity: "); Serial.println(photores); // ouvert, lumiere du salon de nuit: 664, ombre de la main, 111, led de tel collé dessus: 905 
     }
 
     countFps();

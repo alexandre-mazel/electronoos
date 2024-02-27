@@ -21,11 +21,17 @@ SerialParser serialInput;
 #include "behavior.h"
 Behavior behavior;
 
-//#include "ethernetSrv.h"
-//EthernetSrv ethSrv;
+#include "config.h"
 
-//#include "eeprom_mgmt.h"
-//eeprom_mgmt eeprom;
+#include "world.h"
+
+#include "ethernet_srv.h"
+EthernetSrv ethSrv;
+
+
+
+#include "eeprom_mgmt.h"
+eeprom_mgmt eeprom;
 
 #include "motion_detection.h"
 MotionDetection motion = MotionDetection(MOTION_PIR_PIN, cfg.adm_SleepModeDelay); // Sleep mode after SLEEP_MODE_DELAY * 10s check interval
@@ -34,8 +40,8 @@ MotionDetection motion = MotionDetection(MOTION_PIR_PIN, cfg.adm_SleepModeDelay)
 void gpioInit() {
   // Motors PWM pins declaration
   for(int i = 0; i < 9; i++){
-    pinMode(motorPins[i], OUTPUT);
-    digitalWrite(motorPins[i], LOW);
+    pinMode(world.motorPins[i], OUTPUT);
+    digitalWrite(world.motorPins[i], LOW);
   }
   // Temporary main supply pin declaration
   pinMode(TEMP_MAIN_PIN, INPUT_PULLUP);
@@ -110,18 +116,6 @@ void printMotors(){
   Serial.println("");
 }
 
-void printColor(){
-  Serial.print(colorSensor.hue); Serial.print(' ');
-  Serial.print(colorSensor.ambient); Serial.print(' ');
-  Serial.print(colorSensor.deltaLight - 2.0f); Serial.print(' ');
-  Serial.println(behavior.pulseAmpl * 50);
-}
-
-void printMotionDetection() {
-  Serial.print("Sleep mode : ");
-  Serial.println(motion.sleep_mode ? "ON" : "OFF");
-}
-
 
 //=============== SETUP ==============
 void setup() {
@@ -132,7 +126,7 @@ void setup() {
   //eeprom.writeEeprom((uint8_t)offsetof(union eepromData, mot_MotorsAngleSetting), cfg.mot_MotorsAngleSetting = true);
  
   // Serial link parameters
-  Serial.begin(index2Speed(cfg.usb_SpeedIndex));
+  Serial.begin(1000000L); // Alma was: cfg.usb_SpeedIndex
   Serial.setTimeout(cfg.usb_Timeout);
 
   printProjectVersion();
@@ -199,7 +193,11 @@ void setup() {
 #endif
 }
 
-//=============== LOOP MOTORS ==============
+
+
+
+//=============== LOOP ==============
+
 void loop(){
 #ifdef MOTORS_TEST
   return;
@@ -260,10 +258,10 @@ void loop(){
     timeMotion = millis();
     // Check motion sensor
     motion.update();
-    ethData.pir = motion.pir;
-    ethData.pir_cnt = motion.count;
+    //ethData.pir = motion.pir; // TODO update datas here
+    //ethData.pir_cnt = motion.count;
     // Enable / disable sleep_mode based on the current value
-    ethData.sleep_m = motion.sleep_mode;
+    //ethData.sleep_m = motion.sleep_mode;
   }
 
   dPerm = (frc.f_mPerm) ? frc.f_vPerm : ethData.perm;
@@ -289,7 +287,7 @@ void loop(){
 	  // Supply motors ON & update status
     if ((f_status == STOPPED) && !dPS_Stop) {
       setFStatus(MOVING);
-      gpioMotorsPS();
+      _gpioMotorsPS();
     } else {
       setStatus(MOVING);
       gpioMotorsPS(true);
@@ -337,7 +335,7 @@ void loop(){
         // Switch off motors supply relay
         if (f_status == STOPPING) {
           setFStatus(STOPPED);
-          gpioMotorsPS();
+          _gpioMotorsPS();
         } else {
           setStatus(STOPPED);
           gpioMotorsPS(false);
@@ -366,11 +364,12 @@ void loop(){
   if ((millis() - timeFrame) >= TIME_FRAME_PERIOD) {
     timeFrame = millis(); 
     colorSensor.update();
-    behavior.deltaLight = colorSensor.deltaLight;
+    //behavior.setDeltaLight() = colorSensor.deltaLight; // TODO alma: update in behavior
   }
 
-  behavior.update(millis());
+  behavior.update(millis(),colorSensor);
 
+/*
   alpha1 = behavior.sections[0].alpha;
   PHI1   = behavior.sections[0].phi;
   alpha2 = behavior.sections[1].alpha;
@@ -403,11 +402,12 @@ void loop(){
   if ((millis() - timePrint) > TIME_PRINT_PERIOD){
     timePrint = millis();
     switch(witchPrint){
-      case 1: printColor(); break;      
+      case 1: colorSensor.printColor(); break;      
       case 2: printMotors(); break;
-      case 3: printMotionDetection(); break;
+      case 3: motionDetection.print(); break;
     }
   }
+  */
 }
 
 //======================================================
@@ -443,7 +443,7 @@ void serialCmd(){
     else if (strcmp(cmd, "lc") == 0) {
       float p1 = serialInput.getFloat();
       if (isnan(p1)) p1 = 0.92f;
-      colorSensor.lightCoef = p1;
+      colorSensor.setLightCoef(p1);
     }
     else if (strcmp(cmd, "$") == 0) {
       behavior.stop();

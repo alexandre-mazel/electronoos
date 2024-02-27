@@ -1,9 +1,6 @@
-#ifndef __COLORSENSOR_H__
-#define __COLORSENSOR_H__
-
 #include <Wire.h>
 #include <math.h>
-#include "SparkFun_APDS9960.h"
+#include "color_sensor.h"
 
 //////
 //  o GND
@@ -56,9 +53,9 @@ ColorSensor::ColorSensor()
 
 boolean ColorSensor::init() 
 {
-  enabled_ = apds.init();
+  enabled_ = apds_.init();
   if (enabled_) {
-    enabled_ = apds.enableLightSensor(false);
+    enabled_ = apds_.enableLightSensor(false);
   }
   // Wait for initialization and calibration to finish
   delay(500);
@@ -73,10 +70,10 @@ void ColorSensor::update()
   if (enabled_) 
   {
 
-    if (!apds.readAmbientLight(ambient_) ||
-      !apds.readRedLight(red_) ||
-      !apds.readGreenLight(green_) ||
-      !apds.readBlueLight(blue_)
+    if (!apds_.readAmbientLight(ambient_) ||
+      !apds_.readRedLight(red_) ||
+      !apds_.readGreenLight(green_) ||
+      !apds_.readBlueLight(blue_)
     )
     {
       Serial.println("Error reading light values");
@@ -90,6 +87,14 @@ void ColorSensor::update()
   }
 
   hue_ = rgb2hue(red_, green_, blue_);
-  deltaLight_ = abs((float)ambient-light); 
+  deltaLight_ = abs((float)ambient_-light_); 
   light_ = light_ * lightCoef_ + (1.0f - lightCoef_)*(float)ambient_;        
+}
+
+void ColorSensor::printColor()
+{
+  Serial.print(hue_); Serial.print(' ');
+  Serial.print(ambient_); Serial.print(' ');
+  Serial.print(deltaLight_ - 2.0f); Serial.print(' ');
+  //Serial.println(behavior.pulseAmpl * 50);
 }

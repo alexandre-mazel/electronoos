@@ -1,4 +1,5 @@
 #include "motion_detection.h"
+#include "definitions.h"
 
 MotionDetection::MotionDetection(unsigned int pin, byte counter_max) 
   :sleep_mode_ ( true )
@@ -23,11 +24,11 @@ MotionDetection::MotionDetection(unsigned int pin, byte counter_max)
 void MotionDetection::update() 
 {
   pir_ = digitalRead(sensor_pin_);
-  motion_ = (frc.f_mPir) ? frc.f_vPir : pir_;
+  //motion_ = (frc.f_mPir) ? frc.f_vPir : pir_; // TODO Alma: c'est quoi ?
 
   // If motion and in sleep mode, wake up
   if (motion_) {
-    if (motion_ != last_state) {
+    if (motion_ != last_state_) {
       count_ = counter_ = 0;
       Serial.println("Motion detected");
     }
@@ -60,4 +61,10 @@ void MotionDetection::update()
     }
   }
   last_state_ = motion_;
+}
+
+void MotionDetection::print() 
+{
+  Serial.print("Sleep mode : ");
+  Serial.println(sleep_mode_ ? "ON" : "OFF");
 }

@@ -1,8 +1,6 @@
 #ifndef __COLORSENSOR_H__
 #define __COLORSENSOR_H__
 
-#include <Wire.h>
-#include <math.h>
 #include "SparkFun_APDS9960.h"
 
 //////
@@ -17,8 +15,12 @@ class ColorSensor
 	public:
 		ColorSensor();
 
-		boolean init()
+		boolean init();
 		void update();
+
+    void setLightCoef(float coef) {lightCoef_ = coef; };
+
+    void printColor();
 
   private:
   	SparkFun_APDS9960   apds_;

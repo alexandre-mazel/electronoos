@@ -15,6 +15,8 @@ class MotionDetection
     MotionDetection(unsigned int pin, byte counter_max);
     void update();
 
+    void print();
+
   private:
     boolean sleep_mode_;
     boolean last_state_;

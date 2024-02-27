@@ -32,7 +32,7 @@ void Behavior::resume()
 
 }
 
-void Behavior::update( unsigned long t )
+void Behavior::update( unsigned long t_ms, const ColorSensor & colorSensor )
 {
 
 }

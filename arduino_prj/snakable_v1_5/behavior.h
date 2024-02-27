@@ -1,6 +1,8 @@
 #ifndef __BEHAVIOR_H__
 #define __BEHAVIOR_H__
 
+#include "color_sensor.h"
+
 class Behavior 
 {
 	public:
@@ -14,7 +16,7 @@ class Behavior
     void pause();
     void resume();
 
-    void update( unsigned long t );
+    void update( unsigned long t_ms, const ColorSensor & colorSensor );
 
   private:
     bool bRunning_;

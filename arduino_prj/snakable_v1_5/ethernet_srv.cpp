@@ -2,6 +2,8 @@
 #include "definitions.h"
 #include "config.h"
 
+#include "world.h"
+
 _frc frc;
 _ethData ethData;
 
@@ -58,7 +60,7 @@ void EthernetSrv::init()
   Ethernet.init(ETH_CS_PIN);
 
   byte ethMode = cfg.eth_Mode;
-  world.ethernetAvailable = false;
+  world.ethernetAvailable_ = false;
   
   if (ethMode == ETH_DHCP) {
     // start the Ethernet connection:
@@ -90,7 +92,7 @@ void EthernetSrv::init()
   Serial.print("DNS server       : "); Serial.println(Ethernet.dnsServerIP());
   Serial.print("Listening port   : "); Serial.println(cfg.eth_SrvDefaultPort);
   Serial.println();
-  ethernetAvailable = true;
+  world.ethernetAvailable_ = true;
   server_.begin();
   ethData.session = random(256);
   Serial.print("Session #        : "); Serial.println(ethData.session);

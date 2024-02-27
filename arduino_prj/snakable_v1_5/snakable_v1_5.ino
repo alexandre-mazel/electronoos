@@ -40,8 +40,8 @@ MotionDetection motion = MotionDetection(MOTION_PIR_PIN, cfg.adm_SleepModeDelay)
 void gpioInit() {
   // Motors PWM pins declaration
   for(int i = 0; i < 9; i++){
-    pinMode(world.motorPins[i], OUTPUT);
-    digitalWrite(world.motorPins[i], LOW);
+    pinMode(world.motorPins_[i], OUTPUT);
+    digitalWrite(world.motorPins_[i], LOW);
   }
   // Temporary main supply pin declaration
   pinMode(TEMP_MAIN_PIN, INPUT_PULLUP);
@@ -98,8 +98,8 @@ void setStatus(STATUS new_status) {
 }
 
 void setFStatus(STATUS new_status) {
-  f_status = new_status;
-  switch (f_status) {
+  world.f_status_ = new_status;
+  switch (world.f_status_) {
     case STOPPED: Serial.println("FORCED - STOPPED"); break;
     case MOVING: Serial.println("FORCED - MOVING"); break;
     case STOPPING: Serial.println("FORCED - STOPPING"); break;
@@ -108,9 +108,9 @@ void setFStatus(STATUS new_status) {
 
 void printMotors(){
   for(int i = 0; i < 9; i++) {
-    if (angles[i] < 100) Serial.print(" ");
-    if (angles[i] < 10) Serial.print(" ");
-    Serial.print(angles[i]);
+    if (world.angles_[i] < 100) Serial.print(" ");
+    if (world.angles_[i] < 10) Serial.print(" ");
+    Serial.print(world.angles_[i]);
     Serial.print(" ");
   }
   Serial.println("");
@@ -131,13 +131,13 @@ void setup() {
 
   printProjectVersion();
   
-  user_button_pressed = !digitalRead(USER_BUTTON_PIN);
-  if (user_button_pressed) {
+  world.user_button_pressed_ = !digitalRead(USER_BUTTON_PIN);
+  if (world.user_button_pressed_) {
     Serial.println("User button pressed !");
     Serial.println("Rewriting EEPROM with default values !");
     eeprom.storeFactoryDefaultValues();
     Serial.println("Done !!");
-    user_button_pressed_last = true;
+    world.user_button_pressed_last_ = true;
   }
   
   Serial.println(cfg.mot_MotorsAngleSetting ? "!!! CONFIG mode detected. RESETTING motors angles !!!" : "NORMAL mode");
@@ -146,7 +146,7 @@ void setup() {
   // Motors declaration and angles initialization
   for (int i = 0; i < 9; i++) {
     motors[i] = new Motor();
-    motors[i]->init(motorPins[i], angles[i] = ((cfg.mot_MotorsAngleSetting) ? cfg.mot_DefaultAngleSetting[i] : cfg.mot_DefaultAngle[i]));
+    motors[i]->init(world.motorPins_[i], world.angles_[i] = ((cfg.mot_MotorsAngleSetting) ? cfg.mot_DefaultAngleSetting[i] : cfg.mot_DefaultAngle[i]));
   }
 #ifndef MOTORS_TEST
   // Color sensor initialization
@@ -205,29 +205,29 @@ void loop(){
 
   // Process Ethernet commands and requests
 #ifdef USE_ETHERNET
-  if ((millis() - timeEthernet) >= TIME_ETHERNET_PERIOD) {
-    timeEthernet = millis();
+  if ((millis() - world.timeEthernet_) >= TIME_ETHERNET_PERIOD) {
+    world.timeEthernet_ = millis();
     ethSrv.process();
   }
 #endif
 
   // Get standby pushbutton status and set standby mode
-  standby_pressed = !digitalRead(STANDBY_PIN);
-  if (standby_pressed && !standby_pressed_last) {
+  world.standby_pressed_ = !digitalRead(STANDBY_PIN);
+  if (world.standby_pressed_ && !world.standby_pressed_last_) {
 	  ethData.stdby_m = !ethData.stdby_m;
     digitalWrite(STANDBY_LED_PIN, ethData.stdby_m);
     Serial.print("Standby ");
     Serial.println(ethData.stdby_m ? "ON" : "OFF");
   }
-  standby_pressed_last = standby_pressed;
+  world.standby_pressed_last_ = world.standby_pressed_;
 
 #ifdef NO_TMP_DETECTION
   ethData.temp = true;
 #else
   // Get temporary mains voltage status
   ethData.temp = !digitalRead(TEMP_MAIN_PIN);
-  if (ethData.temp != temp_main_input_last) {
-    temp_main_input_last = ethData.temp;
+  if (ethData.temp != world.temp_main_input_last_) {
+    world.temp_main_input_last_ = ethData.temp;
     Serial.print("Tmp mains input ");
     Serial.println(ethData.temp ? "ON" : "OFF");
   }
@@ -238,24 +238,24 @@ void loop(){
   ethData.perm = true;
 #else
   ethData.perm = !digitalRead(PERM_MAIN_PIN);
-  if (ethData.perm != perm_main_input_last) {
-    perm_main_input_last = ethData.perm;
+  if (ethData.perm != world.perm_main_input_last_) {
+    world.perm_main_input_last_ = ethData.perm;
     Serial.print("Perm mains input ");
     Serial.println(ethData.perm ? "ON" : "OFF");
   }
 #endif
 
-  user_button_pressed = !digitalRead(USER_BUTTON_PIN);
-  if (user_button_pressed && !user_button_pressed_last) {
+  world.user_button_pressed_ = !digitalRead(USER_BUTTON_PIN);
+  if (world.user_button_pressed_ && !world.user_button_pressed_last_) {
     ethData.user_m = !ethData.user_m;
     Serial.print("User mode ");
     Serial.println(ethData.user_m ? "ON" : "OFF");
   }
-  user_button_pressed_last = user_button_pressed;
+  world.user_button_pressed_last_ = world.user_button_pressed_;
 
   // Get motion detection sensor status and set sleep mode every TIME_MOTION_PERIOD ms
-  if ((millis() - timeMotion) >= TIME_MOTION_PERIOD) {
-    timeMotion = millis();
+  if ((millis() - world.timeMotion_) >= TIME_MOTION_PERIOD) {
+    world.timeMotion_ = millis();
     // Check motion sensor
     motion.update();
     //ethData.pir = motion.pir; // TODO update datas here
@@ -264,28 +264,28 @@ void loop(){
     //ethData.sleep_m = motion.sleep_mode;
   }
 
-  dPerm = (frc.f_mPerm) ? frc.f_vPerm : ethData.perm;
-  dTemp = (frc.f_mTemp) ? frc.f_vTemp : ethData.temp;
-  dSleep_m = (frc.f_mSleep_m) ? frc.f_vSleep_m : ethData.sleep_m;
-  dPS_Stop = (frc.f_mRelay && !frc.f_vRelay) || (frc.f_mPS_ON && !frc.f_vPS_ON);
+  world.dPerm_ = (frc.f_mPerm) ? frc.f_vPerm : ethData.perm;
+  world.dTemp_ = (frc.f_mTemp) ? frc.f_vTemp : ethData.temp;
+  world.dSleep_m_ = (frc.f_mSleep_m) ? frc.f_vSleep_m : ethData.sleep_m;
+  world.dPS_Stop_ = (frc.f_mRelay && !frc.f_vRelay) || (frc.f_mPS_ON && !frc.f_vPS_ON);
 
   // Check if system has to be switched off
-  if (((ethData.state == MOVING) && (!dTemp || !dPerm || dSleep_m || ethData.stdby_m || (ethData.mode & 2))) || ((f_status == MOVING) && dPS_Stop)) {
+  if (((ethData.state == MOVING) && (!world.dTemp_ || !world.dPerm_ || world.dSleep_m_ || ethData.stdby_m || (ethData.mode & 2))) || ((world.f_status_ == MOVING) && world.dPS_Stop_)) {
     // Stop the behavior
     behavior.stop();
 	  // Update status
-    if ((f_status == MOVING) && dPS_Stop)
+    if ((world.f_status_ == MOVING) && world.dPS_Stop_)
       setFStatus(STOPPING);
     else
       setStatus(STOPPING);
   }
-  else if (((ethData.state == STOPPED) && dTemp && dPerm && !dSleep_m && !ethData.stdby_m && ((ethData.mode & 2) == 0)) || ((f_status == STOPPED) && !dPS_Stop)) {
+  else if (((ethData.state == STOPPED) && world.dTemp_ && world.dPerm_ && !world.dSleep_m_ && !ethData.stdby_m && ((ethData.mode & 2) == 0)) || ((world.f_status_ == STOPPED) && !world.dPS_Stop_)) {
     // Motors angles update - but should already be defaulted
     for (int i = 0; i < 9; i++) {
       motors[i]->goAngle(cfg.mot_DefaultAngle[i]);
     }
 	  // Supply motors ON & update status
-    if ((f_status == STOPPED) && !dPS_Stop) {
+    if ((world.f_status_ == STOPPED) && !world.dPS_Stop_) {
       setFStatus(MOVING);
       _gpioMotorsPS();
     } else {
@@ -293,47 +293,47 @@ void loop(){
       gpioMotorsPS(true);
     }
     // Start the behavior
-    if ((ethData.state == MOVING) && (f_status == MOVING)) {
+    if ((ethData.state == MOVING) && (world.f_status_ == MOVING)) {
       behavior.init();
       behavior.start();
     }
     //delay(50);
   }
 
-  if ((ethData.state == STOPPING) || (f_status == STOPPING)) {
-    if (millis() - timeStopping > TIME_INCREMENT_TO_RESET) {
-      timeStopping = millis();
-      if (((ethData.state == STOPPING) && (f_status == STOPPED)) || ((ethData.state == STOPPED) && (f_status == STOPPING)))
-        stp_mot = 0;
+  if ((ethData.state == STOPPING) || (world.f_status_ == STOPPING)) {
+    if (millis() - world.timeStopping_ > TIME_INCREMENT_TO_RESET) {
+      world.timeStopping_ = millis();
+      if (((ethData.state == STOPPING) && (world.f_status_ == STOPPED)) || ((ethData.state == STOPPED) && (world.f_status_ == STOPPING)))
+        world.stp_mot_ = 0;
       else {
         Serial.print("   ");
-        if (abs(angles[stp_cur] - cfg.mot_DefaultAngle[stp_cur]) <= cfg.mot_RstIncrement) {
-          angles[stp_cur] = cfg.mot_DefaultAngle[stp_cur];
-          stp_mot--;
+        if (abs(world.angles_[world.stp_cur_] - cfg.mot_DefaultAngle[world.stp_cur_]) <= cfg.mot_RstIncrement) {
+          world.angles_[world.stp_cur_] = cfg.mot_DefaultAngle[world.stp_cur_];
+          world.stp_mot_--;
         }
         else {
-          if (angles[stp_cur] > cfg.mot_DefaultAngle[stp_cur])
-            angles[stp_cur] -= cfg.mot_RstIncrement;
+          if (world.angles_[world.stp_cur_] > cfg.mot_DefaultAngle[world.stp_cur_])
+            world.angles_[world.stp_cur_] -= cfg.mot_RstIncrement;
           else
-            angles[stp_cur] += cfg.mot_RstIncrement;
+            world.angles_[world.stp_cur_] += cfg.mot_RstIncrement;
         }
         digitalWrite(STOPPED_LED_PIN, !digitalRead(STOPPED_LED_PIN));
-        motors[stp_cur]->goAngle(angles[stp_cur]);
-        if (angles[stp_cur] < 100) Serial.print(" ");
-        if (angles[stp_cur] < 10) Serial.print(" ");
-        Serial.print(angles[stp_cur]);
+        motors[world.stp_cur_]->goAngle(world.angles_[world.stp_cur_]);
+        if (world.angles_[world.stp_cur_] < 100) Serial.print(" ");
+        if (world.angles_[world.stp_cur_] < 10) Serial.print(" ");
+        Serial.print(world.angles_[world.stp_cur_]);
         Serial.print(" ");
 
-        if (++stp_cur == 9) {
+        if (++world.stp_cur_ == 9) {
           Serial.println();
-          stp_cur = 0;
-          if (stp_mot) stp_mot = 9;
+          world.stp_cur_ = 0;
+          if (world.stp_mot_) world.stp_mot_ = 9;
         }
       }
-      if (stp_mot == 0) {
+      if (world.stp_mot_ == 0) {
         Serial.println("Done !");
         // Switch off motors supply relay
-        if (f_status == STOPPING) {
+        if (world.f_status_ == STOPPING) {
           setFStatus(STOPPED);
           _gpioMotorsPS();
         } else {
@@ -347,7 +347,7 @@ void loop(){
         if (ethData.mode & 2) {
           Serial.println("MODE CONFIG ready");
         }
-        stp_mot = 9;
+        world.stp_mot_ = 9;
       }
     }
   }
@@ -356,13 +356,13 @@ void loop(){
   serialCmd();
 
   // if not moving, just return
-  if ((ethData.state != MOVING) || (f_status != MOVING)) {
+  if ((ethData.state != MOVING) || (world.f_status_ != MOVING)) {
     return;
   }
 
   // Get color sensor value update
-  if ((millis() - timeFrame) >= TIME_FRAME_PERIOD) {
-    timeFrame = millis(); 
+  if ((millis() - world.timeFrame_) >= TIME_FRAME_PERIOD) {
+    world.timeFrame_ = millis(); 
     colorSensor.update();
     //behavior.setDeltaLight() = colorSensor.deltaLight; // TODO alma: update in behavior
   }
@@ -370,6 +370,8 @@ void loop(){
   behavior.update(millis(),colorSensor);
 
 /*
+  // todo Alma: uncomment this block
+
   alpha1 = behavior.sections[0].alpha;
   PHI1   = behavior.sections[0].phi;
   alpha2 = behavior.sections[1].alpha;
@@ -379,29 +381,29 @@ void loop(){
 
   // -------- motors angles calculation ------------
   //section 1
-  angles[0] = cfg.mot_DefaultAngle[0] + (cfg.mot_SectionCoef[0] * motors[0]->calculMoteur(PHI1, alpha1, phiWires[0])); 
-  angles[1] = cfg.mot_DefaultAngle[1] + (cfg.mot_SectionCoef[0] * motors[1]->calculMoteur(PHI1, alpha1, phiWires[1]));
-  angles[2] = cfg.mot_DefaultAngle[2] - (cfg.mot_SectionCoef[0] * motors[2]->calculMoteur(PHI1, alpha1, phiWires[2]));
+  world.angles_[0] = cfg.mot_DefaultAngle[0] + (cfg.mot_SectionCoef[0] * motors[0]->calculMoteur(PHI1, alpha1, phiWires[0])); 
+  world.angles_[1] = cfg.mot_DefaultAngle[1] + (cfg.mot_SectionCoef[0] * motors[1]->calculMoteur(PHI1, alpha1, phiWires[1]));
+  world.angles_[2] = cfg.mot_DefaultAngle[2] - (cfg.mot_SectionCoef[0] * motors[2]->calculMoteur(PHI1, alpha1, phiWires[2]));
  
   //section 2
-  angles[3] = cfg.mot_DefaultAngle[3] - (cfg.mot_SectionCoef[1] * motors[3]->calculMoteur(PHI2, alpha2, phiWires[3]));
-  angles[4] = cfg.mot_DefaultAngle[4] - (cfg.mot_SectionCoef[1] * motors[4]->calculMoteur(PHI2, alpha2, phiWires[4]));
-  angles[5] = cfg.mot_DefaultAngle[5] - (cfg.mot_SectionCoef[1] * motors[5]->calculMoteur(PHI2, alpha2, phiWires[5]));
+  world.angles_[3] = cfg.mot_DefaultAngle[3] - (cfg.mot_SectionCoef[1] * motors[3]->calculMoteur(PHI2, alpha2, phiWires[3]));
+  world.angles_[4] = cfg.mot_DefaultAngle[4] - (cfg.mot_SectionCoef[1] * motors[4]->calculMoteur(PHI2, alpha2, phiWires[4]));
+  world.angles_[5] = cfg.mot_DefaultAngle[5] - (cfg.mot_SectionCoef[1] * motors[5]->calculMoteur(PHI2, alpha2, phiWires[5]));
 
   //section 3
-  angles[6] = cfg.mot_DefaultAngle[6] + (cfg.mot_SectionCoef[2] * motors[6]->calculMoteur(PHI3, alpha3, phiWires[6]));
-  angles[7] = cfg.mot_DefaultAngle[7] + (cfg.mot_SectionCoef[2] * motors[7]->calculMoteur(PHI3, alpha3, phiWires[7]));
-  angles[8] = cfg.mot_DefaultAngle[8] - (cfg.mot_SectionCoef[2] * motors[8]->calculMoteur(PHI3, alpha3, phiWires[8]));
+  world.angles_[6] = cfg.mot_DefaultAngle[6] + (cfg.mot_SectionCoef[2] * motors[6]->calculMoteur(PHI3, alpha3, phiWires[6]));
+  world.angles_[7] = cfg.mot_DefaultAngle[7] + (cfg.mot_SectionCoef[2] * motors[7]->calculMoteur(PHI3, alpha3, phiWires[7]));
+  world.angles_[8] = cfg.mot_DefaultAngle[8] - (cfg.mot_SectionCoef[2] * motors[8]->calculMoteur(PHI3, alpha3, phiWires[8]));
 
   // Motors angles update
   for(int i = 0; i < 9; i++){
-    motors[i]->goAngle(angles[i]);
+    motors[i]->goAngle(world.angles_[i]);
   }
 
   // Serial print management
   if ((millis() - timePrint) > TIME_PRINT_PERIOD){
     timePrint = millis();
-    switch(witchPrint){
+    switch(world.witchPrint_){
       case 1: colorSensor.printColor(); break;      
       case 2: printMotors(); break;
       case 3: motionDetection.print(); break;
@@ -429,12 +431,12 @@ void serialCmd(){
       float a2 = serialInput.getFloat();
       float p3 = serialInput.getFloat();
       float a3 = serialInput.getFloat();
-      if(!isnan(p1)) PHI1   = p1;
-      if(!isnan(a1)) alpha1 = a1;
-      if(!isnan(p2)) PHI2   = p2;
-      if(!isnan(a2)) alpha2 = a2;
-      if(!isnan(p3)) PHI3   = p3;
-      if(!isnan(a3)) alpha3 = a3;
+      if(!isnan(p1)) world.PHI1_   = p1;
+      if(!isnan(a1)) world.alpha1_ = a1;
+      if(!isnan(p2)) world.PHI2_   = p2;
+      if(!isnan(a2)) world.alpha2_ = a2;
+      if(!isnan(p3)) world.PHI3_   = p3;
+      if(!isnan(a3)) world.alpha3_ = a3;
     }
     else if (strcmp(cmd, "beh") == 0) {
       behavior.stop();
@@ -452,7 +454,7 @@ void serialCmd(){
     else if (strcmp(cmd, "print") == 0) {
       float p1 = serialInput.getFloat();
       if (!isnan(p1))
-        witchPrint = (int)p1;
+        world.witchPrint_ = (int)p1;
     }
 /*    else if (strcmp(cmd, "test_m") == 0) {
       if (!ethData.stdby_m) return;

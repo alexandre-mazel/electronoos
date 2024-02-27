@@ -1,4 +1,4 @@
-#inckude "behavior.h"
+#include "behavior.h"
 
 Behavior::Behavior()
   : bRunning_ ( false )

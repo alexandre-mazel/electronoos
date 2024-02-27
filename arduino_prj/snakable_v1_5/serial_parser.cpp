@@ -23,8 +23,8 @@ char* SerialParser::readLine()
       return bufferW_;        
     }
     else if( writeIndex_ < 255 ){
-      bufferW[writeIndex_++]=c;
-      bufferW[writeIndex_]=0;
+      bufferW_[writeIndex_++] = c;
+      bufferW_[writeIndex_] = 0;
     }
   }
   return NULL;
@@ -42,11 +42,11 @@ int SerialParser::nextField()
 char* SerialParser::getStr()
 {
   int idx = nextField();
-  char c = bufferW[readIndex_];
+  char c = bufferW_[readIndex_];
   while( (c>' ') && ( c!=',' ) && ( c!=':' ) && ( c!='=' )  ){
-    c = bufferW[++readIndex_];    
+    c = bufferW_[++readIndex_];    
   }
-  bufferW[readIndex_]=0;
+  bufferW_[readIndex_]=0;
   eol_ = (c < 32); //endofLine
   if(!eol_) //not eol
     readIndex_++;

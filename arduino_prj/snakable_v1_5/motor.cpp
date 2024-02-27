@@ -1,4 +1,5 @@
 #include "motor.h"
+#include <Arduino.h>
 
 Motor::Motor() 
   :sectionLength_ ( 385.0f )// was L
@@ -9,10 +10,10 @@ Motor::Motor()
 {
 }
 
-void Motor::init(int pin, float a) 
+void Motor::init(int pin, float angle) 
 {
-  servo.attach(pin, 900, 2100);
-  servo.write(angle_ = angle);
+  servo_.attach(pin, 900, 2100);
+  servo_.write(angle_ = angle);
 }
 
 float Motor::calculMoteur(float cmdPHI, float cmdAlpha, double phiWire) 
@@ -24,11 +25,11 @@ float Motor::calculMoteur(float cmdPHI, float cmdAlpha, double phiWire)
 
   double psi   = phiWire - cmdAlpha;
   double theta = asin(sin(cmdPHI/2) * cos(phiWire - cmdAlpha));
-  delta_ = sectionLength - (sectionLength_ / theta - sectionRadius_) * theta;
-  return (angle_ = (180.0/PI) * delta / wheelRadius);
+  delta_ = sectionLength_ - (sectionLength_ / theta - sectionRadius_) * theta;
+  return (angle_ = (180.0/PI) * delta_ / wheelRadius_);
 }
 
 void Motor::goAngle(float angle) 
 {
-  servo.write(angle_ = angle); //todo interpol?
+  servo_.write(angle_ = angle); //todo interpol?
 }

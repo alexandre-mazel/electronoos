@@ -56,39 +56,40 @@ ColorSensor::ColorSensor()
 
 boolean ColorSensor::init() 
 {
-  enabled = apds.init();
-  if (enabled) {
-    enabled = apds.enableLightSensor(false);
+  enabled_ = apds.init();
+  if (enabled_) {
+    enabled_ = apds.enableLightSensor(false);
   }
   // Wait for initialization and calibration to finish
   delay(500);
-  return enabled;
+  return enabled_;
 }
 
 void ColorSensor::update() 
 {
-  if (enabled) {
-    int prevA = (int)ambient;
-    float prevL = light;
-    if (!apds.readAmbientLight(ambient) ||
-      !apds.readRedLight(red) ||
-      !apds.readGreenLight(green) ||
-      !apds.readBlueLight(blue) ) {
-      //Serial.println("Error reading light values");
-    } else {
-      hue = rgb2hue(red, green, blue);
-      deltaLight = abs((float)ambient-light); 
-      light = light * lightCoef + (1.0f - lightCoef)*(float)ambient;
-      //deltaLight = abs( (int)ambient-prevL );
+  //int prevA = (int)ambient_;
+  //float prevL = light_;
+
+  if (enabled_) 
+  {
+
+    if (!apds.readAmbientLight(ambient_) ||
+      !apds.readRedLight(red_) ||
+      !apds.readGreenLight(green_) ||
+      !apds.readBlueLight(blue_)
+    )
+    {
+      Serial.println("Error reading light values");
+      return;
     }
   }
-  else {
+  else 
+  {
     //Serial.println("Mode simulation");
-    int prevA = (int)ambient;
-    float prevL = light;
-    red = random(1024); green = random(1024); blue = random(1024); ambient = random(1024);
-    hue = rgb2hue(red, green, blue);
-    deltaLight = abs((float)ambient-light); 
-    light = light * lightCoef + (1.0f - lightCoef)*(float)ambient;        
+    red_ = random(1024); green_ = random(1024); blue_ = random(1024); ambient_ = random(1024);
   }
+
+  hue_ = rgb2hue(red_, green_, blue_);
+  deltaLight_ = abs((float)ambient-light); 
+  light_ = light_ * lightCoef_ + (1.0f - lightCoef_)*(float)ambient_;        
 }

@@ -18,8 +18,8 @@ ColorSensor colorSensor;
 #include "serial_parser.h"
 SerialParser serialInput;
 
-//#include "behavior.h"
-//Behavior behavior;
+#include "behavior.h"
+Behavior behavior;
 
 //#include "ethernetSrv.h"
 //EthernetSrv ethSrv;
@@ -483,7 +483,7 @@ void serialCmd(){
       }
     }*/
     else {
-      behavior.serialCmd(cmd);
+      //behavior.serialCmd(cmd); // TODO Alma
     }
     str = serialInput.readLine(); 
   }

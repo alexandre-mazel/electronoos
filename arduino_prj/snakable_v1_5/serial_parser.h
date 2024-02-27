@@ -10,6 +10,8 @@
  *  getValue(); parses name:number ; name is given by valueName; returns float or Nan
  */
 
+ #include <Arduino.h>
+
 class SerialParser 
 {
   public:

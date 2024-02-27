@@ -18,7 +18,7 @@ class Behavior
 
   private:
     bool bRunning_;
-    bool bPause_;
+    bool bPaused_;
 
 };
 

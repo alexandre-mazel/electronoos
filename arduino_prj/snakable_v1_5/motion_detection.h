@@ -1,6 +1,8 @@
 #ifndef _MOTION_DETECTION_H_
 #define _MOTION_DETECTION_H_
 
+#include <Arduino.h>
+
 //////
 //  o GND
 //  o Sensor Pin 12 (5V)

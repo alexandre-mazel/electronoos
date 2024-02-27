@@ -4,6 +4,7 @@
 
 #include "world.h"
 
+_mode mode;
 _frc frc;
 _ethData ethData;
 

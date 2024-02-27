@@ -9,12 +9,12 @@
 #define ETH_DHCP_RESP_TIMEOUT  2000  // 2s (= factory default value (or no parameter value))
 #define TIME_INACTIVE_CLIENT   1000
 
-enum MODE {
+typedef enum MODE {
   NORMAL = 0,       // Default value
   CONFIG_DEBUG,
   CONFIG_PARAMS,
   CONFIG_MOTORS
-} mode;
+} _mode;
 
 enum EthMode {
   ETH_DHCP = 0,

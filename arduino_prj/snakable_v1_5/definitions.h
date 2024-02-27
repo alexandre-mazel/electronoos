@@ -28,11 +28,11 @@
 
 ///////////////////////// CONSTANTS /////////////////////////
 
-#define PRJ_NAME          "SNAKABLE 2021"
+#define PRJ_NAME          "SNAKABLE 2024"
 #define PRJ_CRED          "ENSADLAB, FEMTO-ST/AS2M"
-#define PRJ_DEV           "François MARIONNET"
-#define DEV_RELEASE       "1.2.3"
-#define DEV_REL_DATE      "04/15/2023"
+#define PRJ_DEV           "François MARIONNET & Alexandre MAZEL"
+#define DEV_RELEASE       "1.5"
+#define DEV_REL_DATE      "xx/02/2023"
 
 // If changeable by the program, should be moved to config
 #define TIME_INCREMENT_TO_RESET 200
@@ -52,15 +52,18 @@ enum STATUS {
   STOPPING
 };
 
-enum CMD {
+typedef enum CMD {
   GET_STATUS = 0,   // Default value
   GET_ETH_MODE
-} cmd;
+} _cmd;
+extern _cmd cmd;
 
-enum ERRCODE {
+typedef enum ERRCODE {
   OK = 0,           // Default value
   WRN_0,
   ERR_0
-} errcode;
+} _errcode;
+
+extern _errcode errcode;
 
 #endif // __DEFINITIONS_H__

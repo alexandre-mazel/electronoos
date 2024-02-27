@@ -57,9 +57,16 @@ MotorInterpolator mot1(PWM_TWIST,PHASE_TWIST);
 #define dirPin 11 //direction
 #define stepPin 12 //step-pulse
 
+// twist
 #define enaPin2 31 //enable-motor
 #define dirPin2 33 //direction
 #define stepPin2 35 //step-pulse
+
+
+// collect
+#define enaPin3 30 //enable-motor
+#define dirPin3 32 //direction
+#define stepPin3 34 //step-pulse
 
 #define switchTwistGoPin 51 // button go +
 #define switchTwistRevPin 53 // button go -
@@ -144,6 +151,11 @@ void setup()
   pinMode(enaPin2, OUTPUT);
   pinMode(dirPin2, OUTPUT);
   pinMode(stepPin2, OUTPUT);
+
+  pinMode(enaPin3, OUTPUT);
+  pinMode(dirPin3, OUTPUT);
+  pinMode(stepPin3, OUTPUT);
+
 
   pinMode(switchTwistGoPin, INPUT);
   pinMode(switchTwistRevPin, INPUT);
@@ -431,6 +443,7 @@ void updateMachine1b()
         nTwistMove = 1;
         bSendCmdMotor1 = 1;
         digitalWrite(dirPin2,LOW);
+        digitalWrite(dirPin3,LOW);
       }
     }
   }
@@ -452,13 +465,14 @@ void updateMachine1b()
         nTwistMove = -1;
         bSendCmdMotor1 = 1;
         digitalWrite(dirPin2,HIGH);
+        digitalWrite(dirPin3,HIGH);
       }
     }
   }
 
   if(bSendCmdMotor1)
   {
-    digitalWrite(stepPin2,bFlipFlopMotor1);
+    digitalWrite(stepPin3,bFlipFlopMotor1);
     bFlipFlopMotor1 = ! bFlipFlopMotor1;
     if(bFlipFlopMotor1)
     {

@@ -30,6 +30,8 @@ Behavior behavior;
 #include "ethernet_srv.h"
 EthernetSrv ethSrv;
 
+#include "interpolator.h"
+
 
 
 #include "eeprom_mgmt.h"
@@ -132,6 +134,8 @@ void setup() {
   Serial.setTimeout(cfg.usb_Timeout);
 
   printProjectVersion();
+
+  Interpolator::autoTest();
   
   world.user_button_pressed_ = !digitalRead(USER_BUTTON_PIN);
   if (world.user_button_pressed_) {

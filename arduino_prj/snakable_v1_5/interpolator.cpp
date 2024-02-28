@@ -1,7 +1,8 @@
 #include "interpolator.h"
 #include <Arduino.h>
 
-#define myAssert(val) {if(!(val)){Serial.print("ASSERT FAILED: ");Serial.print(__FILE__);Serial.print(": ");Serial.println(__LINE__);delay(2000);}}
+#define myAssert(val) {if(!(val)){Serial.print("ASSERT FAILED at ");Serial.print(__FILE__);Serial.print(": ");Serial.println(__LINE__);delay(2000);}}
+#define myAssertDiff(val,ref) {if( abs((val)-(ref)) > 0.1) {Serial.print("ASSERT FAILED: ");Serial.print(val);Serial.print(" != ");Serial.print(ref);Serial.print(" at ");Serial.print(__FILE__);Serial.print(": ");Serial.println(__LINE__);delay(2000);}}
 
 #define DEBUG
 
@@ -81,11 +82,14 @@ float Interpolator:: update( timetype current_time_ms )
         val = rStartPos_ + val;
     }
 
-    Serial.print("DBG: Interpolator::update: rt: "); Serial.println( rt );
-    Serial.print("DBG: Interpolator::update: delta: "); Serial.println( delta );
-    Serial.print("DBG: Interpolator::update: val: "); Serial.println( val );
-    
     rPos_ = val;
+
+    if(0)
+    {
+      Serial.print("DBG: Interpolator::update: rt: "); Serial.println( rt );
+      Serial.print("DBG: Interpolator::update: delta: "); Serial.println( delta );
+      Serial.print("DBG: Interpolator::update: val: "); Serial.println( val );
+    }
     
     return false;  
 }
@@ -124,7 +128,7 @@ void Interpolator::autoTest()
 {
     Serial.println("DBG: Interpolator::autoTest");
     
-    myAssert(1); // test myAssert :)
+    myAssert(1==1); // test myAssert :)
     // myAssert(0); // test myAssert :)
     
     Interpolator int1;
@@ -133,16 +137,42 @@ void Interpolator::autoTest()
     int1.setRelGoal( 10,timeGoal1 );
     long int timeBegin = millis();
     pinMode(LED_BUILTIN, OUTPUT);
+    int1.update(millis());
+    delay(10);
+    myAssertDiff(int1.getVal(), 0);
     while( ! int1.isFinished() )
     {
         int1.update(millis());
-        analogWrite(LED_BUILTIN, int1.getVal()*255); // sur le R3, c'est la led la plus a coté du pin 13
-        int1.print();
-        delay(100);
+        analogWrite(LED_BUILTIN, int1.getVal()*25); // sur le R3, c'est la led la plus a coté du pin 13
+        //int1.print();
+        delay(10);
     }
     long int duration = millis()-timeBegin;
     myAssert(millis()-timeBegin > timeGoal1-50);
     myAssert(millis()-timeBegin < timeGoal1+50);
+    myAssertDiff(int1.getVal(), 10);
+
+    if(1)
+    {
+      const int timeGoal1 = 1000;
+      int1.setRelGoal( -9,timeGoal1 ); // previously finished at 10
+      int1.setSpline( true );
+      long int timeBegin = millis();
+      pinMode(LED_BUILTIN, OUTPUT);
+      int1.update(millis());
+      myAssertDiff(int1.getVal(), 10);
+      while( ! int1.isFinished() )
+      {
+          int1.update(millis());
+          analogWrite(LED_BUILTIN, int1.getVal()*25); // sur le R3, c'est la led la plus a coté du pin 13
+          //int1.print();
+          delay(10);
+      }
+      long int duration = millis()-timeBegin;
+      myAssert(millis()-timeBegin > timeGoal1-50);
+      myAssert(millis()-timeBegin < timeGoal1+50);
+      myAssertDiff(int1.getVal(), 1);
+    }
     
     if(0)
     {
@@ -182,7 +212,10 @@ void Interpolator::autoTest()
         Serial.print("duration 10000 gaussian (ms): "); // Mega2560: 2.090s it's the same after const optimisation: the compiler has already optimise consts. Kudos !
         Serial.println(duration);
         delay(100000);
-        
+    }
+
+    if(1)
+     {   
         for( int spline = 0; spline < 2; ++spline )
         {
             const int timeGoal1 = 2000;
@@ -196,7 +229,7 @@ void Interpolator::autoTest()
             {
                 int1.update(millis());
                 analogWrite(LED_BUILTIN, int1.getVal()*255);
-                int1.print();
+                //int1.print();
                 delay(100);
             }
         }

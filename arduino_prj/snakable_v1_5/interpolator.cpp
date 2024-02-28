@@ -14,12 +14,21 @@ float gaussian(float x)
     const float pi = 3.141592653589793f;
     const float e =  2.71828f;
 
-    float midpoint = 1 / (( 1/( stdD * sqrt(2 * pi) ) ) * pow(e , -1 * sq(0.5 - mean) / (2 * sq(stdD))));
+    //float midpoint = 1 / (( 1/( stdD * sqrt(2 * pi) ) ) * pow(e , -1 * sq(0.5 - mean) / (2 * sq(stdD))));
+    const float midpoint = 0.31332853432887503;
 
-    Serial.print("midpoint: "); Serial.println( midpoint );
-    Serial.print("-1 * sq(x - mean): "); Serial.println( -1 * sq(x - mean) );
+    //Serial.print("midpoint: "); Serial.println( midpoint );
+    //Serial.print("-1 * sq(x - mean): "); Serial.println( -1 * sq(x - mean) );
 
-    float ret = (( 1/( stdD * sqrt(2 * pi) ) ) * pow(e , -1 * sq(x - mean) / (2 * sq(stdD)))) * midpoint;
+    // float ret = (( 1/( stdD * sqrt(2 * pi) ) ) * pow(e , -1 * sq(x - mean) / (2 * sq(stdD)))) * midpoint;
+
+    // precalcFirst = 1/( stdD * np.sqrt(2 * pi) )
+    const float precalcFirst = 3.1915382432114616;
+    // precalcSecond = 2 * sq(stdD)
+    const float precalcSecond = 0.03125;
+
+    float ret = (( precalcFirst ) * pow(e , -1 * sq(x - mean) / (precalcSecond))) * midpoint;
+
     //Serial.print( "x: " );
     //Serial.print( x, 4 );
     //Serial.print( ", gaussian: " );
@@ -146,21 +155,32 @@ void Interpolator::autoTest()
       }
     }
 
-    if(0)
+    if(1)
     {
         // test gaussian
         for( int i = 0; i < 100; ++i )
         {
           float x = i / 100.f;
-          Serial.print( "x: " );
-          Serial.print( x );
-          Serial.print( ", gaussian: " );
           float y = gaussian(x);
-          Serial.println( y );
         }
         
         for( int i = 0; i < 5; ++i )
-            gaussian( i*0.125 );
+        {
+          gaussian( i*0.125 );
+        }
+
+        Serial.println("gaussian speed test...");
+        float y;
+        long int timeBegin = millis();
+        for( long int i = 0; i < 1000000; ++i )
+        {
+          y = gaussian(i);
+          if( y < -1 ) Serial.print("cette ligne sert a enlever l'optimisation du compiler sur du code inutile (eg l'appal a la fonction gaussian si on n'utilise pas la valeur de retour)");
+        }
+        long int duration = millis() - timeBegin; 
+        Serial.print("duration 10000 gaussian (ms): "); // Mega2560: 2.090s same after const optimisation: the compiler has already optimise them. Kudos !
+        Serial.println(duration);
+        delay(100000);
         
         for( int spline = 0; spline < 2; ++spline )
         {

@@ -1787,7 +1787,7 @@ def gaussian(x):
     precalcSecond = 0.03125
     
     res =  (( precalcFirst ) * pow(e , -1 * sq(x - mean) / (precalcSecond))) * midpoint;
-    print( "DBG: gaussian %s => %s" % (x,res) )
+    #~ print( "DBG: gaussian %s => %s" % (x,res) )
     return res
 # gaussian - end
 
@@ -1799,12 +1799,15 @@ if 1:
         gaussian(i*0.125)
     gaussian(0.9)
         
-    if 0:
+    if 1:
         timeBegin = time.time()
+        x = 1.
         for i in range(1000000):
             y = gaussian(x)
         duration = time.time() - timeBegin
-        print("DBG: time gaussian: %.3fs" % duration ) # mstab7 for 1 million: 3.033s; 1.581s with the optimisation of  midpoint; 0.413s with precalcFirst & Second
+        print("DBG: time gaussian: %.3fs" % duration ) 
+        # mstab7 for 1 million: 3.033s; 1.581s with the optimisation of  midpoint; 0.413s with precalcFirst & Second
+        # mega 2570: // Mega2560: 2.090s for 10000, so 209.0s for 1 million
 
     exit(1)
     

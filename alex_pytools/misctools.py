@@ -1791,7 +1791,7 @@ def gaussian(x):
     return res
 # gaussian - end
 
-if 1:
+if 0:
     for i in range(100):
         x = i / 100.
         gaussian(x)

@@ -172,13 +172,13 @@ void Interpolator::autoTest()
         Serial.println("gaussian speed test...");
         float y;
         long int timeBegin = millis();
-        for( long int i = 0; i < 1000000; ++i )
+        for( long int i = 0; i < 10000; ++i )
         {
           y = gaussian(i);
           if( y < -1 ) Serial.print("cette ligne sert a enlever l'optimisation du compiler sur du code inutile (eg l'appal a la fonction gaussian si on n'utilise pas la valeur de retour)");
         }
         long int duration = millis() - timeBegin; 
-        Serial.print("duration 10000 gaussian (ms): "); // Mega2560: 2.090s same after const optimisation: the compiler has already optimise them. Kudos !
+        Serial.print("duration 10000 gaussian (ms): "); // Mega2560: 2.090s it's the same after const optimisation: the compiler has already optimise them. Kudos !
         Serial.println(duration);
         delay(100000);
         

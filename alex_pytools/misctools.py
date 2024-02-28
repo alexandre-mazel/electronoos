@@ -1749,6 +1749,64 @@ def eraseFileLongerLine(filename,sizemax):
     
 #~ eraseFileLongerLine("/tmp/data_offers.py",10000)
 #~ exit(0)
+
+
+def gaussian(x):
+    # inspired by https://codepen.io/zapplebee/pen/ByvmMo
+    # returns values along a bell curve from 0 - 1 - 0 with an input of 0 - 1.
+    # 
+    # for reference:
+    # midpoint: 0.31332853432887503 (js & python)
+    # 
+    # gaussian(0.125*0): 0.00033546262790251196 (js)    0.00033546443310615646 (python)     0.0003354645 (mega 2560)
+    # gaussian(0.125*1): 0.011108996538242308 (js)          0.01110903016452842 (python)            0.0111090314 (mega 2560)
+    # gaussian(0.125*2): 0.1353352832366127 (js)               0.13533546530402737 (python)            0.1353354573 (mega 2560)
+    # gaussian(0.125*3): 0.6065306597126334 (js)              0.6065308637049162 (python)             0.6065308570 (mega 2560)
+    # gaussian(0.125*4): 1
+    # gaussian(0.90): # 0.005976043476356159 (python) 0.0059760446 (mega 2560)
+
+    stdD = .125
+    mean = .5
+    pi = 3.141592653589793
+    e =  2.71828
+    
+    def sq(a):
+        return a*a
+
+    # midpoint = 1 / (( 1/( stdD * np.sqrt(2 * pi) ) ) * pow(e , -1 * sq(0.5 - mean) / (2 * sq(stdD))));
+    midpoint = 0.31332853432887503 # it's a constant !
+
+    #~ print("midpoint: %s" % midpoint );
+    #~ print("-1 * sq(x - mean): %s" % (-1 * sq(x - mean)) );
+
+    # res =  (( 1/( stdD * np.sqrt(2 * pi) ) ) * pow(e , -1 * sq(x - mean) / (2 * sq(stdD)))) * midpoint;
+    
+    # precalcFirst = 1/( stdD * np.sqrt(2 * pi) )
+    precalcFirst = 3.1915382432114616
+    # precalcSecond = 2 * sq(stdD)
+    precalcSecond = 0.03125
+    
+    res =  (( precalcFirst ) * pow(e , -1 * sq(x - mean) / (precalcSecond))) * midpoint;
+    print( "DBG: gaussian %s => %s" % (x,res) )
+    return res
+# gaussian - end
+
+if 1:
+    for i in range(100):
+        x = i / 100.
+        gaussian(x)
+    for i in range(5):
+        gaussian(i*0.125)
+    gaussian(0.9)
+        
+    if 0:
+        timeBegin = time.time()
+        for i in range(1000000):
+            y = gaussian(x)
+        duration = time.time() - timeBegin
+        print("DBG: time gaussian: %.3fs" % duration ) # mstab7 for 1 million: 3.033s; 1.581s with the optimisation of  midpoint; 0.413s with precalcFirst & Second
+
+    exit(1)
     
 def autoTest():
     s = str(getCpuModel())

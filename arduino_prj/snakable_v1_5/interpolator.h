@@ -2,7 +2,7 @@
 #define __INTERPOLATOR_H__
 
 // all times are in ms
-typedef signed long timeunit; // ms stored to signed long => (overflow after 25 days)
+typedef signed long timetype; // ms stored to signed long => (overflow after 25 days)
 
 class Interpolator
 {
@@ -10,11 +10,16 @@ class Interpolator
         
         Interpolator();
         
-        float   update( timeunit time_ms ); // update values and return the value
+        float   update( timetype current_time_ms ); // update values and return if it's finished
         int      isFinished( void ) const {return bIsFinished_;};
+        void   forcePos( float pos ) {rPos_ = pos;};
         float   getPos( void ) const {return rPos_;};
-        void    setRelGoal( float rGoalPos, timeunit tGoalRel );  // set absolute goal position
-        void    setAbsGoal( float rGoalPos, timeunit tGoalRel ); // set goal relative to current one position
+        float   getVal( void ) const {return rPos_;};
+        void    setRelGoal( float rGoalPos, timetype tGoalRel );  // set absolute goal position
+        void    setAbsGoal( float rGoalPos, timetype tGoalRel ); // set goal relative to current one position
+        
+        void    setPingpong( bool bEnable ) { bPingPong_= bEnable; };
+        void    setSpline( bool bEnable ) { bSpline_= bEnable; };
     
         void    print(void);
         
@@ -26,8 +31,11 @@ class Interpolator
         float rStartPos_;
         float rGoalPos_;
     
-        timeunit  rStartTime_;
-        timeunit  rGoalTime_;
+        timetype  rStartTime_;
+        timetype  rGoalTime_;
+    
+        int         bPingPong_;
+        int         bSpline_;
 };
 
 

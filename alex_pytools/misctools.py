@@ -1807,7 +1807,11 @@ if 0:
         duration = time.time() - timeBegin
         print("DBG: time gaussian: %.3fs" % duration ) 
         # mstab7 for 1 million: 3.033s; 1.581s with the optimisation of  midpoint; 0.413s with precalcFirst & Second
-        # mega 2570: // Mega2560: 2.090s for 10000, so 209.0s for 1 million
+        # RPI 3.0 (python2): 13.63s (precalc...)
+        # RPI 3.0 (python3): 11.89s (precalc...)
+        # RPI 4.0 (python3): 1.870s (precalc...)
+        # RPI 5.0 (python3): 0.483s (precalc...)
+        # mega 2560: 2.090s for 10000, so 209.0s for 1 million
 
     exit(1)
     

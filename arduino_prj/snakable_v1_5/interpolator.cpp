@@ -146,6 +146,7 @@ void Interpolator::autoTest()
     
     if(0)
     {
+      // locate LED_BUILTIN position on the board
       for(int i = 0; i < 10; ++i )
       {
           digitalWrite(LED_BUILTIN, HIGH);
@@ -155,7 +156,7 @@ void Interpolator::autoTest()
       }
     }
 
-    if(1)
+    if(0)
     {
         // test gaussian
         for( int i = 0; i < 100; ++i )
@@ -178,7 +179,7 @@ void Interpolator::autoTest()
           if( y < -1 ) Serial.print("cette ligne sert a enlever l'optimisation du compiler sur du code inutile (eg l'appal a la fonction gaussian si on n'utilise pas la valeur de retour)");
         }
         long int duration = millis() - timeBegin; 
-        Serial.print("duration 10000 gaussian (ms): "); // Mega2560: 2.090s it's the same after const optimisation: the compiler has already optimise them. Kudos !
+        Serial.print("duration 10000 gaussian (ms): "); // Mega2560: 2.090s it's the same after const optimisation: the compiler has already optimise consts. Kudos !
         Serial.println(duration);
         delay(100000);
         

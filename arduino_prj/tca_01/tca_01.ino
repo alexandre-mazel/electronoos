@@ -335,7 +335,7 @@ void testStepperA4988_PWM()
   Serial.println("testStepperA4988_PWM");
   const int nNbrStepPerTurn = 200;
   //const unsigned long nTimeOneTurnMicroSec = 1000L*nNbrStepPerTurn;
-  const int nTimeOneTurnMs = (1000/976)*nNbrStepPerTurn+4; // add a bit for a full turn
+  const int nTimeOneTurnMs = (1000/976.f)*nNbrStepPerTurn;
 
   analogWrite( stepPin2_pwm, 255/2. );
   //delayMicroseconds(nTimeOneTurnMicroSec);

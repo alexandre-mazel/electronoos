@@ -62,6 +62,8 @@ MotorInterpolator mot1(PWM_TWIST,PHASE_TWIST);
 #define dirPin2 33 //direction
 #define stepPin2 35 //step-pulse
 
+#define stepPin2_pwm 4 //step-pulse 4: pwm a 976Hz, 5: pwm a 490Hz
+
 
 // collect
 #define enaPin3 30 //enable-motor
@@ -151,6 +153,7 @@ void setup()
   pinMode(enaPin2, OUTPUT);
   pinMode(dirPin2, OUTPUT);
   pinMode(stepPin2, OUTPUT);
+  pinMode(stepPin2_pwm, OUTPUT);
 
   pinMode(enaPin3, OUTPUT);
   pinMode(dirPin3, OUTPUT);
@@ -312,6 +315,7 @@ void testStepper()
 
 void testStepperA4988()
 {
+  Serial.println("testStepperA4988");
   const int nNbrStepPerTurn = 200;
   const int nSleepMicroSec = 500;  // 500 was ok // 300 also for 17HE15-1504S without charge // with 314g charge, set 500
 
@@ -323,6 +327,21 @@ void testStepperA4988()
     digitalWrite( stepPin2,LOW );
     delayMicroseconds(nSleepMicroSec);
   }
+  delay(2000);
+}
+
+void testStepperA4988_PWM()
+{
+  Serial.println("testStepperA4988_PWM");
+  const int nNbrStepPerTurn = 200;
+  //const unsigned long nTimeOneTurnMicroSec = 1000L*nNbrStepPerTurn;
+  const int nTimeOneTurnMs = (1000/976)*nNbrStepPerTurn+4; // add a bit for a full turn
+
+  analogWrite( stepPin2_pwm, 255/2. );
+  //delayMicroseconds(nTimeOneTurnMicroSec);
+  delay(nTimeOneTurnMs);
+
+  analogWrite( stepPin2_pwm, 0 );
   delay(2000);
 }
 
@@ -472,7 +491,7 @@ void updateMachine1b()
 
   if(bSendCmdMotor1)
   {
-    digitalWrite(stepPin3,bFlipFlopMotor1);
+    digitalWrite(stepPin2,bFlipFlopMotor1);
     bFlipFlopMotor1 = ! bFlipFlopMotor1;
     if(bFlipFlopMotor1)
     {
@@ -628,10 +647,11 @@ void loop()
 
   //testStepper();
   //testStepperA4988();
+   testStepperA4988_PWM();
 
   //testDelayedLcd();
 
-  updateMachine1b();
+  //updateMachine1b();
 
 
 

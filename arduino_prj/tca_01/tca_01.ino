@@ -182,7 +182,7 @@ float readRawAngleAS5600()
   int rawAngle = highbyte | lowbyte;                        // combine bytes to get 12-bit value 11:0
   float degAngle = rawAngle * 0.087890625;                    // 360/4096 = 0.087890625
 
-  Serial.print("DBG: readRawAngleAS5600: Deg angle: ");
+  Serial.print("DBG: readRawAngleAS5600: Deg angle: "); // quand rien en face, oscille autour de 180deg
   Serial.println(degAngle, 2);                          //absolute position of the encoder within the 0-360 circle
   return degAngle;
 }

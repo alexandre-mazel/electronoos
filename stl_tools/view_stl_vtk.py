@@ -83,7 +83,7 @@ def WriteCartouche(filename_generated, filename_original, nbr_faces = 0):
         # puttext front left ...
         margin = 10
         hmargin = margin+20
-        cv2.putText( im, "Front",  ( 0+margin, 0+hmargin ), font, 1, fontColor, 1 )
+        cv2.putText( im, "Front",  ( 0+margin, 0+hmargin ), font, 1, fontColor, 1 ) #todo: write a '*' beside the name if camera or object has been moved!
         cv2.putText( im, "Right",  ( 0+margin+wi//2, 0+hmargin ), font, 1, fontColor, 1 )
         cv2.putText( im, "Top",  ( 0+margin, 0+hmargin+hi//2 ), font, 1, fontColor, 1 )
 
@@ -179,7 +179,9 @@ def WriteImage(fileName, renWin, rgba=True):
     writer.SetInputConnection(windowto_image_filter.GetOutputPort())
     writer.Write()
     print("INF: WriteImage: rendered image written to '%s'" % fileName)
-        
+    
+bRenderToFile = False            
+
 def showStl(filename, bAnimate=True, bDrawingTechnic = True):
     
     class MyInteractorStyle(vtk.vtkInteractorStyleTrackballCamera):
@@ -192,7 +194,18 @@ def showStl(filename, bAnimate=True, bDrawingTechnic = True):
         def keyPressEvent(self,obj,event):
             key = self.parent.GetKeySym()
             print("DBG: keyPressEvent: key: %s" % key)
+            
+            bExit = False
+            if key == 'p' or key == 't' or key == 'd': # for Print or Technical Drawing
+                global bRenderToFile
+                bRenderToFile = True
+                print("rendering to file then Exiting!")
+                bExit = True
+                
             if key == 'Escape':
+                bExit = True
+                
+            if bExit:
                 print("Exiting!")
                 renderWindow.Finalize()
                 self.parent.TerminateApp()
@@ -393,10 +406,11 @@ def showStl(filename, bAnimate=True, bDrawingTechnic = True):
     renderWindowInteractor.SetInteractorStyle(MyInteractorStyle())
     
     renderWindowInteractor.Start()
-    
-    if bDrawingTechnic:
+    print("bRenderToFile: %s" % bRenderToFile )
+    if bRenderToFile:
+        print("INF: Rendering to file...")
         print("actor rot: %s" % str(actor.GetOrientationWXYZ()) )
-        outfn = filename.lower().replace(".stl","_technical_drawing.") + "png"
+        outfn = filename.lower().replace(".stl","__technical_drawing.") + "png"
         WriteImage(outfn, renderWindow, rgba=True)
         
         nbr_faces = 0
@@ -407,6 +421,11 @@ def showStl(filename, bAnimate=True, bDrawingTechnic = True):
 
 
 if __name__ == "__main__":
+    """
+    
+    """
+    print("Syntaxe: <scriptname> <stl_file>")
+    print("during rendering, press p, t or d to render to a file then exit")
     fn = "MovingWeight_with_roller.stl"
     #~ fn = "CameraFishEye_p1.stl"
     fn = "CameraFishEye_p2.stl"

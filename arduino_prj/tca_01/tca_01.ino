@@ -129,6 +129,65 @@ bool i2CAddrTest(uint8_t addr) {
   return false;
 }
 
+const int nI2CAS5600_1_address = 0x36;
+
+
+float readRawAngleAS5600()
+{
+  Serial.println("INF: readRawAngleAS5600: start");
+  //----- read low-order bits 7:0
+  Wire.beginTransmission(nI2CAS5600_1_address);         //connect to the sensor
+  Wire.write(0x0D);                                     //figure 21 - register map: Raw angle (7:0)
+  if(Wire.endTransmission() != 0)                       //end transmission
+  {
+    Serial.println("WRN: readRawAngleAS5600: error transmission (1)");
+    //return -666;          
+  }
+  Wire.requestFrom(nI2CAS5600_1_address, 1);            //request from the sensor
+  long int timeStart = millis();
+  while (Wire.available() == 0)                         //wait until it becomes available
+  {
+    if( millis() - timeStart > 1000 )
+    {
+      Serial.println("WRN: readRawAngleAS5600: timeout (1)");
+      return -666;
+    }
+    delay(1);
+  }
+  byte lowbyte = Wire.read();                           //Reading the data after the request
+
+  // ----- read high-order bits 11:8
+  Wire.beginTransmission(nI2CAS5600_1_address);
+  Wire.write(0x0C);                                     //figure 21 - register map: Raw angle (11:8)
+  if(Wire.endTransmission() != 0)                       //end transmission
+  {
+    Serial.println("WRN: readRawAngleAS5600: error transmission (2)");
+    //return -666;
+  }
+  Wire.requestFrom(nI2CAS5600_1_address, 1);
+  timeStart = millis();
+  while (Wire.available() == 0)
+  {
+    if( millis() - timeStart > 1000 )
+    {
+      Serial.println("WRN: readRawAngleAS5600: timeout (2)");
+      return -666;
+    }
+    delay(1);
+  }
+  int highbyte = Wire.read();
+
+  // ----- combine bytes
+  highbyte = highbyte << 8;                             // shift highbyte to left
+  int rawAngle = highbyte | lowbyte;                        // combine bytes to get 12-bit value 11:0
+  float degAngle = rawAngle * 0.087890625;                    // 360/4096 = 0.087890625
+
+  Serial.print("DBG: readRawAngleAS5600: Deg angle: ");
+  Serial.println(degAngle, 2);                          //absolute position of the encoder within the 0-360 circle
+  return degAngle;
+}
+
+
 int bTwistGoButtonPushed = 1; // state of the button (so we detect it changes) // let's pretend it was on at startup as there's a spurious on this one
 int bTwistRevButtonPushed = 1; // state of the button (so we detect it changes) // spurious here also now!
 int nTwistMove = 0; // 0: stop, 1: positive direction, -1: reverse
@@ -181,13 +240,23 @@ void setup()
 	int status = lcd.begin(20, 4);
 	if(status) // non zero status means it was unsuccesful
   {
-   DEBUG.println("ERR: LCD not ready"); 
+   DEBUG.println("ERR: LCD NOT ok");
   }
   else
   {
-    lcd.print("Ready HD44780...");// Print a message to the LCD
+    DEBUG.println("INF: LCD: OK");
+    lcd.print("INF: Ready LCD & HD44780...");// Print a message to the LCD
   }
 #endif
+
+  if( i2CAddrTest(nI2CAS5600_1_address) ) 
+  {
+    DEBUG.println("INF: Encoder: OK");
+  }
+  else
+  {
+    DEBUG.println("WRN: Encoder: NOT ok");
+  }
 
   LCD.init();                // initialize the lcd
   LCD.backlight();           // Turn on backlight // sans eclairage on voit rien...
@@ -650,6 +719,8 @@ void loop()
    testStepperA4988_PWM();
 
   //testDelayedLcd();
+
+  readRawAngleAS5600();
 
   //updateMachine1b();
 

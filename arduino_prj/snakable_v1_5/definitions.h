@@ -44,6 +44,8 @@
 #define TIME_MOTION_PERIOD 100
 #define TIME_MOTION_INC (int)(1000 / TIME_MOTION_PERIOD)
 
+#define NBR_INTERPOLATOR 9
+
 ///////////////////////// DATA STRUCTURES /////////////////////////
 
 enum STATUS {

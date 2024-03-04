@@ -39,5 +39,23 @@ class Interpolator
 };
 
 
+class InterpolatorManager
+{
+  public:
+    InterpolatorManager();
+    ~InterpolatorManager();
+
+    void init( int nNbrInterpolator );
+
+    update( timetype current_time_ms );
+
+  private:
+    Interpolator *  pInterpolators_;
+    int             nNbrInterpolator_;
+};
+
+extern InterpolatorManager interpolatorManager; // a singleton to manage all interpolators of our programs
+
+
 
 #endif // __INTERPOLATOR_H__

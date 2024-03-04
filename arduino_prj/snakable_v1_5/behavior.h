@@ -19,6 +19,7 @@ class Behavior
     void update( unsigned long t_ms, const ColorSensor & colorSensor );
   
   private:
+      void _udpateInternalVar(const ColorSensor & colorSensor); // TODO update rArousal_ & rValence_ relatively to external stimuli
       void _udpateExternalVar();
       void _sendMoves();
     

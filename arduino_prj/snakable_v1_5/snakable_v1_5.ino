@@ -38,7 +38,7 @@ EthernetSrv ethSrv;
 eeprom_mgmt eeprom;
 
 #include "motion_detection.h"
-MotionDetection motion = MotionDetection(MOTION_PIR_PIN, cfg.adm_SleepModeDelay); // Sleep mode after SLEEP_MODE_DELAY * 10s check interval
+MotionDetection motionDetection = MotionDetection(MOTION_PIR_PIN, cfg.adm_SleepModeDelay); // Sleep mode after SLEEP_MODE_DELAY * 10s check interval
 
 
 void gpioInit() {
@@ -135,7 +135,7 @@ void setup() {
 
   printProjectVersion();
 
-  Interpolator::autoTest();
+  //Interpolator::autoTest();
   
   world.user_button_pressed_ = !digitalRead(USER_BUTTON_PIN);
   if (world.user_button_pressed_) {
@@ -197,14 +197,51 @@ void setup() {
   gpioMotorsPS(false);
   delay(500);
 #endif
-}
 
+  interpolatorManager.init(NBR_INTERPOLATOR);
+
+} // setup()
+
+void sendCommandsToMotor( void )
+{
+  // Todo Alma: uncomment: how sections are working ?
+  /*
+  world.alpha1_ = behavior.sections[0].alpha;
+  world.PHI1_   = behavior.sections[0].phi;
+  world.alpha2_ = behavior.sections[1].alpha;
+  world.PHI2_   = behavior.sections[1].phi;
+  world.alpha3_ = behavior.sections[2].alpha;
+  world.PHI3_   = behavior.sections[2].phi;
+  */
+
+  // -------- motors angles calculation ------------
+  //section 1
+  world.angles_[0] = cfg.mot_DefaultAngle[0] + (cfg.mot_SectionCoef[0] * motors[0]->calculMoteur(world.PHI1_, world.alpha1_, world.phiWires_[0])); 
+  world.angles_[1] = cfg.mot_DefaultAngle[1] + (cfg.mot_SectionCoef[0] * motors[1]->calculMoteur(world.PHI1_, world.alpha1_, world.phiWires_[1]));
+  world.angles_[2] = cfg.mot_DefaultAngle[2] - (cfg.mot_SectionCoef[0] * motors[2]->calculMoteur(world.PHI1_, world.alpha1_, world.phiWires_[2]));
+ 
+  //section 2
+  world.angles_[3] = cfg.mot_DefaultAngle[3] - (cfg.mot_SectionCoef[1] * motors[3]->calculMoteur(world.PHI2_, world.alpha2_, world.phiWires_[3]));
+  world.angles_[4] = cfg.mot_DefaultAngle[4] - (cfg.mot_SectionCoef[1] * motors[4]->calculMoteur(world.PHI2_, world.alpha2_, world.phiWires_[4]));
+  world.angles_[5] = cfg.mot_DefaultAngle[5] - (cfg.mot_SectionCoef[1] * motors[5]->calculMoteur(world.PHI2_, world.alpha2_, world.phiWires_[5]));
+
+  //section 3
+  world.angles_[6] = cfg.mot_DefaultAngle[6] + (cfg.mot_SectionCoef[2] * motors[6]->calculMoteur(world.PHI3_, world.alpha3_, world.phiWires_[6]));
+  world.angles_[7] = cfg.mot_DefaultAngle[7] + (cfg.mot_SectionCoef[2] * motors[7]->calculMoteur(world.PHI3_, world.alpha3_, world.phiWires_[7]));
+  world.angles_[8] = cfg.mot_DefaultAngle[8] - (cfg.mot_SectionCoef[2] * motors[8]->calculMoteur(world.PHI3_, world.alpha3_, world.phiWires_[8]));
+
+  // Motors angles update
+  for(int i = 0; i < 9; i++){
+    motors[i]->goAngle(world.angles_[i]);
+  }
+}
 
 
 
 //=============== LOOP ==============
 
-void loop(){
+void loop()
+{
 #ifdef MOTORS_TEST
   return;
 #endif
@@ -263,11 +300,11 @@ void loop(){
   if ((millis() - world.timeMotion_) >= TIME_MOTION_PERIOD) {
     world.timeMotion_ = millis();
     // Check motion sensor
-    motion.update();
-    //ethData.pir = motion.pir; // TODO update datas here
-    //ethData.pir_cnt = motion.count;
+    motionDetection.update();
+    //ethData.pir = motionDetection.pir; // TODO update datas here
+    //ethData.pir_cnt = motionDetection.count;
     // Enable / disable sleep_mode based on the current value
-    //ethData.sleep_m = motion.sleep_mode;
+    //ethData.sleep_m = motionDetection.sleep_mode;
   }
 
   world.dPerm_ = (frc.f_mPerm) ? frc.f_vPerm : ethData.perm;
@@ -373,50 +410,28 @@ void loop(){
     //behavior.setDeltaLight() = colorSensor.deltaLight; // TODO alma: update in behavior
   }
 
+  Serial.println("updatemana");
+  interpolatorManager.update(millis());
+
   behavior.update(millis(),colorSensor);
 
-/*
-  // todo Alma: uncomment this block
-
-  alpha1 = behavior.sections[0].alpha;
-  PHI1   = behavior.sections[0].phi;
-  alpha2 = behavior.sections[1].alpha;
-  PHI2   = behavior.sections[1].phi;
-  alpha3 = behavior.sections[2].alpha;
-  PHI3   = behavior.sections[2].phi;
-
-  // -------- motors angles calculation ------------
-  //section 1
-  world.angles_[0] = cfg.mot_DefaultAngle[0] + (cfg.mot_SectionCoef[0] * motors[0]->calculMoteur(PHI1, alpha1, phiWires[0])); 
-  world.angles_[1] = cfg.mot_DefaultAngle[1] + (cfg.mot_SectionCoef[0] * motors[1]->calculMoteur(PHI1, alpha1, phiWires[1]));
-  world.angles_[2] = cfg.mot_DefaultAngle[2] - (cfg.mot_SectionCoef[0] * motors[2]->calculMoteur(PHI1, alpha1, phiWires[2]));
- 
-  //section 2
-  world.angles_[3] = cfg.mot_DefaultAngle[3] - (cfg.mot_SectionCoef[1] * motors[3]->calculMoteur(PHI2, alpha2, phiWires[3]));
-  world.angles_[4] = cfg.mot_DefaultAngle[4] - (cfg.mot_SectionCoef[1] * motors[4]->calculMoteur(PHI2, alpha2, phiWires[4]));
-  world.angles_[5] = cfg.mot_DefaultAngle[5] - (cfg.mot_SectionCoef[1] * motors[5]->calculMoteur(PHI2, alpha2, phiWires[5]));
-
-  //section 3
-  world.angles_[6] = cfg.mot_DefaultAngle[6] + (cfg.mot_SectionCoef[2] * motors[6]->calculMoteur(PHI3, alpha3, phiWires[6]));
-  world.angles_[7] = cfg.mot_DefaultAngle[7] + (cfg.mot_SectionCoef[2] * motors[7]->calculMoteur(PHI3, alpha3, phiWires[7]));
-  world.angles_[8] = cfg.mot_DefaultAngle[8] - (cfg.mot_SectionCoef[2] * motors[8]->calculMoteur(PHI3, alpha3, phiWires[8]));
-
-  // Motors angles update
-  for(int i = 0; i < 9; i++){
-    motors[i]->goAngle(world.angles_[i]);
-  }
+  sendCommandsToMotor();
 
   // Serial print management
-  if ((millis() - timePrint) > TIME_PRINT_PERIOD){
-    timePrint = millis();
+  if( (millis() - world.timePrint_) > TIME_PRINT_PERIOD)
+  {
+    world.timePrint_ = millis();
     switch(world.witchPrint_){
       case 1: colorSensor.printColor(); break;      
       case 2: printMotors(); break;
       case 3: motionDetection.print(); break;
     }
   }
-  */
-}
+
+} // loop()
+
+
+
 
 //======================================================
 //                    FUNCTIONS
@@ -425,10 +440,12 @@ void loop(){
 // Function to let the cable return to straight position by 'increment' degrees every 'time_increment_to_reset' ms
 //------------------------------------
 // Serial commands format : cmd,params
-void serialCmd(){
+void serialCmd()
+{
   /*  */
   char* str = serialInput.readLine();
-  while (str != NULL) {
+  while (str != NULL) 
+  {
     char* cmd = serialInput.getStr();
     if (strcmp(cmd, "play") == 0) {
       float p1 = serialInput.getFloat();
@@ -494,5 +511,7 @@ void serialCmd(){
       //behavior.serialCmd(cmd); // TODO Alma
     }
     str = serialInput.readLine(); 
-  }
-}
+
+  } // while str
+
+} // serialCommand

@@ -6,6 +6,8 @@
 
 #define DEBUG
 
+// #define CLEAN_DESTROY // define me if on a system where there's a life after this program, undefined to gain code size
+
 float gaussian(float x)
 {
     // inspired by  https://codepen.io/zapplebee/pen/ByvmMo
@@ -84,8 +86,9 @@ float Interpolator:: update( timetype current_time_ms )
 
     rPos_ = val;
 
-    if(0)
+    if(1)
     {
+      Serial.print("DBG: Interpolator::update: this: "); Serial.println( (int)(this) );
       Serial.print("DBG: Interpolator::update: rt: "); Serial.println( rt );
       Serial.print("DBG: Interpolator::update: delta: "); Serial.println( delta );
       Serial.print("DBG: Interpolator::update: val: "); Serial.println( val );
@@ -238,3 +241,40 @@ void Interpolator::autoTest()
     
     Serial.println("DBG: Interpolator::autoTest: success");
 }
+
+InterpolatorManager::InterpolatorManager()
+  : pInterpolators_  ( NULL )
+  , nNbrInterpolator_( 0 )
+{
+}
+
+void InterpolatorManager::init( int nNbrInterpolator )
+{
+  nNbrInterpolator_ = nNbrInterpolator;
+  //pInterpolators = (Interpolator*)malloc(sizeof(Interpolator)*nNbrInterpolator_); // C syntaxe
+  pInterpolators_ = new Interpolator[nNbrInterpolator_];
+}
+
+InterpolatorManager::~InterpolatorManager()
+{
+#ifdef CLEAN_DESTROY
+  // free(pInterpolators_); // C syntaxe
+  delete pInterpolators_[];
+
+  pInterpolators_ = NULL;
+  nNbrInterpolator_ = 0;
+#endif // CLEAN_DESTROY
+}
+
+InterpolatorManager::update(timetype current_time_ms)
+{
+  Interpolator* p =  pInterpolators_;
+  Interpolator* pEnd =  pInterpolators_ + nNbrInterpolator_;
+  while( p != pEnd )
+  {
+    p->update( current_time_ms );
+    ++p;
+  }
+}
+
+InterpolatorManager interpolatorManager;

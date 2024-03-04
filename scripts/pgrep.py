@@ -119,7 +119,7 @@ def findInFiles( strPath, strToMatch, strFileMask = '*', bVerbose = True ):
     return nbrFilesAnalysed,nbrFilesWithMatch,nbrLinesAnalysed,nbrLinesWithMatch
         
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
+    if len(sys.argv) < 2:
         print( "\n  My Grep-clone v1.0\n\n  syntax: %s <string_to_match> <files_mask> [1]\n\n  eg: %s a_word_in_a_line *.py\n  eg: %s *word1*word2* face*\n  eg: %s any_string_with_some* * 1 => will print binary file kipped file(s)" % ((sys.argv[0],)*4))
         exit(-1)
     print("\n")
@@ -127,7 +127,13 @@ if __name__ == "__main__":
     bVerbose = 0
     if len(sys.argv)>3 and sys.argv[3]=='1':
         bVerbose = 1
-    strToMatch,mask = sys.argv[1:3]
+    #strToMatch,mask = sys.argv[1:3]
+    if len(sys.argv)>1:
+        strToMatch = sys.argv[1]
+    if len(sys.argv)>2:
+        mask = sys.argv[2]
+    else:
+        mask = "*.*"
     print("INF: bVerbose: %s" % bVerbose ) 
     na,nf,nla,nlm = findInFiles(".",strToMatch,mask.lower(),bVerbose=bVerbose)
     print("\nNbr Analysed Files: %d\nNbr Matching Files: %d\nNbr Total Line Analysed: %d\nNbr Total Line With Match: %d" % (na,nf,nla,nlm) )

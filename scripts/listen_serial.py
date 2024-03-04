@@ -66,6 +66,8 @@ def monitorPort(strPortName, nBaudRate=9600):
         print("INF: %s is open: %s at %s" % (ser.name,ser.is_open,nBaudRate) )
         #~ for i in range(100):
         prevPrint = ""
+        
+        # tempo, send a trace to debug angle
         while 1:
             buf = ser.readline()
             buf = str(buf)
@@ -78,6 +80,7 @@ def monitorPort(strPortName, nBaudRate=9600):
             if buf != prevPrint:
                 prevPrint = buf
                 print("buf: " + buf)
+            ser.write("print 2".encode())
     except BaseException as err: # including KeyboardInterrupt
         print("ERR: monitorPort (2): %s" % str(err) )
         if "ClearCommError" not in str(err):
@@ -86,19 +89,33 @@ def monitorPort(strPortName, nBaudRate=9600):
     print("INF: monitorPort: exiting with code %s" % str(retVal) )
     return retVal
 
-#~ listPorts()
-strPortName = '/dev/ttyUSB0'
-strPortName = 'COM7'
-strPortName = 'COM6'
-strPortName = 'COM8'
-nBaudRate = 9600
-nBaudRate = 57600
-#~ nBaudRate = 115200
-strPortNameAutodetect = listPorts()
-if 0:
-    print("using autodetected port: %s" % strPortNameAutodetect )
-    strPortName = strPortNameAutodetect
-while 2 != monitorPort(strPortName,nBaudRate):
-    time.sleep(1.)
-    print("Reconnecting...")
-print("INF: script finished...")
+if __name__ == "__main__":
+    print("Command line syntaxe: scriptname [<PORT_NAME>] [baud, default is 57600]")
+    print("")
+    #~ listPorts()
+    strPortName = '/dev/ttyUSB0'
+    strPortName = 'COM7'
+    strPortName = 'COM6'
+    strPortName = 'COM8'
+    nBaudRate = 9600
+    nBaudRate = 57600
+    #~ nBaudRate = 115200
+    
+    strPortNameAutodetect = listPorts()
+    
+    if len(sys.argv) > 1:
+        strPortName = sys.argv[1]
+        
+    if len(sys.argv) > 1:
+        nBaudRate = int(sys.argv[2])
+
+            
+    if 0:
+        print("using autodetected port: %s" % strPortNameAutodetect )
+        strPortName = strPortNameAutodetect
+        
+    print("\nINF: Connecting to %s (baud: %s)" % (strPortName,nBaudRate) )
+    while 2 != monitorPort(strPortName,nBaudRate):
+        time.sleep(1.)
+        print("Reconnecting...")
+    print("INF: script finished...")

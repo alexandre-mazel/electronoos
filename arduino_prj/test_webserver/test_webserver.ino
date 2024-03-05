@@ -51,6 +51,7 @@ void loop()
   EthernetClient client = serveur.available();
   if (client) 
   {
+    long int timeBegin = millis();
     // Quelqu'un est connecté !
     Serial.print("On envoi !");
     // On fait notre en-tête
@@ -72,7 +73,13 @@ void loop()
     client.println(",");
     // Et on envoie la seconde nommée "analog 0"
     client.print("\t\"analog 0\": ");
-    client.println(analogRead(A0));
+    client.print(analogRead(A0));
+    client.println(",");
+
+
+    client.print("\t\"served in (ms)\": ");
+    client.println(millis()-timeBegin);
+    
     // Et enfin on termine notre JSON par une accolade fermante
     client.println("}");
     // Donne le temps au client de prendre les données

@@ -37,7 +37,7 @@ def listPorts():
     return strFirstOpenPort
         
         
-def monitorPort(strPortName, nBaudRate=9600):
+def monitorPort(strPortName, nBaudRate=9600, bImmediateClosing = False):
     """
     return 2 if user want to stop
     """
@@ -46,6 +46,16 @@ def monitorPort(strPortName, nBaudRate=9600):
     
     try:
         ser = serial.Serial(strPortName) # pb: ca gele tant que rien n'est recu... c'est dommage...
+        if bImmediateClosing:
+            print("INF: immediately closing...")
+            ser.read();
+            #ser.setBreak(True)
+            time.sleep(0.2)
+            ser.sendBreak(duration = 0.02)
+            time.sleep(0.2)
+            ser.flush()
+            ser.close()
+            return 2
         
     except BaseException as err: # including KeyboardInterrupt
         print("ERR: monitorPort (1): %s" % str(err) )
@@ -86,11 +96,13 @@ def monitorPort(strPortName, nBaudRate=9600):
         if "ClearCommError" not in str(err):
             retVal = 2
     ser.close()
+    time.sleep(1.)
+    ser.close() # try again just in case
     print("INF: monitorPort: exiting with code %s" % str(retVal) )
     return retVal
 
 if __name__ == "__main__":
-    print("Command line syntaxe: scriptname [<PORT_NAME>] [baud, default is 57600]")
+    print("Command line syntaxe: scriptname [<PORT_NAME>] [baud, default is 57600, clean will try to open then close it, then we're sure he's clean")
     print("")
     #~ listPorts()
     strPortName = '/dev/ttyUSB0'
@@ -100,14 +112,20 @@ if __name__ == "__main__":
     nBaudRate = 9600
     nBaudRate = 57600
     #~ nBaudRate = 115200
+    bClean = False
     
     strPortNameAutodetect = listPorts()
     
     if len(sys.argv) > 1:
         strPortName = sys.argv[1]
         
-    if len(sys.argv) > 1:
-        nBaudRate = int(sys.argv[2])
+    
+    if len(sys.argv) > 2:
+        if sys.argv[2].lower()[0] == 'c': # clean, clear ...
+            print("INF: Cleaning port")
+            bClean = True
+        else:
+            nBaudRate = int(sys.argv[2])
 
             
     if 0:
@@ -115,7 +133,7 @@ if __name__ == "__main__":
         strPortName = strPortNameAutodetect
         
     print("\nINF: Connecting to %s (baud: %s)" % (strPortName,nBaudRate) )
-    while 2 != monitorPort(strPortName,nBaudRate):
+    while 2 != monitorPort(strPortName,nBaudRate,bImmediateClosing=bClean):
         time.sleep(1.)
         print("Reconnecting...")
     print("INF: script finished...")

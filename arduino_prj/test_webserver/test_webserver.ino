@@ -42,18 +42,15 @@ void setup()
   delay(1000);
   // On lance le serveur
   serveur.begin();
-  Serial.print("Pret !");
+  Serial.println("Pret !");
 }
 
-void loop()
+void answer(EthernetClient client) 
 {
-  // Regarde si un client est connecté et attend une réponse
-  EthernetClient client = serveur.available();
-  if (client) 
-  {
     long int timeBegin = millis();
     // Quelqu'un est connecté !
-    Serial.print("On envoi !");
+    Serial.print( "INF: Answering client to " );
+    Serial.println( client.remoteIP() );
     // On fait notre en-tête
     // Tout d'abord le code de réponse 200 = réussite
     client.println("HTTP/1.1 200 OK");
@@ -78,10 +75,53 @@ void loop()
 
 
     client.print("\t\"served in (ms)\": ");
-    client.println(millis()-timeBegin);
+    client.println(millis()-timeBegin);  // mega2560: 5ms
     
     // Et enfin on termine notre JSON par une accolade fermante
     client.println("}");
+}
+
+void listen(EthernetClient client)
+{
+  long int timeBegin = millis();
+
+  const int nBufferSize = 256;
+  char buffer[nBufferSize+1];
+  int nLenBuffer = 0;
+
+  while(client.available())
+  {
+    if(!client.connected())
+    {
+      break;
+    }
+    char ch = client.read(); //on lit ce qu'il raconte
+    buffer[nLenBuffer] = ch;
+    ++nLenBuffer;
+    // concatene les chars
+    if( nLenBuffer >= nBufferSize )
+    {
+      break;
+    }
+  }
+  
+  buffer[nLenBuffer] = '\0';
+
+  Serial.print( "DBG: analysed in (ms): " ); Serial.println( millis()-timeBegin ); // mega2560: 18ms
+  Serial.print( "DBG: listen: buffer:\n" ); Serial.println(buffer);
+  // TODO: analyse buffer !
+}
+
+
+void loop()
+{
+  // Regarde si un client est connecté et attend une réponse
+  EthernetClient client = serveur.available();
+  if (client) 
+  {
+    listen(client);
+    answer(client);
+
     // Donne le temps au client de prendre les données
     delay(10);
     // Ferme la connexion avec le client

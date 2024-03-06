@@ -1,8 +1,9 @@
-// Ces deux bibliothèques sont indispensables pour le shield
 #include <SPI.h>
 #include <Ethernet.h>
 
 #define ETH_CS_PIN      53
+
+// inspiré de https://zestedesavoir.com/tutoriels/686/arduino-premiers-pas-en-informatique-embarquee/1213_internet-of-things-arduino-sur-internet/4848_arduino-et-ethernet-serveur/
 
 // L'adresse MAC du shield
 byte mac[] = { 0x90, 0xA2, 0xDA, 0x0E, 0xA5, 0x7E };
@@ -56,6 +57,7 @@ void answer(EthernetClient client)
     client.println("HTTP/1.1 200 OK");
     // Puis le type mime du contenu renvoyé, du json
     client.println("Content-Type: application/json");
+    client.println("Access-Control-Allow-Origin: *"); // access from other web domain
     // Et c'est tout !
     // On envoie une ligne vide pour signaler la fin du header
     client.println();

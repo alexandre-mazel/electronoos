@@ -5,18 +5,30 @@ import mediapipe as mp
 import os
 import time
 
-def exportResult( PoseLandmarkerResult, file ):
-    result = PoseLandmarkerResult.pose_landmarks
+def myLandmarksDraw( img, poseLandmarkerResult ):
+    img2 = img.copy()
+    result = poseLandmarkerResult.pose_landmarks
+    h,w = img.shape[:2]
+    for skel in result:
+        for num, pt in enumerate(skel):
+            ptint = ( int(pt.x*w),int(pt.y*h))
+            cv2.circle( img2,ptint, 10, (255,0,0))
+            cv2.putText( img2, "%d"%num, ptint,  fontFace = cv2.FONT_HERSHEY_DUPLEX, fontScale = 1.0,color = (255,255,0), thickness = 1 )
+    return img2
+
+def exportResult( poseLandmarkerResult, file ):
+    result = poseLandmarkerResult.pose_landmarks
     for skel in result:
         s = ""
         for pt in skel:
             s += "[%s,%s,%s,%5.2f,%5.2f]," % (pt.x,pt.y,pt.z,pt.presence,pt.visibility)
-        break
-    print(s)
-    file.write(s+"\n")
-
+        #~ print(s)
+        file.write(s+"\n")
+        break # quit after first skeleton
 
 def extractFromVideo( strFilename, detector ):
+    bOutputSkel = 0 # output to file
+    bOutputSkel = 1
     print( "INF: extractFromVideo: processing '%s'" % strFilename )
     nNumFrame = 0
     cap = cv2.VideoCapture( strFilename )
@@ -25,7 +37,7 @@ def extractFromVideo( strFilename, detector ):
       print("ERR: extractFromVideo: Error opening video file '%s'" % strFilename )
       return
       
-    outfile = open(strFilename.replace(".mkv",".skl"),"wt")
+    if bOutputSkel: outfile = open(strFilename.replace(".mkv",".skl"),"wt")
  
     while(cap.isOpened()):
             
@@ -36,11 +48,12 @@ def extractFromVideo( strFilename, detector ):
         imgRGB = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
         imagebuf = mp.Image(image_format=mp.ImageFormat.SRGB, data=imgRGB)
         detection_result = detector.detect(imagebuf)
-        print("detection_result:" + str(detection_result) );
-        exportResult(detection_result,outfile)
+        #~ print("detection_result:" + str(detection_result) );
+        if bOutputSkel: exportResult(detection_result,outfile)
         
         img[:] = (0,0,0)
         img2 = mediapipe_fx.draw_landmarks_on_image(img,detection_result)
+        img2 = myLandmarksDraw(img2,detection_result)
         
         
 
@@ -54,14 +67,16 @@ def extractFromVideo( strFilename, detector ):
             
         nNumFrame += 1
            
-    outfile.close()
+    if bOutputSkel: outfile.close()
     cap.release()
     cv2.destroyAllWindows()
 
 
 detector = mediapipe_fx.init()
 strPath = "C:/seq_vid2/sms/"
-strPath = "d:/seq_vid/eat/"
+strPath = "C:/seq_vid2/phone/"
+#~ strPath = "d:/seq_vid/eat/"
+#~ strPath = "d:/seq_vid/sleep/"
 for f in os.listdir(strPath):
     if not ".mkv" in f:
         continue

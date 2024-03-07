@@ -2,6 +2,7 @@ import cv2
 import mediapipe_fx
 import mediapipe as mp
 
+import os
 import time
 
 def exportResult( PoseLandmarkerResult, file ):
@@ -44,7 +45,7 @@ def extractFromVideo( strFilename, detector ):
         
 
         img2 = cv2.resize(img2,(0,0),fx=0.5,fy=0.5)
-        cv2.imshow( 'detection',img2 )
+        cv2.imshow( 'detection on ' + strFilename, img2 )
 
         # Press ESC on keyboard to  exit
         key = cv2.waitKey(10)
@@ -60,7 +61,9 @@ def extractFromVideo( strFilename, detector ):
 
 detector = mediapipe_fx.init()
 strPath = "C:/seq_vid2/sms/"
+strPath = "d:/seq_vid/eat/"
 for f in os.listdir(strPath):
     if not ".mkv" in f:
-        break
+        continue
+    print("DBG: %s" % f)
     extractFromVideo( strPath + f, detector)

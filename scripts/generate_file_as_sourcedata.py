@@ -18,9 +18,11 @@ def outputToSrc( data, dest_template_name, n_original_size = -1 ):
     Generate a C/C++ source file embedding some binary datas
     - n_original_size: if -1: data aren't compressed
     """
-    strH = '#ifndef __%s__"' % dest_template_name.upper()
-    strH = '#define __%s__"' % dest_template_name.upper()
-    strCpp = '#include "%s.h"' % dest_template_name
+    strVarname = "data_" + dest_template_name
+    strH = '#ifndef __%s_H__\n' % dest_template_name.upper()
+    strH += '#define __%s_H__\n' % dest_template_name.upper()
+    strH += "extern const char* %s;\n" % strVarname
+    strCpp = '#include "%s.h"\n' % dest_template_name
     
     strDestName = dest_template_name + ".h"
     print("INF: Writing to '%s'" % strDestName )

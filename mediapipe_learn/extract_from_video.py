@@ -26,9 +26,7 @@ def exportResult( poseLandmarkerResult, file ):
         file.write(s+"\n")
         break # quit after first skeleton
 
-def extractFromVideo( strFilename, detector ):
-    bOutputSkel = 0 # output to file
-    bOutputSkel = 1
+def extractFromVideo( strFilename, detector, bOutputSkel = 1 ):
     print( "INF: extractFromVideo: processing '%s'" % strFilename )
     nNumFrame = 0
     cap = cv2.VideoCapture( strFilename )
@@ -74,11 +72,20 @@ def extractFromVideo( strFilename, detector ):
 
 detector = mediapipe_fx.init()
 strPath = "C:/seq_vid2/sms/"
-strPath = "C:/seq_vid2/phone/"
-#~ strPath = "d:/seq_vid/eat/"
+#~ strPath = "C:/seq_vid2/phone/"
+strPath = "d:/seq_vid/eat/"
 #~ strPath = "d:/seq_vid/sleep/"
-for f in os.listdir(strPath):
-    if not ".mkv" in f:
-        continue
-    print("DBG: %s" % f)
-    extractFromVideo( strPath + f, detector)
+if 0:
+    # loop all files
+    for f in os.listdir(strPath):
+        if not ".mkv" in f:
+            continue
+        print("DBG: %s" % f)
+        extractFromVideo( strPath + f, detector)
+if 1:
+    # just see one file
+    file = "sms_01.mkv"
+    file = "sms_02.mkv"
+    file = "eat_01.mkv"
+    extractFromVideo( strPath + file, detector,bOutputSkel=0)
+    

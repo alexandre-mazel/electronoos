@@ -145,7 +145,7 @@ class MyServer:
         sys.stderr.flush()
         
         if os.name != "nt": 
-            fn = "/home/na/logs/%s.log" % sourcename
+            fn = os.path.expanduser('~') + "/logs/%s.log" % sourcename
         else:
             fn = "c:/logs/%s.log" % sourcename
         try:
@@ -185,7 +185,7 @@ class MyServer:
             self.logError("loadPage: file '%s' not found, returning empty" % path)
             return b""
             
-        if "spider" in path or "cvs" in path or "save" in path:
+        if "spider" in path or "cvs" in path or "save" in path or "/.env" in path:
             self.logError("loadPage: forbotten to access to file '%s', returning empty" % path)
             return b""
             
@@ -696,11 +696,15 @@ Accept-Language: fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7
         
         
         self.send_response(200)
-        
-        if "print_image.htm" in self.path:
+
+        if "print_image.htm" in self.path: # stickers/cdl
             strFilename ,contentstype,filedata = dictBinary['image']
             y,m,d = getDay()
-            strFolder = "c:/stickers/%4d_%02d_%02d/" % (y,m,d)
+            if os.name == "nt":
+                strFolder = "c:/stickers/
+            else:
+                strFolder = os.path.expanduser('~') + "/stickers/"
+            strFolder += "%4d_%02d_%02d/" % (y,m,d)
             makeDirs(strFolder)
             strAbsFilename = strFolder + strFilename
             print("INF: writing %dB to '%s'" % (len(filedata), strAbsFilename) )

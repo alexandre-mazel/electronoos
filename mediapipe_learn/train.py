@@ -35,11 +35,15 @@ def computeSizeChest(dataForOneImage):
 
     return (diag1+diag2)/2
 
-def loadFile(strFilename):
+def computeFeaturesFromFile(strFilename):
+    """
+    return a list of list of features
+    """
     print("\nINF: loadFile '%s'" % strFilename )
     f = open(strFilename,"rt")
     allImages = []
     nSizeAnalyse = 120
+    listOfFeatures = []
     while 1:
         buf = f.readline()
         if(len(buf)<2): break
@@ -64,23 +68,39 @@ def loadFile(strFilename):
             avgHandR = div3D( avgHandR, nSizeAnalyse )
             print("avgHandL: %s" % avgHandL )
             print("avgHandR: %s" % avgHandR )
+            feats = []
+            feats.extend(avgHandL)
+            feats.extend(avgHandR)
+            listOfFeatures.append(feats)
+            listOfFeatures.extend(avgHandR)
             allImages = []
+    return listOfFeatures
 
 
 def trainAll():
     # loop all folders
+    aListClassName = []
+    allFeatures = []
+    allClasseRef = []
     for parentFolder in ["C:/seq_vid2/","D:/seq_vid/"]:
-        for folders in os.listdir(parentFolder):
-            if not os.path.isdir(parentFolder+folders):
+        for folder in os.listdir(parentFolder):
+            if not os.path.isdir(parentFolder+folder):
                 continue
                 
-            for f in os.listdir(parentFolder+folders):
+            for f in os.listdir(parentFolder+folder):
                 if not ".skl" in f:
                     continue
-                print("DBG: %s" % f)
-                loadFile(parentFolder+folders+"/"+f)
-
-
+                listOfFeatures = computeFeaturesFromFile(parentFolder+folder+"/"+f)
+                allFeatures.extend(listOfFeatures)
+                for i in range(len(listOfFeatures)):
+                    allClasseRef.append(len(aListClassName))
+                    
+            aListClassName.append(folder)
+            
+    print("allClasseRef: %s" % allClasseRef )
+    for nNumClass,strClassName in enumerate(aListClassName):
+        print("numclass: %d: class: %s" % (nNumClass,strClassName) )
+    
 def test():
     strPath = "C:/seq_vid2/sms/"
     strPathD = "D:/seq_vid/eat/"
@@ -90,6 +110,6 @@ def test():
     loadFile(strFile)
 
     strFile = strPathD + "eat_01.skl"
-    loadFile(strFile)
+    computeFeaturesFromFile(strFile)
     
 trainAll()

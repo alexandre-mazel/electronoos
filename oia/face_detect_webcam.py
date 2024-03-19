@@ -120,6 +120,8 @@ while 1:
     #~ img = cv2.resize(img, None, fx=2,fy=2)
     
     #~ img = cv2.flip(img,0) # flip vertic
+    
+    print(img.shape)
 
     # Convert into grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)

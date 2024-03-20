@@ -481,7 +481,7 @@ void commandByButton()
   LCD.print(nTwistMove);
   LCD.print("  "); // clean remaining char when number are off
   delay(10);
-}
+} // commandByButton
 
 
 
@@ -494,6 +494,8 @@ void updateMachine1b()
 {
   // the goal is to loop at 400microsec, so anytime we could decide to activate one motor or other motor or not
   const int target_frameduration_micros = 600+6;
+  //const int target_frameduration_micros = 800+6;
+  //const int target_frameduration_micros = 1200+6;
 
   const int nNbrStepPerTurnMotor1 = 200;
 
@@ -561,6 +563,7 @@ void updateMachine1b()
   if(bSendCmdMotor1)
   {
     digitalWrite(stepPin2,bFlipFlopMotor1);
+    //digitalWrite(stepPin3,bFlipFlopMotor1);
     bFlipFlopMotor1 = ! bFlipFlopMotor1;
     if(bFlipFlopMotor1)
     {
@@ -680,7 +683,7 @@ void updateMachine1b()
       }
     }
   }
-}
+} // updateMachine1b
 
 void testDelayedLcd()
 {
@@ -716,13 +719,13 @@ void loop()
 
   //testStepper();
   //testStepperA4988();
-   testStepperA4988_PWM();
+  //testStepperA4988_PWM();
 
   //testDelayedLcd();
 
-  readRawAngleAS5600();
+  //readRawAngleAS5600();
 
-  //updateMachine1b();
+  updateMachine1b();
 
 
 

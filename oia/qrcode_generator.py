@@ -15,6 +15,21 @@ data = "http://youtu.be/Xl5sS80VrTM" # video pres sonia fr
 #~ data = "https://www.linkedin.com/in/alexandremazel/"
 data = "http://linkedin.com/in/alexandremazel/"
 data = "http://obo-world.com/vitrine/form_candi.htm"
+data = """BEGIN:VCARD
+VERSION:3.0
+N:Mazel;Alexandre
+FN:Alexandre Mazel
+ORG:Obo-World;Engrenage.studio;AlmaTools;Freelance
+ROLE:CTO;CEO;CCO
+TITLE:CTO;CEO;CCO
+"""
+#~ data += "URL:http://obo-world.com\n"
+data += "URL:http://linkedin.com/in/alexandremazel/\n"
+data += """PHOTO;TYPE=PNG:http://obo-world.com/vitrine/img/alexandre_o.png
+EMAIL:alexandre.mazel@obo-world.com
+TEL;TYPE=voice,work,pref:+33 610601979
+END:VCARD
+"""
 # output file name
 filename = "oia_cycle_x.png"
 # generate qr code

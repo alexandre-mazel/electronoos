@@ -757,9 +757,25 @@ void loop()
     sox1->update();
     sox2->update();
 
-    angle_db = sox1->getDegZ()*10;
-    //angle_nip = sox2->getDegZ()*10;
-    angle_nip = 900-(sox2->getDegZ()*10);
+    bool bErrorNip = false;
+    bool bErrorDb = false;
+
+    float angle_db_read = sox1->getDegZ();
+    float angle_nip_read = sox2->getDegZ();
+    
+    if(angle_db_read< -600.f )
+    {
+      bErrorDb = true;
+    }
+
+    if(angle_nip_read< -600.f )
+    {
+      bErrorNip = true;
+    }
+
+    angle_db = angle_db_read*10;
+
+    angle_nip = 900-(angle_nip_read*10);
 
     if( nCptFrame%100==0 )
     {
@@ -784,6 +800,17 @@ void loop()
     //db = angle_db; // pour afficher le capteur brut apres calib
 
     //db = analogRead(A15)*(5.0*8 / 1023.0);
+
+    if(bErrorNip)
+    {
+      nip = 666;
+    }
+    if(bErrorNip || bErrorDb)
+    {
+      db = 666;
+    }
+
+    
 
     if(0)
     { // code de test/debug

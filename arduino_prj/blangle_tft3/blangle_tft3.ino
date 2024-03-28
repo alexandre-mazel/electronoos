@@ -97,11 +97,11 @@ float fps = 60.;
 // Create the MCP9808 temperature sensor object
 Adafruit_MCP9808 tempsensor = Adafruit_MCP9808();
 
-const char name1[] = "AngleRacle";
-const char name2[] = "AngleNIP";
+const char sox_name1[] = "AngleRacle";
+const char sox_name2[] = "AngleNIP";
 
-Alex_LSM6DSOX sox1(name1);
-Alex_LSM6DSOX sox2(name2);
+Alex_LSM6DSOX * sox1 = 0;
+Alex_LSM6DSOX * sox2 = 0;
 
 
 
@@ -202,8 +202,11 @@ void setup()
   Serial.println("");
   Serial.println("");
 
+  sox1 = new Alex_LSM6DSOX(sox_name1);
+  sox2 = new Alex_LSM6DSOX(sox_name2);
 
-  if( !sox1.begin_I2C(0x6A) )
+
+  if( !sox1->begin_I2C(0x6A) )
   {
     Serial.println("ERR: Can't find imu1!");
     ++nNumError;
@@ -211,14 +214,14 @@ void setup()
   else
   {
     Serial.println("INF: Found imu1!");
-    sox1.printConfig();
+    sox1->printConfig();
   }
 
   // passe le capteur 2 sur une autre adresse
   pinMode(PIN_SOX_IDX_CHANGE, OUTPUT);
   digitalWrite(PIN_SOX_IDX_CHANGE ,HIGH);
 
-  if( !sox2.begin_I2C(0x6B) )
+  if( !sox2->begin_I2C(0x6B) )
   {
     Serial.println("ERR: Can't find imu2!");
     ++nNumError;
@@ -226,7 +229,7 @@ void setup()
   else
   {
     Serial.println("INF: Found imu2!");
-    sox2.printConfig();
+    sox2->printConfig();
   }
 
   if (!tempsensor.begin(0x18)) 
@@ -750,18 +753,18 @@ void loop()
     //angle_db = bjy_getAngle(1);
     //angle_nip = bjy_getAngle(0);
 
-/*
-    sox1.update();
-    sox2.update();
 
-    angle_db = sox1.getDegZ()*10;
-    angle_nip = sox2.getDegZ()*10;*/
+    sox1->update();
+    sox2->update();
+
+    angle_db = sox1->getDegZ()*10;
+    angle_nip = sox2->getDegZ()*10;
 
     if( nCptFrame%100==0 )
     {
       Serial.print("angle_db: "); Serial.print(angle_db); Serial.print(", angle_nip: "); Serial.println(angle_nip);
-      sox1.printValues();
-      sox2.printValues();
+      sox1->printValues();
+      sox2->printValues();
     }
 
         //angle_db = bjy_getAngle(1);

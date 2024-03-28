@@ -17,6 +17,7 @@ bool Alex_LSM6DSOX::begin_I2C(uint8_t i2c_addr)
   if( Adafruit_LSM6DSOX::begin_I2C(i2c_addr) )
   {
     Serial.println("': Success !");
+    bFound_ = true;
     return true;
   }
   Serial.println("': Failure!");
@@ -29,8 +30,15 @@ void Alex_LSM6DSOX::printConfig( void )
   Serial.print("Alex_LSM6DSOX.printConfig '");
   if(pNickName_!=NULL) Serial.print(this->pNickName_);
   Serial.println("': ");
+  if(!bFound_)
+  {
+    Serial.println("Not initialised");
+    return;
+  }
 
-// this->setAccelRange(LSM6DS_ACCEL_RANGE_2_G);
+  return; // comment to gain code size
+
+  // this->setAccelRange(LSM6DS_ACCEL_RANGE_2_G);
   Serial.print("Accelerometer range set to: ");
   switch (this->getAccelRange()) {
   case LSM6DS_ACCEL_RANGE_2_G:
@@ -146,38 +154,57 @@ void Alex_LSM6DSOX::printConfig( void )
   }
 }
 
-void Alex_LSM6DSOX::printValues( void )
+
+void Alex_LSM6DSOX::update( void )
 {
+  //  Get a new normalized sensor event
+  this->getEvent(&accel_, &gyro_, &temp_);
+}
+
+float Alex_LSM6DSOX::getDegZ( void ) const
+{
+  return accel_.acceleration.z*10.f;
+}
+
+void Alex_LSM6DSOX::printValues( void ) const
+{
+
   Serial.print("Alex_LSM6DSOX.printValues '");
   if(pNickName_!=NULL) Serial.print(this->pNickName_);
   Serial.println("': ");
 
-  //  Get a new normalized sensor event
-  sensors_event_t accel;
-  sensors_event_t gyro;
-  sensors_event_t temp;
-  this->getEvent(&accel, &gyro, &temp);
+  if(!bFound_)
+  {
+    Serial.println("Not initialised");
+    return;
+  }
+
+  /*
 
   Serial.print("\tTemperature ");
-  Serial.print(temp.temperature);
+  Serial.print(temp_.temperature);
   Serial.println(" deg C");
 
-  /* Display the results (acceleration is measured in m/s^2) */
+  // Display the results (acceleration is measured in m/s^2)
   Serial.print("\tAccel X: ");
-  Serial.print(accel.acceleration.x);
+  Serial.print(accel_.acceleration.x);
   Serial.print(" \tY: ");
-  Serial.print(accel.acceleration.y);
+  Serial.print(accel_.acceleration.y);
+  */
   Serial.print(" \tZ: ");
-  Serial.print(accel.acceleration.z);
+  Serial.print(accel_.acceleration.z);
   Serial.println(" m/s^2 ");
+  /*
 
-  /* Display the results (rotation is measured in rad/s) */
+  // Display the results (rotation is measured in rad/s)
   Serial.print("\tGyro X: ");
-  Serial.print(gyro.gyro.x);
+  Serial.print(gyro_.gyro.x);
   Serial.print(" \tY: ");
-  Serial.print(gyro.gyro.y);
+  Serial.print(gyro_.gyro.y);
   Serial.print(" \tZ: ");
-  Serial.print(gyro.gyro.z);
+  Serial.print(gyro_.gyro.z);
   Serial.println(" radians/s ");
   Serial.println();
+  */
+  
 }

@@ -98,7 +98,7 @@ float fps = 60.;
 Adafruit_MCP9808 tempsensor = Adafruit_MCP9808();
 
 const char sox_name1[] = "AngleRacle";
-const char sox_name2[] = "AngleNIP";
+const char sox_name2[] = "AngleForNIP";
 
 Alex_LSM6DSOX * sox1 = 0;
 Alex_LSM6DSOX * sox2 = 0;
@@ -758,7 +758,8 @@ void loop()
     sox2->update();
 
     angle_db = sox1->getDegZ()*10;
-    angle_nip = sox2->getDegZ()*10;
+    //angle_nip = sox2->getDegZ()*10;
+    angle_nip = 900-(sox2->getDegZ()*10);
 
     if( nCptFrame%100==0 )
     {

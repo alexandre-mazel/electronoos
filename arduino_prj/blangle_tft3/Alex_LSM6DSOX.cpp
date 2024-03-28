@@ -3,8 +3,9 @@
 #include "Alex_LSM6DSOX.h"
 
 Alex_LSM6DSOX::Alex_LSM6DSOX(const char* pNickName)
-:Adafruit_LSM6DSOX()
-,pNickName_()
+  : Adafruit_LSM6DSOX ()
+  , pNickName_        ( pNickName )
+  , bFound_           ( false )
 {
 
 }
@@ -163,7 +164,13 @@ void Alex_LSM6DSOX::update( void )
 
 float Alex_LSM6DSOX::getDegZ( void ) const
 {
-  return accel_.acceleration.z*10.f;
+  if(!bFound_)
+  {
+    return 666.6f;
+  }
+  const float g = 9.806f;
+  //return accel_.acceleration.z*90/9.81f;
+  return asin(accel_.acceleration.z/g)*180/PI;
 }
 
 void Alex_LSM6DSOX::printValues( void ) const
@@ -179,11 +186,13 @@ void Alex_LSM6DSOX::printValues( void ) const
     return;
   }
 
-  /*
+  
 
   Serial.print("\tTemperature ");
   Serial.print(temp_.temperature);
   Serial.println(" deg C");
+
+  /*
 
   // Display the results (acceleration is measured in m/s^2)
   Serial.print("\tAccel X: ");

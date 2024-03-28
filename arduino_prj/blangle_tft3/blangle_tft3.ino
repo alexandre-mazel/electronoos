@@ -85,6 +85,7 @@ MCUFRIEND_kbv tft;
 #define GRAY    0x8410
 
 #define PIN_PHOTORES A14
+#define PIN_SOX_IDX_CHANGE 32
 
 
 uint16_t version = MCUFRIEND_KBV_H_;
@@ -96,8 +97,11 @@ float fps = 60.;
 // Create the MCP9808 temperature sensor object
 Adafruit_MCP9808 tempsensor = Adafruit_MCP9808();
 
-Alex_LSM6DSOX sox1( "AngleNIP" );
-Alex_LSM6DSOX sox2( "AngleRacle" );
+const char name1[] = "AngleRacle";
+const char name2[] = "AngleNIP";
+
+Alex_LSM6DSOX sox1(name1);
+Alex_LSM6DSOX sox2(name2);
 
 
 
@@ -210,6 +214,10 @@ void setup()
     sox1.printConfig();
   }
 
+  // passe le capteur 2 sur une autre adresse
+  pinMode(PIN_SOX_IDX_CHANGE, OUTPUT);
+  digitalWrite(PIN_SOX_IDX_CHANGE ,HIGH);
+
   if( !sox2.begin_I2C(0x6B) )
   {
     Serial.println("ERR: Can't find imu2!");
@@ -244,6 +252,7 @@ void setup()
   {
     Serial.print("INF: error(s) detected nbr: ");
     Serial.println(nNumError);
+    delay(3000);
   }
 
   loadConfigFromEeprom();
@@ -735,15 +744,29 @@ void loop()
       tempsensor.shutdown_wake(1);
     }
 
-    if( nCptFrame%100==0 )
-    {
-      sox1.printValues();
-    }
-
+    
     //bubble = bjy_getAngle(0);
     // db = bjy_getAngle(1);
-    //angle_db = bjy_getAngle(1); // TODO
+    //angle_db = bjy_getAngle(1);
     //angle_nip = bjy_getAngle(0);
+
+/*
+    sox1.update();
+    sox2.update();
+
+    angle_db = sox1.getDegZ()*10;
+    angle_nip = sox2.getDegZ()*10;*/
+
+    if( nCptFrame%100==0 )
+    {
+      Serial.print("angle_db: "); Serial.print(angle_db); Serial.print(", angle_nip: "); Serial.println(angle_nip);
+      sox1.printValues();
+      sox2.printValues();
+    }
+
+        //angle_db = bjy_getAngle(1);
+    //angle_nip = bjy_getAngle(0);
+
 
     angle_nip -= 6; // calibration en hard (lecture du zero quand posé a plat) todo stocke dans eeprom
     angle_db -= 7; // sur la tranche on doit avoir 90, calibration en hard todo: => eeprom

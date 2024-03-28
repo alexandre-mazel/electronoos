@@ -13,6 +13,10 @@
     void printConfig( void );
     void printValues( void );
 
+    void update( void );
+
+  private:
+
   const char* pNickName_; // personal name of this sensor (for debug)
  };
  

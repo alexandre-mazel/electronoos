@@ -3,8 +3,8 @@
 #include "Alex_LSM6DSOX.h"
 
 Alex_LSM6DSOX::Alex_LSM6DSOX(const char* pNickName)
-  :Adafruit_LSM6DSOX()
-  ,pNickName_(pNickName)
+:Adafruit_LSM6DSOX()
+,pNickName_()
 {
 
 }

@@ -154,7 +154,7 @@ def load_csv(filename, sepa = ';', bSkipFirstLine = 0, encoding =  'utf-8', bVer
         else:
             nNumLine += 1
             
-    print("INF: load_csv: file '%s' loaded in 5.2%fs" % (filename,time.time()-timeBegin))
+    print("INF: load_csv: file '%s' loaded in %5.2fs" % (filename,time.time()-timeBegin))
     return data
 # load_csv - end
 

@@ -710,7 +710,7 @@ void countFps()
     //DEBUG.println(durationprint);
   }
 
-}
+} // countFps
 
 float rTemperature = -1.f;
 
@@ -729,7 +729,7 @@ void loop()
     int angle_nip;
     int bubble=0;
     //const int nHalfBoitierMM = 43; // demi largeur du capteur - (distance des 2 extremites de contacts)
-    const int nHalfBoitierMM = 24; // taille du boitier satelitte: distance des 2 extremites de contacts / 2
+    const int nHalfBoitierMM = 20; // taille du boitier satelitte: distance des 2 extremites de contacts / 2
     const int nLuminoLimit = 300; // to detect opening of the box
 
 
@@ -754,8 +754,10 @@ void loop()
     //angle_nip = bjy_getAngle(0);
 
 
+    //Serial.println("avant update");
     sox1->update();
     sox2->update();
+    //Serial.println("apres update");
 
     bool bErrorNip = false;
     bool bErrorDb = false;
@@ -795,9 +797,12 @@ void loop()
     nip = (presetCirc[nNumSettingsSelected]*angle_nip/360)/10/1; // /10 for angle, then /10 for cm or /1 for mm
 
     nip += nHalfBoitierMM;
+    //nip -= 21; // calib en reel;
 
-    db = angle_db - ( angle_nip + 3600*(nHalfBoitierMM / presetCirc[nNumSettingsSelected]));
-    //db = angle_db; // pour afficher le capteur brut apres calib
+    db = angle_db; // pour afficher le capteur brut apres calib
+    //db = angle_db - ( angle_nip + 3600*(nHalfBoitierMM / presetCirc[nNumSettingsSelected]));
+    db = (900-angle_db) - ( angle_nip + 3600*(nHalfBoitierMM / presetCirc[nNumSettingsSelected]));
+    
 
     //db = analogRead(A15)*(5.0*8 / 1023.0);
 
@@ -884,7 +889,7 @@ void loop()
       delay(1);
     } // code de debug
     
-    if( (nCptFrame % 100)==0 ) // reading every frame prevent serial reading ?!?
+    if( (nCptFrame % 10)==0 ) // reading every frame prevent serial reading ?!?
     {
       // detect touch - center of the point
       int x,y,z;

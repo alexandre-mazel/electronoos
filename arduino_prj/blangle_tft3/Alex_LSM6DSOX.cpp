@@ -2,27 +2,32 @@
 #include <Wire.h>
 #include "Alex_LSM6DSOX.h"
 
+// #define ALEX_MSM6DSOX_ALL_DEBUG_CODE // define me to include all debug code (increase static code size)
+
 Alex_LSM6DSOX::Alex_LSM6DSOX(const char* pNickName)
   : Adafruit_LSM6DSOX ()
-  , pNickName_        ( pNickName )
-  , bFound_           ( false )
+  , pNickName_             ( pNickName )
+  , bFound_                   ( false )
+  , nNbrMissedUpdate_   ( 0 )
 {
+
 
 }
 
 bool Alex_LSM6DSOX::begin_I2C(uint8_t i2c_addr)
 {
-  Serial.print("Alex_LSM6DSOX::begin_I2C '");
-  if(pNickName_!=NULL) Serial.print(this->pNickName_);
+    Serial.print("Alex_LSM6DSOX::begin_I2C '");
+    i2c_addr_ = i2c_addr;
+    if(pNickName_!=NULL) Serial.print(this->pNickName_);
 
-  if( Adafruit_LSM6DSOX::begin_I2C(i2c_addr) )
-  {
-    Serial.println("': Success !");
-    bFound_ = true;
-    return true;
-  }
-  Serial.println("': Failure!");
-  return false;
+    if( Adafruit_LSM6DSOX::begin_I2C(i2c_addr) )
+    {
+        Serial.println("': Success !");
+        bFound_ = true;
+        return true;
+    }
+    Serial.println("': Failure!");
+    return false;
 }
 
 
@@ -31,13 +36,13 @@ void Alex_LSM6DSOX::printConfig( void )
   Serial.print("Alex_LSM6DSOX.printConfig '");
   if(pNickName_!=NULL) Serial.print(this->pNickName_);
   Serial.println("': ");
-  if(!bFound_)
+  if( ! bFound_ )
   {
     Serial.println("Not initialised");
     return;
   }
 
-  return; // comment to gain code size
+  #ifdef ALEX_MSM6DSOX_ALL_DEBUG_CODE
 
   // this->setAccelRange(LSM6DS_ACCEL_RANGE_2_G);
   Serial.print("Accelerometer range set to: ");
@@ -153,24 +158,77 @@ void Alex_LSM6DSOX::printConfig( void )
     Serial.println("6.66 KHz");
     break;
   }
+  
+#endif
 }
 
 
 void Alex_LSM6DSOX::update( void )
 {
-  //  Get a new normalized sensor event
-  this->getEvent(&accel_, &gyro_, &temp_);
+    //  Get a new normalized sensor event
+
+    //int32_t timestamp_prev = accel_.timestamp;
+    float prev_temp = temp_.temperature;
+
+    this->getEvent(&accel_, &gyro_, &temp_);
+
+    //if( accel_.timestamp == timestamp_prev ) // so sad: timestamp is updated even when no read!
+    Serial.println(temp_.timestamp);
+    Serial.println(temp_.temperature);
+    if( prev_temp == temp_.temperature )
+    {
+        Serial.print("nNbrMissedUpdate_: "); Serial.println( (int)nNbrMissedUpdate_ ); 
+        ++nNbrMissedUpdate_;
+        if( nNbrMissedUpdate_ > 20 )
+        {
+            nNbrMissedUpdate_ = 0;
+            begin_I2C(i2c_addr_);
+        }
+        else if( nNbrMissedUpdate_ > 3 )
+        {
+            bFound_ = false;
+        }
+    }
+    else 
+    {
+        // success
+        nNbrMissedUpdate_ = 0;
+        if( ! bFound_ )
+        {
+            bFound_ = true;
+        }
+        
+        const float g = 9.806f;
+  
+        //float r = accel_.acceleration.z*90/9.81f;
+        float r = accel_.acceleration.y-gyro_.gyro.y;
+        if(r<-g)
+        {
+            r = -90.f;
+        }
+        else if(r>g)
+        {
+            r = 90.f;
+        }
+        else
+        {
+            r = asin((r)/g)*180/PI;
+        }
+        //~ if( isnan(r) )
+        //~ {
+            //~ r = 90.f; // too much acceleration
+        //~ }
+        rPrevDegY_ = r*0.5f + rPrevDegY_ * 0.5f;  // avg roughly on 5 values
+    }
 }
 
-float Alex_LSM6DSOX::getDegZ( void ) const
+float Alex_LSM6DSOX::getDegY( void ) const
 {
   if(!bFound_)
   {
     return 666.6f;
   }
-  const float g = 9.806f;
-  //return accel_.acceleration.z*90/9.81f;
-  return asin(accel_.acceleration.z/g)*180/PI;
+  return rPrevDegY_;
 }
 
 void Alex_LSM6DSOX::printValues( void ) const
@@ -185,6 +243,11 @@ void Alex_LSM6DSOX::printValues( void ) const
     Serial.println("Not initialised");
     return;
   }
+  
+#ifdef ALEX_MSM6DSOX_ALL_DEBUG_CODE
+  Serial.print("\ttimestamp: ");
+  Serial.println(accel_.timestamp);
+#endif
 
   
 
@@ -192,18 +255,22 @@ void Alex_LSM6DSOX::printValues( void ) const
   Serial.print(temp_.temperature);
   Serial.println(" deg C");
 
-  /*
+#ifdef ALEX_MSM6DSOX_ALL_DEBUG_CODE
 
   // Display the results (acceleration is measured in m/s^2)
   Serial.print("\tAccel X: ");
   Serial.print(accel_.acceleration.x);
+  
+#endif
+  
   Serial.print(" \tY: ");
   Serial.print(accel_.acceleration.y);
-  */
+  
   Serial.print(" \tZ: ");
   Serial.print(accel_.acceleration.z);
   Serial.println(" m/s^2 ");
-  /*
+  
+#ifdef ALEX_MSM6DSOX_ALL_DEBUG_CODE
 
   // Display the results (rotation is measured in rad/s)
   Serial.print("\tGyro X: ");
@@ -214,6 +281,6 @@ void Alex_LSM6DSOX::printValues( void ) const
   Serial.print(gyro_.gyro.z);
   Serial.println(" radians/s ");
   Serial.println();
-  */
+#endif
   
 }

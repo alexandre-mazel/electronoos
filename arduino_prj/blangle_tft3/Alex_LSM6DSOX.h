@@ -21,7 +21,7 @@ typedef struct Sensors
     
     void update( void );      // call to read values (immediate)
 
-    float getDegZ( void ) const;    // get Last measured Z in degrees
+    float getDegY( void ) const;    // get Last measured Y in degrees
 
     void printValues( void ) const; // print last updated values
 
@@ -29,13 +29,18 @@ typedef struct Sensors
 
     const char* pNickName_; // personal name of this sensor (for debug)
     
-    bool bFound_;       // set to false while not correctly inited (by begin_I2C)
-    char filler[3]; // padding a la mano, sinon ca reboote quand on accede a bFound_ (non c'est pas pour ca que ca reboote)
+    uint8_t     i2c_addr_;
+    bool bFound_;                   // set to false while not correctly inited (by begin_I2C)
+    char nNbrMissedUpdate_;     // inc on read error
+    char filler[1];                     // padding a la mano
+  
 
 
     sensors_event_t accel_;
     sensors_event_t gyro_;
     sensors_event_t temp_;
+  
+    float rPrevDegY_;
 
  };
  

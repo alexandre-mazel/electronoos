@@ -3,23 +3,9 @@
 #define ALEX_MSM6DSOX_ALL_DEBUG_CODE
 #include "C:\Users\alexa\dev\git\electronoos\arduino_prj\blangle_tft3\Alex_LSM6DSOX.cpp"
 
-Alex_LSM6DSOX * sox1 = 0;
+#define TWO_SENSORS // in case you plug the two sensors
+#define PIN_SOX_I2C_CHANGE_ADDR 32
 
-void setup()
-{
-  Serial.begin(57600);
-  sox1 = new Alex_LSM6DSOX("sox_name1");
-  if( !sox1->begin_I2C(0x6A) )
-  {
-    Serial.println("ERR: Can't find imu1!");
-    delay(3000);
-  }
-  else
-  {
-    Serial.println("INF: Found imu1!");
-    sox1->printConfig();
-  }
-}
 
 
 unsigned long fpsTimeStart = 0;
@@ -66,11 +52,52 @@ void countFps()
 
 } // countFps
 
+
+Alex_LSM6DSOX * sox1 = 0;
+Alex_LSM6DSOX * sox2 = 0;
+
+void setup()
+{
+  Serial.begin(57600);
+  sox1 = new Alex_LSM6DSOX("sox_name1");
+  if( !sox1->begin_I2C(0x6A) )
+  {
+    Serial.println("ERR: Can't find imu1!");
+    delay(3000);
+  }
+  else
+  {
+    Serial.println("INF: Found imu1!");
+    sox1->printConfig();
+  }
+
+#ifdef TWO_SENSORS
+  
+  // passe le capteur 2 sur une autre adresse
+  pinMode(PIN_SOX_I2C_CHANGE_ADDR, OUTPUT);
+  digitalWrite(PIN_SOX_I2C_CHANGE_ADDR ,HIGH);
+
+  sox2 = new Alex_LSM6DSOX("sox_name2");
+  if( !sox2->begin_I2C(0x6B) )
+  {
+    Serial.println("ERR: Can't find imu2!");
+    delay(3000);
+  }
+  else
+  {
+    Serial.println("INF: Found imu2!");
+    sox2->printConfig();
+  }
+#endif
+}
+
+
 long int nCptFrame = 0;
 void loop()
 {
   Serial.println("avant update");
   sox1->update();
+  if(sox2) sox2->update();
   Serial.println("apres update");
 
   float angle_db_read = sox1->getDegY();
@@ -81,10 +108,18 @@ void loop()
     bErrorDb = true;
   }
 
+  float angle2 = 0;
+  if(sox2) angle2 = sox2->getDegY();
+
   //if( nCptFrame%100==0 )
   {
     Serial.print( "angle_db: " ); Serial.println(angle_db_read);
     sox1->printValues();
+    if(sox2)
+    {
+      Serial.print( "angle2: " ); Serial.println(angle2);
+      sox2->printValues();
+    }
   }
 
   nCptFrame += 1;

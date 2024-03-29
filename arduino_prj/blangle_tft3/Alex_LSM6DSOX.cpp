@@ -172,12 +172,14 @@ void Alex_LSM6DSOX::update( void )
 
     this->getEvent(&accel_, &gyro_, &temp_);
 
+    //Serial.print("temp_.timestamp: "); Serial.println(temp_.timestamp);
+    //Serial.print("temp_.temperature: "); Serial.println(temp_.temperature);
+    
     //if( accel_.timestamp == timestamp_prev ) // so sad: timestamp is updated even when no read!
-    Serial.println(temp_.timestamp);
-    Serial.println(temp_.temperature);
-    if( prev_temp == temp_.temperature )
+
+    if( prev_temp == temp_.temperature || temp_.sensor_id <= 0 || temp_.sensor_id > 3 )
     {
-        Serial.print("nNbrMissedUpdate_: "); Serial.println( (int)nNbrMissedUpdate_ ); 
+        //Serial.print("nNbrMissedUpdate_: "); Serial.println( (int)nNbrMissedUpdate_ ); 
         ++nNbrMissedUpdate_;
         if( nNbrMissedUpdate_ > 20 )
         {
@@ -245,8 +247,11 @@ void Alex_LSM6DSOX::printValues( void ) const
   }
   
 #ifdef ALEX_MSM6DSOX_ALL_DEBUG_CODE
+  Serial.print("\tsensor_id: ");
+  Serial.println(temp_.sensor_id);
+  
   Serial.print("\ttimestamp: ");
-  Serial.println(accel_.timestamp);
+  Serial.println(temp_.timestamp);
 #endif
 
   

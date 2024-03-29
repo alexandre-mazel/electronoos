@@ -85,7 +85,7 @@ MCUFRIEND_kbv tft;
 #define GRAY    0x8410
 
 #define PIN_PHOTORES A14
-#define PIN_SOX_IDX_CHANGE 32
+#define PIN_SOX_I2C_CHANGE_ADDR 32
 
 
 uint16_t version = MCUFRIEND_KBV_H_;
@@ -218,8 +218,8 @@ void setup()
   }
 
   // passe le capteur 2 sur une autre adresse
-  pinMode(PIN_SOX_IDX_CHANGE, OUTPUT);
-  digitalWrite(PIN_SOX_IDX_CHANGE ,HIGH);
+  pinMode(PIN_SOX_I2C_CHANGE_ADDR, OUTPUT);
+  digitalWrite(PIN_SOX_I2C_CHANGE_ADDR ,HIGH);
 
   if( !sox2->begin_I2C(0x6B) )
   {
@@ -762,8 +762,8 @@ void loop()
     bool bErrorNip = false;
     bool bErrorDb = false;
 
-    float angle_db_read = sox1->getDegZ();
-    float angle_nip_read = sox2->getDegZ();
+    float angle_db_read = sox1->getDegY();
+    float angle_nip_read = sox2->getDegY();
     
     if(angle_db_read< -600.f )
     {

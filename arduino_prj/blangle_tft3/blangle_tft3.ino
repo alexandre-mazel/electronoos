@@ -777,7 +777,8 @@ void loop()
 
     angle_db = angle_db_read*10;
 
-    angle_nip = 900-(angle_nip_read*10);
+    //angle_nip = 900-(angle_nip_read*10);
+    angle_nip = angle_nip_read*10; // remise a plat des capteurs
 
     if( nCptFrame%100==0 )
     {
@@ -799,9 +800,9 @@ void loop()
     nip += nHalfBoitierMM;
     //nip -= 21; // calib en reel;
 
-    db = angle_db; // pour afficher le capteur brut apres calib
-    //db = angle_db - ( angle_nip + 3600*(nHalfBoitierMM / presetCirc[nNumSettingsSelected]));
-    db = (900-angle_db) - ( angle_nip + 3600*(nHalfBoitierMM / presetCirc[nNumSettingsSelected]));
+    // db = angle_db; // pour afficher le capteur brut apres calib
+    db = angle_db - ( angle_nip + 3600*(nHalfBoitierMM / presetCirc[nNumSettingsSelected]));
+    // db = (900-angle_db) - ( angle_nip + 3600*(nHalfBoitierMM / presetCirc[nNumSettingsSelected]));
     
 
     //db = analogRead(A15)*(5.0*8 / 1023.0);

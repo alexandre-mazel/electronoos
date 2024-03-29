@@ -6,9 +6,9 @@
 
 Alex_LSM6DSOX::Alex_LSM6DSOX(const char* pNickName)
   : Adafruit_LSM6DSOX ()
-  , pNickName_             ( pNickName )
-  , bFound_                   ( false )
-  , nNbrMissedUpdate_   ( 0 )
+  , pNickName_            ( pNickName )
+  , bFound_               ( false )
+  , nNbrMissedUpdate_     ( 0 )
 {
 
 
@@ -19,6 +19,8 @@ bool Alex_LSM6DSOX::begin_I2C(uint8_t i2c_addr)
     Serial.print("Alex_LSM6DSOX::begin_I2C '");
     i2c_addr_ = i2c_addr;
     if(pNickName_!=NULL) Serial.print(this->pNickName_);
+
+    Serial.print( ", this: "); Serial.print((int)this);
 
     if( Adafruit_LSM6DSOX::begin_I2C(i2c_addr) )
     {
@@ -179,7 +181,7 @@ void Alex_LSM6DSOX::update( void )
 
     if( prev_temp == temp_.temperature || temp_.sensor_id <= 0 || temp_.sensor_id > 3 )
     {
-        //Serial.print("nNbrMissedUpdate_: "); Serial.println( (int)nNbrMissedUpdate_ ); 
+        Serial.print("nNbrMissedUpdate_: "); Serial.println( (int)nNbrMissedUpdate_ ); 
         ++nNbrMissedUpdate_;
         if( nNbrMissedUpdate_ > 20 )
         {
@@ -228,7 +230,7 @@ float Alex_LSM6DSOX::getDegY( void ) const
 {
   if(!bFound_)
   {
-    return 666.6f;
+    return 6666.6f;
   }
   return rPrevDegY_;
 }
@@ -246,13 +248,13 @@ void Alex_LSM6DSOX::printValues( void ) const
     return;
   }
   
-#ifdef ALEX_MSM6DSOX_ALL_DEBUG_CODE
+//#ifdef ALEX_MSM6DSOX_ALL_DEBUG_CODE
   Serial.print("\tsensor_id: ");
   Serial.println(temp_.sensor_id);
   
   Serial.print("\ttimestamp: ");
   Serial.println(temp_.timestamp);
-#endif
+//#endif
 
   
 

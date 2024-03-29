@@ -68,6 +68,7 @@ void setup()
   else
   {
     Serial.println("INF: Found imu1!");
+    sox1->setAccelDataRate(LSM6DS_RATE_104_HZ);
     sox1->printConfig();
   }
 
@@ -86,6 +87,7 @@ void setup()
   else
   {
     Serial.println("INF: Found imu2!");
+    sox2->setAccelDataRate(LSM6DS_RATE_104_HZ);
     sox2->printConfig();
   }
 #endif
@@ -124,5 +126,5 @@ void loop()
 
   nCptFrame += 1;
   countFps();
-  delay(500);
+  delay(100);
 }

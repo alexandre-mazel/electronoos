@@ -103,6 +103,15 @@ const char sox_name2[] = "AngleForNIP";
 Alex_LSM6DSOX * sox1 = 0;
 Alex_LSM6DSOX * sox2 = 0;
 
+int tft_write_y = 10;
+void tft_write( const char* msg )
+{
+  tft.setRotation(LANDSCAPE+2); // +2 => revert haut bas
+  tft.setTextSize(3);
+  tft.setCursor( 10, tft_write_y ); tft_write_y += 30;
+  tft.print(msg);
+}
+
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -197,6 +206,7 @@ void setup()
 
   delay(300);
 
+  tft.fillScreen(BLACK);
   Serial.println("");
   Serial.println("");
   Serial.println("");
@@ -209,11 +219,13 @@ void setup()
   if( !sox1->begin_I2C(0x6A) )
   {
     Serial.println("ERR: Can't find imu1!");
+    tft_write("ERROR 1: Can't find imu1!");
     ++nNumError;
   }
   else
   {
     Serial.println("INF: Found imu1!");
+    sox1->setAccelDataRate(LSM6DS_RATE_104_HZ);
     sox1->printConfig();
   }
 
@@ -224,17 +236,20 @@ void setup()
   if( !sox2->begin_I2C(0x6B) )
   {
     Serial.println("ERR: Can't find imu2!");
+    tft_write("ERROR 2: Can't find imu2!");
     ++nNumError;
   }
   else
   {
     Serial.println("INF: Found imu2!");
+    sox2->setAccelDataRate(LSM6DS_RATE_104_HZ);
     sox2->printConfig();
   }
 
   if (!tempsensor.begin(0x18)) 
   {
     Serial.println("ERR: Can't find temperature sensor MCP9808!");
+    tft_write("ERROR 3: Can't find temp sensor!");
     ++nNumError;
   }
   else
@@ -765,12 +780,12 @@ void loop()
     float angle_db_read = sox1->getDegY();
     float angle_nip_read = sox2->getDegY();
     
-    if(angle_db_read< -600.f )
+    if(angle_db_read > 600.f )
     {
       bErrorDb = true;
     }
 
-    if(angle_nip_read< -600.f )
+    if(angle_nip_read > 600.f )
     {
       bErrorNip = true;
     }
@@ -780,7 +795,7 @@ void loop()
     //angle_nip = 900-(angle_nip_read*10);
     angle_nip = angle_nip_read*10; // remise a plat des capteurs
 
-    if( nCptFrame%100==0 )
+    if( nCptFrame%20==0 )
     {
       Serial.print("angle_db: "); Serial.print(angle_db); Serial.print(", angle_nip: "); Serial.println(angle_nip);
       sox1->printValues();
@@ -800,6 +815,7 @@ void loop()
     nip += nHalfBoitierMM;
     //nip -= 21; // calib en reel;
 
+
     // db = angle_db; // pour afficher le capteur brut apres calib
     db = angle_db - ( angle_nip + 3600*(nHalfBoitierMM / presetCirc[nNumSettingsSelected]));
     // db = (900-angle_db) - ( angle_nip + 3600*(nHalfBoitierMM / presetCirc[nNumSettingsSelected]));
@@ -809,11 +825,11 @@ void loop()
 
     if(bErrorNip)
     {
-      nip = 666;
+      nip = 6666;
     }
     if(bErrorNip || bErrorDb)
     {
-      db = 666;
+      db = 6666;
     }
 
     
@@ -890,7 +906,7 @@ void loop()
       delay(1);
     } // code de debug
     
-    if( (nCptFrame % 10)==0 ) // reading every frame prevent serial reading ?!?
+    if( (nCptFrame % 2)==0 ) // reading every frame prevent serial reading ?!?
     {
       // detect touch - center of the point
       int x,y,z;
@@ -1050,5 +1066,5 @@ void loop()
     }
 
     countFps();
-    delay(10);
+    delay(100); // time for sensors to update
 }

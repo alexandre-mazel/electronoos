@@ -219,7 +219,7 @@ void setup()
   if( !sox1->begin_I2C(0x6A) )
   {
     Serial.println("ERR: Can't find imu1!");
-    tft_write("ERROR 1: Can't find imu1!");
+    tft_write("ERR 1: Can't find imu1!");
     ++nNumError;
   }
   else
@@ -236,7 +236,7 @@ void setup()
   if( !sox2->begin_I2C(0x6B) )
   {
     Serial.println("ERR: Can't find imu2!");
-    tft_write("ERROR 2: Can't find imu2!");
+    tft_write("ERR 2: Can't find imu2!");
     ++nNumError;
   }
   else
@@ -249,7 +249,7 @@ void setup()
   if (!tempsensor.begin(0x18)) 
   {
     Serial.println("ERR: Can't find temperature sensor MCP9808!");
-    tft_write("ERROR 3: Can't find temp sensor!");
+    tft_write("WRN 1: Can't find temp sens");
     ++nNumError;
   }
   else
@@ -583,8 +583,15 @@ int render_screen(int nPresel, int nip, int db, int bubble, double circ,int bLoc
     tft.print("NIP");
     tft.setCursor(nMenuW+50, yText+nLineH*5);
     
-    tft.print(nip);
-    tft.print("mm");
+    if(nip>999)
+    {
+      tft.print("???");
+    }
+    else
+    {
+      tft.print(nip);
+      tft.print("mm");
+    }
   }
 
   if(nPrevDb != db )
@@ -594,10 +601,17 @@ int render_screen(int nPresel, int nip, int db, int bubble, double circ,int bLoc
     tft.setCursor(nMenuW+nAreaW+50, yText);
     tft.print("DB");
     tft.setCursor(nMenuW+nAreaW+50, yText+nLineH*5);
-    tft.print(db/10.,1);
-    tft.setCursor(tft.getCursorX(), yText+nLineH*5-nLineH+2);
-    tft.setTextSize(3);
-    tft.print("o");
+    if(db>360)
+    {
+      tft.print("???");
+    }
+    else
+    {
+      tft.print(db/10.,1);
+      tft.setCursor(tft.getCursorX(), yText+nLineH*5-nLineH+2);
+      tft.setTextSize(3);
+      tft.print("o");
+    }
   }
 
   tft.setTextSize(5);
@@ -671,7 +685,14 @@ int render_screen(int nPresel, int nip, int db, int bubble, double circ,int bLoc
     tft.fillRect( nMenuW+50+46, yText+nOffsetY,48, 16, BLUE );
     tft.setCursor( nMenuW+50, yText+nOffsetY );
     tft.print("temp:");
-    tft.print(rTemperature, 2);
+    if(isnan(rTemperature))
+    {
+      tft.print("???");
+    }
+    else
+    {
+      tft.print(rTemperature, 2);
+    }
 
     tft.fillRect( nMenuW+nAreaW+50+46, yText+nOffsetY,48, 16, RED );
     tft.setCursor( nMenuW+nAreaW+50, yText+nOffsetY );

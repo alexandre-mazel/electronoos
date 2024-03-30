@@ -1637,7 +1637,7 @@ class ExclusiveLock:
             
     def __del__( self ):
         if self.acquired:
-            print("WRN:common.ExclusiveLock: releasing from destructor lock '%s' " % self.lockname)
+            print("WRN:common.ExclusiveLock: releasing from ExclusiveLock.destructor '%s' " % self.lockname)
             self.release()
             
     def acquire( self, timeout = 0, bVerbose=True ):

@@ -1635,6 +1635,10 @@ class ExclusiveLock:
             
         self.lockname = lockdir+os.path.basename(lockname) # need to be accessible from everywhere and every process
             
+    def __del__( self ):
+        if self.acquired:
+            print("WRN:common.ExclusiveLock: releasing from destructor lock '%s' " % self.lockname)
+            self.release()
             
     def acquire( self, timeout = 0, bVerbose=True ):
         """

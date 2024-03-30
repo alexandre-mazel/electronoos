@@ -279,6 +279,19 @@ def getDay():
     datetimeObject = datetime.datetime.now()
     return datetimeObject.year, datetimeObject.month, datetimeObject.day 
     
+def getNumDayOfWeek(year,month,day):
+    """
+    return the num of week:0: lundi, 6: dimanche
+    """
+    given_date = datetime.datetime(year, month, day)
+    return given_date.weekday()
+    
+if 0:
+    print(getNumDayOfWeek(2024,3,31)) # it's a sunday => 6
+    print(getNumDayOfWeek(1974,8,20)) # it's a monday => 0
+    exit(1)
+
+
 def getYMD(strDate):
     """
     separate a date "YYYY/MM/DD" to year, month, day

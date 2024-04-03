@@ -927,6 +927,7 @@ python version   : 3.7.3 (32bits) (4 core(s))
 cpu              : ARMv7 Processor rev 3 (v7l)
 test_cpu_int2    : ####################   1.73s
 test_cpu_float2  : ####################   0.26s
+test_crypt       : ####################  11.91s
 test_scipy_xxt   : ####################   7.41s (53.96x)
 test_orb4.6.0    : ####################   1.60s (62.38fps)
 test_orbcv imgs  : ####################   6.03s (16.57fps)
@@ -1005,6 +1006,7 @@ cpu              : Raspberry Pi 5 Model B Rev 1.0
 ram              : 7.36 / 7.86 GB
 test_cpu_int2    : ####################   0.40s
 test_cpu_float2  : ####################   0.08s
+test_crypt       : ####################   6.65s
 test_cpu_ram 2G  : ####################   0.68s
 test_cpu_ram 4G  : ####################   1.37s
 test_cpu_ram 6G  : ####################   2.04s
@@ -1430,29 +1432,30 @@ disk_read  1024KB: ####################   1.23s (4078 Mo/s)
 ubuntu@VM-ef8b3a4e-a4fe-4560-9021-74a52faa6357:~/dev/git/electronoos/scripts$ python3 test_perf.py
 python version   : 3.10.12 (64bits) (4 core(s))
 cpu              : Intel Xeon Processor (Skylake)
-ram              : 5.63 / 7.75 GB
-test_cpu_int2    : ####################   0.36s
-test_cpu_float2  : ####################   0.09s
-test_cpu_ram 2G  : ####################   1.26s
-test_cpu_ram 4G  : ####################   2.36s
-test_cpu_ram 6G  : ####################   4.11s
-test_cpu_ram 8G  : ####################   5.06s
-test_cpu_ram10G  : ####################   6.28s
-test_cpu_ram12G  : ####################   7.73s
-test_cpu_ram14G  : ####################   8.54s
+ram              : 7.24 / 7.75 GB
+test_cpu_int2    : ####################   0.35s
+test_cpu_float2  : ####################   0.08s
+test_crypt       : ####################   5.26s
+test_cpu_ram 2G  : ####################   1.20s
+test_cpu_ram 4G  : ####################   2.21s
+test_cpu_ram 6G  : ####################   3.65s
+test_cpu_ram 8G  : ####################   4.88s
+test_cpu_ram10G  : ####################   6.13s
+test_cpu_ram12G  : ####################   7.44s
+test_cpu_ram14G  : ####################   8.59s
 test_cpu_ram16G  :  Memory Error...
-scipy.fftpack    : not found
+test_scipy_xxt   : ####################   1.02s (393.63x)
 opencv (orb)      : not found
 opencv (orb)    : not found
 opencv (orb)    : not found
-multiprocess x1 :  0.36s /  0.09s /  0.00s /  0.01s /  0.01s /  0.01s =>    0.47s (per thread:0.47s)
-multiprocess x4 :  0.38s /  0.11s /  0.01s /  0.01s /  0.01s /  0.01s =>    1.00s (per thread:0.25s)
-multiprocess x8 :  0.77s /  0.21s /  0.01s /  0.01s /  0.01s /  0.02s =>    2.04s (per thread:0.26s)
-multiprocess x32:  2.94s /  0.85s /  0.04s /  0.05s /  0.05s /  0.05s =>    6.03s (per thread:0.19s)
-disk_write    1KB: ####################   3.46s (289.20 Mo/s)
-disk_read     1KB: ####################   1.47s (682.48 Mo/s)
-disk_write 1024KB: ####################   2.92s (342.16 Mo/s)
-disk_read  1024KB: ####################   0.70s (1425.74 Mo/s)
+multiprocess x1 :  0.39s /  0.12s /  5.26s /  1.13s /  0.01s /  0.01s /  0.01s =>    6.93s (per thread:6.93s)
+multiprocess x4 :  0.40s /  0.12s /  5.30s /  1.34s /  0.02s /  0.02s /  0.01s =>   14.13s (per thread:3.53s)
+multiprocess x8 :  0.76s /  0.29s / 10.56s /  2.59s /  0.02s /  0.02s /  0.02s =>   28.40s (per thread:3.55s)
+multiprocess x32:  2.97s /  0.84s / 42.23s / 10.87s /  0.08s /  0.08s /  0.08s =>   85.55s (per thread:2.67s)
+disk_write    1KB: ####################   5.11s (195.62 Mo/s)
+disk_read     1KB: ####################   1.71s (585.41 Mo/s)
+disk_write 1024KB: ####################   2.85s (350.36 Mo/s)
+disk_read  1024KB: ####################   0.74s (1359.73 Mo/s)
 
 *** don de concept: gros
 C:\dev\git\electronoos\scripts>python test_perf.py

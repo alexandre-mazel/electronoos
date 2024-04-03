@@ -165,6 +165,27 @@ def test_cpu_float( bPrint = True ):
     return rDuration;
 #test_cpu_float - end
 
+def test_crypt( bPrint = True ):
+    try:
+        import bcrypt
+    except:
+        if bPrint: print( "bcrypt        : not found")
+        return 0
+        
+    if bPrint: sys.stdout.write( "test_crypt       : " )
+    timeBegin = time.time();
+    x = 18.2
+    for i in range( 20 ):
+        password = "cazaekncecd".encode()
+        salt ="$2b$12$DTK1eFh7Xf5IJcHwDjy7x.".encode()
+        bcrypt.hashpw(password,salt)
+        if bPrint: sys.stdout.write( "#" );
+        if bPrint: sys.stdout.flush();
+    rDuration = time.time() - timeBegin;
+    if bPrint: print("%7.2fs" % rDuration);
+    return rDuration;
+#test_crypt - end
+
 def test_ram( sizeGB = 1, bPrint = True ):
     try:
         import numpy
@@ -415,7 +436,7 @@ def test_multithreading():
         sys.stdout.write( "multiprocess x%-2d:" % nNbrProcessInParalell  )    
         bFirstInLine = True
         all_process = []
-        for func_to_test in (test_cpu_int,test_cpu_float,test_numpy,test_opencv_orb,test_opencv_orb_realcase,test_opencv_orb_realcase):
+        for func_to_test in (test_cpu_int,test_cpu_float,test_crypt, test_numpy,test_opencv_orb,test_opencv_orb_realcase,test_opencv_orb_realcase):
             if not bFirstInLine: sys.stdout.write(" /" )
             bFirstInLine = False
             timeBegin = time.time()        
@@ -441,6 +462,8 @@ def test_perf(nDiskTestSizeMB=200,bTestMultiThreading=True):
     rTotalTime = 0;
     rTotalTime += test_cpu_int();
     rTotalTime += test_cpu_float();
+    rTotalTime += test_crypt();
+    exit(1)
     rTotalTime += test_ram(2);
     rTotalTime += test_ram(4);
     rTotalTime += test_ram(6);
@@ -1400,6 +1423,35 @@ disk_write    1KB: ####################   19.43s (235 Mo/s)
 disk_read     1KB: ####################   17.74s (281 Mo/s)
 disk_write 1024KB: ####################   3.31s (1375 Mo/s)
 disk_read  1024KB: ####################   1.23s (4078 Mo/s)
+
+*** ExoScale instance Standard - Large
+
+ubuntu@VM-ef8b3a4e-a4fe-4560-9021-74a52faa6357:~/dev/git/electronoos/scripts$ python3 test_perf.py
+python version   : 3.10.12 (64bits) (4 core(s))
+cpu              : Intel Xeon Processor (Skylake)
+ram              : 5.63 / 7.75 GB
+test_cpu_int2    : ####################   0.36s
+test_cpu_float2  : ####################   0.09s
+test_cpu_ram 2G  : ####################   1.26s
+test_cpu_ram 4G  : ####################   2.36s
+test_cpu_ram 6G  : ####################   4.11s
+test_cpu_ram 8G  : ####################   5.06s
+test_cpu_ram10G  : ####################   6.28s
+test_cpu_ram12G  : ####################   7.73s
+test_cpu_ram14G  : ####################   8.54s
+test_cpu_ram16G  :  Memory Error...
+scipy.fftpack    : not found
+opencv (orb)      : not found
+opencv (orb)    : not found
+opencv (orb)    : not found
+multiprocess x1 :  0.36s /  0.09s /  0.00s /  0.01s /  0.01s /  0.01s =>    0.47s (per thread:0.47s)
+multiprocess x4 :  0.38s /  0.11s /  0.01s /  0.01s /  0.01s /  0.01s =>    1.00s (per thread:0.25s)
+multiprocess x8 :  0.77s /  0.21s /  0.01s /  0.01s /  0.01s /  0.02s =>    2.04s (per thread:0.26s)
+multiprocess x32:  2.94s /  0.85s /  0.04s /  0.05s /  0.05s /  0.05s =>    6.03s (per thread:0.19s)
+disk_write    1KB: ####################   3.46s (289.20 Mo/s)
+disk_read     1KB: ####################   1.47s (682.48 Mo/s)
+disk_write 1024KB: ####################   2.92s (342.16 Mo/s)
+disk_read  1024KB: ####################   0.70s (1425.74 Mo/s)
 
 *** don de concept: gros
 C:\dev\git\electronoos\scripts>python test_perf.py

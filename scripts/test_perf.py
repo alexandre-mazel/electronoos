@@ -463,7 +463,6 @@ def test_perf(nDiskTestSizeMB=200,bTestMultiThreading=True):
     rTotalTime += test_cpu_int();
     rTotalTime += test_cpu_float();
     rTotalTime += test_crypt();
-    exit(1)
     rTotalTime += test_ram(2);
     rTotalTime += test_ram(4);
     rTotalTime += test_ram(6);
@@ -1212,6 +1211,7 @@ python version   : 3.9.5 (64bits) (8 core(s))
 cpu              : Intel(R) Core(TM) i7-1065G7 CPU @ 1.30GHz
 test_cpu_int2    : ####################   0.62s
 test_cpu_float2  : ####################   0.09s
+test_crypt       : ####################   7.89s
 test_scipy_xxt   : ####################   1.06s (377.83x)
 test_orb4.5.2    : ####################   0.27s (373.96fps)
 test_orbcv imgs  : ####################   1.25s (80.10fps)
@@ -1230,6 +1230,7 @@ ram              : 11.02 / 15.60 GB
 ram              : 10.73 / 15.60 GB
 test_cpu_int2    : ####################   0.46s
 test_cpu_float2  : ####################   0.07s
+test_crypt       : ####################   5.68s
 test_cpu_ram 2G  : ####################   0.37s
 test_cpu_ram 4G  : ####################   0.65s
 test_cpu_ram 6G  : ####################   0.94s

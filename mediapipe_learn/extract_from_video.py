@@ -2,6 +2,8 @@ import cv2
 import mediapipe_fx
 import mediapipe as mp
 
+from mediapipe_fx import computeBaryChest, landmarkToListPoints
+
 import os
 import time
 
@@ -35,7 +37,9 @@ def extractFromVideo( strFilename, detector, bOutputSkel = 1 ):
       print("ERR: extractFromVideo: Error opening video file '%s'" % strFilename )
       return
       
-    if bOutputSkel: outfile = open(strFilename.replace(".mkv",".skl"),"wt")
+    if bOutputSkel: outfile = open(strFilename.replace(".mkv",".skl").replace(".mp4",".skl"),"wt")
+    
+    prevBaryChest = [0.5,0.5,0.5]
  
     while(cap.isOpened()):
             
@@ -46,7 +50,37 @@ def extractFromVideo( strFilename, detector, bOutputSkel = 1 ):
         imgRGB = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
         imagebuf = mp.Image(image_format=mp.ImageFormat.SRGB, data=imgRGB)
         detection_result = detector.detect(imagebuf)
-        #~ print("detection_result:" + str(detection_result) );
+        print("detection_result:" + str(detection_result) );
+        print("detection_result.pose_landmarks:" + str(detection_result.pose_landmarks) );
+        print("detection_result len pose_landmarks: %s" % len(detection_result.pose_landmarks) );
+        
+        if len(detection_result.pose_landmarks) < 1:
+            continue
+        
+        
+        baryChest = computeBaryChest(landmarkToListPoints(detection_result.pose_landmarks))
+        print("baryChest: %s" % baryChest )
+        if baryChest[0] < 0.2 or baryChest[0] > 0.8:
+            print("DBG: bary not centered !!!")
+            # blackened the skeleton on the side
+            imgRGB = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+            h,w = imgRGB.shape[:2]
+            if baryChest[0] > 0.8:
+                x1 = int((baryChest[0]-0.05)*w)
+                x2 = w
+            else:
+                x1 = 0
+                x2 = int((baryChest[0]+0.05)*w)
+                
+            imgRGB[:,x1:x2]= (0,0,0)
+            imagebuf = mp.Image(image_format=mp.ImageFormat.SRGB, data=imgRGB)
+            detection_result = detector.detect(imagebuf)
+            baryChest = computeBaryChest(landmarkToListPoints(detection_result.pose_landmarks))
+            print("baryChest (2): %s" % baryChest )
+            if baryChest[0] < 0.2 or baryChest[0] > 0.8:
+                print("DBG: skipping !!! \n")
+        
+        
         if bOutputSkel: exportResult(detection_result,outfile)
         
         img[:] = (0,0,0)
@@ -75,6 +109,7 @@ strPath = "C:/seq_vid2/sms/"
 #~ strPath = "C:/seq_vid2/phone/"
 strPath = "d:/seq_vid/eat/"
 #~ strPath = "d:/seq_vid/sleep/"
+#~ strPath = "d:/seq_vid/stretch/"
 if 0:
     # loop all files
     for f in os.listdir(strPath):
@@ -82,10 +117,12 @@ if 0:
             continue
         print("DBG: %s" % f)
         extractFromVideo( strPath + f, detector)
-if 1:
+if 0:
     # just see one file
     file = "sms_01.mkv"
     file = "sms_02.mkv"
     file = "eat_01.mkv"
     extractFromVideo( strPath + file, detector,bOutputSkel=0)
     
+absfile = "C:/seq_vid2/test.mp4"
+extractFromVideo( absfile, detector,bOutputSkel=1)

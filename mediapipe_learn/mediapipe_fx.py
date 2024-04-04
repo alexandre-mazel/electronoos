@@ -15,6 +15,7 @@ import time
 
 timeBegin = time.time()
 
+import math
 from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
 import numpy as np
@@ -35,6 +36,51 @@ print("Imports takes %.3fs" % (time.time()-timeBegin))
 # pip install protobuf==3.19.6
 # copy builder.py in the current version ...\site-packages\google\protobuf\internal\
 
+
+anIdxChests = [12,11,23,24]
+anIdxWrists = [16,15] # Left then Right, par rapport a la camera
+
+
+def dist3D(a,b):
+    # return sqrt( (b[0]-a[0])*(b[0]-a[0]) + (b[1]-a[1])*(b[1]-a[1]) + (b[2]-a[2])*(b[2]-a[2]) )
+    # return sqrt( pow( (b[0]-a[0]) ) + pow( (b[1]-a[1]) ) + pow( (b[2]-a[2]) )  )
+    return math.sqrt( (b[0]-a[0])**2 + (b[1]-a[1])**2 + (b[2]-a[2])**2 )
+
+def vectNorm3D(a,b,size):
+    return [ (b[0]-a[0])/size, (b[1]-a[1])/size, (b[2]-a[2])/size ]
+    
+def sum3D(a,b):
+    c = [ a[0]+b[0], a[1]+b[1], a[2]+b[2] ]
+    return c
+    
+def div3D(a,k):
+    c = [ a[0] / k, a[1] / k, a[2] / k ]
+    return c
+    
+def computeBaryChest(dataForOneImage):
+    bary = [0,0,0]
+    for idx in anIdxChests:
+        for pt in range(3):
+            bary[pt] += dataForOneImage[idx][pt]
+    for pt in range(3):
+        bary[pt] /= len(anIdxChests)
+    return bary
+    
+def computeSizeChest(dataForOneImage):
+    diag1 = dist3D(dataForOneImage[anIdxChests[0]],dataForOneImage[anIdxChests[2]])
+    diag2 = dist3D(dataForOneImage[anIdxChests[1]],dataForOneImage[anIdxChests[3]])
+
+    return (diag1+diag2)/2
+    
+def landmarkToListPoints(datas):
+    """
+    receive a poseLandmarkerResult.pose_landmarks
+    and return a list of point[x,y,z,pres,vis]
+    """
+    o = []
+    for pt in datas[0]:
+        o.append([pt.x,pt.y,pt.z,pt.presence,pt.visibility])
+    return o
 
 
 

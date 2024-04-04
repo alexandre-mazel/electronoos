@@ -56,7 +56,7 @@ def computeFeaturesFromFile(strFilename, bDetect = False):
                   fontScale = 1.0, color = (255, 0, 0), thickness = 2
                 )
             cv2.imshow( 'detected', img )
-            key = cv2.waitKey(30)
+            key = cv2.waitKey(33/3) # real time is 33.3 (30 fps
             if key == 27:
                 break
         

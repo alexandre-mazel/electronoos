@@ -1,35 +1,37 @@
 import stl
 import view_stl_vtk
 
-def generateCube(o, center, size=10):
+def generatePara(o, center, size=10):
     
-    n=size//2
+    m = size//3
+    n = size//2
+    h = 2*n
 
     # bottom
-    o.addTriangle((-n,-n,-n),(-n,+n,-n),(+n,-n,-n))
-    o.addTriangle((+n,+n,-n),(-n,+n,-n),(+n,-n,-n))
+    o.addTriangle((-m,-n,-h),(-m,+n,-h),(+m,-n,-h))
+    o.addTriangle((+m,+n,-h),(-m,+n,-h),(+m,-n,-h))
     
-    o.addTriangle((-n,-n,-n),(-n,+n,-n),(-n,-n,+n))
-    o.addTriangle((-n,+n,+n),(-n,+n,-n),(-n,-n,+n))
+    o.addTriangle((-m,-n,-h),(-m,+n,-h),(-m,-n,+h))
+    o.addTriangle((-m,+n,+h),(-m,+n,-h),(-m,-n,+h))
     
-    o.addTriangle((+n,+n,-n),(+n,-n,-n),(+n,-n,+n))
-    o.addTriangle((+n,+n,+n),(+n,+n,-n),(+n,-n,+n))
+    o.addTriangle((+m,+n,-h),(+m,-n,-h),(+m,-n,+h))
+    o.addTriangle((+m,+n,+h),(+m,+n,-h),(+m,-n,+h))
     
-    o.addTriangle((-n,+n,-n),(+n,+n,-n),(-n,+n,+n))
-    o.addTriangle((+n,+n,-n),(+n,+n,+n),(-n,+n,+n))
+    o.addTriangle((-m,+n,-h),(+m,+n,-h),(-m,+n,+h))
+    o.addTriangle((+m,+n,-h),(+m,+n,+h),(-m,+n,+h))
     
-    o.addTriangle((-n,-n,-n),(+n,-n,-n),(-n,-n,+n))
-    o.addTriangle((+n,-n,-n),(+n,-n,+n),(-n,-n,+n))
+    o.addTriangle((-m,-n,-h),(+m,-n,-h),(-m,-n,+h))
+    o.addTriangle((+m,-n,-h),(+m,-n,+h),(-m,-n,+h))
 
     # top
-    o.addTriangle((-n,-n,+n),(-n,+n,+n),(+n,-n,+n))
-    o.addTriangle((+n,+n,+n),(-n,+n,+n),(+n,-n,+n))
+    o.addTriangle((-m,-n,+h),(-m,+n,+h),(+m,-n,+h))
+    o.addTriangle((+m,+n,+h),(-m,+n,+h),(+m,-n,+h))
         
     return o
     
 def test():
     o = stl.StlObject()
-    generateCube(o,(10,10,10),10)
+    generatePara(o,(10,10,10),10)
     if 1:
         strFilename = "generated.stl"
         o.saveToStl(strFilename)

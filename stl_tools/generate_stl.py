@@ -1,7 +1,7 @@
 import stl
 import view_stl_vtk
 
-def generatePara(o, center, size=10):
+def generateParaCenter(o, size=10):
     
     m = size//3
     n = size//2
@@ -31,7 +31,8 @@ def generatePara(o, center, size=10):
     
 def test():
     o = stl.StlObject()
-    generatePara(o,(10,10,10),10)
+    generateParaCenter(o,10)
+    #~ generatePara(o,(10,10,10),10)
     if 1:
         strFilename = "generated.stl"
         o.saveToStl(strFilename)

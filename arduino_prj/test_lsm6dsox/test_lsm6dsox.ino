@@ -91,6 +91,8 @@ void setup()
     sox2->printConfig();
   }
 #endif
+
+  delay(2000);
 }
 
 

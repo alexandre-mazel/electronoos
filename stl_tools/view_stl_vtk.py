@@ -79,13 +79,20 @@ def WriteCartouche(filename_generated, filename_original, nbr_faces = 0):
     #~ cv2.line( im, (leCart,toCart), (wi,toCart), black, 1 )
     #~ cv2.line( im, (leCart,toCart), (leCart,hi), black, 1 )
     
+    global nRotationConfig
+    text1 = ["Front","Right","Top"]
+    text2 = ["Front","Right","Bottom"]
+    text3 = ["Front","Right","Bottom"]
+    titless = [text1,text2,text3]
+    titles = titless[nRotationConfig%len(titless)]
+    
     if 1:
         # puttext front left ...
-        margin = 10
+        margin = 20
         hmargin = margin+20
-        cv2.putText( im, "Front",  ( 0+margin, 0+hmargin ), font, 1, fontColor, 1 ) #todo: write a '*' beside the name if camera or object has been moved!
-        cv2.putText( im, "Right",  ( 0+margin+wi//2, 0+hmargin ), font, 1, fontColor, 1 )
-        cv2.putText( im, "Top",  ( 0+margin, 0+hmargin+hi//2 ), font, 1, fontColor, 1 )
+        cv2.putText( im, titles[0],  ( 0+margin, 0+hmargin ), font, 1, fontColor, 1 ) #todo: write a '*' beside the name if camera or object has been moved!
+        cv2.putText( im, titles[1],  ( 0+margin+wi//2, 0+hmargin ), font, 1, fontColor, 1 )
+        cv2.putText( im, titles[2],  ( 0+margin, 0+hmargin+hi//2 ), font, 1, fontColor, 1 )
 
     strDateFile = getDate(os.path.getmtime(filename_original))
     strDateNow = getDate()
@@ -180,7 +187,8 @@ def WriteImage(fileName, renWin, rgba=True):
     writer.Write()
     print("INF: WriteImage: rendered image written to '%s'" % fileName)
     
-bRenderToFile = False            
+bRenderToFile = False      
+nRotationConfig = 0
 
 def showStl(filename, bAnimate=True, bDrawingTechnic = True):
     
@@ -200,6 +208,14 @@ def showStl(filename, bAnimate=True, bDrawingTechnic = True):
                 global bRenderToFile
                 bRenderToFile = True
                 print("rendering to file then Exiting!")
+                bExit = True
+                
+            if key == 'r' or key == 'f': # for Rotate or Flip
+                global nRotationConfig
+                nRotationConfig += 1
+                print("INF: rotation config is now: " + str(nRotationConfig))
+                #~ callback_func_animate(None,None)
+                showStl(filename,bAnimate=False,bDrawingTechnic=True)
                 bExit = True
                 
             if key == 'Escape':
@@ -281,19 +297,29 @@ def showStl(filename, bAnimate=True, bDrawingTechnic = True):
         ymins = [.5, .5, 0, 0]
         ymaxs = [1, 1,0.5, 0.5]
         # sympa pour des impressions a plat genre le logo gaia
-        rots =  (
+        rots1 =  (
                         (0,0,0),
                         (0,90,0),
-                        (90,0,0),
+                        (-90,0,0),
                         (30,-35,0),
                     )
         # plus respectueux de la maniere de les dessiner (par exemple scene des cuves du louvres)
-        rots =  (
+        rots2 =  (
                 (-90,0,0),
                 (-90,0,-90),
-                (0,0,0),
+                (0,0,0),      # (180,0,0),
                 (-40,0,-20),
             )
+            
+        rots3 =  (
+                (-90,0,0),
+                (-90,0,-90),
+                (180,0,0),
+                (-40,0,-20),
+            )
+            
+        rotsConfig = [rots2,rots3, rots1]
+        rots = rotsConfig[nRotationConfig%len(rotsConfig)]
         rBackgroundColor = 0.8
         for i in range(4):
             ren = vtkRenderer()
@@ -418,6 +444,7 @@ def showStl(filename, bAnimate=True, bDrawingTechnic = True):
         
         WriteCartouche( outfn, filename, nbr_faces = nbr_faces )
         # todo: write cartouche in 2nd pass using opencv2 !!!
+        exit(3)
 
 
 if __name__ == "__main__":
@@ -430,6 +457,7 @@ if __name__ == "__main__":
     #~ fn = "CameraFishEye_p1.stl"
     fn = "CameraFishEye_p2.stl"
     fn = "gaia_logo.stl"
+    fn = "spool_test.stl"
     if 0:
         WriteCartouche("gaia_logo_technical_drawing.png","gaia_logo.stl",123)
         exit(2)

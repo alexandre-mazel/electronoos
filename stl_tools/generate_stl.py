@@ -16,6 +16,10 @@ def generateCube(o, center, size=10):
     o.addTriangle((+n,+n,+n),(+n,+n,-n),(+n,-n,+n))
     
     o.addTriangle((-n,+n,-n),(+n,+n,-n),(-n,+n,+n))
+    o.addTriangle((+n,+n,-n),(+n,+n,+n),(-n,+n,+n))
+    
+    o.addTriangle((-n,-n,-n),(+n,-n,-n),(-n,-n,+n))
+    o.addTriangle((+n,-n,-n),(+n,-n,+n),(-n,-n,+n))
 
     # top
     o.addTriangle((-n,-n,+n),(-n,+n,+n),(+n,-n,+n))

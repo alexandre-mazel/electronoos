@@ -64,11 +64,12 @@ def isSamePoint(v1, v2, rEqualThreshold ):
 
 class StlTriangle:
     """
-    a list of triangles
-    """
-    def __init__( self ):
-        self.nv = (0., 0., 0. )
-        self.v = [ (0., 0., 0. ), (0., 0., 0. ), (0., 0., 0. ) ]
+    a simple triangle
+,     """
+    def __init__( self, p1 = (0.,0.,0.), p2 = (0.,0.,0.), p3 = (0.,0.,0.) ):
+        self.nv = (0., 0., 0. ) # the normal ?
+        #~ self.v = [ (0., 0., 0. ), (0., 0., 0. ), (0., 0., 0. ) ]
+        self.v = [ p1,p2,p3 ]
         self.attr = 0
         
     def __str__( self ):
@@ -166,7 +167,11 @@ class StlObject:
         
     def saveToStl( self, strFilename ):
         file = open( strFilename, "wb")
-        buf = ""
+        if sys.version_info[0] >= 3:
+            buf = b""
+        else:
+            buf = ""
+            
         buf += struct.pack( "80B", *((0,)*80) )
         buf += struct.pack( "I", len(self.aTriangles) )
         
@@ -178,6 +183,9 @@ class StlObject:
             
         file.write(buf)
         file.close()
+        
+    def addTriangle( self, p1,p2,p3):
+        self.aTriangles.append(StlTriangle(p1,p2,p3))
 # class StlObject - end
                         
 
@@ -380,4 +388,5 @@ if( __name__ == "__main__" ):
         splitStl( sys.argv[1], sys.argv[2] )
         
     #splitStl( "C:/Users/amazel/Downloads/PepperBackSmall(5).stl", "/tmp/t" )
-splitStl( "C:/Users/amazel/Downloads/Meuble SDB.stl", "/tmp/sdb" )    
+#~ splitStl( "C:/Users/amazel/Downloads/Meuble SDB.stl", "/tmp/sdb" )    
+#~ splitStl( "Meuble SDB.stl", "/tmp/sdb" )    

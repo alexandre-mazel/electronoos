@@ -338,6 +338,8 @@ class Game:
         self.bOpponentIsAi = 1 # turn to one to activate AI
         self.bOpponentIsAi = 0
         
+        self.bOpponentIsAiPlayer3 = 1
+        
         pg.font.init() # you have to call this at the start, 
                    # if you want to use this module.
         self.fontTitle = pg.font.SysFont('Comic Sans MS', 30)
@@ -376,11 +378,11 @@ class Game:
         self.effects.append(Effect(self.ws//2,self.hs//2,"Let's Fight !!!"))
         
         
-    def getCommandAI(self):
+    def getCommandAI(self,nNumAiPlayer):
         
         nFront = nTurn = bShoot = 0
         
-        playerAi = self.players[1]
+        playerAi = self.players[nNumAiPlayer]
         
         #
         # dodge missile
@@ -395,7 +397,7 @@ class Game:
                 nDistNearest = d
                 projNearest = proj
                 
-        if nDistNearest < 16000:
+        if nDistNearest < 6000:
             print("DBG: getCommandAI: proj near!")
             
             dx = projNearest.x - playerAi.x
@@ -421,16 +423,32 @@ class Game:
                 #~ if playerAi.vx > 0:
                     #~ nFront = -1
 
-        else:
+        #else:
+        if 1:
             #
-            #  chase other
+            #  chase other(s)
             #
             dx = self.players[0].x-playerAi.x
             dy = self.players[0].y-playerAi.y
             dist = dx*dx+dy*dy
+            
+            if len(self.players)>2:
+                nNumOtherHuman = 2
+                if nNumAiPlayer == nNumOtherHuman:
+                    nNumOtherHuman = 1
+                if not self.players[nNumOtherHuman].bDead:
+                    dx2 = self.players[nNumOtherHuman].x-playerAi.x
+                    dy2 = self.players[nNumOtherHuman].y-playerAi.y
+                    dist2 = dx2*dx2+dy2*dy2
+                    if dist2 < dist or self.players[0].bDead:
+                        dx = dx2
+                        dy = dy2
+                        dist = dist2
+                
+            
             #~ print("dist: %s" % dist )
             if dist < 80000:
-                if random.random()>0.95:
+                if random.random()>0.85:
                     print("shoot")
                     bShoot = 1
             else:
@@ -471,7 +489,7 @@ class Game:
             if not self.bEndOfGame:
                 # AI emulate keys:
                 # to rewrite: badly programmed
-                nFrontAI, nTurnAI,bShootAI = self.getCommandAI()
+                nFrontAI, nTurnAI,bShootAI = self.getCommandAI(1)
                 #~ print("nFrontAI, nTurnAI,bShootAI: %s,%s,%s" % (nFrontAI, nTurnAI,bShootAI) )
                 self.keypressed[listConfigKeys[1][0]] = 0
                 self.keypressed[listConfigKeys[1][1]] = 0
@@ -488,6 +506,29 @@ class Game:
                 if bShootAI == 1: 
                     # ugly: cut and paste! don't do that please
                     self.addProjectile(1)
+                    pg.mixer.Sound.play(self.sound_missile)
+                    
+        if self.bOpponentIsAiPlayer3:
+            if not self.bEndOfGame:
+                # AI emulate keys:
+                # to rewrite: badly programmed
+                nFrontAI, nTurnAI,bShootAI = self.getCommandAI(2)
+                #~ print("nFrontAI, nTurnAI,bShootAI: %s,%s,%s" % (nFrontAI, nTurnAI,bShootAI) )
+                self.keypressed[listConfigKeys[2][0]] = 0
+                self.keypressed[listConfigKeys[2][1]] = 0
+                if nFrontAI == 1: self.keypressed[listConfigKeys[2][0]] = 1
+                elif nFrontAI == -1: self.keypressed[listConfigKeys[2][1]] = 1
+
+                self.keypressed[listConfigKeys[2][2]] = 0
+                self.keypressed[listConfigKeys[2][3]] = 0
+                    
+                if nTurnAI == 1: self.keypressed[listConfigKeys[2][2]] = 1
+                elif nTurnAI == -1: self.keypressed[listConfigKeys[2][3]] = 1
+
+                
+                if bShootAI == 1: 
+                    # ugly: cut and paste! don't do that please
+                    self.addProjectile(2)
                     pg.mixer.Sound.play(self.sound_missile)
                     
                       

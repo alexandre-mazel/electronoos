@@ -452,7 +452,9 @@ if __name__ == "__main__":
     
     """
     print("Syntaxe: <scriptname> <stl_file>")
-    print("during rendering, press p, t or d to render to a file then exit")
+    print("during rendering:")
+    print( "\tpress 'p', 't' or 'd' to render to a file then exit")
+    print( "\tpress 'r' to rotate one config")
     fn = "MovingWeight_with_roller.stl"
     #~ fn = "CameraFishEye_p1.stl"
     fn = "CameraFishEye_p2.stl"

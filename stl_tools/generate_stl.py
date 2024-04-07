@@ -39,21 +39,29 @@ def generatePara(o, center, size=10):
        G---H
      /     / |
     E---F  |
-    |     |  |
-    | C---D
-    |/    |/
-    A---B
+    |     |  |     |   /
+    | C---D     z  x
+    |/    |/      | /
+    A---B       |--y--
     
     """
+    centx = center[0]
+    centy = center[1]
+    centz = center[2]
     
-    c = center
-    xa = c-m
-    xb = c-m
-    xc = c+m
+    xa = centx-m; ya = centy-n; za = centy-h
+    xb = centx-m; yb = centy+n; zb = centy-h
+    xc = centx+m; yc = centy-n; zc = centy-h
+    xd = centx+m; yd = centy+n; zd = centy-h
+    
+    xe = centx-m; ye = centy-n; ze = centy+h
+    xf = centx-m; yf = centy+n; zf = centy+h
+    xg = centx+m; yg = centy-n; zg = centy+h
+    xh = centx+m; yh = centy+n; zh = centy+h
 
     # bottom
-    o.addTriangle((xa,-n,-h),(xb,+n,-h),(xc,-n,-h))
-    o.addTriangle((+m,+n,-h),(-m,+n,-h),(+m,-n,-h))
+    o.addTriangle((xa,ya,za),(xb,yb,zb),(xc,yc,zc))
+    o.addTriangle((xd,yd,zd),(xb,yb,zb),(xc,yc,zc))
     
     o.addTriangle((-m,-n,-h),(-m,+n,-h),(-m,-n,+h))
     o.addTriangle((-m,+n,+h),(-m,+n,-h),(-m,-n,+h))
@@ -68,15 +76,15 @@ def generatePara(o, center, size=10):
     o.addTriangle((+m,-n,-h),(+m,-n,+h),(-m,-n,+h))
 
     # top
-    o.addTriangle((-m,-n,+h),(-m,+n,+h),(+m,-n,+h))
-    o.addTriangle((+m,+n,+h),(-m,+n,+h),(+m,-n,+h))
+    o.addTriangle((xe,ye,ze),(xf,yf,zf),(xg,yg,zg))
+    o.addTriangle((xh,yh,zh),(xf,yf,zf),(xg,yg,zg))
         
     return o
     
 def test():
     o = stl.StlObject()
-    generateParaCenter(o,10)
-    generatePara(o,(10,10,10),10)
+    #~ generateParaCenter(o,10)
+    generatePara(o,(30,20,10),10)
     if 1:
         strFilename = "generated.stl"
         o.saveToStl(strFilename)

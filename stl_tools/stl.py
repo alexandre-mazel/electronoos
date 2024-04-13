@@ -186,6 +186,11 @@ class StlObject:
         
     def addTriangle( self, p1,p2,p3):
         self.aTriangles.append(StlTriangle(p1,p2,p3))
+        
+    def addQuad( self, p1,p2,p3,p4):
+        self.aTriangles.append(StlTriangle(p1,p2,p3))
+        self.aTriangles.append(StlTriangle(p3,p1,p4))
+        
 # class StlObject - end
                         
 

@@ -84,9 +84,10 @@ def continuousSave():
         if not bIsImageEqual:
             img_prev = img
             name = "/scr/" + misctools.getFilenameFromTime() + ".png"
-            print( "INF: saving to '%s'" % name ) 
+            print( "INF: saving to '%s'..." % name )
             try:
                 img.save( name, 'PNG' )
+                print( "INF: saved" )
                 bipInform()
             except AttributeError as err:
                 print( "WRN: img.save: error: %s" % str(err))

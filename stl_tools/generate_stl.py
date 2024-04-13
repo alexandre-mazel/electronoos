@@ -99,12 +99,13 @@ def generateRing(o, center, hole_radius, disk_w, disk_h, rx=0, ry=0, rz=0, circ 
     """
     a cylinder with a hole in it.
     the base is in the Oxy plane (Ox is the seg=0 axis)(ou alors c'est Oy)
-    - alpha and beta: angle of the radial axis.
-        - rx: rotation around x axis(degrees)
-        - ry: ...
-        - rz: ... applied first (decay of seg)
-        - circ: put less than 2pi to limit the completness of the ring
+    
+    - rx: rotation around x axis (degrees)
+    - ry: ...
+    - rz: ... applied first (decay of seg)
+    - circ: put less than 2pi to limit the completness of the ring (in rad!)
     - disk_w: width of disk
+    
     """
     disk_h /= 2 # offset around center
     
@@ -114,6 +115,7 @@ def generateRing(o, center, hole_radius, disk_w, disk_h, rx=0, ry=0, rz=0, circ 
     rx = rx *pi/180
     ry = ry *pi/180
     rz = rz *pi/180
+
     
     while seg < circ:
         d1 = hole_radius
@@ -220,9 +222,10 @@ def test():
         generateParaCentered(o)
         generatePara(o,(0,0,5),(10,20,10))
         generatePara(o,(0,0,15),(4,2,10))
+        
     if 0:
         generateRing(o,(3,5,0),5,10,20)
-        generateRing(o,(10,10,-10),5,10,20)
+        #~ generateRing(o,(10,10,-10),5,10,20)
         #~ generateRing(o,(5,5,32),2,11,23,rz=15,circ=pi*4/3)
         generateRing(o,(0,0,30),2,11,23,rx=25,circ=pi*21/12)
         generateRing(o,(0,0,60),2,11,23,rx=45,circ=pi*4/3)
@@ -239,6 +242,7 @@ def test():
         # une rotation de papier toilette
         for i in range(7):
             generateRing(o,(3,5,i*22),5,10,20,rx=i*15)
+            generateRing(o,(3,5,-i*22),5,10,20,rx=i*15,ry=i*15)
     
     
     if 1:

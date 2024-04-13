@@ -118,10 +118,10 @@ def generateRing(o, center, hole_radius, disk_w, disk_h, rx=0, ry=0, rz = 0, cir
     while seg < circ:
         d1 = hole_radius
         d2 = hole_radius+disk_w
-        p1 = center[0]+d1*cos(seg+rz)*cos(rx)*cos(ry)-disk_h*sin(rx), center[1]+d1*sin(seg+rz)*cos(rx)*cos(ry),center[2]-disk_h*sin(rx)*sin(ry)
-        p2 = center[0]+d2*cos(seg+rz)*cos(rx)*cos(ry), center[1]+d2*sin(seg+rz)*cos(rx)*cos(ry),center[2]-disk_h*sin(rx)*sin(ry)
-        p3 = center[0]+d1*cos(seg+rz+step)*cos(rx)*cos(ry), center[1]+d1*sin(seg+rz+step)*cos(rx)*cos(ry),center[2]-disk_h*sin(rx)*sin(ry)
-        p4 = center[0]+d2*cos(seg+rz+step)*cos(rx)*cos(ry), center[1]+d2*sin(seg+rz+step)*cos(rx)*cos(ry),center[2]-disk_h*sin(rx)*sin(ry)
+        p1 = center[0]+d1*cos(seg+rz), center[1]+d1*sin(seg+rz),center[2]-disk_h
+        p2 = center[0]+d2*cos(seg+rz), center[1]+d2*sin(seg+rz),center[2]-disk_h
+        p3 = center[0]+d1*cos(seg+rz+step), center[1]+d1*sin(seg+rz+step),center[2]-disk_h
+        p4 = center[0]+d2*cos(seg+rz+step), center[1]+d2*sin(seg+rz+step),center[2]-disk_h
         
         #~ p1 = p1[0]*cos(rx)*cos(ry), p1[1]*cos(rx)*cos(ry), p1[2]*sin(rx)*sin(ry)
         #~ p2 = p2[0]*cos(rx)*cos(ry), p2[1]*cos(rx)*cos(ry), p2[2]*sin(rx)*sin(ry)

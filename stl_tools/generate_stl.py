@@ -94,6 +94,97 @@ def generatePara(o, center, size):
     return o
     
 # generatePara - end
+
+def generateParaRot(o, center, size, rx=0, ry=0, rz=0):
+    centx = center[0]
+    centy = center[1]
+    centz = center[2]
+    
+    m = size[0]/2
+    n = size[1]/2
+    h = size[2]/2
+    
+    rx = rx *pi/180
+    ry = ry *pi/180
+    rz = rz *pi/180
+    
+    xa = -m; ya = -n; za = -h
+    xb = -m; yb = +n; zb = -h
+    xc = +m; yc = -n; zc = -h
+    xd = +m; yd = +n; zd = -h
+    
+    xe = -m; ye = -n; ze = +h
+    xf = -m; yf = +n; zf = +h
+    xg = +m; yg = -n; zg = +h
+    xh = +m; yh = +n; zh = +h
+    
+    # rotx
+    xa = xa*cos(rx)-za*sin(rx); za = za*cos(rx)+xa*sin(rx)
+    xb = xb*cos(rx)-zb*sin(rx); zb = zb*cos(rx)+xb*sin(rx)
+    xc = xc*cos(rx)-zc*sin(rx); zc = zc*cos(rx)+xc*sin(rx)
+    xd = xd*cos(rx)-zd*sin(rx); zd = zd*cos(rx)+xd*sin(rx)
+
+    #roty
+    ya = ya*cos(ry)-za*sin(ry); za = za*cos(ry)+ya*sin(ry)
+    yb = yb*cos(ry)-zb*sin(ry); zb = zb*cos(ry)+yb*sin(ry)
+    yc = yc*cos(ry)-zc*sin(ry); zc = zc*cos(ry)+yc*sin(ry)
+    yd = yd*cos(ry)-zd*sin(ry); zd = zd*cos(ry)+yd*sin(ry)
+    
+    #offset
+    xa += centx; ya += centy; za += centz
+    xb += centx; yb += centy; zb += centz
+    xc += centx; yc += centy; zc += centz
+    xd += centx; yd += centy; zd += centz
+    
+    
+    
+    # rotx
+    xe = xe*cos(rx)-ze*sin(rx); ze = ze*cos(rx)+xe*sin(rx)
+    xf = xf*cos(rx)-zf*sin(rx); zf = zf*cos(rx)+xf*sin(rx)
+    xg = xg*cos(rx)-zg*sin(rx); zg = zg*cos(rx)+xg*sin(rx)
+    xh = xh*cos(rx)-zh*sin(rx); zh = zh*cos(rx)+xh*sin(rx)
+    
+    #roty
+    ye = ye*cos(ry)-ze*sin(ry); ze = ze*cos(ry)+ye*sin(ry)
+    yf = yf*cos(ry)-zf*sin(ry); zf = zf*cos(ry)+yf*sin(ry)
+    yg = yg*cos(ry)-zg*sin(ry); zg = zg*cos(ry)+yg*sin(ry)
+    yh = yh*cos(ry)-zh*sin(ry); zh = zh*cos(ry)+yh*sin(ry)
+    
+    #offset
+    xe += centx; ye += centy; ze += centz
+    xf += centx; yf += centy; zf += centz
+    xg += centx; yg += centy; zg += centz
+    xh += centx; yh += centy; zh += centz
+
+
+    a = (xa,ya,za)
+    b = (xb,yb,zb)
+    c = (xc,yc,zc)
+    d = (xd,yd,zd)
+    e = (xe,ye,ze)
+    f = (xf,yf,zf)
+    g = (xg,yg,zg)
+    h = (xh,yh,zh)
+    
+    # bottom
+    o.addTriangle(a,b,c)
+    o.addTriangle(d,b,c)
+    
+    o.addTriangle(a,c,e)
+    o.addTriangle(c,e,g)
+    
+    o.addTriangle(b,d,f)
+    o.addTriangle(d,f,h)
+    
+    o.addTriangle(a,b,e)
+    o.addTriangle(b,e,f)
+    
+    o.addTriangle(c,d,h)
+    o.addTriangle(c,h,g)
+
+    # top
+    o.addTriangle(e,f,g)
+    o.addTriangle(h,f,g)
     
 def generateRing(o, center, hole_radius, disk_w, disk_h, rx=0, ry=0, rz=0, circ = 2*pi ):
     """
@@ -109,7 +200,7 @@ def generateRing(o, center, hole_radius, disk_w, disk_h, rx=0, ry=0, rz=0, circ 
     """
     disk_h /= 2 # offset around center
     
-    step = pi/12
+    step = pi/128
     seg = 0 # advancing in the disk
     
     rx = rx *pi/180
@@ -238,11 +329,19 @@ def test():
         for i in range(5):
             generateRing(o,(3,5,i*22),5,10,20)
             
-    if 1:
+    if 0:
         # une rotation de papier toilette
         for i in range(7):
             generateRing(o,(3,5,i*22),5,10,20,rx=i*15)
             generateRing(o,(3,5,-i*22),5,10,20,rx=i*15,ry=i*15)
+            
+    if 1:
+        # la piece pour Vincent
+        width = 20
+        #~ generateRing(o,(0,0,0),60,disk_w=4,disk_h=width,rx=0,ry=90,rz=30,circ=1*pi/3)
+        generateParaRot(o,(0,0,0),(4,width,10),rx=0)
+        generateParaRot(o,(0,0,0),(4,width,10),rx=45)
+        generateParaRot(o,(0,0,0),(4,width,10),rx=90)
     
     
     if 1:

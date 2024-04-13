@@ -191,6 +191,13 @@ class StlObject:
         self.aTriangles.append(StlTriangle(p1,p2,p3))
         self.aTriangles.append(StlTriangle(p3,p1,p4))
         
+    def move( self, offset ):
+        for k in range(len(self.aTriangles)):
+            for j in range(3):
+                #~ for i in range(3):
+                    #~ self.aTriangles[k].v[j][i] += offset[i]
+                    self.aTriangles[k].v[j] = self.aTriangles[k].v[j][0] + offset[0],self.aTriangles[k].v[j][1] + offset[1], self.aTriangles[k].v[j][2] + offset[2]
+        
 # class StlObject - end
                         
 

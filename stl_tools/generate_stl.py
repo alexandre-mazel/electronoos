@@ -307,14 +307,18 @@ def generateRing(o, center, hole_radius, disk_w, disk_h, rx=0, ry=0, rz=0, circ 
 
 def generateBlangle(o,thick, width, diam, lenborder, angle_racle = 0 ):
     # la piece pour Vincent
+    
+    diam /= 2
     generateRing(o,(0,-width/3,0),diam,disk_w=thick,disk_h=width/3,rx=0,ry=90,rz=30,circ=1*pi/3)
     generateRing(o,(0,width/3,0),diam,disk_w=thick,disk_h=width/3,rx=0,ry=90,rz=30,circ=1*pi/3)
     #~ generateParaRot(o,(0,0,0),(4,width,10),rx=0)
     a = 30*pi/180
     diam += lenborder/2
     cx,cy,cz = diam*cos(a),0,diam*sin(a)
+    ztopbarreau = (diam-thick/2+width/2)*cos(a)
+    ztopbarreau = diam-thick/2
     generateParaRot(o,(cx,cy,cz),(2,width,lenborder),rx=-60+angle_racle)
-    generateParaRot(o,(0,cy,cx+thick*1.666),(thick,width,lenborder),rx=90)
+    generateParaRot(o,(0,cy,ztopbarreau),(thick,width,lenborder),rx=90)
     #~ generateParaRot(o,(0,0,0),(4,width,10),rx=90)
     return o
     
@@ -349,9 +353,9 @@ def test():
             
     if 1:
         # la piece pour Vincent
-        generateBlangle(o, thick=4, width = 20, diam = 60, lenborder=8)
+        generateBlangle(o, thick=4, width = 20, diam = 120, lenborder=8)
         o.move((0,30,0))
-        generateBlangle(o, thick=4, width = 20, diam = 60, lenborder=8, angle_racle=-20)
+        generateBlangle(o, thick=4, width = 20, diam = 160, lenborder=8, angle_racle=-20)
     
     
     if 1:

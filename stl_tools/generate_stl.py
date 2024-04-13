@@ -341,12 +341,16 @@ def test():
         thick = 4
         width = 20
         diam = 60
-        generateRing(o,(0,0,0),diam,disk_w=thick,disk_h=width,rx=0,ry=90,rz=30,circ=1*pi/3)
+        generateRing(o,(0,-width/3,0),diam,disk_w=thick,disk_h=width/3,rx=0,ry=90,rz=30,circ=1*pi/3)
+        generateRing(o,(0,width/3,0),diam,disk_w=thick,disk_h=width/3,rx=0,ry=90,rz=30,circ=1*pi/3)
         #~ generateParaRot(o,(0,0,0),(4,width,10),rx=0)
         a = 30*pi/180
-        diam += thick
+        lenborder = 8
+        diam += lenborder/2
         cx,cy,cz = diam*cos(a),0,diam*sin(a)
-        generateParaRot(o,(cx,cy,cz),(2,width,8),rx=-60)
+        angle_racle=0
+        generateParaRot(o,(cx,cy,cz),(2,width,lenborder),rx=-60+angle_racle)
+        generateParaRot(o,(0,cy,cx+thick*1.666),(thick,width,lenborder),rx=90)
         #~ generateParaRot(o,(0,0,0),(4,width,10),rx=90)
     
     

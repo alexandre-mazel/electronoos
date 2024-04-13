@@ -119,16 +119,17 @@ def generateParaRot(o, center, size, rx=0, ry=0, rz=0):
     xh = +m; yh = +n; zh = +h
     
     # rotx
-    xa = xa*cos(rx)-za*sin(rx); za = za*cos(rx)+xa*sin(rx)
-    xb = xb*cos(rx)-zb*sin(rx); zb = zb*cos(rx)+xb*sin(rx)
-    xc = xc*cos(rx)-zc*sin(rx); zc = zc*cos(rx)+xc*sin(rx)
-    xd = xd*cos(rx)-zd*sin(rx); zd = zd*cos(rx)+xd*sin(rx)
+    # xa = xa*cos(rx)-za*sin(rx); za=za*cos(rx)+xa*sin(rx) # NB: don't change za before doing both computation
+    xa,za = xa*cos(rx)-za*sin(rx), za*cos(rx)+xa*sin(rx)
+    xb,zb = xb*cos(rx)-zb*sin(rx), zb*cos(rx)+xb*sin(rx)
+    xc,zc = xc*cos(rx)-zc*sin(rx), zc*cos(rx)+xc*sin(rx)
+    xd,zd = xd*cos(rx)-zd*sin(rx), zd*cos(rx)+xd*sin(rx)
 
     #roty
-    ya = ya*cos(ry)-za*sin(ry); za = za*cos(ry)+ya*sin(ry)
-    yb = yb*cos(ry)-zb*sin(ry); zb = zb*cos(ry)+yb*sin(ry)
-    yc = yc*cos(ry)-zc*sin(ry); zc = zc*cos(ry)+yc*sin(ry)
-    yd = yd*cos(ry)-zd*sin(ry); zd = zd*cos(ry)+yd*sin(ry)
+    ya,za = ya*cos(ry)-za*sin(ry), za*cos(ry)+ya*sin(ry)
+    yb,zb = yb*cos(ry)-zb*sin(ry), zb*cos(ry)+yb*sin(ry)
+    yc,zc = yc*cos(ry)-zc*sin(ry), zc*cos(ry)+yc*sin(ry)
+    yd,zc = yd*cos(ry)-zd*sin(ry), zd*cos(ry)+yd*sin(ry)
     
     #offset
     xa += centx; ya += centy; za += centz
@@ -139,16 +140,16 @@ def generateParaRot(o, center, size, rx=0, ry=0, rz=0):
     
     
     # rotx
-    xe = xe*cos(rx)-ze*sin(rx); ze = ze*cos(rx)+xe*sin(rx)
-    xf = xf*cos(rx)-zf*sin(rx); zf = zf*cos(rx)+xf*sin(rx)
-    xg = xg*cos(rx)-zg*sin(rx); zg = zg*cos(rx)+xg*sin(rx)
-    xh = xh*cos(rx)-zh*sin(rx); zh = zh*cos(rx)+xh*sin(rx)
+    xe,ze = xe*cos(rx)-ze*sin(rx), ze*cos(rx)+xe*sin(rx)
+    xf,zf = xf*cos(rx)-zf*sin(rx), zf*cos(rx)+xf*sin(rx)
+    xg,zg = xg*cos(rx)-zg*sin(rx), zg*cos(rx)+xg*sin(rx)
+    xh,zh = xh*cos(rx)-zh*sin(rx), zh*cos(rx)+xh*sin(rx)
     
     #roty
-    ye = ye*cos(ry)-ze*sin(ry); ze = ze*cos(ry)+ye*sin(ry)
-    yf = yf*cos(ry)-zf*sin(ry); zf = zf*cos(ry)+yf*sin(ry)
-    yg = yg*cos(ry)-zg*sin(ry); zg = zg*cos(ry)+yg*sin(ry)
-    yh = yh*cos(ry)-zh*sin(ry); zh = zh*cos(ry)+yh*sin(ry)
+    ye,ze = ye*cos(ry)-ze*sin(ry), ze*cos(ry)+ye*sin(ry)
+    yf,zf = yf*cos(ry)-zf*sin(ry), zf*cos(ry)+yf*sin(ry)
+    yg,zg = yg*cos(ry)-zg*sin(ry), zg*cos(ry)+yg*sin(ry)
+    yh,zh = yh*cos(ry)-zh*sin(ry), zh*cos(ry)+yh*sin(ry)
     
     #offset
     xe += centx; ye += centy; ze += centz
@@ -337,11 +338,16 @@ def test():
             
     if 1:
         # la piece pour Vincent
+        thick = 4
         width = 20
-        #~ generateRing(o,(0,0,0),60,disk_w=4,disk_h=width,rx=0,ry=90,rz=30,circ=1*pi/3)
-        generateParaRot(o,(0,0,0),(4,width,10),rx=0)
-        generateParaRot(o,(0,0,0),(4,width,10),rx=45)
-        generateParaRot(o,(0,0,0),(4,width,10),rx=90)
+        diam = 60
+        generateRing(o,(0,0,0),diam,disk_w=thick,disk_h=width,rx=0,ry=90,rz=30,circ=1*pi/3)
+        #~ generateParaRot(o,(0,0,0),(4,width,10),rx=0)
+        a = 30*pi/180
+        diam += thick
+        cx,cy,cz = diam*cos(a),0,diam*sin(a)
+        generateParaRot(o,(cx,cy,cz),(2,width,8),rx=-60)
+        #~ generateParaRot(o,(0,0,0),(4,width,10),rx=90)
     
     
     if 1:

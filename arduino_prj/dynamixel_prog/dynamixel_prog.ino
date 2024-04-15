@@ -30,6 +30,11 @@
   const int32_t buad[MAX_BAUD] = {9600, 57600, 115200, 1000000}; // default for 430 is 57600
 #endif
 
+#define nMotorBaudRate 1000000
+#define nMotorProtocol 1
+
+const int nMotorId = 46;
+
 
 Dynamixel2Arduino dxl(DXL_SERIAL, DXL_DIR_PIN);
 
@@ -40,70 +45,38 @@ void setup() {
   
   // Use UART port of DYNAMIXEL Shield to debug.
   DEBUG_SERIAL.begin(115200);   //set debugging port baudrate to 115200bps
-  while(!DEBUG_SERIAL);         //Wait until the serial port is opened
-
-    
-  for(int8_t protocol = 1; protocol < 2; protocol++) {
-    // Set Port Protocol Version. This has to match with DYNAMIXEL protocol version.
-
-    DEBUG_SERIAL.print("Serial: ");
-    DEBUG_SERIAL.println(Serial);
-
-  //  DEBUG_SERIAL.print("Serial1: ");
-  //  DEBUG_SERIAL.println(Serial1);
-
-    DEBUG_SERIAL.print("DXL_SERIAL: ");
-    DEBUG_SERIAL.println(DXL_SERIAL);
+  //while(!DEBUG_SERIAL);         //Wait until the serial port is opened
 
 
-    DEBUG_SERIAL.print("DXL_DIR_PIN: ");
-    DEBUG_SERIAL.println(DXL_DIR_PIN);
+  dxl.setPortProtocolVersion((float)nMotorProtocol);
+  DEBUG_SERIAL.print("SCAN PROTOCOL ");
+  DEBUG_SERIAL.println(nMotorProtocol);
 
-    dxl.setPortProtocolVersion((float)protocol);
-    DEBUG_SERIAL.print("SCAN PROTOCOL ");
-    DEBUG_SERIAL.println(protocol);
-    
-    for(index = 3; index < MAX_BAUD; index++) {
-      // Set Port baudrate.
-      DEBUG_SERIAL.print("SCAN BAUDRATE ");
-      DEBUG_SERIAL.println(buad[index]);
-      dxl.begin(buad[index]);
-      for(int id = 46; id < 47; id++) {
-        //iterate until all ID in each buadrate is scanned.
-        //DEBUG_SERIAL.println(id);
-        if(dxl.ping(id)) {
+  DEBUG_SERIAL.print("SCAN BAUDRATE ");
+  DEBUG_SERIAL.println(nMotorBaudRate);
+  dxl.begin(nMotorBaudRate);
 
-          dxl.torqueOff(id);
-          dxl.setOperatingMode(id, OP_POSITION);
-          dxl.setOperatingMode(id, OP_VELOCITY);
-          dxl.torqueOn(id);
-          dxl.setGoalVelocity(id, 100, UNIT_PERCENT);
+  dxl.torqueOff(nMotorId);
+  dxl.setOperatingMode(nMotorId, OP_POSITION);
+  dxl.setOperatingMode(nMotorId, OP_VELOCITY);
+  dxl.torqueOn(nMotorId);
+  dxl.setGoalVelocity(nMotorId, 100, UNIT_PERCENT);
 
-          for(int i = 0; i < 60; ++i)
-          {
-            dxl.ledOn(id);
-            delay(500);
-            dxl.ledOff(id);
-            delay(500);
-          }
-
-          dxl.setGoalVelocity(id, 0, UNIT_PERCENT);
-          dxl.torqueOff(id);
-          
-          DEBUG_SERIAL.print("ID: ");
-          DEBUG_SERIAL.print(id);
-          DEBUG_SERIAL.print(", Model Number: ");
-          DEBUG_SERIAL.println(dxl.getModelNumber(id));
-          found_dynamixel++;
-        }
-      }
-    }
+  for(int i = 0; i < 60; ++i)
+  {
+    dxl.ledOn(nMotorId);
+    delay(500);
+    dxl.ledOff(nMotorId);
+    delay(500);
   }
-  
-  DEBUG_SERIAL.print("Total ");
-  DEBUG_SERIAL.print(found_dynamixel);
-  DEBUG_SERIAL.println(" DYNAMIXEL(s) found!");
-  
+
+  dxl.setGoalVelocity(nMotorId, 0, UNIT_PERCENT);
+  dxl.torqueOff(nMotorId);
+
+  DEBUG_SERIAL.print("ID: ");
+  DEBUG_SERIAL.print(nMotorId);
+  DEBUG_SERIAL.print(", Model Number: ");
+  DEBUG_SERIAL.println(dxl.getModelNumber(nMotorId));
 }
 
 void loop() {

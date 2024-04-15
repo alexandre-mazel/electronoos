@@ -62,6 +62,7 @@ void setup() {
   dxl.torqueOn(nMotorId);
   dxl.setGoalVelocity(nMotorId, 100, UNIT_PERCENT);
 
+
   for(int i = 0; i < 60; ++i)
   {
     dxl.ledOn(nMotorId);

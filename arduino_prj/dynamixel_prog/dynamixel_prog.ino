@@ -43,7 +43,7 @@ void setup() {
   while(!DEBUG_SERIAL);         //Wait until the serial port is opened
 
     
-  for(int8_t protocol = 1; protocol < 3; protocol++) {
+  for(int8_t protocol = 1; protocol < 2; protocol++) {
     // Set Port Protocol Version. This has to match with DYNAMIXEL protocol version.
 
     DEBUG_SERIAL.print("Serial: ");
@@ -63,12 +63,12 @@ void setup() {
     DEBUG_SERIAL.print("SCAN PROTOCOL ");
     DEBUG_SERIAL.println(protocol);
     
-    for(index = 0; index < MAX_BAUD; index++) {
+    for(index = 3; index < MAX_BAUD; index++) {
       // Set Port baudrate.
       DEBUG_SERIAL.print("SCAN BAUDRATE ");
       DEBUG_SERIAL.println(buad[index]);
       dxl.begin(buad[index]);
-      for(int id = 0; id < DXL_BROADCAST_ID; id++) {
+      for(int id = 46; id < 47; id++) {
         //iterate until all ID in each buadrate is scanned.
         //DEBUG_SERIAL.println(id);
         if(dxl.ping(id)) {
@@ -77,9 +77,9 @@ void setup() {
           dxl.setOperatingMode(id, OP_POSITION);
           dxl.setOperatingMode(id, OP_VELOCITY);
           dxl.torqueOn(id);
-          dxl.setGoalVelocity(id, 10, UNIT_PERCENT);
+          dxl.setGoalVelocity(id, 100, UNIT_PERCENT);
 
-          for(int i = 0; i < 3; ++i)
+          for(int i = 0; i < 60; ++i)
           {
             dxl.ledOn(id);
             delay(500);

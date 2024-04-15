@@ -340,7 +340,7 @@ def test():
         generateRing(o,(0,0,120),2,11,23,ry=45,circ=pi*4/3)
         generateRing(o,(0,0,150),2,11,23,rx=45,ry=45,circ=pi*4/3)
         
-    if 0:
+    if 1:
         # une pile de papier toilette
         for i in range(5):
             generateRing(o,(3,5,i*22),5,10,20)
@@ -351,7 +351,7 @@ def test():
             generateRing(o,(3,5,i*22),5,10,20,rx=i*15)
             generateRing(o,(3,5,-i*22),5,10,20,rx=i*15,ry=i*15)
             
-    if 1:
+    if 0:
         # la piece pour Vincent
         generateBlangle(o, thick=4, width = 20, diam = 120, lenborder=8)
         o.move((0,30,0))

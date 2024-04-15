@@ -35,6 +35,12 @@
 
 const int nMotorId = 46;
 
+#define REG_MAX_TORQUE_LBITS 0X0E
+#define REG_MAX_TORQUE_HBITS 0X0F
+
+#define REG_CW_COMPLIANCE_MARGIN 0X1A
+#define REG_CCW_COMPLIANCE_MARGIN 0X1B
+
 #define REG_TORQUE_ENABLE 0X18
 #define REG_CW_COMPLIANCE_MARGIN 0X1A
 #define REG_CCW_COMPLIANCE_MARGIN 0X1B
@@ -42,8 +48,8 @@ const int nMotorId = 46;
 #define REG_MOVING_SPEED_LBITS 0X20
 #define REG_MOVING_SPEED_HBITS 0X21
 
-#define REG_MAX_TORQUE_LBITS 0X22
-#define REG_MAX_TORQUE_HBITS 0X23
+#define REG_TORQUE_LIMIT_LBITS 0X22
+#define REG_TORQUE_LIMIT_HBITS 0X23
 
 
 Dynamixel2Arduino dxl(DXL_SERIAL, DXL_DIR_PIN);
@@ -105,9 +111,9 @@ void setup() {
     dxl.torqueOff(nMotorId);
   }
 
-  if(1)
+  if(0)
   {
-    // very slow move
+    // very slow move ping pong
     dxl.torqueOff(nMotorId);
     dxl.setOperatingMode(nMotorId, OP_VELOCITY);
     dxl.torqueOn(nMotorId);
@@ -138,23 +144,26 @@ void setup() {
     dxl.writeControlTableItem(REG_MAX_TORQUE_LBITS, nMotorId, 0);
 
     // Set Goal Current 3.0% using percentage (-100.0 [%] ~ 100.0[%])
-    dxl.setGoalCurrent(nMotorId, 5.0, UNIT_PERCENT);
+    dxl.setGoalCurrent(nMotorId, 1.0, UNIT_PERCENT);
     dxl.setGoalPosition(nMotorId, +180.0, UNIT_DEGREE);
     dxl.writeControlTableItem(REG_TORQUE_ENABLE, nMotorId, 1);
-    dxl.writeControlTableItem(REG_MAX_TORQUE_HBITS, nMotorId, 0);
-    dxl.writeControlTableItem(REG_MAX_TORQUE_LBITS, nMotorId, 0x01); // moves with 1 and not with 0
+    dxl.writeControlTableItem(REG_TORQUE_LIMIT_HBITS, nMotorId, 0);
+    dxl.writeControlTableItem(REG_TORQUE_LIMIT_LBITS, nMotorId, 0x01); // moves with 1 and not with 0
     dxl.writeControlTableItem(REG_CW_COMPLIANCE_MARGIN, nMotorId, 0x7F);
     dxl.writeControlTableItem(REG_CCW_COMPLIANCE_MARGIN, nMotorId, 0x7F);
 
     dxl.writeControlTableItem(REG_MOVING_SPEED_HBITS, nMotorId, 0x0);
     dxl.writeControlTableItem(REG_MOVING_SPEED_LBITS, nMotorId, 0x1);
 
+    dxl.writeControlTableItem(REG_MAX_TORQUE_HBITS, nMotorId, 0);
+    dxl.writeControlTableItem(REG_MAX_TORQUE_LBITS, nMotorId, 0x01); // ne change rien, even with 0
+
     delay(2000);
 
     dxl.setGoalPosition(nMotorId, +0.0, UNIT_DEGREE);
     delay(2000);
 
-    dxl.setGoalCurrent(nMotorId, -5.0, UNIT_PERCENT);
+    //dxl.setGoalCurrent(nMotorId, -5.0, UNIT_PERCENT);
     dxl.setGoalPosition(nMotorId, -180.0, UNIT_DEGREE);
     delay(2000);
 
@@ -171,6 +180,23 @@ void setup() {
     // Set Goal Current 3.0% using percentage (-100.0 [%] ~ 100.0[%])
     dxl.setGoalCurrent(nMotorId, -50.0, UNIT_PERCENT);
     delay(2000);
+
+    dxl.torqueOff(nMotorId);
+  }
+
+  if(0)
+  {
+    dxl.torqueOff(nMotorId);
+    dxl.setOperatingMode(nMotorId, OP_PWM);
+    dxl.torqueOn(nMotorId);
+
+    for(int i = 0; i < 2000; ++i)
+    {
+      dxl.setGoalPWM(nMotorId, 100.0, UNIT_PERCENT);
+      delayMicroseconds(500);
+      dxl.setGoalPWM(nMotorId, 0.0, UNIT_PERCENT);
+      delayMicroseconds(500);
+    }
 
     dxl.torqueOff(nMotorId);
   }

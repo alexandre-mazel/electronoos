@@ -91,6 +91,22 @@ void setup() {
   }
   if(1)
   {
+    // fast ping pong
+    dxl.torqueOff(nMotorId);
+    dxl.setOperatingMode(nMotorId, OP_VELOCITY);
+    dxl.torqueOn(nMotorId);
+    dxl.setGoalVelocity(nMotorId, 100, UNIT_PERCENT);
+    delay(2000);
+    //dxl.setGoalVelocity(nMotorId, -10, UNIT_PERCENT); // WRN: bug in the lib for protocol 1 wirh negative values
+    dxl.setGoalVelocity(nMotorId, 1023, UNIT_RAW); // 50: very slow reverse, 1023: fast reverse, 1074: slow straight, 2047: fast straight
+    delay(2000);
+    //dxl.setGoalVelocity(nMotorId, 0, UNIT_PERCENT);
+    //delay(2000);
+    dxl.torqueOff(nMotorId);
+  }
+
+  if(1)
+  {
     // very slow move
     dxl.torqueOff(nMotorId);
     dxl.setOperatingMode(nMotorId, OP_VELOCITY);

@@ -56,23 +56,68 @@ void setup() {
   DEBUG_SERIAL.println(nMotorBaudRate);
   dxl.begin(nMotorBaudRate);
 
-  dxl.torqueOff(nMotorId);
-  dxl.setOperatingMode(nMotorId, OP_POSITION);
-  dxl.setOperatingMode(nMotorId, OP_VELOCITY);
-  dxl.torqueOn(nMotorId);
-  dxl.setGoalVelocity(nMotorId, 100, UNIT_PERCENT);
-
-
-  for(int i = 0; i < 60; ++i)
+  if(0)
   {
-    dxl.ledOn(nMotorId);
-    delay(500);
-    dxl.ledOff(nMotorId);
-    delay(500);
+    dxl.torqueOff(nMotorId);
+    dxl.setOperatingMode(nMotorId, OP_POSITION);
+    dxl.setOperatingMode(nMotorId, OP_VELOCITY);
+    dxl.torqueOn(nMotorId);
+    dxl.setGoalVelocity(nMotorId, 100, UNIT_PERCENT);
+
+    int nNbrLoop = 60; // 60 sec
+    nNbrLoop = 2;
+    for(int i = 0; i < nNbrLoop; ++i)
+    {
+      dxl.ledOn(nMotorId);
+      delay(500);
+      dxl.ledOff(nMotorId);
+      delay(500);
+    }
+
+    dxl.setGoalVelocity(nMotorId, 0, UNIT_PERCENT);
+    dxl.torqueOff(nMotorId);
+
+    delay(2000);
+  }
+  if(1)
+  {
+    dxl.torqueOff(nMotorId);
+    //dxl.setOperatingMode(nMotorId, OP_POSITION); // moves
+    //dxl.setOperatingMode(nMotorId, OP_EXTENDED_POSITION); // moves
+    //dxl.setOperatingMode(nMotorId, OP_CURRENT_BASED_POSITION); // moves
+    //dxl.setOperatingMode(nMotorId, OP_VELOCITY); // no moves (as we don't send velocity order)
+    //dxl.setOperatingMode(nMotorId, OP_CURRENT); // no moves (not available in ax12a ?)
+    
+    dxl.torqueOn(nMotorId);
+
+    // Set Goal Current 3.0% using percentage (-100.0 [%] ~ 100.0[%])
+    dxl.setGoalCurrent(nMotorId, 50.0, UNIT_PERCENT);
+    dxl.setGoalPosition(nMotorId, +180.0, UNIT_DEGREE);
+    delay(2000);
+
+    dxl.setGoalPosition(nMotorId, +0.0, UNIT_DEGREE);
+    delay(2000);
+
+    dxl.setGoalCurrent(nMotorId, -50.0, UNIT_PERCENT);
+    dxl.setGoalPosition(nMotorId, -180.0, UNIT_DEGREE);
+    delay(2000);
+
+    dxl.torqueOff(nMotorId);
   }
 
-  dxl.setGoalVelocity(nMotorId, 0, UNIT_PERCENT);
-  dxl.torqueOff(nMotorId);
+  if(0)
+  {
+    // fonctionne pas sur ax12a
+    dxl.torqueOff(nMotorId);
+    dxl.setOperatingMode(nMotorId, OP_CURRENT);
+    dxl.torqueOn(nMotorId);
+
+    // Set Goal Current 3.0% using percentage (-100.0 [%] ~ 100.0[%])
+    dxl.setGoalCurrent(nMotorId, -50.0, UNIT_PERCENT);
+    delay(2000);
+
+    dxl.torqueOff(nMotorId);
+  }
 
   DEBUG_SERIAL.print("ID: ");
   DEBUG_SERIAL.print(nMotorId);

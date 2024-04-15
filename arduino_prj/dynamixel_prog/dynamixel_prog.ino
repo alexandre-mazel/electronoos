@@ -82,23 +82,34 @@ void setup() {
   if(1)
   {
     dxl.torqueOff(nMotorId);
-    //dxl.setOperatingMode(nMotorId, OP_POSITION); // moves
+    dxl.setOperatingMode(nMotorId, OP_POSITION); // moves
     //dxl.setOperatingMode(nMotorId, OP_EXTENDED_POSITION); // moves
-    //dxl.setOperatingMode(nMotorId, OP_CURRENT_BASED_POSITION); // moves
+    dxl.setOperatingMode(nMotorId, OP_CURRENT_BASED_POSITION); // no moves
     //dxl.setOperatingMode(nMotorId, OP_VELOCITY); // no moves (as we don't send velocity order)
     //dxl.setOperatingMode(nMotorId, OP_CURRENT); // no moves (not available in ax12a ?)
     
     dxl.torqueOn(nMotorId);
 
+    #define REG_TORQUE_ENABLE 0X18
+    #define REG_MAX_TORQUE_LBITS 0X22
+    #define REG_MAX_TORQUE_HBITS 0X23
+
+    dxl.writeControlTableItem(REG_TORQUE_ENABLE, nMotorId, 1);
+    dxl.writeControlTableItem(REG_MAX_TORQUE_HBITS, nMotorId, 0);
+    dxl.writeControlTableItem(REG_MAX_TORQUE_LBITS, nMotorId, 0);
+
     // Set Goal Current 3.0% using percentage (-100.0 [%] ~ 100.0[%])
-    dxl.setGoalCurrent(nMotorId, 50.0, UNIT_PERCENT);
+    dxl.setGoalCurrent(nMotorId, 5.0, UNIT_PERCENT);
     dxl.setGoalPosition(nMotorId, +180.0, UNIT_DEGREE);
+    dxl.writeControlTableItem(REG_TORQUE_ENABLE, nMotorId, 1);
+    dxl.writeControlTableItem(REG_MAX_TORQUE_HBITS, nMotorId, 0);
+    dxl.writeControlTableItem(REG_MAX_TORQUE_LBITS, nMotorId, 0x01); // moves with 1 and not with 0
     delay(2000);
 
     dxl.setGoalPosition(nMotorId, +0.0, UNIT_DEGREE);
     delay(2000);
 
-    dxl.setGoalCurrent(nMotorId, -50.0, UNIT_PERCENT);
+    dxl.setGoalCurrent(nMotorId, -5.0, UNIT_PERCENT);
     dxl.setGoalPosition(nMotorId, -180.0, UNIT_DEGREE);
     delay(2000);
 

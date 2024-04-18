@@ -2,7 +2,7 @@ const int analogPin = A3;
 const int chauffePin1 = 30;
 const int chauffePin2 = 31;
 
-const int rThermalResistanceReference = 678.0;
+const int rThermalResistanceReference = 678.0; // avec 678, on a une precision de 2.5 ohm soit 0.15degrees
 
 void setup() 
 {
@@ -10,8 +10,8 @@ void setup()
 
   pinMode(chauffePin1, OUTPUT);
   pinMode(chauffePin2, OUTPUT);
-  digitalWrite(chauffePin1, LOW);
-  digitalWrite(chauffePin2, LOW);
+  digitalWrite(chauffePin1, HIGH);
+  digitalWrite(chauffePin2, HIGH);
 
   Serial.println("Starting...");
   delay(1000);
@@ -40,20 +40,22 @@ void loop()
   if(temperature < 10 ||temperature > 300 )
   {
     Serial.println("EMERGENCY. Turning off!");
-    digitalWrite(chauffePin1, LOW);
+    digitalWrite(chauffePin1, HIGH);
     digitalWrite(chauffePin1, HIGH);
     delay(5000);
     return;
   }
   if( temperature > target+5 )
   {
-    digitalWrite(chauffePin1, LOW);
+    digitalWrite(chauffePin2, HIGH);
+    digitalWrite(chauffePin1, HIGH);
     Serial.println( "Chauffe STOP");
 
   }
   else if( temperature < target -5 )
   {
-    digitalWrite(chauffePin1, HIGH);
+    digitalWrite(chauffePin1, LOW);
+    digitalWrite(chauffePin2, LOW);
     Serial.println( "Chauffe START");
   }
   delay(500);

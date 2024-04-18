@@ -3,6 +3,7 @@ const int chauffePin1 = 30;
 const int chauffePin2 = 31;
 
 const int rThermalResistanceReference = 678.0; // avec 678, on a une precision de 2.5 ohm soit 0.15degrees
+// je suis monté a genre ~100 et j'ai une resistance de 894o soit 56.15, ma formule est fausse (ou alors du moins il y a une constante)
 
 void setup() 
 {

@@ -39,7 +39,7 @@ HX711 scale;
 
 //float calibration_factor = 205; // when set to 1, it's = read/known value // poid de 1kg: 206.9, poid de 20g: 193.68
 // avec 200:
-// poids de gym, l'une a 1041 et l'autre a 1036
+// poids de gym, l'un a 1041 et l'autre a 1036
 // poids de 20g+10g, entre 29.10 et 29.38
 
 // reglage pour barre de 3kg:
@@ -68,7 +68,7 @@ LiquidCrystal_I2C lcd(0x3F, 16, 2);
 
 void setup() {
   
-  Serial.begin(9600);
+  Serial.begin(9600); // was 9600 // changing here need to change also in the android application.
   //pinMode(resetPin, INPUT);
 
   pinMode(VANNE_1_PIN, OUTPUT);
@@ -374,9 +374,10 @@ void loop() {
       Serial.print("Place a known weight on the scale...");
       delay(5000);
     }
-    float reading = scale.get_units(2); // chaque mesure en plus, c'est prend 88ms
+    float reading = scale.get_units(2); // chaque mesure en plus, c'est 88ms
     last_measured = reading;
-    if(0)
+
+    if(1)
     {
       Serial.print(millis());
       Serial.print(", weight: ");

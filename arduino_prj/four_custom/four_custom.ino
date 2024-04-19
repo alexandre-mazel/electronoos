@@ -1,13 +1,37 @@
+
 const int analogPin = A3;
 const int chauffePin1 = 30;
 const int chauffePin2 = 31;
 
 const int rThermalResistanceReference = 678.0; // avec 678, on a une precision de 2.5 ohm soit 0.15degrees
-// je suis monté a genre ~100 et j'ai une resistance de 894o soit 56.15, ma formule est fausse (ou alors du moins il y a une constante)
+// je suis monté a genre ~100 et j'ai une resistance de 900ohm soit 56.3, ma formule est fausse (ou alors du moins il y a une constante)
+
+// a 88.6 mesuré, je lis: 690.04 resistance
+
+#define USE_TEMP_REF_DALLAS
+
+#ifdef USE_TEMP_REF_DALLAS
+#define DS18B20MODEL 0x28
+#include "OneWire.h"
+#include "DallasTemperature.h"
+
+const int tempDallasPin = 7; // D7
+
+OneWire ds(tempDallasPin);
+DallasTemperature sensors(&ds);
+#endif // USE_TEMP_REF_DALLAS
+
+
 
 void setup() 
 {
   Serial.begin(57600);           //  setup serial
+
+#ifdef USE_TEMP_REF_DALLAS
+  Serial.println("INF: using Dallas");
+  pinMode(tempDallasPin,INPUT);
+  sensors.begin();          // sonde activee
+#endif // USE_TEMP_REF_DALLAS
 
   pinMode(chauffePin1, OUTPUT);
   pinMode(chauffePin2, OUTPUT);
@@ -33,10 +57,22 @@ void loop()
   int val = analogRead(analogPin);
   float resistance = inputToResistance(val, rThermalResistanceReference);
   float temperature = resistance / 16.;
+
+#ifdef USE_TEMP_REF_DALLAS
+  sensors.requestTemperatures();
+  float tRef = sensors.getTempCByIndex(0);
+#endif
+
   Serial.print("resistance: ");
   Serial.print(resistance,2);
   Serial.print(", temperature: ");
-  Serial.println(temperature,2);
+  Serial.print(temperature,2);
+#ifdef USE_TEMP_REF_DALLAS
+  Serial.print(", temp_ref: ");
+  Serial.print(tRef,2);
+#endif
+  Serial.println();
+
   float target = 100;
   if(temperature < 10 ||temperature > 300 )
   {

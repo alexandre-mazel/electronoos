@@ -21,7 +21,20 @@ OneWire ds(tempDallasPin);
 DallasTemperature sensors(&ds);
 #endif // USE_TEMP_REF_DALLAS
 
+#include <LiquidCrystal_I2C.h>
+LiquidCrystal_I2C lcd(0x27, 20, 4);
 
+bool i2CAddrTest(uint8_t addr) {
+  Wire.begin();
+  Wire.beginTransmission(addr);
+  if (Wire.endTransmission() == 0) {
+    return true;
+  }
+  return false;
+}
+
+
+char tabAnim[] = "-\\|/"; // antislash is bugged
 
 void setup() 
 {
@@ -38,6 +51,19 @@ void setup()
   digitalWrite(chauffePin1, HIGH);
   digitalWrite(chauffePin2, HIGH);
 
+  if (!i2CAddrTest(0x27)) 
+  {
+    Serial.println("Alternate init on 0x3F");
+    lcd = LiquidCrystal_I2C(0x3F, 20, 4);
+  }
+  lcd.init();                // initialize the lcd
+  lcd.backlight();           // Turn on backlight // sans eclairage on voit rien...
+
+  lcd.print("Four AlexBraun v2.0");
+
+  lcd.setCursor(0, 2);
+  lcd.print("Four ready");
+
   Serial.println("Starting...");
   delay(1000);
 
@@ -52,9 +78,11 @@ float inputToResistance( int nAnalogValue, const float rKnownResistance )
   return resistance;
 }
 
+long int nNumFrame = 0;
+
 void loop()
 {
-  float target = 260;
+  float target = 200;
 
   int val = analogRead(analogPin);
   float resistance = inputToResistance(val, rThermalResistanceReference);
@@ -77,26 +105,58 @@ void loop()
 #endif
   Serial.println();
 
-  if(temperature < 10 ||temperature > 300 )
+  bool bEnChauffe = 0;
+
+  if(temperature < 10 ||temperature > 280 )
   {
     Serial.println("EMERGENCY. Turning off!");
     digitalWrite(chauffePin1, HIGH);
     digitalWrite(chauffePin1, HIGH);
+    lcd.setCursor(0, 2);
+    lcd.print("Probleme capteur !");
     delay(5000);
     return;
   }
-  if( temperature > target+5 )
+  const int nHisteresis = 2;
+  if( temperature > target + nHisteresis )
   {
     digitalWrite(chauffePin2, HIGH);
     digitalWrite(chauffePin1, HIGH);
     Serial.println( "Chauffe STOP");
 
   }
-  else if( temperature < target -5 )
+  else if( temperature < target - nHisteresis )
   {
     digitalWrite(chauffePin1, LOW);
     digitalWrite(chauffePin2, LOW);
     Serial.println( "Chauffe START");
+    bEnChauffe = 1;
   }
+  lcd.setCursor(0, 1);
+  lcd.print("Target: ");
+  lcd.print(target);
+
+  lcd.setCursor(0, 2);
+  lcd.print("Actual: ");
+  lcd.print(temperature);
+  lcd.print(" (");
+  lcd.print(int(tRef));
+  lcd.print(")");
+
+  lcd.setCursor(0, 3);
+  lcd.print(tabAnim[nNumFrame%4]);
+  
+  if(bEnChauffe)
+  {
+    lcd.print(" En chauffe !!!");
+  }
+  else
+  {
+    lcd.print(" ------------");
+  }
+
+  nNumFrame += 1;
+
   delay(1000);
+  
 }

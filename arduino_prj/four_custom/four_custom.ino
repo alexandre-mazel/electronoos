@@ -54,9 +54,11 @@ float inputToResistance( int nAnalogValue, const float rKnownResistance )
 
 void loop()
 {
+  float target = 260;
+
   int val = analogRead(analogPin);
   float resistance = inputToResistance(val, rThermalResistanceReference);
-  float temperature = resistance / 16.;
+  float temperature = 16.75+(resistance - 544)*0.4377; // cf hack four spreadsheet
 
 #ifdef USE_TEMP_REF_DALLAS
   sensors.requestTemperatures();
@@ -67,13 +69,14 @@ void loop()
   Serial.print(resistance,2);
   Serial.print(", temperature: ");
   Serial.print(temperature,2);
+  Serial.print(", target: ");
+  Serial.print(target,2);
 #ifdef USE_TEMP_REF_DALLAS
   Serial.print(", temp_ref: ");
   Serial.print(tRef,2);
 #endif
   Serial.println();
 
-  float target = 100;
   if(temperature < 10 ||temperature > 300 )
   {
     Serial.println("EMERGENCY. Turning off!");
@@ -95,5 +98,5 @@ void loop()
     digitalWrite(chauffePin2, LOW);
     Serial.println( "Chauffe START");
   }
-  delay(500);
+  delay(1000);
 }

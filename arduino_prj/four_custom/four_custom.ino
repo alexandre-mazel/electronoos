@@ -152,7 +152,7 @@ void loop()
   }
   else
   {
-    lcd.print(" ------------");
+    lcd.print("                 ");
   }
 
   nNumFrame += 1;

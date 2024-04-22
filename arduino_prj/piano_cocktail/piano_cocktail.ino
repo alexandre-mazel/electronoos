@@ -48,6 +48,9 @@ HX711 scale;
 // avec 200:
 // poids de gym, l'un a 1041 et l'autre a 1036
 // poids de 20g+10g, entre 29.10 et 29.38
+// 
+// Mon tel A52s: 226g
+// Un steack haché: 100g
 
 // reglage pour barre de 3kg:
 

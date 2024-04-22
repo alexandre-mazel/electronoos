@@ -35,6 +35,11 @@ const int LOADCELL_SCK_PIN = A0;
 #endif
 
 HX711 scale;
+
+
+// ordre de branchement: Rouge (E+) Noir (E-) Blanc  (A-) Vert (A+)
+// de l'autre cot�: GND, DT, SCK, VCC
+
 // si plus petit, ca surcote un peu (les poids affiché semblent etre plus lourd que la réalité)
 
 // reglage pour la barre de 10kg:

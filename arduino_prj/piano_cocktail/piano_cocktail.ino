@@ -89,6 +89,9 @@ void animateLcd()
   }
 }
 
+long int nTimeStartFill = 0;
+int bIsFilling = 0;
+
 void setOpen( int nNumVanne, int bOpen)
 { 
     // ouvre ou ferme la vanne.
@@ -96,6 +99,16 @@ void setOpen( int nNumVanne, int bOpen)
     // - bOpen: 1: ouvre, 0: ferme
 
     digitalWrite(VANNE_1_PIN+nNumVanne, bOpen?LOW:HIGH); // high don't send voltage => HIGH is OFF.
+
+    if(bOpen)
+    {
+      nTimeStartFill = millis();
+      bIsFilling = true;
+    }
+    else
+    {
+      bIsFilling = false;
+    }
 }
 
 void setup() {
@@ -144,6 +157,7 @@ void setup() {
 } // setup
 
 float last_measured = 0;
+
 
 
 // ask to verse x grammes
@@ -263,6 +277,13 @@ char lastCommand[LEN_COMMAND_MAX+1] = "\0";
 int queueOrder[LEN_QUEUE_ORDER*2]; // a list of [numcuve,ml,numcuve,ml,...]
 int nNbrQueueOrder = 0; // nbr data in queue order (nbr of data pair)
 
+
+void stop_all()
+{
+  force_stop_verse(); 
+  nNbrQueueOrder = 0;
+}
+
 // receive order format #string
 // return 0 on error
 int handleOrder( const char * command)
@@ -322,8 +343,7 @@ int handleOrder( const char * command)
   {
     // STOP
     Serial.println("INF: handleOrder: STOP !" );
-    nNbrQueueOrder = 0;
-    force_stop_verse();
+    stop_all();
   } // STOP
 
   return 1;
@@ -412,12 +432,25 @@ void simulateReceiveAssembleOrder( int qt1 = 50, int qt2 = 50, int qt3 = 50, int
     queueOrder[nNbrQueueOrder*2+0] = i;
     queueOrder[nNbrQueueOrder*2+1] = aqt[i];
     ++nNbrQueueOrder;
-  }imeNextQueueOrder = millis() + 500;
+  }
+  timeNextQueueOrder = millis() + 500;
 }
 
 int bWasDisconnected = 0;
 
-void loop() {
+void loop() 
+{
+
+  // security
+  if(bIsFilling && millis()-nTimeStartFill>60*1000) // 60*1000 => 1 min
+  {
+    // 1 min => security close
+    stop_all();
+    lcd.home();
+    Serial.println("WRN: Security close!");
+    lcd.print("Security close!");
+    delay(5000);
+  }
   
   
   if (!scale.is_ready()) 
@@ -528,7 +561,7 @@ void loop() {
           else if(input == 'A'){  simulateReceiveAssembleOrder(); }
           else if(input == 'd'){  sendSerialCommand("Debug/1/2/3"); } // debug
           else if(input == 'f'){  force_stop_verse();	 } // force stop verse
-          else if(input == 'S'){  force_stop_verse(); nNbrQueueOrder = 0;} // Stop All
+          else if(input == 'S'){  stop_all();} // Stop All
         }
         if(handleSerialCommand())
         {

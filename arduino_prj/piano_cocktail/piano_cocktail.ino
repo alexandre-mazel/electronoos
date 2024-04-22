@@ -6,7 +6,9 @@
 void __assert(int bTest, const char *__func, const char *__file, int __lineno, const char *__sexp) 
 {
   if(bTest)
-    return
+  {
+    return;
+  }
   Serial.println(__func);
   Serial.println(__file);
   Serial.println(__lineno, DEC);
@@ -27,7 +29,7 @@ const int LOADCELL_SCK_PIN = 3;
 // or analogic ?
 //#define CLK A0
 //#define DOUT A1
-const int LOADCELL_DOUT_PIN = A1;
+const int LOADCELL_DOUT_PIN = A1; // attention, c'est pas D0 (le TX) mais bien A0 (a coté du Vin) !!!
 const int LOADCELL_SCK_PIN = A0;
 
 #endif
@@ -59,25 +61,59 @@ void tare(byte times = 10); // OFFSET = read_average(times);
 So, get_units() returns (read_average(1) - OFFSET) / SCALE;
 */
 
-const int VANNE_1_PIN = 7;
+const int VANNE_1_PIN = 7; // others need to be continuous
+const int NBR_VANNE = 5;
+
 
 #include <LiquidCrystal_I2C.h>
 
 // initialize the library with the numbers of the interface pins
 LiquidCrystal_I2C lcd(0x3F, 16, 2);
 
+int nAnimateLcdCount = 0;
+void animateLcd()
+{
+  const int nNbrAnimateMax = 3;
+  nAnimateLcdCount += 1;
+  if( nAnimateLcdCount > nNbrAnimateMax )
+  {
+    nAnimateLcdCount = 0;
+  }
+  for( int i = 0; i < nAnimateLcdCount; ++i )
+  {
+    lcd.print(".");
+  }
+  for( int i = nAnimateLcdCount; i < nNbrAnimateMax; ++i )
+  {
+    lcd.print(" ");
+  }
+}
+
+void setOpen( int nNumVanne, int bOpen)
+{ 
+    // ouvre ou ferme la vanne.
+    // - nNumVanne: 0..n-1
+    // - bOpen: 1: ouvre, 0: ferme
+
+    digitalWrite(VANNE_1_PIN+nNumVanne, bOpen?LOW:HIGH); // high don't send voltage => HIGH is OFF.
+}
+
 void setup() {
   
-  Serial.begin(9600); // was 9600 // changing here need to change also in the android application.
+  Serial.begin(57600); // was 9600 // changing here need to change also in the android application.
   //pinMode(resetPin, INPUT);
 
-  pinMode(VANNE_1_PIN, OUTPUT);
-  digitalWrite(VANNE_1_PIN, HIGH); // high don't send voltage !?!
+  lcd.print("Setup started...");
+
+  for( int i = 0; i < NBR_VANNE; ++i )
+  {
+    pinMode(VANNE_1_PIN+i, OUTPUT);
+  }
+
+  close_all();
   
   lcd.init();                // initialize the lcd
   lcd.backlight();           // Turn on backlight // sans eclairage on voit rien...
-  lcd.setCursor(0, 0);
-  lcd.print("taring...");
 
   
   scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
@@ -85,7 +121,13 @@ void setup() {
   {
     Serial.println("INF: Waiting for HX711...");
     delay(500);
+    lcd.setCursor(0, 0);
+    lcd.print("HX711 waiting");
+    animateLcd();
   }
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("taring...");
   Serial.print("calibration_factor: ");
   Serial.println(calibration_factor);
   scale.set_scale(calibration_factor);
@@ -98,7 +140,8 @@ void setup() {
   lcd.clear();
 
   //handleOrder("#Assemble_10_20_30"); // to test when not connected to the tablet
-}
+
+} // setup
 
 float last_measured = 0;
 
@@ -117,7 +160,7 @@ void verse_quantite(float rGrammes,int nNumVanne)
   Serial.print(last_measured);
   Serial.print(", target: ");
   Serial.println(target_verse);
-  digitalWrite(VANNE_1_PIN, LOW);
+  setOpen(nNumVanne,1);
 }
 
 int isTargetDefined()
@@ -127,6 +170,7 @@ int isTargetDefined()
 int check_if_must_stop_verse()
 {
   // return 0 if not versing, 1 if versing, 2 if done
+
   if(!isTargetDefined())
   {
     return 0;
@@ -144,14 +188,14 @@ int check_if_must_stop_verse()
   lcd.print("  "); // clean eol
   if(diff<1+4+3+1) // couramment on prend 8 apres coupure
   {
-    digitalWrite(VANNE_1_PIN, HIGH);
+    setOpen(nCurrentVanne, 0);
     if(0)
     {
       // fait un petit on/off pour bien la fermer (non ca marche pas)
       delay(100);
-      digitalWrite(VANNE_1_PIN, LOW);
+      setOpen(nCurrentVanne, 1);
       delay(100);
-      digitalWrite(VANNE_1_PIN, HIGH);
+      setOpen(nCurrentVanne, 0);
     }
     
     Serial.print("INF: check_if_must_stop_verse: finished, target was ");
@@ -163,10 +207,19 @@ int check_if_must_stop_verse()
   return 1;
 }
 
+void close_all()
+{
+  Serial.println("INF: close_all");
+  for( int i = 0; i < NBR_VANNE; ++i )
+  {
+    setOpen(i, 0);
+  }
+}
+
 void force_stop_verse()
 {
-  Serial.println("INF: force stop verse");
-  digitalWrite(VANNE_1_PIN, HIGH);
+  Serial.println("INF: force stop verse !");
+  close_all();
   target_verse = -1001;
 }
 
@@ -346,15 +399,44 @@ void sendSerialCommand(const char * msg)
   //Serial.println(millis());
 }
 
+char dummyChangeCompiledSizeToPreventUploadError[23] = {1,2};
+
+void simulateReceiveAssembleOrder( int qt1 = 50, int qt2 = 50, int qt3 = 50, int qt4 = 50, int qt5 = 50)
+{
+  Serial.println("simulateReceiveAssembleOrder");
+  scale.tare();
+  int aqt[NBR_VANNE] = {qt1,qt2,qt3,qt4,qt5};
+  nNbrQueueOrder = 0;
+  for(int i = NBR_VANNE-1; i >= 0; --i )
+  {
+    queueOrder[nNbrQueueOrder*2+0] = i;
+    queueOrder[nNbrQueueOrder*2+1] = aqt[i];
+    ++nNbrQueueOrder;
+  }imeNextQueueOrder = millis() + 500;
+}
+
+int bWasDisconnected = 0;
+
 void loop() {
   
   
   if (!scale.is_ready()) 
   {
     Serial.println("HX711 not found.");
+    lcd.home();
+    lcd.print("HX711: Disconnected");
+    //close_all();
+    bWasDisconnected = 1;
+    delay(500);
   }
   else
   {
+    if(bWasDisconnected)
+    {
+      Serial.println("DBG: was disconnected");
+      lcd.clear();
+      bWasDisconnected = 0;
+    }
     if(old_calibration_factor != calibration_factor)
     {
       old_calibration_factor = calibration_factor;
@@ -375,7 +457,16 @@ void loop() {
       delay(5000);
     }
     float reading = scale.get_units(2); // chaque mesure en plus, c'est 88ms
-    last_measured = reading;
+    if( reading > 3000 )
+    {
+      Serial.print("WRN: weird reading (keeping previous): ");
+      Serial.println("reading ");
+      reading = last_measured;
+    }
+    else
+    {
+      last_measured = reading;
+    }
 
     if(1)
     {
@@ -434,8 +525,10 @@ void loop() {
           else if(input == '3'){  verse_quantite(50,0);	 }
           else if(input == '4'){  verse_quantite(100,0); }
           else if(input == '5'){  verse_quantite(200,0); }
+          else if(input == 'A'){  simulateReceiveAssembleOrder(); }
           else if(input == 'd'){  sendSerialCommand("Debug/1/2/3"); } // debug
           else if(input == 'f'){  force_stop_verse();	 } // force stop verse
+          else if(input == 'S'){  force_stop_verse(); nNbrQueueOrder = 0;} // Stop All
         }
         if(handleSerialCommand())
         {
@@ -454,6 +547,7 @@ void loop() {
         {
           if( millis() >= timeNextQueueOrder )
           {
+            Serial.println("DBG: Processing next order...");
             --nNbrQueueOrder;
             verse_quantite(queueOrder[nNbrQueueOrder*2+1],queueOrder[nNbrQueueOrder*2+0]);
           }

@@ -46,8 +46,10 @@ HX711 scale;
 
 // reglage pour barre de 3kg:
 
-float calibration_factor = 733; // 30g => 22000: 733 [une bouteille vide (celle de blanc orschwiller) peserait 448g; le plateau en fer 352g]
+float calibration_factor = 661; // 30g => 22000: 733 [une bouteille vide (celle de blanc orschwiller) peserait 448g; le plateau en fer 352g]
 
+// la balance dans le sous sol: 733
+// balance a ochateau, section 1: 733 => 929 au lieu de 1030 entre 660 et 661
 
 float old_calibration_factor = calibration_factor;
 

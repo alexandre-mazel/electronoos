@@ -38,7 +38,7 @@ HX711 scale;
 
 
 // ordre de branchement: Rouge (E+) Noir (E-) Blanc  (A-) Vert (A+)
-// de l'autre cot�: GND, DT, SCK, VCC
+// de l'autre cote: GND, DT, SCK, VCC
 
 // si plus petit, ca surcote un peu (les poids affiché semblent etre plus lourd que la réalité)
 
@@ -50,7 +50,7 @@ HX711 scale;
 // poids de 20g+10g, entre 29.10 et 29.38
 // 
 // Mon tel A52s: 226g
-// Un steack hach�: 100g
+// Un steack hache: 100g
 
 // reglage pour barre de 3kg:
 
@@ -71,8 +71,10 @@ void tare(byte times = 10); // OFFSET = read_average(times);
 So, get_units() returns (read_average(1) - OFFSET) / SCALE;
 */
 
-const int VANNE_1_PIN = 7; // others need to be continuous
+const int VANNE_1_PIN = 32; // others need to be continuous
 const int NBR_VANNE = 5;
+
+const int VANNE_TEST_PIN = 44;
 
 
 #include <LiquidCrystal_I2C.h>
@@ -132,6 +134,9 @@ void setup() {
   {
     pinMode(VANNE_1_PIN+i, OUTPUT);
   }
+
+  pinMode(VANNE_TEST_PIN, OUTPUT);
+   digitalWrite(VANNE_TEST_PIN, HIGH);
 
   close_all();
   
@@ -193,6 +198,7 @@ int isTargetDefined()
 }
 int check_if_must_stop_verse()
 {
+  const int nWaitBetweenBottleMs = 3000;
   // return 0 if not versing, 1 if versing, 2 if done
 
   if(!isTargetDefined())
@@ -210,7 +216,7 @@ int check_if_must_stop_verse()
   lcd.print(" C");
   lcd.print(nCurrentVanne+1);
   lcd.print("  "); // clean eol
-  if(diff<1+4+3+1) // couramment on prend 8 apres coupure
+  if(diff<1+4+3+1+1) // couramment on prend 8 apres coupure // On ajoute 1 de plus en condition réél des caves
   {
     setOpen(nCurrentVanne, 0);
     if(0)
@@ -225,7 +231,7 @@ int check_if_must_stop_verse()
     Serial.print("INF: check_if_must_stop_verse: finished, target was ");
     Serial.println(target_verse);
     target_verse = -1001;
-    timeNextQueueOrder = millis() + 5000; // wait some sec so the tuyau se vide avant de passer a la commande d'apres
+    timeNextQueueOrder = millis() + nWaitBetweenBottleMs; // wait some sec so the tuyau se vide avant de passer a la commande d'apres
     return 2;
   }
   return 1;
@@ -292,6 +298,24 @@ void stop_all()
 {
   force_stop_verse(); 
   nNbrQueueOrder = 0;
+}
+
+void chenillard()
+{
+  Serial.println("INF: chenillard");
+  delay(1000);
+  for( int j = 0; j < 5; ++j )
+  {
+    Serial.println("INF: chenillard: looping...");
+    for( int i = 0; i < NBR_VANNE; ++i )
+    {
+      setOpen(i, 1);
+      delay(1000);
+      setOpen(i, 0);
+      delay(1000);
+    }
+  }
+  Serial.println("INF: chenillard - end ");
 }
 
 // receive order format #string
@@ -563,6 +587,7 @@ void loop()
           else if(input == 'r'){  calibration_factor = 1; }
           else if(input == 't'){  Serial.println("re-taring..."); scale.tare();}
           else if(input == 'v'){  digitalWrite(VANNE_1_PIN, LOW); delay(1000); digitalWrite(VANNE_1_PIN, HIGH);	 } // a bit of
+          else if(input == 'V'){  Serial.println("vanne de test"); digitalWrite(VANNE_TEST_PIN, LOW); delay(1000); digitalWrite(VANNE_TEST_PIN, HIGH);	 } // une vanne de test
           else if(input == '1'){  verse_quantite(10,0);	 } // asservissement sur poids
           else if(input == '2'){  verse_quantite(20,0);	 }
           else if(input == '3'){  verse_quantite(50,0);	 }
@@ -572,6 +597,7 @@ void loop()
           else if(input == 'd'){  sendSerialCommand("Debug/1/2/3"); } // debug
           else if(input == 'f'){  force_stop_verse();	 } // force stop verse
           else if(input == 'S'){  stop_all();} // Stop All
+          else if(input == 'C'){  chenillard();} // one each second
         }
         if(handleSerialCommand())
         {

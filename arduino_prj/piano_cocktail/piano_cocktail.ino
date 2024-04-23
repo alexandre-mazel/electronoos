@@ -29,8 +29,8 @@ const int LOADCELL_SCK_PIN = 3;
 // or analogic ?
 //#define CLK A0
 //#define DOUT A1
-const int LOADCELL_DOUT_PIN = A1; // attention, c'est pas D0 (le TX) mais bien A0 (a coté du Vin) !!!
-const int LOADCELL_SCK_PIN = A0;
+const int LOADCELL_DOUT_PIN = A1; 
+const int LOADCELL_SCK_PIN = A0; // attention, c'est pas D0 (le TX) mais bien A0 (a coté du Vin) !!!
 
 #endif
 

@@ -39,13 +39,15 @@ def findNonAscii(filename, bOnlyNotFrench = False, nSpecificValue = None):
         
     f.close()
 # findNonAscii - end
-    
 
 
 if __name__ == "__main__":
+    
     if len(sys.argv)< 2:
-        print("syntaxe: filename to search into")
+        print("Find a non ascii character in a file (eg a python source)")
+        print("syntaxe: scriptname <filename_to_search_into>")
         exit(0)
+        
     fn = sys.argv[1]
     
     nSpecificValue = None
@@ -58,3 +60,4 @@ if __name__ == "__main__":
     
     #~ findNonAscii(fn, bOnlyNotFrench = True)
     findNonAscii(fn, nSpecificValue = nSpecificValue)
+    #~ testFileEncoding(fn)

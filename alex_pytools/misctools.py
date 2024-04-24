@@ -1642,7 +1642,9 @@ class ExclusiveLock:
         if os.name == "nt":
             lockdir = "/tmp/"
         else:
-            lockdir = "/var/www/html/obo/www/tmp/"
+            #~ lockdir = "/var/www/html/obo/www/tmp/" # good for a webserver, eg apache...
+            lockdir = "/tmp/" # good for a linux standard when no webserver
+            
             
         self.acquired = False
             

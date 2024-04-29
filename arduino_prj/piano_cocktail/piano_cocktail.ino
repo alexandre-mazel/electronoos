@@ -172,6 +172,7 @@ void setup() {
 } // setup
 
 float last_measured = 0;
+float rTotalTarget = -1; // set when we receive an assemble command to fill the bottle to the brim - or not more
 
 
 
@@ -179,9 +180,11 @@ float last_measured = 0;
 float target_verse = -1001; // negative when no current
 int nCurrentVanne = -1;
 unsigned long timeNextQueueOrder = 0; // we want to wait a bit before handling next queue
+float rCurrentQuantityToVerse = -1;
 void verse_quantite(float rGrammes,int nNumVanne)
 {
   target_verse = last_measured + rGrammes;
+  rCurrentQuantityToVerse = rGrammes;
   nCurrentVanne = nNumVanne;
   Serial.print("INF: verse_quantite: cuve: ");
   Serial.print(nCurrentVanne);
@@ -198,7 +201,7 @@ int isTargetDefined()
 }
 int check_if_must_stop_verse()
 {
-  const int nWaitBetweenBottleMs = 3000;
+  const int nWaitBetweenBottleMs = 1000; // was 5000, then 3000
   // return 0 if not versing, 1 if versing, 2 if done
 
   if(!isTargetDefined())
@@ -216,6 +219,17 @@ int check_if_must_stop_verse()
   lcd.print(" C");
   lcd.print(nCurrentVanne+1);
   lcd.print("  "); // clean eol
+  
+  lcd.setCursor(4, 1);
+  //lcd.print("dbg: ");
+  lcd.print(rCurrentQuantityToVerse);
+  if( rTotalTarget > 0.f)
+  {
+    lcd.print( "/" );
+    lcd.print(rTotalTarget);
+  }
+  
+  
   if(diff<1+4+3+1+1) // couramment on prend 8 apres coupure // On ajoute 1 de plus en condition réél des caves
   {
     setOpen(nCurrentVanne, 0);
@@ -353,6 +367,7 @@ int handleOrder( const char * command)
     }
     scale.tare(); // remet a zero c'est mieux pour valider la pesée de la bouteille
     last_measured = 0;
+    rTotalTarget = 0;
     timeNextQueueOrder = millis();
     ASSERT(nNbrArgs<=LEN_QUEUE_ORDER)
     for( int i=nNbrArgs-1; i >= 0; --i )
@@ -361,6 +376,7 @@ int handleOrder( const char * command)
       {
         queueOrder[nNbrQueueOrder*2+0] = i;
         queueOrder[nNbrQueueOrder*2+1] = args[i];
+        rTotalTarget += args[i];
         ++nNbrQueueOrder;
       }
     }
@@ -536,7 +552,8 @@ void loop()
     }
 
     if(1)
-    {
+    { 
+      Serial.print( "DBG: " );
       Serial.print(millis());
       Serial.print(", weight: ");
       Serial.print(reading);
@@ -618,7 +635,16 @@ void loop()
           {
             Serial.println("DBG: Processing next order...");
             --nNbrQueueOrder;
-            verse_quantite(queueOrder[nNbrQueueOrder*2+1],queueOrder[nNbrQueueOrder*2+0]);
+            float rGramme = queueOrder[nNbrQueueOrder*2+1];
+            if(nNbrQueueOrder==0 && rTotalTarget>0)
+            {
+              rGramme = rTotalTarget-last_measured-0.5; // remove 0.5g to add margin car bouteilel trop pleine
+              rTotalTarget = -1; 
+            }
+            if(rGramme>0)
+            {
+              verse_quantite(rGramme,queueOrder[nNbrQueueOrder*2+0]);
+            }
           }
         }
       }

@@ -286,9 +286,17 @@ def getNumDayOfWeek(year,month,day):
     given_date = datetime.datetime(year, month, day)
     return given_date.weekday()
     
+def getNumWeek():
+    """
+    return the num of week in the year 1..52 ou 53
+    """
+    datetimeObject = datetime.datetime.now()
+    return datetimeObject.isocalendar()[1]
+    
 if 0:
     print(getNumDayOfWeek(2024,3,31)) # it's a sunday => 6
     print(getNumDayOfWeek(1974,8,20)) # it's a monday => 0
+    print(getNumWeek()) # current week number
     exit(1)
 
 

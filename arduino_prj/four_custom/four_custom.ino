@@ -82,7 +82,7 @@ long int nNumFrame = 0;
 
 void loop()
 {
-  float target = 200;
+  float target = 180;
 
   int val = analogRead(analogPin);
   float resistance = inputToResistance(val, rThermalResistanceReference);

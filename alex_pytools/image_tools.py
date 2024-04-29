@@ -138,7 +138,7 @@ def isLookLikePhoto(im,roi,bDebug=False):
     laplacian = cv2.Laplacian(imc,cv2.CV_64F,ksize=3) # ksize=3
 
     cnz = np.count_nonzero(laplacian)/(imc.shape[0]*imc.shape[1])
-    #~ print("DBG: isLookLikePhoto: cnz: %s" % cnz )
+    print("DBG: isLookLikePhoto: cnz: %s" % cnz )
 
     diff2 = abs(np.mean(laplacian)*100)
     if bDebug: print("DBG: isLookLikePhoto: diffLapla2: %.3f" % diff2 )

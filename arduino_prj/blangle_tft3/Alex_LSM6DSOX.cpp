@@ -21,6 +21,7 @@ bool Alex_LSM6DSOX::begin_I2C(uint8_t i2c_addr)
     if(pNickName_!=NULL) Serial.print(this->pNickName_);
 
     Serial.print( ", this: "); Serial.print((int)this);
+    Serial.print( ", i2c_addr: "); Serial.print((int)i2c_addr,HEX);
 
     if( Adafruit_LSM6DSOX::begin_I2C(i2c_addr) )
     {

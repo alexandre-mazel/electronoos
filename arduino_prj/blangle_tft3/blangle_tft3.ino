@@ -85,6 +85,8 @@ MCUFRIEND_kbv tft;
 #define GRAY    0x8410
 
 #define PIN_PHOTORES A14
+#define PIN_LOWBATTERY A15
+
 #define PIN_SOX_I2C_CHANGE_ADDR 32
 
 
@@ -121,7 +123,7 @@ void setup()
   int nNumError = 0;
 
   Serial.begin(57600);
-  if (!Serial) delay(5000);           //allow some time for Leonardo
+  //if (!Serial) delay(5000);           //allow some time for Leonardo
     
 
 #if 1
@@ -259,6 +261,8 @@ void setup()
   }
 
   pinMode( PIN_PHOTORES, INPUT );
+  pinMode( PIN_LOWBATTERY, INPUT );
+  
 
   Serial.println("INF: Blangle v0.8");  
   Serial.println("INF: Starting...");
@@ -447,7 +451,7 @@ const int nNbrSettings = 8;
 int nNumSettingsSelected = 0; // 0 to nNbrSettings-1
 
 
-double presetCirc[nNbrSettings] = {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}; // en mm
+double presetCirc[nNbrSettings] = {628.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}; // en mm
 
 const byte nEepromVersion = 100; // to differentiate from other program (arome...)
 void loadConfigFromEeprom()
@@ -509,7 +513,7 @@ const int yArrowBottom = nAreaH+80+30;
 const int wArrow = 20;
 const int wInterArrow = 10;
 
-int render_screen(int nPresel, int nip, int db, int bubble, double circ,int bLocked, float rTemperature, int nLuminosity)
+int render_screen(int nPresel, int nip, int db, int bubble, double circ,int bLocked, float rTemperature, int nLuminosity, bool bLowBattery)
 {
   static uint8_t bDrawed = 0;
   static uint8_t bPrevLocked = 2;
@@ -693,11 +697,16 @@ int render_screen(int nPresel, int nip, int db, int bubble, double circ,int bLoc
     {
       tft.print(rTemperature, 2);
     }
+    tft.print("  ");
 
     tft.fillRect( nMenuW+nAreaW+50+46, yText+nOffsetY,48, 16, RED );
     tft.setCursor( nMenuW+nAreaW+50, yText+nOffsetY );
     tft.print("lum:");
     tft.print(nLuminosity);
+    tft.print(" lb:");
+    tft.print(bLowBattery);
+    tft.print("     ");
+    
   }
 
   return 0;
@@ -775,6 +784,7 @@ void loop()
     // update sensors
 
     int photores = analogRead(PIN_PHOTORES);
+    int bLowBattery = analogRead(PIN_LOWBATTERY) < 512;
 
     if( nCptFrame%100==0 )
     {
@@ -931,7 +941,7 @@ void loop()
     {
       // detect touch - center of the point
       int x,y,z;
-      bool bPressed = std_getPressed(&x,&y,&z);
+      bool bPressed = std_getPressed(&x,&y,&z,false);
       if( bPressed )
       {
         const int dw_arrow = wArrow+wInterArrow;
@@ -1057,7 +1067,7 @@ void loop()
         
       } // if bPressed
 
-      render_screen(nNumSettingsSelected,nip,db,bubble,presetCirc[nNumSettingsSelected],nLocked,rTemperature,photores);
+      render_screen(nNumSettingsSelected,nip,db,bubble,presetCirc[nNumSettingsSelected],nLocked,rTemperature,photores,bLowBattery);
 
     } // detect touch
 
@@ -1065,7 +1075,7 @@ void loop()
 
     //delay(1); // ! L'appel a delay nique la lecture du capteur !?!
     ++nCptFrame;
-    if( nCptFrame > 400) // 400
+    if( nCptFrame > 40) // 400
     {
       // sur uno, avec loop delay 1 => 44fps, 43 avec un println
       // avec text size 1 => 103fps // 188 si affichÃ© en int
@@ -1083,7 +1093,9 @@ void loop()
       Serial.println(fps);
       //bjy_displayLastAngles();
       Serial.print("Temperature (C): "); Serial.println(rTemperature, 1);
-      Serial.print("Luminosity: "); Serial.println(photores); // ouvert, lumiere du salon de nuit: 664, ombre de la main, 111, led de tel collé dessus: 905 
+      Serial.print("Luminosity: "); Serial.println(photores); // ouvert, lumiere du salon de nuit: 664, ombre de la main, 111, led de tel collé dessus: 905
+      Serial.print("LowBattery: "); Serial.println(bLowBattery); // ouvert, lumiere du salon de nuit: 664, ombre de la main, 111, led de tel collé dessus: 905
+      
     }
 
     countFps();

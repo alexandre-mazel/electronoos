@@ -100,5 +100,12 @@ def testLoopBugMyScanner():
             break
         except BaseException as err:
             print("err: %s" % err)
-            
-acquire_image_wia("c:/tmp/wia-test2.png",nResolution=300)
+    
+if 1:                
+    for i in range(30):
+        try:
+            acquire_image_wia("c:/tmp/wia-test2.png",nResolution=300)
+            print("INF: Success!")
+            break
+        except BaseException as err:
+            print("ERR: try %d: %s" % (i,err))

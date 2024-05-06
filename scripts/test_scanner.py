@@ -102,7 +102,7 @@ def testLoopBugMyScanner():
             print("err: %s" % err)
     
 if 1:                
-    for i in range(100):
+    for i in range(50):
         try:
             acquire_image_wia("c:/tmp/wia-test2.png",nResolution=300)
             print("INF: Success!")

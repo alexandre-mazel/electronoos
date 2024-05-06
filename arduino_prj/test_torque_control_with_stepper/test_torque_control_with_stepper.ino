@@ -24,10 +24,11 @@ void setup()
 void loop() 
 {
   const int nNbrStepPerTurn = 200;
-  const int nSleepMicroSec = 500;  // 500 was ok // 300 also for 17HE15-1504S without charge // with 314g charge, set 500
+  const int nSleepMicroSec = 4000;  // 500 was ok // 300 also for 17HE15-1504S without charge // with 314g charge, set 500
 
   Serial.println("looping...");
 
+  digitalWrite(enaPin2,LOW);
   for(int i = 0; i < nNbrStepPerTurn; ++i )
   {
     digitalWrite( stepPin2, HIGH ); // takes 6micros
@@ -36,6 +37,7 @@ void loop()
     digitalWrite( stepPin2,LOW );
     delayMicroseconds(nSleepMicroSec);
   }
+  //digitalWrite(enaPin2,HIGH); // cut
   delay(2000);
 
 }

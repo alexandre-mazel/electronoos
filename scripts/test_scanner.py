@@ -91,6 +91,67 @@ def acquire_image_wia_test():
     if os.path.exists(fname):
         os.remove(fname)
     image.SaveFile(fname)
+    
+def countTrigramme(txt):
+    # count "trigramme", as part of word classical # du pauvre car fait "vite fait"
+    listTri = ["thi","tha","ce", "com", "est", "sig", "tit", "en", "pren", "par", "ti", "je", "tu", "il", "nous", "vous", "ils", "page", "for", "le", "la", "un", "de", "du", "de le", "de la", "mon", "ton", "son", "aux", "a","car","alex"]
+    txt = txt.lower()
+    words = txt.split()
+    n = 0
+    for w in words:
+        if w in listTri:
+            n += 1
+    return n
+    
+    
+def preprocessExportedFile(filename):
+    """
+    return name of the new created preprocessed file
+    """
+    import sys
+    sys.path.append("../alex_pytools/")
+    import ocr_tools
+    import cv2
+    import cv2_tools
+    im = cv2.imread(filename)
+    im = cv2_tools.autoCrop(im,bDebug=1)
+    
+    bf,ext = os.path.splitext(filename)
+    ext = ".jpg"
+    filename_dst = bf + "_pp" + ext
+    cv2.imwrite(filename_dst,im)
+    im2 = cv2.flip(im, -1)
+    filename_dst2 = bf + "_ppf" + ext
+    cv2.imwrite(filename_dst2,im2)
+    exit(1)
+    
+    txt1=ocr_tools.extract_txt(filename_dst)
+    print("")
+    print("ocr1 (len:%s):" % len(txt1))
+    print(txt1)
+    
+    txt2=ocr_tools.extract_txt(filename_dst2)
+    print("")
+    print("ocr2 (len:%s):" % len(txt2))
+    print(txt2)
+    
+    # on elsa passport: 2189 contre 2137 pour la version flipped qui est pourtant la bonne !
+    #~ bRotIsBetter = len(txt2) > len(txt1)
+    
+    tri1 = countTrigramme(txt1)
+    tri2 = countTrigramme(txt2)
+    print("tri1: %s" % tri1 )
+    print("tri2: %s" % tri2 )
+    bRotIsBetter = tri2 > tri1
+    if bRotIsBetter:
+        filename_to_delete = filename_dst
+        filename_dst = filename_dst2
+    else:
+        filename_to_delete = filename_dst2
+    os.unlink(filename_to_delete)
+    
+    print("INF: preprocessExportedFile: cleaned file exported to '%s'" % filename_dst )
+    return filename_dst
 
 def testLoopBugMyScanner():
     os.chdir("c:/tmp")
@@ -100,12 +161,17 @@ def testLoopBugMyScanner():
             break
         except BaseException as err:
             print("err: %s" % err)
-    
-if 1:                
-    for i in range(50):
+           
+       
+def runManyTimes( nNbrTimes = 50 ):
+    for i in range(nNbrTimes):
         try:
             acquire_image_wia("c:/tmp/wia-test2.png",nResolution=300)
             print("INF: Success!")
             break
         except BaseException as err:
             print("ERR: try %d: %s" % (i,err))
+            
+#~ runManyTimes()   
+preprocessExportedFile("c:/tmp/wia-test2a.png")
+

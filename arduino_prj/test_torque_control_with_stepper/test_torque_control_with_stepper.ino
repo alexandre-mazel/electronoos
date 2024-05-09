@@ -4,7 +4,6 @@
 #define enaPin2 31 //enable-motor
 #define dirPin2 33 //direction
 #define stepPin2 35 //step-pulse
-#define stepPin2_pwm 44 //step-pulse on a 16bit pwm // can only be 44 45 or 46 for these methods
 
 
 
@@ -21,13 +20,39 @@ void setup()
   Serial.println("test_torque_control_with_stepper");
 }
 
-void loop() 
+void slowGive()
 {
   const int nNbrStepPerTurn = 200;
-  const int nSleepMicroSec = 4000;  // 500 was ok // 300 also for 17HE15-1504S without charge // with 314g charge, set 500
+  const int nSleepMicroSec = 8000;  // 500 was ok // 300 also for 17HE15-1504S without charge // with 314g charge, set 500 // max 16383
+  const int nNbrMulti = 2;
 
   Serial.println("looping...");
 
+  digitalWrite(dirPin2,HIGH);
+
+  digitalWrite(enaPin2,LOW);
+  for(int i = 0; i < nNbrStepPerTurn; ++i )
+  {
+    digitalWrite( stepPin2, HIGH ); // takes 6micros
+    for(int j = 0; j < nNbrMulti; ++j)
+      delayMicroseconds(nSleepMicroSec);
+
+    digitalWrite( stepPin2,LOW );
+    for(int j = 0; j < nNbrMulti; ++j)
+      delayMicroseconds(nSleepMicroSec);
+  }
+  //digitalWrite(enaPin2,HIGH); // cut
+  //delay(2000);
+}
+
+void fastRoll()
+{
+  const int nNbrStepPerTurn = 200;
+  const int nSleepMicroSec = 700;  // 500 was ok // 300 also for 17HE15-1504S without charge // with 314g charge, set 500 // max 16383
+
+  Serial.println("looping...");
+
+  digitalWrite(dirPin2,LOW);
   digitalWrite(enaPin2,LOW);
   for(int i = 0; i < nNbrStepPerTurn; ++i )
   {
@@ -38,6 +63,12 @@ void loop()
     delayMicroseconds(nSleepMicroSec);
   }
   //digitalWrite(enaPin2,HIGH); // cut
-  delay(2000);
+  //delay(2000);
+}
 
+void loop() 
+{
+  // fastRoll(); // to create the spool
+
+  slowGive();
 }

@@ -123,7 +123,7 @@ def preprocessExportedFile(filename):
     im2 = cv2.flip(im, -1)
     filename_dst2 = bf + "_ppf" + ext
     cv2.imwrite(filename_dst2,im2)
-    exit(1)
+    #~ exit(1)
     
     txt1=ocr_tools.extract_txt(filename_dst)
     print("")
@@ -173,5 +173,7 @@ def runManyTimes( nNbrTimes = 50 ):
             print("ERR: try %d: %s" % (i,err))
             
 #~ runManyTimes()   
-preprocessExportedFile("c:/tmp/wia-test2a.png")
+#~ preprocessExportedFile("c:/tmp/wia-test2a.png")
+preprocessExportedFile("../data/wia-test2a.png")
+preprocessExportedFile("../data/wia-test2b.png")
 

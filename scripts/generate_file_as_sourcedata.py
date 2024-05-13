@@ -10,6 +10,9 @@ import unishox2
 #  (to get the source in c to generate pypi)
 # then python setup.py install
 
+# arduino code:
+#https://github.com/siara-cc/Unishox_Arduino_lib
+
 import os
 import sys
 
@@ -39,9 +42,13 @@ def outputToSrc( data, dest_template_name, n_original_size = -1 ):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print( "syntax: scriptname <file> [filename]");
+        print( "syntax: scriptname <file> [filename] - interesting for text file");
         print( "eg: scriptname index.html will generate data_index_html.h and data_index_html.cpp");
         exit(-1)
+        
+    # eg: python3 generate_file_as_sourcedata.py C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\\just_lock.png
+    #  (not interesting as not compressing very well)
+    # or python3 generate_file_as_sourcedata.py ..\data\confucius_ext.txt
         
         
     strDataFilename = sys.argv[1]
@@ -54,7 +61,7 @@ if __name__ == "__main__":
         
     
     print("INF: opening '%s'" % strDataFilename )
-    f = open(strDataFilename)
+    f = open(strDataFilename,"rb")
     buf = f.read()
     compressed, original_size = unishox2.compress(buf)
     print("INF: size before: %d, after: %d, gain: %5.2f%%" % (original_size,len(compressed),100*(1-(float(len(compressed))/original_size))) )

@@ -59,6 +59,10 @@ except NameError:
     FileNotFoundError = IOError
         
         
+def getSystemHostName():
+    import socket
+    return socket.gethostname()
+        
 def getUserHome():
     """
     return a user root folder

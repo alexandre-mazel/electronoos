@@ -3,6 +3,9 @@
 
 #include "Alex_LSM6DSOX.h"
 
+#include <LowPower.h>
+#include <avr/sleep.h>
+
 /*
 Le croquis utilise 31158 octets (12%) de l'espace de stockage de programmes. Le maximum est de 253952 octets.
 Les variables globales utilisent 7293 octets (89%) de mémoire dynamique, ce qui laisse 899 octets pour les variables locales. Le maximum est de 8192 octets.
@@ -1100,4 +1103,25 @@ void loop()
 
     countFps();
     delay(100); // time for sensors to update
+
+  if(0)
+  {
+    // test low power
+      
+    tft.fillRect(0,0,640,640,BLACK);
+
+
+    // for MEGA2560:
+    LowPower.idle(SLEEP_8S, ADC_OFF, TIMER5_OFF, TIMER4_OFF, TIMER3_OFF, 
+          TIMER2_OFF, TIMER1_OFF, TIMER0_OFF, SPI_OFF, USART3_OFF, 
+          USART2_OFF, USART1_OFF, USART0_OFF, TWI_OFF);
+          
+
+
+  set_sleep_mode (SLEEP_MODE_PWR_DOWN);  
+  sleep_enable();
+  sleep_cpu ();  
+
+
+  }
 }

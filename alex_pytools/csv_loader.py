@@ -320,6 +320,7 @@ def pasteOnChar( datas, begin = '(',end = ')', sepa = ',', bVerbose=0 ):
     paste field in second array if contain begin until field containing end.
     eg [ "bobo","les animaux (chat", "rat", "poule) sont heureux." ,"youpi" ] => [ "bobo", "les animaux (chat,rat,poule) sont heureux." ,"youpi" ]
     """
+    #~ bVerbose = 1
     assert(begin != end)
     for j in range(len(datas)):
         d = datas[j]
@@ -328,6 +329,9 @@ def pasteOnChar( datas, begin = '(',end = ')', sepa = ',', bVerbose=0 ):
         nIdxStart = -1 # -1 if not between begin and end
         while i < len(d):
             if nIdxStart == -1:
+                if isinstance((d[i]), int) or isinstance((d[i]), float) : # une fois il y avait le nombre 1000 comme nom d'agent !
+                    i += 1
+                    continue
                 idx1 = d[i].rfind(begin) # cherche le dernier
                 if idx1 > -1:
                     #~ print("idx1: %s" % idx1)

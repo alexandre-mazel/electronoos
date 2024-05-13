@@ -238,6 +238,12 @@ def generatePdfFromImages( listImgs, strOutPdfFilename, strVersoText = None, nNb
             import cv2
             import numpy as np
             im = cv2.imread(strFilename,cv2.IMREAD_ANYDEPTH)
+            if im is None:
+                print( "ERR: generatePdfFromImages: image can't be loaded: %s" % strFilename ) 
+                nNumImage += 1
+                if nNumImage >= len(listImgs):
+                    break
+                continue
             print("DBG: pdfMultiCell: im.dtype: %s" % str(im.dtype))
             print("DBG: pdfMultiCell: im.shape: %s" % str(im.shape))
             if im.dtype == np.uint16:

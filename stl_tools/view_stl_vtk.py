@@ -245,6 +245,7 @@ def showStl(filename, bAnimate=True, bDrawingTechnic = True):
     # Create an actor
     actor = vtk.vtkActor()
     actor.SetMapper(mapper)
+
         
     #actor.SetPosition(0,0,0)
     # put the center at the center of the world!
@@ -284,6 +285,27 @@ def showStl(filename, bAnimate=True, bDrawingTechnic = True):
         for i in range(3):
             actorNew = vtk.vtkActor()
             actorNew.SetMapper(mapper)
+            if 1:
+                # not working
+                actorNew.GetProperty().SetRenderLinesAsTubes
+                actorNew.GetProperty().SetRepresentationToSurface()
+                actorNew.GetProperty().EdgeVisibilityOn()
+                actorNew.GetProperty().SetEdgeColor(0,0,0)
+                actorNew.GetProperty().SetColor(0,0,0)
+                actorNew.GetProperty().SetEdgeTint(0,255,0)
+                actorNew.GetProperty().SetEdgeOpacity(0.5)
+                # other try:
+                prop = actorNew.GetProperty()
+                prop.SetRepresentationToSurface()
+                prop.EdgeVisibilityOn()
+                prop.SetColor(0,0,0)
+                prop.SetEdgeColor(0,0,0)
+                prop.SetEdgeTint(0,255,0)
+                prop.SetEdgeOpacity(0.5)
+                actorNew.SetProperty(prop)
+                
+                #~ actorNew.SetForceTranslucent(1) # this one works
+                                
             actors.append(actorNew)
         actors.append(actor)
         #~ actor2.SetPosition(100,100,0)
@@ -436,7 +458,10 @@ def showStl(filename, bAnimate=True, bDrawingTechnic = True):
     if bRenderToFile:
         print("INF: Rendering to file...")
         print("actor rot: %s" % str(actor.GetOrientationWXYZ()) )
-        outfn = filename.lower().replace(".stl","__technical_drawing.") + "png"
+        postfn = "__technical_drawing."
+        if nRotationConfig != 0:
+            postfn = postfn.replace(".","_r%d."%nRotationConfig)
+        outfn = filename.lower().replace(".stl",postfn) + "png"
         WriteImage(outfn, renderWindow, rgba=True)
         
         nbr_faces = 0
@@ -458,8 +483,8 @@ if __name__ == "__main__":
     fn = "MovingWeight_with_roller.stl"
     #~ fn = "CameraFishEye_p1.stl"
     fn = "CameraFishEye_p2.stl"
-    fn = "gaia_logo.stl"
-    fn = "spool_test.stl"
+    #~ fn = "gaia_logo.stl"
+    #~ fn = "spool_test.stl"
     if 0:
         WriteCartouche("gaia_logo_technical_drawing.png","gaia_logo.stl",123)
         exit(2)

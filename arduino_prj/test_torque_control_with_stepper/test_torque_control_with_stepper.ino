@@ -23,8 +23,8 @@ void setup()
 void slowGive()
 {
   const int nNbrStepPerTurn = 200;
-  const int nSleepMicroSec = 8000;  // 500 was ok // 300 also for 17HE15-1504S without charge // with 314g charge, set 500 // max 16383
-  const int nNbrMulti = 2;
+  const int nSleepMicroSec = 12000;  // 500 was ok // 300 also for 17HE15-1504S without charge // with 314g charge, set 500 // max 16383
+  const int nNbrMulti = 5;
 
   Serial.println("looping...");
 
@@ -47,8 +47,9 @@ void slowGive()
 
 void fastRoll()
 {
+  // fast in the other direction
   const int nNbrStepPerTurn = 200;
-  const int nSleepMicroSec = 700;  // 500 was ok // 300 also for 17HE15-1504S without charge // with 314g charge, set 500 // max 16383
+  const int nSleepMicroSec = 500;  // 500 was ok // 300 also for 17HE15-1504S without charge // with 314g charge, set 500 // max 16383
 
   Serial.println("looping...");
 

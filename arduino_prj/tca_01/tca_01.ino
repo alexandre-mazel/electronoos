@@ -560,14 +560,17 @@ void updateMachine1b()
     }
   }
 
-  if(bSendCmdMotor1)
+  if (nTwistMove == -1 || (nTwistMove == 1 && (nFrame%128)==0) ) // 256 slower with the green button
   {
-    digitalWrite(stepPin2,bFlipFlopMotor1);
-    //digitalWrite(stepPin3,bFlipFlopMotor1);
-    bFlipFlopMotor1 = ! bFlipFlopMotor1;
-    if(bFlipFlopMotor1)
+    if(bSendCmdMotor1 )
     {
-      nNbrStepMotor1 += nTwistMove;
+      digitalWrite(stepPin2,bFlipFlopMotor1);
+      //digitalWrite(stepPin3,bFlipFlopMotor1);
+      bFlipFlopMotor1 = ! bFlipFlopMotor1;
+      if(bFlipFlopMotor1)
+      {
+        nNbrStepMotor1 += nTwistMove;
+      }
     }
   }
 

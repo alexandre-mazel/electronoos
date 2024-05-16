@@ -42,10 +42,12 @@ def crypt_rotdec(w):
         o += chr(numChar+ord('A'))
     return o
     
-print(crypt_rot(listWords[0]))
-for i in [6,9,11]:
-    print(crypt_rot(listWords[i]))
     
-print(crypt_rotdec(listWords[0]))
-for i in [7,12,13]:
-    print(crypt_rotdec(listWords[i]))
+if __name__ == "__main__":
+    print(crypt_rot(listWords[0]))
+    for i in [6,9,11]:
+        print(crypt_rot(listWords[i]))
+        
+    print(crypt_rotdec(listWords[0]))
+    for i in [7,12,13]:
+        print(crypt_rotdec(listWords[i]))

@@ -272,6 +272,9 @@ void setup()
   if( nNumError == 0 )
   {
     Serial.println("INF: Everything looks GOOD !");
+    //tft_write("GOOD: All 3 I2Cs are ok!");
+    tft_write("GOOD3!");
+    delay(1500);
   }
   else
   {
@@ -608,7 +611,7 @@ int render_screen(int nPresel, int nip, int db, int bubble, double circ,int bLoc
     tft.setCursor(nMenuW+nAreaW+50, yText);
     tft.print("DB");
     tft.setCursor(nMenuW+nAreaW+50, yText+nLineH*5);
-    if(db>360)
+    if(db>3600) // was 360 (error)
     {
       tft.print("???");
     }

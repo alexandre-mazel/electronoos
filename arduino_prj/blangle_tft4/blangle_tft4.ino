@@ -8,8 +8,8 @@
 
 /*
 Actuellement:
-Sketch uses 40504 bytes (15%) of program storage space. Maximum is 253952 bytes.
-Global variables use 5815 bytes (70%) of dynamic memory, leaving 2377 bytes for local variables. Maximum is 8192 bytes.
+Sketch uses 41228 bytes (16%) of program storage space. Maximum is 253952 bytes.
+Global variables use 6393 bytes (78%) of dynamic memory, leaving 1799 bytes for local variables. Maximum is 8192 bytes.
 */
 
 // install tft_espi using the library manager
@@ -511,23 +511,25 @@ const int nBubbleH = h_screen;
 const int nAreaW = (w_screen-nMenuW-nBubbleW)/2; // width of an area
 const int nAreaH = h_screen/2;
 const int nAreaH_Display = 4*h_screen/5;
+const int yCircEdit = 100;
 const int nLineH = 8;
 
 const int xLock = nMenuW+342;
-const int yLock = nAreaH+20;
+const int yLock = nAreaH+20+24;
 
 const int wLock = 88;
 const int hLock = 124;
 
-const int xArrow = nMenuW+88;
-const int yArrow = nAreaH+32;
-const int yArrowBottom = nAreaH+80+30;
-const int wArrow = 20;
-const int wInterArrow = 10;
+const int xArrow = nMenuW+88+44;
+const int yArrow = yCircEdit-32-20;
+const int yArrowBottom = yCircEdit+50;
+const int wArrow = 34;
+const int wInterArrow = 12;
 
 
 const int yBigText = 40+30;
 const int wBigText = 6;
+const int wBigTextEdit = 8;
 
 OptimalTextRenderer otr_nip(BLUE,WHITE,wBigText,nMenuW+30, yBigText+nLineH*wBigText+10);
 OptimalTextRenderer otr_db(LBLUE,WHITE,wBigText,nMenuW+nAreaW+30, yBigText+nLineH*wBigText+10);
@@ -584,13 +586,15 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
 
   if(bRedrawAll) // temporary to find bugs or forgotten background
   {
-    tft.fillRect(0,0,w_screen,h_screen,GRAY);
+    // tft.fillRect(0,0,w_screen,h_screen,GRAY);
   }
 
-  // we always print the selection colonne
+  // we always print the selection column
   if( nPrevPresel != nPresel || bRedrawAll )
   {
+    tft.fillRect(0,0,nMenuW,nMenuH,GRAY);
     nPrevPresel = nPresel;
+    tft.setTextSize(3);
     for( int i = 0; i < nNbrSettings; ++i)
     {
       if( i == nPresel )
@@ -602,10 +606,8 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
         tft.setTextColor(WHITE);
       }
       tft.setCursor(10, 6+i*h/nNbrSettings);
-      tft.setTextSize(3);
       tft.print(i+1);
     }
-    tft.setTextColor(WHITE);
   }
 
   if(bEditionMode)
@@ -613,20 +615,20 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
 
     if( bRedrawAll )
     {
-      tft.fillRect(0,0,nMenuW,nMenuH,GRAY);
-      tft.fillRect(nMenuW,nAreaH,nAreaW*2,nAreaH,BLACK);
+      tft.fillRect(nMenuW,0,w_screen-nMenuW,h_screen,PURPLE);
     }
 
-    tft.setTextSize(wBigText);
-    tft.setCursor(nMenuW+20, nAreaH+64);
+    tft.setTextSize(wBigTextEdit);
+    tft.setCursor(nMenuW+20, yCircEdit);
     tft.print("C=");
     tft.setCursor(tft.getCursorX()+8, tft.getCursorY()); // half space
-    tft.setTextColor(WHITE, BLACK);
+    tft.setTextColor(WHITE, PURPLE);
     //tft.print(circ,1);
 
     snprintf(buf,8,"%4d.%1d", int(circ),int( 0.5+(circ-int(circ))*10 ) );
     tft.print(buf);
     tft.setTextColor(WHITE);
+    tft.setCursor(nMenuW+20, yCircEdit+60);
     tft.print("mm");
     
 
@@ -640,7 +642,7 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
       if( ! bLocked )
       {
         // cache le haut du verrou
-        tft.fillRect(xLock, yLock,80,48,BLACK);
+        tft.fillRect(xLock, yLock,80,48,PURPLE);
 
         // affiche les fleches
         
@@ -744,6 +746,7 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
     else
       snprintf(buf,8,"%2d.%1d", int(db/10),db%10 );
     otr_db.render(&tft,buf,bRedrawAll);
+
     if(bRedrawAll)
     {
       tft.setCursor(tft.getCursorX()+4, yBigText+nLineH*wBigText+10-nLineH+2); // get cursor is'nt always at the good place here (it depends of which char has been rendered before)
@@ -793,7 +796,7 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
 
 
     tft.setTextSize(2);
-    tft.fillRect( nMenuW+50+46+12, nDebugY,62, 15, BLUE );
+    tft.fillRect( nMenuW+50+46+12, nDebugY,62, 15, bEditionMode?PURPLE:BLUE );
     tft.setCursor( nMenuW+50, nDebugY );
     tft.print("temp:");
     if(isnan(rTemperature))
@@ -806,12 +809,12 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
     }
     tft.print("  ");
 
-    tft.fillRect( nMenuW+nAreaW+50+46, nDebugY,36, 15, LBLUE );
+    tft.fillRect( nMenuW+nAreaW+50+46, nDebugY,36, 15, bEditionMode?PURPLE:LBLUE );
     tft.setCursor( nMenuW+nAreaW+50, nDebugY );
     tft.print("lum:");
     tft.print(nLuminosity);
 
-    tft.fillRect( nMenuW+nAreaW+50+46+86, nDebugY,10, 15, LBLUE );
+    tft.fillRect( nMenuW+nAreaW+50+46+86, nDebugY,10, 15, bEditionMode?PURPLE:LBLUE );
     tft.print(" lb:");
     tft.print(bLowBattery);
     tft.print("     ");
@@ -1052,6 +1055,9 @@ void loop()
       // detect touch - center of the point
       int x,y,z;
       bool bPressed = std_getPressed(&x,&y,&z,true);
+
+      // dommage de recreer la listPos a chaque frame!
+
       if( bPressed )
       {
         const int dw_arrow = wArrow+wInterArrow;
@@ -1063,8 +1069,8 @@ void loop()
         // add 10 arrows
         for( int i = 0; i < 5; ++i )
         {
-          listPos[2+i*2+0] = xArrow+i*dw_arrow+wArrow/2+1;
-          listPos[2+i*2+1] = yArrow+8;
+          listPos[2+i*2+0] = xArrow+i*dw_arrow+wArrow/2+1+6;
+          listPos[2+i*2+1] = yArrow+16;
 
           if( i == 4)
           {
@@ -1074,7 +1080,7 @@ void loop()
 
           // fleches du bas
           listPos[2+(i+5)*2+0] = listPos[2+(i+0)*2+0];
-          listPos[2+(i+5)*2+1] = listPos[2+(i+0)*2+1] + 86;
+          listPos[2+(i+5)*2+1] = listPos[2+(i+0)*2+1] + yArrowBottom-yArrow+10; // bizarre de devoir ajouter 10 !
 
         }
 
@@ -1215,11 +1221,12 @@ void loop()
     {
       if( ((millis()/3000) & 2) == 0 )
       {
-        //bEditionMode = 0;
+        bEditionMode = 0;
       }
       else
       {
         bEditionMode = 1;
+        nLocked = ((millis()/6000) & 2) == 1; // un coup sur deux
       }
     }
 

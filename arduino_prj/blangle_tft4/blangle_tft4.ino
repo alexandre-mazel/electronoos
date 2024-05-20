@@ -8,8 +8,8 @@
 
 /*
 Actuellement:
-Sketch uses 40646 bytes (16%) of program storage space. Maximum is 253952 bytes.
-Global variables use 6631 bytes (80%) of dynamic memory, leaving 1561 bytes for local variables. Maximum is 8192 bytes.
+Sketch uses 40900 bytes (16%) of program storage space. Maximum is 253952 bytes.
+Global variables use 6639 bytes (81%) of dynamic memory, leaving 1553 bytes for local variables. Maximum is 8192 bytes.
 */
 
 // install tft_espi using the library manager
@@ -72,6 +72,7 @@ void loop()
 MCUFRIEND_kbv tft;
 
 // Assign human-readable names to some common 16-bit color values:
+// cf https://rgbcolorpicker.com/565 mais avec r et b inverted
 #define BLACK   0x0000
 #define BLUE    0x001F
 #define RED     0xF800
@@ -81,6 +82,9 @@ MCUFRIEND_kbv tft;
 #define YELLOW  0xFFE0
 #define WHITE   0xFFFF
 #define GRAY    0x8410
+#define PURPLE  0xa014 // 20 / 0 / 20
+#define LBLUE   0xc3e5
+#define ORANGE  0x03ff // 0 / 31 / 31
 
 #define PIN_PHOTORES A14
 #define PIN_LOWBATTERY A15
@@ -506,6 +510,7 @@ const int nBubbleW = 0; // bubble level (was 32 to render it)
 const int nBubbleH = h_screen;
 const int nAreaW = (w_screen-nMenuW-nBubbleW)/2; // width of an area
 const int nAreaH = h_screen/2;
+const int nAreaH_Display = 4*h_screen/5;
 const int nLineH = 8;
 
 const int xLock = nMenuW+342;
@@ -521,10 +526,11 @@ const int wArrow = 20;
 const int wInterArrow = 10;
 
 
-const int yBigText = 40;
+const int yBigText = 40+30;
+const int wBigText = 6;
 
-OptimalTextRenderer otr_nip(BLUE,WHITE,5,nMenuW+50, yBigText+nLineH*5);
-OptimalTextRenderer otr_db(RED,WHITE,5,nMenuW+nAreaW+50, yBigText+nLineH*5);
+OptimalTextRenderer otr_nip(BLUE,WHITE,wBigText,nMenuW+30, yBigText+nLineH*wBigText+10);
+OptimalTextRenderer otr_db(LBLUE,WHITE,wBigText,nMenuW+nAreaW+30, yBigText+nLineH*wBigText+10);
 
 int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, double circ,int bLocked, float rTemperature, int nLuminosity, bool bLowBattery)
 {
@@ -535,7 +541,7 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
   static int nPrevNip = 9999;
   static int nPrevBubble = 9999;
   static int bPrevEditionMode = -1;
-  char buf[8];
+  char buf[14];
   
   // dessine l'interface, ne redessinne que ce qui est utile
 
@@ -612,7 +618,7 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
       tft.fillRect(nMenuW,nAreaH,nAreaW*2,nAreaH,BLACK);
     }
 
-    tft.setTextSize(5);
+    tft.setTextSize(wBigText);
     tft.setCursor(nMenuW+20, nAreaH+64);
     tft.print("C=");
     tft.setCursor(tft.getCursorX()+8, tft.getCursorY()); // half space
@@ -662,12 +668,12 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
 
     if( bRedrawAll )
     {
-      tft.fillRect(nMenuW,0,nAreaW,nAreaH,BLUE);
-      tft.fillRect(nMenuW+nAreaW,0,nAreaW,nAreaH,RED);
+      tft.fillRect(nMenuW,0,nAreaW,nAreaH_Display,BLUE);
+      tft.fillRect(nMenuW+nAreaW,0,nAreaW,nAreaH_Display,LBLUE);
     }
 
 
-    tft.setTextSize(5);
+    tft.setTextSize(wBigText);
 
     /*
 
@@ -713,18 +719,16 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
     }
     */
 
-    char bufval[8];
-
     if( bRedrawAll )
     {
       tft.setCursor(nMenuW+50, yBigText);
       tft.print("NIP");
     }
     if(nip>999)
-      snprintf(bufval,8,"???" );
+      snprintf(buf,8,"???" );
     else
-      snprintf(bufval,8,"%3d", nip );
-    otr_nip.render(&tft,bufval);
+      snprintf(buf,8,"%3d", nip );
+    otr_nip.render(&tft,buf,bRedrawAll);
     if( bRedrawAll )
     {
       tft.print("mm"); 
@@ -737,13 +741,13 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
     }
 
     if(db>3600)
-      snprintf(bufval,8,"???" );
+      snprintf(buf,8,"???" );
     else
-      snprintf(bufval,8,"%2d.%1d", int(db/10),db%10 );
-    otr_db.render(&tft,bufval);
+      snprintf(buf,8,"%2d.%1d", int(db/10),db%10 );
+    otr_db.render(&tft,buf,bRedrawAll);
     if(bRedrawAll)
     {
-      tft.setCursor(tft.getCursorX(), yBigText+nLineH*5-nLineH+2);
+      tft.setCursor(tft.getCursorX()+4, yBigText+nLineH*wBigText+10-nLineH+2); // get cursor is'nt always at the good place here (it depends of which char has been rendered before)
       tft.setTextSize(3);
       tft.print("o");
     }
@@ -766,6 +770,18 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
       tft.drawRect(w-nBubbleW,h/2+nBubbleSize2,nBubbleW,2,BLACK);
     }
 
+
+    if( bRedrawAll )
+    {
+      // small circ just for information
+      const int yCirc = nAreaH_Display+14;
+      tft.setTextSize(5);
+      tft.setTextColor(WHITE);
+      tft.setCursor(nMenuW+70, yCirc);
+      snprintf(buf,12,"C=%4d.%1dmm", int(circ),int( 0.5+(circ-int(circ))*10 ) );
+      tft.print(buf);
+    }
+
   } // view mode
 
 
@@ -774,12 +790,12 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
 
     // debug temp et lum
     
-    const int nOffsetY = -20;
+    const int nDebugY = 8;
 
 
     tft.setTextSize(2);
-    tft.fillRect( nMenuW+50+46, yBigText+nOffsetY,48, 16, BLUE );
-    tft.setCursor( nMenuW+50, yBigText+nOffsetY );
+    tft.fillRect( nMenuW+50+46+12, nDebugY,62, 15, BLUE );
+    tft.setCursor( nMenuW+50, nDebugY );
     tft.print("temp:");
     if(isnan(rTemperature))
     {
@@ -791,10 +807,12 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
     }
     tft.print("  ");
 
-    tft.fillRect( nMenuW+nAreaW+50+46, yBigText+nOffsetY,48, 16, RED );
-    tft.setCursor( nMenuW+nAreaW+50, yBigText+nOffsetY );
+    tft.fillRect( nMenuW+nAreaW+50+46, nDebugY,36, 15, LBLUE );
+    tft.setCursor( nMenuW+nAreaW+50, nDebugY );
     tft.print("lum:");
     tft.print(nLuminosity);
+
+    tft.fillRect( nMenuW+nAreaW+50+46+86, nDebugY,10, 15, LBLUE );
     tft.print(" lb:");
     tft.print(bLowBattery);
     tft.print("     ");
@@ -1202,7 +1220,7 @@ void loop()
       }
       else
       {
-        //bEditionMode = 1;
+        bEditionMode = 1;
       }
     }
 
@@ -1222,7 +1240,7 @@ void loop()
 
   set_sleep_mode (SLEEP_MODE_PWR_DOWN);  
   sleep_enable();
-  sleep_cpu ();  
+  sleep_cpu();  
 
 
   }

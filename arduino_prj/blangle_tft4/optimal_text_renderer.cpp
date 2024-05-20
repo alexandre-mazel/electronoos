@@ -29,9 +29,9 @@ OptimalTextRenderer::~OptimalTextRenderer()
 #endif
 }
 
-void OptimalTextRenderer::render( MCUFRIEND_kbv * pTft, const char * txt )
+void OptimalTextRenderer::render( MCUFRIEND_kbv * pTft, const char * txt, int bForceRedrawAll )
 {
-  if(1 && strcmp(lastRenderedText_,txt) == 0)
+  if( !bForceRedrawAll && strcmp(lastRenderedText_,txt) == 0)
     return;
   
   //Serial.print("OptimalTextRenderer: rendering: "); Serial.println(txt);
@@ -56,7 +56,7 @@ void OptimalTextRenderer::render( MCUFRIEND_kbv * pTft, const char * txt )
   int nSizeChar = nSizeText_*6;
   while(*src)
   {
-    if( (*p) != (*src) )
+    if( (*p) != (*src) || bForceRedrawAll )
     {
       // render new char
       pTft->fillRect( xcur, y_, nSizeChar, nSizeText_*7, colorBackground_ );

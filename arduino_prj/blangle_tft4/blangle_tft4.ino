@@ -8,8 +8,8 @@
 
 /*
 Actuellement:
-Sketch uses 40532 bytes (15%) of program storage space. Maximum is 253952 bytes.
-Global variables use 6617 bytes (80%) of dynamic memory, leaving 1575 bytes for local variables. Maximum is 8192 bytes.
+Sketch uses 40512 bytes (15%) of program storage space. Maximum is 253952 bytes.
+Global variables use 6649 bytes (81%) of dynamic memory, leaving 1543 bytes for local variables. Maximum is 8192 bytes.
 */
 
 // install tft_espi using the library manager

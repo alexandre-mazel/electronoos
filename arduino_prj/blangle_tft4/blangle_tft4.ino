@@ -523,7 +523,7 @@ const int wInterArrow = 10;
 
 const int yBigText = 40;
 
-OptimalTextRenderer otr_db(RED,WHITE,5,nMenuW+nAreaW+50, yBigText+nLineH*5+20);
+OptimalTextRenderer otr_db(RED,WHITE,5,nMenuW+nAreaW+50, yBigText+nLineH*5+80);
 
 int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, double circ,int bLocked, float rTemperature, int nLuminosity, bool bLowBattery)
 {
@@ -699,10 +699,10 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
   
 
     char bufval[8];
-    snprintf(bufval,8,"%4.1f", db/10.f );
+    snprintf(bufval,8,"%3d.%1d", int(db/10),db%10 );
     otr_db.render(&tft,bufval);
 
-    if(nPrevBubble != bubble && 1 )
+    if(nPrevBubble != bubble && 0 )
     {
       // render bubble
       const int nBubbleSize2=32/2;

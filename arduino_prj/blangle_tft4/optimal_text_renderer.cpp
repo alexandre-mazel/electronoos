@@ -28,11 +28,13 @@ OptimalTextRenderer::~OptimalTextRenderer()
 #endif
 }
 
-OptimalTextRenderer::render( MCUFRIEND_kbv * pTft, const char * txt )
+void OptimalTextRenderer::render( MCUFRIEND_kbv * pTft, const char * txt )
 {
-  if(strcmp(lastRenderedText_,txt) == 0)
+  if(0 && strcmp(lastRenderedText_,txt) == 0)
     return;
   
+  Serial.print("OptimalTextRenderer: rendering: "); Serial.println(txt);
+
   // version no optim, just to test rendering
   pTft->setTextSize(nSizeText_);
   pTft->setTextColor(colorText_);

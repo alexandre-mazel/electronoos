@@ -17,6 +17,7 @@ OptimalTextRenderer::OptimalTextRenderer(int colorBackground, int colorText, int
 #endif
 {
   lastRenderedText_ = new char[nNbrCharMax+1];
+  memset(lastRenderedText_,0,nNbrCharMax+1);
 
 }
 
@@ -49,22 +50,25 @@ void OptimalTextRenderer::render( MCUFRIEND_kbv * pTft, const char * txt )
   pTft->setTextColor(colorText_);
 
   char * p = lastRenderedText_;
-  const char * ptxt = txt;
+  const char * src = txt;
   int num_char = 0;
   int xcur = x_;
   int nSizeChar = nSizeText_*6;
-  while(*ptxt)
+  while(*src)
   {
-    if( (*p) != (*txt) )
+    if( (*p) != (*src) )
     {
       // render new char
       pTft->fillRect( xcur, y_, nSizeChar, nSizeText_*7, colorBackground_ );
       pTft->setCursor(xcur,y_);
-      pTft->print(*ptxt);
+      pTft->print(*src);
+      *p = *src; // update previous char
     }
     xcur += nSizeChar;
-    ++ptxt;
+    ++src;
     ++p;
   }
-  strcpy(lastRenderedText_,txt);
+  // erase previous other char if previous string was longer
+  pTft->fillRect( xcur, y_, nSizeChar*strlen(p), nSizeText_*7, colorBackground_ );
+  *p = '\0';
 }

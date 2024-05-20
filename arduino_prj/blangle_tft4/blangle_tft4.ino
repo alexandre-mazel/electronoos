@@ -8,8 +8,8 @@
 
 /*
 Actuellement:
-Sketch uses 40588 bytes (15%) of program storage space. Maximum is 253952 bytes.
-Global variables use 6617 bytes (80%) of dynamic memory, leaving 1575 bytes for local variables. Maximum is 8192 bytes.
+Sketch uses 40646 bytes (16%) of program storage space. Maximum is 253952 bytes.
+Global variables use 6631 bytes (80%) of dynamic memory, leaving 1561 bytes for local variables. Maximum is 8192 bytes.
 */
 
 // install tft_espi using the library manager
@@ -523,7 +523,8 @@ const int wInterArrow = 10;
 
 const int yBigText = 40;
 
-OptimalTextRenderer otr_db(RED,WHITE,5,nMenuW+nAreaW+50, yBigText+nLineH*5+80);
+OptimalTextRenderer otr_nip(BLUE,WHITE,5,nMenuW+50, yBigText+nLineH*5);
+OptimalTextRenderer otr_db(RED,WHITE,5,nMenuW+nAreaW+50, yBigText+nLineH*5);
 
 int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, double circ,int bLocked, float rTemperature, int nLuminosity, bool bLowBattery)
 {
@@ -568,44 +569,47 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
     return 0;
   }
 
-  if( ! bDrawed )
+  if( ! bDrawed)
   {
     bDrawed = 1;
     tft.setRotation(LANDSCAPE+2); // +2 => revert haut bas
     //tft.fillScreen(BLACK);
-    tft.setTextColor(WHITE);
-    tft.fillRect(0,0,nMenuW,nMenuH,GRAY);
-    tft.fillRect(nMenuW,0,nAreaW,nAreaH,BLUE);
-    tft.fillRect(nMenuW+nAreaW,0,nAreaW,nAreaH,RED);
-    tft.fillRect(nMenuW,nAreaH,nAreaW*2,nAreaH,BLACK);
+    bRedrawAll = 1;
   }
 
-  if(bRedrawAll)
+  if(bRedrawAll) // temporary to find bugs or forgotten background
   {
     tft.fillRect(0,0,w_screen,h_screen,GRAY);
+  }
+
+  // we always print the selection colonne
+  if( nPrevPresel != nPresel || bRedrawAll )
+  {
+    nPrevPresel = nPresel;
+    for( int i = 0; i < nNbrSettings; ++i)
+    {
+      if( i == nPresel )
+      {
+      tft.setTextColor(BLUE); 
+      }
+      else
+      {
+        tft.setTextColor(WHITE);
+      }
+      tft.setCursor(10, 6+i*h/nNbrSettings);
+      tft.setTextSize(3);
+      tft.print(i+1);
+    }
+    tft.setTextColor(WHITE);
   }
 
   if(bEditionMode)
   {
 
-    if( nPrevPresel != nPresel)
+    if( bRedrawAll )
     {
-      nPrevPresel = nPresel;
-      for( int i = 0; i < nNbrSettings; ++i)
-      {
-        if( i == nPresel )
-        {
-        tft.setTextColor(BLUE); 
-        }
-        else
-        {
-          tft.setTextColor(WHITE);
-        }
-        tft.setCursor(10, 6+i*h/nNbrSettings);
-        tft.setTextSize(3);
-        tft.print(i+1);
-      }
-      tft.setTextColor(WHITE);
+      tft.fillRect(0,0,nMenuW,nMenuH,GRAY);
+      tft.fillRect(nMenuW,nAreaH,nAreaW*2,nAreaH,BLACK);
     }
 
     tft.setTextSize(5);
@@ -655,7 +659,17 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
   else
   {
     // view mode
+
+    if( bRedrawAll )
+    {
+      tft.fillRect(nMenuW,0,nAreaW,nAreaH,BLUE);
+      tft.fillRect(nMenuW+nAreaW,0,nAreaW,nAreaH,RED);
+    }
+
+
     tft.setTextSize(5);
+
+    /*
 
     if(nPrevNip != nip || !bDrawed )
     {
@@ -675,8 +689,9 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
         tft.print("mm");
       }
     }
+    */
 
-
+        /*
     if(nPrevDb != db )
     {
       nPrevDb = db;
@@ -696,11 +711,42 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
         tft.print("o");
       }
     }
-  
+    */
 
     char bufval[8];
-    snprintf(bufval,8,"%2d.%1d", int(db/10),db%10 );
+
+    if( bRedrawAll )
+    {
+      tft.setCursor(nMenuW+50, yBigText);
+      tft.print("NIP");
+    }
+    if(nip>999)
+      snprintf(bufval,8,"???" );
+    else
+      snprintf(bufval,8,"%3d", nip );
+    otr_nip.render(&tft,bufval);
+    if( bRedrawAll )
+    {
+      tft.print("mm"); 
+    }
+
+    if(bRedrawAll)
+    {
+      tft.setCursor(nMenuW+nAreaW+50, yBigText);
+      tft.print("DB");
+    }
+
+    if(db>3600)
+      snprintf(bufval,8,"???" );
+    else
+      snprintf(bufval,8,"%2d.%1d", int(db/10),db%10 );
     otr_db.render(&tft,bufval);
+    if(bRedrawAll)
+    {
+      tft.setCursor(tft.getCursorX(), yBigText+nLineH*5-nLineH+2);
+      tft.setTextSize(3);
+      tft.print("o");
+    }
 
     if(nPrevBubble != bubble && 0 )
     {

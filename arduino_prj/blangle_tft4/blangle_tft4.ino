@@ -8,8 +8,8 @@
 
 /*
 Actuellement:
-Sketch uses 40512 bytes (15%) of program storage space. Maximum is 253952 bytes.
-Global variables use 6649 bytes (81%) of dynamic memory, leaving 1543 bytes for local variables. Maximum is 8192 bytes.
+Sketch uses 40588 bytes (15%) of program storage space. Maximum is 253952 bytes.
+Global variables use 6617 bytes (80%) of dynamic memory, leaving 1575 bytes for local variables. Maximum is 8192 bytes.
 */
 
 // install tft_espi using the library manager
@@ -699,7 +699,7 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
   
 
     char bufval[8];
-    snprintf(bufval,8,"%3d.%1d", int(db/10),db%10 );
+    snprintf(bufval,8,"%2d.%1d", int(db/10),db%10 );
     otr_db.render(&tft,bufval);
 
     if(nPrevBubble != bubble && 0 )
@@ -1156,7 +1156,7 @@ void loop()
       }
       else
       {
-        bEditionMode = 1;
+        //bEditionMode = 1;
       }
     }
 

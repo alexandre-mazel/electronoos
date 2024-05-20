@@ -8,8 +8,8 @@
 
 /*
 Actuellement:
-Sketch uses 40900 bytes (16%) of program storage space. Maximum is 253952 bytes.
-Global variables use 6639 bytes (81%) of dynamic memory, leaving 1553 bytes for local variables. Maximum is 8192 bytes.
+Sketch uses 40504 bytes (15%) of program storage space. Maximum is 253952 bytes.
+Global variables use 5815 bytes (70%) of dynamic memory, leaving 2377 bytes for local variables. Maximum is 8192 bytes.
 */
 
 // install tft_espi using the library manager
@@ -554,8 +554,7 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
 
   int bRedrawAll = 0;
 
-  Serial.print("bEditionMode: ");
-  Serial.println(bEditionMode);
+  //Serial.print("bEditionMode: "); Serial.println(bEditionMode);
 
   if( bPrevEditionMode != bEditionMode )
   {
@@ -1052,7 +1051,7 @@ void loop()
     {
       // detect touch - center of the point
       int x,y,z;
-      bool bPressed = std_getPressed(&x,&y,&z,false);
+      bool bPressed = std_getPressed(&x,&y,&z,true);
       if( bPressed )
       {
         const int dw_arrow = wArrow+wInterArrow;
@@ -1087,7 +1086,7 @@ void loop()
         }
 
         // debug: render touch point
-        if(0)
+        if(1)
         {
           for( int i = 0; i < sizeof(listPos)/2/2; ++i ) // /2(short) /2(x & y)
           {
@@ -1216,7 +1215,7 @@ void loop()
     {
       if( ((millis()/3000) & 2) == 0 )
       {
-        bEditionMode = 0;
+        //bEditionMode = 0;
       }
       else
       {

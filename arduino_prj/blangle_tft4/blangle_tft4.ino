@@ -8,8 +8,8 @@
 
 /*
 Actuellement:
-Sketch uses 32680 bytes (12%) of program storage space. Maximum is 253952 bytes.
-Global variables use 1689 bytes (20%) of dynamic memory, leaving 6503 bytes for local variables. Maximum is 8192 bytes.
+Sketch uses 40116 bytes (15%) of program storage space. Maximum is 253952 bytes.
+Global variables use 6581 bytes (80%) of dynamic memory, leaving 1611 bytes for local variables. Maximum is 8192 bytes.
 */
 
 // install tft_espi using the library manager
@@ -1126,6 +1126,18 @@ void loop()
 
     countFps();
     delay(100); // time for sensors to update
+
+    if( 1 ) // demo mode
+    {
+      if( ((millis()/1000) & 1) == 0 )
+      {
+        bEditionMode = 0;
+      }
+      else
+      {
+        bEditionMode = 1;
+      }
+    }
 
   if(0)
   {

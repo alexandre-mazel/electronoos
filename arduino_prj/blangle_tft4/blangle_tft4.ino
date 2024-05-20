@@ -8,8 +8,8 @@
 
 /*
 Actuellement:
-Sketch uses 40116 bytes (15%) of program storage space. Maximum is 253952 bytes.
-Global variables use 6581 bytes (80%) of dynamic memory, leaving 1611 bytes for local variables. Maximum is 8192 bytes.
+Sketch uses 40532 bytes (15%) of program storage space. Maximum is 253952 bytes.
+Global variables use 6617 bytes (80%) of dynamic memory, leaving 1575 bytes for local variables. Maximum is 8192 bytes.
 */
 
 // install tft_espi using the library manager
@@ -67,6 +67,7 @@ void loop()
 #include <MCUFRIEND_kbv.h>
 #include "imgs.h" // cf comments in render_lock
 #include "simple_touch_detection.h"
+#include "optimal_text_renderer.h"
 
 MCUFRIEND_kbv tft;
 
@@ -519,6 +520,11 @@ const int yArrowBottom = nAreaH+80+30;
 const int wArrow = 20;
 const int wInterArrow = 10;
 
+
+const int yBigText = 40;
+
+OptimalTextRenderer otr_db(RED,WHITE,5,nMenuW+nAreaW+50, yBigText+nLineH*5+20);
+
 int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, double circ,int bLocked, float rTemperature, int nLuminosity, bool bLowBattery)
 {
   static uint8_t bDrawed = 0;
@@ -535,13 +541,14 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
   const int w = w_screen;
   const int h = h_screen;
 
-  const int yBigText = 40;
-
 
 
   int nBubblePos = 0;
 
   int bRedrawAll = 0;
+
+  Serial.print("bEditionMode: ");
+  Serial.println(bEditionMode);
 
   if( bPrevEditionMode != bEditionMode )
   {
@@ -571,6 +578,11 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
     tft.fillRect(nMenuW,0,nAreaW,nAreaH,BLUE);
     tft.fillRect(nMenuW+nAreaW,0,nAreaW,nAreaH,RED);
     tft.fillRect(nMenuW,nAreaH,nAreaW*2,nAreaH,BLACK);
+  }
+
+  if(bRedrawAll)
+  {
+    tft.fillRect(0,0,w_screen,h_screen,GRAY);
   }
 
   if(bEditionMode)
@@ -639,35 +651,6 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
       }
     }
 
-    if(1)
-    {
-      
-      const int nOffsetY = -20;
-
-
-      tft.setTextSize(2);
-      tft.fillRect( nMenuW+50+46, yBigText+nOffsetY,48, 16, BLUE );
-      tft.setCursor( nMenuW+50, yBigText+nOffsetY );
-      tft.print("temp:");
-      if(isnan(rTemperature))
-      {
-        tft.print("???");
-      }
-      else
-      {
-        tft.print(rTemperature, 2);
-      }
-      tft.print("  ");
-
-      tft.fillRect( nMenuW+nAreaW+50+46, yBigText+nOffsetY,48, 16, RED );
-      tft.setCursor( nMenuW+nAreaW+50, yBigText+nOffsetY );
-      tft.print("lum:");
-      tft.print(nLuminosity);
-      tft.print(" lb:");
-      tft.print(bLowBattery);
-      tft.print("     ");
-      
-    }
   }
   else
   {
@@ -693,6 +676,7 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
       }
     }
 
+
     if(nPrevDb != db )
     {
       nPrevDb = db;
@@ -712,6 +696,11 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
         tft.print("o");
       }
     }
+  
+
+    char bufval[8];
+    snprintf(bufval,8,"%4.1f", db/10.f );
+    otr_db.render(&tft,bufval);
 
     if(nPrevBubble != bubble && 1 )
     {
@@ -732,6 +721,38 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
     }
 
   } // view mode
+
+
+  if(1)
+  {
+
+    // debug temp et lum
+    
+    const int nOffsetY = -20;
+
+
+    tft.setTextSize(2);
+    tft.fillRect( nMenuW+50+46, yBigText+nOffsetY,48, 16, BLUE );
+    tft.setCursor( nMenuW+50, yBigText+nOffsetY );
+    tft.print("temp:");
+    if(isnan(rTemperature))
+    {
+      tft.print("???");
+    }
+    else
+    {
+      tft.print(rTemperature, 2);
+    }
+    tft.print("  ");
+
+    tft.fillRect( nMenuW+nAreaW+50+46, yBigText+nOffsetY,48, 16, RED );
+    tft.setCursor( nMenuW+nAreaW+50, yBigText+nOffsetY );
+    tft.print("lum:");
+    tft.print(nLuminosity);
+    tft.print(" lb:");
+    tft.print(bLowBattery);
+    tft.print("     ");
+  }
 
   return 0;
 
@@ -1129,7 +1150,7 @@ void loop()
 
     if( 1 ) // demo mode
     {
-      if( ((millis()/1000) & 1) == 0 )
+      if( ((millis()/3000) & 2) == 0 )
       {
         bEditionMode = 0;
       }

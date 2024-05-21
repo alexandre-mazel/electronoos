@@ -147,7 +147,9 @@ int std_getPressed(int * px, int * py, int * pz, bool bDebug )
   bool pressed, prev_pressed=0;
   while (count < 10) {
       readResistiveTouch();
-      pressed = tp.z > 160;     // ADJUST THIS VALUE TO SUIT YOUR SCREEN e.g. 20 ... 250 // was 1750
+      // on screen 2 "best": no touch is 160-200
+      // juste un ongle pose c'est entre 300 et 500 selon les endroits
+      pressed = tp.z > 280;     // ADJUST THIS VALUE TO SUIT YOUR SCREEN e.g. 20 ... 250 // was 1750 // was 160
       //Serial.println(tp.z);
       if( pressed == prev_pressed ) 
       {

@@ -3,8 +3,8 @@
 #define IMG_NBR_BITS 4
 #define IMG_NBR    2
 
-#define IMG_1_SIZE_X 88
-#define IMG_1_SIZE_Y 85
+#define IMG_1_SIZE_X 40
+#define IMG_1_SIZE_Y 52
 extern unsigned char aImgs_1[];
 extern unsigned char aPalette_1[];
 

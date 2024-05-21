@@ -54,7 +54,7 @@ void OptimalTextRenderer::render( MCUFRIEND_kbv * pTft, const char * txt, int bF
   int num_char = 0;
   int xcur = x_;
   int nSizeChar = nSizeText_*6;
-  while(*src)
+  while(*src && num_char<nNbrCharMax_)
   {
     if( (*p) != (*src) || bForceRedrawAll )
     {
@@ -67,6 +67,7 @@ void OptimalTextRenderer::render( MCUFRIEND_kbv * pTft, const char * txt, int bF
     xcur += nSizeChar;
     ++src;
     ++p;
+    ++num_char;
   }
   // erase previous other char if previous string was longer
   pTft->fillRect( xcur, y_, nSizeChar*strlen(p), nSizeText_*7, colorBackground_ );

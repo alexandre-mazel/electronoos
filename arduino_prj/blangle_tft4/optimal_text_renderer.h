@@ -14,6 +14,8 @@ class OptimalTextRenderer {
 
         void render( MCUFRIEND_kbv * pTft, const char * txt, int bForceRedrawAll = 0 );
 
+        void changeBackgroundColor(int nNewBackgroundColor) { colorBackground_ = nNewBackgroundColor; }
+
     private:
       int colorBackground_;
       int colorText_;

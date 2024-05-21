@@ -8,8 +8,8 @@
 
 /*
 Actuellement:
-Sketch uses 42358 bytes (16%) of program storage space. Maximum is 253952 bytes.
-Global variables use 6092 bytes (74%) of dynamic memory, leaving 2100 bytes for local variables. Maximum is 8192 bytes.
+Sketch uses 39618 bytes (15%) of program storage space. Maximum is 253952 bytes.
+Global variables use 3404 bytes (41%) of dynamic memory, leaving 4788 bytes for local variables. Maximum is 8192 bytes.
 */
 
 // install tft_espi using the library manager
@@ -523,8 +523,8 @@ const int yCircEdit = 100;
 const int yCircView = nAreaH_Display+14;
 const int nLineH = 8;
 
-const int xLock = nMenuW+342;
-const int yLock = nAreaH+20+24;
+const int xLock = nMenuW+342+50; // +50 car passage au petit
+const int yLock = nAreaH+20+24+50;
 
 const int wLock = 88;
 const int hLock = 124;
@@ -540,9 +540,14 @@ const int yBigText = 40+30;
 const int wBigText = 6;
 const int wBigTextEdit = 8;
 
+    
+const int yDebug = 8;
+
+
 OptimalTextRenderer otr_nip(BLUE,WHITE,wBigText,nMenuW+30, yBigText+nLineH*wBigText+10);
-OptimalTextRenderer otr_db(DB_COLOR,WHITE,wBigText,nMenuW+nAreaW+30, yBigText+nLineH*wBigText+10);
+OptimalTextRenderer otr_db(DB_COLOR,WHITE,wBigText,nMenuW+nAreaW+30, yBigText+nLineH*wBigText+10,4); // 5 to limit to 5 chars
 OptimalTextRenderer otr_circ(PURPLE,WHITE,5,nMenuW+70, yCircView);
+OptimalTextRenderer otr_low(PURPLE,WHITE,2,nMenuW+nAreaW+50+46+40, yDebug);
 
 
 int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, double circ,int bLocked, float rTemperature, int nLuminosity, bool bLowBattery)
@@ -649,7 +654,7 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
     
 
 
-    if( bPrevLocked != bLocked )
+    if( bPrevLocked != bLocked || bRedrawAll )
     {
       bPrevLocked = bLocked;
       render_lock(xLock, yLock);
@@ -658,7 +663,7 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
       if( ! bLocked )
       {
         // cache le haut du verrou
-        tft.fillRect(xLock, yLock,80,48,PURPLE);
+        tft.fillRect(xLock, yLock,40,20,PURPLE); // was 40/48 with the big one
 
         // affiche les fleches
         
@@ -673,8 +678,8 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
       else
       {
         // cache les fleches
-        tft.fillRect( xArrow, yArrow,144+32,16,PURPLE );
-        tft.fillRect( xArrow, yArrowBottom+8,144+32,16,PURPLE );
+        tft.fillRect( xArrow, yArrow,144+32+90,24,PURPLE );
+        tft.fillRect( xArrow, yArrowBottom+12,144+32+90,24,PURPLE );
       }
     }
 
@@ -761,7 +766,7 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
       tft.print("DB");
     }
 
-    if(db>3600)
+    if(db>3600 || db < -200)
       snprintf(buf,8,"???" );
     else
       snprintf(buf,8,"%2d.%1d", int(db/10),abs(db%10) );
@@ -808,13 +813,10 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
   {
 
     // debug temp et lum
-    
-    const int nDebugY = 8;
-
 
     tft.setTextSize(2);
-    tft.fillRect( nMenuW+50+46+12, nDebugY,62, 15, bEditionMode?PURPLE:BLUE );
-    tft.setCursor( nMenuW+50, nDebugY );
+    tft.fillRect( nMenuW+50+46+12, yDebug,62, 15, bEditionMode?PURPLE:BLUE );
+    tft.setCursor( nMenuW+50, yDebug );
     tft.print("temp:");
     if(isnan(rTemperature))
     {
@@ -826,25 +828,25 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
     }
     tft.print("  ");
 
-    tft.fillRect( nMenuW+nAreaW+50+46, nDebugY,36, 15, bEditionMode?PURPLE:DB_COLOR );
-    tft.setCursor( nMenuW+nAreaW+50, nDebugY );
+    tft.fillRect( nMenuW+nAreaW+50+46, yDebug,36, 15, bEditionMode?PURPLE:DB_COLOR );
+    tft.setCursor( nMenuW+nAreaW+50, yDebug );
     tft.print("lum:");
     tft.print(nLuminosity);
 
     /*
-    tft.fillRect( nMenuW+nAreaW+50+46+86, nDebugY,10, 15, bEditionMode?PURPLE:DB_COLOR );
+    tft.fillRect( nMenuW+nAreaW+50+46+86, yDebug,10, 15, bEditionMode?PURPLE:DB_COLOR );
     tft.print(" lb:");
     tft.print(bLowBattery);
     tft.print("     ");
     */
-    if(bLowBattery|| 1)
+    otr_low.changeBackgroundColor(bEditionMode?PURPLE:DB_COLOR);
+    if( bLowBattery )
     {
-      tft.fillRect( nMenuW+nAreaW+50+46+40, nDebugY,10*3, 15, bEditionMode?PURPLE:PURPLE );
-      tft.print("   LOW");
+      otr_low.render(&tft,"   LOW",bRedrawAll);
     }
     else
     {
-      tft.fillRect( nMenuW+nAreaW+50+46+86, nDebugY,10, 15, bEditionMode?PURPLE:PURPLE );
+      otr_low.render(&tft,"",bRedrawAll);
     }
   }
 
@@ -1123,7 +1125,7 @@ void loop()
         }
 
         // debug: render touch point
-        if(1 && nLocked == 0)
+        if(0 && nLocked == 0)
         {
           for( int i = 0; i < sizeof(listPos)/2/2; ++i ) // /2(short) /2(x & y)
           {

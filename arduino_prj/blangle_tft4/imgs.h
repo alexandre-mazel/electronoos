@@ -8,8 +8,8 @@
 extern unsigned char aImgs_1[];
 extern unsigned char aPalette_1[];
 
-#define IMG_2_SIZE_X 48
-#define IMG_2_SIZE_Y 32
+#define IMG_2_SIZE_X 36
+#define IMG_2_SIZE_Y 24
 extern unsigned char aImgs_2[];
 extern unsigned char aPalette_2[];
 

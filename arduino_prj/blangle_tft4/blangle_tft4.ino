@@ -8,8 +8,8 @@
 
 /*
 Actuellement:
-Sketch uses 41228 bytes (16%) of program storage space. Maximum is 253952 bytes.
-Global variables use 6393 bytes (78%) of dynamic memory, leaving 1799 bytes for local variables. Maximum is 8192 bytes.
+Sketch uses 42358 bytes (16%) of program storage space. Maximum is 253952 bytes.
+Global variables use 6092 bytes (74%) of dynamic memory, leaving 2100 bytes for local variables. Maximum is 8192 bytes.
 */
 
 // install tft_espi using the library manager
@@ -91,6 +91,8 @@ MCUFRIEND_kbv tft;
 
 #define PIN_SOX_I2C_CHANGE_ADDR 32
 
+#define DB_COLOR RED
+
 
 uint16_t version = MCUFRIEND_KBV_H_;
 
@@ -130,7 +132,12 @@ void setup()
 
 #if 1
   //tft.begin(0x7793);
-  tft.begin(0x9487); // new tft
+  tft.begin(0x9487); // new tft (qu'on mette 0x9486 ou 0x9487 ca n'a l'air de rien changer), pourtant ca change qqchose dans la suite (les couleurs)
+
+  uint16_t ID = tft.readID(); //
+  Serial.print("TFT ID=0x");
+  Serial.print(ID, HEX);  // ecran 1?: 0x9486, 2: 0x9487 (celui qui fonctionne), ecran 3: 0x9486 (pas touch)
+  if (ID == 0xD3D3) Serial.print(" w/o"); // ecran not detected
   
 #else
   // autotdetect version (prend plus de ram)
@@ -277,6 +284,7 @@ void setup()
   {
     Serial.println("INF: Everything looks GOOD !");
     // tft_write("GOOD3!");
+    tft_write("");
     tft_write("GOOD: All 3 I2Cs are ok!");
     
     delay(1500);
@@ -512,6 +520,7 @@ const int nAreaW = (w_screen-nMenuW-nBubbleW)/2; // width of an area
 const int nAreaH = h_screen/2;
 const int nAreaH_Display = 4*h_screen/5;
 const int yCircEdit = 100;
+const int yCircView = nAreaH_Display+14;
 const int nLineH = 8;
 
 const int xLock = nMenuW+342;
@@ -532,7 +541,9 @@ const int wBigText = 6;
 const int wBigTextEdit = 8;
 
 OptimalTextRenderer otr_nip(BLUE,WHITE,wBigText,nMenuW+30, yBigText+nLineH*wBigText+10);
-OptimalTextRenderer otr_db(LBLUE,WHITE,wBigText,nMenuW+nAreaW+30, yBigText+nLineH*wBigText+10);
+OptimalTextRenderer otr_db(DB_COLOR,WHITE,wBigText,nMenuW+nAreaW+30, yBigText+nLineH*wBigText+10);
+OptimalTextRenderer otr_circ(PURPLE,WHITE,5,nMenuW+70, yCircView);
+
 
 int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, double circ,int bLocked, float rTemperature, int nLuminosity, bool bLowBattery)
 {
@@ -541,6 +552,7 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
   static int nPrevPresel = -1;
   static int nPrevDb = 9999;
   static int nPrevNip = 9999;
+  static double rPrevCirc = -1;
   static int nPrevBubble = 9999;
   static int bPrevEditionMode = -1;
   char buf[14];
@@ -586,7 +598,7 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
 
   if(bRedrawAll) // temporary to find bugs or forgotten background
   {
-    // tft.fillRect(0,0,w_screen,h_screen,GRAY);
+    tft.fillRect(0,0,w_screen,h_screen,GRAY);
   }
 
   // we always print the selection column
@@ -625,11 +637,15 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
     tft.setTextColor(WHITE, PURPLE);
     //tft.print(circ,1);
 
-    snprintf(buf,8,"%4d.%1d", int(circ),int( 0.5+(circ-int(circ))*10 ) );
-    tft.print(buf);
-    tft.setTextColor(WHITE);
-    tft.setCursor(nMenuW+20, yCircEdit+60);
-    tft.print("mm");
+    if( bRedrawAll || rPrevCirc != circ )
+    {
+      rPrevCirc = circ;
+      snprintf(buf,8,"%4d.%1d", int(circ),int( 0.5+(circ-int(circ))*10 ) );
+      tft.print(buf);
+      tft.setTextColor(WHITE);
+      tft.setCursor(nMenuW+20, yCircEdit+60);
+      tft.print("mm");
+    }
     
 
 
@@ -657,20 +673,22 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
       else
       {
         // cache les fleches
-        tft.fillRect( xArrow, yArrow,144+32,16,BLACK );
-        tft.fillRect( xArrow, yArrowBottom+8,144+32,16,BLACK );
+        tft.fillRect( xArrow, yArrow,144+32,16,PURPLE );
+        tft.fillRect( xArrow, yArrowBottom+8,144+32,16,PURPLE );
       }
     }
 
   }
   else
   {
+
     // view mode
 
     if( bRedrawAll )
     {
       tft.fillRect(nMenuW,0,nAreaW,nAreaH_Display,BLUE);
-      tft.fillRect(nMenuW+nAreaW,0,nAreaW,nAreaH_Display,LBLUE);
+      tft.fillRect(nMenuW+nAreaW,0,nAreaW,nAreaH_Display,DB_COLOR);
+      tft.fillRect(nMenuW,nAreaH_Display,w_screen-nMenuW,h_screen-nAreaH_Display,PURPLE);
     }
 
 
@@ -728,7 +746,9 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
     if(nip>999)
       snprintf(buf,8,"???" );
     else
+    {
       snprintf(buf,8,"%3d", nip );
+    }
     otr_nip.render(&tft,buf,bRedrawAll);
     if( bRedrawAll )
     {
@@ -744,7 +764,7 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
     if(db>3600)
       snprintf(buf,8,"???" );
     else
-      snprintf(buf,8,"%2d.%1d", int(db/10),db%10 );
+      snprintf(buf,8,"%2d.%1d", int(db/10),abs(db%10) );
     otr_db.render(&tft,buf,bRedrawAll);
 
     if(bRedrawAll)
@@ -773,15 +793,12 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
     }
 
 
-    if( bRedrawAll )
+    if( bRedrawAll || rPrevCirc != circ)
     {
-      // small circ just for information
-      const int yCirc = nAreaH_Display+14;
-      tft.setTextSize(5);
-      tft.setTextColor(WHITE);
-      tft.setCursor(nMenuW+70, yCirc);
+      // small circ printing just for information
+      rPrevCirc = circ;
       snprintf(buf,12,"C=%4d.%1dmm", int(circ),int( 0.5+(circ-int(circ))*10 ) );
-      tft.print(buf);
+      otr_circ.render(&tft,buf,bRedrawAll);
     }
 
   } // view mode
@@ -809,15 +826,26 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
     }
     tft.print("  ");
 
-    tft.fillRect( nMenuW+nAreaW+50+46, nDebugY,36, 15, bEditionMode?PURPLE:LBLUE );
+    tft.fillRect( nMenuW+nAreaW+50+46, nDebugY,36, 15, bEditionMode?PURPLE:DB_COLOR );
     tft.setCursor( nMenuW+nAreaW+50, nDebugY );
     tft.print("lum:");
     tft.print(nLuminosity);
 
-    tft.fillRect( nMenuW+nAreaW+50+46+86, nDebugY,10, 15, bEditionMode?PURPLE:LBLUE );
+    /*
+    tft.fillRect( nMenuW+nAreaW+50+46+86, nDebugY,10, 15, bEditionMode?PURPLE:DB_COLOR );
     tft.print(" lb:");
     tft.print(bLowBattery);
     tft.print("     ");
+    */
+    if(bLowBattery|| 1)
+    {
+      tft.fillRect( nMenuW+nAreaW+50+46+40, nDebugY,10*3, 15, bEditionMode?PURPLE:PURPLE );
+      tft.print("   LOW");
+    }
+    else
+    {
+      tft.fillRect( nMenuW+nAreaW+50+46+86, nDebugY,10, 15, bEditionMode?PURPLE:PURPLE );
+    }
   }
 
   return 0;
@@ -870,6 +898,8 @@ void countFps()
 
 float rTemperature = -1.f;
 
+
+int bDemoMode = 0; // automatically alternate between every mode
 int bEditionMode = 0; // 0: view angle, 1: edit
 
 void loop()
@@ -1066,11 +1096,12 @@ void loop()
                     xLock+wLock/2,yLock+hLock/2, // lock // 370/200 // 360/182
                     // 80,120, // first arrow
         };
+
         // add 10 arrows
         for( int i = 0; i < 5; ++i )
         {
-          listPos[2+i*2+0] = xArrow+i*dw_arrow+wArrow/2+1+6;
-          listPos[2+i*2+1] = yArrow+16;
+          listPos[2+i*2+0] = xArrow+i*dw_arrow+wArrow/2+1;
+          listPos[2+i*2+1] = yArrow+12;
 
           if( i == 4)
           {
@@ -1092,7 +1123,7 @@ void loop()
         }
 
         // debug: render touch point
-        if(1)
+        if(1 && nLocked == 0)
         {
           for( int i = 0; i < sizeof(listPos)/2/2; ++i ) // /2(short) /2(x & y)
           {
@@ -1178,6 +1209,25 @@ void loop()
           {
             // presel
             nNumSettingsSelected = i-11;
+
+            // handle demo mode
+            if(1)
+            {
+              if(nNumSettingsSelected == 5)
+              {
+                bDemoMode = 1;
+              }
+              else if(nNumSettingsSelected == 6)
+              {
+                bDemoMode = 0;
+                bEditionMode = 0;
+              }
+              else if(nNumSettingsSelected == 7)
+              {
+                bDemoMode = 0;
+                bEditionMode = 1;
+              }
+            }
           }
         } // if idx_element != -1
         
@@ -1217,18 +1267,21 @@ void loop()
     countFps();
     delay(100); // time for sensors to update
 
-    if( 1 ) // demo mode
+    if( bDemoMode )
     {
-      if( ((millis()/3000) & 2) == 0 )
+      if( ((millis()/30000) % 2) == 0 )
       {
         bEditionMode = 0;
+        nLocked = 1;
       }
       else
       {
         bEditionMode = 1;
-        nLocked = ((millis()/6000) & 2) == 1; // un coup sur deux
+        nLocked = ((millis()/60000) % 2) == 1; // un coup sur deux
       }
     }
+
+
 
   if(0)
   {
@@ -1246,8 +1299,6 @@ void loop()
 
   set_sleep_mode (SLEEP_MODE_PWR_DOWN);  
   sleep_enable();
-  sleep_cpu();  
-
-
+  sleep_cpu();
   }
 }

@@ -8,8 +8,8 @@
 
 /*
 Actuellement:
-Sketch uses 39618 bytes (15%) of program storage space. Maximum is 253952 bytes.
-Global variables use 3404 bytes (41%) of dynamic memory, leaving 4788 bytes for local variables. Maximum is 8192 bytes.
+Sketch uses 39552 bytes (15%) of program storage space. Maximum is 253952 bytes.
+Global variables use 3436 bytes (41%) of dynamic memory, leaving 4756 bytes for local variables. Maximum is 8192 bytes.
 */
 
 // install tft_espi using the library manager
@@ -544,10 +544,13 @@ const int wBigTextEdit = 8;
 const int yDebug = 8;
 
 
-OptimalTextRenderer otr_nip(BLUE,WHITE,wBigText,nMenuW+30, yBigText+nLineH*wBigText+10);
+OptimalTextRenderer otr_nip(BLUE,WHITE,wBigText,nMenuW+30-25, yBigText+nLineH*wBigText+10);
 OptimalTextRenderer otr_db(DB_COLOR,WHITE,wBigText,nMenuW+nAreaW+30, yBigText+nLineH*wBigText+10,4); // 5 to limit to 5 chars
 OptimalTextRenderer otr_circ(PURPLE,WHITE,5,nMenuW+70, yCircView);
-OptimalTextRenderer otr_low(PURPLE,WHITE,2,nMenuW+nAreaW+50+46+40, yDebug);
+OptimalTextRenderer otr_temp(PURPLE,WHITE,2,nMenuW+50, yDebug);
+OptimalTextRenderer otr_lum(PURPLE,WHITE,2,nMenuW+nAreaW+50, yDebug);
+OptimalTextRenderer otr_low(PURPLE,WHITE,2,nMenuW+nAreaW+50+46+40+30, yDebug);
+
 
 
 int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, double circ,int bLocked, float rTemperature, int nLuminosity, bool bLowBattery)
@@ -814,6 +817,7 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
 
     // debug temp et lum
 
+    /*
     tft.setTextSize(2);
     tft.fillRect( nMenuW+50+46+12, yDebug,62, 15, bEditionMode?PURPLE:BLUE );
     tft.setCursor( nMenuW+50, yDebug );
@@ -827,11 +831,37 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
       tft.print(rTemperature, 2);
     }
     tft.print("  ");
+    */
+
+    otr_temp.changeBackgroundColor(bEditionMode?PURPLE:BLUE);
+
+    if(isnan(rTemperature))
+    {
+      strcpy(buf,"temp: ???");
+    }
+    else
+    {
+      snprintf(buf,12,"temp: %2d.%1d", int(rTemperature),(int(rTemperature*10)%10) );
+    }
+    otr_temp.render(&tft,buf,bRedrawAll);
+
+    /*
+
+    tft.setCursor( nMenuW+nAreaW+50+46, yDebug );
 
     tft.fillRect( nMenuW+nAreaW+50+46, yDebug,36, 15, bEditionMode?PURPLE:DB_COLOR );
     tft.setCursor( nMenuW+nAreaW+50, yDebug );
     tft.print("lum:");
     tft.print(nLuminosity);
+    */
+
+    if((nCptFrame&0xF)==0 || bRedrawAll) // optim because it changes too fast
+    {
+      otr_lum.changeBackgroundColor(bEditionMode?PURPLE:DB_COLOR);
+      snprintf(buf,12,"lum:%4d", nLuminosity );
+      otr_lum.render(&tft,buf,bRedrawAll);
+    }
+
 
     /*
     tft.fillRect( nMenuW+nAreaW+50+46+86, yDebug,10, 15, bEditionMode?PURPLE:DB_COLOR );
@@ -842,7 +872,7 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
     otr_low.changeBackgroundColor(bEditionMode?PURPLE:DB_COLOR);
     if( bLowBattery )
     {
-      otr_low.render(&tft,"   LOW",bRedrawAll);
+      otr_low.render(&tft,"LOW",bRedrawAll);
     }
     else
     {

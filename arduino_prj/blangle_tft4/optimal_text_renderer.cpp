@@ -29,12 +29,12 @@ OptimalTextRenderer::~OptimalTextRenderer()
 #endif
 }
 
-void OptimalTextRenderer::render( MCUFRIEND_kbv * pTft, const char * txt, int bForceRedrawAll )
+void OptimalTextRenderer::render( MCUFRIEND_kbv * pTft, const char * txt, int bForceRedrawAll, int bVerbose )
 {
   if( !bForceRedrawAll && strcmp(lastRenderedText_,txt) == 0)
     return;
   
-  //Serial.print("OptimalTextRenderer: rendering: "); Serial.println(txt);
+  if( bVerbose) { Serial.print("OptimalTextRenderer: rendering: '"); Serial.print(txt); Serial.print("' was '"); Serial.print(lastRenderedText_); Serial.println("'");}
 
 
   // version no optim, just to test rendering
@@ -56,9 +56,12 @@ void OptimalTextRenderer::render( MCUFRIEND_kbv * pTft, const char * txt, int bF
   int nSizeChar = nSizeText_*6;
   while(*src && num_char<nNbrCharMax_)
   {
+    if( bVerbose) { Serial.print("OptimalTextRenderer: comparing '"); Serial.print(*p); Serial.print("' and '"); Serial.print(*src); Serial.println("'"); }
+
     if( (*p) != (*src) || bForceRedrawAll )
     {
       // render new char
+      if( bVerbose) {Serial.println("diff!");}
       pTft->fillRect( xcur, y_, nSizeChar, nSizeText_*7, colorBackground_ );
       pTft->setCursor(xcur,y_);
       pTft->print(*src);

@@ -12,7 +12,7 @@ class OptimalTextRenderer {
         OptimalTextRenderer(int colorBackground, int colorText, int nSizeText, int x, int y, int nNbrCharMax = 16 );
         ~OptimalTextRenderer();
 
-        void render( MCUFRIEND_kbv * pTft, const char * txt, int bForceRedrawAll = 0 );
+        void render( MCUFRIEND_kbv * pTft, const char * txt, int bForceRedrawAll = 0, int bVerbose = 0 );
 
         void changeBackgroundColor(int nNewBackgroundColor) { colorBackground_ = nNewBackgroundColor; }
 

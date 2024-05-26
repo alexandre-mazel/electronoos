@@ -103,8 +103,8 @@ float fps = 60.;
 // Create the MCP9808 temperature sensor object
 Adafruit_MCP9808 tempsensor = Adafruit_MCP9808();
 
-const char sox_name1[] = "AngleRacle";
-const char sox_name2[] = "AngleForNIP";
+const char sox_name1[] = "AngleForNIP";
+const char sox_name2[] = "AngleRacle";
 
 Alex_LSM6DSOX * sox1 = 0;
 Alex_LSM6DSOX * sox2 = 0;
@@ -132,11 +132,11 @@ void setup()
 
 #if 1
   //tft.begin(0x7793);
-  tft.begin(0x9487); // new tft (qu'on mette 0x9486 ou 0x9487 ca n'a l'air de rien changer), pourtant ca change qqchose dans la suite (les couleurs)
+  tft.begin(0x9487); // new tft (qu'on mette 0x9486 ou 0x9487 ca n'a l'air de rien changer), pourtant ca change qqchose dans la suite (les couleurs?non)
 
   uint16_t ID = tft.readID(); //
   Serial.print("TFT ID=0x");
-  Serial.print(ID, HEX);  // ecran 1?: 0x9486, 2: 0x9487 (celui qui fonctionne), ecran 3: 0x9486 (pas touch)
+  Serial.print(ID, HEX);  // ecran 1?: 0x9486, 2: 0x9487 (celui qui fonctionne), ecran 3: 0x9486 (pas touchou alors inversé: 1240 si pas touch et 800 si touch) - le 9486 (ecran 4 et 5), le threshold est vers 1030 (1015 si pas touché, 1113 quand a fond)
   if (ID == 0xD3D3) Serial.print(" w/o"); // ecran not detected
   
 #else
@@ -226,7 +226,7 @@ void setup()
   sox1 = new Alex_LSM6DSOX(sox_name1);
   sox2 = new Alex_LSM6DSOX(sox_name2);
 
-  const char szVersion[] = "Blangle_tft4: v0.8";
+  const char szVersion[] = "Blangle_tft4: v0.81";
 
   Serial.println(szVersion);
   tft_write(szVersion);
@@ -626,7 +626,14 @@ int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, do
         tft.setTextColor(WHITE);
       }
       tft.setCursor(10, 6+i*h/nNbrSettings);
-      tft.print(i+1);
+      if(i<5)
+      {
+        tft.print(i+1);
+      }
+      else
+      {
+        tft.print(i==5?"D":i==6?"V":"E");
+      }
     }
   }
 
@@ -931,7 +938,7 @@ void countFps()
 float rTemperature = -1.f;
 
 
-int bDemoMode = 0; // automatically alternate between every mode
+int bDemoMode = 1; // automatically alternate between every mode
 int bEditionMode = 0; // 0: view angle, 1: edit
 
 void loop()
@@ -983,8 +990,8 @@ void loop()
     bool bErrorNip = false;
     bool bErrorDb = false;
 
-    float angle_db_read = sox1->getDegY();
-    float angle_nip_read = sox2->getDegY();
+    float angle_nip_read = sox1->getDegY();
+    float angle_db_read = -sox2->getDegY();
     
     if(angle_db_read > 600.f )
     {
@@ -1025,7 +1032,14 @@ void loop()
     // db = angle_db; // pour afficher le capteur brut apres calib
     db = angle_db - ( angle_nip + 3600*(nHalfBoitierMM / presetCirc[nNumSettingsSelected]));
     // db = (900-angle_db) - ( angle_nip + 3600*(nHalfBoitierMM / presetCirc[nNumSettingsSelected]));
-    
+
+    db +=250; // bidouille tuning anant demo
+
+    if( nCptFrame%20==0 )
+    {
+      Serial.print("nip: "); Serial.print(nip); Serial.print(", db: "); Serial.println(db);
+    }
+
 
     //db = analogRead(A15)*(5.0*8 / 1023.0);
 

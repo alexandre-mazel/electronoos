@@ -193,7 +193,7 @@ float readRawAngleAS5600()
 int bTwistGoButtonPushed = 1; // state of the button (so we detect it changes) // let's pretend it was on at startup as there's a spurious on this one
 int bTwistRevButtonPushed = 1; // state of the button (so we detect it changes) // spurious here also now!
 int nTwistMove = 1; // 0: stop, 1: positive direction, -1: reverse
-int bCollect = 1; // 1: collecting
+int bCollect = 0; // 1: collecting
 
 void setup() 
 {
@@ -427,7 +427,7 @@ void commandByButton()
     bTwistGoButtonPushed = pushed;
     if(pushed)
     {
-      //DEBUG.println("button go pin pushed");
+      DEBUG.println("button go pin pushed");
       if( nTwistMove == 1 ) 
       {
         nTwistMove = 0;
@@ -484,6 +484,8 @@ void commandByButton()
   LCD.print(rMotRev1);
   LCD.print(", twst: ");
   LCD.print(nTwistMove);
+  LCD.print(", coll: ");
+  LCD.print(bCollect);
   LCD.print("  "); // clean remaining char when number are off
   delay(10);
 } // commandByButton
@@ -500,9 +502,10 @@ long nFrame = 0;
 void updateMachine1b()
 {
   // the goal is to loop at 400microsec, so anytime we could decide to activate one motor or other motor or not
-  const int target_frameduration_micros = 600+6;
+  //const int target_frameduration_micros = 600+6;
   //const int target_frameduration_micros = 800+6;
   //const int target_frameduration_micros = 1200+6;
+  int target_frameduration_micros = 6000+6; // slow down to understand
 
   const int nNbrStepPerTurnMotor1 = 200;
 
@@ -529,7 +532,7 @@ void updateMachine1b()
     bTwistGoButtonPushed = pushed;
     if(pushed)
     {
-      //DEBUG.println("button go pin pushed");
+      DEBUG.println("button go pin pushed");
       if( nTwistMove == 1 ) 
       {
         nTwistMove = 0;
@@ -540,7 +543,7 @@ void updateMachine1b()
         nTwistMove = 1;
         bSendCmdMotor1 = 1;
         digitalWrite(dirPin2,LOW);
-        digitalWrite(dirPin3,LOW);
+        digitalWrite(dirPin3,HIGH); // inverted to turn in the same direction (because of the gear transmission) // need to be sent every frame!!! ?!
       }
     }
   }
@@ -552,6 +555,7 @@ void updateMachine1b()
     if(pushed)
     {
       DEBUG.println("button rev pin pushed");
+      /*
       if( nTwistMove == -1 ) 
       {
         nTwistMove = 0;
@@ -564,6 +568,8 @@ void updateMachine1b()
         digitalWrite(dirPin2,HIGH);
         digitalWrite(dirPin3,HIGH);
       }
+      */
+      bCollect = ! bCollect;
     }
   }
 
@@ -584,6 +590,7 @@ void updateMachine1b()
   if( (nTwistMove == -1 || nTwistMove == 1) && ( ! bCollect || (bCollect == 1 && (nFrame%2)==0) ) ) // x times slower when collecting
   {
     digitalWrite(stepPin3,bFlipFlopMotor2);
+    digitalWrite(dirPin3,HIGH);
     bFlipFlopMotor2 = ! bFlipFlopMotor2;
     if(bFlipFlopMotor2)
     {
@@ -624,6 +631,8 @@ void updateMachine1b()
       LCD.print(rMotRev1);
       LCD.print(", twst: ");
       LCD.print(nTwistMove);
+      LCD.print(", coll: ");
+      LCD.print(bCollect);
       LCD.print("  "); // clean remaining char when number are off
     }
     else

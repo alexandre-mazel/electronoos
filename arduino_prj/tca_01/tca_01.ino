@@ -192,7 +192,7 @@ float readRawAngleAS5600()
 
 int bTwistGoButtonPushed = 1; // state of the button (so we detect it changes) // let's pretend it was on at startup as there's a spurious on this one
 int bTwistRevButtonPushed = 1; // state of the button (so we detect it changes) // spurious here also now!
-int nTwistMove = 1; // 0: stop, 1: positive direction, -1: reverse
+int nTwistMove = 0; // 0: stop, 1: positive direction, -1: reverse
 int bCollect = 0; // 1: collecting
 
 void setup() 
@@ -502,10 +502,10 @@ long nFrame = 0;
 void updateMachine1b()
 {
   // the goal is to loop at 400microsec, so anytime we could decide to activate one motor or other motor or not
-  //const int target_frameduration_micros = 600+6;
+  const int target_frameduration_micros = 600+6;
   //const int target_frameduration_micros = 800+6;
   //const int target_frameduration_micros = 1200+6;
-  int target_frameduration_micros = 6000+6; // slow down to understand
+  //int target_frameduration_micros = 1200+6; // slow down to understand
 
   const int nNbrStepPerTurnMotor1 = 200;
 
@@ -587,7 +587,9 @@ void updateMachine1b()
     }
   }
 
-  if( (nTwistMove == -1 || nTwistMove == 1) && ( ! bCollect || (bCollect == 1 && (nFrame%2)==0) ) ) // x times slower when collecting
+   // (nFrame%4)==0: 4 times slower when collecting
+   // (nFrame%100)!=0: 1% slower when collecting
+  if( (nTwistMove == -1 || nTwistMove == 1) && ( ! bCollect || (bCollect == 1 && (nFrame%30)!=0) ) )
   {
     digitalWrite(stepPin3,bFlipFlopMotor2);
     digitalWrite(dirPin3,HIGH);

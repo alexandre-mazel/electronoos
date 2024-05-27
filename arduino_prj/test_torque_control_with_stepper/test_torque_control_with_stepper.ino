@@ -5,6 +5,8 @@
 #define dirPin2 33 //direction
 #define stepPin2 35 //step-pulse
 
+#define switchTurbo 48
+
 
 
 void setup() 
@@ -14,17 +16,45 @@ void setup()
   pinMode(dirPin2, OUTPUT);
   pinMode(stepPin2, OUTPUT);
 
+  pinMode(switchTurbo, INPUT);
+
   digitalWrite(enaPin2,LOW);
   digitalWrite(dirPin2,LOW);
+  
 
   Serial.println("test_torque_control_with_stepper");
 }
 
 void slowGive()
 {
-  const int nNbrStepPerTurn = 200;
+  const int nNbrStepPerTurn = 200/20; // /20 to be more precise when putting turbo
   const int nSleepMicroSec = 12000;  // 500 was ok // 300 also for 17HE15-1504S without charge // with 314g charge, set 500 // max 16383
   const int nNbrMulti = 5;
+
+  Serial.println("looping...");
+
+  digitalWrite(dirPin2,HIGH);
+
+  digitalWrite(enaPin2,LOW);
+  for(int i = 0; i < nNbrStepPerTurn; ++i )
+  {
+    digitalWrite( stepPin2, HIGH ); // takes 6micros
+    for(int j = 0; j < nNbrMulti; ++j)
+      delayMicroseconds(nSleepMicroSec);
+
+    digitalWrite( stepPin2,LOW );
+    for(int j = 0; j < nNbrMulti; ++j)
+      delayMicroseconds(nSleepMicroSec);
+  }
+  //digitalWrite(enaPin2,HIGH); // cut
+  //delay(2000);
+}
+
+void turboGive()
+{
+  const int nNbrStepPerTurn = 200;
+  const int nSleepMicroSec = 3000;  // 500 was ok // 300 also for 17HE15-1504S without charge // with 314g charge, set 500 // max 16383
+  const int nNbrMulti = 1;
 
   Serial.println("looping...");
 
@@ -69,7 +99,21 @@ void fastRoll()
 
 void loop() 
 {
-  // fastRoll(); // to create the spool
+  if(0)
+  {
+    fastRoll(); // to create the spool
+  }
+  else
+  {
+    int bTurbo = digitalRead(switchTurbo) == HIGH;
+    Serial.print("DBG: bTurbo: "); Serial.println(bTurbo); 
+    if(bTurbo)
+      turboGive();
+    else
+      slowGive();
+  }
+  
 
-  slowGive();
+
+  
 }

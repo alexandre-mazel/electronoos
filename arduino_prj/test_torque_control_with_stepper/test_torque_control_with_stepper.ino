@@ -27,7 +27,7 @@ void setup()
 
 void slowGive()
 {
-  const int nNbrStepPerTurn = 200/20; // /20 to be more precise when putting turbo
+  const int nNbrStepPerTurn = 200/20; // /20 to be more precise when putting/removing turbo
   const int nSleepMicroSec = 12000;  // 500 was ok // 300 also for 17HE15-1504S without charge // with 314g charge, set 500 // max 16383
   const int nNbrMulti = 5;
 
@@ -52,11 +52,11 @@ void slowGive()
 
 void turboGive()
 {
-  const int nNbrStepPerTurn = 200;
-  const int nSleepMicroSec = 3000;  // 500 was ok // 300 also for 17HE15-1504S without charge // with 314g charge, set 500 // max 16383
+  const int nNbrStepPerTurn = 200/20;
+  const int nSleepMicroSec = 4000;  // 500 was ok // 300 also for 17HE15-1504S without charge // with 314g charge, set 500 // max 16383
   const int nNbrMulti = 1;
 
-  Serial.println("looping...");
+  //Serial.println("looping...");
 
   digitalWrite(dirPin2,HIGH);
 

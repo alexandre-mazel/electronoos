@@ -70,10 +70,13 @@ def bruteForceTable(listWords,listCryptedWords):
     #~ for cw in listCryptedWords:
         #~ print(cw)
         
+    print("NOT FOUND!")
+        
 
 # bruteforce - end
     
     
     
 ret = bruteForceTable(listWords, ["FGF","TGMYWJ","HQLZGF"])
+ret = bruteForceTable(listWords, ["HDAGUFBGA","UNAEM","KNAFUNIGEQ"])
 print(ret)

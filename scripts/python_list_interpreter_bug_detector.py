@@ -41,10 +41,12 @@ INF: 668 line(s) analysed, 3 error(s) found
     nNumTested = 0
     nNumError = 0
     
-    for line in lines:
-        # print(line)
+    nRefLenLine = -1
+    
+    for line in lines[1:]: #skip first lines
+        #~ print(line)
         line = line.strip()
-        if("= [" in line or "]" == line):
+        if("= [" in line or "]" == line or line == ''):
             continue
             
         nNumTested += 1
@@ -54,8 +56,15 @@ INF: 668 line(s) analysed, 3 error(s) found
             print("LINE: %s" % line)
             print("ERR: %s\n" % str(err))
             nNumError += 1
+            
+        if nRefLenLine == -1:
+            nRefLenLine = line.count(',')
+        nLenLine = line.count(',')
+        if nLenLine != nRefLenLine:
+            print("LINE: '%s'" % line)
+            print("WRN: length is different (%s instead of %s)" % (nLenLine,nRefLenLine))
         
-    print("INF: %d line(s) analysed, %d error(s) found" % (nNumTested,nNumError) )
+    print("\nINF: %d line(s) analysed, %d error(s) found" % (nNumTested,nNumError) )
     
     
 findPythonErrorBigTable( "../../obo/www/job_table.py")

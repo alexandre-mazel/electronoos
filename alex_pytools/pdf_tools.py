@@ -370,7 +370,16 @@ def pdf_full_page_to_img(src,dst):
         #~ zoom = 2    # zoom factor
         #~ mat = fitz.Matrix(zoom, zoom)
         #~ pix = page.get_pixmap(matrix=map)
-        for dpi in [300,150,75]:
+        dpiList = [300,150,75]
+        pageBound = page.bound()
+        print("DBG: pdf_full_page_to_img: page.bound: %s" % str(pageBound))
+        if pageBound[2]-pageBound[0]>7500 or pageBound[3]-pageBound[1]>7500:
+            print("DBG: pdf_full_page_to_img: reducing dpi...(1)")
+            dpiList = [50,25]
+        elif pageBound[2]-pageBound[0]>4000 or pageBound[3]-pageBound[1]>4000:
+            print("DBG: pdf_full_page_to_img: reducing dpi... (2)")
+            dpiList = [150,75]
+        for dpi in dpiList:
             try:
                 if bFitz16: 
                     pix = page.get_pixmap()
@@ -380,6 +389,7 @@ def pdf_full_page_to_img(src,dst):
                     pix = page.get_pixmap(dpi=dpi)
                 output = dst.replace(".png","_%04d.png"%i)
                 pix.save(output)
+                print("DBG: pix.size: %sx%s" % (str(pix.width),str(pix.height)))
                 listImg.append(output)
                 break; # exit of the for dpi
             except BaseException as err:

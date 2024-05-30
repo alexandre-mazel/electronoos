@@ -169,7 +169,7 @@ def drawRoundCorner(im, center, radius, color, nAngleStart=0, bDrawOuter=0):
                 else: # nAngleStart == 180:
                     im[center[1]+j,center[0]-i] = color    
                     
-def hisEqulColor(img):
+def hisEqualColor(img):
     """
     histogram equalization while maintaining (as much as possible) colors
     """
@@ -256,9 +256,89 @@ def listCameras( bShowImages = True, bLiveFeed = False ):
         
     return available_ports,working_ports,non_working_ports
     
-def computeImageDifference( im1, im2 ):
+def computeImageDifference( im1, im2):
     import image_tools
     return image_tools.computeImageDifference(im1,im2)
+    
+def increase_brightness(img, value=30):
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    h, s, v = cv2.split(hsv)
+
+    lim = 255 - value
+    v[v > lim] = 255
+    v[v <= lim] += value
+
+    final_hsv = cv2.merge((h, s, v))
+    img = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
+    return img
+    
+def autoCrop(im_param, bDebug=False ):
+    import numpy
+    dividerSize = 8
+    im = cv2.resize(im_param,(0,0),fx=1/dividerSize,fy=1/dividerSize) # scale down (giving a simplified aspect)
+    im = increase_brightness(im,40) # great when coming from scanner, when the background are often "not so white"
+    h,w = im.shape[:2]
+    print("DBG: autoCrop: work w: %s, h: %s " % (w,h) )
+    if 0:
+        corners = im[0,0],im[0,w-1],im[h-1,0],im[h-1,w-1]
+        print("DBG: autoCrop: corners: %s" % str(corners))
+        i = 1
+        # find bottom interesting first line
+        
+        so = cv2.Sobel(im,cv2.CV_8U,1,0,ksize=5)
+        soline = cv2.Sobel(im[h-i:h-i+1,],cv2.CV_64F,1,0,ksize=15)
+        
+        cv2.imshow("sobel",so)
+        cv2.imshow("sobel_line",soline)
+        cv2.waitKey(0)
+        while 1:
+            sobelx64f = cv2.Sobel(im[h-i:h-i+1,],cv2.CV_64F,1,0,ksize=5)
+            maxdiff = np.max(sobelx64f)
+            print("DBG: autoCrop: %d: %s" % (i,maxdiff))
+            i += 1
+            if i > h:
+                break
+    if 1:
+        imgray = cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
+        imgray = cv2.blur(imgray,(31,31))
+        ret,thresh = cv2.threshold(imgray,math.floor(numpy.average(imgray)*0.99),255,cv2.THRESH_BINARY_INV) # 0.99: essaye de garder moins de blanc autour, mais ca n'a pas fonctionné... (sur le cv d'elsa du moins)
+        dilated=cv2.morphologyEx(thresh, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(20,20)))
+        contours,hierarchy = cv2.findContours(dilated,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
+        
+        print("DBG: autoCrop: contours: %s" % str(contours) )
+        new_contours=[]
+        for c in contours:
+            if cv2.contourArea(c) < h*w: # h*w: approx of image total size
+                new_contours.append(c)
+                
+        print("DBG: autoCrop: new_contours: %s" % str(new_contours) )
+                
+        best_box=[-1,-1,-1,-1]
+        for c in new_contours:
+           x,y,w,h = cv2.boundingRect(c)
+           if best_box[0] < 0:
+               best_box=[x,y,x+w,y+h]
+           else:
+               if x<best_box[0]:
+                   best_box[0]=x
+               if y<best_box[1]:
+                   best_box[1]=y
+               if x+w>best_box[2]:
+                   best_box[2]=x+w
+               if y+h>best_box[3]:
+                   best_box[3]=y+h
+                   
+        print("DBG: autoCrop: best_box: %s (dividerSize:%s)" % (str(best_box),dividerSize) )
+        if bDebug:
+            imDebug = im[:]
+            cv2.rectangle(imDebug,(best_box[0],best_box[1]),(best_box[2],best_box[3]),(255,0,0),4)
+            cv2.imshow("best_box",imDebug)
+            cv2.waitKey(0)
+            
+    k = dividerSize
+    return im_param[best_box[1]*k:best_box[3]*k+k,best_box[0]*k:best_box[2]*k+k] # +k//2 or +k (for rounding error)
+        
+        
     
 def autoTest():
     im = np.zeros((600,800,3),dtype=np.uint8)

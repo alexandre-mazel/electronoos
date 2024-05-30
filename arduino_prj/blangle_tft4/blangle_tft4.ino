@@ -7,15 +7,9 @@
 #include <avr/sleep.h>
 
 /*
-Le croquis utilise 31158 octets (12%) de l'espace de stockage de programmes. Le maximum est de 253952 octets.
-Les variables globales utilisent 7293 octets (89%) de mémoire dynamique, ce qui laisse 899 octets pour les variables locales. Le maximum est de 8192 octets.
-La mémoire disponible faible, des problèmes de stabilité pourraient survenir.
-
-En enlevant des prints, on arrive a:
-- 30944
-- 7201
-
-
+Actuellement:
+Sketch uses 39552 bytes (15%) of program storage space. Maximum is 253952 bytes.
+Global variables use 3436 bytes (41%) of dynamic memory, leaving 4756 bytes for local variables. Maximum is 8192 bytes.
 */
 
 // install tft_espi using the library manager
@@ -73,10 +67,12 @@ void loop()
 #include <MCUFRIEND_kbv.h>
 #include "imgs.h" // cf comments in render_lock
 #include "simple_touch_detection.h"
+#include "optimal_text_renderer.h"
 
 MCUFRIEND_kbv tft;
 
 // Assign human-readable names to some common 16-bit color values:
+// cf https://rgbcolorpicker.com/565 mais avec r et b inverted
 #define BLACK   0x0000
 #define BLUE    0x001F
 #define RED     0xF800
@@ -86,11 +82,16 @@ MCUFRIEND_kbv tft;
 #define YELLOW  0xFFE0
 #define WHITE   0xFFFF
 #define GRAY    0x8410
+#define PURPLE  0xa014 // 20 / 0 / 20
+#define LBLUE   0xc3e5
+#define ORANGE  0x03ff // 0 / 31 / 31
 
 #define PIN_PHOTORES A14
 #define PIN_LOWBATTERY A15
 
 #define PIN_SOX_I2C_CHANGE_ADDR 32
+
+#define DB_COLOR RED
 
 
 uint16_t version = MCUFRIEND_KBV_H_;
@@ -102,8 +103,8 @@ float fps = 60.;
 // Create the MCP9808 temperature sensor object
 Adafruit_MCP9808 tempsensor = Adafruit_MCP9808();
 
-const char sox_name1[] = "AngleRacle";
-const char sox_name2[] = "AngleForNIP";
+const char sox_name1[] = "AngleForNIP";
+const char sox_name2[] = "AngleRacle";
 
 Alex_LSM6DSOX * sox1 = 0;
 Alex_LSM6DSOX * sox2 = 0;
@@ -131,7 +132,12 @@ void setup()
 
 #if 1
   //tft.begin(0x7793);
-  tft.begin(0x9487); // new tft
+  tft.begin(0x9487); // new tft (qu'on mette 0x9486 ou 0x9487 ca n'a l'air de rien changer), pourtant ca change qqchose dans la suite (les couleurs?non)
+
+  uint16_t ID = tft.readID(); //
+  Serial.print("TFT ID=0x");
+  Serial.print(ID, HEX);  // ecran 1?: 0x9486, 2: 0x9487 (celui qui fonctionne), ecran 3: 0x9486 (pas touchou alors inversé: 1240 si pas touch et 800 si touch) - le 9486 (ecran 4 et 5), le threshold est vers 1030 (1015 si pas touché, 1113 quand a fond)
+  if (ID == 0xD3D3) Serial.print(" w/o"); // ecran not detected
   
 #else
   // autotdetect version (prend plus de ram)
@@ -220,6 +226,11 @@ void setup()
   sox1 = new Alex_LSM6DSOX(sox_name1);
   sox2 = new Alex_LSM6DSOX(sox_name2);
 
+  const char szVersion[] = "Blangle_tft4: v0.81";
+
+  Serial.println(szVersion);
+  tft_write(szVersion);
+
 
   if( !sox1->begin_I2C(0x6A) )
   {
@@ -272,8 +283,10 @@ void setup()
   if( nNumError == 0 )
   {
     Serial.println("INF: Everything looks GOOD !");
-    //tft_write("GOOD: All 3 I2Cs are ok!");
-    tft_write("GOOD3!");
+    // tft_write("GOOD3!");
+    tft_write("");
+    tft_write("GOOD: All 3 I2Cs are ok!");
+    
     delay(1500);
   }
   else
@@ -368,9 +381,9 @@ int render_lock(int x,int y)
 
   // generated from electronoos\generate_img.py:
   // python C:\Users\alexa\dev\git\electronoos\generate_img\generate_img.py "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\just_lock.png" "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\just_arrow.png" "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\bubble.png" 4
-  // snas la bubble
+  // sans la bubble
   // python C:\Users\alexa\dev\git\electronoos\generate_img\generate_img.py "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\just_lock.png" "C:\Users\alexa\perso\docs\2022-05-20_-_blangle_tft\just_arrow.png" 4
-  // copy \tmp\imgs.* C:\Users\alexa\dev\git\electronoos\arduino_prj\blangle_tft2\ /Y
+  // copy \tmp\imgs.* C:\Users\alexa\dev\git\electronoos\arduino_prj\blangle_tft4\ /Y
 
   render_img(x,y,IMG_1_SIZE_X,IMG_1_SIZE_Y,aImgs_1,aPalette_1);
 }
@@ -505,29 +518,52 @@ const int nBubbleW = 0; // bubble level (was 32 to render it)
 const int nBubbleH = h_screen;
 const int nAreaW = (w_screen-nMenuW-nBubbleW)/2; // width of an area
 const int nAreaH = h_screen/2;
+const int nAreaH_Display = 4*h_screen/5;
+const int yCircEdit = 100;
+const int yCircView = nAreaH_Display+14;
 const int nLineH = 8;
 
-const int xLock = nMenuW+342;
-const int yLock = nAreaH+20;
+const int xLock = nMenuW+342+50; // +50 car passage au petit
+const int yLock = nAreaH+20+24+50;
 
 const int wLock = 88;
 const int hLock = 124;
 
-const int xArrow = nMenuW+88;
-const int yArrow = nAreaH+32;
-const int yArrowBottom = nAreaH+80+30;
-const int wArrow = 20;
-const int wInterArrow = 10;
+const int xArrow = nMenuW+88+44;
+const int yArrow = yCircEdit-32-20;
+const int yArrowBottom = yCircEdit+50;
+const int wArrow = 34;
+const int wInterArrow = 12;
 
-int render_screen(int nPresel, int nip, int db, int bubble, double circ,int bLocked, float rTemperature, int nLuminosity, bool bLowBattery)
+
+const int yBigText = 40+30;
+const int wBigText = 6;
+const int wBigTextEdit = 8;
+
+    
+const int yDebug = 8;
+
+
+OptimalTextRenderer otr_nip(BLUE,WHITE,wBigText,nMenuW+30-25, yBigText+nLineH*wBigText+10);
+OptimalTextRenderer otr_db(DB_COLOR,WHITE,wBigText,nMenuW+nAreaW+30, yBigText+nLineH*wBigText+10,4); // 5 to limit to 5 chars
+OptimalTextRenderer otr_circ(PURPLE,WHITE,5,nMenuW+70, yCircView);
+OptimalTextRenderer otr_temp(PURPLE,WHITE,2,nMenuW+50, yDebug);
+OptimalTextRenderer otr_lum(PURPLE,WHITE,2,nMenuW+nAreaW+50, yDebug);
+OptimalTextRenderer otr_low(PURPLE,WHITE,2,nMenuW+nAreaW+50+46+40+30, yDebug);
+
+
+
+int render_screen(int bEditionMode, int nPresel, int nip, int db, int bubble, double circ,int bLocked, float rTemperature, int nLuminosity, bool bLowBattery)
 {
   static uint8_t bDrawed = 0;
   static uint8_t bPrevLocked = 2;
   static int nPrevPresel = -1;
   static int nPrevDb = 9999;
   static int nPrevNip = 9999;
+  static double rPrevCirc = -1;
   static int nPrevBubble = 9999;
-  char buf[8];
+  static int bPrevEditionMode = -1;
+  char buf[14];
   
   // dessine l'interface, ne redessinne que ce qui est utile
 
@@ -537,6 +573,17 @@ int render_screen(int nPresel, int nip, int db, int bubble, double circ,int bLoc
 
 
   int nBubblePos = 0;
+
+  int bRedrawAll = 0;
+
+  //Serial.print("bEditionMode: "); Serial.println(bEditionMode);
+
+  if( bPrevEditionMode != bEditionMode )
+  {
+    bPrevEditionMode = bEditionMode;
+    bRedrawAll = 1;
+  }
+  
 
   if( 0 )
   {
@@ -549,151 +596,238 @@ int render_screen(int nPresel, int nip, int db, int bubble, double circ,int bLoc
     return 0;
   }
 
-  if( ! bDrawed )
+  if( ! bDrawed)
   {
     bDrawed = 1;
     tft.setRotation(LANDSCAPE+2); // +2 => revert haut bas
     //tft.fillScreen(BLACK);
-    tft.setTextColor(WHITE);
-    tft.fillRect(0,0,nMenuW,nMenuH,GRAY);
-    tft.fillRect(nMenuW,0,nAreaW,nAreaH,BLUE);
-    tft.fillRect(nMenuW+nAreaW,0,nAreaW,nAreaH,RED);
-    tft.fillRect(nMenuW,nAreaH,nAreaW*2,nAreaH,BLACK);
+    bRedrawAll = 1;
   }
 
-  if( nPrevPresel != nPresel)
+  if(bRedrawAll) // temporary to find bugs or forgotten background
   {
+    tft.fillRect(0,0,w_screen,h_screen,GRAY);
+  }
+
+  // we always print the selection column
+  if( nPrevPresel != nPresel || bRedrawAll )
+  {
+    tft.fillRect(0,0,nMenuW,nMenuH,GRAY);
     nPrevPresel = nPresel;
+    tft.setTextSize(3);
     for( int i = 0; i < nNbrSettings; ++i)
     {
       if( i == nPresel )
       {
-       tft.setTextColor(BLUE); 
+      tft.setTextColor(BLUE); 
       }
       else
       {
         tft.setTextColor(WHITE);
       }
       tft.setCursor(10, 6+i*h/nNbrSettings);
-      tft.setTextSize(3);
-      tft.print(i+1);
+      if(i<5)
+      {
+        tft.print(i+1);
+      }
+      else
+      {
+        tft.print(i==5?"D":i==6?"V":"E");
+      }
     }
-    tft.setTextColor(WHITE);
   }
 
-
-  tft.setTextSize(5);
-  const int yText = 40;
-
-  if(nPrevNip != nip || !bDrawed )
+  if(bEditionMode)
   {
-    nPrevNip = nip;
-    tft.fillRect(nMenuW,0+nAreaH/2,nAreaW,nAreaH/2,BLUE);
-    tft.setCursor(nMenuW+50, yText);
-    tft.print("NIP");
-    tft.setCursor(nMenuW+50, yText+nLineH*5);
-    
-    if(nip>999)
+
+    if( bRedrawAll )
     {
-      tft.print("???");
+      tft.fillRect(nMenuW,0,w_screen-nMenuW,h_screen,PURPLE);
     }
-    else
+
+    tft.setTextSize(wBigTextEdit);
+    tft.setCursor(nMenuW+20, yCircEdit);
+    tft.print("C=");
+    tft.setCursor(tft.getCursorX()+8, tft.getCursorY()); // half space
+    tft.setTextColor(WHITE, PURPLE);
+    //tft.print(circ,1);
+
+    if( bRedrawAll || rPrevCirc != circ )
     {
-      tft.print(nip);
+      rPrevCirc = circ;
+      snprintf(buf,8,"%4d.%1d", int(circ),int( 0.5+(circ-int(circ))*10 ) );
+      tft.print(buf);
+      tft.setTextColor(WHITE);
+      tft.setCursor(nMenuW+20, yCircEdit+60);
       tft.print("mm");
     }
-  }
+    
 
-  if(nPrevDb != db )
-  {
-    nPrevDb = db;
-    tft.fillRect(nMenuW+nAreaW,0+nAreaH/2,nAreaW,nAreaH/2,RED);
-    tft.setCursor(nMenuW+nAreaW+50, yText);
-    tft.print("DB");
-    tft.setCursor(nMenuW+nAreaW+50, yText+nLineH*5);
-    if(db>3600) // was 360 (error)
+
+    if( bPrevLocked != bLocked || bRedrawAll )
     {
-      tft.print("???");
+      bPrevLocked = bLocked;
+      render_lock(xLock, yLock);
+
+      int x = xArrow;
+      if( ! bLocked )
+      {
+        // cache le haut du verrou
+        tft.fillRect(xLock, yLock,40,20,PURPLE); // was 40/48 with the big one
+
+        // affiche les fleches
+        
+        for( int i = 0; i < 5; ++i )
+        {
+          if( i == 4 ) x += wArrow+wInterArrow;
+          render_arrow(x,yArrow);
+          render_arrow(x,yArrowBottom, 1);
+          x += wArrow+wInterArrow;
+        }
+      }
+      else
+      {
+        // cache les fleches
+        tft.fillRect( xArrow, yArrow,144+32+90,24,PURPLE );
+        tft.fillRect( xArrow, yArrowBottom+12,144+32+90,24,PURPLE );
+      }
     }
+
+  }
+  else
+  {
+
+    // view mode
+
+    if( bRedrawAll )
+    {
+      tft.fillRect(nMenuW,0,nAreaW,nAreaH_Display,BLUE);
+      tft.fillRect(nMenuW+nAreaW,0,nAreaW,nAreaH_Display,DB_COLOR);
+      tft.fillRect(nMenuW,nAreaH_Display,w_screen-nMenuW,h_screen-nAreaH_Display,PURPLE);
+    }
+
+
+    tft.setTextSize(wBigText);
+
+    /*
+
+    if(nPrevNip != nip || !bDrawed )
+    {
+      nPrevNip = nip;
+      tft.fillRect(nMenuW,0+nAreaH/2,nAreaW,nAreaH/2,BLUE);
+      tft.setCursor(nMenuW+50, yBigText);
+      tft.print("NIP");
+      tft.setCursor(nMenuW+50, yBigText+nLineH*5);
+      
+      if(nip>999)
+      {
+        tft.print("???");
+      }
+      else
+      {
+        tft.print(nip);
+        tft.print("mm");
+      }
+    }
+    */
+
+        /*
+    if(nPrevDb != db )
+    {
+      nPrevDb = db;
+      tft.fillRect(nMenuW+nAreaW,0+nAreaH/2,nAreaW,nAreaH/2,RED);
+      tft.setCursor(nMenuW+nAreaW+50, yBigText);
+      tft.print("DB");
+      tft.setCursor(nMenuW+nAreaW+50, yBigText+nLineH*5);
+      if(db>3600) // was 360 (error)
+      {
+        tft.print("???");
+      }
+      else
+      {
+        tft.print(db/10.,1);
+        tft.setCursor(tft.getCursorX(), yBigText+nLineH*5-nLineH+2);
+        tft.setTextSize(3);
+        tft.print("o");
+      }
+    }
+    */
+
+    if( bRedrawAll )
+    {
+      tft.setCursor(nMenuW+50, yBigText);
+      tft.print("NIP");
+    }
+    if(nip>999)
+      snprintf(buf,8,"???" );
     else
     {
-      tft.print(db/10.,1);
-      tft.setCursor(tft.getCursorX(), yText+nLineH*5-nLineH+2);
+      snprintf(buf,8,"%3d", nip );
+    }
+    otr_nip.render(&tft,buf,bRedrawAll);
+    if( bRedrawAll )
+    {
+      tft.print("mm"); 
+    }
+
+    if(bRedrawAll)
+    {
+      tft.setCursor(nMenuW+nAreaW+50, yBigText);
+      tft.print("DB");
+    }
+
+    if(db>3600 || db < -200)
+      snprintf(buf,8,"???" );
+    else
+      snprintf(buf,8,"%2d.%1d", int(db/10),abs(db%10) );
+    otr_db.render(&tft,buf,bRedrawAll);
+
+    if(bRedrawAll)
+    {
+      tft.setCursor(tft.getCursorX()+4, yBigText+nLineH*wBigText+10-nLineH+2); // get cursor is'nt always at the good place here (it depends of which char has been rendered before)
       tft.setTextSize(3);
       tft.print("o");
     }
-  }
 
-  tft.setTextSize(5);
-  tft.setCursor(nMenuW+20, nAreaH+64);
-  tft.print("C=");
-  tft.setCursor(tft.getCursorX()+8, tft.getCursorY()); // half space
-  tft.setTextColor(WHITE, BLACK);
-  //tft.print(circ,1);
-
-  snprintf(buf,8,"%4d.%1d", int(circ),int( 0.5+(circ-int(circ))*10 ) );
-  tft.print(buf);
-  tft.setTextColor(WHITE);
-  tft.print("mm");
-
-  if(nPrevBubble != bubble && 0 )
-  {
-    // render bubble
-    const int nBubbleSize2=32/2;
-    nPrevBubble = bubble;
-    int bubble_back_color = GREEN;
-    if(bubble>5 || bubble<-5) bubble_back_color = MAGENTA; // half degree => bad
-    tft.fillRect(w-nBubbleW,0,w,h,bubble_back_color);
-    nBubblePos = (bubble/10.)*(bubble/10.);
-    if(nBubblePos>h/2-nBubbleSize2) nBubblePos = h/2-nBubbleSize2;
-  //  if(nBubblePos<-(h/2-nBubbleSize2)) nBubblePos = -(h/2-nBubbleSize2);
-    if(bubble>0) nBubblePos=h/2-16-nBubblePos;
-    else nBubblePos=h/2-16+nBubblePos;
-    render_bubble(w-nBubbleW+2,nBubblePos);
-    tft.drawRect(w-nBubbleW,h/2-nBubbleSize2-2,nBubbleW,2,BLACK);
-    tft.drawRect(w-nBubbleW,h/2+nBubbleSize2,nBubbleW,2,BLACK);
-  }
-  
-
-
-  if( bPrevLocked != bLocked )
-  {
-    bPrevLocked = bLocked;
-    render_lock(xLock, yLock);
-
-    int x = xArrow;
-    if( ! bLocked )
+    if(nPrevBubble != bubble && 0 )
     {
-      // cache le haut du verrou
-      tft.fillRect(xLock, yLock,80,48,BLACK);
+      // render bubble
+      const int nBubbleSize2=32/2;
+      nPrevBubble = bubble;
+      int bubble_back_color = GREEN;
+      if(bubble>5 || bubble<-5) bubble_back_color = MAGENTA; // half degree => bad
+      tft.fillRect(w-nBubbleW,0,w,h,bubble_back_color);
+      nBubblePos = (bubble/10.)*(bubble/10.);
+      if(nBubblePos>h/2-nBubbleSize2) nBubblePos = h/2-nBubbleSize2;
+    //  if(nBubblePos<-(h/2-nBubbleSize2)) nBubblePos = -(h/2-nBubbleSize2);
+      if(bubble>0) nBubblePos=h/2-16-nBubblePos;
+      else nBubblePos=h/2-16+nBubblePos;
+      render_bubble(w-nBubbleW+2,nBubblePos);
+      tft.drawRect(w-nBubbleW,h/2-nBubbleSize2-2,nBubbleW,2,BLACK);
+      tft.drawRect(w-nBubbleW,h/2+nBubbleSize2,nBubbleW,2,BLACK);
+    }
 
-      // affiche les fleches
-      
-      for( int i = 0; i < 5; ++i )
-      {
-        if( i == 4 ) x += wArrow+wInterArrow;
-        render_arrow(x,yArrow);
-        render_arrow(x,yArrowBottom, 1);
-        x += wArrow+wInterArrow;
-      }
-    }
-    else
+
+    if( bRedrawAll || rPrevCirc != circ)
     {
-      // cache les fleches
-      tft.fillRect( xArrow, yArrow,144+32,16,BLACK );
-      tft.fillRect( xArrow, yArrowBottom+8,144+32,16,BLACK );
+      // small circ printing just for information
+      rPrevCirc = circ;
+      snprintf(buf,12,"C=%4d.%1dmm", int(circ),int( 0.5+(circ-int(circ))*10 ) );
+      otr_circ.render(&tft,buf,bRedrawAll);
     }
-  }
+
+  } // view mode
+
 
   if(1)
   {
-    
-    const int nOffsetY = -20;
 
+    // debug temp et lum
 
+    /*
     tft.setTextSize(2);
-    tft.fillRect( nMenuW+50+46, yText+nOffsetY,48, 16, BLUE );
-    tft.setCursor( nMenuW+50, yText+nOffsetY );
+    tft.fillRect( nMenuW+50+46+12, yDebug,62, 15, bEditionMode?PURPLE:BLUE );
+    tft.setCursor( nMenuW+50, yDebug );
     tft.print("temp:");
     if(isnan(rTemperature))
     {
@@ -704,15 +838,53 @@ int render_screen(int nPresel, int nip, int db, int bubble, double circ,int bLoc
       tft.print(rTemperature, 2);
     }
     tft.print("  ");
+    */
 
-    tft.fillRect( nMenuW+nAreaW+50+46, yText+nOffsetY,48, 16, RED );
-    tft.setCursor( nMenuW+nAreaW+50, yText+nOffsetY );
+    otr_temp.changeBackgroundColor(bEditionMode?PURPLE:BLUE);
+
+    if(isnan(rTemperature))
+    {
+      strcpy(buf,"temp: ???");
+    }
+    else
+    {
+      snprintf(buf,12,"temp: %2d.%1d", int(rTemperature),(int(rTemperature*10)%10) );
+    }
+    otr_temp.render(&tft,buf,bRedrawAll);
+
+    /*
+
+    tft.setCursor( nMenuW+nAreaW+50+46, yDebug );
+
+    tft.fillRect( nMenuW+nAreaW+50+46, yDebug,36, 15, bEditionMode?PURPLE:DB_COLOR );
+    tft.setCursor( nMenuW+nAreaW+50, yDebug );
     tft.print("lum:");
     tft.print(nLuminosity);
+    */
+
+    if((nCptFrame&0xF)==0 || bRedrawAll) // optim because it changes too fast
+    {
+      otr_lum.changeBackgroundColor(bEditionMode?PURPLE:DB_COLOR);
+      snprintf(buf,12,"lum:%4d", nLuminosity );
+      otr_lum.render(&tft,buf,bRedrawAll);
+    }
+
+
+    /*
+    tft.fillRect( nMenuW+nAreaW+50+46+86, yDebug,10, 15, bEditionMode?PURPLE:DB_COLOR );
     tft.print(" lb:");
     tft.print(bLowBattery);
     tft.print("     ");
-    
+    */
+    otr_low.changeBackgroundColor(bEditionMode?PURPLE:DB_COLOR);
+    if( bLowBattery )
+    {
+      otr_low.render(&tft,"LOW",bRedrawAll);
+    }
+    else
+    {
+      otr_low.render(&tft,"",bRedrawAll);
+    }
   }
 
   return 0;
@@ -765,6 +937,10 @@ void countFps()
 
 float rTemperature = -1.f;
 
+
+int bDemoMode = 1; // automatically alternate between every mode
+int bEditionMode = 0; // 0: view angle, 1: edit
+
 void loop()
 {
     static uint8_t aspect = 0;
@@ -814,8 +990,8 @@ void loop()
     bool bErrorNip = false;
     bool bErrorDb = false;
 
-    float angle_db_read = sox1->getDegY();
-    float angle_nip_read = sox2->getDegY();
+    float angle_nip_read = sox1->getDegY();
+    float angle_db_read = -sox2->getDegY();
     
     if(angle_db_read > 600.f )
     {
@@ -856,7 +1032,14 @@ void loop()
     // db = angle_db; // pour afficher le capteur brut apres calib
     db = angle_db - ( angle_nip + 3600*(nHalfBoitierMM / presetCirc[nNumSettingsSelected]));
     // db = (900-angle_db) - ( angle_nip + 3600*(nHalfBoitierMM / presetCirc[nNumSettingsSelected]));
-    
+
+    db +=250; // bidouille tuning anant demo
+
+    if( nCptFrame%20==0 )
+    {
+      Serial.print("nip: "); Serial.print(nip); Serial.print(", db: "); Serial.println(db);
+    }
+
 
     //db = analogRead(A15)*(5.0*8 / 1023.0);
 
@@ -947,7 +1130,10 @@ void loop()
     {
       // detect touch - center of the point
       int x,y,z;
-      bool bPressed = std_getPressed(&x,&y,&z,false);
+      bool bPressed = std_getPressed(&x,&y,&z,true);
+
+      // dommage de recreer la listPos a chaque frame!
+
       if( bPressed )
       {
         const int dw_arrow = wArrow+wInterArrow;
@@ -956,11 +1142,12 @@ void loop()
                     xLock+wLock/2,yLock+hLock/2, // lock // 370/200 // 360/182
                     // 80,120, // first arrow
         };
+
         // add 10 arrows
         for( int i = 0; i < 5; ++i )
         {
           listPos[2+i*2+0] = xArrow+i*dw_arrow+wArrow/2+1;
-          listPos[2+i*2+1] = yArrow+8;
+          listPos[2+i*2+1] = yArrow+12;
 
           if( i == 4)
           {
@@ -970,7 +1157,7 @@ void loop()
 
           // fleches du bas
           listPos[2+(i+5)*2+0] = listPos[2+(i+0)*2+0];
-          listPos[2+(i+5)*2+1] = listPos[2+(i+0)*2+1] + 86;
+          listPos[2+(i+5)*2+1] = listPos[2+(i+0)*2+1] + yArrowBottom-yArrow+10; // bizarre de devoir ajouter 10 !
 
         }
 
@@ -982,7 +1169,7 @@ void loop()
         }
 
         // debug: render touch point
-        if(0)
+        if(0 && nLocked == 0)
         {
           for( int i = 0; i < sizeof(listPos)/2/2; ++i ) // /2(short) /2(x & y)
           {
@@ -1068,12 +1255,31 @@ void loop()
           {
             // presel
             nNumSettingsSelected = i-11;
+
+            // handle demo mode
+            if(1)
+            {
+              if(nNumSettingsSelected == 5)
+              {
+                bDemoMode = 1;
+              }
+              else if(nNumSettingsSelected == 6)
+              {
+                bDemoMode = 0;
+                bEditionMode = 0;
+              }
+              else if(nNumSettingsSelected == 7)
+              {
+                bDemoMode = 0;
+                bEditionMode = 1;
+              }
+            }
           }
         } // if idx_element != -1
         
       } // if bPressed
 
-      render_screen(nNumSettingsSelected,nip,db,bubble,presetCirc[nNumSettingsSelected],nLocked,rTemperature,photores,bLowBattery);
+      render_screen(bEditionMode,nNumSettingsSelected,nip,db,bubble,presetCirc[nNumSettingsSelected],nLocked,rTemperature,photores,bLowBattery);
 
     } // detect touch
 
@@ -1107,6 +1313,22 @@ void loop()
     countFps();
     delay(100); // time for sensors to update
 
+    if( bDemoMode )
+    {
+      if( ((millis()/30000) % 2) == 0 )
+      {
+        bEditionMode = 0;
+        nLocked = 1;
+      }
+      else
+      {
+        bEditionMode = 1;
+        nLocked = ((millis()/60000) % 2) == 1; // un coup sur deux
+      }
+    }
+
+
+
   if(0)
   {
     // test low power
@@ -1123,8 +1345,6 @@ void loop()
 
   set_sleep_mode (SLEEP_MODE_PWR_DOWN);  
   sleep_enable();
-  sleep_cpu ();  
-
-
+  sleep_cpu();
   }
 }

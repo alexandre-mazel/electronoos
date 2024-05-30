@@ -73,6 +73,8 @@ MotorInterpolator mot1(PWM_TWIST,PHASE_TWIST);
 #define switchTwistGoPin 51 // button go +
 #define switchTwistRevPin 53 // button go -
 
+#define switchCollectPin 49 // a button
+
 #define STPR 200 //steps-per-revolution
 
 
@@ -191,6 +193,7 @@ float readRawAngleAS5600()
 int bTwistGoButtonPushed = 1; // state of the button (so we detect it changes) // let's pretend it was on at startup as there's a spurious on this one
 int bTwistRevButtonPushed = 1; // state of the button (so we detect it changes) // spurious here also now!
 int nTwistMove = 0; // 0: stop, 1: positive direction, -1: reverse
+int bCollect = 0; // 1: collecting
 
 void setup() 
 {
@@ -221,6 +224,8 @@ void setup()
 
   pinMode(switchTwistGoPin, INPUT);
   pinMode(switchTwistRevPin, INPUT);
+  pinMode(switchCollectPin, INPUT);
+  
 
   digitalWrite(enaPin ,LOW);
   digitalWrite(dirPin ,LOW);
@@ -479,6 +484,8 @@ void commandByButton()
   LCD.print(rMotRev1);
   LCD.print(", twst: ");
   LCD.print(nTwistMove);
+  LCD.print(", coll: ");
+  LCD.print(bCollect);
   LCD.print("  "); // clean remaining char when number are off
   delay(10);
 } // commandByButton
@@ -487,8 +494,10 @@ void commandByButton()
 
 
 long nNbrStepMotor1 = 0;
-int bSendCmdMotor1 = 0;
+long nNbrStepMotor2 = 0;
+int bSendCmdMotor1 = 1;
 int bFlipFlopMotor1 = 0;
+int bFlipFlopMotor2 = 0;
 long nFrame = 0;
 void updateMachine1b()
 {
@@ -496,6 +505,7 @@ void updateMachine1b()
   const int target_frameduration_micros = 600+6;
   //const int target_frameduration_micros = 800+6;
   //const int target_frameduration_micros = 1200+6;
+  //int target_frameduration_micros = 1200+6; // slow down to understand
 
   const int nNbrStepPerTurnMotor1 = 200;
 
@@ -533,7 +543,7 @@ void updateMachine1b()
         nTwistMove = 1;
         bSendCmdMotor1 = 1;
         digitalWrite(dirPin2,LOW);
-        digitalWrite(dirPin3,LOW);
+        digitalWrite(dirPin3,HIGH); // inverted to turn in the same direction (because of the gear transmission) // need to be sent every frame!!! ?!
       }
     }
   }
@@ -545,6 +555,7 @@ void updateMachine1b()
     if(pushed)
     {
       DEBUG.println("button rev pin pushed");
+      /*
       if( nTwistMove == -1 ) 
       {
         nTwistMove = 0;
@@ -557,21 +568,49 @@ void updateMachine1b()
         digitalWrite(dirPin2,HIGH);
         digitalWrite(dirPin3,HIGH);
       }
+      */
+      bCollect = ! bCollect;
     }
   }
 
-  if(bSendCmdMotor1)
+  if( nTwistMove == -1 || nTwistMove == 1 ) // || (nTwistMove == 1) && (nFrame%128)==0) ) // 256 times slower with the green button
   {
-    digitalWrite(stepPin2,bFlipFlopMotor1);
-    //digitalWrite(stepPin3,bFlipFlopMotor1);
-    bFlipFlopMotor1 = ! bFlipFlopMotor1;
-    if(bFlipFlopMotor1)
+    if(bSendCmdMotor1)
     {
-      nNbrStepMotor1 += nTwistMove;
+      digitalWrite(stepPin2,bFlipFlopMotor1);
+      //digitalWrite(stepPin3,bFlipFlopMotor1);
+      bFlipFlopMotor1 = ! bFlipFlopMotor1;
+      if(bFlipFlopMotor1)
+      {
+        nNbrStepMotor1 += nTwistMove;
+      }
+    }
+  }
+
+   // (nFrame%4)==0: 4 times slower when collecting
+   // (nFrame%100)!=0: 1% slower when collecting
+  if( (nTwistMove == -1 || nTwistMove == 1) && ( ! bCollect || (bCollect == 1 && (nFrame%30)!=0) ) )
+  {
+    digitalWrite(stepPin3,bFlipFlopMotor2);
+    digitalWrite(dirPin3,HIGH);
+    bFlipFlopMotor2 = ! bFlipFlopMotor2;
+    if(bFlipFlopMotor2)
+    {
+      nNbrStepMotor2 += nTwistMove;
     }
   }
 
   // nNbrStepMotor1++; // just to debug lcd
+
+
+  if( 1 )
+  {
+    if( (nFrame%2000)==0 )
+    {
+      Serial.print( "nNbrStepMotor1: " ); Serial.print( nNbrStepMotor1 );
+      Serial.print( ", nNbrStepMotor2: " ); Serial.println( nNbrStepMotor2 );
+    }
+  }
     
   
   
@@ -594,6 +633,8 @@ void updateMachine1b()
       LCD.print(rMotRev1);
       LCD.print(", twst: ");
       LCD.print(nTwistMove);
+      LCD.print(", coll: ");
+      LCD.print(bCollect);
       LCD.print("  "); // clean remaining char when number are off
     }
     else
@@ -628,6 +669,8 @@ void updateMachine1b()
     LCD.update();
   }
 #endif
+
+
 
   countFps();
 

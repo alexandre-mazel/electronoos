@@ -21,4 +21,6 @@ def crypt_vigenere(txt,key):
     
 print(crypt_vigenere("coucou le chat.","allo"))
 
+
+
 print(crypt_vigenere("a nous le gouter!","optionia"))

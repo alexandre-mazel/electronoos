@@ -1,5 +1,6 @@
 #include "HX711.h" // install in the library manager the HX711 by Rob Tillart (for cell amplifier)
 #include <LiquidCrystal.h>
+#include <EEPROM.h>
 
 # define ASSERT(b) __assert((b),"__FUNC__",__FILE__,__LINE__,"");
 // handle diagnostic informations given by assertion and abort program execution:
@@ -54,10 +55,12 @@ HX711 scale;
 
 // reglage pour barre de 3kg:
 
-float calibration_factor = 661; // 30g => 22000: 733 [une bouteille vide (celle de blanc orschwiller) peserait 448g; le plateau en fer 352g]
+float calibration_factor = 100; // 30g => 22000: 733 [une bouteille vide (celle de blanc orschwiller) peserait 448g; le plateau en fer 352g]
+// will be overwritten by EEPROM reading (so I put 100 to remember and test), to write it goto readCfgFromEeproom
 
 // la balance dans le sous sol: 733
-// balance a ochateau, section 1: 733 => 929 au lieu de 1030,cad la bonne valeur est entre 660 et 661
+// balance a ochateau, section 1: 733 => 929 au lieu de 1030,cad la bonne valeur est entre 660 et 661 => 661
+// balance du oversized: 661 => 1140 au lieu de 1030/1036, mettre entre 727 et 732 => mettre 729
 
 float old_calibration_factor = calibration_factor;
 
@@ -79,8 +82,17 @@ const int VANNE_TEST_PIN = 44;
 
 #include <LiquidCrystal_I2C.h>
 
+bool i2CAddrTest(uint8_t addr) {
+  Wire.begin();
+  Wire.beginTransmission(addr);
+  if (Wire.endTransmission() == 0) {
+    return true;
+  }
+  return false;
+}
+
 // initialize the library with the numbers of the interface pins
-LiquidCrystal_I2C lcd(0x3F, 16, 2);
+LiquidCrystal_I2C * pLcd = NULL;
 
 int nAnimateLcdCount = 0;
 void animateLcd()
@@ -93,11 +105,11 @@ void animateLcd()
   }
   for( int i = 0; i < nAnimateLcdCount; ++i )
   {
-    lcd.print(".");
+    pLcd->print(".");
   }
   for( int i = nAnimateLcdCount; i < nNbrAnimateMax; ++i )
   {
-    lcd.print(" ");
+    pLcd->print(" ");
   }
 }
 
@@ -123,12 +135,23 @@ void setOpen( int nNumVanne, int bOpen)
     }
 }
 
+void readCfgFromEeproom()
+{
+  if(0)
+  {
+    //write values (for the first time)
+    EEPROM.put(0x00, calibration_factor);
+  }
+
+  EEPROM.get(0x00, calibration_factor);
+}
+
 void setup() {
   
   Serial.begin(57600); // was 9600 // changing here need to change also in the android application.
   //pinMode(resetPin, INPUT);
 
-  lcd.print("Setup started...");
+  Serial.println("\nPianoCocktail v0.9");
 
   for( int i = 0; i < NBR_VANNE; ++i )
   {
@@ -136,26 +159,42 @@ void setup() {
   }
 
   pinMode(VANNE_TEST_PIN, OUTPUT);
-   digitalWrite(VANNE_TEST_PIN, HIGH);
+  digitalWrite(VANNE_TEST_PIN, HIGH);
 
   close_all();
-  
-  lcd.init();                // initialize the lcd
-  lcd.backlight();           // Turn on backlight // sans eclairage on voit rien...
 
+  uint8_t i2cAddr = 0x3F;
+  if(!i2CAddrTest(i2cAddr))
+  {
+    i2cAddr = 0x27;
+  }
+
+  Serial.print("DBG: Using LCD at I2C Addr: 0x");
+  Serial.println(i2cAddr,HEX);
+
+  pLcd = new LiquidCrystal_I2C(i2cAddr, 16, 2); // 0x3F sur la version de base, 0x27 sur la version oversized
+  
+  pLcd->init();                // initialize the lcd
+  pLcd->backlight();           // Turn on backlight // sans eclairage on voit rien...
+  //pLcd->noBacklight();
+  // pLcd->setBacklight(2);
+
+  pLcd->print("Setup started...");
+
+  readCfgFromEeproom();
   
   scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
   while(!scale.is_ready())
   {
     Serial.println("INF: Waiting for HX711...");
     delay(500);
-    lcd.setCursor(0, 0);
-    lcd.print("HX711 waiting");
+    pLcd->setCursor(0, 0);
+    pLcd->print("HX711 waiting");
     animateLcd();
   }
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("taring...");
+  pLcd->clear();
+  pLcd->setCursor(0, 0);
+  pLcd->print("taring...");
   Serial.print("calibration_factor: ");
   Serial.println(calibration_factor);
   scale.set_scale(calibration_factor);
@@ -165,7 +204,7 @@ void setup() {
   Serial.print("Zero factor: ");
   Serial.println(zero_factor);
   delay(500);
-  lcd.clear();
+  pLcd->clear();
 
   //handleOrder("#Assemble_10_20_30"); // to test when not connected to the tablet
 
@@ -213,20 +252,20 @@ int check_if_must_stop_verse()
   Serial.print(nCurrentVanne);
   Serial.print(", diff: ");
   Serial.println(diff);
-  lcd.setCursor(5, 0);
-  lcd.print(" => ");
-  lcd.print(int(diff));
-  lcd.print(" C");
-  lcd.print(nCurrentVanne+1);
-  lcd.print("  "); // clean eol
+  pLcd->setCursor(5, 0);
+  pLcd->print(" => ");
+  pLcd->print(int(diff));
+  pLcd->print(" C");
+  pLcd->print(nCurrentVanne+1);
+  pLcd->print("  "); // clean eol
   
-  lcd.setCursor(4, 1);
-  //lcd.print("dbg: ");
-  lcd.print(rCurrentQuantityToVerse);
+  pLcd->setCursor(4, 1);
+  //pLcd->print("dbg: ");
+  pLcd->print(rCurrentQuantityToVerse);
   if( rTotalTarget > 0.f)
   {
-    lcd.print( "/" );
-    lcd.print(rTotalTarget);
+    pLcd->print( "/" );
+    pLcd->print(rTotalTarget);
   }
   
   
@@ -496,9 +535,9 @@ void loop()
   {
     // 1 min => security close
     stop_all();
-    lcd.home();
+    pLcd->home();
     Serial.println("WRN: Security close!");
-    lcd.print("Security close!");
+    pLcd->print("Security close!");
     delay(5000);
   }
   
@@ -506,8 +545,8 @@ void loop()
   if (!scale.is_ready()) 
   {
     Serial.println("HX711 not found.");
-    lcd.home();
-    lcd.print("HX711: Disconnected");
+    pLcd->home();
+    pLcd->print("HX711: Disconnected");
     //close_all();
     bWasDisconnected = 1;
     delay(500);
@@ -517,7 +556,7 @@ void loop()
     if(bWasDisconnected)
     {
       Serial.println("DBG: was disconnected");
-      lcd.clear();
+      pLcd->clear();
       bWasDisconnected = 0;
     }
     if(old_calibration_factor != calibration_factor)
@@ -562,15 +601,15 @@ void loop()
       Serial.println(" g    ");
     }
 
-    lcd.home();
-    lcd.print(int(round(reading)));
-    lcd.print(" g    ");
+    pLcd->home();
+    pLcd->print(int(round(reading)));
+    pLcd->print(" g    ");
 
     int nResVerse = check_if_must_stop_verse();
     if(nResVerse==2)
     {
       sendSerialCommand("End0"); // +nCurrentVanne
-      lcd.clear();
+      pLcd->clear();
     }
     else if(nResVerse==1)
     {
@@ -618,9 +657,9 @@ void loop()
         }
         if(handleSerialCommand())
         {
-          lcd.clear();
-          lcd.setCursor(0, 1);
-          lcd.print(lastCommand);
+          pLcd->clear();
+          pLcd->setCursor(0, 1);
+          pLcd->print(lastCommand);
         }
       }
     }

@@ -113,8 +113,31 @@ void lcdPrintChar(unsigned char ch)
   pLcd->print(buf);
 }
 
+// print always on 4 chars
+void lcdPrint(float r)
+{
+  if(abs(r)<10)
+  {
+    pLcd->print(r,2);
+    return;
+  }
+  if(abs(r)<100)
+  {
+    pLcd->print(r,1);
+    return;
+  }
+  if(r<1000)
+  {
+    pLcd->print(" ");
+  }
+  pLcd->print(int(r));
+  return;
+  
+}
+
 float rNbrTwist = 0;
 float rNbrCollect = 0;
+int nNbrCollectSpeed = 100;
 float rNbrSpool = 0;
 
 int nNumLineEdited = 0;
@@ -168,21 +191,23 @@ void loop()
   {
     // update lcd (takes 57ms)
     pLcd->setCursor(0, 0);
-    pLcd->print("Twist  : ");
-    pLcd->print(rNbrTwist,0);
+    pLcd->print("Twist   ");
+    lcdPrint(rNbrTwist);
     pLcd->print("   ");
 
     pLcd->setCursor(0, 1);
-    pLcd->print("Collect: ");
-    pLcd->print(rNbrCollect,1);
-    pLcd->print("   ");
+    pLcd->print("Collect ");
+    lcdPrint(rNbrCollect);
+    pLcd->print("/");
+    pLcd->print(nNbrCollectSpeed);
+    pLcd->print("rpm");
 
     pLcd->setCursor(0, 2);
-    pLcd->print("Spool  : ");
-    pLcd->print(rNbrSpool,1);
+    pLcd->print("Spool   ");
+    lcdPrint(rNbrSpool);
     pLcd->print("   ");
 
-    pLcd->setCursor(18, nNumLineEdited);
+    pLcd->setCursor(19, nNumLineEdited);
     lcdPrintChar(127);
   }
 

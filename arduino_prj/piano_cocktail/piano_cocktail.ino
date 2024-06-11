@@ -116,6 +116,8 @@ void animateLcd()
 long int nTimeStartFill = 0;
 int bIsFilling = 0;
 
+unsigned char nMilliBeforeCut = 100; // 45 ok, si slow, si rapide, mettre 100
+
 void setOpen( int nNumVanne, int bOpen)
 { 
     // ouvre ou ferme la vanne.
@@ -269,7 +271,7 @@ int check_if_must_stop_verse()
   }
   
   
-  if(diff<1+4+3+1+1) // couramment on prend 8 apres coupure // On ajoute 1 de plus en condition réél des caves
+  if(diff<nMilliBeforeCut) // couramment on prend 8 apres coupure // On ajoute 1 de plus en condition réél des caves
   {
     setOpen(nCurrentVanne, 0);
     if(0)

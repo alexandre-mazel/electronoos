@@ -42,7 +42,7 @@ def index(req):
         login = dArg["l"]
         password = dArg["p"]
         s += "Checking credentials '%s' with '%s'\n" % (login,password)
-        if password == 'sous-marincheval':
+        if password == 'sous-marincheval42':
             s += "<br>Connection Success!<br>"
             s += "<br> L'information capitale est celle ci: 'Bravo a toi, tu recois un deuxieme bonbon en cadeau!'<br>"
         else:

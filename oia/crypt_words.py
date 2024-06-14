@@ -44,10 +44,16 @@ def crypt_rotdec(w):
     
     
 if __name__ == "__main__":
+    print("seq1:")
+    print("test:")
     print(crypt_rot(listWords[0]))
+    print("realseq1:")
     for i in [6,9,11]:
         print(crypt_rot(listWords[i]))
-        
+    
+    print("\nseq2:")
+    print("test:")
     print(crypt_rotdec(listWords[0]))
+    print("realseq2:")
     for i in [7,12,13]:
         print(crypt_rotdec(listWords[i]))

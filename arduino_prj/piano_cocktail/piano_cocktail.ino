@@ -55,7 +55,7 @@ HX711 scale;
 
 // reglage pour barre de 3kg:
 
-float calibration_factor = 100; // 30g => 22000: 733 [une bouteille vide (celle de blanc orschwiller) peserait 448g; le plateau en fer 352g]
+float calibration_factor = 729; // 30g => 22000: 733 [une bouteille vide (celle de blanc orschwiller) peserait 448g; le plateau en fer 352g]
 // will be overwritten by EEPROM reading (so I put 100 to remember and test), to write it goto readCfgFromEeproom
 
 // la balance dans le sous sol: 733
@@ -116,7 +116,18 @@ void animateLcd()
 long int nTimeStartFill = 0;
 int bIsFilling = 0;
 
-unsigned char nMilliBeforeCut = 100; // 45 ok, si slow, si rapide, mettre 100
+unsigned char nMilliBeforeCut = 100; // 10 en version normal, en oversize: 45 si slow, si rapide, mettre 100
+
+
+unsigned long hache_timeNextChange = 0;
+int hache_nNextIsOpen = 1;
+int hache_period_ms = 500;
+
+// internal opening, without high level handling
+void _setOpen( int nNumVanne, int bOpen)
+{
+    digitalWrite(VANNE_1_PIN+nNumVanne, bOpen?LOW:HIGH); // high don't send voltage => HIGH is OFF.
+}
 
 void setOpen( int nNumVanne, int bOpen)
 { 
@@ -124,7 +135,13 @@ void setOpen( int nNumVanne, int bOpen)
     // - nNumVanne: 0..n-1
     // - bOpen: 1: ouvre, 0: ferme
 
-    digitalWrite(VANNE_1_PIN+nNumVanne, bOpen?LOW:HIGH); // high don't send voltage => HIGH is OFF.
+    _setOpen(nNumVanne, bOpen);
+    
+    
+    // we will hache only if versing is on, so next hache will be after an opening
+    hache_nNextIsOpen = 0;
+    hache_timeNextChange = millis()+hache_period_ms;
+
 
     if(bOpen)
     {
@@ -142,10 +159,15 @@ void readCfgFromEeproom()
   if(0)
   {
     //write values (for the first time)
+    Serial.println("\nWRITING TO EEPROM !\n");
     EEPROM.put(0x00, calibration_factor);
+    EEPROM.put(0x04, nMilliBeforeCut);
+    
   }
 
   EEPROM.get(0x00, calibration_factor);
+  EEPROM.get(0x04, nMilliBeforeCut);
+  nMilliBeforeCut = 120;
 }
 
 void setup() {
@@ -207,6 +229,10 @@ void setup() {
   Serial.println(zero_factor);
   delay(500);
   pLcd->clear();
+  
+  // print all eeproms read parameters
+  Serial.print("nMilliBeforeCut: ");
+  Serial.println(nMilliBeforeCut);
 
   //handleOrder("#Assemble_10_20_30"); // to test when not connected to the tablet
 
@@ -222,6 +248,13 @@ float target_verse = -1001; // negative when no current
 int nCurrentVanne = -1;
 unsigned long timeNextQueueOrder = 0; // we want to wait a bit before handling next queue
 float rCurrentQuantityToVerse = -1;
+
+float rPrevLastMeasured = -1;
+int nCptFrameWithNoChangeInWeight = 0;
+
+int nbBalanceIsStuck = 0;
+unsigned long timeLastBalanceStuck = 0;
+
 void verse_quantite(float rGrammes,int nNumVanne)
 {
   target_verse = last_measured + rGrammes;
@@ -234,6 +267,19 @@ void verse_quantite(float rGrammes,int nNumVanne)
   Serial.print(", target: ");
   Serial.println(target_verse);
   setOpen(nNumVanne,1);
+}
+
+void hache()
+{
+    // handle the fact we want to slow down filling by making the opening clignote every 500ms
+    
+    if( millis() > hache_timeNextChange )
+    {
+        Serial.println("haching...");
+        _setOpen(nCurrentVanne,hache_nNextIsOpen);
+        hache_nNextIsOpen ^= 1; // pingpong between 0 and 1
+        hache_timeNextChange = millis() + hache_period_ms;
+    }
 }
 
 int isTargetDefined()
@@ -269,9 +315,37 @@ int check_if_must_stop_verse()
     pLcd->print( "/" );
     pLcd->print(rTotalTarget);
   }
+
+  if( abs(last_measured - rPrevLastMeasured) < 0.5 )
+  {
+    // c'est en train de verser, et ca bouge pas alors qu'on a un asservissement en poids.
+    // c'est mauvais signe!
+
+    Serial.print("INF: Balance is stuck ? rPrevLastMeasured: "); Serial.print( rPrevLastMeasured ); Serial.print( ", last_measured: " ); Serial.print( last_measured ); Serial.print( ", nCptFrameWithNoChangeInWeight: " ); Serial.println( nCptFrameWithNoChangeInWeight );
+
+    ++nCptFrameWithNoChangeInWeight;
+    if( nCptFrameWithNoChangeInWeight > 10 ) // roughly 2sec
+    {
+      nCptFrameWithNoChangeInWeight = 0;
+      Serial.println("INF: Balance seems stuck !");
+      nbBalanceIsStuck = 1;
+      timeLastBalanceStuck = millis();
+    }
+    else
+    {
+      nbBalanceIsStuck = 0; // let's reset it to leave a chance to some wine to be send
+    }
+  }
+  else
+  {
+    rPrevLastMeasured = last_measured;
+    nCptFrameWithNoChangeInWeight = 0;
+    nbBalanceIsStuck = 0;
+  }
+
   
   
-  if(diff<nMilliBeforeCut) // couramment on prend 8 apres coupure // On ajoute 1 de plus en condition réél des caves
+  if(diff<nMilliBeforeCut || nbBalanceIsStuck) // couramment on prend 8 apres coupure // On ajoute 1 de plus en condition réél des caves
   {
     setOpen(nCurrentVanne, 0);
     if(0)
@@ -288,6 +362,12 @@ int check_if_must_stop_verse()
     target_verse = -1001;
     timeNextQueueOrder = millis() + nWaitBetweenBottleMs; // wait some sec so the tuyau se vide avant de passer a la commande d'apres
     return 2;
+  }
+  
+  // hachage en fin de versage
+  if(rTotalTarget < 0 && diff < 300 ) // if it's the last cuve, and near the end, we must slow down
+  {
+    hache();
   }
   return 1;
 }
@@ -533,7 +613,7 @@ void loop()
 {
 
   // security
-  if(bIsFilling && millis()-nTimeStartFill>60*1000) // 60*1000 => 1 min
+  if(bIsFilling && millis()-nTimeStartFill>60*1000L) // 60*1000 => 1 min
   {
     // 1 min => security close
     stop_all();
@@ -617,6 +697,23 @@ void loop()
     {
       sendSerialCommand("Fill0"); // +nCurrentVanne
     }
+
+    if( nbBalanceIsStuck )
+    {     
+      pLcd->setCursor(0, 1);
+      pLcd->print("ERR: Bal stuck?");
+
+      if(millis()-timeLastBalanceStuck>3000)
+      {
+        // let's check it moved again (the goal is to remove the error about the stuck balance)
+        Serial.print("INF: balance stiistuck ? last_measured:"); Serial.println(last_measured);
+        if( abs(last_measured - rPrevLastMeasured) > 10 )
+        {
+          nbBalanceIsStuck = 0;
+          pLcd->clear(); // clear msg
+        }
+      }
+    }
     
 
     if(0)
@@ -679,7 +776,7 @@ void loop()
             float rGramme = queueOrder[nNbrQueueOrder*2+1];
             if(nNbrQueueOrder==0 && rTotalTarget>0)
             {
-              rGramme = rTotalTarget-last_measured-0.5; // remove 0.5g to add margin car bouteilel trop pleine
+              rGramme = rTotalTarget-last_measured-0.5; // remove 0.5g to add margin car bouteille trop pleine
               rTotalTarget = -1; 
             }
             if(rGramme>0)

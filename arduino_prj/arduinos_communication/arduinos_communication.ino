@@ -82,6 +82,41 @@ void setup()
   Serial2.begin(57600);
 }
 
+
+/*
+* retrieve int argument in a string, return the number of argumen set
+* argument are coded in a string separated by a '_' _arg1_arg2_arg3... 
+* eg: toto_10_34_45_10
+*/
+int retrieveIntArguments(const char* s, int * pDstArg, int nNbrArgMax)
+{
+  int nNbrArg = 0;
+  const char* p = s;
+  const char* pstart = NULL;
+  while(*p && nNbrArg < nNbrArgMax )
+  {
+    if(*p=='_')
+    {
+      if( pstart != NULL )
+      {
+        pDstArg[nNbrArg] = atoi(pstart); // atoi s'arrete au premier char non decimal
+        nNbrArg += 1;
+      }
+      pstart = p+1;
+
+    }
+    ++p;
+  }
+  // last remainder:
+  if( pstart != NULL && nNbrArg < nNbrArgMax )
+  {
+    pDstArg[nNbrArg]=atoi(pstart);
+    nNbrArg += 1;
+  }
+  return nNbrArg;
+}
+
+
 #define LEN_COMMAND_MAX 32
 char lastCommand[LEN_COMMAND_MAX+1] = "\0";
 
@@ -89,9 +124,41 @@ char lastCommand[LEN_COMMAND_MAX+1] = "\0";
 // return 0 on error
 int handleOrder( const char * command)
 {
-  // this two next lines takes: 
-  Serial.print( "INF: handleOrder: Receiving: " );
-  Serial.println( command );
+  int bDebug = 1;
+
+  // this two next lines takes: 356us
+  if(bDebug)
+  {
+    //int before = micros();
+    Serial.print( "INF: handleOrder: Receiving: " );
+    Serial.println( command );
+    //defore = micros()-before;
+    //Serial.println(before);
+  }
+
+
+  if(command[2]=='M' && command[3]=='O')
+  {
+    Serial.println("INF: handleOrder: Command: Motor" );
+    // Assemble
+    int args[3];
+    int nNbrArgs = retrieveIntArguments(command,args,3);
+    if(bDebug)
+    {
+      // debug
+      Serial.print("DBG: handleOrder: " );
+      for(int i=0;i<nNbrArgs;++i)
+      {
+        Serial.print(i);
+        Serial.print(": ");
+        Serial.print(args[i]);
+        Serial.print(", ");
+      }
+      Serial.println("");
+    } // debug
+  } // if command
+
+  return 1;
 }
 
 int handleSerialCommand()

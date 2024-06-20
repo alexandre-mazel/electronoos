@@ -216,7 +216,7 @@ void loop()
     {
       *prEdited += 1000;
       bMotor1_sign = 1;
-      sendSerialCommand("MOTOR__1__1");
+      sendSerialCommand("MOTOR_1_1_500");
     }
   }
   
@@ -227,7 +227,7 @@ void loop()
     {
       *prEdited -= 1000;
       bMotor1_sign = -1;
-      sendSerialCommand("MOTOR__1__-1");
+      sendSerialCommand("MOTOR_1_-1_50");
     }
   }
 

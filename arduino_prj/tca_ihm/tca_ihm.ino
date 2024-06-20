@@ -84,7 +84,34 @@ void setup()
   pLcd->init();                // initialize the lcd
   pLcd->backlight();           // Turn on backlight // sans eclairage on voit rien...
   
+  Serial2.begin(57600);
+
   pLcd->print("Setup started...");
+}
+
+
+// same as print, but add some space after msg to clean previous string
+
+void lcdPrint(const char * msg)
+{
+  pLcd->print(msg);
+  if(strlen(msg)<20)
+    pLcd->print(" ");
+  if(strlen(msg)<19)
+    pLcd->print(" ");
+}
+
+
+void sendSerialCommand(const char * msg)
+{
+  Serial2.print("##");
+  Serial2.println(msg);
+  //char buf[32];
+  //snprintf
+  //Serial.println(millis());
+
+  pLcd->setCursor(0, 3);
+  lcdPrint(msg);
 }
 
 
@@ -144,6 +171,10 @@ int nNumLineEdited = 0;
 float * prEdited = &rNbrTwist;
 int nNbrFrame = 0;
 
+bool bMotor1_sign = 0;
+
+bool bPrevPush1 = 0;
+bool bPrevPush2 = 0;
 
 void loop()
 {
@@ -154,7 +185,7 @@ void loop()
   int pushed2 = digitalRead(PIN_SW2) == HIGH;
   int nPotar1 = 1023-analogRead(PIN_POTAR1);
 
-  if((nNbrFrame%100)==0)
+  if((nNbrFrame%20)==0)
   {
     // debug
     Serial.print("DBG: sw1: "); Serial.print(pushed1); Serial.print(", sw2: "); Serial.print(pushed2); Serial.print(", nPotar1: "); Serial.println(nPotar1);
@@ -178,13 +209,26 @@ void loop()
     *prEdited += rInc*rInc*rInc*30;
   }
 
-  if(pushed1)
+  if(bPrevPush1 != pushed1)
   {
-    *prEdited += 1000;
+    bPrevPush1 = pushed1;
+    if(pushed1 )
+    {
+      *prEdited += 1000;
+      bMotor1_sign = 1;
+      sendSerialCommand("MOTOR__1__1");
+    }
   }
-  if(pushed2)
+  
+  if(bPrevPush2 != pushed2)
   {
-    *prEdited -= 1000;
+    bPrevPush2 = pushed2;
+    if(pushed2)
+    {
+      *prEdited -= 1000;
+      bMotor1_sign = -1;
+      sendSerialCommand("MOTOR__1__-1");
+    }
   }
 
   if(1)

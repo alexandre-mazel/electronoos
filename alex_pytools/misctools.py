@@ -345,6 +345,15 @@ def getTimeStamp():
     strTimeStamp = datetimeObject.strftime( "%Y/%m/%d: %Hh%Mm%Ss" )
     return strTimeStamp
     
+def getFileStamp(filename):
+    """
+    get a nice stamp of the last modified time of a file
+    """    
+    datetimeObject = datetime.datetime.fromtimestamp(os.path.getmtime(filename))
+    strTimeStamp = datetimeObject.strftime( "%Y/%m/%d: %Hh%Mm%Ss" )
+    
+    return strTimeStamp
+    
 def getWeekDay():
     """
     return the number 1..7 of the day in the week (beginning on monday)

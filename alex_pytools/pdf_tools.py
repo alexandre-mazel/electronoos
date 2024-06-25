@@ -199,13 +199,16 @@ def pdfMultiCell( pdf, x, y, txt, hInterlign, bCentered = False ):
         pdf.text(xp,y,line )
         y += hInterlign
 
-def generatePdfFromImages( listImgs, strOutPdfFilename, strVersoText = None, nNbrImagePerPage = 1, aListArea = None, bAddPageNum = True ):
+def generatePdfFromImages( listImgs, strOutPdfFilename, strVersoText = None, nNbrImagePerPage = 1, aListArea = None, bAddPageNum = True, bLandscape = False ):
     """
     Generate a pdf files from a list of images
     - nNbrImagePerPage: currently tested: 1 and 4
     - aListArea: for each area one image will be generated and copied as a new image (one area per page if nbr_image_per_page = 1)
     """
-    pdf = FPDF('P', 'mm', 'A4') # Portrait, measures in mm, format is A4
+    if bLandscape:
+        pdf = FPDF('L', 'mm', 'A4') # Portrait, measures in mm, format is A4
+    else:
+        pdf = FPDF('P', 'mm', 'A4') # Portrait, measures in mm, format is A4
     #~ pdf.SetAuthor("amazel")
     #~ pdf.add_page()
     #~ pdf.set_font('Arial', 'B', 16)
@@ -213,6 +216,11 @@ def generatePdfFromImages( listImgs, strOutPdfFilename, strVersoText = None, nNb
     #~ pdf.output(strOutPdfFilename, 'F')
     wA4 = 210
     hA4 = 297
+    
+    if bLandscape:
+        wA4 = hA4
+        hA4 = 210
+        
     if nNbrImagePerPage > 1:
         nImageW = wA4/(nNbrImagePerPage//2)
     else:

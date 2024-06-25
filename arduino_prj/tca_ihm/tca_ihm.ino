@@ -235,19 +235,19 @@ void loop()
   {
     // update lcd (takes 57ms)
     pLcd->setCursor(0, 0);
-    pLcd->print("Twist   ");
+    pLcd->print("Twi ");
     lcdPrint(rNbrTwist);
     pLcd->print("   ");
 
     pLcd->setCursor(0, 1);
-    pLcd->print("Collect ");
+    pLcd->print("Col ");
     lcdPrint(rNbrCollect);
     pLcd->print("/");
     pLcd->print(nNbrCollectSpeed);
     pLcd->print("rpm");
 
     pLcd->setCursor(0, 2);
-    pLcd->print("Spool   ");
+    pLcd->print("Spo ");
     lcdPrint(rNbrSpool);
     pLcd->print("   ");
 

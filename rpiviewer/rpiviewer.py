@@ -24,16 +24,23 @@ def show_user_settings():
         showinfo("Alerte", vidlist.get())
 
     vidlist = Listbox(root)
-    vidlist.insert(1, "Python")
-    vidlist.insert(2, "PHP")
+    vidlist.insert(1, "Vid1.mp4")
+    vidlist.insert(2, "vide2.mp4")
     vidlist.insert(3, "jQuery")
     vidlist.insert(4, "CSS")
     vidlist.insert(5, "Javascript")
     vidlist.activate(2) # set focus to a specific line (seems not to work)
     vidlist.grid(column=1, row=nNumRow); nNumRow += 10
     print("sel: " + str(vidlist.curselection() ))
+    
+    def quit_settings():
+        print("sel: " + str(vidlist.curselection() ))
+        root.destroy()
+
         
-    ttk.Button(frm, text="Quit", command=root.destroy).grid(column=colcenter, row=nNumRow)
+    ttk.Button(frm, text="Quit", command=quit_settings).grid(column=colcenter, row=nNumRow)
+    
+    
     root.mainloop()
     
     

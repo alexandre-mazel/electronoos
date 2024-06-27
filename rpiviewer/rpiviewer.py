@@ -1,6 +1,9 @@
 from tkinter import *
 from tkinter import ttk
 
+# idée: faire un rsync avec le serveur et proposé de lire des vidéos depuis le disque local ?
+# on choisit en local la vidéo
+
 def show_user_settings():
     """
     from https://docs.python.org/3/library/tkinter.html
@@ -38,7 +41,6 @@ def show_user_settings():
         print("sel: " + str(vidlist.curselection() ))
         root.destroy()
 
-        
     ttk.Button(frm, text="Quit", command=quit_settings).grid(column=colcenter, row=nNumRow)
     
     
@@ -46,3 +48,4 @@ def show_user_settings():
     
     
 show_user_settings()
+print("la suite: affiche la vidéo en boucle (avec opencv en fullscreen?)")

@@ -34,6 +34,7 @@ def show_user_settings():
     print("sel: " + str(vidlist.curselection() ))
     
     def quit_settings():
+        print("radio: " + str(radio.state() )) # alternate/selected/vide
         print("sel: " + str(vidlist.curselection() ))
         root.destroy()
 

@@ -97,7 +97,7 @@ def show_video_fullscreen( filename, bLoop = False ):
     strWinName = "Frame"
     
     cv2.namedWindow(strWinName, cv2.WINDOW_NORMAL)
-    #~ cv2.setWindowProperty(strWinName, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+    cv2.setWindowProperty(strWinName, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
     
     nNumFrame = 0

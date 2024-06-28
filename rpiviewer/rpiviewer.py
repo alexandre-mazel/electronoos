@@ -110,6 +110,7 @@ def show_user_settings(strPath, listSettings):
         # in place storing
         listSettings[0] = bIsSelected
         listSettings[1] = nNumSelected
+        listSettings[2] = allVideos[nNumSelected]
         
         root.destroy()
 
@@ -230,9 +231,12 @@ if os.name == "nt":
     
 strLocalPath += "videos/"
 
-#~ show_video_fullscreen(strLocalPath+"sdaec_farmcow.mp4", bLoop=True)
 
-listSettings = [False,0]
-listSettings = show_user_settings(strLocalPath,listSettings)
-show_user_settings(strLocalPath,listSettings)
+if 1:
+    listSettings = [False,0,""]
+    listSettings = show_user_settings(strLocalPath,listSettings)
+    show_user_settings(strLocalPath,listSettings)
+    
+#~ show_video_fullscreen(strLocalPath+"sdaec_farmcow.mp4", bLoop=True)
+show_video_fullscreen(strLocalPath+listSettings[2], bLoop=True)
 

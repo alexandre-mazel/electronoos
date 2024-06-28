@@ -9,10 +9,60 @@ import time
 # idée: faire un rsync avec le serveur et proposé de lire des vidéos depuis le disque local ?
 # on choisit en local la vidéo
 
-def show_user_settings():
+class MyCheckbox(ttk.Checkbutton):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.variable = BooleanVar(self)
+        self.config(variable=self.variable)
+
+    def isChecked(self):
+        return self.variable.get()
+        
+    def setChecked(self,bIsChecked):
+        self.variable.set(bIsChecked)
+
+    def check(self):
+        self.variable.set(True)
+
+    def uncheck(self):
+        self.variable.set(False)
+
+if 0:
+
+    def setCheckboxChecked(checkbox,bSelected):
+        """
+        change a checkbox widget, bSelected: True => checked, False => unchecked, -1 => unknown
+        """
+        if bSelected:
+            # checkbox.state(['selected'])
+            checkbox.set(True)
+        elif bSelected == False:
+            #~ checkbox.deselect()
+            checkbox.state([])
+        # else si -1: ne fait rien!
+        return
+        
+    def getCheckboxChecked(checkbox):
+        readedState = checkbox.state()
+        if len(readedState)>0:
+            if readedState[0] == 'alternate':
+                return -1
+            if readedState[0] == 'selected': # or directly:  "selected" in self.checkbutton.state()
+                return True
+
+        return False
+
+def retrieveLocalVideos(strPath):
+    listFiles = os.listdir(strPath)
+    return listFiles
+
+def show_user_settings(strPath, listSettings):
     """
     from https://docs.python.org/3/library/tkinter.html
     and https://python.doctor/page-tkinter-interface-graphique-python-tutoriel
+    
+    return settings
     """
     root = Tk()
     frm = ttk.Frame(root, padding=20)
@@ -23,33 +73,54 @@ def show_user_settings():
     ttk.Label(frm, text="RPIVIEWER",background="lightblue").grid(column=colcenter, row=nNumRow); nNumRow += 1
     ttk.Label(frm, text="Settings").grid(column=colcenter, row=nNumRow); nNumRow += 1
     
-    radio = ttk.Checkbutton(frm,text="Nouveau?",onvalue=1,state=1)
-    radio.grid(column=colcenter, row=nNumRow); nNumRow += 1
-    print(radio.configure().keys())
+    checkbox = MyCheckbox(frm,text="Nouveau?",onvalue=1,state=1)
+    checkbox.grid(column=colcenter, row=nNumRow); nNumRow += 1
+    print(checkbox.configure().keys())
+    
+    checkbox.setChecked(listSettings[0])
     
     # liste
     def get_video_name():
         showinfo("Alerte", vidlist.get())
+        
+    allVideos = retrieveLocalVideos(strPath)
 
     vidlist = Listbox(root)
-    vidlist.insert(1, "Vid1.mp4")
-    vidlist.insert(2, "vide2.mp4")
-    vidlist.insert(3, "jQuery")
-    vidlist.insert(4, "CSS")
-    vidlist.insert(5, "Javascript")
-    vidlist.activate(2) # set focus to a specific line (seems not to work)
+    
+    for i,f in enumerate(allVideos):
+        vidlist.insert(i+1, f)
+
     vidlist.grid(column=1, row=nNumRow); nNumRow += 10
-    print("sel: " + str(vidlist.curselection() ))
+
+
+    vidlist.selection_set(listSettings[1])
     
     def quit_settings():
-        print("radio: " + str(radio.state() )) # alternate/selected/vide
-        print("sel: " + str(vidlist.curselection() ))
+        print("INF: in quit_settings...")
+        print("checkbox: " + str(checkbox.state() )) # alternate/selected/vide
+        print("video selected: " + str(vidlist.curselection() ))
+        
+        bIsSelected = checkbox.isChecked()
+        
+        nNumSelected = 0
+        curSel = vidlist.curselection()
+        if len(curSel)>0:
+            nNumSelected = curSel[0]
+        
+        # in place storing
+        listSettings[0] = bIsSelected
+        listSettings[1] = nNumSelected
+        
         root.destroy()
 
     ttk.Button(frm, text="Quit", command=quit_settings).grid(column=colcenter, row=nNumRow)
     
     
     root.mainloop()
+    
+    print("INF: show_user_settings: exiting with settings: %s" % str(listSettings))
+    
+    return listSettings
     
 def sync_remote_video():
 	"""
@@ -103,6 +174,7 @@ def show_video_fullscreen( filename, bLoop = False ):
     
     nNumFrame = 0
     timeStart = time.time()
+    
     while(cap.isOpened()):
         # Capture frame-by-frame
         ret, frame = cap.read()
@@ -145,18 +217,22 @@ def show_video_fullscreen( filename, bLoop = False ):
         if (nNumFrame & 0x7F) == 0x7F:
             print("INF: real fps: %5.2f" % (nNumFrame/(time.time()-timeStart)) )
             
-
-
-
-    # When everything done, release the video capture object
+    # while is open - end
+    
     cap.release()
+    
+# show_video_fullscreen - end
 
-	
-#~ show_user_settings()
-
-strLocalPath = "/home/na"
+strLocalPath = "/home/na/"
 
 if os.name == "nt":
     strLocalPath = "c:/"
+    
+strLocalPath += "videos/"
 
-show_video_fullscreen(strLocalPath+"/videos/sdaec_farmcow.mp4", bLoop=True)
+#~ show_video_fullscreen(strLocalPath+"sdaec_farmcow.mp4", bLoop=True)
+
+listSettings = [False,0]
+listSettings = show_user_settings(strLocalPath,listSettings)
+show_user_settings(strLocalPath,listSettings)
+

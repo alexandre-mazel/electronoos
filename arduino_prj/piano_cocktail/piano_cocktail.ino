@@ -1,5 +1,6 @@
 #include "HX711.h" // install in the library manager the HX711 by Rob Tillart (for cell amplifier)
 #include <LiquidCrystal.h>
+#include <EEPROM.h>
 
 # define ASSERT(b) __assert((b),"__FUNC__",__FILE__,__LINE__,"");
 // handle diagnostic informations given by assertion and abort program execution:
@@ -54,10 +55,12 @@ HX711 scale;
 
 // reglage pour barre de 3kg:
 
-float calibration_factor = 661; // 30g => 22000: 733 [une bouteille vide (celle de blanc orschwiller) peserait 448g; le plateau en fer 352g]
+float calibration_factor = 729; // 30g => 22000: 733 [une bouteille vide (celle de blanc orschwiller) peserait 448g; le plateau en fer 352g]
+// will be overwritten by EEPROM reading (so I put 100 to remember and test), to write it goto readCfgFromEeproom
 
 // la balance dans le sous sol: 733
-// balance a ochateau, section 1: 733 => 929 au lieu de 1030 entre 660 et 661
+// balance a ochateau, section 1: 733 => 929 au lieu de 1030,cad la bonne valeur est entre 660 et 661 => 661
+// balance du oversized: 661 => 1140 au lieu de 1030/1036, mettre entre 727 et 732 => mettre 729
 
 float old_calibration_factor = calibration_factor;
 
@@ -79,8 +82,17 @@ const int VANNE_TEST_PIN = 44;
 
 #include <LiquidCrystal_I2C.h>
 
+bool i2CAddrTest(uint8_t addr) {
+  Wire.begin();
+  Wire.beginTransmission(addr);
+  if (Wire.endTransmission() == 0) {
+    return true;
+  }
+  return false;
+}
+
 // initialize the library with the numbers of the interface pins
-LiquidCrystal_I2C lcd(0x3F, 16, 2);
+LiquidCrystal_I2C * pLcd = NULL;
 
 int nAnimateLcdCount = 0;
 void animateLcd()
@@ -93,16 +105,29 @@ void animateLcd()
   }
   for( int i = 0; i < nAnimateLcdCount; ++i )
   {
-    lcd.print(".");
+    pLcd->print(".");
   }
   for( int i = nAnimateLcdCount; i < nNbrAnimateMax; ++i )
   {
-    lcd.print(" ");
+    pLcd->print(" ");
   }
 }
 
 long int nTimeStartFill = 0;
 int bIsFilling = 0;
+
+unsigned char nMilliBeforeCut = 100; // 10 en version normal, en oversize: 45 si slow, si rapide, mettre 100
+
+
+unsigned long hache_timeNextChange = 0;
+int hache_nNextIsOpen = 1;
+int hache_period_ms = 500;
+
+// internal opening, without high level handling
+void _setOpen( int nNumVanne, int bOpen)
+{
+    digitalWrite(VANNE_1_PIN+nNumVanne, bOpen?LOW:HIGH); // high don't send voltage => HIGH is OFF.
+}
 
 void setOpen( int nNumVanne, int bOpen)
 { 
@@ -110,7 +135,13 @@ void setOpen( int nNumVanne, int bOpen)
     // - nNumVanne: 0..n-1
     // - bOpen: 1: ouvre, 0: ferme
 
-    digitalWrite(VANNE_1_PIN+nNumVanne, bOpen?LOW:HIGH); // high don't send voltage => HIGH is OFF.
+    _setOpen(nNumVanne, bOpen);
+    
+    
+    // we will hache only if versing is on, so next hache will be after an opening
+    hache_nNextIsOpen = 0;
+    hache_timeNextChange = millis()+hache_period_ms;
+
 
     if(bOpen)
     {
@@ -123,12 +154,28 @@ void setOpen( int nNumVanne, int bOpen)
     }
 }
 
+void readCfgFromEeproom()
+{
+  if(0)
+  {
+    //write values (for the first time)
+    Serial.println("\nWRITING TO EEPROM !\n");
+    EEPROM.put(0x00, calibration_factor);
+    EEPROM.put(0x04, nMilliBeforeCut);
+    
+  }
+
+  EEPROM.get(0x00, calibration_factor);
+  EEPROM.get(0x04, nMilliBeforeCut);
+  nMilliBeforeCut = 120;
+}
+
 void setup() {
   
   Serial.begin(57600); // was 9600 // changing here need to change also in the android application.
   //pinMode(resetPin, INPUT);
 
-  lcd.print("Setup started...");
+  Serial.println("\nPianoCocktail v0.9");
 
   for( int i = 0; i < NBR_VANNE; ++i )
   {
@@ -136,26 +183,42 @@ void setup() {
   }
 
   pinMode(VANNE_TEST_PIN, OUTPUT);
-   digitalWrite(VANNE_TEST_PIN, HIGH);
+  digitalWrite(VANNE_TEST_PIN, HIGH);
 
   close_all();
-  
-  lcd.init();                // initialize the lcd
-  lcd.backlight();           // Turn on backlight // sans eclairage on voit rien...
 
+  uint8_t i2cAddr = 0x3F;
+  if(!i2CAddrTest(i2cAddr))
+  {
+    i2cAddr = 0x27;
+  }
+
+  Serial.print("DBG: Using LCD at I2C Addr: 0x");
+  Serial.println(i2cAddr,HEX);
+
+  pLcd = new LiquidCrystal_I2C(i2cAddr, 16, 2); // 0x3F sur la version de base, 0x27 sur la version oversized
+  
+  pLcd->init();                // initialize the lcd
+  pLcd->backlight();           // Turn on backlight // sans eclairage on voit rien...
+  //pLcd->noBacklight();
+  // pLcd->setBacklight(2);
+
+  pLcd->print("Setup started...");
+
+  readCfgFromEeproom();
   
   scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
   while(!scale.is_ready())
   {
     Serial.println("INF: Waiting for HX711...");
     delay(500);
-    lcd.setCursor(0, 0);
-    lcd.print("HX711 waiting");
+    pLcd->setCursor(0, 0);
+    pLcd->print("HX711 waiting");
     animateLcd();
   }
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("taring...");
+  pLcd->clear();
+  pLcd->setCursor(0, 0);
+  pLcd->print("taring...");
   Serial.print("calibration_factor: ");
   Serial.println(calibration_factor);
   scale.set_scale(calibration_factor);
@@ -165,7 +228,11 @@ void setup() {
   Serial.print("Zero factor: ");
   Serial.println(zero_factor);
   delay(500);
-  lcd.clear();
+  pLcd->clear();
+  
+  // print all eeproms read parameters
+  Serial.print("nMilliBeforeCut: ");
+  Serial.println(nMilliBeforeCut);
 
   //handleOrder("#Assemble_10_20_30"); // to test when not connected to the tablet
 
@@ -181,6 +248,13 @@ float target_verse = -1001; // negative when no current
 int nCurrentVanne = -1;
 unsigned long timeNextQueueOrder = 0; // we want to wait a bit before handling next queue
 float rCurrentQuantityToVerse = -1;
+
+float rPrevLastMeasured = -1;
+int nCptFrameWithNoChangeInWeight = 0;
+
+int nbBalanceIsStuck = 0;
+unsigned long timeLastBalanceStuck = 0;
+
 void verse_quantite(float rGrammes,int nNumVanne)
 {
   target_verse = last_measured + rGrammes;
@@ -193,6 +267,19 @@ void verse_quantite(float rGrammes,int nNumVanne)
   Serial.print(", target: ");
   Serial.println(target_verse);
   setOpen(nNumVanne,1);
+}
+
+void hache()
+{
+    // handle the fact we want to slow down filling by making the opening clignote every 500ms
+    
+    if( millis() > hache_timeNextChange )
+    {
+        Serial.println("haching...");
+        _setOpen(nCurrentVanne,hache_nNextIsOpen);
+        hache_nNextIsOpen ^= 1; // pingpong between 0 and 1
+        hache_timeNextChange = millis() + hache_period_ms;
+    }
 }
 
 int isTargetDefined()
@@ -213,24 +300,52 @@ int check_if_must_stop_verse()
   Serial.print(nCurrentVanne);
   Serial.print(", diff: ");
   Serial.println(diff);
-  lcd.setCursor(5, 0);
-  lcd.print(" => ");
-  lcd.print(int(diff));
-  lcd.print(" C");
-  lcd.print(nCurrentVanne+1);
-  lcd.print("  "); // clean eol
+  pLcd->setCursor(5, 0);
+  pLcd->print(" => ");
+  pLcd->print(int(diff));
+  pLcd->print(" C");
+  pLcd->print(nCurrentVanne+1);
+  pLcd->print("  "); // clean eol
   
-  lcd.setCursor(4, 1);
-  //lcd.print("dbg: ");
-  lcd.print(rCurrentQuantityToVerse);
+  pLcd->setCursor(4, 1);
+  //pLcd->print("dbg: ");
+  pLcd->print(rCurrentQuantityToVerse);
   if( rTotalTarget > 0.f)
   {
-    lcd.print( "/" );
-    lcd.print(rTotalTarget);
+    pLcd->print( "/" );
+    pLcd->print(rTotalTarget);
   }
+
+  if( abs(last_measured - rPrevLastMeasured) < 0.5 )
+  {
+    // c'est en train de verser, et ca bouge pas alors qu'on a un asservissement en poids.
+    // c'est mauvais signe!
+
+    Serial.print("INF: Balance is stuck ? rPrevLastMeasured: "); Serial.print( rPrevLastMeasured ); Serial.print( ", last_measured: " ); Serial.print( last_measured ); Serial.print( ", nCptFrameWithNoChangeInWeight: " ); Serial.println( nCptFrameWithNoChangeInWeight );
+
+    ++nCptFrameWithNoChangeInWeight;
+    if( nCptFrameWithNoChangeInWeight > 10 ) // roughly 2sec
+    {
+      nCptFrameWithNoChangeInWeight = 0;
+      Serial.println("INF: Balance seems stuck !");
+      nbBalanceIsStuck = 1;
+      timeLastBalanceStuck = millis();
+    }
+    else
+    {
+      nbBalanceIsStuck = 0; // let's reset it to leave a chance to some wine to be send
+    }
+  }
+  else
+  {
+    rPrevLastMeasured = last_measured;
+    nCptFrameWithNoChangeInWeight = 0;
+    nbBalanceIsStuck = 0;
+  }
+
   
   
-  if(diff<1+4+3+1+1) // couramment on prend 8 apres coupure // On ajoute 1 de plus en condition réél des caves
+  if(diff<nMilliBeforeCut || nbBalanceIsStuck) // couramment on prend 8 apres coupure // On ajoute 1 de plus en condition réél des caves
   {
     setOpen(nCurrentVanne, 0);
     if(0)
@@ -247,6 +362,12 @@ int check_if_must_stop_verse()
     target_verse = -1001;
     timeNextQueueOrder = millis() + nWaitBetweenBottleMs; // wait some sec so the tuyau se vide avant de passer a la commande d'apres
     return 2;
+  }
+  
+  // hachage en fin de versage
+  if(rTotalTarget < 0 && diff < 300 ) // if it's the last cuve, and near the end, we must slow down
+  {
+    hache();
   }
   return 1;
 }
@@ -492,13 +613,13 @@ void loop()
 {
 
   // security
-  if(bIsFilling && millis()-nTimeStartFill>60*1000) // 60*1000 => 1 min
+  if(bIsFilling && millis()-nTimeStartFill>60*1000L) // 60*1000 => 1 min
   {
     // 1 min => security close
     stop_all();
-    lcd.home();
+    pLcd->home();
     Serial.println("WRN: Security close!");
-    lcd.print("Security close!");
+    pLcd->print("Security close!");
     delay(5000);
   }
   
@@ -506,8 +627,8 @@ void loop()
   if (!scale.is_ready()) 
   {
     Serial.println("HX711 not found.");
-    lcd.home();
-    lcd.print("HX711: Disconnected");
+    pLcd->home();
+    pLcd->print("HX711: Disconnected");
     //close_all();
     bWasDisconnected = 1;
     delay(500);
@@ -517,7 +638,7 @@ void loop()
     if(bWasDisconnected)
     {
       Serial.println("DBG: was disconnected");
-      lcd.clear();
+      pLcd->clear();
       bWasDisconnected = 0;
     }
     if(old_calibration_factor != calibration_factor)
@@ -562,19 +683,36 @@ void loop()
       Serial.println(" g    ");
     }
 
-    lcd.home();
-    lcd.print(int(round(reading)));
-    lcd.print(" g    ");
+    pLcd->home();
+    pLcd->print(int(round(reading)));
+    pLcd->print(" g    ");
 
     int nResVerse = check_if_must_stop_verse();
     if(nResVerse==2)
     {
       sendSerialCommand("End0"); // +nCurrentVanne
-      lcd.clear();
+      pLcd->clear();
     }
     else if(nResVerse==1)
     {
       sendSerialCommand("Fill0"); // +nCurrentVanne
+    }
+
+    if( nbBalanceIsStuck )
+    {     
+      pLcd->setCursor(0, 1);
+      pLcd->print("ERR: Bal stuck?");
+
+      if(millis()-timeLastBalanceStuck>3000)
+      {
+        // let's check it moved again (the goal is to remove the error about the stuck balance)
+        Serial.print("INF: balance stiistuck ? last_measured:"); Serial.println(last_measured);
+        if( abs(last_measured - rPrevLastMeasured) > 10 )
+        {
+          nbBalanceIsStuck = 0;
+          pLcd->clear(); // clear msg
+        }
+      }
     }
     
 
@@ -618,9 +756,9 @@ void loop()
         }
         if(handleSerialCommand())
         {
-          lcd.clear();
-          lcd.setCursor(0, 1);
-          lcd.print(lastCommand);
+          pLcd->clear();
+          pLcd->setCursor(0, 1);
+          pLcd->print(lastCommand);
         }
       }
     }
@@ -638,7 +776,7 @@ void loop()
             float rGramme = queueOrder[nNbrQueueOrder*2+1];
             if(nNbrQueueOrder==0 && rTotalTarget>0)
             {
-              rGramme = rTotalTarget-last_measured-0.5; // remove 0.5g to add margin car bouteilel trop pleine
+              rGramme = rTotalTarget-last_measured-0.5; // remove 0.5g to add margin car bouteille trop pleine
               rTotalTarget = -1; 
             }
             if(rGramme>0)

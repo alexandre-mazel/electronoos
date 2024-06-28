@@ -1684,4 +1684,317 @@ class MyClass(GeneratedClass):
 		GeneratedClass.__init__(self)
 
 	def onInput_onStart(self):
-		self.onStopped("Je n\'ai pas dit ça, vous avez du mal comprendre.")]]></content></script><pluginContent><text><![CDATA[Je n'ai pas dit ça, vous avez du mal comprendre.]]></text></pluginContent><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="1" inner="0" tooltip="To send the text on the output." id="2" /><Output name="onStopped" type="3" type_size="1" nature="2" inner="0" tooltip="The text you entered." id="3" /></Box><Link inputowner="13" indexofinput="5" outputowner="7" indexofoutput="3" /><Link inputowner="13" indexofinput="5" outputowner="1" indexofoutput="3" /><Link inputowner="13" indexofinput="5" outputowner="2" indexofoutput="3" /><Link inputowner="13" indexofinput="5" outputowner="3" indexofoutput="3" /><Link inputowner="13" indexofinput="5" outputowner="4" indexofoutput="3" /><Link inputowner="0" indexofinput="5" outputowner="13" indexofoutput="7" /><Link inputowner="0" indexofinput="6" outputowner="13" indexofoutput="6" /><Link inputowner="13" indexofinput="5" outputowner="10" indexofoutput="3" /><Link inputowner="13" indexofinput="5" outputowner="9" indexofoutput="3" /><Link inputowner="13" indexofinput="5" outputowner="11" indexofoutput="3" /><Link inputowner="13" indexofinput="5" outputowner="12" indexofoutput="3" /></Diagram></BehaviorKeyframe></BehaviorLayer></Timeline></Box><Link inputowner="14" indexofinput="2" outputowner="5" indexofoutput="8" /><Link inputowner="10" indexofinput="2" outputowner="14" indexofoutput="4" /><Link inputowner="10" indexofinput="3" outputowner="5" indexofoutput="10" /><Link inputowner="1" indexofinput="2" outputowner="10" indexofoutput="4" /><Link inputowner="6" indexofinput="2" outputowner="0" indexofoutput="2" /><Link inputowner="2" indexofinput="2" outputowner="0" indexofoutput="2" /><Link inputowner="11" indexofinput="2" outputowner="9" indexofoutput="4" /><Link inputowner="15" indexofinput="2" outputowner="0" indexofoutput="2" /><Link inputowner="12" indexofinput="2" outputowner="0" indexofoutput="2" /><Link inputowner="13" indexofinput="3" outputowner="15" indexofoutput="5" /><Link inputowner="13" indexofinput="2" outputowner="16" indexofoutput="4" /><Link inputowner="16" indexofinput="2" outputowner="15" indexofoutput="6" /><Link inputowner="13" indexofinput="3" outputowner="12" indexofoutput="5" /><Link inputowner="16" indexofinput="2" outputowner="12" indexofoutput="6" /><Link inputowner="13" indexofinput="3" outputowner="19" indexofoutput="5" /><Link inputowner="13" indexofinput="2" outputowner="19" indexofoutput="6" /><Link inputowner="19" indexofinput="2" outputowner="0" indexofoutput="2" /><Link inputowner="20" indexofinput="2" outputowner="0" indexofoutput="2" /><Link inputowner="13" indexofinput="3" outputowner="20" indexofoutput="5" /><Link inputowner="13" indexofinput="2" outputowner="20" indexofoutput="6" /><Link inputowner="13" indexofinput="2" outputowner="17" indexofoutput="6" /><Link inputowner="13" indexofinput="3" outputowner="17" indexofoutput="5" /><Link inputowner="17" indexofinput="2" outputowner="0" indexofoutput="2" /></Diagram></BehaviorKeyframe></BehaviorLayer></Timeline></Box></ChoregrapheProject>
+		self.onStopped("Je n\'ai pas dit ça, vous avez du mal comprendre.")]]></content></script><pluginContent><text><![CDATA[Je n'ai pas dit ça, vous avez du mal comprendre.]]></text></pluginContent><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="1" inner="0" tooltip="To send the text on the output." id="2" /><Output name="onStopped" type="3" type_size="1" nature="2" inner="0" tooltip="The text you entered." id="3" /></Box><Link inputowner="13" indexofinput="5" outputowner="7" indexofoutput="3" /><Link inputowner="13" indexofinput="5" outputowner="1" indexofoutput="3" /><Link inputowner="13" indexofinput="5" outputowner="2" indexofoutput="3" /><Link inputowner="13" indexofinput="5" outputowner="3" indexofoutput="3" /><Link inputowner="13" indexofinput="5" outputowner="4" indexofoutput="3" /><Link inputowner="0" indexofinput="5" outputowner="13" indexofoutput="7" /><Link inputowner="0" indexofinput="6" outputowner="13" indexofoutput="6" /><Link inputowner="13" indexofinput="5" outputowner="10" indexofoutput="3" /><Link inputowner="13" indexofinput="5" outputowner="9" indexofoutput="3" /><Link inputowner="13" indexofinput="5" outputowner="11" indexofoutput="3" /><Link inputowner="13" indexofinput="5" outputowner="12" indexofoutput="3" /></Diagram></BehaviorKeyframe></BehaviorLayer></Timeline></Box><Box name="Move To" id="18" localization="8" tooltip="Make the robot move to a configured point relative to its current location." x="1058" y="194"><bitmap>media/images/box/movement/walk_forward.png</bitmap><script language="4"><content><![CDATA[
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+        self.motion = ALProxy("ALMotion")
+        self.positionErrorThresholdPos = 0.01
+        self.positionErrorThresholdAng = 0.03
+
+    def onLoad(self):
+        pass
+
+    def onUnload(self):
+        self.motion.moveToward(0.0, 0.0, 0.0)
+
+    def onInput_onStart(self):
+        import almath
+        # The command position estimation will be set to the sensor position
+        # when the robot starts moving, so we use sensors first and commands later.
+        initPosition = almath.Pose2D(self.motion.getRobotPosition(True))
+        targetDistance = almath.Pose2D(self.getParameter("Distance X (m)"),
+            self.getParameter("Distance Y (m)"),
+            self.getParameter("Theta (deg)") * almath.PI / 180)
+        expectedEndPosition = initPosition * targetDistance
+        enableArms = self.getParameter("Arms movement enabled")
+        self.motion.setMoveArmsEnabled(enableArms, enableArms)
+        self.motion.moveTo(self.getParameter("Distance X (m)"),
+            self.getParameter("Distance Y (m)"),
+            self.getParameter("Theta (deg)") * almath.PI / 180)
+
+        # The move is finished so output
+        realEndPosition = almath.Pose2D(self.motion.getRobotPosition(False))
+        positionError = realEndPosition.diff(expectedEndPosition)
+        positionError.theta = almath.modulo2PI(positionError.theta)
+        if (abs(positionError.x) < self.positionErrorThresholdPos
+            and abs(positionError.y) < self.positionErrorThresholdPos
+            and abs(positionError.theta) < self.positionErrorThresholdAng):
+            self.onArrivedAtDestination()
+            pass
+        else:
+            self.onStoppedBeforeArriving(positionError.toVector())
+            pass
+            self.log("obstacle but continuing")
+
+    def onInput_onStop(self):
+        self.onUnload()]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onArrivedAtDestination" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when the robot arrives at its destination." id="4" /><Output name="onStoppedBeforeArriving" type="0" type_size="1" nature="1" inner="0" tooltip="Signal sent when the robot stops before arriving to its destination. Returns a vector [x (m), y (m), theta(rad)] with the remaining distance up to the destination. This distance is expressed in the ROBOT frame." id="5" /><Parameter name="Distance X (m)" inherits_from_parent="0" content_type="2" value="0.8" default_value="0.2" min="-5" max="10" tooltip="The distance in meters for forward/backward motion. Positive value&#x0A;means forward, negative value means backward." id="6" /><Parameter name="Distance Y (m)" inherits_from_parent="0" content_type="2" value="0" default_value="0" min="-5" max="5" tooltip="The distance in meters for lateral motion. Positive value means left, negative&#x0A;value means right." id="7" /><Parameter name="Theta (deg)" inherits_from_parent="0" content_type="2" value="0" default_value="0" min="-180" max="180" tooltip="The orientation in degrees for final rotation. Positive value means anticlockwise,&#x0A;negative value means clockwise." id="8" /><Parameter name="Arms movement enabled" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Enables natural motion of the arms." id="9" /><Resource name="Legs" type="Lock" timeout="0" /></Box><Box name="Set External Anti-Collision" id="21" localization="8" tooltip="Enable or disable the external collision protection on some specific part of the robot&apos;s body.&#x0A;&#x0A;For example if the protection is enabled on the left arm, the robot will follow movement commands as precisely as possible, while guaranteeing his left arm does not collide with his surroundings." x="1050" y="92"><bitmap>media/images/box/sensors/anti_collision.png</bitmap><script language="4"><content><![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.motion = ALProxy( "ALMotion" )
+
+    def onUnload(self):
+        pass
+
+    def onInput_onSet(self):
+        # is it enable or disable asked?
+        enable = (self.getParameter("Action") == "Enable")
+        # enable/disable collision protection
+        self.motion.setExternalCollisionProtectionEnabled( self.getParameter("Body part"), enable )
+        self.output() # activate output of the box]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onSet" type="1" type_size="1" nature="1" inner="0" tooltip="The anti-collision feature is enabled or disabled when this input is stimulated." id="2" /><Output name="output" type="1" type_size="1" nature="2" inner="0" tooltip="" id="3" /><Parameter name="Body part" inherits_from_parent="0" content_type="3" value="All" default_value="All" custom_choice="0" tooltip="Body part which avoids the collision." id="4"><Choice value="All" /><Choice value="Move" /><Choice value="Arms" /><Choice value="LArm" /><Choice value="RArm" /></Parameter><Parameter name="Action" inherits_from_parent="0" content_type="3" value="Disable" default_value="Enable" custom_choice="0" tooltip="Enable or disable the collision protection." id="5"><Choice value="Disable" /><Choice value="Enable" /></Parameter></Box><Box name="Animated Say Text (1)" id="22" localization="8" tooltip="Say the text received on its input and move during its speech.&#x0A;" x="1849" y="273"><bitmap>media/images/box/interaction/say.png</bitmap><script language="4"><content><![CDATA[import time
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+        self.tts = ALProxy('ALAnimatedSpeech')
+        self.ttsStop = ALProxy('ALAnimatedSpeech', True) #Create another proxy as wait is blocking if audioout is remote
+
+    def onLoad(self):
+        self.bIsRunning = False
+        self.ids = []
+
+    def onUnload(self):
+        for id in self.ids:
+            try:
+                self.ttsStop.stop(id)
+            except:
+                pass
+        while( self.bIsRunning ):
+            time.sleep( 0.2 )
+
+    def onInput_onStart(self, p):
+        self.bIsRunning = True
+        try:
+            movement = self.getParameter("Speaking movement mode")
+            sentence = "\RSPD="+ str( self.getParameter("Speed (%)") ) + "\ "
+            sentence += "\VCT="+ str( self.getParameter("Voice shaping (%)") ) + "\ "
+            sentence += str(p)
+            sentence +=  "\RST\ "
+            id = self.tts.post.say(str(sentence), {"speakingMovementMode":movement})
+            self.ids.append(id)
+            self.tts.wait(id, 0)
+        finally:
+            try:
+                self.ids.remove(id)
+            except:
+                pass
+            if( self.ids == [] ):
+                self.onStopped() # activate output of the box
+                self.bIsRunning = False
+
+    def onInput_onStop(self):
+        self.onUnload()]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" /><Input name="onStart" type="3" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this Input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this Input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when Box behavior is finished." id="4" /><Parameter name="Voice shaping (%)" inherits_from_parent="1" content_type="1" value="100" default_value="100" min="50" max="150" tooltip='Used to modify at runtime the voice feature (tone, speed). In a slighty&#x0A;different way than pitch and speed, it gives a kind of &quot;gender or age&#x0A;modification&quot; effect.&#x0A;&#x0A;For instance, a quite good male derivation of female voice can be&#x0A;obtained setting this parameter to 78%.&#x0A;&#x0A;Note: For a better effect, you can compensate this parameter with the&#x0A;speed parameter. For example, if you want to decrease by 20% the voice&#x0A;shaping, you will have to increase by 20% the speed to keep a constant&#x0A;average speed.' id="5" /><Parameter name="Speed (%)" inherits_from_parent="1" content_type="1" value="80" default_value="100" min="50" max="200" tooltip="Changes the speed of the voice.&#x0A;&#x0A;Note: For a better effect, you can compensate this parameter with the voice&#x0A;shaping parameter. For example, if you want to increase by 20% the speed, you&#x0A;will have to decrease by 20% the voice shaping to keep a constant average&#x0A;speed." id="6" /><Parameter name="Speaking movement mode" inherits_from_parent="0" content_type="3" value="contextual" default_value="contextual" custom_choice="0" tooltip="Change the body language mode during the speech.&#x0A;disabled: The robot will only play the animations given by the user through the animation parameter.&#x0A;random: During time the robot has no animation to play, he will launch random neutral animations.&#x0A;contextual: During time the robot has no animation to play, he will try to launch a new one accordingly to the saying text. Every time the robot can&apos;t find a contextual animation he will launch a random neutral animation." id="7"><Choice value="disabled" /><Choice value="random" /><Choice value="contextual" /></Parameter></Box><Box name="Text Edit" id="23" localization="8" tooltip="Send the text you entered when the input is stimulated." plugin="textedit_plugin" x="1357" y="172"><bitmap>media/images/box/interaction/vocabulary.png</bitmap><script language="4"><content><![CDATA[# /!\ Generated content. Do not edit!
+class MyClass(GeneratedClass):
+	def __init__(self):
+		GeneratedClass.__init__(self)
+
+	def onInput_onStart(self):
+		self.onStopped("\\\\RSPD=80\\\\  Bonjour Brice, j’ai remarqué que tu bougeais un peu dans ton sommeil,  \\\\PAU=500\\\\  je pense que c’est l’heure de se lever. Nous sommes jeudi, la journée va être assez belle et je te rappelle que tu as rendez-vous chez le kiné à 15h. \\\\PAU=500\\\\  Comment vas- tu ?")]]></content></script><pluginContent><text><![CDATA[\\RSPD=80\\  Bonjour Brice, j’ai remarqué que tu bougeais un peu dans ton sommeil,  \\PAU=500\\  je pense que c’est l’heure de se lever. Nous sommes jeudi, la journée va être assez belle et je te rappelle que tu as rendez-vous chez le kiné à 15h. \\PAU=500\\  Comment vas- tu ?]]></text></pluginContent><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="1" inner="0" tooltip="To send the text on the output." id="2" /><Output name="onStopped" type="3" type_size="1" nature="2" inner="0" tooltip="The text you entered." id="3" /></Box><Box name="Timeline (1)" id="24" localization="8" tooltip="This box is empty (contains a single motion layer with no motor position&#x0A;defined in it) and should be used to create any animation you would like." x="1813" y="428"><bitmap>media/images/box/movement/move.png</bitmap><script language="4"><content><![CDATA[]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" /><Timeline enable="1" fps="25" start_frame="1" end_frame="-1" size="35"><BehaviorLayer name="behavior_layer1"><BehaviorKeyframe name="keyframe1" index="1"><Diagram /></BehaviorKeyframe></BehaviorLayer><ActuatorList model="juliette"><ActuatorCurve name="value" actuator="HeadPitch" mute="0" unit="0"><Key frame="35" value="-22.3242" /></ActuatorCurve><ActuatorCurve name="value" actuator="HeadYaw" mute="0" unit="0"><Key frame="35" value="0.878909" /></ActuatorCurve><ActuatorCurve name="value" actuator="HipPitch" mute="0" unit="0"><Key frame="35" value="-1.66993" /></ActuatorCurve><ActuatorCurve name="value" actuator="HipRoll" mute="0" unit="0"><Key frame="35" value="-0.615236" /></ActuatorCurve><ActuatorCurve name="value" actuator="KneePitch" mute="0" unit="0"><Key frame="35" value="0.351564" /></ActuatorCurve><ActuatorCurve name="value" actuator="LElbowRoll" mute="0" unit="0"><Key frame="35" value="-6.24024" /></ActuatorCurve><ActuatorCurve name="value" actuator="LElbowYaw" mute="0" unit="0"><Key frame="35" value="-98.5254" /></ActuatorCurve><ActuatorCurve name="value" actuator="LHand" mute="0" unit="1"><Key frame="35" value="0.679262" /></ActuatorCurve><ActuatorCurve name="value" actuator="LShoulderPitch" mute="0" unit="0"><Key frame="35" value="101.338" /></ActuatorCurve><ActuatorCurve name="value" actuator="LShoulderRoll" mute="0" unit="0"><Key frame="35" value="5.625" /></ActuatorCurve><ActuatorCurve name="value" actuator="LWristYaw" mute="0" unit="0"><Key frame="35" value="2.89802" /></ActuatorCurve><ActuatorCurve name="value" actuator="RElbowRoll" mute="0" unit="0"><Key frame="35" value="5.71289" /></ActuatorCurve><ActuatorCurve name="value" actuator="RElbowYaw" mute="0" unit="0"><Key frame="35" value="97.3828" /></ActuatorCurve><ActuatorCurve name="value" actuator="RHand" mute="0" unit="1"><Key frame="35" value="0.673111" /></ActuatorCurve><ActuatorCurve name="value" actuator="RShoulderPitch" mute="0" unit="0"><Key frame="35" value="99.9316" /></ActuatorCurve><ActuatorCurve name="value" actuator="RShoulderRoll" mute="0" unit="0"><Key frame="35" value="-5.27344" /></ActuatorCurve><ActuatorCurve name="value" actuator="RWristYaw" mute="0" unit="0"><Key frame="35" value="-2.55127" /></ActuatorCurve></ActuatorList></Timeline></Box><Box name="abcdk_BodyTalk" id="25" localization="8" tooltip="The abcdk_bodytalk: start fast and lightweight.&#x0A;&#x0A;v0.96: optionnal no wait at end&#x0A;v0.95: handle obstacles and exclude joint&#x0A;v0.94: patching on every error case&#x0A;v0.93: onSay: add the global speech speed&#x0A;v0.92: onSay: add a pause before speaking&#x0A;v0.91b: add comments&#x0A;v0.91: add direct txt inputing&#x0A;v0.9: change initialisation&#x0A;v0.8: add a track face&#x0A;v0.7: add an option to disable head movement (so you can launch what you want on it)" x="1777" y="127"><bitmap>media/images/box/interaction/say.png</bitmap><bitmap>media/images/box/movement/move.png</bitmap><script language="4"><content><![CDATA[# abcdk_BodyTalk
+# v0.96
+
+try: import abcdk.bodytalk
+except: pass # this error could occurs only on first execution, it's handled in the installer
+try: import abcdk.naoqitools
+except: pass
+try: import abcdk.speech
+except: pass
+
+if( 1 ):
+    import abcdk.bodytalk
+    reload(abcdk.bodytalk)
+    import abcdk.motiontools
+    reload(abcdk.motiontools)
+    reload(abcdk.speech)
+    import abcdk.tracking
+    reload(abcdk.tracking)
+
+import time
+class MyClass(GeneratedClass):
+    """ insert here your comments about this class """
+    def __init__(self):
+        GeneratedClass.__init__(self);
+        try:
+            self.tts = ALProxy( "ALTextToSpeech" );
+        except Exception, err:
+            self.log( "ERR: tts seems not to be present, so we won't use it..." );
+            self.tts = False;
+
+    def onLoad(self):
+        self.bMustStop = False;
+        self.bIsRunning = False;
+
+    def onUnload(self):
+        self.onInput_onStop(); # stop current loop execution
+
+    def onInput_onPrepare(self):
+        abcdk.bodytalk.bodyTalk.prepare( bUseHead = self.getParameter( 'bUseHead' ), rSide = self.getParameter( "rSide" ), rElevation = self.getParameter( "rElevation" ),
+                    astrJointsToExclude = eval(self.getParameter( "astrJointsToExclude" )),
+                    astrObstacles = eval(self.getParameter( "astrObstacles" )),
+        );
+
+    def startBodyTalk( self, nSayID ):
+        self.log( self.boxName + ": start - begin" );
+
+        if( self.bIsRunning ):
+            self.log( self.boxName + ": already started => nothing" );
+            return;
+
+        self.bIsRunning = True;
+        self.bMustStop = False;
+
+        abcdk.bodytalk.bodyTalk.start( bUseHead = self.getParameter( 'bUseHead' ), bTrackFace = self.getParameter( 'bTrackFace' ),
+                nSayID = nSayID, astrJointsToExclude = eval(self.getParameter( "astrJointsToExclude" )), astrObstacles = eval(self.getParameter( "astrObstacles" )),
+        );
+        rPeriod = 0.5;
+        while( not self.bMustStop ):
+            bRet = abcdk.bodytalk.bodyTalk.update( rSide = self.getParameter( "rSide" ), rElevation = self.getParameter( "rElevation" ) );
+            if( not bRet ):
+                self.bMustStop = True;
+            time.sleep( rPeriod );
+        # end while
+        abcdk.bodytalk.bodyTalk.stop(self.getParameter("bWaitEndOfRestMovement"));
+        self.bIsRunning = False;
+        self.onStopped();
+        self.log( self.boxName + ": start - end" );
+
+
+    def onInput_onStart(self):
+        self.startBodyTalk( -1 );
+
+    def onInput_onStop(self):
+        self.bMustStop = True; # stop current loop execution
+
+    def onInput_onSay( self, strTxt ):
+        self.output_start_speak()
+        strTxt = strTxt.replace("SPD_NORMAL","\\RSPD=93\\ ")
+        if( self.bIsRunning ):
+            self.log( "Already running => nothing..." );
+            return;
+        nSayID = self.tts.post.say( "\\PAU=700\\ " + abcdk.speech.getTextWithCurrentSpeed( strTxt ) );
+        self.startBodyTalk( nSayID );
+
+# abcdk_BodyTalk - end
+pass]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onPrepare" type="1" type_size="1" nature="1" inner="0" tooltip="If you know you will talk, you can prepare to have a starting more reactive." id="2" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Start the box behavior" id="3" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="4" /><Input name="onSay" type="3" type_size="1" nature="1" inner="0" tooltip="automatic say and animate imput: just send some text, and it will say them while talking, if the text is enough long..." id="5" /><Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="6" /><Output name="output_start_speak" type="1" type_size="1" nature="2" inner="0" tooltip="" id="7" /><Parameter name="bUseHead" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Do we send movements to the head ?" id="8" /><Parameter name="rElevation" inherits_from_parent="0" content_type="2" value="0.1" default_value="0" min="-0.5" max="0.5" tooltip="" id="9" /><Parameter name="rSide" inherits_from_parent="0" content_type="2" value="0" default_value="0" min="-1" max="1" tooltip="" id="10" /><Parameter name="bTrackFace" inherits_from_parent="0" content_type="0" value="0" default_value="0" tooltip="Mario use face tracking to look at human" id="11" /><Parameter name="astrJointsToExclude" inherits_from_parent="0" content_type="3" value="[]" default_value='[&quot;RArm&quot;]' custom_choice="1" tooltip="a string to evaluate as an array: it&apos;s a list of obstacles" id="12"><Choice value="[]" /><Choice value='[&quot;RHand&quot;]' /><Choice value='[&quot;RArm&quot;]' /></Parameter><Parameter name="astrObstacles" inherits_from_parent="0" content_type="3" value="[]" default_value='[&quot;Table&quot;]' custom_choice="0" tooltip="a string to evaluate as an array: it&apos;s a list of obstacles" id="13"><Choice value="[]" /><Choice value='[&quot;Table&quot;]' /></Parameter><Parameter name="bWaitEndOfRestMovement" inherits_from_parent="0" content_type="0" value="0" default_value="1" tooltip="The box will wait for the rest movement to be finished. So when the stop is triggered, no movement is on the stack. (default)" id="14" /></Box><Box name="Wait (1)" id="26" localization="8" tooltip="Wait a moment before sending a signal on the output. &#x0A;Can be stopped anytime. &#x0A;Stimulating the input again before output is activated restarts the waiting period.&#x0A;" x="913" y="229"><bitmap>media/images/box/wait.png</bitmap><script language="4"><content><![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.waiting = None
+
+    def onUnload(self):
+        self.cancelWaiting()
+
+    def triggerOutput(self):
+        self.timerOutput()
+
+    def cancelWaiting(self):
+        if self.waiting:
+            self.waiting.cancel()
+        self.waiting = None
+
+    def onInput_onStart(self):
+        self.cancelWaiting()
+        import qi
+        self.waiting = qi.async(self.triggerOutput, delay=int(self.getParameter("Timeout (s)") * 1000 * 1000))
+
+    def onInput_onStop(self):
+        if self.getParameter("Trigger timerOutput if cancelled") and self.waiting and self.waiting.isRunning():
+            self.timerOutput()
+        self.onUnload()]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Start the Wait box with the configured timeout value." id="2" /><Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Stop the wait and stimulate the output." id="3" /><Output name="timerOutput" type="1" type_size="1" nature="1" inner="0" tooltip="Send a bang once time set in parameters is elapsed, or if the box is stopped and the appropriate parameter is set." id="4" /><Parameter name="Timeout (s)" inherits_from_parent="0" content_type="2" value="4" default_value="1" min="0" max="5000" tooltip="Duration the box waits before stimulating the output." id="5" /><Parameter name="Trigger timerOutput if cancelled" inherits_from_parent="0" content_type="0" value="0" default_value="1" tooltip="If the box is currently waiting and cancelled, output will be stimulated." id="6" /></Box><Box name="Text Edit (1)" id="27" localization="8" tooltip="Send the text you entered when the input is stimulated." plugin="textedit_plugin" x="1328" y="595"><bitmap>media/images/box/interaction/vocabulary.png</bitmap><script language="4"><content><![CDATA[# /!\ Generated content. Do not edit!
+class MyClass(GeneratedClass):
+	def __init__(self):
+		GeneratedClass.__init__(self)
+
+	def onInput_onStart(self):
+		self.onStopped("\\\\RSPD=80\\\\ Hello Brice, I noticed that you moved a little in your sleep, \\\\PAU=500\\\\ I think it\'s time to get up. It\'s Thursday, the day is going to be quite beautiful and I remind you that you have an appointment with the physiotherapist at 3 p.m. \\\\PAU=500\\\\ How are you?")]]></content></script><pluginContent><text><![CDATA[\\RSPD=80\\ Hello Brice, I noticed that you moved a little in your sleep, \\PAU=500\\ I think it's time to get up. It's Thursday, the day is going to be quite beautiful and I remind you that you have an appointment with the physiotherapist at 3 p.m. \\PAU=500\\ How are you?]]></text></pluginContent><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="1" inner="0" tooltip="To send the text on the output." id="2" /><Output name="onStopped" type="3" type_size="1" nature="2" inner="0" tooltip="The text you entered." id="3" /></Box><Box name="EN" id="28" localization="8" tooltip="Set the language of your robot for the current application. Your robot will speak and understand the selected language as long as your application has focus. Any following call to ALSpeechRecognition (Speech Reco. box for instance), ALTextToSpeech (Say box for instance) or ALDialog will use this language.&#x0A;" x="1318" y="1020"><bitmap>media/images/box/interaction/say.png</bitmap><script language="4"><content><![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        try:
+            self.tts = ALProxy("ALTextToSpeech")
+        except:
+            self.logger.warn("ALTextToSpeech is not available, language setting cannot be applied to speech")
+            self.tts = None
+
+        try:
+            self.asr = ALProxy("ALSpeechRecognition")
+        except:
+            self.logger.warn("ALSpeechRecognition is not available, language setting cannot be applied to recognition")
+            self.asr = None
+
+        try:
+            self.dialog = ALProxy("ALDialog")
+        except:
+            self.logger.warn("ALDialog is not available, language setting cannot be applied to dialog")
+            self.dialog = None
+
+    def onInput_onSet(self):
+        lang = self.getParameter("Language")
+        try:
+            if self.asr:
+                self.asr.setLanguage( self.getParameter("Language") )
+            if self.tts:
+                self.tts.setLanguage( self.getParameter("Language") )
+            if self.dialog:
+                self.dialog.setLanguage( self.getParameter("Language") )
+            if self.tts is None and self.asr is None and self.dialog is None:
+                raise RuntimeError("Cannot set language: neither ALTextToSpeech nor ALSpeechRecognition nor ALDialog is available.")
+            self.onReady()
+        except:
+            error = "Language " + lang + " cannot be set."
+            self.logger.warn(error)
+            self.onError(error)]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onSet" type="1" type_size="1" nature="1" inner="0" tooltip="The data is set when a signal is received on this input." id="2" /><Output name="onReady" type="1" type_size="1" nature="2" inner="0" tooltip="Signal sent when the data has been set." id="3" /><Output name="onError" type="3" type_size="1" nature="2" inner="0" tooltip="Error output:&#x0A;- triggered if the language asked cannot be set" id="4" /><Parameter name="Language" inherits_from_parent="0" content_type="3" value="English" default_value="English" custom_choice="1" tooltip="Set the language the robot speaks and understands." id="5"><Choice value="Arabic" /><Choice value="Brazilian" /><Choice value="Chinese" /><Choice value="Czech" /><Choice value="Danish" /><Choice value="Dutch" /><Choice value="English" /><Choice value="Finnish" /><Choice value="French" /><Choice value="German" /><Choice value="Greek" /><Choice value="Italian" /><Choice value="Japanese" /><Choice value="Korean" /><Choice value="MandarinTaiwan" /><Choice value="Norwegian" /><Choice value="Polish" /><Choice value="Portuguese" /><Choice value="Russian" /><Choice value="Spanish" /><Choice value="Swedish" /><Choice value="Turkish" /></Parameter><Resource name="Speech" type="Lock" timeout="0" /></Box><Box name="FR" id="30" localization="8" tooltip="Set the language of your robot for the current application. Your robot will speak and understand the selected language as long as your application has focus. Any following call to ALSpeechRecognition (Speech Reco. box for instance), ALTextToSpeech (Say box for instance) or ALDialog will use this language.&#x0A;" x="1373" y="1165"><bitmap>media/images/box/interaction/say.png</bitmap><script language="4"><content><![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        try:
+            self.tts = ALProxy("ALTextToSpeech")
+        except:
+            self.logger.warn("ALTextToSpeech is not available, language setting cannot be applied to speech")
+            self.tts = None
+
+        try:
+            self.asr = ALProxy("ALSpeechRecognition")
+        except:
+            self.logger.warn("ALSpeechRecognition is not available, language setting cannot be applied to recognition")
+            self.asr = None
+
+        try:
+            self.dialog = ALProxy("ALDialog")
+        except:
+            self.logger.warn("ALDialog is not available, language setting cannot be applied to dialog")
+            self.dialog = None
+
+    def onInput_onSet(self):
+        lang = self.getParameter("Language")
+        try:
+            if self.asr:
+                self.asr.setLanguage( self.getParameter("Language") )
+            if self.tts:
+                self.tts.setLanguage( self.getParameter("Language") )
+            if self.dialog:
+                self.dialog.setLanguage( self.getParameter("Language") )
+            if self.tts is None and self.asr is None and self.dialog is None:
+                raise RuntimeError("Cannot set language: neither ALTextToSpeech nor ALSpeechRecognition nor ALDialog is available.")
+            self.onReady()
+        except:
+            error = "Language " + lang + " cannot be set."
+            self.logger.warn(error)
+            self.onError(error)]]></content></script><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" /><Input name="onSet" type="1" type_size="1" nature="1" inner="0" tooltip="The data is set when a signal is received on this input." id="2" /><Output name="onReady" type="1" type_size="1" nature="2" inner="0" tooltip="Signal sent when the data has been set." id="3" /><Output name="onError" type="3" type_size="1" nature="2" inner="0" tooltip="Error output:&#x0A;- triggered if the language asked cannot be set" id="4" /><Parameter name="Language" inherits_from_parent="0" content_type="3" value="French" default_value="English" custom_choice="1" tooltip="Set the language the robot speaks and understands." id="5"><Choice value="Arabic" /><Choice value="Brazilian" /><Choice value="Chinese" /><Choice value="Czech" /><Choice value="Danish" /><Choice value="Dutch" /><Choice value="English" /><Choice value="Finnish" /><Choice value="French" /><Choice value="German" /><Choice value="Greek" /><Choice value="Italian" /><Choice value="Japanese" /><Choice value="Korean" /><Choice value="MandarinTaiwan" /><Choice value="Norwegian" /><Choice value="Polish" /><Choice value="Portuguese" /><Choice value="Russian" /><Choice value="Spanish" /><Choice value="Swedish" /><Choice value="Turkish" /></Parameter><Resource name="Speech" type="Lock" timeout="0" /></Box><Box name="Text Edit (3)" id="31" localization="8" tooltip="Send the text you entered when the input is stimulated." plugin="textedit_plugin" x="1524" y="978"><bitmap>media/images/box/interaction/vocabulary.png</bitmap><script language="4"><content><![CDATA[# /!\ Generated content. Do not edit!
+class MyClass(GeneratedClass):
+	def __init__(self):
+		GeneratedClass.__init__(self)
+
+	def onInput_onStart(self):
+		self.onStopped("Hello, I\'m Pepper, a pet robot, \\\\PAU=200\\\\ and my human calls me Gnocchi, \\\\PAU=100\\\\ because he likes Italian food. \\\\PAU=600\\\\ I am here to keep him company in daily life. \\\\PAU=500\\\\ You will see some selected sequences of this daily life, \\\\PAU=300\\\\ precisely, \\\\PAU=200\\\\ then you will have a questionnaire to complete. \\\\PAU=600\\\\ We thank you very much in advance for your collaboration.")]]></content></script><pluginContent><text><![CDATA[Hello, I'm Pepper, a pet robot, \\PAU=200\\ and my human calls me Gnocchi, \\PAU=100\\ because he likes Italian food. \\PAU=600\\ I am here to keep him company in daily life. \\PAU=500\\ You will see some selected sequences of this daily life, \\PAU=300\\ precisely, \\PAU=200\\ then you will have a questionnaire to complete. \\PAU=600\\ We thank you very much in advance for your collaboration.]]></text></pluginContent><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="1" inner="0" tooltip="To send the text on the output." id="2" /><Output name="onStopped" type="3" type_size="1" nature="2" inner="0" tooltip="The text you entered." id="3" /></Box><Box name="Text Edit (2)" id="29" localization="8" tooltip="Send the text you entered when the input is stimulated." plugin="textedit_plugin" x="1694" y="662"><bitmap>media/images/box/interaction/vocabulary.png</bitmap><script language="4"><content><![CDATA[# /!\ Generated content. Do not edit!
+class MyClass(GeneratedClass):
+	def __init__(self):
+		GeneratedClass.__init__(self)
+
+	def onInput_onStart(self):
+		self.onStopped("Bonjour, je suis Pepper, un robot de compagnie, \\\\PAU=200\\\\ et mon humain m’appelle Gnocchi, \\\\PAU=100\\\\  car il aime bien la cuisine italienne. \\\\PAU=600\\\\  Je suis là pour lui tenir compagnie dans la vie quotidienne. \\\\PAU=500\\\\\nVous allez voir quelques séquences choisies de cette vie quotidienne, \\\\PAU=300\\\\  justement, \\\\PAU=200\\\\  puis vous aurez un questionnaire à remplir. \\\\PAU=600\\\\  Nous vous remercions infiniment par avance de votre collaboration.")]]></content></script><pluginContent><text><![CDATA[Bonjour, je suis Pepper, un robot de compagnie, \\PAU=200\\ et mon humain m’appelle Gnocchi, \\PAU=100\\  car il aime bien la cuisine italienne. \\PAU=600\\  Je suis là pour lui tenir compagnie dans la vie quotidienne. \\PAU=500\\
+Vous allez voir quelques séquences choisies de cette vie quotidienne, \\PAU=300\\  justement, \\PAU=200\\  puis vous aurez un questionnaire à remplir. \\PAU=600\\  Nous vous remercions infiniment par avance de votre collaboration.]]></text></pluginContent><Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when Diagram is loaded." id="1" /><Input name="onStart" type="1" type_size="1" nature="1" inner="0" tooltip="To send the text on the output." id="2" /><Output name="onStopped" type="3" type_size="1" nature="2" inner="0" tooltip="The text you entered." id="3" /></Box><Link inputowner="14" indexofinput="2" outputowner="5" indexofoutput="8" /><Link inputowner="10" indexofinput="2" outputowner="14" indexofoutput="4" /><Link inputowner="10" indexofinput="3" outputowner="5" indexofoutput="10" /><Link inputowner="1" indexofinput="2" outputowner="10" indexofoutput="4" /><Link inputowner="6" indexofinput="2" outputowner="0" indexofoutput="2" /><Link inputowner="2" indexofinput="2" outputowner="0" indexofoutput="2" /><Link inputowner="11" indexofinput="2" outputowner="9" indexofoutput="4" /><Link inputowner="15" indexofinput="2" outputowner="0" indexofoutput="2" /><Link inputowner="12" indexofinput="2" outputowner="0" indexofoutput="2" /><Link inputowner="13" indexofinput="3" outputowner="15" indexofoutput="5" /><Link inputowner="13" indexofinput="2" outputowner="16" indexofoutput="4" /><Link inputowner="16" indexofinput="2" outputowner="15" indexofoutput="6" /><Link inputowner="13" indexofinput="3" outputowner="12" indexofoutput="5" /><Link inputowner="16" indexofinput="2" outputowner="12" indexofoutput="6" /><Link inputowner="13" indexofinput="3" outputowner="19" indexofoutput="5" /><Link inputowner="13" indexofinput="2" outputowner="19" indexofoutput="6" /><Link inputowner="19" indexofinput="2" outputowner="0" indexofoutput="2" /><Link inputowner="20" indexofinput="2" outputowner="0" indexofoutput="2" /><Link inputowner="13" indexofinput="3" outputowner="20" indexofoutput="5" /><Link inputowner="13" indexofinput="2" outputowner="20" indexofoutput="6" /><Link inputowner="13" indexofinput="2" outputowner="17" indexofoutput="6" /><Link inputowner="13" indexofinput="3" outputowner="17" indexofoutput="5" /><Link inputowner="17" indexofinput="2" outputowner="0" indexofoutput="2" /><Link inputowner="24" indexofinput="2" outputowner="22" indexofoutput="4" /><Link inputowner="25" indexofinput="5" outputowner="23" indexofoutput="3" /><Link inputowner="24" indexofinput="2" outputowner="25" indexofoutput="6" /><Link inputowner="18" indexofinput="2" outputowner="26" indexofoutput="4" /><Link inputowner="27" indexofinput="2" outputowner="18" indexofoutput="4" /><Link inputowner="27" indexofinput="2" outputowner="18" indexofoutput="5" /><Link inputowner="25" indexofinput="5" outputowner="27" indexofoutput="3" /><Link inputowner="25" indexofinput="5" outputowner="29" indexofoutput="3" /><Link inputowner="25" indexofinput="5" outputowner="31" indexofoutput="3" /></Diagram></BehaviorKeyframe></BehaviorLayer></Timeline></Box></ChoregrapheProject>

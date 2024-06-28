@@ -8,7 +8,7 @@ else:
 sys.path.append(strElectroPath+"/alex_pytools/")
 import pdf_tools
 
-def convertImgsToPdf(strStrSkull, strDestPdf ):
+def convertImgsToPdf(strStrSkull, strDestPdf,bLandscape=False ):
     # get all images
     imgs = []
     n = 0
@@ -27,7 +27,7 @@ def convertImgsToPdf(strStrSkull, strDestPdf ):
     #~ pdf_to_pptx.imagesToPres(imgs, pptx)
     print("INF: pasting to '%s' those images: %s" % (strDestPdf,imgs) )
         
-    return pdf_tools.generatePdfFromImages(imgs,strDestPdf)
+    return pdf_tools.generatePdfFromImages(imgs,strDestPdf,bLandscape=bLandscape)
 
 
 if __name__ == "__main__":
@@ -38,8 +38,13 @@ if __name__ == "__main__":
     strPdfFile = ""
     strDestFolder = None
     if len(sys.argv) < 3:
-        print( "\nPdfToImgs\n\nSyntaxe: %s img_template pdf_file\n eg: %s im.png will create a pdf with im_0000.png, im_0001.png ..."  % (sys.argv[0],sys.argv[0]) )
+        print( "\nPdfToImgs\n\nSyntaxe: %s img_template pdf_file [L: Landscape]\n eg: %s im.png will create a pdf with im_0000.png, im_0001.png ..."  % (sys.argv[0],sys.argv[0]) )
         exit( 0 )
     strImgsTemplate = sys.argv[1]
     strPdfFile = sys.argv[2]
-    convertImgsToPdf( strImgsTemplate, strPdfFile )
+    
+    bLandscape = False
+    if len(sys.argv) > 3:
+        bLandscape = sys.argv[3] == 'L'
+        print("bLandscape: %s" % bLandscape )
+    convertImgsToPdf( strImgsTemplate, strPdfFile, bLandscape = bLandscape )

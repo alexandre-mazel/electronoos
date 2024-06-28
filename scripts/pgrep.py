@@ -47,7 +47,7 @@ def findInFile( filename, strToMatch, bVerbose = True ):
         if strToMatchLower in line.lower() or stringmatch.isMatch(line.lower(),strToMatchLower):
             if bFirstTime:
                 bFirstTime = False
-                stamp = misctools.getTimeStamp()
+                stamp = misctools.getFileStamp(filename)
                 print( "\n***** %s (date: %s):" % (filename,stamp) )
                 line=line.replace(chr(13),"")
             lenLineMax = 200

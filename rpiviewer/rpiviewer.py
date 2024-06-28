@@ -1,5 +1,8 @@
+# -*- coding: cp1252 -*-
+
 from tkinter import *
 from tkinter import ttk
+import cv2
 
 # idée: faire un rsync avec le serveur et proposé de lire des vidéos depuis le disque local ?
 # on choisit en local la vidéo
@@ -46,6 +49,49 @@ def show_user_settings():
     
     root.mainloop()
     
-    
-show_user_settings()
-print("la suite: affiche la vidéo en boucle (avec opencv en fullscreen?)")
+def sync_remote_video():
+	"""
+	cf https://github.com/gchamon/sysrsync
+	"""
+	pass
+
+def show_video_fullscreen( filename ):
+		
+	print("INF: show_video_fullscreen: loading '%s'" % filename )
+	import cv2
+	import numpy as np
+	 
+	# Create a VideoCapture object and read from input file
+	# If the input is the camera, pass 0 instead of the video file name
+	
+	print("opening...")
+	cap = cv2.VideoCapture(filename)
+	 
+	# Check if camera opened successfully
+	if (cap.isOpened()== False): 
+	  print("Error opening video stream or file")
+	 
+	# Read until video is completed
+	while(cap.isOpened()):
+		# Capture frame-by-frame
+		ret, frame = cap.read()
+		if ret == True:
+
+			print("displaying...")
+			# Display the resulting frame
+			cv2.imshow('Frame',frame)
+
+			# Press Q on keyboard to  exit
+			if cv2.waitKey(25) & 0xFF == ord('q'):
+				break
+
+			# Break the loop
+			else: 
+				break
+	# When everything done, release the video capture object
+	cap.release()
+	
+	
+#~ show_user_settings()
+
+show_video_fullscreen("/home/na/videos/ads_manpower.mp4")

@@ -4,6 +4,7 @@ from tkinter import *
 from tkinter import ttk
 import cv2
 import os
+import sysrsync
 import time
 
 # idée: faire un rsync avec le serveur et proposé de lire des vidéos depuis le disque local ?
@@ -53,8 +54,13 @@ if 0:
 
         return False
 
-def retrieveLocalVideos(strPath):
-    listFiles = os.listdir(strPath)
+
+def updateFromServer(strLocalPath):
+    strRemote = "192.168.0.50:/home/na/dev/git/obo/www/agent/videod/"
+    sysrsync.run(source='/home/user/files', destination=strLocalPath, destination_ssh='myserver', options=['-a'])
+    
+def retrieveLocalVideos(strLocalPath):
+    listFiles = os.listdir(strLocalPath)
     return listFiles
 
 def show_user_settings(strPath, listSettings):
@@ -232,11 +238,15 @@ if os.name == "nt":
 strLocalPath += "videos/"
 
 
-if 1:
+if 0:
     listSettings = [False,0,""]
     listSettings = show_user_settings(strLocalPath,listSettings)
     show_user_settings(strLocalPath,listSettings)
     
-#~ show_video_fullscreen(strLocalPath+"sdaec_farmcow.mp4", bLoop=True)
-show_video_fullscreen(strLocalPath+listSettings[2], bLoop=True)
+if 0:
+    #~ show_video_fullscreen(strLocalPath+"sdaec_farmcow.mp4", bLoop=True)
+    show_video_fullscreen(strLocalPath+listSettings[2], bLoop=True)
+    
+if 1:
+    updateFromServer(strLocalPath)
 

@@ -97,7 +97,7 @@ def show_video_fullscreen( filename, bLoop = False ):
     strWinName = "Frame"
     
     cv2.namedWindow(strWinName, cv2.WINDOW_NORMAL)
-    cv2.resizeWindow(strWinName, 1980, 1024) # set a window size in case the next property fail (eg when launched from a putty shell)
+    cv2.resizeWindow(strWinName, 1920//2, 1080//2) # set a window size in case the next property fail (eg when launched from a putty shell)
     cv2.setWindowProperty(strWinName, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
     

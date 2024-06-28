@@ -97,7 +97,7 @@ def show_video_fullscreen( filename, bLoop = False ):
     strWinName = "Frame"
     
     cv2.namedWindow(strWinName, cv2.WINDOW_NORMAL)
-    cv2.setWindowProperty(strWinName, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+    #~ cv2.setWindowProperty(strWinName, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
     
     nNumFrame = 0
@@ -117,7 +117,7 @@ def show_video_fullscreen( filename, bLoop = False ):
                 nNumFrame = 0
                 timeStart = time.time()
                 
-            
+        
         if 1:
             cv2.putText(frame,"%d/%d, t:%5.2fs" % (nNumFrame,nNbrFrame,time.time()-timeStart), 
                 (10,30), 

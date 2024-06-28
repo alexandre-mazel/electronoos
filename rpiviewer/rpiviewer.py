@@ -91,7 +91,7 @@ def show_video_fullscreen( filename, bLoop = False ):
     rWantedFps = int(cap.get(cv2. CAP_PROP_FPS))
     nDurationFrame = int(1000./rWantedFps)
     
-    print( "DBG: show_video_fullscreen: rWantedFps: %5.3f, rDurationFrame: %5.3f" % (rWantedFps,nDurationFrame) )
+    print( "INF: show_video_fullscreen: rWantedFps: %5.3f, rDurationFrame: %5.3f" % (rWantedFps,nDurationFrame) )
     
     
     strWinName = "Frame"
@@ -110,6 +110,7 @@ def show_video_fullscreen( filename, bLoop = False ):
                 break
             else:
                 # restart at begin
+                print( "INF: show_video_fullscreen: looping...")
                 cap.release()
                 cap = cv2.VideoCapture(filename)
                 ret, frame = cap.read()
@@ -140,8 +141,8 @@ def show_video_fullscreen( filename, bLoop = False ):
             
         ensureFps(timeStart,nNumFrame,rWantedFps)
             
-        if (nNumFrame % 100) == 0:
-            print("DBG: real fps: %5.2f" % (nNumFrame/(time.time()-timeStart)) )
+        if (nNumFrame & 0x7F) == 0x7F:
+            print("INF: real fps: %5.2f" % (nNumFrame/(time.time()-timeStart)) )
             
 
 

@@ -157,4 +157,4 @@ strLocalPath = "/home/na"
 if os.name == "nt":
     strLocalPath = "c:/"
 
-show_video_fullscreen("/videos/sdaec_farmcow.mp4", bLoop=True)
+show_video_fullscreen(strLocalPath+"/videos/sdaec_farmcow.mp4", bLoop=True)

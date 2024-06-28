@@ -30,6 +30,7 @@ def store(city,temp,cond):
 # from https://weather.com
 def retrieveTemp():
     startbase = '<span data-testid="TemperatureValue" class="CurrentConditions--tempValue--MHmYY">'
+    startbase = '<span data-testid="TemperatureValue" class="CurrentConditions--tempValue--MHmYY" dir="ltr">'
     stopbase = "°</span>"
     # beau: soleil avec des nuages, ensolleile: plein soleil
     astrDatas = [

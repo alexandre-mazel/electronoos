@@ -59,9 +59,11 @@ def updateFromServer(strLocalPath):
     if os.name == "nt":
         print("WRN: updateFromServer: no rsyncing on windows")
         return
-    strRemoteServer = "192.168.0.50:"
+    strRemoteServer = "192.168.0.50"
     strRemotePath = '/home/na/dev/git/obo/www/agent/videod/'
-    sysrsync.run(source=strRemotePath, destination=strLocalPath, destination_ssh=strRemoteServer, options=['-rv --size-only'])
+    
+    print( "INF: updateFromServer: sync: %s:%s => %s" % (strRemoteServer,strRemotePath,strLocalPath) )
+    sysrsync.run(source=strRemotePath, destination=strLocalPath, source_ssh=strRemoteServer, options=['--size-only','--verbose', '--recursive' ], verbose = True )
     
 def retrieveLocalVideos(strLocalPath):
     listFiles = os.listdir(strLocalPath)
@@ -241,16 +243,17 @@ if os.name == "nt":
     
 strLocalPath += "videos/"
 
-
+    
 if 0:
+    updateFromServer(strLocalPath)
+
+if 1:
     listSettings = [False,0,""]
     listSettings = show_user_settings(strLocalPath,listSettings)
     show_user_settings(strLocalPath,listSettings)
     
-if 0:
+if 1:
     #~ show_video_fullscreen(strLocalPath+"sdaec_farmcow.mp4", bLoop=True)
     show_video_fullscreen(strLocalPath+listSettings[2], bLoop=True)
-    
-if 1:
-    updateFromServer(strLocalPath)
+
 

@@ -56,6 +56,9 @@ if 0:
 
 
 def updateFromServer(strLocalPath):
+    if os.name == "nt":
+        print("WRN: updateFromServer: no rsyncing on windows")
+        return
     strRemote = "192.168.0.50:/home/na/dev/git/obo/www/agent/videod/"
     sysrsync.run(source='/home/user/files', destination=strLocalPath, destination_ssh='myserver', options=['-a'])
     

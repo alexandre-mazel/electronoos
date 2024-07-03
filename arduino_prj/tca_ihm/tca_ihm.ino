@@ -203,16 +203,26 @@ void lcdPrint(float r)
 float rNbrTwist = 0;
 float rNbrTwistLimit = 1000;
 int nNbrTwistSpeed = 500;
+int nTwistDir = 0; // current moving of the twist motor: -1,0,1
+
 float rNbrCollect = 0;
 float rNbrCollectLimit = 1000;
 int nNbrCollectSpeed = 100;
+int nCollectDir = 0;
+
 float rNbrSpool = 0;
 float rNbrSpoolLimit = 1000;
 int nNbrSpoolSpeed = 100;
+int nSpoolDir = 0;
 
 // array of pointer to help algorithm and settings
-int * apnSpeedArray[] = {&nNbrTwistSpeed,&nNbrCollectSpeed,&nNbrSpoolSpeed};
-
+int * apnSpeedArray[] = {&nNbrTwistSpeed,&nNbrCollectSpeed,&nNbrSpoolSpeed}; // Potar Routing
+int * apnDirArray[] = {&nTwistDir,&nCollectDir,&nSpoolDir}; // Potar Routing
+// Switch routing
+int   anSwIndex[] = {1, 0, 3, 2}; // order is turbo, select, +, -
+// TriSwich routing
+int   anTriSwIndex[] = {2,1,0}; // how ordered are the triswitch compared to the motor number, anTriIndex[2] = 0 => the third tri switch is related to the twisting motor
+int   anTriSwInverted[] = {-1,1,1}; // invert direction (miscabled) anTriSwInverted[0] = -1: the first switch is reverted
 
 int nNumLineEdited = 3;
 float * prEdited = &rNbrTwist;
@@ -225,34 +235,78 @@ bool bPrevPush2 = 0;
 
 int anPrevReadValues[NBR_SENSORS];
 
+int nPrevDT = 0;
+
 void loop()
 {
   // char buf[16];
   //drawCharsTable();
-
+  const int nSizeBuf = 24;
+  char buf[nSizeBuf+1];
   int anReadValues[NBR_SENSORS];
+
+  int abSendMotorChange[] = {0,0,0};
 
 
   for( int i = 0; i < NBR_POTAR; ++i )
   {
     anReadValues[i] = analogRead(PIN_POTAR_BASE+i);
-    if(anReadValues[i] != anPrevReadValues[i])
+    if(abs(anReadValues[i] - anPrevReadValues[i])>1) // avoid spurious change
     {
       if(i<1)
+      {
         *(apnSpeedArray[i]) = (int)( (anReadValues[i] *1000L) / 1023);
+      }
       else
+      {
         *(apnSpeedArray[i]) = (int)( (anReadValues[i] *300L) / 1023);
+      }
+      if(*apnDirArray[i] != 0)
+        abSendMotorChange[i] = 1;
     }
   }
 
   for( int i = 0; i < NBR_SW; ++i )
   {
     anReadValues[i+NBR_POTAR] = digitalRead(PIN_SW_BASE+i) == HIGH;
+    if(anReadValues[i+NBR_POTAR] != anPrevReadValues[i+NBR_POTAR])
+    {
+      int nSwitch = anSwIndex[i];
+      if (nSwitch == 0)
+      {
+        // turbo
+        if( nSpoolDir != 0 )
+        {
+          int nMotor = 2;
+          int nTurbo = 5;
+          if(anReadValues[i+NBR_POTAR] == 0)
+          {
+            nTurbo = 1;
+          }
+          snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nSpoolDir,*apnSpeedArray[nMotor]*nTurbo);
+          sendSerialCommand(buf);
+        }
+      }
+    }
   }
 
   for( int i = 0; i < NBR_SWTRI*2; ++i )
   {
     anReadValues[i+NBR_POTAR+NBR_SW] = digitalRead(PIN_SWTRI_BASE+i) == HIGH;
+    int nMotor = anTriSwIndex[i/2];
+    //Serial.print("mot: " ); Serial.print(nMotor); Serial.print(", sendchange:" ); Serial.println(abSendMotorChange[nMotor]);
+    if(anReadValues[i+NBR_POTAR+NBR_SW] != anPrevReadValues[i+NBR_POTAR+NBR_SW] || (abSendMotorChange[nMotor]&&anReadValues[i+NBR_POTAR+NBR_SW]) ) // second &&, because we can enter the loop with the other direction of this triswitch
+    {
+      int nDirection = ((i%2)*2)-1;
+      nDirection *= anTriSwInverted[nMotor];
+      if(anReadValues[i+NBR_POTAR+NBR_SW] == 0)
+      {
+        nDirection = 0;
+      }
+      *apnDirArray[nMotor] = nDirection;
+      snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nDirection,*apnSpeedArray[nMotor]);
+      sendSerialCommand(buf);
+    }
   }
 
   memcpy(anPrevReadValues,anReadValues,sizeof(anPrevReadValues));
@@ -286,7 +340,11 @@ void loop()
       Serial.print(", ");
     }
     Serial.println("");
+  }
 
+  if(1)
+  {
+    
   }
   
   if(1)

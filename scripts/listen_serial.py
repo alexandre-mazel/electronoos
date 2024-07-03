@@ -102,7 +102,7 @@ def monitorPort(strPortName, nBaudRate=9600, bImmediateClosing = False):
     return retVal
 
 if __name__ == "__main__":
-    print("Command line syntaxe: scriptname [<PORT_NAME>] [baud, default is 57600, clean will try to open then close it, then we're sure he's clean")
+    print("Command line syntaxe: scriptname [<PORT_NAME>] (baud, default is 57600) [clean or reset] clean will try to open then close it, then we're sure he's clean")
     print("")
     #~ listPorts()
     strPortName = '/dev/ttyUSB0'
@@ -121,7 +121,8 @@ if __name__ == "__main__":
         
     
     if len(sys.argv) > 2:
-        if sys.argv[2].lower()[0] == 'c': # clean, clear ...
+        ch = sys.argv[2].lower()[0]
+        if ch == 'c' or ch == 'r': # clean, clear ... or reset
             print("INF: Cleaning port")
             bClean = True
         else:

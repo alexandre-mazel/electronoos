@@ -164,12 +164,31 @@ void lcdPrint(float r)
 {
   if(abs(r)<10)
   {
-    pLcd->print(r,2);
+    if((float)(int)r != r)
+    {
+      // with decimals
+      pLcd->print(r,2);
+    }
+    else
+    {
+      // decimals are null, print with no decimals
+      pLcd->print("   ");
+      pLcd->print(r,0);
+    }
     return;
   }
   if(abs(r)<100)
   {
-    pLcd->print(r,1);
+    if((float)(int)r != r)
+    {
+      // with 1 decimal
+      pLcd->print(r,1);
+    }
+    else
+    {
+      pLcd->print("  ");
+      pLcd->print(r,0);
+    }
     return;
   }
   if(r<1000)
@@ -182,11 +201,20 @@ void lcdPrint(float r)
 }
 
 float rNbrTwist = 0;
+float rNbrTwistLimit = 1000;
+int nNbrTwistSpeed = 500;
 float rNbrCollect = 0;
+float rNbrCollectLimit = 1000;
 int nNbrCollectSpeed = 100;
 float rNbrSpool = 0;
+float rNbrSpoolLimit = 1000;
+int nNbrSpoolSpeed = 100;
 
-int nNumLineEdited = 0;
+// array of pointer to help algorithm and settings
+int * apnSpeedArray[] = {&nNbrTwistSpeed,&nNbrCollectSpeed,&nNbrSpoolSpeed};
+
+
+int nNumLineEdited = 3;
 float * prEdited = &rNbrTwist;
 int nNbrFrame = 0;
 
@@ -208,6 +236,13 @@ void loop()
   for( int i = 0; i < NBR_POTAR; ++i )
   {
     anReadValues[i] = analogRead(PIN_POTAR_BASE+i);
+    if(anReadValues[i] != anPrevReadValues[i])
+    {
+      if(i<1)
+        *(apnSpeedArray[i]) = (int)( (anReadValues[i] *1000L) / 1023);
+      else
+        *(apnSpeedArray[i]) = (int)( (anReadValues[i] *300L) / 1023);
+    }
   }
 
   for( int i = 0; i < NBR_SW; ++i )
@@ -219,6 +254,9 @@ void loop()
   {
     anReadValues[i+NBR_POTAR+NBR_SW] = digitalRead(PIN_SWTRI_BASE+i) == HIGH;
   }
+
+  memcpy(anPrevReadValues,anReadValues,sizeof(anPrevReadValues));
+
 
  // Serial.println(digitalRead(PIN_SW_BASE+0) == HIGH);
 
@@ -253,23 +291,33 @@ void loop()
   
   if(1)
   {
-    // update lcd (takes 57ms)
+    // update lcd (takes 57ms) - when 3 lines
     pLcd->setCursor(0, 0);
     pLcd->print("Twi ");
     lcdPrint(rNbrTwist);
-    pLcd->print("   ");
+    pLcd->print("/");
+    lcdPrint(rNbrTwistLimit);
+    pLcd->print("");
+    lcdPrint(nNbrTwistSpeed);
+    pLcd->print("rpm");
 
     pLcd->setCursor(0, 1);
     pLcd->print("Col ");
     lcdPrint(rNbrCollect);
     pLcd->print("/");
-    pLcd->print(nNbrCollectSpeed);
+    lcdPrint(rNbrCollectLimit);
+    pLcd->print("");
+    lcdPrint(nNbrCollectSpeed);
     pLcd->print("rpm");
 
     pLcd->setCursor(0, 2);
     pLcd->print("Spo ");
     lcdPrint(rNbrSpool);
-    pLcd->print("   ");
+    pLcd->print("/");
+    lcdPrint(rNbrSpoolLimit);
+    pLcd->print("");
+    lcdPrint(nNbrSpoolSpeed);
+    pLcd->print("rpm");
 
     pLcd->setCursor(19, nNumLineEdited);
     lcdPrintChar(127);

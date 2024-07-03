@@ -1,8 +1,16 @@
 #include <LiquidCrystal.h>
 
-#define PIN_POTAR1  A15
-#define PIN_SW1 42
-#define PIN_SW2 40
+#define PIN_POTAR_BASE  A10 // first pin of the series
+#define PIN_SW_BASE     30
+#define PIN_SWTRI_BASE  40
+
+
+#define NBR_POTAR   3
+#define NBR_SW      4
+#define NBR_SWTRI   3
+
+#define NBR_SENSORS (NBR_POTAR+NBR_SW+NBR_SWTRI*2)
+
 
 #include <LiquidCrystal_I2C.h>
 
@@ -66,9 +74,20 @@ void setup()
 {
   Serial.begin(57600);
 
-  pinMode(PIN_POTAR1, INPUT);
-  pinMode(PIN_SW1, INPUT);
-  pinMode(PIN_SW2, INPUT);
+  for( int i = 0; i < NBR_POTAR; ++i )
+  {
+    pinMode( PIN_POTAR_BASE+i, INPUT );
+  }
+
+  for( int i = 0; i < NBR_SW; ++i )
+  {
+    pinMode( PIN_SW_BASE+i, INPUT );
+  }
+
+  for( int i = 0; i < NBR_SWTRI*2; ++i )
+  {
+    pinMode( PIN_SWTRI_BASE+i, INPUT );
+  }
 
   uint8_t i2cAddr = 0x3F;
   if(!i2CAddrTest(i2cAddr))
@@ -176,61 +195,62 @@ bool bMotor1_sign = 0;
 bool bPrevPush1 = 0;
 bool bPrevPush2 = 0;
 
+int anPrevReadValues[NBR_SENSORS];
+
 void loop()
 {
   // char buf[16];
   //drawCharsTable();
 
-  int pushed1 = digitalRead(PIN_SW1) == HIGH;
-  int pushed2 = digitalRead(PIN_SW2) == HIGH;
-  int nPotar1 = 1023-analogRead(PIN_POTAR1);
+  int anReadValues[NBR_SENSORS];
+
+
+  for( int i = 0; i < NBR_POTAR; ++i )
+  {
+    anReadValues[i] = analogRead(PIN_POTAR_BASE+i);
+  }
+
+  for( int i = 0; i < NBR_SW; ++i )
+  {
+    anReadValues[i+NBR_POTAR] = digitalRead(PIN_SW_BASE+i) == HIGH;
+  }
+
+  for( int i = 0; i < NBR_SWTRI*2; ++i )
+  {
+    anReadValues[i+NBR_POTAR+NBR_SW] = digitalRead(PIN_SWTRI_BASE+i) == HIGH;
+  }
+
+ // Serial.println(digitalRead(PIN_SW_BASE+0) == HIGH);
 
   if((nNbrFrame%20)==0)
   {
     // debug
-    Serial.print("DBG: sw1: "); Serial.print(pushed1); Serial.print(", sw2: "); Serial.print(pushed2); Serial.print(", nPotar1: "); Serial.println(nPotar1);
+    Serial.print("DBG: values: ");
+    for( int i = 0; i < NBR_SENSORS; ++i )
+    {
+      if(i<NBR_POTAR)
+      {
+        Serial.print("POT");
+        Serial.print(i);
+      }
+      else if(i<NBR_POTAR+NBR_SW)
+      {
+        Serial.print("SW");
+        Serial.print(i-NBR_POTAR);
+      }
+      else
+      {
+        Serial.print("SWTRI");
+        Serial.print(i-NBR_POTAR-NBR_SW);
+      }
+      Serial.print(": ");
+      Serial.print(anReadValues[i]);
+      Serial.print(", ");
+    }
+    Serial.println("");
+
   }
   
-
-  if(1)
-  {
-    // update value from potar
-    float rInc = 0.0f;
-    // mid is 512
-    if(nPotar1<400)
-    {
-      rInc = -(400-nPotar1)/400.f;
-    }
-    else if(nPotar1>623)
-    {
-      rInc = (nPotar1-623)/500.f;
-    }
-
-    *prEdited += rInc*rInc*rInc*30;
-  }
-
-  if(bPrevPush1 != pushed1)
-  {
-    bPrevPush1 = pushed1;
-    if(pushed1 )
-    {
-      *prEdited += 1000;
-      bMotor1_sign = 1;
-      sendSerialCommand("MOTOR_1_1_500");
-    }
-  }
-  
-  if(bPrevPush2 != pushed2)
-  {
-    bPrevPush2 = pushed2;
-    if(pushed2)
-    {
-      *prEdited -= 1000;
-      bMotor1_sign = -1;
-      sendSerialCommand("MOTOR_1_-1_50");
-    }
-  }
-
   if(1)
   {
     // update lcd (takes 57ms)

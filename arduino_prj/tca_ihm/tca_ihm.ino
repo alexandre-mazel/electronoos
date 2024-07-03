@@ -216,6 +216,7 @@ int nNbrSpoolSpeed = 100;
 int nSpoolDir = 0;
 
 // array of pointer to help algorithm and settings
+float * aprPosArray[] = {&rNbrTwist,&rNbrCollect,&rNbrSpool}; // Potar Routing
 int * apnSpeedArray[] = {&nNbrTwistSpeed,&nNbrCollectSpeed,&nNbrSpoolSpeed}; // Potar Routing
 int * apnDirArray[] = {&nTwistDir,&nCollectDir,&nSpoolDir}; // Potar Routing
 // Switch routing
@@ -235,7 +236,7 @@ bool bPrevPush2 = 0;
 
 int anPrevReadValues[NBR_SENSORS];
 
-int nPrevDT = 0;
+long int nPrevTimeIntoLoop = 0;
 
 void loop()
 {
@@ -315,6 +316,7 @@ void loop()
  // Serial.println(digitalRead(PIN_SW_BASE+0) == HIGH);
 
   if((nNbrFrame%20)==0)
+  //if(0)
   {
     // debug
     Serial.print("DBG: values: ");
@@ -342,14 +344,27 @@ void loop()
     Serial.println("");
   }
 
-  if(1)
+  //if(1)
+  if((nNbrFrame%4)==0) // compute less to reduce computations errors
   {
+    // estimate rotation of motors
+    long int nDT = millis()-nPrevTimeIntoLoop; // will be more precise with micros, but we explode the long int with 60*1000*1000 (and LL doesn't change sth)
+    nPrevTimeIntoLoop = millis();
+    for( int nMotor = 0; nMotor < NBR_POTAR; ++nMotor )
+    {
+      if(*apnDirArray[nMotor] == 0)
+        continue;
+      float rIncTurn = ( nDT * (*apnSpeedArray[nMotor]) * (*apnDirArray[nMotor]) ) / (60.f*1000);
+      //Serial.println(rIncTurn);
+      *aprPosArray[nMotor] += rIncTurn;
+    }
     
   }
   
   if(1)
   {
     // update lcd (takes 57ms) - when 3 lines
+    // now: 102ms
     pLcd->setCursor(0, 0);
     pLcd->print("Twi ");
     lcdPrint(rNbrTwist);
@@ -382,6 +397,6 @@ void loop()
   }
 
   ++nNbrFrame;
-  delay(10);
+  // delay(10); // with 100ms of lcd refresh, no need to wait...
   countFps();
 }

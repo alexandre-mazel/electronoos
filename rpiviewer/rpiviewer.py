@@ -103,6 +103,9 @@ def cb_CecAlt(event, *args):
             if key == 0:
                 #~ startUserSettings()
                 global_bShowSettings = True
+            if key == 2:
+                global root
+                root.event_generate('<<Down>>')
     
 def handleCecCommandAlt():
     # from https://github.com/trainman419/python-cec
@@ -207,6 +210,7 @@ def retrieveLocalVideos(strLocalPath):
     listFiles = os.listdir(strLocalPath)
     return listFiles
 
+root = Tk()
 def show_user_settings(strPath, listSettings):
     """
     from https://docs.python.org/3/library/tkinter.html
@@ -214,7 +218,8 @@ def show_user_settings(strPath, listSettings):
     
     return settings
     """
-    root = Tk()
+    # root = Tk()
+    global root
     frm = ttk.Frame(root, padding=20)
     # we define a grid of 5 columns
     colcenter = 2
@@ -412,6 +417,9 @@ if 1:
             listSettings = show_user_settings(strLocalPath,listSettings)
             
         time.sleep(1.)
+        
+        #~ if 1:
+            #~ cb_CecAlt(2,0,0)
     
 
 

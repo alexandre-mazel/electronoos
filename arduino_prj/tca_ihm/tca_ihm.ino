@@ -11,6 +11,8 @@
 
 #define NBR_SENSORS (NBR_POTAR+NBR_SW+NBR_SWTRI*2)
 
+#define NBR_MOTORS  3
+
 
 #include <LiquidCrystal_I2C.h>
 
@@ -216,17 +218,18 @@ int nNbrSpoolSpeed = 100;
 int nSpoolDir = 0;
 
 // array of pointer to help algorithm and settings
-float * aprPosArray[] = {&rNbrTwist,&rNbrCollect,&rNbrSpool}; // Potar Routing
-int * apnSpeedArray[] = {&nNbrTwistSpeed,&nNbrCollectSpeed,&nNbrSpoolSpeed}; // Potar Routing
-int * apnDirArray[] = {&nTwistDir,&nCollectDir,&nSpoolDir}; // Potar Routing
+float * aprPosArray[] = {&rNbrTwist,&rNbrCollect,&rNbrSpool};
+float * aprLimitArray[] = {&rNbrTwistLimit,&rNbrCollectLimit,&rNbrSpoolLimit};
+int * apnSpeedArray[] = {&nNbrTwistSpeed,&nNbrCollectSpeed,&nNbrSpoolSpeed};
+int * apnDirArray[] = {&nTwistDir,&nCollectDir,&nSpoolDir};
 // Switch routing
-int   anSwIndex[] = {1, 0, 3, 2}; // order is turbo, select, +, -
+int   anSwIndex[] = {1, 0, 2, 3}; // order is turbo, select, +, -
 // TriSwich routing
 int   anTriSwIndex[] = {2,1,0}; // how ordered are the triswitch compared to the motor number, anTriIndex[2] = 0 => the third tri switch is related to the twisting motor
 int   anTriSwInverted[] = {-1,1,1}; // invert direction (miscabled) anTriSwInverted[0] = -1: the first switch is reverted
 
 int nNumLineEdited = 3;
-float * prEdited = &rNbrTwist;
+float * prEdited = aprLimitArray[0];
 int nNbrFrame = 0;
 
 bool bMotor1_sign = 0;
@@ -256,7 +259,7 @@ void loop()
     {
       if(i<1)
       {
-        *(apnSpeedArray[i]) = (int)( (anReadValues[i] *1000L) / 1023);
+        *(apnSpeedArray[i]) = (int)( (anReadValues[i] *900L) / 1023);
       }
       else
       {
@@ -287,6 +290,32 @@ void loop()
           snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nSpoolDir,*apnSpeedArray[nMotor]*nTurbo);
           sendSerialCommand(buf);
         }
+      }
+      else if (nSwitch == 1 && anReadValues[i+NBR_POTAR] )
+      {
+        // select and reset laps
+        for( int nMotor = 0; nMotor < NBR_MOTORS; ++nMotor )
+        {
+          *aprPosArray[nMotor] = 0;
+        }
+        nNumLineEdited += 1;
+        nNumLineEdited %= 4;
+
+        if( nNumLineEdited < 3 )
+        {
+          prEdited = aprLimitArray[nNumLineEdited];
+        }
+      }
+      else if (nSwitch == 2 && anReadValues[i+NBR_POTAR] )
+      {
+        // up
+        if( nNumLineEdited < 3 ) *prEdited += 100;
+
+      }
+      else if (nSwitch == 3 && anReadValues[i+NBR_POTAR] )
+      {
+        // down
+        if( nNumLineEdited < 3 ) *prEdited -= 100;
       }
     }
   }
@@ -350,13 +379,20 @@ void loop()
     // estimate rotation of motors
     long int nDT = millis()-nPrevTimeIntoLoop; // will be more precise with micros, but we explode the long int with 60*1000*1000 (and LL doesn't change sth)
     nPrevTimeIntoLoop = millis();
-    for( int nMotor = 0; nMotor < NBR_POTAR; ++nMotor )
+    for( int nMotor = 0; nMotor < NBR_MOTORS; ++nMotor )
     {
       if(*apnDirArray[nMotor] == 0)
         continue;
       float rIncTurn = ( nDT * (*apnSpeedArray[nMotor]) * (*apnDirArray[nMotor]) ) / (60.f*1000);
       //Serial.println(rIncTurn);
       *aprPosArray[nMotor] += rIncTurn;
+
+      if( *aprPosArray[nMotor] > *aprLimitArray[nMotor] )
+      {
+        snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,0,0);
+        sendSerialCommand(buf);
+        *apnDirArray[nMotor] = 0;
+      }
     }
     
   }
@@ -372,7 +408,7 @@ void loop()
     lcdPrint(rNbrTwistLimit);
     pLcd->print("");
     lcdPrint(nNbrTwistSpeed);
-    pLcd->print("rpm");
+    pLcd->print("rm");
 
     pLcd->setCursor(0, 1);
     pLcd->print("Col ");
@@ -381,7 +417,7 @@ void loop()
     lcdPrint(rNbrCollectLimit);
     pLcd->print("");
     lcdPrint(nNbrCollectSpeed);
-    pLcd->print("rpm");
+    pLcd->print("rm");
 
     pLcd->setCursor(0, 2);
     pLcd->print("Spo ");
@@ -390,10 +426,21 @@ void loop()
     lcdPrint(rNbrSpoolLimit);
     pLcd->print("");
     lcdPrint(nNbrSpoolSpeed);
-    pLcd->print("rpm");
+    pLcd->print("rm");
 
-    pLcd->setCursor(19, nNumLineEdited);
-    lcdPrintChar(127);
+    for(int i = 0; i < 4; ++i )
+    {
+      pLcd->setCursor(19, i);
+      if(nNumLineEdited==i)
+      {
+        lcdPrintChar(127);
+      }
+      else
+      {
+        pLcd->print(" ");
+      }
+    }
+    
   }
 
   ++nNbrFrame;

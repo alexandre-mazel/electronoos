@@ -116,6 +116,13 @@ int retrieveIntArguments(const char* s, int * pDstArg, int nNbrArgMax)
   return nNbrArg;
 }
 
+motorConsign dir, speed
+void updateMotorCommand()
+{
+  
+}
+
+
 
 #define LEN_COMMAND_MAX 32
 char lastCommand[LEN_COMMAND_MAX+1] = "\0";
@@ -240,6 +247,7 @@ void sendSerialCommand(const char * msg)
 void loop() 
 {
   handleSerialCommand();
+  updateMotorCommand();
   countFps();
   delay(10);
 }

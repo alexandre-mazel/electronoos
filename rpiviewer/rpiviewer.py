@@ -3,6 +3,7 @@
 from tkinter import *
 from tkinter import ttk
 import cv2
+import json
 import os
 import sys
 import sysrsync
@@ -120,7 +121,12 @@ def handleCecCommandAlt():
     sys.path.insert(0,"/home/na/dev/git/python-cec/")
     # or:
     # cp ~/dev/git/python-cec/cec.cpython-311-arm-linux-gnueabihf.so  .
-    import cec
+    try:
+        import cec
+    except ModuleNotFoundError as err:
+        print("WRN: handleCecCommandAlt: while loading cec, err: %s" % err )
+        return
+        
     adapters = cec.list_adapters()
     
     print(adapters)
@@ -280,6 +286,8 @@ def show_user_settings(strPath, listSettings):
         listSettings[1] = nNumSelected
         listSettings[2] = allVideos[nNumSelected]
         
+        saveSettingsToDisk(listSettings)
+        
         root.destroy()
         
 
@@ -322,7 +330,7 @@ def ensureFps( timeStart,nNumFrame,rWantedFps ):
         time.sleep(rDiff-rMargin)
     
 
-def show_video_fullscreen( filename, bLoop = False ):
+def show_video_fullscreen( filename, bLoop = False, bPrintPlayInfo = True ):
         
     print("INF: show_video_fullscreen: loading '%s'" % filename )
     import cv2
@@ -371,7 +379,7 @@ def show_video_fullscreen( filename, bLoop = False ):
                 timeStart = time.time()
                 
         
-        if 1:
+        if bPrintPlayInfo:
             cv2.putText(frame,"%d/%d, t:%5.2fs" % (nNumFrame,nNbrFrame,time.time()-timeStart), 
                 (10,30), 
                 cv2.FONT_HERSHEY_SIMPLEX, 
@@ -411,26 +419,66 @@ if os.name == "nt":
 strLocalPath += "videos/"
 
 
-def startUserSettings():
-    print("INF: startUserSettings" )
-    global listSettings, strLocalPath
-    listSettings = show_user_settings(strLocalPath,listSettings)
+global_filename_settings = "rpiviewer.dat"
+def loadSettingsFromDisk(listSettings):
+    try:
+        f = open(global_filename_settings,"rt")
+    except:
+        print("WRN: loadSettingsFromDisk: no settings found")
+        return listSettings 
+    loadedSettings = json.load(f)
+    f.close()
+    if len(loadedSettings) > 0:
+        print("INF: loadSettingsFromDisk: loaded %s setting(s)" % len(loadedSettings) )
+        listSettings = loadedSettings
+    return listSettings
+    
+def saveSettingsToDisk(listSettings):
+    try:
+        f = open(global_filename_settings,"wt")
+    except:
+        print("ERR: saveSettingsToDisk: save settings impossible")
+        return False
+        
+    ret = json.dump((listSettings),f,indent=2)
+    f.close()
+    print("ERR: saveSettingsToDisk: saved success")
+    return ret
 
-listSettings = [False,0,""]
+def appLoop(strLocalPath):
+    print("INF: appLoop: starting...")
+    listSettings = [False,0,""]
+    listSettings = loadSettingsFromDisk(listSettings)
+    updateFromServer(strLocalPath)
+    allVideos = retrieveLocalVideos(strLocalPath)
+    handleCecCommandAlt()
+    if 0:
+        listSettings = show_user_settings(strLocalPath,listSettings)
+    strVideoFilename = allVideos[listSettings[1]]
+    show_video_fullscreen(strLocalPath+strVideoFilename, bLoop=True)
+
+
+#~ def startUserSettings():
+    #~ print("INF: startUserSettings" )
+    #~ global global_listSettings, strLocalPath
+    #~ global_listSettings = show_user_settings(strLocalPath,global_listSettings)
+
+global_listSettings = [False,0,""]
+
 
 if 0:
-    listSettings = show_user_settings(strLocalPath,listSettings)
-    show_user_settings(strLocalPath,listSettings)
+    global_listSettings = show_user_settings(strLocalPath,global_listSettings)
+    show_user_settings(strLocalPath,global_listSettings)
     
 if 0:
     #~ show_video_fullscreen(strLocalPath+"sdaec_farmcow.mp4", bLoop=True)
-    show_video_fullscreen(strLocalPath+listSettings[2], bLoop=True)
+    show_video_fullscreen(strLocalPath+global_listSettings[2], bLoop=True)
     
 if 0:
     updateFromServer(strLocalPath)
     
 global_bShowSettings = False
-if 1:
+if 0:
     #~ loopHandleInput()
     #~ cecobj = handleCecCommand()
     cecobj = handleCecCommandAlt()
@@ -438,12 +486,14 @@ if 1:
         print(".")
         if global_bShowSettings:
             global_bShowSettings = False
-            listSettings = show_user_settings(strLocalPath,listSettings)
+            global_listSettings = show_user_settings(strLocalPath,global_listSettings)
             
         time.sleep(1.)
         
         #~ if 1:
             #~ cb_CecAlt(2,0,0)
+            
+appLoop(strLocalPath)
     
 
 

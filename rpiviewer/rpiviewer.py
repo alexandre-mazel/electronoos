@@ -8,6 +8,8 @@ import sys
 import sysrsync
 import time
 
+import cec # sudo apt-get install libcec-dev python3-cec
+
 # idée: faire un rsync avec le serveur et proposé de lire des vidéos depuis le disque local ?
 # on choisit en local la vidéo
 
@@ -51,6 +53,8 @@ def loopHandleInput():
         
 def keyPressCallback(key, duration):
     print("[key pressed] " + str(key))
+    if key == 1:
+        startUserSettings()
     return 0
         
 def handleCecCommand():
@@ -299,6 +303,11 @@ if os.name == "nt":
     strLocalPath = "c:/"
     
 strLocalPath += "videos/"
+
+
+def startUserSettings():
+    global listSettings, strLocalPath
+    listSettings = show_user_settings(strLocalPath,listSettings)
 
 
 if 0:

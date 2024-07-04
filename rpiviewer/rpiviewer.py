@@ -92,8 +92,17 @@ def handleCecCommand():
     print("INF: handleCecCommand: Open")
     return lib
     
+   
 def cb_CecAlt(event, *args):
-    print("Got event", event, "with data", args)
+    global global_bShowSettings
+    print("DBG: cb_CecAlt: Got event", event, "with data", args)
+    if event == 2:
+        print("INF: cb_CecAlt: got keypress")
+        key, down = args
+        if down == 0:
+            if key == 0:
+                #~ startUserSettings()
+                global_bShowSettings = True
     
 def handleCecCommandAlt():
     # from https://github.com/trainman419/python-cec
@@ -136,8 +145,8 @@ def handleCecCommandAlt():
 
         print("Volume Up")
         cec.volume_up()
-        print("Volume Down")
-        cec.volume_down()
+        #~ print("Volume Down")
+        #~ cec.volume_down()
     
 
 
@@ -374,12 +383,13 @@ strLocalPath += "videos/"
 
 
 def startUserSettings():
+    print("INF: startUserSettings" )
     global listSettings, strLocalPath
     listSettings = show_user_settings(strLocalPath,listSettings)
 
+listSettings = [False,0,""]
 
 if 0:
-    listSettings = [False,0,""]
     listSettings = show_user_settings(strLocalPath,listSettings)
     show_user_settings(strLocalPath,listSettings)
     
@@ -390,12 +400,17 @@ if 0:
 if 0:
     updateFromServer(strLocalPath)
     
+global_bShowSettings = False
 if 1:
     #~ loopHandleInput()
     #~ cecobj = handleCecCommand()
     cecobj = handleCecCommandAlt()
     while 1:
         print(".")
+        if global_bShowSettings:
+            global_bShowSettings = False
+            listSettings = show_user_settings(strLocalPath,listSettings)
+            
         time.sleep(1.)
     
 

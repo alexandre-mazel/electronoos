@@ -4,11 +4,46 @@ from tkinter import *
 from tkinter import ttk
 import cv2
 import os
+import sys
 import sysrsync
 import time
 
 # idée: faire un rsync avec le serveur et proposé de lire des vidéos depuis le disque local ?
 # on choisit en local la vidéo
+
+
+def handleInput():
+    if 0:
+        #buf = sys.stdin.readlines()
+        buf = sys.stdin.read()
+        print( "INF: handleInput: buf: " + str(buf) )
+    if 0:
+        import fileinput
+        for line in fileinput.input():
+            print( "INF: handleInput: line: " + str(line) )
+            
+    if 1:
+        # check data
+        if os.name == "nt":
+            import msvcrt
+            if not msvcrt.kbhit(): 
+                return
+        else:
+            if not select.select([sys.stdin, ], [], [], 0.0)[0]:
+                return
+            
+        for line in sys.stdin:
+            print(f'Input : {line}')
+            break
+        print("exiting...")
+    
+    
+def loopHandleInput():
+    print( "INF: loopHandleInput: looping...")
+    while 1:
+        handleInput()
+        print(".")
+        time.sleep(0.5)
 
 class MyCheckbox(ttk.Checkbutton):
 
@@ -59,11 +94,9 @@ def updateFromServer(strLocalPath):
     if os.name == "nt":
         print("WRN: updateFromServer: no rsyncing on windows")
         return
-    strRemoteServer = "192.168.0.50"
+    strRemoteServer = "192.168.0.50:"
     strRemotePath = '/home/na/dev/git/obo/www/agent/videod/'
-    
-    print( "INF: updateFromServer: sync: %s:%s => %s" % (strRemoteServer,strRemotePath,strLocalPath) )
-    sysrsync.run(source=strRemotePath, destination=strLocalPath, source_ssh=strRemoteServer, options=['--size-only','--verbose', '--recursive' ], verbose = True )
+    sysrsync.run(source=strRemotePath, destination=strLocalPath, destination_ssh=strRemoteServer, options=['-rv --size-only'])
     
 def retrieveLocalVideos(strLocalPath):
     listFiles = os.listdir(strLocalPath)
@@ -243,17 +276,21 @@ if os.name == "nt":
     
 strLocalPath += "videos/"
 
-    
-if 0:
-    updateFromServer(strLocalPath)
 
-if 1:
+if 0:
     listSettings = [False,0,""]
     listSettings = show_user_settings(strLocalPath,listSettings)
     show_user_settings(strLocalPath,listSettings)
     
-if 1:
+if 0:
     #~ show_video_fullscreen(strLocalPath+"sdaec_farmcow.mp4", bLoop=True)
     show_video_fullscreen(strLocalPath+listSettings[2], bLoop=True)
+    
+if 0:
+    updateFromServer(strLocalPath)
+    
+if 1:
+    loopHandleInput()
+    
 
 

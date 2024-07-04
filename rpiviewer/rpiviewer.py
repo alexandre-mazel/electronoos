@@ -258,6 +258,14 @@ def show_user_settings(strPath, listSettings):
 
     vidlist.selection_set(listSettings[1])
     
+        
+    def getCurrentVideoSelected():
+        nNumSelected = 0
+        curSel = vidlist.curselection() # currentItem() ?
+        if len(curSel)>0:
+            nNumSelected = curSel[0]
+        return nNumSelected
+    
     def quit_settings():
         print("INF: in quit_settings...")
         print("checkbox: " + str(checkbox.state() )) # alternate/selected/vide
@@ -265,10 +273,7 @@ def show_user_settings(strPath, listSettings):
         
         bIsSelected = checkbox.isChecked()
         
-        nNumSelected = 0
-        curSel = vidlist.curselection()
-        if len(curSel)>0:
-            nNumSelected = curSel[0]
+        nNumSelected = getCurrentVideoSelected()
         
         # in place storing
         listSettings[0] = bIsSelected
@@ -276,16 +281,21 @@ def show_user_settings(strPath, listSettings):
         listSettings[2] = allVideos[nNumSelected]
         
         root.destroy()
+        
+
+
+    def rootDown(event):
+        print("DBG: rootDown: entering" )
+        nNumSelected = (getCurrentVideoSelected() + 1) % len(allVideos)
+        print("DBG: rootDown: nNumSelected: %s" % nNumSelected )
+        vidlist.clearSelection()
+        vidlist.selection_set(nNumSelected)
+        
 
     ttk.Button(frm, text="Quit", command=quit_settings).grid(column=colcenter, row=nNumRow)
-
-
-    def frameDown(event):
-        print("DBG: frameDown!")
-        vidlist.selection_set((vidlist.curselection()[0]+1)%4)
     
-    #~ frm.bind("<<Down>>",frameDown)
-    root.bind("<<Down>>",frameDown)
+    #~ frm.bind("<<Down>>",rootDown)
+    root.bind("<<Down>>",rootDown)
     root.mainloop()
     
     print("INF: show_user_settings: exiting with settings: %s" % str(listSettings))

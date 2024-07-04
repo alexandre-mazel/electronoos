@@ -94,18 +94,25 @@ def handleCecCommand():
     
    
 def cb_CecAlt(event, *args):
+    evKeyPress = 2
+    kOK = 0
+    kUp = 1
+    kDown = 2
+    kLeft = 3
+    kRight = 4
     global global_bShowSettings
     print("DBG: cb_CecAlt: Got event", event, "with data", args)
-    if event == 2:
+    if event == evKeyPress:
         print("INF: cb_CecAlt: got keypress")
         key, down = args
         if down == 0:
-            if key == 0:
+            if key == kOK:
                 #~ startUserSettings()
                 global_bShowSettings = True
-            if key == 2:
+            if key == kDown:
+                print("INF: cb_CecAlt: DOWN!")
                 global root
-                root.event_generate('<<Down>>')
+                root.event_generate("<<Down>>")
     
 def handleCecCommandAlt():
     # from https://github.com/trainman419/python-cec
@@ -140,7 +147,7 @@ def handleCecCommandAlt():
     print("Installing callback...")
     cec.add_callback(cb_CecAlt, cec.EVENT_ALL & ~cec.EVENT_LOG)
     
-    if 1:
+    if 0:
         print("Creating Device object for TV")
         tv = cec.Device(0)
         print("Turning on TV")
@@ -211,6 +218,7 @@ def retrieveLocalVideos(strLocalPath):
     return listFiles
 
 root = Tk()
+    
 def show_user_settings(strPath, listSettings):
     """
     from https://docs.python.org/3/library/tkinter.html
@@ -270,8 +278,14 @@ def show_user_settings(strPath, listSettings):
         root.destroy()
 
     ttk.Button(frm, text="Quit", command=quit_settings).grid(column=colcenter, row=nNumRow)
+
+
+    def frameDown(event):
+        print("DBG: frameDown!")
+        vidlist.selection_set((vidlist.curselection()[0]+1)%4)
     
-    
+    #~ frm.bind("<<Down>>",frameDown)
+    root.bind("<<Down>>",frameDown)
     root.mainloop()
     
     print("INF: show_user_settings: exiting with settings: %s" % str(listSettings))

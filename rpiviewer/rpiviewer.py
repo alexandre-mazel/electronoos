@@ -13,6 +13,9 @@ import time
 
 
 def handleInput():
+    """
+    Fonction dans le cas ou on redirige la sortie de l'executable cec dans notre programme (mais en fait avec la lib cec c'est plus propre) cf handleCecCommand
+    """
     if 0:
         #buf = sys.stdin.readlines()
         buf = sys.stdin.read()
@@ -29,6 +32,7 @@ def handleInput():
             if not msvcrt.kbhit(): 
                 return
         else:
+            import select
             if not select.select([sys.stdin, ], [], [], 0.0)[0]:
                 return
             
@@ -44,6 +48,26 @@ def loopHandleInput():
         handleInput()
         print(".")
         time.sleep(0.5)
+        
+def keyPressCallback(key, duration):
+    print("[key pressed] " + str(key))
+    return 0
+        
+def handleCecCommand():
+    import cec
+    #~ adapters = cec.list_adapters() # may be called before init()
+
+    #~ cec.init() # use default adapter
+    #~ cec.init(adapter) # use a specific adapter
+    
+    cecconfig = cec.libcec_configuration()
+    cecconfig.strDeviceName = "libCEC"
+    cecconfig.bActivateSource = 0
+    cecconfig.deviceTypes.Add(cec.CEC_DEVICE_TYPE_RECORDING_DEVICE)
+    cecconfig.clientVersion = cec.LIBCEC_VERSION_CURRENT
+    # cecconfig.SetLogCallback(LogCallback)
+    cecconfig.SetKeyPressCallback(keyPressCallback)
+
 
 class MyCheckbox(ttk.Checkbutton):
 
@@ -290,7 +314,10 @@ if 0:
     updateFromServer(strLocalPath)
     
 if 1:
-    loopHandleInput()
+    #~ loopHandleInput()
+    handleCecCommand()
+    while 1:
+        pass
     
 
 

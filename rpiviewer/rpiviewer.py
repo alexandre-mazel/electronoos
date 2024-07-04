@@ -8,8 +8,6 @@ import sys
 import sysrsync
 import time
 
-import cec # sudo apt-get install libcec-dev python3-cec
-
 # idée: faire un rsync avec le serveur et proposé de lire des vidéos depuis le disque local ?
 # on choisit en local la vidéo
 
@@ -51,14 +49,21 @@ def loopHandleInput():
         print(".")
         time.sleep(0.5)
         
-def keyPressCallback(key, duration):
+def keyPressCallback(key,duration):
+    return 0
     print("[key pressed] " + str(key))
-    if key == 1:
+    if key == 0:
         startUserSettings()
     return 0
+    
+def LogCallback(s):
+    print("DBG: LogCallback: " + str(s) )
         
 def handleCecCommand():
-    import cec
+    print( "INF: handleCecCommand...")
+    
+    import cec # sudo apt-get install libcec-dev python3-cec
+    
     #~ adapters = cec.list_adapters() # may be called before init()
 
     #~ cec.init() # use default adapter
@@ -66,11 +71,74 @@ def handleCecCommand():
     
     cecconfig = cec.libcec_configuration()
     cecconfig.strDeviceName = "libCEC"
-    cecconfig.bActivateSource = 0
+    cecconfig.bActivateSource = 1
     cecconfig.deviceTypes.Add(cec.CEC_DEVICE_TYPE_RECORDING_DEVICE)
     cecconfig.clientVersion = cec.LIBCEC_VERSION_CURRENT
-    # cecconfig.SetLogCallback(LogCallback)
-    cecconfig.SetKeyPressCallback(keyPressCallback)
+    #~ cecconfig.SetLogCallback(LogCallback)
+    cecconfig.SetKeyPressCallback(keyPressCallback) # quand on active cette ligne ca fait un coredump plus tard
+    
+    lib = cec.ICECAdapter.Create(cecconfig)
+    detected = lib.DetectAdapters()
+    print("detected: %s" % str(detected) )
+    print("detected0: %s" % dir(detected[0]) )
+    print("detected0.strComPath: %s" % str(detected[0].strComPath) )
+    print("detected0.strComName: %s" % str(detected[0].strComName) )
+    print("detected0.iProductId: %s" % str(detected[0].iProductId) )
+    print("detected0.iVendorId: %s" % str(detected[0].iVendorId) )
+    print("detected1: %s" % str(detected[1].strComName) )
+    adapter = detected[0].strComName
+    print("INF: handleCecCommand: Opening...")
+    lib.Open(adapter)
+    print("INF: handleCecCommand: Open")
+    return lib
+    
+def cb_CecAlt(event, *args):
+    print("Got event", event, "with data", args)
+    
+def handleCecCommandAlt():
+    # from https://github.com/trainman419/python-cec
+    
+    sys.path.insert(0,"/home/na/dev/git/python-cec/")
+    # or:
+    # cp ~/dev/git/python-cec/cec.cpython-311-arm-linux-gnueabihf.so  .
+    import cec
+    adapters = cec.list_adapters()
+    
+    print(adapters)
+
+    if len(adapters) < 1:
+        print("INF: handleCecCommandAlt: no adapters...")
+        return
+    
+    adapter = adapters[0]
+    print("Using Adapter %s"%(adapter))
+    cec.init(adapter)
+
+    print("Devices:", cec.list_devices())
+
+    d = cec.Device(0)
+
+    # print fields
+    print("Address:", d.address)
+    print("Physical Address:", d.physical_address)
+    print("Vendor ID:", d.vendor)
+    print("OSD:", d.osd_string)
+    print("CEC Version:", d.cec_version )
+
+    print("Installing callback...")
+    cec.add_callback(cb_CecAlt, cec.EVENT_ALL & ~cec.EVENT_LOG)
+    
+    if 1:
+        print("Creating Device object for TV")
+        tv = cec.Device(0)
+        print("Turning on TV")
+        tv.power_on()
+
+        print("Volume Up")
+        cec.volume_up()
+        print("Volume Down")
+        cec.volume_down()
+    
 
 
 class MyCheckbox(ttk.Checkbutton):
@@ -324,9 +392,11 @@ if 0:
     
 if 1:
     #~ loopHandleInput()
-    handleCecCommand()
+    #~ cecobj = handleCecCommand()
+    cecobj = handleCecCommandAlt()
     while 1:
-        pass
+        print(".")
+        time.sleep(1.)
     
 
 

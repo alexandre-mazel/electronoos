@@ -33,6 +33,20 @@ import time
 # idée: faire un rsync avec le serveur et proposé de lire des vidéos depuis le disque local ?
 # on choisit en local la vidéo
 
+import socket
+
+def getLocalIP():   
+    IP = "???"
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        IP = s.getsockname()[0]
+        s.close()    
+        print("DBG: getLocalIP: " + IP)
+    except:
+        pass
+    return IP
+
 
 def handleInput():
     """
@@ -245,10 +259,10 @@ def updateFromServer(strLocalPath):
     if os.name == "nt":
         print("WRN: updateFromServer: no rsyncing on windows")
         return
-    strRemoteServer = "192.168.0.50:"
+    strRemoteServer = "192.168.0.50"
     strRemotePath = '/home/na/dev/git/obo/www/agent/videod/'
     try:
-        sysrsync.run(source=strRemotePath, destination=strLocalPath, destination_ssh=strRemoteServer, options=['-rv --size-only'])
+        sysrsync.run(source=strRemotePath, destination=strLocalPath, destination_ssh=strRemoteServer, options=['-rv','--size-only'])
     except BaseException as err:
         print("ERR: updateFromServer: rsync failed, err: %s" % err )
         
@@ -276,6 +290,7 @@ def show_user_settings(strPath, listSettings):
     nNumRow = 0
     ttk.Label(frm, text="RPIVIEWER by AlmaTools",background="lightblue").grid(column=colcenter, row=nNumRow); nNumRow += 1
     ttk.Label(frm, text="Settings").grid(column=colcenter, row=nNumRow); nNumRow += 1
+    ttk.Label(frm, text="IP: " + getLocalIP() ).grid(column=colcenter, row=nNumRow); nNumRow += 1
     
     checkbox = MyCheckbox(frm,text="Nouveau?",onvalue=1,state=1)
     checkbox.grid(column=colcenter, row=nNumRow); nNumRow += 1
@@ -308,6 +323,7 @@ def show_user_settings(strPath, listSettings):
         return nNumSelected
     
     def quit_settings(event=None):
+        global global_bShowSettings
         print("INF: in quit_settings...")
         print("checkbox: " + str(checkbox.state() )) # alternate/selected/vide
         print("video selected: " + str(vidlist.curselection() ))
@@ -324,6 +340,7 @@ def show_user_settings(strPath, listSettings):
         saveSettingsToDisk(listSettings)
         
         root.destroy()
+        global_bShowSettings = False
         
 
 
@@ -459,6 +476,9 @@ def show_video_fullscreen( filename, bLoop = False, bPrintPlayInfo = True ):
             nReturnCode = 2
             break
             
+        if ch == 13:
+            global_bShowSettings = True
+            
         if global_bShowSettings:
             break
                 
@@ -550,8 +570,9 @@ if 0:
     #~ show_video_fullscreen(strLocalPath+"sdaec_farmcow.mp4", bLoop=True)
     show_video_fullscreen(strLocalPath+global_listSettings[2], bLoop=True)
     
-if 0:
+if 1:
     updateFromServer(strLocalPath)
+    exit(1)
     
 global_bShowSettings = False
 if 0:

@@ -1,7 +1,22 @@
 # -*- coding: cp1252 -*-
 
 """
-la 3D ne semble pas activé.
+
+Raspberry Viewer for the Caves du Louvre.
+v0.9
+(c) A.Mazel 2024
+
+
+# on RPI4, la 3D ne semble pas activé sur le raspberry.
+
+cat /proc/device-tree/soc/firmwarekms@7e600000/status
+disabled
+cat /proc/device-tree/v3dbus/v3d@7ec04000/status
+okay
+
+# on Raspberry Pi 3 the v3dbus command should be:
+cat /proc/device-tree/soc/v3d@7ec00000/status
+
 
 Passer l'ecran en 1280x720 pour accelerer la lecture
 """
@@ -259,7 +274,7 @@ def show_user_settings(strPath, listSettings):
     colcenter = 2
     frm.grid()
     nNumRow = 0
-    ttk.Label(frm, text="RPIVIEWER by AlmaTools   -   (c) A.Mazel 2024",background="lightblue").grid(column=colcenter, row=nNumRow); nNumRow += 1
+    ttk.Label(frm, text="RPIVIEWER by AlmaTools",background="lightblue").grid(column=colcenter, row=nNumRow); nNumRow += 1
     ttk.Label(frm, text="Settings").grid(column=colcenter, row=nNumRow); nNumRow += 1
     
     checkbox = MyCheckbox(frm,text="Nouveau?",onvalue=1,state=1)
@@ -502,7 +517,7 @@ def appLoop(strLocalPath):
     print("INF: appLoop: starting...")
     listSettings = [False,0,""]
     listSettings = loadSettingsFromDisk(listSettings)
-    updateFromServer(strLocalPath)
+    #~ updateFromServer(strLocalPath)
     allVideos = retrieveLocalVideos(strLocalPath)
     handleCecCommandAlt()
     if 0:
@@ -514,6 +529,8 @@ def appLoop(strLocalPath):
         if nRet == 2:
             break
         if global_bShowSettings:
+            updateFromServer(strLocalPath)
+            allVideos = retrieveLocalVideos(strLocalPath)
             listSettings = show_user_settings(strLocalPath,listSettings)
 
 

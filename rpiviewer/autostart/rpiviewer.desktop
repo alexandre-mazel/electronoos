@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=RpiViewer
+Comment=test
+StartupNotify=fals
+Exec=/home/na/.config/autostart/rpiviewer.sh

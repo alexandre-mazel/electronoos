@@ -1,5 +1,11 @@
 # -*- coding: cp1252 -*-
 
+"""
+la 3D ne semble pas activé.
+
+Passer l'ecran en 1280x720 pour accelerer la lecture
+"""
+
 from tkinter import *
 from tkinter import ttk
 import cv2
@@ -102,6 +108,7 @@ def cb_CecAlt(event, *args):
     kLeft = 3
     kRight = 4
     global global_bShowSettings
+    global root    
     print("DBG: cb_CecAlt: Got event", event, "with data", args)
     if event == evKeyPress:
         print("INF: cb_CecAlt: got keypress")
@@ -109,11 +116,19 @@ def cb_CecAlt(event, *args):
         if down == 0:
             if key == kOK:
                 #~ startUserSettings()
-                global_bShowSettings = True
+                print("INF: cb_CecAlt: Ok received")
+                if not global_bShowSettings:
+                    global_bShowSettings = True
+                else:
+                    global_bShowSettings = False
+                    root.event_generate("<<Quit>>")
             if key == kDown:
                 print("INF: cb_CecAlt: DOWN!")
-                global root
                 root.event_generate("<<Down>>")
+            if key == kUp:
+                print("INF: cb_CecAlt: UP!")
+                root.event_generate("<<Up>>")
+
     
 def handleCecCommandAlt():
     # from https://github.com/trainman419/python-cec
@@ -217,8 +232,12 @@ def updateFromServer(strLocalPath):
         return
     strRemoteServer = "192.168.0.50:"
     strRemotePath = '/home/na/dev/git/obo/www/agent/videod/'
-    sysrsync.run(source=strRemotePath, destination=strLocalPath, destination_ssh=strRemoteServer, options=['-rv --size-only'])
-    
+    try:
+        sysrsync.run(source=strRemotePath, destination=strLocalPath, destination_ssh=strRemoteServer, options=['-rv --size-only'])
+    except BaseException as err:
+        print("ERR: updateFromServer: rsync failed, err: %s" % err )
+        
+        
 def retrieveLocalVideos(strLocalPath):
     listFiles = os.listdir(strLocalPath)
     return listFiles
@@ -235,11 +254,12 @@ def show_user_settings(strPath, listSettings):
     # root = Tk()
     global root
     frm = ttk.Frame(root, padding=20)
+    frm.pack(fill=BOTH,expand=True)
     # we define a grid of 5 columns
     colcenter = 2
     frm.grid()
     nNumRow = 0
-    ttk.Label(frm, text="RPIVIEWER",background="lightblue").grid(column=colcenter, row=nNumRow); nNumRow += 1
+    ttk.Label(frm, text="RPIVIEWER by AlmaTools   -   (c) A.Mazel 2024",background="lightblue").grid(column=colcenter, row=nNumRow); nNumRow += 1
     ttk.Label(frm, text="Settings").grid(column=colcenter, row=nNumRow); nNumRow += 1
     
     checkbox = MyCheckbox(frm,text="Nouveau?",onvalue=1,state=1)
@@ -254,7 +274,7 @@ def show_user_settings(strPath, listSettings):
         
     allVideos = retrieveLocalVideos(strPath)
 
-    vidlist = Listbox(root)
+    vidlist = Listbox(root,selectmode="browse",width=70,height=30) # 100,40 if hd, 70, 30 else
     
     for i,f in enumerate(allVideos):
         vidlist.insert(i+1, f)
@@ -272,7 +292,7 @@ def show_user_settings(strPath, listSettings):
             nNumSelected = curSel[0]
         return nNumSelected
     
-    def quit_settings():
+    def quit_settings(event=None):
         print("INF: in quit_settings...")
         print("checkbox: " + str(checkbox.state() )) # alternate/selected/vide
         print("video selected: " + str(vidlist.curselection() ))
@@ -292,23 +312,41 @@ def show_user_settings(strPath, listSettings):
         
 
 
+    def moveSelelection(nStep=1):
+        print("DBG: moveSelelection: entering with step %s" % nStep )
+        nNumSelected = getCurrentVideoSelected()
+        #~ vidlist.selection_unset(nNumSelected)
+        nNumSelected = (nNumSelected + nStep) % len(allVideos)
+        print("DBG: rootDown: nNumSelected: %s" % nNumSelected )
+        #vidlist.clearSelection()
+        vidlist.selection_clear(0,"end")
+        vidlist.selection_set(nNumSelected)
+        
     def rootDown(event):
         print("DBG: rootDown: entering" )
-        nNumSelected = (getCurrentVideoSelected() + 1) % len(allVideos)
-        print("DBG: rootDown: nNumSelected: %s" % nNumSelected )
-        vidlist.clearSelection()
-        vidlist.selection_set(nNumSelected)
+        moveSelelection(+1)
+    
+    def rootUp(event):
+        moveSelelection(-1)
         
 
     ttk.Button(frm, text="Quit", command=quit_settings).grid(column=colcenter, row=nNumRow)
     
     #~ frm.bind("<<Down>>",rootDown)
+    root.bind("<<Up>>",rootUp)
     root.bind("<<Down>>",rootDown)
+    root.bind("<<Quit>>",quit_settings)
     root.mainloop()
+    
+    root = Tk() # clean root and prepare for next call
     
     print("INF: show_user_settings: exiting with settings: %s" % str(listSettings))
     
     return listSettings
+# show_user_settings - end    
+
+
+
     
 def sync_remote_video():
 	"""
@@ -324,15 +362,19 @@ def ensureFps( timeStart,nNumFrame,rWantedFps ):
     
     rTheoricTime = nNumFrame / rWantedFps
     rDiff = rTheoricTime - (time.time()-timeStart)
-    #~ print( "DBG: ensureFps: rDiff: %5.3fs" % rDiff )
+    #print( "DBG: ensureFps: rDiff: %5.3fs" % rDiff )
     rMargin = 0.01
     if rDiff > rMargin:
-        time.sleep(rDiff-rMargin)
+        rTimeSleepSec = rDiff-rMargin
+        print( "DBG: ensureFps: sleeping: %5.3fs" % rTimeSleepSec )
+        time.sleep(rTimeSleepSec)
     
+
 
 def show_video_fullscreen( filename, bLoop = False, bPrintPlayInfo = True ):
         
     print("INF: show_video_fullscreen: loading '%s'" % filename )
+    global global_bShowSettings
     import cv2
     import numpy as np
      
@@ -355,6 +397,8 @@ def show_video_fullscreen( filename, bLoop = False, bPrintPlayInfo = True ):
     
     strWinName = "Frame"
     
+    cv2.destroyAllWindows() # erase the prev video before creating anew, else it's not full screen
+    
     cv2.namedWindow(strWinName, cv2.WINDOW_NORMAL)
     cv2.resizeWindow(strWinName, 1920//3, 1080//3) # set a window size in case the next property fail (eg when launched from a putty shell) // reduces as it's soo slow with my network
     cv2.setWindowProperty(strWinName, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
@@ -362,6 +406,8 @@ def show_video_fullscreen( filename, bLoop = False, bPrintPlayInfo = True ):
     
     nNumFrame = 0
     timeStart = time.time()
+    
+    nReturnCode = 0
     
     while(cap.isOpened()):
         # Capture frame-by-frame
@@ -379,7 +425,7 @@ def show_video_fullscreen( filename, bLoop = False, bPrintPlayInfo = True ):
                 timeStart = time.time()
                 
         
-        if bPrintPlayInfo:
+        if bPrintPlayInfo and 0:
             cv2.putText(frame,"%d/%d, t:%5.2fs" % (nNumFrame,nNbrFrame,time.time()-timeStart), 
                 (10,30), 
                 cv2.FONT_HERSHEY_SIMPLEX, 
@@ -392,11 +438,14 @@ def show_video_fullscreen( filename, bLoop = False, bPrintPlayInfo = True ):
         cv2.imshow(strWinName,frame)
 
         # Press Q on keyboard to  exit
-        ch = cv2.waitKey(nDurationFrame//2) & 0xFF # le //2 is to ensure we're faster, then we'll wait a bit in ensureFps
+        ch = cv2.waitKey(nDurationFrame//10) & 0xFF # le //2 is to ensure we're faster, then we'll wait a bit in ensureFps
         if  ch == ord('q') or ch == 27:
             print( "INF: show_video_fullscreen: quit received")
+            nReturnCode = 2
             break
             
+        if global_bShowSettings:
+            break
                 
         nNumFrame += 1
             
@@ -408,6 +457,10 @@ def show_video_fullscreen( filename, bLoop = False, bPrintPlayInfo = True ):
     # while is open - end
     
     cap.release()
+    
+    # cv2.destroyAllWindows() # doing it here, hide the stucked video
+    
+    return nReturnCode
     
 # show_video_fullscreen - end
 
@@ -454,8 +507,14 @@ def appLoop(strLocalPath):
     handleCecCommandAlt()
     if 0:
         listSettings = show_user_settings(strLocalPath,listSettings)
-    strVideoFilename = allVideos[listSettings[1]]
-    show_video_fullscreen(strLocalPath+strVideoFilename, bLoop=True)
+    
+    while 1:
+        strVideoFilename = allVideos[listSettings[1]]
+        nRet = show_video_fullscreen(strLocalPath+strVideoFilename, bLoop=True)
+        if nRet == 2:
+            break
+        if global_bShowSettings:
+            listSettings = show_user_settings(strLocalPath,listSettings)
 
 
 #~ def startUserSettings():

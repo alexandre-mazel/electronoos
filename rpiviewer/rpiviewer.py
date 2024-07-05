@@ -23,7 +23,7 @@ Passer l'ecran en 1280x720 pour accelerer la lecture
 
 from tkinter import *
 from tkinter import ttk
-import cv2
+import cv2 # rpi: sudo apt install python3-opencv
 import json
 import os
 import sys

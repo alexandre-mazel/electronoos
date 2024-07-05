@@ -27,7 +27,7 @@ import cv2 # rpi: sudo apt install python3-opencv
 import json
 import os
 import sys
-import sysrsync
+import sysrsync # rpi: sudo pip install sysrsync --break-system-packages
 import time
 
 # idée: faire un rsync avec le serveur et proposé de lire des vidéos depuis le disque local ?

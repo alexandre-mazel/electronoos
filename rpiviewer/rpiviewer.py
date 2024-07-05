@@ -256,16 +256,18 @@ if 0:
 
 
 def updateFromServer(strLocalPath):
+    print("INF: updateFromServer: starting...")
     if os.name == "nt":
         print("WRN: updateFromServer: no rsyncing on windows")
         return
-    strRemoteServer = "192.168.0.50"
-    strRemotePath = '/home/na/dev/git/obo/www/agent/videod/'
+    strRemoteServer = "pi@10.0.189.248"
+    strRemotePath = '/home/pi/shared/'
     try:
-        sysrsync.run(source=strRemotePath, destination=strLocalPath, destination_ssh=strRemoteServer, options=['-rv','--size-only'])
+        sysrsync.run(source=strRemotePath, destination=strLocalPath, source_ssh=strRemoteServer, options=['-rv','--size-only','--stats'])
     except BaseException as err:
         print("ERR: updateFromServer: rsync failed, err: %s" % err )
-        
+            
+    print("INF: updateFromServer: finished")
         
 def retrieveLocalVideos(strLocalPath):
     listFiles = os.listdir(strLocalPath)
@@ -570,7 +572,7 @@ if 0:
     #~ show_video_fullscreen(strLocalPath+"sdaec_farmcow.mp4", bLoop=True)
     show_video_fullscreen(strLocalPath+global_listSettings[2], bLoop=True)
     
-if 1:
+if 0:
     updateFromServer(strLocalPath)
     exit(1)
     

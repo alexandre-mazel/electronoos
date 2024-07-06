@@ -276,6 +276,11 @@ def updateFromServer(strLocalPath):
     if os.name == "nt":
         print("WRN: updateFromServer: no rsyncing on windows")
         return
+
+    if getLocalIP()[:3] == "192":
+        print("WRN: updateFromServer: no rsyncing on candiotti network")
+        return
+        
     strRemoteServer = "pi@10.0.189.248"
     strRemotePath = '/home/pi/shared/'
     try:
@@ -470,8 +475,8 @@ def show_video_fullscreen( filename, bLoop = False, bPrintPlayInfo = True ):
     def cb_cv2_MouseEvent(event,x,y,flags,param):
         global bRightButtonClicked
         print( "INF: cb_cv2_MouseEvent: event: %s, x: %s, y: %s, flags: 0x%x, param: %s" % (event,x,y,flags,str(param)) )
-        if event == cv2.EVENT_RBUTTONDOWN:
-            print( "INF: cb_cv2_MouseEvent: Right Click !" )
+        if event == cv2.EVENT_LBUTTONDOWN or event == cv2.EVENT_RBUTTONDOWN:
+            print( "INF: cb_cv2_MouseEvent: Click !" )
             bRightButtonClicked = True
             print( "INF: cb_cv2_MouseEvent: bRightButtonClicked: %s" % bRightButtonClicked )
 
@@ -606,7 +611,7 @@ if 0:
     global_listSettings = show_user_settings(strLocalPath,global_listSettings)
     show_user_settings(strLocalPath,global_listSettings)
     
-if 1:
+if 0:
     #~ show_video_fullscreen(strLocalPath+"sdaec_farmcow.mp4", bLoop=True)
     global_listSettings = loadSettingsFromDisk(global_listSettings)
     show_video_fullscreen(strLocalPath+global_listSettings[2], bLoop=True)

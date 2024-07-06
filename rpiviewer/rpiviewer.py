@@ -47,6 +47,22 @@ def getLocalIP():
         pass
     return IP
 
+def setMousePos(x,y):
+    if os.name == "nt":
+        import win32api
+        win32api.SetCursorPos((x,y))
+    else:        
+        import pyautogui #  sudo pip install pyautogui --break-system-packages
+        pyautogui.moveTo(x, y, duration = 1)
+        """
+        from Xlib import X, display
+        d = display.Display()
+        s = d.screen()
+        root = s.root
+        root.warp_pointer(300,300)
+        d.sync()
+        """
+
 
 def handleInput():
     """
@@ -443,6 +459,24 @@ def show_video_fullscreen( filename, bLoop = False, bPrintPlayInfo = True ):
     
     nReturnCode = 0
     
+    if 1:
+        # move mouse top right
+        _,_,w,h = cv2.getWindowImageRect(strWinName)
+        setMousePos( w, 0 )
+        
+        
+    global bRightButtonClicked # je ne comprend pas pourquoi sans cette commande, il crois que le bRightButtonClicked dans la boucle est local
+    bRightButtonClicked = False
+    def cb_cv2_MouseEvent(event,x,y,flags,param):
+        global bRightButtonClicked
+        print( "INF: cb_cv2_MouseEvent: event: %s, x: %s, y: %s, flags: 0x%x, param: %s" % (event,x,y,flags,str(param)) )
+        if event == cv2.EVENT_RBUTTONDOWN:
+            print( "INF: cb_cv2_MouseEvent: Right Click !" )
+            bRightButtonClicked = True
+            print( "INF: cb_cv2_MouseEvent: bRightButtonClicked: %s" % bRightButtonClicked )
+
+    cv2.setMouseCallback( strWinName, cb_cv2_MouseEvent )
+    
     while(cap.isOpened()):
         # Capture frame-by-frame
         ret, frame = cap.read()
@@ -478,7 +512,10 @@ def show_video_fullscreen( filename, bLoop = False, bPrintPlayInfo = True ):
             nReturnCode = 2
             break
             
-        if ch == 13:
+        #~ print(bRightButtonClicked)
+            
+        if ch == 13 or bRightButtonClicked:
+            print( "INF: show_video_fullscreen: show settings!")
             global_bShowSettings = True
             
         if global_bShowSettings:
@@ -562,21 +599,23 @@ def appLoop(strLocalPath):
     #~ global_listSettings = show_user_settings(strLocalPath,global_listSettings)
 
 global_listSettings = [False,0,""]
+global_bShowSettings = False
 
 
 if 0:
     global_listSettings = show_user_settings(strLocalPath,global_listSettings)
     show_user_settings(strLocalPath,global_listSettings)
     
-if 0:
+if 1:
     #~ show_video_fullscreen(strLocalPath+"sdaec_farmcow.mp4", bLoop=True)
+    global_listSettings = loadSettingsFromDisk(global_listSettings)
     show_video_fullscreen(strLocalPath+global_listSettings[2], bLoop=True)
+    exit(1)
     
 if 0:
     updateFromServer(strLocalPath)
     exit(1)
     
-global_bShowSettings = False
 if 0:
     #~ loopHandleInput()
     #~ cecobj = handleCecCommand()

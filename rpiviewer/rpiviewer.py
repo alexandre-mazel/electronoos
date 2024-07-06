@@ -177,6 +177,10 @@ def cb_CecAlt(event, *args):
     
 def handleCecCommandAlt():
     # from https://github.com/trainman419/python-cec
+    # git clone https://github.com/trainman419/python-cec
+    # cd python-cec
+    # make
+    # cp build/lib.linux-aarch64-cpython-311/cec.cpython-311-arm-linux-gnueabihf.so ~/dev/git/electronoos/rpiviewer/
     
     sys.path.insert(0,"/home/na/dev/git/python-cec/")
     # or:
@@ -474,7 +478,7 @@ def show_video_fullscreen( filename, bLoop = False, bPrintPlayInfo = True ):
     bRightButtonClicked = False
     def cb_cv2_MouseEvent(event,x,y,flags,param):
         global bRightButtonClicked
-        print( "INF: cb_cv2_MouseEvent: event: %s, x: %s, y: %s, flags: 0x%x, param: %s" % (event,x,y,flags,str(param)) )
+        #~ print( "INF: cb_cv2_MouseEvent: event: %s, x: %s, y: %s, flags: 0x%x, param: %s" % (event,x,y,flags,str(param)) )
         if event == cv2.EVENT_LBUTTONDOWN or event == cv2.EVENT_RBUTTONDOWN:
             print( "INF: cb_cv2_MouseEvent: Click !" )
             bRightButtonClicked = True

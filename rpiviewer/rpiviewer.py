@@ -53,7 +53,7 @@ def setMousePos(x,y):
         win32api.SetCursorPos((x,y))
     else:        
         import pyautogui #  sudo pip install pyautogui --break-system-packages
-        pyautogui.moveTo(x, y, duration = 1)
+        pyautogui.moveTo(x, y, duration = 1) # doesn't seem to work
         """
         from Xlib import X, display
         d = display.Display()

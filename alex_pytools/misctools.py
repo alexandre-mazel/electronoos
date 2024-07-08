@@ -891,6 +891,7 @@ def multiBeep(nbr):
         time.sleep(0.4)
         
 def beepError(nbrError = 4):
+    print("INF: beepError")
     for i in range(nbrError):
         multiBeep(3)
         time.sleep(1)

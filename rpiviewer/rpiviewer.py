@@ -63,6 +63,25 @@ def setMousePos(x,y):
         d.sync()
         """
 
+def turnPC_ScreenOn(bIsOn):
+    """
+    Function to turn on or off the PC screen.
+    bIsOn: True => on, False => off
+    """
+    print("INF: turnPC_ScreenOn: %s" % bIsOn )
+    if os.name == "nt":
+        import win32gui
+        import win32con
+        nNewState = 2
+        if bIsOn:
+            nNewState = -1
+        win32gui.SendMessage(win32con.HWND_BROADCAST, win32con.WM_SYSCOMMAND, win32con.SC_MONITORPOWER, nNewState)
+        if 0:
+            # quite the same:
+            import ctypes
+            ctypes.windll.user32.SendMessageW(65535, 274, 61808,nNewState)
+        return
+    # linux / rpi
 
 def handleInput():
     """
@@ -623,6 +642,12 @@ if 0:
     
 if 0:
     updateFromServer(strLocalPath)
+    exit(1)
+    
+if 1:
+    turnPC_ScreenOn(0) # le probleme c'est que sur mon portable mstab7, ca gele l'ordi, et donc les lignes suivantes ne sont pas éxécutées...
+    time.sleep(10)
+    turnPC_ScreenOn(1)
     exit(1)
     
 if 0:

@@ -239,6 +239,7 @@ def isRPI():
     global global_bIsRaspberry
     if global_bIsRaspberry != None:
         return global_bIsRaspberry
+        
     try:
         f = open("/proc/cpuinfo", "rt")
         buf=f.read()
@@ -246,7 +247,7 @@ def isRPI():
     except:
         global_bIsRaspberry = False
         return global_bIsRaspberry
-    print(buf)
+    #~ print(buf)
     global_bIsRaspberry = "Raspberry Pi" in buf or "ARMv7 Processor rev 4 (v7l)" in buf # v4 or v3
     print("DBG: isRPI: %s" %  global_bIsRaspberry )
     return global_bIsRaspberry

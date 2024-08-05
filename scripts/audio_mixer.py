@@ -71,10 +71,10 @@ class Sound:
         f = "c:/tmp/poker-face-medieval-style.mp3"        
         f = "c:/tmp/theme-from-the-shawshank-redemption (double bass).mp3"
         #~ f = "c:/tmp/Eminem - Mockingbird (Blasterjaxx Remix).mp3"
-        #~ f = "c:/tmp/8_bits.mp3"
-        f = "c:/tmp/summer3.mp3"
-        f = "../test/chirp.mp3"
-        f = "../test/440hz.mp3"
+        f = "c:/tmp/8_bits.mp3"
+        #~ f = "c:/tmp/summer3.mp3"
+        #~ f = "../test/chirp.mp3"
+        #~ f = "../test/440hz.mp3"
         print("Loading sound %s..." % f)
         self.datas,self.samplerate = librosa.load(f,sr=None)
         print("load sound - end")
@@ -111,11 +111,11 @@ class Sound:
         x = 20
         y = 840+30 # bottom of graph
         
-        windowsize = 2048
+        windowsize = 2048*2
         n = int(self.pos * self.samplerate)#+windowsize//2 # heard sound is centered to window
         
         try:
-            m_block = librosa.feature.melspectrogram(self.datas[n:n+windowsize], sr=self.samplerate,n_fft=2048,hop_length=2048,center=False)
+            m_block = librosa.feature.melspectrogram(self.datas[n:n+windowsize], sr=self.samplerate,n_fft=windowsize,hop_length=windowsize,center=False)
         except librosa.util.exceptions.ParameterError as err:
             print("WRN: Sound.render: err: %s" % str(err))
             return

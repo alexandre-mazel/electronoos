@@ -64,13 +64,16 @@ class Sound:
         self.timemaxcur = 0
         self.bPause = False
         
+        self.freqHistory = [] # for each sec an average of the volume of each band
+        
     def load(self):
         print("load sound...")
         f = "c:/tmp/poker-face-medieval-style.mp3"        
-        #~ f = "c:/tmp/theme-from-the-shawshank-redemption (double bass).mp3"
-        f = "c:/tmp/Eminem - Mockingbird (Blasterjaxx Remix).mp3"
-        f = "c:/tmp/8_bits.mp3"
-        print("Loading sound...")
+        f = "c:/tmp/theme-from-the-shawshank-redemption (double bass).mp3"
+        #~ f = "c:/tmp/Eminem - Mockingbird (Blasterjaxx Remix).mp3"
+        #~ f = "c:/tmp/8_bits.mp3"
+        f = "c:/tmp/summer3.mp3"
+        print("Loading sound %s..." % f)
         self.datas,self.samplerate = librosa.load(f,sr=None)
         print("load sound - end")
         
@@ -140,7 +143,7 @@ class Sound:
                 
             x += bw
 
-
+        # total volume on the right
         x += 100
         vol = self.datas[n]*500
         vol = max(self.datas[n:n+windowsize])*200
@@ -151,6 +154,39 @@ class Sound:
         else:
             self.maxcur -= 5*(time.time()-self.timemaxcur)*(time.time()-self.timemaxcur)
             pg.draw.rect(surface,gray,(x,y-self.maxcur,bw,2))
+            
+        # history in 3D
+        if len(self.freqHistory) < self.pos*8: #*10: vitesse du scroll
+            newVal = []
+            for i in range(len(S_dB)):
+                newVal.append(0)
+            self.freqHistory.append(newVal)
+        
+        for i in range(len(S_dB)):
+            vol = 5+int(abs(0.5*m_block[i][0]))
+            self.freqHistory[-1][i] += vol
+        #~ print("freqHistory:")
+        #~ print(self.freqHistory)
+        
+        offx, offy = 600,400
+        for j,vols in enumerate(self.freqHistory[-20:]):
+            startx = offx-j*12
+            starty = offy+j*10
+            for i,vol in enumerate(vols[:60]):
+                x = startx + i*bw
+                y = starty
+                color = white
+                vol *= 4 # to change relatively to speed of scroll
+                ind = vol//4
+                if ind>255:
+                    ind = 255
+                color = (ind,10+j*10,10+j*10)
+                if vol//10 < 2:
+                    continue
+                pg.draw.rect(surface,color,(x,y-vol//10,bw,vol//10))
+            
+        
+        
         
 class Game:
     def __init__(self):

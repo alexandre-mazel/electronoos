@@ -73,6 +73,8 @@ class Sound:
         #~ f = "c:/tmp/Eminem - Mockingbird (Blasterjaxx Remix).mp3"
         #~ f = "c:/tmp/8_bits.mp3"
         f = "c:/tmp/summer3.mp3"
+        f = "../test/chirp.mp3"
+        f = "../test/440hz.mp3"
         print("Loading sound %s..." % f)
         self.datas,self.samplerate = librosa.load(f,sr=None)
         print("load sound - end")

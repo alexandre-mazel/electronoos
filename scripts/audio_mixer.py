@@ -70,8 +70,10 @@ class Sound:
         print("load sound...")
         f = "c:/tmp/poker-face-medieval-style.mp3"        
         f = "c:/tmp/theme-from-the-shawshank-redemption (double bass).mp3"
-        #~ f = "c:/tmp/Eminem - Mockingbird (Blasterjaxx Remix).mp3"
-        f = "c:/tmp/8_bits.mp3"
+        f = "c:/tmp/Eminem - Mockingbird (Blasterjaxx Remix).mp3"
+        f = "D:/FreezerMusic/Carameii/Noot Noot Theme Mozart Lacrimosa (Epic Version)/01. Carameii - Noot Noot Theme Mozart Lacrimosa (Epic Version).mp3"
+        f = "D:/FreezerMusic/Metallica/Metallica (Remastered 2021)/08. Metallica - Nothing Else Matters (Remastered 2021).mp3"
+        #~ f = "c:/tmp/8_bits.mp3"
         #~ f = "c:/tmp/summer3.mp3"
         #~ f = "../test/chirp.mp3"
         #~ f = "../test/440hz.mp3"
@@ -158,6 +160,7 @@ class Sound:
             pg.draw.rect(surface,gray,(x,y-self.maxcur,bw,2))
             
         # history in 3D
+        bw = 16
         if len(self.freqHistory) < self.pos*8: #*10: vitesse du scroll
             newVal = []
             for i in range(len(S_dB)):
@@ -170,19 +173,23 @@ class Sound:
         #~ print("freqHistory:")
         #~ print(self.freqHistory)
         
-        offx, offy = 600,400
-        for j,vols in enumerate(self.freqHistory[-20:]):
+        offx, offy = 400,400
+        for j,vols in enumerate(self.freqHistory[-30:]): # number of freq in past
             startx = offx-j*12
-            starty = offy+j*10
+            starty = offy+j*12
             for i,vol in enumerate(vols[:60]):
                 x = startx + i*bw
                 y = starty
                 color = white
-                vol *= 4 # to change relatively to speed of scroll
-                ind = vol//4
-                if ind>255:
-                    ind = 255
-                color = (ind,10+j*10,10+j*10)
+                vol *= 2 # to change relatively to speed of scroll
+                maxvol = 4000
+                if vol > maxvol:
+                    vol = maxvol
+                comp_color = vol//4
+                if comp_color > 255:
+                    comp_color = 255
+                col_mul = 8
+                color = (comp_color,10+j*col_mul,10+j*col_mul)
                 if vol//10 < 2:
                     continue
                 pg.draw.rect(surface,color,(x,y-vol//10,bw,vol//10))

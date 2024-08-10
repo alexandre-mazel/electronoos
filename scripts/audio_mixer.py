@@ -1,6 +1,7 @@
 #~ import audioread
 import librosa
 import time
+import math
 
 def test():
     f = "c:/tmp/poker-face-medieval-style.mp3"
@@ -160,8 +161,7 @@ class Sound:
             pg.draw.rect(surface,gray,(x,y-self.maxcur,bw,2))
             
         # history in 3D
-        nbrFreqToDraw = 40
-        bw = 60*16//nbrFreqToDraw # width of each bar
+        
         if len(self.freqHistory) < self.pos*8: #*10: vitesse du scroll
             newVal = []
             for i in range(len(S_dB)):
@@ -174,15 +174,25 @@ class Sound:
         #~ print("freqHistory:")
         #~ print(self.freqHistory)
         
-        offx, offy = 400,400
+        offx, offy = 400,100
         nbrLineDrawHistory = 300
-        decy = 12*30//nbrLineDrawHistory
+        nbrFreqToDraw = 40
+        bw = 60*16//nbrFreqToDraw # width of each bar
+        
+        decy = 12*30*2//nbrLineDrawHistory
         if decy<1:
             decy = 1
             
+        decx = decy
+        if 1:
+            # essai d'animation de rotation pendant jouage (ebauche)
+            decx *= (math.sin(self.pos/2)*2)
+            #~ decy *= 1+abs(math.sin(self.pos/10)*4)
+            
+            
         for j,vols in enumerate(self.freqHistory[-nbrLineDrawHistory:]): # number of freq in past
-            startx = offx-j*decy
-            starty = offy+j*decy
+            startx = int(offx-j*decx)
+            starty = int(offy+j*decy)
             for i,vol in enumerate(vols[:nbrFreqToDraw]):
                 x = startx + i*bw
                 y = starty
@@ -201,7 +211,8 @@ class Sound:
                 if neutralcol > 255:
                     neutralcol = 255
                 color = (comp_color,neutralcol,neutralcol)
-                if vol//10 < 2:
+                # don't render if no sound:
+                if vol//10 < 4 and 1:
                     continue
                 pg.draw.rect(surface,color,(x,y-vol//10,bw,vol//10))
             

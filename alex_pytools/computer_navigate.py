@@ -59,9 +59,14 @@ def getClipboardText():
     win32clipboard.OpenClipboard()
     try:
         data = win32clipboard.GetClipboardData()
+        #~ data = win32clipboard.GetClipboardData(win32clipboard.CF_UNICODETEXT)
     except TypeError:
         data = None
     win32clipboard.CloseClipboard()
+    if 0:
+        # look for eol mark when from html => none
+        for d in data:
+            print("%s, 0x%d" % (d,ord(d)) )
     return data
 # getClipboardText - end
 
@@ -70,6 +75,12 @@ def setClipboardText( txt ):
     import win32clipboard
     win32clipboard.OpenClipboard()
     win32clipboard.EmptyClipboard()
-    win32clipboard.SetClipboardText(txt)
+    win32clipboard.SetClipboardText(txt) # also try: win32clipboard.SetClipboardData(win32clipboard.CF_TEXT, data).
     win32clipboard.CloseClipboard()
 # setClipboardText - end
+
+
+if __name__ == "__main__":
+    #~ setClipboardText("coucou\nles") # copying from web page, remove \n
+    txt = getClipboardText()
+    print("getClipboardText: '%s'" % txt )

@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "website"
+version = "2.1.0"
+description = ""
+authors = ["Yannick Mulot <yannick.mulot@ac-creteil.fr>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+mkdocs-material = "^9.2.5"
+mkdocs-minify-plugin = "^0.7.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

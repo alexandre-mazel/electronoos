@@ -1,6 +1,7 @@
 #~ import audioread
 import librosa
 import time
+import math
 
 def test():
     f = "c:/tmp/poker-face-medieval-style.mp3"
@@ -64,13 +65,20 @@ class Sound:
         self.timemaxcur = 0
         self.bPause = False
         
+        self.freqHistory = [] # for each sec an average of the volume of each band
+        
     def load(self):
         print("load sound...")
         f = "c:/tmp/poker-face-medieval-style.mp3"        
-        #~ f = "c:/tmp/theme-from-the-shawshank-redemption (double bass).mp3"
+        f = "c:/tmp/theme-from-the-shawshank-redemption (double bass).mp3"
         f = "c:/tmp/Eminem - Mockingbird (Blasterjaxx Remix).mp3"
+        f = "D:/FreezerMusic/Carameii/Noot Noot Theme Mozart Lacrimosa (Epic Version)/01. Carameii - Noot Noot Theme Mozart Lacrimosa (Epic Version).mp3"
+        f = "D:/FreezerMusic/Metallica/Metallica (Remastered 2021)/08. Metallica - Nothing Else Matters (Remastered 2021).mp3"
         f = "c:/tmp/8_bits.mp3"
-        print("Loading sound...")
+        #~ f = "c:/tmp/summer3.mp3"
+        #~ f = "../test/chirp.mp3"
+        #~ f = "../test/440hz.mp3"
+        print("Loading sound %s..." % f)
         self.datas,self.samplerate = librosa.load(f,sr=None)
         print("load sound - end")
         
@@ -106,11 +114,11 @@ class Sound:
         x = 20
         y = 840+30 # bottom of graph
         
-        windowsize = 2048
+        windowsize = 2048*2
         n = int(self.pos * self.samplerate)#+windowsize//2 # heard sound is centered to window
         
         try:
-            m_block = librosa.feature.melspectrogram(self.datas[n:n+windowsize], sr=self.samplerate,n_fft=2048,hop_length=2048,center=False)
+            m_block = librosa.feature.melspectrogram(self.datas[n:n+windowsize], sr=self.samplerate,n_fft=windowsize,hop_length=windowsize,center=False)
         except librosa.util.exceptions.ParameterError as err:
             print("WRN: Sound.render: err: %s" % str(err))
             return
@@ -140,7 +148,7 @@ class Sound:
                 
             x += bw
 
-
+        # total volume on the right
         x += 100
         vol = self.datas[n]*500
         vol = max(self.datas[n:n+windowsize])*200
@@ -151,6 +159,65 @@ class Sound:
         else:
             self.maxcur -= 5*(time.time()-self.timemaxcur)*(time.time()-self.timemaxcur)
             pg.draw.rect(surface,gray,(x,y-self.maxcur,bw,2))
+            
+        # history in 3D
+        
+        if len(self.freqHistory) < self.pos*8: #*10: vitesse du scroll
+            newVal = []
+            for i in range(len(S_dB)):
+                newVal.append(0)
+            self.freqHistory.append(newVal)
+        
+        for i in range(len(S_dB)):
+            vol = 5+int(abs(0.5*m_block[i][0]))
+            self.freqHistory[-1][i] += vol
+        #~ print("freqHistory:")
+        #~ print(self.freqHistory)
+        
+        offx, offy = 400,100
+        nbrLineDrawHistory = 300
+        nbrFreqToDraw = 40
+        bw = 60*16//nbrFreqToDraw # width of each bar
+        
+        decy = 12*30*2//nbrLineDrawHistory
+        if decy<1:
+            decy = 1
+            
+        decx = decy
+        if 1:
+            # essai d'animation de rotation pendant jouage (ebauche)
+            decx *= (math.sin(self.pos/5)*2)
+            #~ decy *= 1+abs(math.sin(self.pos/10)*4)
+            
+            
+        for j,vols in enumerate(self.freqHistory[-nbrLineDrawHistory:]): # number of freq in past
+            startx = int(offx-j*decx)
+            starty = int(offy+j*decy)
+            for i,vol in enumerate(vols[:nbrFreqToDraw]):
+                x = startx + i*bw
+                y = starty
+                color = white
+                vol *= 2 # to change relatively to speed of scroll
+                maxvol = 4000
+                if vol > maxvol:
+                    vol = maxvol
+                comp_color = vol//4
+                if comp_color > 255:
+                    comp_color = 255
+                col_mul = (255-10)//nbrLineDrawHistory
+                if col_mul<1:
+                    col_mul = 1
+                neutralcol = 10+j*col_mul
+                if neutralcol > 255:
+                    neutralcol = 255
+                color = (comp_color,neutralcol,neutralcol)
+                # don't render if no sound:
+                if vol//10 < 4 and 1:
+                    continue
+                pg.draw.rect(surface,color,(x,y-vol//10,bw,vol//10))
+            
+        
+        
         
 class Game:
     def __init__(self):

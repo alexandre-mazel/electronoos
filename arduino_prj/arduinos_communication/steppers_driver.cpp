@@ -1,5 +1,7 @@
 #include "stepper_driver.hpp"
 
+#define DEBUG 1
+
 StepperMotorInfo::StepperMotorInfo( int nNumPinEnable, int nNumPinDir, int nNumPinTrig, int nNbrStepPerTurn )
     : nNbrStepPerTurn_   ( nNbrStepPerTurn )
     , nNumPinEnable_     ( nNumPinEnable )
@@ -23,6 +25,15 @@ SteppersDriver::SteppersDriver( int nNbrMotors )
     stopAll();
 }
 
+void setup( int nNumMotor, int nNumPinEnable, int nNumPinDir, int nNumPinTrig, int nNbrStepPerTurn )
+{
+    const int i = nNumMotor;
+    motors_[i].nNumPinEnable_ = nNumPinEnable;
+    motors_[i].nNumPinDir_ = nNumPinDir;
+    motors_[i].nNumPinTrig_ = nNumPinTrig;
+    motors_[i].nNbrStepPerTurn_ = nNbrStepPerTurn;
+}
+
 void SteppersDriver::_initPins( void )
 {
     for( int i = 0; i < nNbrMotors_; ++i )
@@ -38,6 +49,14 @@ void SteppersDriver::order( int nNumMotor, int nDirection, int nSpeedRPM )
     const int i = nNumMotor;
     if( nDirection != motors_[i].dir_ )
     {
+        
+#ifdef DEBUG
+        Serial.print( "INF: SteppersDriver::order: motor: ");
+        Serial.print( nNumMotor );
+        Serial.print( ", newdir: " );
+        Serial.println( nDirection );
+#endif
+        
         if( motors_[i].dir_ == 0 )
         {
             digitalWrite( motors_[i].nNumPinEna_ , LOW ); // enable
@@ -67,6 +86,13 @@ void SteppersDriver::update( void )
         {
             
             digitalWrite( motors_[i].nNumPinTrig_ , bNextIsHigh_?HIGH:LOW );
+            
+#ifdef DEBUG
+            Serial.print( "INF: SteppersDriver::update: motor: ");
+            Serial.print( i );
+            Serial.print( ", trigger: " );
+            Serial.println( bNextIsHigh_?HIGH:LOW );
+#endif
             bNextIsHigh_ = ! bNextIsHigh_;
             motors_[i].timeNextTrig_ += motors_[i].timeHalfPeriod_;
         }

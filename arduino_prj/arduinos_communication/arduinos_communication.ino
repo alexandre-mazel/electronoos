@@ -5,6 +5,24 @@ unsigned long nFrameMsMin = 4000;
 unsigned long nFrameMsMax = 0;
 unsigned long fpsTimeLast = 0;
 
+#define enaPin 10 //enable-motor
+#define dirPin 11 //direction
+#define stepPin 12 //step-pulse
+
+// twist
+#define enaPin2 31 //enable-motor
+#define dirPin2 33 //direction
+#define stepPin2 35 //step-pulse
+
+#define stepPin2_pwm 4 //step-pulse 4: pwm a 976Hz, 5: pwm a 490Hz
+
+
+// collect
+#define enaPin3 30 //enable-motor
+#define dirPin3 32 //direction
+#define stepPin3 34 //step-pulse
+
+
 void countFps()
 {
   fpsCpt += 1;
@@ -73,7 +91,7 @@ void countFps()
 
 }
 
-StepperDriver stepperDriver(3);
+SteppersDriver steppersDriver(3);
 
 void setup() 
 {
@@ -82,6 +100,12 @@ void setup()
   Serial.println("Receive Command v0.6");
 
   Serial2.begin(57600);
+  
+  const int nStepPerRevolution = 200;
+
+  steppersDriver.setup(0,enaPin,dirPin,stepPin,nStepPerRevolution);
+  steppersDriver.setup(1,enaPin2,dirPin2,stepPin2,nStepPerRevolution);
+  steppersDriver.setup(2,enaPin3,dirPin3,stepPin3,nStepPerRevolution);
 }
 
 
@@ -120,7 +144,7 @@ int retrieveIntArguments(const char* s, int * pDstArg, int nNbrArgMax)
 
 void updateMotorCommand()
 {
-  stepperDriver.update();
+  stepperDrivers.update();
 }
 
 
@@ -164,6 +188,7 @@ int handleOrder( const char * command)
       }
       Serial.println("");
     } // debug
+    stepperDrivers.order(args[0],args[1],args[2]);
   } // if command
 
   return 1;

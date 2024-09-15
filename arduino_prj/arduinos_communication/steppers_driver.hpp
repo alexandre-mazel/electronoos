@@ -16,7 +16,7 @@ class StepperMotorInfo {
     // a simple structure to handle information for each motor
     
     public:
-        StepperDriverInfo( int nNumPinEnable, int nNumPinDir, int nNumPinTrig int nNbrStepPerTurn );
+        StepperDriverInfo( int nNumPinEnable, int nNumPinDir, int nNumPinTrig, int nNbrStepPerTurn );
     
         // motor config
         int                     nNbrStepPerTurn_;
@@ -41,6 +41,8 @@ class SteppersDriver {
     
     public:
         SteppersDriver( int nNbrMotors );
+    
+        void setup( int nNumMotor, int nNumPinEnable, int nNumPinDir, int nNumPinTrig, int nNbrStepPerTurn ); // setup for each motor
     
         void order( int nNumMotor, int nDirection, int nSpeedRPM ); // change speed or direction for this motor, dir = 0 => stop
     

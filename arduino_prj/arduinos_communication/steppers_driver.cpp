@@ -6,10 +6,11 @@ StepperMotorInfo::StepperMotorInfo( int nNumPinEnable, int nNumPinDir, int nNumP
     , nNumPinDir_           ( nNumPinDir )
     , nNumPinTrig_          ( nNumPinTrig )
 {
-    dir_ = 0;
-    speed_ = 0;
-    timeNextTrig_ = 0;
-    bNextIsHigh_ = 1;
+    dir_                      = 0;
+    speed_                 = 0;
+    timeHalfPeriod_     = 0;
+    timeNextTrig_        = 0;
+    bNextIsHigh_        = 1;
 }
 
 

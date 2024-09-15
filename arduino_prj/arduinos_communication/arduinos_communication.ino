@@ -73,6 +73,8 @@ void countFps()
 
 }
 
+StepperDriver stepperDriver(3);
+
 void setup() 
 {
   Serial.begin(57600);
@@ -116,10 +118,9 @@ int retrieveIntArguments(const char* s, int * pDstArg, int nNbrArgMax)
   return nNbrArg;
 }
 
-motorConsign dir, speed
 void updateMotorCommand()
 {
-  
+  stepperDriver.update();
 }
 
 

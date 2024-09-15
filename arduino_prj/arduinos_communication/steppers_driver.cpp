@@ -1,4 +1,6 @@
-#include "stepper_driver.hpp"
+#include "steppers_driver.hpp"
+
+#include <arduino.h>
 
 #define DEBUG 1
 
@@ -15,17 +17,15 @@ StepperMotorInfo::StepperMotorInfo( int nNumPinEnable, int nNumPinDir, int nNumP
     bNextIsHigh_        = 1;
 }
 
-
-
 SteppersDriver::SteppersDriver( int nNbrMotors )
     : nNbrMotors_       ( nNbrMotors )
 {
-    assert(nNbrMotors_<=STEPPER_DRIVER_NBR_MOTOR_MAX);
+    ASSERT(nNbrMotors_<=STEPPERS_DRIVER_NBR_MOTOR_MAX);
     initPins();
     stopAll();
 }
 
-void setup( int nNumMotor, int nNumPinEnable, int nNumPinDir, int nNumPinTrig, int nNbrStepPerTurn )
+void SteppersDriver::setup( int nNumMotor, int nNumPinEnable, int nNumPinDir, int nNumPinTrig, int nNbrStepPerTurn )
 {
     const int i = nNumMotor;
     motors_[i].nNumPinEnable_ = nNumPinEnable;

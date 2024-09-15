@@ -1,3 +1,5 @@
+#include "steppers_driver.hpp"
+
 #define DEBUG Serial
 unsigned long fpsTimeStart = 0;
 unsigned long fpsCpt = 0;
@@ -144,7 +146,7 @@ int retrieveIntArguments(const char* s, int * pDstArg, int nNbrArgMax)
 
 void updateMotorCommand()
 {
-  stepperDrivers.update();
+  steppersDriver.update();
 }
 
 
@@ -188,7 +190,7 @@ int handleOrder( const char * command)
       }
       Serial.println("");
     } // debug
-    stepperDrivers.order(args[0],args[1],args[2]);
+    steppersDriver.order(args[0],args[1],args[2]);
   } // if command
 
   return 1;

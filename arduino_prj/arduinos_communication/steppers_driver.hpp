@@ -2,10 +2,12 @@
 // manage many stepper pwm in a single loop, pure soft (so not completely precise)
 // (c) A.Mazel 2023
 
-#ifndef _STEPPER_DRIVER_H_
-#define _STEPPER_DRIVER_H_
+#ifndef _STEPPERS_DRIVER_H_
+#define _STEPPERS_DRIVER_H_
 
-#define STEPPER_DRIVER_NBR_MOTOR_MAX   3
+#include <stdint.h>
+
+#define STEPPERS_DRIVER_NBR_MOTOR_MAX   3
 
 #define DIR_REVERSE         -1
 #define DIR_STOP               0
@@ -16,7 +18,7 @@ class StepperMotorInfo {
     // a simple structure to handle information for each motor
     
     public:
-        StepperDriverInfo( int nNumPinEnable, int nNumPinDir, int nNumPinTrig, int nNbrStepPerTurn );
+        StepperMotorInfo( int nNumPinEnable = -1, int nNumPinDir = -1, int nNumPinTrig = -1, int nNbrStepPerTurn = -1 );
     
         // motor config
         int                     nNbrStepPerTurn_;
@@ -55,10 +57,10 @@ class SteppersDriver {
     
     private:
         
-        StepperMotorInfo    motors_[STEPPER_DRIVER_NBR_MOTOR_MAX];
+        StepperMotorInfo    motors_[STEPPERS_DRIVER_NBR_MOTOR_MAX];
         int                         nNbrMotors_; // how much motor to handle at this moment
 };
 
 
 
-#endif // _STEPPER_DRIVER_H_
+#endif // _STEPPERS_DRIVER_H_

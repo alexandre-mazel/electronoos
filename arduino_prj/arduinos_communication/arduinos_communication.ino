@@ -12,7 +12,7 @@ Test me, by sending manual command to the serial:
 
 */
 
- //#define GET_ORDER_FROM_SERIAL1 // to debug
+// #define GET_ORDER_FROM_SERIAL1 // to debug
 
  #ifdef GET_ORDER_FROM_SERIAL1
   #define SERIAL_ORDER Serial

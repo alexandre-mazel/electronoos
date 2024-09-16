@@ -65,6 +65,12 @@ void SteppersDriver::initPins( void )
 void SteppersDriver::order( int nNumMotor, int nDirection, int nSpeedRPM )
 {
     const int i = nNumMotor;
+
+    if(nSpeedRPM <= 1)
+    {
+      Serial.print( "WRN: SteppersDriver::order: speed is null, stopping the motor ");
+      nDirection = 0;
+    }
     if( nDirection != motors_[i].dir_ )
     {
         
@@ -83,8 +89,10 @@ void SteppersDriver::order( int nNumMotor, int nDirection, int nSpeedRPM )
         {
             digitalWrite( motors_[i].nNumPinEna_ , HIGH ); // disable
         }
-        else
+
+        if( nDirection != 0 )
         {
+            Serial.println( nDirection );   
             digitalWrite( motors_[i].nNumPinDir_ , nDirection==1?LOW:HIGH );
         }
         

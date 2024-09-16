@@ -15,7 +15,7 @@
 
 class StepperMotorInfo {
     
-    // a simple structure to handle information for each motor
+    // A simple structure to handle information for each motor
     
     public:
         StepperMotorInfo( int nNumPinEna = -1, int nNumPinDir = -1, int nNumPinTrig = -1, int nNbrStepPerTurn = -1 );
@@ -33,13 +33,16 @@ class StepperMotorInfo {
         
         // internal
         unsigned long   timeNextTrig_; // time next trig
-        int                     bNextIsHigh_; // 1 if next trig is high, 0 if low
+        int             bNextIsHigh_; // 1 if next trig is high, 0 if low
         unsigned long   timeHalfPeriod_; // time between two trig command
 };
 
 class SteppersDriver {
     
-    // the motor manager
+    // the motor manager.
+    // Current performance on a 2560:
+    // - 3 motors  stopped: seems to take 5microsec, complete loop: 17microsec (time for the fps counter)
+    // - 3 motors at 1000rpm slowdown the loop of 18microsec (complete loop: at 35microsec)
     
     public:
         SteppersDriver( int nNbrMotors );

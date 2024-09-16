@@ -91,8 +91,8 @@ void SteppersDriver::order( int nNumMotor, int nDirection, int nSpeedRPM )
     } // new dir
     
     motors_[i].speed_ = nSpeedRPM;
-    motors_[i].timeHalfPeriod_ = 1000000L /(motors_[i].speed_ * motors_[i].nNbrStepPerTurn_ * 2);
-    motors_[i].timeNextTrig_ = micros() + motors_[i].timeHalfPeriod_;
+    motors_[i].timeHalfPeriod_ = (60*1000000L /(motors_[i].speed_)) /  (motors_[i].nNbrStepPerTurn_ * 2L);
+    motors_[i].timeNextTrig_ = micros() + motors_[i].timeHalfPeriod_; // at 1000rps, we got a half period of 156micros
 
 #ifdef DEBUG
       Serial.print( "INF: SteppersDriver::order: motor: ");
@@ -118,7 +118,7 @@ void SteppersDriver::update( void )
         unsigned long t = micros();
 
 #ifdef DEBUG
-        if(1)
+        if(0)
         {
           Serial.print( "INF: SteppersDriver::update: t: ");
           Serial.println( t );
@@ -132,10 +132,13 @@ void SteppersDriver::update( void )
             digitalWrite( motors_[i].nNumPinTrig_ , motors_[i].bNextIsHigh_?HIGH:LOW );
             
 #ifdef DEBUG
+        if(0)
+        {
             Serial.print( "INF: SteppersDriver::update: motor: ");
             Serial.print( i );
             Serial.print( ", trigger: " );
             Serial.println( motors_[i].bNextIsHigh_?HIGH:LOW );
+        }
 #endif
             motors_[i].bNextIsHigh_ = ! motors_[i].bNextIsHigh_;
             motors_[i].timeNextTrig_ += motors_[i].timeHalfPeriod_;

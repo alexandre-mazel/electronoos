@@ -294,8 +294,8 @@ void sendSerialCommand(const char * msg)
 
 void loop() 
 {
-  handleSerialCommand();
-  updateMotorCommand();
+  handleSerialCommand(); // takes around 2micros (when no command)
+  updateMotorCommand(); // takes around 5micros (when no motors running)
   countFps();
-  delay(1);
+  //delay(1);
 }

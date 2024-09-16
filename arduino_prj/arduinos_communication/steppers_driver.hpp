@@ -48,6 +48,8 @@ class SteppersDriver {
         SteppersDriver( int nNbrMotors );
     
         void setup( int nNumMotor, int nNumPinEnable, int nNumPinDir, int nNumPinTrig, int nNbrStepPerTurn ); // setup for each motor
+
+        void initPins( void ); // todo after the setup !
     
         void order( int nNumMotor, int nDirection, int nSpeedRPM ); // change speed or direction for this motor, dir = 0 => stop
     
@@ -56,7 +58,6 @@ class SteppersDriver {
         void stopAll( void ); // emergency stop
 
     private:
-        void _initPins( void );
     
     private:
         

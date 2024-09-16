@@ -33,11 +33,12 @@ StepperMotorInfo::StepperMotorInfo( int nNumPinEna, int nNumPinDir, int nNumPinT
     bNextIsHigh_        = 1;
 }
 
+
+
 SteppersDriver::SteppersDriver( int nNbrMotors )
     : nNbrMotors_       ( nNbrMotors )
 {
     ASSERT(nNbrMotors_<=STEPPERS_DRIVER_NBR_MOTOR_MAX);
-    _initPins();
     stopAll();
 }
 
@@ -50,14 +51,15 @@ void SteppersDriver::setup( int nNumMotor, int nNumPinEna, int nNumPinDir, int n
     motors_[i].nNbrStepPerTurn_ = nNbrStepPerTurn;
 }
 
-void SteppersDriver::_initPins( void )
+void SteppersDriver::initPins( void )
 {
     for( int i = 0; i < nNbrMotors_; ++i )
     {
         pinMode( motors_[i].nNumPinEna_, OUTPUT );
-        pinMode( motors_[i].nNumPinDir_,      OUTPUT );
-        pinMode( motors_[i].nNumPinTrig_,     OUTPUT );
+        pinMode( motors_[i].nNumPinDir_, OUTPUT );
+        pinMode( motors_[i].nNumPinTrig_,OUTPUT );
     }
+    stopAll();
 }
     
 void SteppersDriver::order( int nNumMotor, int nDirection, int nSpeedRPM )
@@ -132,13 +134,13 @@ void SteppersDriver::update( void )
             digitalWrite( motors_[i].nNumPinTrig_ , motors_[i].bNextIsHigh_?HIGH:LOW );
             
 #ifdef DEBUG
-        if(0)
-        {
-            Serial.print( "INF: SteppersDriver::update: motor: ");
-            Serial.print( i );
-            Serial.print( ", trigger: " );
-            Serial.println( motors_[i].bNextIsHigh_?HIGH:LOW );
-        }
+            if(0)
+            {
+                Serial.print( "INF: SteppersDriver::update: motor: ");
+                Serial.print( i );
+                Serial.print( ", trigger: " );
+                Serial.println( motors_[i].bNextIsHigh_?HIGH:LOW );
+            }
 #endif
             motors_[i].bNextIsHigh_ = ! motors_[i].bNextIsHigh_;
             motors_[i].timeNextTrig_ += motors_[i].timeHalfPeriod_;

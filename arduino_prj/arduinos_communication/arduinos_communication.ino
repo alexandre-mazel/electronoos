@@ -12,7 +12,7 @@ Test me, by sending manual command to the serial:
 
 */
 
- #define GET_ORDER_FROM_SERIAL1 // to debug
+ //#define GET_ORDER_FROM_SERIAL1 // to debug
 
  #ifdef GET_ORDER_FROM_SERIAL1
   #define SERIAL_ORDER Serial
@@ -27,9 +27,9 @@ unsigned long nFrameMsMin = 4000;
 unsigned long nFrameMsMax = 0;
 unsigned long fpsTimeLast = 0;
 
-#define enaPin 10 //enable-motor
-#define dirPin 11 //direction
-#define stepPin 12 //step-pulse
+#define enaPin 30 //enable-motor
+#define dirPin 32 //direction
+#define stepPin 34 //step-pulse
 
 // twist
 #define enaPin2 31 //enable-motor
@@ -40,9 +40,9 @@ unsigned long fpsTimeLast = 0;
 
 
 // collect
-#define enaPin3 30 //enable-motor
-#define dirPin3 32 //direction
-#define stepPin3 34 //step-pulse
+#define enaPin3 41 //enable-motor
+#define dirPin3 43 //direction
+#define stepPin3 45 //step-pulse
 
 
 void countFps()
@@ -128,11 +128,16 @@ void setup()
   steppersDriver.setup(0,enaPin,dirPin,stepPin,nStepPerRevolution);
   steppersDriver.setup(1,enaPin2,dirPin2,stepPin2,nStepPerRevolution);
   steppersDriver.setup(2,enaPin3,dirPin3,stepPin3,nStepPerRevolution);
+  steppersDriver.initPins();
 }
 
+int isIntChar(const char c)
+{
+  return (c >= '0' && c <= '9') || c == '-' || c == '+';
+}
 
 /*
-* retrieve int argument in a string, return the number of argumen set
+* retrieve int argument in a string, return the number of argument set
 * argument are coded in a string separated by a '_' _arg1_arg2_arg3... 
 * eg: toto_10_34_45_10
 */
@@ -147,7 +152,16 @@ int retrieveIntArguments(const char* s, int * pDstArg, int nNbrArgMax)
     {
       if( pstart != NULL )
       {
-        pDstArg[nNbrArg] = atoi(pstart); // atoi s'arrete au premier char non decimal
+        // on a des fois des parasites et donc la commande est pétée! (par exemple on recoit ':' a la place du nombre ou X ou ...)
+        if(isIntChar(*pstart))
+        {
+          int val = atoi(pstart); // atoi s'arrete au premier char non decimal
+          pDstArg[nNbrArg] = val;
+        }
+        else
+        {
+          pDstArg[nNbrArg] = -666;
+        }
         nNbrArg += 1;
       }
       pstart = p+1;
@@ -155,10 +169,17 @@ int retrieveIntArguments(const char* s, int * pDstArg, int nNbrArgMax)
     }
     ++p;
   }
-  // last remainder:
+  // last remainer:
   if( pstart != NULL && nNbrArg < nNbrArgMax )
   {
-    pDstArg[nNbrArg]=atoi(pstart);
+    if(isIntChar(*pstart))
+    {
+      pDstArg[nNbrArg]=atoi(pstart);
+    }
+    else
+    {
+      pDstArg[nNbrArg] = -666;
+    }
     nNbrArg += 1;
   }
   return nNbrArg;
@@ -210,7 +231,16 @@ int handleOrder( const char * command)
       }
       Serial.println("");
     } // debug
-    steppersDriver.order(args[0],args[1],args[2]);
+
+    // consistency check (souvent quand les 2 Arduinos ne sont pas alimenté par la meme source)
+    if( args[0] < 0 || args[0] > 2 || args[1] < -1 || args[1] > 1 || args[2] < 0)
+    {
+      Serial.println("WRN: Rotten orders, skipping!");
+    }
+    else
+    {
+      steppersDriver.order(args[0],args[1],args[2]);
+    }
   } // if command
 
   return 1;

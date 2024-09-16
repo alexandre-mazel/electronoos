@@ -1,5 +1,25 @@
 #include "steppers_driver.hpp"
 
+/*
+Test me, by sending manual command to the serial:
+1) define the GET_ORDER_FROM_SERIAL1 to read orders from serial1 instead of serial2 (normal use)
+
+2) send command from the serial monitor input field:
+// launch the motor at 10 rpm
+##MOTOR_0_1_10
+// stop it
+##MOTOR_0_0_0
+
+*/
+
+ #define GET_ORDER_FROM_SERIAL1 // to debug
+
+ #ifdef GET_ORDER_FROM_SERIAL1
+  #define SERIAL_ORDER Serial
+#else
+  #define SERIAL_ORDER Serial2
+#endif
+
 #define DEBUG Serial
 unsigned long fpsTimeStart = 0;
 unsigned long fpsCpt = 0;
@@ -101,7 +121,7 @@ void setup()
   Serial.println("");
   Serial.println("Receive Command v0.6");
 
-  Serial2.begin(57600);
+  SERIAL_ORDER.begin(57600);
   
   const int nStepPerRevolution = 200;
 
@@ -201,7 +221,7 @@ int handleSerialCommand()
   // receive command using the form ##cmd__param1__param2__param3
   // return 1 if a new command has been received
 
-  if(!Serial2.available())
+  if(!SERIAL_ORDER.available())
   {
     return 0;
   }
@@ -209,9 +229,9 @@ int handleSerialCommand()
   char command[LEN_COMMAND_MAX];
   int ichar = 0;
   delay(5); // for all characters to arrive at 57600 baud, 7200chr/sec => donc pour 32 chr => 225 commands/sec, soit 4.4ms pour une commande complete
-  while( Serial2.available() && ichar < LEN_COMMAND_MAX )
+  while( SERIAL_ORDER.available() && ichar < LEN_COMMAND_MAX )
   {
-    command[ichar] = Serial2.read();
+    command[ichar] = SERIAL_ORDER.read();
     if(command[ichar] != '\n')
     {
       if(0)
@@ -277,5 +297,5 @@ void loop()
   handleSerialCommand();
   updateMotorCommand();
   countFps();
-  delay(10);
+  delay(1);
 }

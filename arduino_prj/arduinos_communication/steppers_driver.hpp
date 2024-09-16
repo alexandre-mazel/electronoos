@@ -18,11 +18,11 @@ class StepperMotorInfo {
     // a simple structure to handle information for each motor
     
     public:
-        StepperMotorInfo( int nNumPinEnable = -1, int nNumPinDir = -1, int nNumPinTrig = -1, int nNbrStepPerTurn = -1 );
+        StepperMotorInfo( int nNumPinEna = -1, int nNumPinDir = -1, int nNumPinTrig = -1, int nNbrStepPerTurn = -1 );
     
         // motor config
         int                     nNbrStepPerTurn_;
-        int                     nNumPinEnable_;
+        int                     nNumPinEna_;
         int                     nNumPinDir_;
         int                     nNumPinTrig_;
 

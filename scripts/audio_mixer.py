@@ -184,7 +184,7 @@ class Sound:
             decy = 1
             
         decx = decy
-        if 1:
+        if 0:
             # essai d'animation de rotation pendant jouage (ebauche)
             decx *= (math.sin(self.pos/5)*2)
             #~ decy *= 1+abs(math.sin(self.pos/10)*4)

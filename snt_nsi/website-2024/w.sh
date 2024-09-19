@@ -1,0 +1,1 @@
+scite src/mkdocs.yml src/docs/snt/index.md

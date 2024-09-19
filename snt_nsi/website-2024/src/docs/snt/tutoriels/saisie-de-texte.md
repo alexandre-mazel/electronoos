@@ -18,8 +18,6 @@ navigateur Web *(pour la sélection du texte et ceci malgré que le curseur soit
     - Savoir déplacer le curseur avec le clavier
     - Savoir sélectionner du texte avec le clavier
     - Savoir saisir des caractères spéciaux
-    - Savoir convertir en PDF
-    - Savoir créer un fichier ZIP
 
 ## Préparation
 

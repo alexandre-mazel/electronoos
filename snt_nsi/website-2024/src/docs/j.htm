@@ -1,0 +1,77 @@
+<script>
+function analyseArgs()
+{
+    // analyse args in adress and return a dict
+    
+    var dval = {};
+    loc = window.location.toString();
+    
+    idstart = loc.indexOf('?');
+    if( idstart != -1 )
+    {
+        loc = loc.substring(idstart+1);
+        // enter loop with loc containing at begin a param name
+        while( 1 )
+        {
+            end = loc.indexOf('&');
+            if( end == -1 )
+                end = loc.length
+            
+            sep = loc.indexOf('=');
+            
+            name = loc.substring(0,sep)
+            value = loc.substring(sep+1,end)
+            dval[name]=value
+            
+            if(end == loc.length)
+                break;
+            loc = loc.substring(end+1);
+        }
+    }
+
+    
+    console.log("analyseArgs: ret: " + dval.toString() );
+    console.log(dval);
+    return dval
+}
+
+function jumpToSite(strName)
+{
+    dictConv = {
+        "qcm1": "https://pasallard.gitlab.io/qcm_nsi_premiere/QCM_Python_Bases_partie1.html",
+        "tox": "https://compute-it.toxicode.fr/?progression=python",
+    };
+    
+    console.log( "jumpToSite: '" + strName + "'" )
+    addr = dictConv[strName]
+    console.log( "jumpToSite: addr: '" + addr + "'" )
+    document.write("Jumping to '" + addr + "'" )
+    window.location.href = addr;
+    
+}
+
+function jump()
+{
+    // format: j.htm?name or j.htm?d=name
+    // jump to page registered to name
+    // eg: j.htm?qcm1 => jump to https://pasallard.gitlab.io/qcm_nsi_premiere/QCM_Python_Bases_partie1.html
+    d = analyseArgs();
+    let strName = "";
+    if( 'd' in d )
+    {
+        strName = d.keys['d']
+    }
+    else if( '' in d )
+    {
+        strName = d[''] // use value of key ""
+    }
+    else
+    {
+        strName = Object.keys(d)[0] // use first keyname, assume no other keys passed
+    }
+    jumpToSite(strName)
+}
+
+jump()
+
+</script>

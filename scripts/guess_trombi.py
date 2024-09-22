@@ -1,6 +1,6 @@
 import sys
 
-sys.path.append("../../face_tools/")
+#~ sys.path.append("../../face_tools/")
 sys.path.append("../alex_pytools/")
 
 import face_detector_cv3
@@ -9,7 +9,7 @@ import random
 
 def detect_face_big_image(im):
     """
-    Si l'image est trop grosse, on la coupe hauteur et on analyse en plusieurs fois
+    Si l'image est trop grosse, on la coupe hauteur et on analyse en plusieurs fois, puis on recolle les coords
     """
     bRenderDebug = 0
     print(im.shape)    

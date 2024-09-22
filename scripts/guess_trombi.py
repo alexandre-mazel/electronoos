@@ -1,9 +1,10 @@
 import sys
 
-#~ sys.path.append("../../face_tools/")
+#~ sys.path.append("../../face_tools/")(
 sys.path.append("../alex_pytools/")
 
 import face_detector_cv3
+import misctools
 import cv2
 import random
 
@@ -50,12 +51,14 @@ def guess_trombi(filename):
     faces = detect_face_big_image(im)
 
         
-    timeGuess = 50
+    timeGuess = 10
     timeGuess = 1000
     
+    cpt = 0
     while 1:
-        idx = random.randint(0,len(faces)-1)
-        print("idx: %2s, faces[idx]: %s" % (idx,str(faces[idx])) )
+        #~ idx = random.randint(0,len(faces)-1)
+        idx = misctools.shuffle_int_mem(len(faces))
+        print("try: %d, idx: %2s, faces[idx]: %s" % (cpt,idx,str(faces[idx])) )
         l,t,r,b,_ = faces[idx]
         
         t = t-20
@@ -77,9 +80,11 @@ def guess_trombi(filename):
         cv2.imshow("guess who?", imface)
         key = cv2.waitKey(timeGuess*2)
         if key == 27: break
+        
+        cpt += 1
 
 fname = r"C:\Users\alexa\perso\docs\2024_09_NSI\1NSINF1_trombi_01.png"
-fname = r"C:\Users\alexa\perso\docs\2024_09_SNT\210_trombi_all.png"
-fname = r"C:\Users\alexa\perso\docs\2024_09_SNT\213_trombi_all.png"
+#~ fname = r"C:\Users\alexa\perso\docs\2024_09_SNT\210_trombi_all.png"
+#~ fname = r"C:\Users\alexa\perso\docs\2024_09_SNT\213_trombi_all.png"
 
 guess_trombi(fname)

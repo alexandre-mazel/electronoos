@@ -51,7 +51,7 @@ def guess_trombi(filename):
 
         
     timeGuess = 50
-    #~ timeGuess = 1000
+    timeGuess = 1000
     
     while 1:
         idx = random.randint(0,len(faces)-1)

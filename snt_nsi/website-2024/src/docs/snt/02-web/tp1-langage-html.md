@@ -34,8 +34,8 @@ travaux pratiques.
 
     === ":material-desktop-tower: Ordinateur fixe"
 
-        1. Depuis le bureau, double-cliquez sur l'icône intitulée **Zone personnelle**
-        2. Dans la **zone personnelle**, s'il n'y a pas de dossier nommé `SNT`, créez-le
+        1. Depuis le bureau, double-cliquez sur l'icône intitulée **Documents**
+        2. Dans le dossier **Documents**, s'il n'y a pas de dossier nommé `SNT`, créez-le
         3. Dans le dossier `SNT`, s'il n'y a pas de dossier `web`, créez-le
         4. Dans le dossier `web`, créez le dossier `langage_html`
 
@@ -47,7 +47,7 @@ En informatique, on appelle **code source** les instructions textuelles d'exécu
 contenu.
 Une page web est un contenu construit à partir d'un code source écrit en langage **HTML**.
 
-Pour voir visualiser une page web, vous avez besoin d'un **navigateur web** *(Chrome, Firefox, ...)*.
+Pour visualiser une page web, vous avez besoin d'un **navigateur web** *(Firefox, Chrome, Opera...)*.
 C'est une application capable d'afficher une page web à partir de son code HTML. Mais à quoi ressemble du code HTML ?
 
 !!! note "Visualisation du code source"
@@ -70,6 +70,8 @@ C'est une application capable d'afficher une page web à partir de son code HTML
     
     - par une balise ouvrante `<p>` *(début du paragraphe)* ; 
     - et une balise fermante `</p>` *(fin du paragraphe)*.
+    
+    Cliquez sur les onglets code puis affichage pour voir le code et l'affichage correspondant:
     
     === ":material-code-tags: Code"
         ```html
@@ -456,10 +458,10 @@ rapport aux autres balises déjà rencontrées par la présence de `href=""`.
     
     === ":material-code-tags: Code"
         ```html
-        Rendez-vous sur le <a href="http://www.lyceebachelardchelles.fr">site du lycée</a>
+        Rendez-vous sur le <a href="https://fr.wikipedia.org/wiki/Lyc%C3%A9e_Voltaire_(Paris)">site du lycée</a>
         ``` 
     === ":material-application-outline: Affichage"
-        Rendez-vous sur le [site du lycée](http://www.lyceebachelardchelles.fr){:target="_blank"}
+        Rendez-vous sur le [site du lycée](https://fr.wikipedia.org/wiki/Lyc%C3%A9e_Voltaire_(Paris)){:target="_blank"}
 
 !!! note "Création de liens hypertextes"
 

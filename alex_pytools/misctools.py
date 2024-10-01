@@ -1309,6 +1309,26 @@ def shuffle( aList, n = 1 ):
         del aList[idx]
     return out
     
+
+global_dict_shuffle_int_mem = {}
+def shuffle_int_mem(nMax):
+    """
+    Return a nbr between 0 and nMax (excluded).
+    All nbr will be outputted after nMax call.
+    (then the shuffle will be resetted, and another list will be returned)
+    """
+    global global_dict_shuffle_int_mem
+    if nMax not in global_dict_shuffle_int_mem or len(global_dict_shuffle_int_mem[nMax]) < 1:
+        global_dict_shuffle_int_mem[nMax] = list(range(nMax))
+        random.shuffle(global_dict_shuffle_int_mem[nMax])
+    val = global_dict_shuffle_int_mem[nMax].pop()
+    return val
+            
+if 0:
+    for i in range(16):
+        print(shuffle_int_mem(4))
+    exit(-1)
+    
     
 def intToHashLike(n):
     """

@@ -83,8 +83,9 @@ def guess_trombi(filename):
         
         cpt += 1
 
-fname = r"C:\Users\alexa\perso\docs\2024_09_NSI\1NSINF1_trombi_01.png"
-#~ fname = r"C:\Users\alexa\perso\docs\2024_09_SNT\210_trombi_all.png"
-#~ fname = r"C:\Users\alexa\perso\docs\2024_09_SNT\213_trombi_all.png"
+strPath = r"C:\Users\alexa\perso\docs\2024_09_Enseignement_Voltaire/"
+fname = strPath + r"2024_09_NSI\1NSINF1_trombi_01.png"
+fname = strPath + r"2024_09_SNT\210_trombi_all.png"
+#~ fname = strPath + r"2024_09_SNT\213_trombi_all.png"
 
 guess_trombi(fname)

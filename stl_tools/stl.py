@@ -453,8 +453,20 @@ if 1:
         fn2 = r"C:\Users\alexa\perso\docs\2023-10_cdl_piano_cocktail\print_support\CDL Melangeur_piece_dessus_v3.stl" # different
         fn2 = r"C:\Users\alexa\perso\docs\2023-10_cdl_piano_cocktail\print_support\dessus_v3b_garder_pour_test_doublons.stl" # pareil?
         # le dernier n'est pas pareil car peut etre que les triangles ne sont pas toujours rangé dans le meme ordre
+        # TODO: tri des triangles avec un hash malin
+        # TODO: faire 2 exports ou on est sur que c'est les memes pour refs.
         
     if 1:
+        fn1 = r"C:\Users\alexa\perso\docs\2023-10_cdl_piano_cocktail\print_support\dessus_v3b_garder_pour_test_doublons.stl"
+        fn2 = r"C:\Users\alexa\perso\docs\2023-10_cdl_piano_cocktail\print_support\dessus_v3b_garder_pour_test_doublons2.stl" # pareil?
+        # 2 exports a plusieurs mois de suite ne font pas le meme exports
+        
+    if 1:
+        fn1 = r"C:\Users\alexa\perso\docs\2023-10_cdl_piano_cocktail\print_support\dessus_v3b_garder_pour_test_doublons2.stl" # pareil?
+        fn2 = r"C:\Users\alexa\perso\docs\2023-10_cdl_piano_cocktail\print_support\dessus_v3b_garder_pour_test_doublons3.stl" # pareil?
+        # 2 exports a la suite font pas le meme resultat !!!
+        
+    if 0:
         fn1 = r"C:\Users\alexa\perso\docs\2023-10_cdl_piano_cocktail\print_support\CDL Melangeur_piece_dessous_v3.stl"
         fn2 = r"C:\Users\alexa\perso\docs\2023-10_cdl_piano_cocktail\print_support\CDL Melangeur_piece_dessus_v3.stl" # tres different
         fn2 = r"C:\Users\alexa\perso\docs\2023-10_cdl_piano_cocktail\print_support\dessous_v3_doublons_peut_etre_je_garde_pour_tester_mon_compariseur.stl" # pareil?

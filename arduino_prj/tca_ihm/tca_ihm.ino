@@ -257,13 +257,15 @@ void loop()
     anReadValues[i] = analogRead(PIN_POTAR_BASE+i);
     if(abs(anReadValues[i] - anPrevReadValues[i])>1) // avoid spurious change
     {
-      if(i<1)
+      if(i<2)
       {
-        *(apnSpeedArray[i]) = (int)( (anReadValues[i] *900L) / 1023);
+        int nVal = (int)( (anReadValues[i] *512L) / 1023);
+        nVal = (nVal / 4) * 4; // put entire step to help have same on both
+        *(apnSpeedArray[i]) = nVal;
       }
       else
       {
-        *(apnSpeedArray[i]) = (int)( (anReadValues[i] *300L) / 1023);
+        *(apnSpeedArray[i]) = (int)( (anReadValues[i] *200L) / 1023);
       }
       if(*apnDirArray[i] != 0)
         abSendMotorChange[i] = 1;

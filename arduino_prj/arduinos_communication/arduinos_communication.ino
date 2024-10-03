@@ -200,6 +200,7 @@ char lastCommand[LEN_COMMAND_MAX+1] = "\0";
 int handleOrder( const char * command)
 {
   int bDebug = 1;
+  bDebug = 0;
 
   // this two next lines takes: 356us
   if(bDebug)
@@ -214,7 +215,7 @@ int handleOrder( const char * command)
 
   if(command[2]=='M' && command[3]=='O')
   {
-    Serial.println("INF: handleOrder: Command: Motor" );
+    if(bDebug) Serial.println("INF: handleOrder: Command: Motor" );
     // Assemble
     int args[3];
     int nNbrArgs = retrieveIntArguments(command,args,3);
@@ -326,6 +327,6 @@ void loop()
 {
   handleSerialCommand(); // takes around 2micros (when no command)
   updateMotorCommand(); // takes around 5micros (when no motors running)
-  countFps();
+  //countFps();
   //delay(1);
 }

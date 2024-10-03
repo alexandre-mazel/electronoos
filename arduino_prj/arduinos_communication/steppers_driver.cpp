@@ -2,7 +2,7 @@
 
 #include <arduino.h>
 
-#define DEBUG 1
+//#define DEBUG 1 // define that to enable debug
 
 #define ASSERT(b) __assert((b),"__FUNC__",__FILE__,__LINE__,"");
 // handle diagnostic informations given by assertion and abort program execution:
@@ -68,7 +68,9 @@ void SteppersDriver::order( int nNumMotor, int nDirection, int nSpeedRPM )
 
     if(nSpeedRPM <= 1)
     {
+#ifdef DEBUG
       Serial.print( "WRN: SteppersDriver::order: speed is null, stopping the motor ");
+#endif
       nDirection = 0;
     }
     if( nDirection != motors_[i].dir_ )

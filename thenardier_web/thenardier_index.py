@@ -117,7 +117,7 @@ def index(req):
     txt += "</p>"
     txt += "<p style = 'font-family:calibri;font-size:40px'>"
     #~ txt += "<p style = 'font-family:georgia,garamond,serif;font-size:40px'>"
-    txt += "<I>La Maison des THENARDIER</I>"
+    #~ txt += "<I>La Maison des THENARDIER</I>"
     txt += "</p>"
 
     txt += "<i>Bienvenue sur cette modeste contribution &agrave; l'oeuvre d'Emile Zola.</i>"

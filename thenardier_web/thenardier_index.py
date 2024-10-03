@@ -120,7 +120,7 @@ def index(req):
     txt += "<I>La Maison des THENARDIER</I>"
     txt += "</p>"
 
-    txt += "<i>Bienvenue sur cette modeste contribution à l'oeuvre d'Emile Zola.</i>"
+    txt += "<i>Bienvenue sur cette modeste contribution &agrave; l'oeuvre d'Emile Zola.</i>"
 
     if bDebug:
         txt += "<p>"

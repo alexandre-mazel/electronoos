@@ -89,7 +89,7 @@ C'est une application capable d'afficher une page web à partir de son code HTML
     Il est possible de structurer un contenu ainsi en le délimitant :
 
     - par une balise ouvrante `<strong>` *(début du texte important)* ; 
-    - et une balise fermante `</stong>` *(fin du texte important)*.
+    - et une balise fermante `</strong>` *(fin du texte important)*.
 
     === ":material-code-tags: Code"
         ```html

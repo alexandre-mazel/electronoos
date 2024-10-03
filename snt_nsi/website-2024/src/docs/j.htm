@@ -35,19 +35,33 @@ function analyseArgs()
     return dval
 }
 
+function downloadFile(data, name = 'file', type = 'text/plain') {
+  const anchor = document.createElement('a')
+  anchor.href = window.URL.createObjectURL(new Blob([data], { type }))
+  anchor.download = name
+  anchor.click()
+}
+
 function jumpToSite(strName)
 {
     dictConv = {
         "qcm1": "https://pasallard.gitlab.io/qcm_nsi_premiere/QCM_Python_Bases_partie1.html",
         "tox": "https://compute-it.toxicode.fr/?progression=python",
+        "nbpyt1": "https://pasallard.gitlab.io/premiere_nsi_voltaire/Programmation/1_BasesPython/BasesPython_Exos_Synthese.ipynb",
     };
     
     console.log( "jumpToSite: '" + strName + "'" )
     addr = dictConv[strName]
+    if( addr.includes(".ipynb") )
+    {
+        final_name = addr.split('\\').pop().split('/').pop();
+        downloadFile(addr, final_name);
+        document.write("Downloading file '" + addr + "' ..." )
+        return
+    }
     console.log( "jumpToSite: addr: '" + addr + "'" )
     document.write("Jumping to '" + addr + "'" )
     window.location.href = addr;
-    
 }
 
 function jump()

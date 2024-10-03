@@ -55,7 +55,7 @@ application :
 
 !!! info "Méthodes de lancement de l'explorateur de fichiers"
 
-    - Par l'**icône** :material-folder-outline: présente dans la barre des tâches ;
+    - Par l'**icône** :material-folder-outline: présente dans la barre des tâches ; (pas toujours possible)
     - Par un clic droit sur le **menu démarrer** (icône :fontawesome-brands-windows:) puis **Explorateur de fichiers** ;
     - Par le **raccourci clavier** <span class=keys><kbd>:fontawesome-brands-windows:</kbd><span>+</span><kbd>E</kbd></span>.
 
@@ -65,7 +65,7 @@ comme : ouvrir, modifier, imprimer, copier, coller, ...
 
 !!! note "Mise en pratique"
 
-    1. Lancez l'explorateur de fichiers des **3 façons** possibles
+    1. Lancez l'explorateur de fichiers des **3 façons** possibles (si possible)
     2. Testez le raccourci clavier <span class=keys><kbd>Ctrl</kbd><span>+</span><kbd>N</kbd></span> depuis l'explorateur de fichiers.<br>
        Celui-ci permet d'ouvrir une nouvelle fenêtre de l'explorateur de fichiers.<br>
        *(vous pouvez ainsi comparer deux dossiers ou glisser des fichiers de l'un vers l'autre)*
@@ -282,7 +282,11 @@ La conversion d'un contenu au format en PDF s'effectue toujours depuis l'applica
     - Enregistrer avant toute chose le document au format **Document Word (*.docx)**<br>
       *(pour rappel, un fichier PDF n'est pas modifiable)*
     - Enregistrer de nouveau votre fichier via la fonction **Enregistrer sous...**
-    - Choisir le format de fichier **PDF** au lieu de *Document Word (.docx)*
+    - Choisir le format de fichier **PDF** au lieu de *Document Word (.docx)*  
+      *Attention, cette option ne semble pas fonctionner au lyc&eacute;e sous word2007!  
+      Dans ce cas l&agrave;, on se rabattra sur un .docx, c'est bien dommage.*
+      
+      <!--- to have a line break in the previous list I insert two spaces at the end of the line, where to break -->
 
 ??? info "Export PDF depuis n'importe quelle application"
 

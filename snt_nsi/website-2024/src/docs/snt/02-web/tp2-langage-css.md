@@ -50,8 +50,8 @@ travaux pratiques.
 
     === ":material-desktop-tower: Ordinateur fixe"
 
-        1. Depuis le bureau, double-cliquez sur l'icône intitulée **Zone personnelle**
-        2. Dans la **zone personnelle**, s'il n'y a pas de dossier nommé `SNT`, créez-le
+        1. Depuis le bureau, double-cliquez sur l'icône intitulée **Documents**
+        2. Dans la **Documents**, s'il n'y a pas de dossier nommé `SNT`, créez-le
         3. Dans le dossier `SNT`, s'il n'y a pas de dossier `web`, créez-le
         4. Dans le dossier `web`, créez le dossier `langage_css`
 
@@ -174,7 +174,7 @@ langage CSS.
 
 ??? example "Expérimentation"
 
-    <p class="codepen" data-height="300" data-default-tab="html,result" data-slug-hash="vYbjZGb" data-editable="true" data-user="mulot-nsi" style="height: 300px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;">
+    <p class="codepen" data-height="600" data-default-tab="html,result" data-slug-hash="vYbjZGb" data-editable="true" data-user="mulot-nsi" style="height: 800px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;">
       <span>See the Pen <a href="https://codepen.io/mulot-nsi/pen/vYbjZGb">
       Untitled</a> by Mulot NSI (<a href="https://codepen.io/mulot-nsi">@mulot-nsi</a>)
       on <a href="https://codepen.io">CodePen</a>.</span>
@@ -236,7 +236,7 @@ Pour résoudre ce problème, il existe un autre genre de sélecteur.
 
 ??? example "Expérimentation"
 
-    <p class="codepen" data-height="300" data-default-tab="html,result" data-slug-hash="yLZjXaM" data-editable="true" data-user="mulot-nsi" style="height: 300px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;">
+    <p class="codepen" data-height="600" data-default-tab="html,result" data-slug-hash="yLZjXaM" data-editable="true" data-user="mulot-nsi" style="height: 800px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid; margin: 1em 0; padding: 1em;">
       <span>See the Pen <a href="https://codepen.io/mulot-nsi/pen/yLZjXaM">
       Sélecteurs de type</a> by Mulot NSI (<a href="https://codepen.io/mulot-nsi">@mulot-nsi</a>)
       on <a href="https://codepen.io">CodePen</a>.</span>

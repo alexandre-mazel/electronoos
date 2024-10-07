@@ -1,4 +1,4 @@
-
+import os
 
 import sys
 
@@ -10,8 +10,8 @@ def rename_all_files_in_folder( strPath, strBefore, strAfter ):
         newf = strPath+f.replace(strBefore, strAfter)
         if absf == newf:
             continue
-        print("INF: rename_all_files_in_folder: %s => %s" % () )
-        if 0:
+        print("INF: rename_all_files_in_folder: %s => %s" % (absf,newf) )
+        if 1:
             os.rename(absf,newf)
         cpt += 1
     print("INF: rename_all_files_in_folder: %s file(s) renammed" % cpt )

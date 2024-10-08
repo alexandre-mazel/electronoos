@@ -3,6 +3,9 @@ import os
 import sys
 
 def rename_all_files_in_folder( strPath, strBefore, strAfter ):
+    """
+    Rename all files in a folder (un petit rname-it du pauvre)
+    """
     files = os.listdir(strPath)
     cpt = 0
     for f in files:

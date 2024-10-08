@@ -20,6 +20,8 @@ def extract_joint(filename):
     print("Detect takes %.3fs" % (time.time()-timeBegin))
     print("Detected: detected: %s" % detection_result )
     print("Detected: detected.segmentation_masks: %s" % detection_result.segmentation_masks )
+    if detection_result.segmentation_masks == None:
+        return False
     print("Detected: nbr shape: %s" % len(detection_result.segmentation_masks) )
 
     segmentation_mask = detection_result.segmentation_masks[0].numpy_view()
@@ -42,4 +44,6 @@ def extract_joint(filename):
 fn = "../data/inconnus.jpg"
 fn = "../test/girl-4051811_960_720.jpg"
 #~ fn = "bonhomme_bleu.jpg"
+fn = "bonhomme_bleu_crop.jpg"
+#~ fn = "bonhomme_soleil.jpg"
 extract_joint(fn)

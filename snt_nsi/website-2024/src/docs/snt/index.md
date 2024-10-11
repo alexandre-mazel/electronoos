@@ -2,8 +2,11 @@
 
 ## Tutoriels
 
+- [L'ordinateur de la r&eacute;gion](tutoriels/ordinateur.md)
 - [L'environnement windows](tutoriels/windows.md)
 - [Saisir du texte](tutoriels/saisie-de-texte.md)
+- [FAQ (windows, explorateur de fichiers...)](tutoriels/faq.md)
+
 <!---
 - [L'Environnement Numérique de Travail (ENT)](tutoriels/ent.md)
 - [Le langage Python](tutoriels/python.md)

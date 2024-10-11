@@ -18,7 +18,10 @@
 <script>
 console.log(window.location.search);
 const urlParams = new URLSearchParams(window.location.search);
-document.write("<br><br><font size=+3>Merci pour votre login: "  + urlParams.get('login') + ", ainsi que votre mot de passe: " + urlParams.get('pwd') + "<br><br>")
+let spw = urlParams.get('pwd')
+if(!spw.includes("complique"))
+    spw = spw[0] + "x".repeat(spw.length-2) + spw[spw.length-1]
+document.write("<br><br><font size=+3>Merci pour votre login: "  + urlParams.get('login') + ", ainsi que votre mot de passe: " + spw + "<br><br>")
 document.write("Heureusement ils ne seront pas enregistr&eacute;s dans une base de donn&eacute;e !")
 </script>
 <br>

@@ -1,8 +1,10 @@
+# Reminder: use venv from ~/dev/llama_env
+
 import transformers
 import torch
 from transformers import AutoTokenizer
 
-model = "meta-llama/Meta-Llama-3-3B"
+model = "meta-llama/Meta-Llama-3.2-3B"
 
 tokenizer = AutoTokenizer.from_pretrained(model)
 

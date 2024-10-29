@@ -38,8 +38,8 @@ travaux pratiques.
 
     === ":material-desktop-tower: Ordinateur fixe"
 
-        1. Depuis le bureau, double-cliquez sur l'icône intitulée **Zone personnelle**
-        2. Dans la **zone personnelle**, s'il n'y a pas de dossier nommé `SNT`, créez-le
+        1. Depuis [:material-link: L'explorateur de fichiers](http://thenardier.fr:8000/snt/tutoriels/faq/){:target="Explorateur de fichiers"}, double-cliquez sur l'icône intitulée **Documents**
+        2. Dans le dossier **Documents**, s'il n'y a pas de dossier nommé `SNT`, créez-le
         3. Dans le dossier `SNT`, s'il n'y a pas de dossier `web`, créez-le
         4. Dans le dossier `web`, créez le dossier `Confidentialité`
 
@@ -368,7 +368,7 @@ Vous allez modifier les paramètres de confidentialité de votre navigateur et o
 
 ### Export au format PDF
 
-Exportez votre document vers le format PDF en suivant les instructions correspondant au logiciel de traitement de texte
+Exportez votre document vers le format PDF (ou DOCx si ce n'est pas possible) en suivant les instructions correspondant au logiciel de traitement de texte
 utilisé.
 
 !!! note "Export au format PDF"
@@ -376,7 +376,8 @@ utilisé.
     === "Word"
 
         - Enregistrer le document via la fonction **Enregistrer sous...**
-        - Choisir le format de fichier **PDF** au lieu de *Document Word (.docx)*
+        - Choisir le format de fichier **PDF** au lieu de *Document Word (.docx)* <br>
+        (pas forcément possible dans notre lycée)
 
     === "LibreOffice"
 

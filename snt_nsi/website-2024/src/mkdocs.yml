@@ -23,7 +23,7 @@ nav:
       - Chapitre 2 - Le Web:
           - TP1 - Langage HTML: snt/02-web/tp1-langage-html.md
           - TP2 - Langage CSS: snt/02-web/tp2-langage-css.md
-          #~ - TP3 - Confidentialité: snt/02-web/tp3-confidentialite.md
+          - TP3 - Confidentialité: snt/02-web/tp3-confidentialite.md
           #~ - Projet - Minisite web: snt/02-web/prj-minisite.md
       #~ - Chapitre 3 - Les réseaux sociaux:
           #~ - TP1 - Modélisation: snt/03-reseaux-sociaux/tp1-modelisation.md

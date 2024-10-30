@@ -3,6 +3,19 @@ import os
 import msvcrt
 import pygame as pg
 import time
+"""
+Exemple a essayer pour communiquer avec un popen:
+
+from subprocess import Popen, PIPE
+
+pipes = dict(stdin=PIPE, stdout=PIPE, stderr=PIPE)
+mplayer = Popen(["mplayer", "asdf.m4a"], **pipes)
+
+# to control u can use Popen.communicate
+mplayer.communicate(input=b">")
+sys.stdout.flush()
+"""
+
 
 sys.path.append("../alex_pytools/")
 sys.path.append("C:/Users/alexa/dev/git/electronoos/alex_pytools/")
@@ -14,6 +27,57 @@ def playM4a(strFilename):
     ret = os.system('C:\\Progra~2\\VideoLAN\\VLC\\vlc.exe --play-and-exit "%s"' % strFilename)
     print(dir(os))
     return ret
+    
+def playWebm(strFilename):
+    print("INF: playWebm: starting... (select unselect with mouse to enable keyboard sending)")
+    import pyglet
+    media = pyglet.media.load(strFilename)
+    player = media.play()
+    #~ print(dir(player))
+    bInPause = False
+    while 1:
+        pyglet.clock.tick(100)
+        time.sleep(0.5)
+        print("%5.2fs" % float(player.time) )
+        pyglet.clock.tick(100)
+        if msvcrt.kbhit():
+            pressedKey = msvcrt.getch()
+            print("pressedKey: %s" % (pressedKey))
+            if pressedKey == b'\xe0':
+                print("arrow")
+                pass
+            elif pressedKey == b'\x1b':
+                print("esc")
+                player.pause()
+                return 10
+            else:
+                key = pressedKey.decode()
+                print("key: %s" % key )
+                if key == 'H':
+                    print("vol up")
+                    player.volume(100)
+                if key == 'p':
+                    if not bInPause:
+                        print("pause song")
+                        player.pause()
+                        bInPause = True
+                    else:
+                        print("resume song")
+                        player.play()
+                        bInPause = False
+                if key == 'n':
+                    player.pause()
+                    return 1
+                if key == 'b':
+                    player.pause()
+                    return 2
+                if key == 'M':
+                    player.seek(player.time+5.)
+                if key == 'K':
+                    player.seek(max(player.time-5.,0))
+                    
+                # todo tester player.volume(0..1)
+    return True
 
 def playSongInterruptible(strFilename):
     """
@@ -22,6 +86,9 @@ def playSongInterruptible(strFilename):
     print("INF: playing '%s'" % strFilename )
     if ".m4a" in strFilename:
         return playM4a(strFilename)
+        
+    if ".webm" in strFilename or ".ogg" in strFilename:
+        return playWebm(strFilename)
         
     global timeLastNext
     try:
@@ -119,7 +186,7 @@ def playAllFileFromFolder( strPath, listToExclude=[], strStartFrom = "" ):
     print( "DBG: playAllFileFromFolder: strPath: %s" % strPath )
 
     for f in listFiles:
-        if ".mp3" not in f and ".mp4" not in f and ".m4a" not in f :
+        if ".mp3" not in f and ".mp4" not in f and ".m4a" not in f and ".ogg" not in f and ".webm" not in f :
             continue
         if bSearchStart:
             if f != strStartFrom:

@@ -166,8 +166,9 @@ class Firstnames:
             for strFirstname,nbr,rOccurence in firstnames_extralist.listExtra:
                 k = simpleString(strFirstname)
                 self.dictFirstname[k] = (strFirstname, False, ("?",), rOccurence)
-                if "ehdi" in strFirstname:
-                    print("el mehdi: %s" % str(self.dictFirstname[k]) )
+                if 0:
+                    if "ehdi" in strFirstname:
+                        print("el mehdi: %s" % str(self.dictFirstname[k]) )
             
             
     def get( self, strFirstname ):

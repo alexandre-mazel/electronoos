@@ -239,6 +239,7 @@ def isRPI():
     global global_bIsRaspberry
     if global_bIsRaspberry != None:
         return global_bIsRaspberry
+        
     try:
         f = open("/proc/cpuinfo", "rt")
         buf=f.read()
@@ -246,7 +247,7 @@ def isRPI():
     except:
         global_bIsRaspberry = False
         return global_bIsRaspberry
-    print(buf)
+    #~ print(buf)
     global_bIsRaspberry = "Raspberry Pi" in buf or "ARMv7 Processor rev 4 (v7l)" in buf # v4 or v3
     print("DBG: isRPI: %s" %  global_bIsRaspberry )
     return global_bIsRaspberry
@@ -890,6 +891,7 @@ def multiBeep(nbr):
         time.sleep(0.4)
         
 def beepError(nbrError = 4):
+    print("INF: beepError")
     for i in range(nbrError):
         multiBeep(3)
         time.sleep(1)
@@ -1306,6 +1308,26 @@ def shuffle( aList, n = 1 ):
         out.append(aList[idx])
         del aList[idx]
     return out
+    
+
+global_dict_shuffle_int_mem = {}
+def shuffle_int_mem(nMax):
+    """
+    Return a nbr between 0 and nMax (excluded).
+    All nbr will be outputted after nMax call.
+    (then the shuffle will be resetted, and another list will be returned)
+    """
+    global global_dict_shuffle_int_mem
+    if nMax not in global_dict_shuffle_int_mem or len(global_dict_shuffle_int_mem[nMax]) < 1:
+        global_dict_shuffle_int_mem[nMax] = list(range(nMax))
+        random.shuffle(global_dict_shuffle_int_mem[nMax])
+    val = global_dict_shuffle_int_mem[nMax].pop()
+    return val
+            
+if 0:
+    for i in range(16):
+        print(shuffle_int_mem(4))
+    exit(-1)
     
     
 def intToHashLike(n):

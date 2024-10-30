@@ -1,9 +1,49 @@
+#include "steppers_driver.hpp"
+
+/*
+Test me, by sending manual command to the serial:
+1) define the GET_ORDER_FROM_SERIAL1 to read orders from serial1 instead of serial2 (normal use)
+
+2) send command from the serial monitor input field:
+// launch the motor at 10 rpm
+##MOTOR_0_1_10
+// stop it
+##MOTOR_0_0_0
+
+*/
+
+// #define GET_ORDER_FROM_SERIAL1 // to debug
+
+ #ifdef GET_ORDER_FROM_SERIAL1
+  #define SERIAL_ORDER Serial
+#else
+  #define SERIAL_ORDER Serial2
+#endif
+
 #define DEBUG Serial
 unsigned long fpsTimeStart = 0;
 unsigned long fpsCpt = 0;
 unsigned long nFrameMsMin = 4000;
 unsigned long nFrameMsMax = 0;
 unsigned long fpsTimeLast = 0;
+
+#define enaPin 30 //enable-motor
+#define dirPin 32 //direction
+#define stepPin 34 //step-pulse
+
+// twist
+#define enaPin2 31 //enable-motor
+#define dirPin2 33 //direction
+#define stepPin2 35 //step-pulse
+
+#define stepPin2_pwm 4 //step-pulse 4: pwm a 976Hz, 5: pwm a 490Hz
+
+
+// collect
+#define enaPin3 41 //enable-motor
+#define dirPin3 43 //direction
+#define stepPin3 45 //step-pulse
+
 
 void countFps()
 {
@@ -73,18 +113,31 @@ void countFps()
 
 }
 
+SteppersDriver steppersDriver(3);
+
 void setup() 
 {
   Serial.begin(57600);
   Serial.println("");
   Serial.println("Receive Command v0.6");
 
-  Serial2.begin(57600);
+  SERIAL_ORDER.begin(57600);
+  
+  const int nStepPerRevolution = 200;
+
+  steppersDriver.setup(0,enaPin,dirPin,stepPin,nStepPerRevolution);
+  steppersDriver.setup(1,enaPin2,dirPin2,stepPin2,nStepPerRevolution);
+  steppersDriver.setup(2,enaPin3,dirPin3,stepPin3,nStepPerRevolution);
+  steppersDriver.initPins();
 }
 
+int isIntChar(const char c)
+{
+  return (c >= '0' && c <= '9') || c == '-' || c == '+';
+}
 
 /*
-* retrieve int argument in a string, return the number of argumen set
+* retrieve int argument in a string, return the number of argument set
 * argument are coded in a string separated by a '_' _arg1_arg2_arg3... 
 * eg: toto_10_34_45_10
 */
@@ -99,7 +152,16 @@ int retrieveIntArguments(const char* s, int * pDstArg, int nNbrArgMax)
     {
       if( pstart != NULL )
       {
-        pDstArg[nNbrArg] = atoi(pstart); // atoi s'arrete au premier char non decimal
+        // on a des fois des parasites et donc la commande est pétée! (par exemple on recoit ':' a la place du nombre ou X ou ...)
+        if(isIntChar(*pstart))
+        {
+          int val = atoi(pstart); // atoi s'arrete au premier char non decimal
+          pDstArg[nNbrArg] = val;
+        }
+        else
+        {
+          pDstArg[nNbrArg] = -666;
+        }
         nNbrArg += 1;
       }
       pstart = p+1;
@@ -107,14 +169,27 @@ int retrieveIntArguments(const char* s, int * pDstArg, int nNbrArgMax)
     }
     ++p;
   }
-  // last remainder:
+  // last remainer:
   if( pstart != NULL && nNbrArg < nNbrArgMax )
   {
-    pDstArg[nNbrArg]=atoi(pstart);
+    if(isIntChar(*pstart))
+    {
+      pDstArg[nNbrArg]=atoi(pstart);
+    }
+    else
+    {
+      pDstArg[nNbrArg] = -666;
+    }
     nNbrArg += 1;
   }
   return nNbrArg;
 }
+
+void updateMotorCommand()
+{
+  steppersDriver.update();
+}
+
 
 
 #define LEN_COMMAND_MAX 32
@@ -125,6 +200,7 @@ char lastCommand[LEN_COMMAND_MAX+1] = "\0";
 int handleOrder( const char * command)
 {
   int bDebug = 1;
+  bDebug = 0;
 
   // this two next lines takes: 356us
   if(bDebug)
@@ -139,7 +215,7 @@ int handleOrder( const char * command)
 
   if(command[2]=='M' && command[3]=='O')
   {
-    Serial.println("INF: handleOrder: Command: Motor" );
+    if(bDebug) Serial.println("INF: handleOrder: Command: Motor" );
     // Assemble
     int args[3];
     int nNbrArgs = retrieveIntArguments(command,args,3);
@@ -156,6 +232,16 @@ int handleOrder( const char * command)
       }
       Serial.println("");
     } // debug
+
+    // consistency check (souvent quand les 2 Arduinos ne sont pas alimenté par la meme source)
+    if( args[0] < 0 || args[0] > 2 || args[1] < -1 || args[1] > 1 || args[2] < 0)
+    {
+      Serial.println("WRN: Rotten orders, skipping!");
+    }
+    else
+    {
+      steppersDriver.order(args[0],args[1],args[2]);
+    }
   } // if command
 
   return 1;
@@ -166,7 +252,7 @@ int handleSerialCommand()
   // receive command using the form ##cmd__param1__param2__param3
   // return 1 if a new command has been received
 
-  if(!Serial2.available())
+  if(!SERIAL_ORDER.available())
   {
     return 0;
   }
@@ -174,9 +260,9 @@ int handleSerialCommand()
   char command[LEN_COMMAND_MAX];
   int ichar = 0;
   delay(5); // for all characters to arrive at 57600 baud, 7200chr/sec => donc pour 32 chr => 225 commands/sec, soit 4.4ms pour une commande complete
-  while( Serial2.available() && ichar < LEN_COMMAND_MAX )
+  while( SERIAL_ORDER.available() && ichar < LEN_COMMAND_MAX )
   {
-    command[ichar] = Serial2.read();
+    command[ichar] = SERIAL_ORDER.read();
     if(command[ichar] != '\n')
     {
       if(0)
@@ -239,7 +325,8 @@ void sendSerialCommand(const char * msg)
 
 void loop() 
 {
-  handleSerialCommand();
-  countFps();
-  delay(10);
+  handleSerialCommand(); // takes around 2micros (when no command)
+  updateMotorCommand(); // takes around 5micros (when no motors running)
+  //countFps();
+  //delay(1);
 }

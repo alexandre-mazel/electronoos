@@ -55,7 +55,7 @@ HX711 scale;
 
 // reglage pour barre de 3kg:
 
-float calibration_factor = 729; // 30g => 22000: 733 [une bouteille vide (celle de blanc orschwiller) peserait 448g; le plateau en fer 352g]
+float calibration_factor = 661; // 30g => 22000: 733 [une bouteille vide (celle de blanc orschwiller) peserait 448g; le plateau en fer 352g]
 // will be overwritten by EEPROM reading (so I put 100 to remember and test), to write it goto readCfgFromEeproom
 
 // la balance dans le sous sol: 733
@@ -116,8 +116,9 @@ void animateLcd()
 long int nTimeStartFill = 0;
 int bIsFilling = 0;
 
-unsigned char nMilliBeforeCut = 100; // 10 en version normal, en oversize: 45 si slow, si rapide, mettre 100
+unsigned char nMilliBeforeCut = 13; // 10 en version normal (maintenant 13), en oversize: 45 si slow, si rapide, mettre 100, et mettre
 
+bool bActivateHache  = 0; // activate on oversized
 
 unsigned long hache_timeNextChange = 0;
 int hache_nNextIsOpen = 1;
@@ -167,7 +168,7 @@ void readCfgFromEeproom()
 
   EEPROM.get(0x00, calibration_factor);
   EEPROM.get(0x04, nMilliBeforeCut);
-  nMilliBeforeCut = 120;
+  //nMilliBeforeCut = 120;
 }
 
 void setup() {
@@ -175,7 +176,7 @@ void setup() {
   Serial.begin(57600); // was 9600 // changing here need to change also in the android application.
   //pinMode(resetPin, INPUT);
 
-  Serial.println("\nPianoCocktail v0.9");
+  Serial.println("\nPianoCocktail v0.91");
 
   for( int i = 0; i < NBR_VANNE; ++i )
   {
@@ -365,7 +366,7 @@ int check_if_must_stop_verse()
   }
   
   // hachage en fin de versage
-  if(rTotalTarget < 0 && diff < 300 ) // if it's the last cuve, and near the end, we must slow down
+  if(rTotalTarget < 0 && diff < 300 && bActivateHache ) // if it's the last cuve, and near the end, we must slow down
   {
     hache();
   }
@@ -777,7 +778,8 @@ void loop()
             if(nNbrQueueOrder==0 && rTotalTarget>0)
             {
               rGramme = rTotalTarget-last_measured-0.5; // remove 0.5g to add margin car bouteille trop pleine
-              rTotalTarget = -1; 
+              rGramme -= 5; // 2024/08/27: enleve 5g sur le total car ca fait trop sur le petit assembleur (la balance perdrait des grammes genre 10g a la minute ce qui explique le débordement?)
+              rTotalTarget = -1;
             }
             if(rGramme>0)
             {

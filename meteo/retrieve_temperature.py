@@ -31,6 +31,7 @@ def store(city,temp,cond):
 def retrieveTemp():
     startbase = '<span data-testid="TemperatureValue" class="CurrentConditions--tempValue--MHmYY">'
     startbase = '<span data-testid="TemperatureValue" class="CurrentConditions--tempValue--MHmYY" dir="ltr">'
+    startbase = '<span data-testid="TemperatureValue" class="CurrentConditions--tempValue--zUBSz" dir="ltr">'
     stopbase = "°</span>"
     # beau: soleil avec des nuages, ensolleile: plein soleil
     astrDatas = [
@@ -52,7 +53,9 @@ def retrieveTemp():
     ]
     
     start_cond = '<div data-testid="wxPhrase" class="CurrentConditions--phraseValue--mZC_p">'
+    start_cond = '<div data-testid="wxPhrase" class="CurrentConditions--phraseValue---VS-k">'
     stop_cond = '</div><div class="CurrentConditions--tempHiLoValue--3T1DG">'
+    stop_cond = '</div><div class="CurrentConditions--tempHiLoValue--Og9IG">'
     
     for city,link,txt_start,txt_end in astrDatas:
         dst = "/tmp/meteo_temp.html"

@@ -21,8 +21,9 @@ const urlParams = new URLSearchParams(window.location.search);
 let spw = urlParams.get('pwd')
 if(!spw.includes("complique"))
     spw = spw[0] + "x".repeat(spw.length-2) + spw[spw.length-1]
-document.write("<br><br><font size=+3>Merci pour votre login: "  + urlParams.get('login') + ", ainsi que votre mot de passe: " + spw + "<br><br>")
-document.write("Heureusement ils ne seront pas enregistr&eacute;s dans une base de donn&eacute;e !")
+document.write("<img src='img/bomb_pirate.jpg' width=320/>")
+document.write("<br><br><font size=+3>Pas de chance, ce n'&eacute;tait pas le vrai site instagram !<br><br>Je connais maintenant votre login: "  + urlParams.get('login') + ", ainsi que votre mot de passe: " + spw + "<br><br>")
+document.write("Heureusement ils ne seront pas enregistr&eacute;s dans une base de donn&eacute;es !")
 </script>
 <br>
 <font size=3>

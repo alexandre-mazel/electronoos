@@ -31,6 +31,7 @@ def store(city,temp,cond):
 def retrieveTemp():
     startbase = '<span data-testid="TemperatureValue" class="CurrentConditions--tempValue--MHmYY">'
     startbase = '<span data-testid="TemperatureValue" class="CurrentConditions--tempValue--MHmYY" dir="ltr">'
+    startbase = '<span data-testid="TemperatureValue" class="CurrentConditions--tempValue--zUBSz" dir="ltr">'
     stopbase = "°</span>"
     # beau: soleil avec des nuages, ensolleile: plein soleil
     astrDatas = [
@@ -49,10 +50,13 @@ def retrieveTemp():
             ["Las Palmas", "https://weather.com/fr-FR/temps/aujour/l/9e18ab8b60528d5a8feb814d67eaf1bcf4dbadaeff6525ac3bd8441f91152ddf",startbase,stopbase],
             ["Catanzaro", "https://weather.com/fr-FR/temps/aujour/l/3f280c709bf4c7f0a8fa089a6330d319a5b8d98621e2aa59cd0615a61d1422fb",startbase,stopbase], # 2034 du kb, 1678 de nissan
             ["Bonifacio", "https://weather.com/fr-FR/temps/aujour/l/d239e6e08b72ecddf56b42b9dde7ff0b1a3dc6a02f263523504e905d66e78748",startbase,stopbase],
+            ["Pachino", "https://weather.com/fr-FR/temps/aujour/l/141fff9553992cdbb6063546facc1ba6c182c5a0a806c99e7ba408b37c4f80cb",startbase,stopbase],
     ]
     
     start_cond = '<div data-testid="wxPhrase" class="CurrentConditions--phraseValue--mZC_p">'
+    start_cond = '<div data-testid="wxPhrase" class="CurrentConditions--phraseValue---VS-k">'
     stop_cond = '</div><div class="CurrentConditions--tempHiLoValue--3T1DG">'
+    stop_cond = '</div><div class="CurrentConditions--tempHiLoValue--Og9IG">'
     
     for city,link,txt_start,txt_end in astrDatas:
         dst = "/tmp/meteo_temp.html"

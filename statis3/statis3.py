@@ -1,3 +1,5 @@
+# -*- coding: cp1252 -*-
+
 import json
 import time
 import win32gui
@@ -11,11 +13,26 @@ import misctools
 
 def replaceNameReplaceByNonAccentuatedChars(s):
     trans = [
+                    ( "\\N{LATIN CAPITAL LETTER E WITH ACUTE}", "E" ),
+                    ( "\\N{LATIN CAPITAL LETTER E WITH GRAVE}", "E" ),
+                    ( "\\N{LATIN CAPITAL LETTER E WITH CIRCUMFLEX}", "E" ),
                     ( "\\N{LATIN SMALL LETTER A WITH CIRCUMFLEX}", "a" ),
+                    ( "\\N{LATIN SMALL LETTER A WITH GRAVE}", "a" ),
+                    ( "\\N{LATIN SMALL LETTER C WITH CEDILLA}", "c" ),
                     ( "\\N{LATIN SMALL LETTER E WITH ACUTE}", "e" ),
                     ( "\\N{LATIN SMALL LETTER E WITH GRAVE}", "e" ),
+                    ( "\\N{LATIN SMALL LETTER I WITH CIRCUMFLEX}", "i" ),
+                    ( "\\N{LATIN SMALL LETTER O WITH CIRCUMFLEX}", "o" ),
+                    ( "\\N{LEFT SINGLE QUOTATION MARK}", "'" ),
+                    ( "\\N{RIGHT SINGLE QUOTATION MARK}", "'" ),
+                    ( "\\N{LEFT-POINTING DOUBLE ANGLE QUOTATION MARK}", '"' ),
+                    ( "\\N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK}", '"' ),
                     ( "\\N{NO-BREAK SPACE}", " " ),
+                    ( "\\N{ZERO WIDTH SPACE}", " " ),
                     ( "\\N{EM DASH}", "-" ),
+                    ( "\\N{EN DASH}", "-" ),
+                    ( "\\N{BULLET}", "o" ),
+                    ( "\\N{DEGREE SIGN}", "o" ),
                     
                 ]
     for a,b in trans:
@@ -83,6 +100,7 @@ class Statis3:
             self.dAllTitle = json.load(f)
         except BaseException as err:
             print("INF: Statis3.load: potential error (or file empty): %s" % str(err) )
+        print("GOOD: Statis3.load: %s activitie(s) loaded." % len(self.dAllTitle) )
     
         
     def addTime( self, strTitle, rDuration ):
@@ -112,7 +130,16 @@ while 1:
     strTitle = strTitle.encode("ascii", errors="namereplace").decode("ascii")
     strTitle = strTitle.replace( " * ", " - " ) # for unsaved document in scite
     strTitle = replaceNameReplaceByNonAccentuatedChars(strTitle)
-    if strTitle != "":
+    
+    bPrivate = False
+    if "Mozilla Firefox (navigation privee)" in strTitle:
+        if "Messages pour le Web" in strTitle:
+            strTitle = "Messages pour le Web"
+        else:
+            #~ bPrivate = True
+            strTitle = "(activite privee)"
+            
+    if strTitle != "" and not bPrivate:
         if strTitle != prevTitle:
             print("Title: '%s'" % strTitle )
             prevTitle = strTitle
@@ -120,7 +147,7 @@ while 1:
             # seems like we stay 1 sec more on this window
             statis3.addTime(strTitle,rTimeLoopSec)
 
-    if int(time.time())%5 == 0:
+    if int(time.time())%20 == 0:
         statis3.printAll()
         
     if time.time() - timeLastSave > 60:

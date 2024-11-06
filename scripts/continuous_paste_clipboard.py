@@ -60,12 +60,12 @@ def beepEveryHalf():
     
     
 
-def continuousSave():
-    print("INF: continuousSaveOfClipbBoardImage...")
+def continuousSave( bBeep = True):
+    print("INF: continuousSaveOfClipbBoardImage: starting with bBeep: %s" % bBeep)
     img_prev = None
     nFrameWithoutSave = 0
     while 1:
-        beepEveryHalf()
+        if bBeep: beepEveryHalf()
         try:
             img = ImageGrab.grabclipboard()
         except OSError as err:
@@ -101,4 +101,8 @@ def continuousSave():
 # continuousSave - end
 
 if __name__ == "__main__":
-    continuousSave()
+    bRingHours = True
+    if len(sys.argv) > 1:
+        if sys.argv[1][0].lower() == 'n': # no ring or no sound or ...
+            bRingHours = False
+    continuousSave(bRingHours)

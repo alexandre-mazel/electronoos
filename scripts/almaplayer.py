@@ -38,8 +38,12 @@ def playWebm(strFilename):
     while 1:
         pyglet.clock.tick(100)
         time.sleep(0.5)
-        print("%5.2fs" % float(player.time) )
+        print("\r%5.2fs / %5.2fs" % (float(player.time),float(media.duration)), end = "" )
         pyglet.clock.tick(100)
+        if player.time > media.duration + 0.8: # how much did we leave ?
+            print("\nSong seems finished...")
+            break # or return 1?
+            
         if msvcrt.kbhit():
             pressedKey = msvcrt.getch()
             print("pressedKey: %s" % (pressedKey))

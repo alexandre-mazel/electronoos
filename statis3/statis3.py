@@ -17,6 +17,7 @@ def replaceNameReplaceByNonAccentuatedChars(s):
                     ( "\\N{LATIN CAPITAL LETTER E WITH GRAVE}", "E" ),
                     ( "\\N{LATIN CAPITAL LETTER E WITH CIRCUMFLEX}", "E" ),
                     ( "\\N{LATIN SMALL LETTER A WITH CIRCUMFLEX}", "a" ),
+                    ( "\\N{LATIN_SMALL LETTER A WITH ACUTE}", "a" ),
                     ( "\\N{LATIN SMALL LETTER A WITH GRAVE}", "a" ),
                     ( "\\N{LATIN SMALL LETTER C WITH CEDILLA}", "c" ),
                     ( "\\N{LATIN SMALL LETTER E WITH ACUTE}", "e" ),
@@ -25,14 +26,19 @@ def replaceNameReplaceByNonAccentuatedChars(s):
                     ( "\\N{LATIN SMALL LETTER O WITH CIRCUMFLEX}", "o" ),
                     ( "\\N{LEFT SINGLE QUOTATION MARK}", "'" ),
                     ( "\\N{RIGHT SINGLE QUOTATION MARK}", "'" ),
+                    ( "\\N{FULLWIDTH QUOTATION MARK}", "'" ),
                     ( "\\N{LEFT-POINTING DOUBLE ANGLE QUOTATION MARK}", '"' ),
                     ( "\\N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK}", '"' ),
+                    ( "\\N{FULLWIDTH COLON}", ':' ),
+                    ( "\\N{FULLWIDTH QUESTION MARK}", '?' ),
                     ( "\\N{NO-BREAK SPACE}", " " ),
                     ( "\\N{ZERO WIDTH SPACE}", " " ),
                     ( "\\N{EM DASH}", "-" ),
                     ( "\\N{EN DASH}", "-" ),
+                    ( "\\N{FULLWIDTH VERTICAL LINE}", "-" ),
                     ( "\\N{BULLET}", "o" ),
                     ( "\\N{DEGREE SIGN}", "o" ),
+                    ( "\\N{FLEXED BICEPS}", "" ),
                     
                 ]
     for a,b in trans:
@@ -117,41 +123,45 @@ class Statis3:
     
 # class Statis3 - end
         
-    
-statis3 = Statis3()
+        
+def run_statis():
+    statis3 = Statis3()
 
-prevTitle = ""
-rTimeLoopSec = 1.
+    prevTitle = ""
+    rTimeLoopSec = 1.
 
-timeLastSave = time.time()
+    timeLastSave = time.time()
 
-while 1:
-    strTitle = getCurrentWindowTitleName()
-    strTitle = strTitle.encode("ascii", errors="namereplace").decode("ascii")
-    strTitle = strTitle.replace( " * ", " - " ) # for unsaved document in scite
-    strTitle = replaceNameReplaceByNonAccentuatedChars(strTitle)
-    
-    bPrivate = False
-    if "Mozilla Firefox (navigation privee)" in strTitle:
-        if "Messages pour le Web" in strTitle:
-            strTitle = "Messages pour le Web"
-        else:
-            #~ bPrivate = True
-            strTitle = "(activite privee)"
+    while 1:
+        strTitle = getCurrentWindowTitleName()
+        strTitle = strTitle.encode("ascii", errors="namereplace").decode("ascii")
+        strTitle = strTitle.replace( " * ", " - " ) # for unsaved document in scite
+        strTitle = replaceNameReplaceByNonAccentuatedChars(strTitle)
+        
+        bPrivate = False
+        if "Mozilla Firefox (navigation privee)" in strTitle:
+            if "Messages pour le Web" in strTitle:
+                strTitle = "Messages pour le Web"
+            else:
+                #~ bPrivate = True
+                strTitle = "(activite privee)"
+                
+        if strTitle != "" and not bPrivate:
+            if strTitle != prevTitle:
+                print("Title: '%s'" % strTitle )
+                prevTitle = strTitle
+            else:
+                # seems like we stay 1 sec more on this window
+                statis3.addTime(strTitle,rTimeLoopSec)
+
+        if int(time.time())%20 == 0:
+            statis3.printAll()
             
-    if strTitle != "" and not bPrivate:
-        if strTitle != prevTitle:
-            print("Title: '%s'" % strTitle )
-            prevTitle = strTitle
-        else:
-            # seems like we stay 1 sec more on this window
-            statis3.addTime(strTitle,rTimeLoopSec)
-
-    if int(time.time())%20 == 0:
-        statis3.printAll()
+        if time.time() - timeLastSave > 60:
+            timeLastSave = time.time()
+            statis3.save()
+            
+        time.sleep(rTimeLoopSec)
         
-    if time.time() - timeLastSave > 60:
-        timeLastSave = time.time()
-        statis3.save()
-        
-    time.sleep(rTimeLoopSec)
+if __name__ == "__main__":
+    run_statis()

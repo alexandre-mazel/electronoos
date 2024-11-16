@@ -21,12 +21,15 @@ def reencode(srcFilename):
     else:
         strTemplateCommandLine = 'ffmpeg -i "%s" -c:a libvorbis -q 5 "%s"'
         strDstExt = "ogg"
-    
-    base,ext = os.path.splitext(srcFilename)
-    dst = base + "." + strDstExt
+
+    path = os.path.dirname(srcFilename)
+    basename = os.path.basename(srcFilename)    
+    filenoext,ext = os.path.splitext(basename)
+
+    dst = filenoext + "." + strDstExt
     dst  = cleanString( dst )
     dst = dst.replace(" ", "_").replace(":", "_").replace("!", "_").replace("?", "_").replace("*", "_")
-    
+    dst = path + os.sep + dst
     if not os.path.isfile(dst):
         print("INF: Creating: '%s'" % dst )
         strCommandLine = strTemplateCommandLine % (srcFilename, dst)

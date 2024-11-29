@@ -25,8 +25,9 @@ nav:
           - TP2 - Langage CSS: snt/02-web/tp2-langage-css.md
           - TP3 - Confidentialité: snt/02-web/tp3-confidentialite.md
           #~ - Projet - Minisite web: snt/02-web/prj-minisite.md
-      #~ - Chapitre 3 - Les réseaux sociaux:
-          #~ - TP1 - Modélisation: snt/03-reseaux-sociaux/tp1-modelisation.md
+      - Chapitre 3 - Les réseaux sociaux:
+          - TP1 - Modélisation: snt/03-reseaux-sociaux/tp1-modelisation.md
+          - TP2 - Identité numérique et cyber-violence: snt/03-reseaux-sociaux/tp2_identite_numerique_et_cyberviolence.md
       #~ - Chapitre 4 - Les données structurées:
           #~ - TP1 - Données ouvertes: snt/04-donnees-structurees/tp1-donnees-ouvertes.md
           #~ - TP2 - Les métadonnées:  snt/04-donnees-structurees/tp2-metadonnees.md

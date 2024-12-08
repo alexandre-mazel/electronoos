@@ -265,7 +265,7 @@ void loop()
       }
       else
       {
-        *(apnSpeedArray[i]) = (int)( (anReadValues[i] *200L) / 1023);
+        *(apnSpeedArray[i]) = (int)( (anReadValues[i] *256L) / 1023); // put less to have more precision (was 20L)
       }
       if(*apnDirArray[i] != 0)
         abSendMotorChange[i] = 1;
@@ -284,7 +284,7 @@ void loop()
         if( nSpoolDir != 0 )
         {
           int nMotor = 2;
-          int nTurbo = 5;
+          int nTurbo = 4; // decide the turbo ratio
           if(anReadValues[i+NBR_POTAR] == 0)
           {
             nTurbo = 1;

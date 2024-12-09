@@ -27,5 +27,10 @@
 - [Projet minisite](02-web/prj-minisite.md)
 -->
 
+## Chapitre 3 - R&eacute;seaux sociaux
+- [TP2 - Identite](03-reseaux-sociaux/tp2_identite_numerique_et_cyberviolence.md)
+
+
+
 ## Chapitre X - Demo pour Yannick
 - [TP1 - Test Diagram](0X-test/tp1-test-diagram.md)

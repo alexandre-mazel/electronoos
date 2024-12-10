@@ -103,11 +103,11 @@ def draw_point(list_x,list_y):
     plt.ylabel('temperature')
     plt.show()
     
-def draw_point_series(dictPerDay):
+def draw_point_series(dictPerDay, bRender=True):
     import matplotlib.pyplot as plt
     
     for k in dictPerDay:
-        my_label = k.replace("2024/","" )
+        my_label = k.replace("2024/","" ).replace("2023/","" )
         # invert day et month
         my_label = my_label[:-5] + my_label[-2:] + "/" + my_label[-5:-3]
         plt.plot(dictPerDay[k][0],dictPerDay[k][1],label = my_label)
@@ -120,13 +120,22 @@ def draw_point_series(dictPerDay):
                 plt.annotate( strLabelMin, xy=(dictPerDay[k][0][idx]-0.5, dictPerDay[k][1][idx]+offset))
                 
     first_year = list(dictPerDay.keys())[0].split(":")[1].strip()[:4]
+    first_month = list(dictPerDay.keys())[0].split(":")[1].strip()[5:7]
+    print(first_month)
     plt.ylabel('Temperature' + ' ' + first_year)
     plt.legend()
     plt.locator_params(axis='both', nbins=24) 
-    plt.show()
+    plt.tight_layout(pad=0) # fonctionne pas sur le premier?
+    plt.gcf().set_size_inches(32, 18) # pour le rendu dans le fichier
+    fn = 'output/month_'+first_year+'_'+first_month+".jpg"
+    print("INF: draw_point_series: writing to '%s'" % fn )
+    plt.savefig(fn, dpi=100)
+    if bRender: plt.show()
+    plt.clf()
+    plt.cla()
 
 
-def analyse_sonde_temp( datas, nYearMin, nMonthMin, nYearMax = 2094, nMonthMax = 13 ):
+def analyse_sonde_temp( datas, nYearMin, nMonthMin, nYearMax = 2094, nMonthMax = 13, bRender=True ):
     """
     Analyse data after nYearMin/nMonthMin (included)
     and before nYearMax/nMonthMax (included)
@@ -155,7 +164,8 @@ def analyse_sonde_temp( datas, nYearMin, nMonthMin, nYearMax = 2094, nMonthMax =
         dictPerDay[k][1].append(rTemp)
         
     #~ draw_point(xs,ys)
-    draw_point_series(dictPerDay)
+    if len(dictPerDay) > 0:
+        draw_point_series(dictPerDay, bRender=bRender)
         
         
         
@@ -167,9 +177,20 @@ def analyse_sonde_temp( datas, nYearMin, nMonthMin, nYearMax = 2094, nMonthMax =
     
 strFilename = "data/office_temperature.txt"
 datas = decode_file_sonde(strFilename)
-#~ analyse_sonde_temp(datas, 2024,12)
+if 1:
+    for d in datas[-40:]:
+        print(d)
+    
+analyse_sonde_temp(datas, 2024,12)
 #~ analyse_sonde_temp(datas, 2024,11,2024,11)
 #~ analyse_sonde_temp(datas, 2024,7,2024,7)
 #~ analyse_sonde_temp(datas, 2024,8,2024,8)
 #~ analyse_sonde_temp(datas, 2023,12,2023,12)
-analyse_sonde_temp(datas, 2023,2,2023,2)
+#~ analyse_sonde_temp(datas, 2023,2,2023,2)
+
+if 0:
+    # sort toutes les stats par mois
+    for y in [2023,2024]:
+        for m in range(1,13):
+            analyse_sonde_temp(datas,y,m,y,m,bRender=False)
+        

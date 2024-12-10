@@ -1,5 +1,5 @@
 # analyse temperature file (from real sonde dans la piece)
-# elles sont sur REE
+# elles sont sur REE, le serveur est a l'heure en hiver.
 
 # scp -P 11022 na@thenardier.fr:/home/na/save/office_temperature.txt C:/Users/alexa/dev/git/electronoos/meteo/data/
 
@@ -11,69 +11,6 @@ import common
 import retrieve_pop3
 import datetime
 
-class HelperStat:
-    """
-    class to help computing stat
-    """
-    def __init__( self ):
-        self.minNight = 999 # min of the night of the current analysed day
-        self.maxDay = -999
-        
-        self.strPrevDay = ""
-        
-        self.bStatBreakfastDone = False # helper to know if we analyse the measure as been made for breakfast
-        
-        self.bStatLunchDone = False
-        
-        self.bStatDinnerDone = False
-        
-        self.bStatWetDayDone = False
-        self.bStatWetNightDone = False
-
-class Stat:
-    def __init__( self ):
-        self.nbrMeasures = 0
-        self.sumTemperature = 0
-        
-        self.nbrDay = 0
-        self.min = 999
-        self.max = -40
-        
-        self.nbrBreakfast = 0 # nbr breakfast  at 8.30 >= 15 and no rain breakfast
-        
-        self.nbrLunch = 0 # nbr lunch at 13 >= 20
-        
-        self.nbrDinner = 0 # nbr dinner at 19.30 >= 20
-        
-        self.nbrHotDay = 0 # nbr max > 33, 32 is unconfortable, if it raise to 34 it means a lot of hour are > 32
-        
-        self.nbrHotNight = 0 # nbr min night >= 20
-        self.nbrColdNight = 0 # nbr min night < 13
-        self.nbrWetDay = 0 # day with more than 15min of rain # day is >= 8 and < 22
-        self.nbrWetNight = 0 # night with more than 15min of rain
-        
-        self.score = 0 # nbr points for this location
-        self.score_bonus = 0 # detail of bonus
-        self.score_malus = 0 # detail of malus
-        
-    def __str__(self):
-        o  = ""
-        #~ o += " min: %s, max: %s, hotnight: %s" % (self.min,self.max,self.nbrHotNight)
-        o += "  nbr measures: %s\n" % self.nbrMeasures
-        o += "  nbr day: %s\n" % self.nbrDay
-        o += "  min: %s\n" % self.min
-        o += "  med: %.1f\n" % (self.sumTemperature/self.nbrMeasures)
-        o += "  max: %s\n" % self.max
-        o += "  breakfast: %s\n" % self.nbrBreakfast
-        o += "  lunch: %s\n" % self.nbrLunch
-        o += "  dinner: %s\n" % self.nbrDinner
-        o += "  hot day: %s\n" % self.nbrHotDay
-        o += "  hot night: %s\n" % self.nbrHotNight
-        o += "  cold night: %s\n" % self.nbrColdNight
-        o += "  wet day: %s\n" % self.nbrWetDay
-        o += "  wet night: %s\n" % self.nbrWetNight
-        o += "  score: %s (%s,%s)\n" % (self.score,self.score_bonus,self.score_malus)
-        return o
         
 def isListIn(word,list):
     """
@@ -139,12 +76,16 @@ def decode_file_sonde(strFilename):
         nHour = int(strHour)
         nMin = int(strMin)
         rTemp = float(strTemp)
-        if bVerbose: print("DBG: integered: %d/%02d/%02d: %02dh%02d: temp: %5.2f" % (nYear, nMonth, nDay, nHour,nMin,rTemp))
+        if bVerbose or nNumLine==0: print("DBG: integered: %d/%02d/%02d: %02dh%02d: temp: %5.2f" % (nYear, nMonth, nDay, nHour,nMin,rTemp))
         
         nNumLine += 1
         #~ if nNumLine > 100:
             #~ break
             
+            
+        # remove abberations
+        if rTemp < 1:
+            continue
             
         allDatas.append([nYear, nMonth, nDay, nHour,nMin,rTemp])
     
@@ -166,7 +107,9 @@ def draw_point_series(dictPerDay):
     import matplotlib.pyplot as plt
     
     for k in dictPerDay:
-        my_label = k.replace("2024/","" ) 
+        my_label = k.replace("2024/","" )
+        # invert day et month
+        my_label = my_label[:-5] + my_label[-2:] + "/" + my_label[-5:-3]
         plt.plot(dictPerDay[k][0],dictPerDay[k][1],label = my_label)
         if 1:
             # local min & max
@@ -175,15 +118,18 @@ def draw_point_series(dictPerDay):
                 strLabelMin = my_label + '\n' + str(int(dictPerDay[k][0][idx])) + 'h' + "%02d: "%((dictPerDay[k][0][idx]%1)*60) + str(dictPerDay[k][1][idx]) + '' 
                 # plt.annotate('local max', xy=(2, 1), xytext=(3, 1.5), arrowprops=dict(facecolor='black', shrink=0.05),)
                 plt.annotate( strLabelMin, xy=(dictPerDay[k][0][idx]-0.5, dictPerDay[k][1][idx]+offset))
-    plt.ylabel('temperature')
+                
+    first_year = list(dictPerDay.keys())[0].split(":")[1].strip()[:4]
+    plt.ylabel('Temperature' + ' ' + first_year)
     plt.legend()
     plt.locator_params(axis='both', nbins=24) 
     plt.show()
 
 
-def analyse_sonde_temp( datas, nYearMin, nMonthMin ):
+def analyse_sonde_temp( datas, nYearMin, nMonthMin, nYearMax = 2094, nMonthMax = 13 ):
     """
     Analyse data after nYearMin/nMonthMin (included)
+    and before nYearMax/nMonthMax (included)
     """
     
     dictPerDay = {}
@@ -192,6 +138,8 @@ def analyse_sonde_temp( datas, nYearMin, nMonthMin ):
     for d in datas:
         nYear, nMonth, nDay, nHour,nMin,rTemp = d
         if nYear < nYearMin or ( nYear == nYearMin and nMonth < nMonthMin):
+            continue
+        if nYear > nYearMax or ( nYear == nYearMax and nMonth > nMonthMax):
             continue
         #~ print("INF: analyse_sonde_temp: %d/%02d/%02d: %02dh%02d: temp: %5.2f" % (nYear, nMonth, nDay, nHour,nMin,rTemp))
         xs.append(nHour+nMin/60)
@@ -212,16 +160,16 @@ def analyse_sonde_temp( datas, nYearMin, nMonthMin ):
         
         
 """
-start: 2022/12/06
-stop: 2023/08/14
-
 """
-    
-# a faire: par equipe de 2: quel est la meilleur combinaison par mois
-    
+
     
     
     
 strFilename = "data/office_temperature.txt"
 datas = decode_file_sonde(strFilename)
-analyse_sonde_temp(datas, 2024,12)
+#~ analyse_sonde_temp(datas, 2024,12)
+#~ analyse_sonde_temp(datas, 2024,11,2024,11)
+#~ analyse_sonde_temp(datas, 2024,7,2024,7)
+#~ analyse_sonde_temp(datas, 2024,8,2024,8)
+#~ analyse_sonde_temp(datas, 2023,12,2023,12)
+analyse_sonde_temp(datas, 2023,2,2023,2)

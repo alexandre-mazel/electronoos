@@ -161,4 +161,7 @@ description: Turtle
                 
       ![thonny_window](images/bike-and-tree.png){width=300}
       Un paysage bucolique
+      
+      ![thonny_window](images/snowman.png){width=300}
+      Un paysage bucolique
     </figure>

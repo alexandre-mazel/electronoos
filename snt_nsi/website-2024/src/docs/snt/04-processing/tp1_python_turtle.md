@@ -87,12 +87,50 @@ description: Turtle
       Votre premier résultat
     </figure>
     
-!!! note "Dessinons un carré"
-    L'objectif est maintenant de déssiner un carré avec turtle
-    1. Modifier le script pr�c�dent jusqu'a obtenir un carr� comme ceci:
+!!! note "Déssinons un carré"
+    L'objectif est maintenant de dessiner un carré avec Turtle.
+    
+    1. Modifier le script précédent jusqu'a obtenir ce résultat:
     <figure markdown>
       ![thonny_window](images/turtle_square.png)
-      Votre premier résultat
+      Un carré !
+    </figure>
+    
+    
+!!! note "Utilisation d'une boucle"
+    L'objectif est toujours de dessiner un carré avec Turtle, mais en utilisant une boucle:
+    
+    1. Taper ce script dans Thonny:
+    
+        ``` py
+        from turtle import *
+        for i in range(2):
+            left(90)
+            forward(100)
+        ```
+    
+    2. Puis changer le chiffre **2** par un autre chiffre jusqu'a avoir un carré comme précédemment.
+        <figure markdown>
+      ![thonny_window](images/turtle_square.png)
+      Encore un carré !
+    </figure>
+    
+!!! note "Un hexagone"
+    L'objectif est maintenant de dessiner un hegagone.
+    
+    1. Modifier le script pr�c�dent jusqu'a avoir cette forme:
+    
+        ``` py
+        from turtle import *
+        for i in range(2):
+            left(90)
+            forward(100)
+        ```
+    
+    2. Puis changer le chiffre **2** par un autre chiffre jusqu'a avoir un carré comme précédemment.
+        <figure markdown>
+      ![thonny_window](images/turtle_hexa.png)
+      Un hexagone !
     </figure>
 
 

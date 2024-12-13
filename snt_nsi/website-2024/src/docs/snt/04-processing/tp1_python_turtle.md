@@ -144,10 +144,21 @@ description: Turtle
     
     
 !!! note "A vous de dessiner"
-    A l'aide des commandes ci-dessus, dessiner ce que vous voulez!
+    A l'aide des commandes ci-dessus, dessinez ce que vous voulez!
     
     Voici quelques exemples pour vous inspirer:
         <figure markdown>
-      ![thonny_window](images/turtle_square_rosace.png)
-      Une rosace à bout carré !
+      ![thonny_window](images/turtle_square_rosace.png){width=300}
+      Une rosace à bout carré
+      
+      ![thonny_window](images/six_carres.png){width=300}
+      Un moulin moderne
+      
+            
+      ![thonny_window](images/two-different-houses.png){width=300}
+      2 maisons
+      
+                
+      ![thonny_window](images/bike-and-tree.png){width=300}
+      Un paysage bucolique
     </figure>

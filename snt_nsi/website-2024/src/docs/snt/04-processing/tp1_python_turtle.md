@@ -55,15 +55,26 @@ description: Turtle
     
         
     
-!!! note "Dessinons un carré"
+!!! note "Création d'un nouveau script dans Thonny"
 
     1. Depuis le bureau, lancez l'application **Thonny**
-        <figure markdown>
+    <figure markdown>
       ![thonny_window](images/thonny.png)
-      L'exemple de la documentation de la biliothèque Turtle en python
+      L'application Thonny
     </figure>
-    2. Cliquer dans le menu Fichier/Nouveau (ou File/New)
-    3. Puis dans le menu Fichier/Enregistrer sous (ou File/save as)
-    4. Dans la fenetre qui apparait, enregistrer votre fichier dans Documents/SNT/scripts/turtle_square.py
+    2. Cliquer dans le menu **Fichier/Nouveau** (ou File/New)
+    3. Puis dans le menu **Fichier/Enregistrer sous...*** (ou File/save as...)
+    4. Dans la fenetre qui apparait, enregistrez votre fichier dans **Documents/SNT/scripts** sous le nom **turtle_square.py**
+    
+    
+!!! note "Dessinons un carré"
+    L'objectif est maintenant de déssiner un carré avec turtle
+    1. Taper ce script
+    2. Puis appuyer sur la touche F5 pour que l'ordinateur exécute votre script.
+    3. Vous devriez voir une figure comme celle ci:
+    <figure markdown>
+      ![thonny_window](images/turtle_first.png)
+      Votre premier résultat
+    </figure>
 
 

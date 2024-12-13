@@ -64,7 +64,7 @@ description: Turtle
     </figure>
     2. Cliquer dans le menu **Fichier/Nouveau** (ou File/New)
     3. Puis dans le menu **Fichier/Enregistrer sous...*** (ou File/save as...)
-    4. Dans la fenetre qui apparait, enregistrez votre fichier dans **Documents/SNT/scripts** sous le nom **turtle_square.py**
+    4. Dans la fenetre qui apparait, enregistrez votre fichier dans **Documents/SNT/scripts** sous le nom **turtle_first.py**
     
     
 !!! note "Votre premier script"
@@ -109,7 +109,7 @@ description: Turtle
             forward(100)
         ```
     
-    2. Puis changer le chiffre **2** par un autre chiffre jusqu'a avoir un carré comme précédemment.
+    2. Puis changer le chiffre **2** par un autre chiffre jusqu'à avoir un carré comme précédemment.
         <figure markdown>
       ![thonny_window](images/turtle_square.png)
       Encore un carré !
@@ -118,19 +118,36 @@ description: Turtle
 !!! note "Un hexagone"
     L'objectif est maintenant de dessiner un hegagone.
     
-    1. Modifier le script pr�c�dent jusqu'a avoir cette forme:
-    
-        ``` py
-        from turtle import *
-        for i in range(2):
-            left(90)
-            forward(100)
-        ```
-    
-    2. Puis changer le chiffre **2** par un autre chiffre jusqu'a avoir un carré comme précédemment.
+    1. Modifier le script précédent jusqu'à avoir cette forme:
         <figure markdown>
       ![thonny_window](images/turtle_hexa.png)
       Un hexagone !
     </figure>
 
 
+
+!!! info "Turtle: Toutes les commandes utiles"
+
+    - forward( distance ): avancer d'une certaine distance
+    - left( angle ): tourner vers la gauche d'un certain angle (en degrés par défaut)
+    - right( angle ): (idem left)
+    - up(): lever le crayon
+    - down(): baisser le crayon
+    - color(c): changer la couleur, par exemple:
+        - color("blue")
+        - color("#2850FF")
+        - color(1,0.5,0.2)
+    - circle(rayon): dessine un cercle d'un certain rayon
+    - circle(rayon, 90): dessine un quart de cercle (90 indique la portion en degré à dessiner)
+    - goto(x,y): déplacer le crayon sur une position absolue
+    - speed(vitesse): accélérer au maximum la vitesse de déplacement de la tortue.
+    
+    
+!!! note "A vous de dessiner"
+    A l'aide des commandes ci-dessus, dessiner ce que vous voulez!
+    
+    Voici quelques exemples pour vous inspirer:
+        <figure markdown>
+      ![thonny_window](images/turtle_square_rosace.png)
+      Une rosace a bout carré !
+    </figure>

@@ -30,6 +30,10 @@
 ## Chapitre 3 - R&eacute;seaux sociaux
 - [TP2 - Identite](03-reseaux-sociaux/tp2_identite_numerique_et_cyberviolence.md)
 
+## Chapitre 4 - Donn&eacute;es et traitements (et Python)
+- [TP1 - Turtle](04-processing/tp1_python_turtle.md)
+
+
 
 
 ## Chapitre X - Demo pour Yannick

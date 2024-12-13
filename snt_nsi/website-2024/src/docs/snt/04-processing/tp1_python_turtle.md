@@ -149,5 +149,5 @@ description: Turtle
     Voici quelques exemples pour vous inspirer:
         <figure markdown>
       ![thonny_window](images/turtle_square_rosace.png)
-      Une rosace a bout carré !
+      Une rosace à bout carré !
     </figure>

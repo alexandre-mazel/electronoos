@@ -12,4 +12,7 @@ Ouvrir ce document et suivre les instructions.
 
 !!! info "Cours - La bibliothéque Graphique Turtle"
 
-    Turtle est une bibliothèque graphique, permettant de faire des dessins, inspiré de la vieille bibliothèque logo, crée en 1967 et qui été à l'époque en langage ��Basic��.
+    Turtle est une bibliothèque graphique, permettant de faire des dessins, inspiré de la vieille bibliothèque logo, crée en 1967 et qui été à l'époque en langage "Basic".
+      <figure markdown>
+      ![turtle_example](images/turtle_example.png)
+    </figure>

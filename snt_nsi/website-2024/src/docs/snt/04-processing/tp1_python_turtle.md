@@ -163,5 +163,5 @@ description: Turtle
       Un paysage bucolique
       
       ![thonny_window](images/snowman.png){width=300}
-      Un paysage bucolique
+      Un bonhomme du pays de la neige
     </figure>

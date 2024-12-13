@@ -67,13 +67,31 @@ description: Turtle
     4. Dans la fenetre qui apparait, enregistrez votre fichier dans **Documents/SNT/scripts** sous le nom **turtle_square.py**
     
     
-!!! note "Dessinons un carré"
-    L'objectif est maintenant de déssiner un carré avec turtle
-    1. Taper ce script
+!!! note "Votre premier script"
+    Nous allons tester Turtle:
+    
+    1. Taper ce script dans Thonny:
+    
+        ``` py
+        from turtle import *
+        forward(100)
+        left(90)
+        forward(100)
+        ```
+    
     2. Puis appuyer sur la touche F5 pour que l'ordinateur exécute votre script.
+    
     3. Vous devriez voir une figure comme celle ci:
     <figure markdown>
       ![thonny_window](images/turtle_first.png)
+      Votre premier résultat
+    </figure>
+    
+!!! note "Dessinons un carré"
+    L'objectif est maintenant de déssiner un carré avec turtle
+    1. Modifier le script pr�c�dent jusqu'a obtenir un carr� comme ceci:
+    <figure markdown>
+      ![thonny_window](images/turtle_square.png)
       Votre premier résultat
     </figure>
 

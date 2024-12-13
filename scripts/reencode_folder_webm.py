@@ -23,13 +23,17 @@ def reencode(srcFilename):
         strDstExt = "ogg"
 
     path = os.path.dirname(srcFilename)
+    pathdst = path + os.sep + "mp3s" + os.sep
+    try:
+        os.makedirs(pathdst)
+    except: pass
     basename = os.path.basename(srcFilename)    
     filenoext,ext = os.path.splitext(basename)
 
     dst = filenoext + "." + strDstExt
     dst  = cleanString( dst )
     dst = dst.replace(" ", "_").replace(":", "_").replace("!", "_").replace("?", "_").replace("*", "_")
-    absdst = path + os.sep + dst
+    absdst = pathdst + os.sep + dst
     if not os.path.isfile(absdst) or os.stat(absdst).st_size == 0:
         print("INF: Creating: '%s'" % absdst )
         strCommandLine = strTemplateCommandLine % (srcFilename, absdst)
@@ -46,6 +50,8 @@ def encodeFolder(strPath):
     print("INF: encodeFolder: encoding '%s'" % strPath )
     listFiles = sorted(os.listdir(strPath))
     for f in listFiles:
+        if not os.path.isfile(strPath + f):
+            continue
         reencode(strPath + f )
     print("INF: encodeFolder: done"  )
     

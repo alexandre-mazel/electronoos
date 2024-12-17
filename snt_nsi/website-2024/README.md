@@ -1,6 +1,6 @@
 # Site web
 
-Nouvelle version du site web pour l'année scolaire 2023-2024.
+Nouvelle version du site web pour l'année scolaire 2024-2025.
 
 # Documentation
 
@@ -17,7 +17,7 @@ Lancement du serveur de développement :
 
 ## Déploiement
 
-Le site web est hébergé sur Vercel.
+Le site web est hébergé sur chez moi.
 Le déploiement s'effectue automatiquement dès lors qu'une nouvelle est version poussée sur la branche `main`.
 
 ### Configuration Vercel

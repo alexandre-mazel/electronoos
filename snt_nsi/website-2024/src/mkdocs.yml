@@ -39,8 +39,10 @@ nav:
           #~ - TP2 - Retouche d'une image: snt/05-photographie-numerique/tp-retouche-image.md
       #~ - Chapitre 6 - Cartographie:
           #~ - TP1 - Cartes numériques: snt/06-cartographie/tp1-cartes-numeriques.md
-  #~ - NSI 1RE:
-      #~ - nsi1re/index.md
+  - NSI 1RE:
+      - nsi1re/index.md
+      - Chapitre 5 - Architecture:
+          - TP1 - Architecture d'un ordinateur : nsi1re/05-archi/tp1-compos_ordi.md
       #~ - Chapitre 1 - Langages du Web:
           #~ - TP1 - Création d'une page web: nsi1re/01-langages-web/tp1-creation-page-web.md
       #~ - Chapitre 2 - Architecture des ordinateurs:

@@ -19,7 +19,8 @@ description: Turtle
     
 !!! info "Cours - Le concept de Turtle"
 
-    On dirige un crayon avec des ordres simple afin de faire un dessin.
+    On dirige un [crayon]("plus précisément, on dirige une tortue qui porte un crayon") avec des ordres simple afin de faire un dessin.
+    
 
     Ordre possible:
 
@@ -165,3 +166,5 @@ description: Turtle
       ![thonny_window](images/snowman.png){width=300}
       Un bonhomme du pays de la neige
     </figure>
+    
+    J'ai hâte de voir votre talent !

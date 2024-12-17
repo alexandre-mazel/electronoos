@@ -1,21 +1,31 @@
 # Initiation à Pygame
-![](data/logopygame.png){: .center width=60%}
-
-{{initexo(0)}}
+![](logopygame.png){: .center width=60%}
 
 
-{#
+
+!!! warning "Attention"
+
+    L'usage de **ChatGPT** va vous rendre **idiot**.
+    
+    - Ce TP est adapté à votre niveau.
+    - Sa progression est réfléchie.
+    - Si au lieu de réfléchir, vous allez pomper une solution de ChatGPT ou équivalent, vous n'apprendrez rien, vous vous ennuierez dans les prochains TPs et vous risquez d'avoir du mal lors de l'interrogation, et vous aurez donc une mauvaise image de vous, ce qui est fort dommage.
+    - Il est donc fortement recommandé de [réfléchir]("La reflexion vous aidera à avoir le contrôle de votre vie.")  par vous-même.
+    - Si vous êtes coincé, demandez de l'aide à votre professeur, il est la pour ça.
+    - Ne regardez pas les solutions sans réfléchir.
+
+
+
 ## 0. Preambule
 
 - [Pygame](https://www.pygame.org/news){. target="_blank"} est un package de Python facilitant la création de jeux basés une interface graphique.
 - Au lycée, vous pouvez l'installer sur votre distribution Python, par ```pip3 install pygame```.
 - Sur votre pc perso, vous pouvez utiliser le gestionnaire de packages de Thonny (```Outils / Gérer les Paquets``` )
 
-- Installation et paramétrage de [Github Desktop](../Github/)
+
 
 - La progression de ce TP est fortement inspiré par celui de Gilles Lassus
 
-#}
 
 
 ## 1. Préparation de la scène
@@ -806,7 +816,6 @@ En inclinant la carte, vous devriez voir bouger les valeurs dans la console de T
     )
     }}
 
-{#
 ## 5. À vous !
 
 Fabriquez le jeu que vous souhaitez à partir des informations ci-dessus.
@@ -846,7 +855,6 @@ while sortir == False :
     sortir = True
 ```
 
-#}
 
 </br>
 

@@ -5,6 +5,6 @@
 
 
 
-## Chapitre X - Extras
+## Extras
 - [TP - Initiation à pygame](0X-extras/01_initiation_pygame.md)
 

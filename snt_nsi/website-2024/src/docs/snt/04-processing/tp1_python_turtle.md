@@ -5,16 +5,6 @@ description: Turtle
 
 # Turtle
 
-!!! warning "Attention"
-
-    L'usage de **ChatGPT** va vous rendre **idiot**.
-    
-    - Ce TP est adapté à votre niveau.
-    - Sa progression est réfléchie.
-    - Si au lieu de réfléchir, vous allez pomper une solution de ChatGPT ou équivalent, vous n'apprendrez rien, vous vous ennuierez dans les prochains TPs et vous risquez d'avoir du mal lors de l'interrogation, et vous aurez donc une mauvaise image de vous, ce qui est fort dommage.
-    - Il est donc fortement recommandé de [réfléchir]("La reflexion vous aidera à avoir le contrôle de votre vie.")  par vous-même.
-    - Si vous êtes coincé, demandez de l'aide à votre professeur, il est la pour ça.
-
 !!! info "Cours - La bibliothéque Graphique Turtle"
 
     Turtle est une bibliothèque graphique, permettant de faire des dessins, inspiré de la vieille bibliothèque logo, crée en 1967 et qui été à l'époque en langage "Basic".
@@ -97,7 +87,19 @@ description: Turtle
       Votre premier résultat
     </figure>
     
-!!! note "Déssinons un carré"
+!!! warning "Attention"
+
+    L'usage de **ChatGPT** va vous rendre **idiot**.
+    
+    - Ce TP est adapté à votre niveau.
+    - Sa progression est réfléchie.
+    - Si au lieu de réfléchir, vous allez pomper une solution de ChatGPT ou équivalent, vous n'apprendrez rien, vous vous ennuierez dans les prochains TPs et vous risquez d'avoir du mal lors de l'interrogation, et vous aurez donc une mauvaise image de vous, ce qui est fort dommage.
+    - Il est donc fortement recommandé de [réfléchir]("La reflexion vous aidera à avoir le contrôle de votre vie.")  par vous-même.
+    - Si vous êtes coincé, demandez de l'aide à votre professeur, il est là pour ça.
+
+
+    
+!!! note "Dessinons un carré"
     L'objectif est maintenant de dessiner un carré avec Turtle.
     
     1. Modifier le script précédent jusqu'a obtenir ce résultat:

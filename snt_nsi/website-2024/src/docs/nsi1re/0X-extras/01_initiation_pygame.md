@@ -1,7 +1,3 @@
-# Initiation à Pygame
-![](img/logopygame.png){: .center width=60%}
-
-
 
 !!! warning "Attention"
 
@@ -13,10 +9,17 @@
     - Il est donc fortement recommandé de [réfléchir]("La reflexion vous aidera à avoir le contrôle de votre vie.")  par vous-même.
     - Si vous êtes coincé, demandez de l'aide à votre professeur, il est la pour ça.
     - Ne regardez pas les solutions sans réfléchir.
+    
+    
+
+<br />
+<br />
+
+# Initiation à Pygame
+![](img/logopygame.png)
 
 
-
-## 0. Preambule
+## 0. Préambule
 
 - [Pygame](https://www.pygame.org/news){. target="_blank"} est un package de Python facilitant la création de jeux basés une interface graphique.
 - Au lycée, vous pouvez l'installer sur votre distribution Python, par ```pip3 install pygame```.

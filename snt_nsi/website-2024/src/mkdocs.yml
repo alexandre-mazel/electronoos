@@ -43,6 +43,8 @@ nav:
       - nsi1re/index.md
       - Chapitre 5 - Architecture:
           - TP1 - Architecture d'un ordinateur : nsi1re/05-archi/tp1-compos_ordi.md
+      - Extras:
+          - Initiation à pygame: nsi1re/0X-extras/01_initiation_pygame.md
       #~ - Chapitre 1 - Langages du Web:
           #~ - TP1 - Création d'une page web: nsi1re/01-langages-web/tp1-creation-page-web.md
       #~ - Chapitre 2 - Architecture des ordinateurs:

@@ -1,5 +1,5 @@
 # Initiation à Pygame
-![](logopygame.png){: .center width=60%}
+![](img/logopygame.png){: .center width=60%}
 
 
 
@@ -52,7 +52,7 @@ pygame.quit()
 
 Ce code devrait vous donner ceci :
 
-![image](data/f1.png){: .center width=30%}
+![image](img/pygame_01.png){width=300}
 
 
 **Remarques**
@@ -71,13 +71,13 @@ Ce code devrait vous donner ceci :
 ## 2. Apparition d'un personnage
 
 ### 2.1. Téléchargement de l'image
-Nous allons travailler avec le sprite ci-dessous, nommé ```perso.png```. Il est issu de [https://openclassrooms.com/fr/courses/1399541-interface-graphique-pygame-pour-python/1399813-premieres-fenetres](https://openclassrooms.com/fr/courses/1399541-interface-graphique-pygame-pour-python/1399813-premieres-fenetres)
+Nous allons travailler avec le sprite ci-dessous, nommé ```perso.png```. Il est issu de [openclassrooms](https://openclassrooms.com/fr/courses/1399541-interface-graphique-pygame-pour-python)
 
 
-![image](data/perso.png){: .center}
+![image](img/perso.png){ align=center }
 
 
-[Téléchargez-le](data/perso.png) pour le mettre dans le même dossier que votre code ```pygame```.
+[Téléchargez-le](img/perso.png) pour le mettre dans le même dossier que votre code ```pygame```.
 
 Vous pouvez trouver sur internet un grand nombre de sprites libres de droits, au format ```png``` (donc gérant la transparence), dans de multiples positions (ce qui permet de simuler des mouvements fluides). Ici nous travaillerons avec un sprite unique.
 
@@ -137,7 +137,7 @@ pygame.quit()
 
 **Aperçu**
 
-![image](data/f2.png){: .center width=30%}
+![image](img/pygame_02.png){width=300}
 
 ## 3. Gestion des évènements
 Lorsqu'un programme ```pygame``` est lancé, la variable interne ```pygame.event.get()``` reçoit en continu les évènements des périphériques gérés par le système d'exploitation.  
@@ -153,13 +153,11 @@ for event in pygame.event.get():
         running = False
 ```
 
-!!! example "{{ exercice() }}"
+!!! Example "A vous de jouer"
     Intégrer le code ci-dessus au code précédent afin de pouvoir fermer proprement la fenêtre.
+    
+    ??? success "Voir la correction"
 
-    {{
-    correction(True,
-    """
-    ??? success \"Correction\" 
         ```python linenums='1'
         import pygame
         from pygame.locals import *
@@ -184,9 +182,6 @@ for event in pygame.event.get():
                     
         pygame.quit()
         ```
-    """
-    )
-    }}
 
 ### 3.1. Évènements clavier
 
@@ -257,13 +252,10 @@ for event in pygame.event.get():
 
 Le clic-gauche est associé à la valeur 1, le clic-droit à la valeur 3 (le clic-molette éventuel à la valeur 2).
 
-!!! example "{{ exercice() }}"
+!!! Example "A vous de jouer"
     Reprendre le code initial et y intégrer la capture d'évènements souris afin que s'affiche en console le bouton de souris appuyé.
 
-    {{
-    correction(True,
-    """
-    ??? success \"Correction\" 
+    ??? success "Correction" 
         ```python linenums='1'
 
         import pygame
@@ -297,28 +289,22 @@ Le clic-gauche est associé à la valeur 1, le clic-droit à la valeur 3 (le cli
         pygame.quit()
         
         ```
-    """
-    )
-    }}
+
 
 
 
 
 #### 3.2.2. Récupération des coordonnées de la souris
 
-Le tuple ```(abscisse, ordonnée)``` des coordonnées de la souris sera récupéré avec l'instruction ```pygame.mouse.get_pos()```.
+La paire ```(abscisse, ordonnée)``` des coordonnées de la souris sera récupéré avec l'instruction ```pygame.mouse.get_pos()```.
 
 Cette fonction n'a pas besoin d'être dans notre boucle d'écoute des évènements : elle peut se situer n'importe où dans le code.
 
 
-!!! example "{{ exercice() }}"
-    Faire afficher en console les coordonnées de la souris.
+!!! Example "A vous de jouer"
+    Ajouter au code l'affichage dans la console les coordonnées de la souris.
 
-
-    {{
-    correction(True,
-    """
-    ??? success \"Correction\" 
+    ??? success "Correction" 
         ```python linenums='1'
 
         import pygame
@@ -340,7 +326,7 @@ Cette fonction n'a pas besoin d'être dans notre boucle d'écoute des évènemen
             fenetre.blit(perso, position_perso)
 
             x, y = pygame.mouse.get_pos()
-            print(x, y)
+            print("position du clic souris:", x, y)
 
             pygame.display.flip()
             
@@ -356,9 +342,6 @@ Cette fonction n'a pas besoin d'être dans notre boucle d'écoute des évènemen
         pygame.quit()
         
         ```
-    """
-    )
-    }}
 
 
 
@@ -398,21 +381,17 @@ Au prochain ```fenetre.blit(perso, position_perso)```, le personnage sera positi
 
 
 
-!!! example "{{ exercice() }}"
+!!! example "Déplacement du personnage"
 
-    Réaliser un déplacement aléatoire, comme l'animation ci-dessous.
-
-    ![image](data/exo1.gif){: .center width=30%}
+    Réaliser un déplacement aléatoire du personnage: choisir une position a l'écran aléatoire et déplacer le personnage.
 
     Vous pourrez utiliser les instructions :
 
     - ```pygame.time.delay(1000)``` afin de ne bouger le personnage que toutes les 1000 millisecondes.
     - ```randint(a,b)``` du package ```random```, qui renvoie un entier pseudo-aléatoire entre ```a```  et ```b```.
 
-    {{
-    correction(True,
-    """
-    ??? success \"Correction\" 
+
+    ??? success "Correction" 
         ```python linenums='1'
         import pygame
         from pygame.locals import *
@@ -443,10 +422,7 @@ Au prochain ```fenetre.blit(perso, position_perso)```, le personnage sera positi
 
         pygame.quit()
 
-        ```        
-    """
-    )
-    }}
+        ```
 
 
 
@@ -460,15 +436,11 @@ position_perso = position_perso.move(15,-10)
 ```
 où ```position_perso``` est l'objet de type ```rect```  contenant les coordonnées.
 
-!!! example "{{ exercice() }}"
+!!! example Déplacement au clavier
     
-    Réaliser un contrôle au clavier du personnage, comme dans l'animation ci-dessous.
-    ![image](data/exo2.gif){: .center}
+    Réaliser un contrôle au clavier du personnage: quand on appuie sur la fléche du haut, il monte, sur celle de droite, il va à droite...
 
-    {{
-    correction(True,
-    """
-    ??? success \"Correction\" 
+    ??? success "Correction" 
         ```python linenums='1'
         import pygame
         from pygame.locals import *
@@ -513,15 +485,9 @@ où ```position_perso``` est l'objet de type ```rect```  contenant les coordonn�
             pygame.display.flip() 
 
         pygame.quit()
-    """
-    )
-    }}
-
-
-
         ```
 
-!!! example "{{ exercice() }}"
+!!! example Gestion des bords
     Rajouter des instructions afin que le personnage ne puisse pas sortir de la fenêtre de jeu.
 
     On utilisera les variables suivantes :
@@ -531,10 +497,7 @@ où ```position_perso``` est l'objet de type ```rect```  contenant les coordonn�
     - ```position_perso.left``` : abscisse de la gauche du personnage
     - ```position_perso.right``` : abscisse de la droite du personnage
 
-    {{
-    correction(True,
-    """
-    ??? success \"Correction\" 
+    ??? success "Correction" 
         ```python linenums='1'
         import pygame
         from pygame.locals import *
@@ -593,17 +556,11 @@ où ```position_perso``` est l'objet de type ```rect```  contenant les coordonn�
         pygame.quit()
 
         ```
-    """
-    )
-    }}
 
-!!! example "{{ exercice() }}"
+!!! example Warping
     Reprendre l'exercice précédent mais faire en sorte que le personnage réapparaisse à l'opposé de là où il est sorti.
 
-    {{
-    correction(True,
-    """
-    ??? success \"Correction\" 
+    ??? success "Correction" 
         ```python linenums='1'
         import pygame
         from pygame.locals import *
@@ -662,167 +619,31 @@ où ```position_perso``` est l'objet de type ```rect```  contenant les coordonn�
         pygame.quit()
 
 
-        ```
-    """
-    )
-    }}    
+        ```  
 
-## 5. Contrôle avec la micro:bit
-
-Pour pouvoir contrôler notre personnage avec (par exemple) les boutons de la carte micro:bit, il va falloir :
-
-- mettre dans la carte un programme minimal qui va se contenter d'envoyer des données.
-- mettre dans notre programme Pygame une instruction capable de recevoir les données envoyées par la carte.
-
-
-### 5.1 Programme à téléverser dans la micro:bit
-
-[Lien vers le simulateur](https://python.microbit.org/v/3){. target="_blank"}
-
-```python linenums='1'
-from microbit import *
-
-while True:
-    incX = accelerometer.get_x()
-    incY = accelerometer.get_y()
-    
-    message = "{},{}".format(incX,incY)
-    print(message)
-    
-    sleep(50)
-```
-
-Ce programme va envoyer, 20 fois par seconde, la valeur de l'inclinaison en X et la valeur de l'inclinaison en Y.
-
-
-### 5.2 Récupération des données dans Pygame
-
-Il faut connaître le port utilisé par le système d'exploitation pour communiquer avec la micro:bit. Sous Linux, ce port est de la forme ```ttyACM0```, sous Windows il sera de la forme ```COM2```.
-
-!!! tip "connaitre le port sous Windows"
-    Ouvrir un terminal via ```cmd``` et taper la commande ```mode```. 
-
-Une fois le programme d'envoi téléversé dans la micro:bit et le port connu, testez le programme suivant :
-
-
-
-```python linenums='1'
-import serial
-
-port = "COM2" # à adapter en allant voir le port utilisé par la microbit
-s = serial.Serial(port)
-s.baudrate = 115200
-
-while True:
-    s.flushInput()
-    data = s.readline()
-    data = data.decode('utf-8')
-    data = data.split(',')
-    incX = int(data[0])
-    incY = int(data[1])
-    print(incX, incY)
-```
-
-En inclinant la carte, vous devriez voir bouger les valeurs dans la console de Thonny. Observer quelles sont les valeurs minimales et maximales.
-
-!!! example "{{ exercice() }}"
-    À l'aide de l'exemple précédent, modifiez le code de l'exercice 5 afin de pouvoir bouger le personnage à l'aide de la micro:bit.
-
-    {{
-    correction(True,
-    """
-    ??? success \"Correction\" 
-        ```python linenums='1'
-        import pygame 
-        from pygame.locals import *
-
-        import serial
-
-        port = 'COM2' # à adapter
-        s = serial.Serial(port)
-        s.baudrate = 115200 
-
-
-
-        pygame.init()
-        pygame.key.set_repeat(50)
-
-        fenetre = pygame.display.set_mode((640, 480))
-
-        perso = pygame.image.load('perso.png').convert_alpha()
-
-        position_perso = perso.get_rect()
-        position_perso.center = (320, 240)
-        pas = 10 
-        pygame.time.delay(500)
-        clock = pygame.time.Clock()
-
-        seuil = 200
-
-        running = True
-        while running:
-            
-            clock.tick(30)
-
-            s.flushInput()
-            data = s.readline()
-            data = data.decode('utf-8')
-            data = data.split(',')
-            accX = int(data[0])
-            accY = int(data[1]) 
-
-            if accY < -seuil : 
-                position_perso = position_perso.move(0, -pas)
-
-            if accY > seuil :
-                position_perso = position_perso.move(0, pas)
-
-            if accX > seuil : 
-                position_perso = position_perso.move(pas, 0)
-
-            if accX < -seuil : 
-                position_perso = position_perso.move(-pas, 0)
-                
-            if position_perso.top < 0:
-                position_perso.top = 0
-
-            if position_perso.bottom > 480:
-                position_perso.bottom = 480
-
-            if position_perso.left < 0:
-                position_perso.left = 0
-
-            if position_perso.right > 640:
-                position_perso.right = 640
-
-
-            for event in pygame.event.get() :    
-                if event.type == pygame.QUIT:
-                    running = False
-
-            fenetre.fill((10, 186, 181))
-            fenetre.blit(perso, position_perso)
-            pygame.display.flip()
-            
-        pygame.quit()
-
-        ```
-    """
-    )
-    }}
 
 ## 5. À vous !
 
 Fabriquez le jeu que vous souhaitez à partir des informations ci-dessus.
 Bien d'autres aides peuvent être trouvées dans les liens citées dans la partie Bibliographie.
 
-**Exemple** de réalisation possible : un clicker avec un temps qui diminue à progressivement, et comptage des points.
+### Exemple de réalisation possible
+Un clicker avec un temps qui diminue à progressivement, et comptage des points.
 
-![image](data/exo3.gif){: .center width=30%}
+![image](img/clicker.gif)
+
+
+### D'autres exemples pour vous inspirer
+
+ - Morpion
+ - Snake
+ - Tron
+ - Pong
+ - Puissance 4
 
 
 
-**Quelques aides :**
+### Quelques aides
 
 - **écrire du texte :**  
 ```python
@@ -841,11 +662,11 @@ dessine un rectangle vert de 100 pixels sur 10 pixels, dont le coin en haut à g
 - **gérer le temps:**
 ```python
 import time
-topchrono = time.time()
+time_begin = time.time()
 delai = 5
 sortir = False
-while sortir == False :
-  if time.time() - topchrono > delai :
+while not sortir:
+  if time.time() - time_begin > delai :
     print("5 secondes se sont écoulées")
     sortir = True
 ```
@@ -856,6 +677,4 @@ while sortir == False :
 ---
 **Bibliographie**
 
-- Documentation officielle de Pygame, [https://www.pygame.org/docs/](https://www.pygame.org/docs/)
-- Cours d'OpenClassrooms, [https://openclassrooms.com/fr/courses/1399541-interface-graphique-pygame-pour-python/1399813-premieres-fenetres](https://openclassrooms.com/fr/courses/1399541-interface-graphique-pygame-pour-python/1399813-premieres-fenetres).
-
+- Documentation officielle de Pygame: [https://www.pygame.org/docs/](https://www.pygame.org/docs/)

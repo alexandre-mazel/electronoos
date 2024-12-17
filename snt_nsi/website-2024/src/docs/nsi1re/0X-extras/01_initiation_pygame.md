@@ -32,27 +32,22 @@
 
 ```python
 import pygame
-from pygame.locals import *
+from pygame.locals import * # pour la définition plus facile des constantes
 
-pygame.init() # (4)
+pygame.init() # Initialisation du module pygame
 
-fenetre = pygame.display.set_mode((640, 480)) # (1)
-fenetre.fill((10, 186, 181)) # (2)
+fenetre = pygame.display.set_mode((640, 480)) # Création de la fenêtre de taille (640, 480)
+fenetre.fill((10, 186, 181)) # On remplit tout avec la couleur (10, 186, 181)
 
 running = True
 while running: 
-    fenetre.fill((10, 186, 181)) # (2)
-    pygame.display.flip() #(3) 
+    fenetre.fill((10, 186, 181))
+    pygame.display.flip() # Permet de rafraîchir la totalité de la fenêtre.
 
 pygame.quit()
 ``` 
 
 
-
-1. On crée une fenêtre de taille ```(640, 480)```.
-2. On remplit la fenêtre avec la couleur ```(10, 186, 181)```.
-3. Permet de rafraîchir la totalité de la fenêtre. Pour l'instant inutile car rien ne bouge...
-4. Initialisation du module ```pygame```. 
 
 
 Ce code devrait vous donner ceci :

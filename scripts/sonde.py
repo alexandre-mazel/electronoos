@@ -42,6 +42,13 @@ def run_loop_send(strDeviceID):
     while 1:
         for i in range(10):
             t = getTemperatureFrom1wire(strDeviceID)
+            if 1:
+                 # on va moyenner 2 lectures a 15s d'intervalles
+                if t > -127:
+                    time.sleep(15)
+                    t2 = getTemperatureFrom1wire(strDeviceID)
+                    if t2 > -127:
+                        t = (t + t2) / 2
             if t > -127:
                 if 1:
                     # save in local file

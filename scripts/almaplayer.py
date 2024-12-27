@@ -59,7 +59,7 @@ def playWebm(strFilename):
                 print("key: %s" % key )
                 if key == 'H':
                     print("vol up")
-                    player.volume(100)
+                    player.volume(100) # ou entre 0 et 1 ?
                 if key == 'p':
                     if not bInPause:
                         print("pause song")

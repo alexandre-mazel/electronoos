@@ -40,6 +40,7 @@ def decode_file_sonde(strFilename):
     nNumLine = 0
     
     allDatas = []
+    prevTemp = 0
     while 1:
         line = f.readline()
         if bVerbose: print(line)
@@ -87,6 +88,10 @@ def decode_file_sonde(strFilename):
         if rTemp < 1:
             continue
             
+        if 0:
+            # average on two values
+            rTemp = (prevTemp + rTemp)/2
+            prevTemp = rTemp
         allDatas.append([nYear, nMonth, nDay, nHour,nMin,rTemp])
     
     f.close()
@@ -115,7 +120,7 @@ def draw_point_series(dictPerDay, bRender=True):
             # local min & max
             for extremum,offset in [(min,-0.4),(max,+0.1)]:
                 idx = dictPerDay[k][1].index(extremum(dictPerDay[k][1]))
-                strLabelMin = my_label + '\n' + str(int(dictPerDay[k][0][idx])) + 'h' + "%02d: "%((dictPerDay[k][0][idx]%1)*60) + str(dictPerDay[k][1][idx]) + '' 
+                strLabelMin = my_label + '\n' + str(int(dictPerDay[k][0][idx])) + 'h' + "%02d: "%((dictPerDay[k][0][idx]%1)*60) + "%.1f"%   (dictPerDay[k][1][idx]) + '' 
                 # plt.annotate('local max', xy=(2, 1), xytext=(3, 1.5), arrowprops=dict(facecolor='black', shrink=0.05),)
                 plt.annotate( strLabelMin, xy=(dictPerDay[k][0][idx]-0.5, dictPerDay[k][1][idx]+offset))
                 
@@ -180,7 +185,9 @@ datas = decode_file_sonde(strFilename)
 if 1:
     for d in datas[-40:]:
         print(d)
-    
+
+datas = datas[-24*12*7:] # a peu pres la derniere semaine
+
 analyse_sonde_temp(datas, 2024,12)
 #~ analyse_sonde_temp(datas, 2024,11,2024,11)
 #~ analyse_sonde_temp(datas, 2024,7,2024,7)

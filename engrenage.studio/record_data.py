@@ -33,6 +33,9 @@ def index(req):
     - h: host
     - dn: dataname
     - dv: data value
+    
+    // test me with:
+    http://engrenage.studio/record_data.py?dn=test&dv=421
     """
     # warning: it search for a </html> to decide if it's html or plain text !!!!
     filename = req.filename
@@ -44,7 +47,7 @@ def index(req):
     txt += "<br>"
     #~ txt += "<p style = 'font-family:georgia,garamond,serif;font-size:56px'>"
     #~ txt += "<img src='img/logo_engrenage.png' width=320px />"
-    txt += "record data page"
+    txt += "record data page<br>"
 
     
     if bDebug:
@@ -60,15 +63,30 @@ def index(req):
         txt += "dArgs: %s<br>\n" % str(dArgs)
         txt += "</p>"
         
-    strHostname = dArgs["h"]
-    dataname = dArgs["dn"]
+    try:
+        strHostname = dArgs["h"]
+    except KeyError as err:
+        strHostname = "Unknown host"
+        
+    if "dn" not in dArgs or "dv" not in dArgs:
+        txt += "ERROR: Wrong format (1)<br>"
+        txt += "Args: %s" % str(dArgs)
+        
+        return txt
+                
+    try:
+        dataname = dArgs["dn"]
+    except KeyError as err:
+        txt += "ERROR: Wrong format (2): no name"
+        return txt
+        
     datavalue = dArgs["dv"]
     if "t" in dArgs:
         timestamp = float(dArgs["t"])
     else:
         timestamp = time.time()
         
-    txt += "INF recordData return: <br>"
+    txt += "INF: recordData return: <br>"
     txt += recordData(timestamp,strHostname,dataname, datavalue)
 
     txt += "</html>"

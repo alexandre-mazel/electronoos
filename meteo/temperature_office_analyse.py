@@ -68,6 +68,8 @@ def decode_file_sonde(strFilename):
             
             strDate = strDate.decode()
             strTime = strTime.decode()
+            strHost  = "rpi"  # for back compat
+            strMesureName = "Temperature" # for back compat
             strLocation = strLocation.decode()
             datas_key = (strLocation, "temp")
         else:
@@ -118,6 +120,10 @@ def decode_file_sonde(strFilename):
         if rValue < 1 or rValue > 50000: # max is VOC 1...50000
             continue
             
+        # remove test
+        if "test" in strMesureName.lower() or "misbb" in strHost.lower():
+            continue
+            
         if 0:
             # average on two values (works only on sonde) (else we'll need many prevValues)
             rValue = (prevTemp + rValue)/2
@@ -140,7 +146,7 @@ def draw_point(list_x,list_y):
     plt.ylabel('temperature')
     plt.show()
     
-def draw_temp_series(dictPerDay, bRender=True, bCloseAtEnd = True ):
+def draw_temp_series(dictPerDay, bRender=True, bCloseAtEnd = True, strTitle = None ):
     import matplotlib.pyplot as plt
     
     for k in dictPerDay:
@@ -159,12 +165,17 @@ def draw_temp_series(dictPerDay, bRender=True, bCloseAtEnd = True ):
     first_year = list(dictPerDay.keys())[0].split(":")[1].strip()[:4]
     first_month = list(dictPerDay.keys())[0].split(":")[1].strip()[5:7]
     print(first_month)
-    plt.ylabel('Temperature' + ' ' + first_year)
+    if strTitle == None:
+        strTitle = 'Temperature' + ' ' + first_year
+        strPrefix = "temp"
+    else:
+        strPrefix = strTitle.replace("(","").replace(")","").replace(",","_").replace(" ", "").replace("'", "").replace("-", "").replace(".", "").lower()
+    plt.ylabel(strTitle)
     plt.legend()
     plt.locator_params(axis='both', nbins=24) 
     plt.tight_layout(pad=0) # fonctionne pas sur le premier?
     plt.gcf().set_size_inches(32, 18) # pour le rendu dans le fichier
-    fn = 'output/month_'+first_year+'_'+first_month+".jpg"
+    fn = ('output/%s_month_'% strPrefix) +first_year+'_'+first_month+".jpg"
     print("INF: draw_temp_series: writing to '%s'" % fn )
     plt.savefig(fn, dpi=100)
     if bRender: plt.show()
@@ -208,35 +219,43 @@ def analyse_sonde_temp( alldatas, nYearMin, nMonthMin, nYearMax = 2094, nMonthMa
         
         
         
-def render_all_datas( alldatas ):
+def render_all_datas( alldatas, nYearMin = 2024, nMonthMin = 12, nYearMax = 2094, nMonthMax = 13, bRender=True ):
+    """
+    for each datas, for each week we want all days in one graph
+    """
     import matplotlib.pyplot as plt
     
-    for k in dictPerDay:
-        my_label = k.replace("2024/","" ).replace("2023/","" ).replace("2022/","" )
-        # invert day et month
-        my_label = my_label[:-5] + my_label[-2:] + "/" + my_label[-5:-3]
-        plt.plot(dictPerDay[k][0],dictPerDay[k][1],label = my_label)
-        if 1:
-            # local min & max
-            for extremum,offset in [(min,-0.4),(max,+0.1)]:
-                idx = dictPerDay[k][1].index(extremum(dictPerDay[k][1]))
-                strLabelMin = my_label + '\n' + str(int(dictPerDay[k][0][idx])) + 'h' + "%02d: "%((dictPerDay[k][0][idx]%1)*60) + "%.1f"%   (dictPerDay[k][1][idx]) + '' 
-                # plt.annotate('local max', xy=(2, 1), xytext=(3, 1.5), arrowprops=dict(facecolor='black', shrink=0.05),)
-                plt.annotate( strLabelMin, xy=(dictPerDay[k][0][idx]-0.5, dictPerDay[k][1][idx]+offset))
-                
-    first_year = list(dictPerDay.keys())[0].split(":")[1].strip()[:4]
-    first_month = list(dictPerDay.keys())[0].split(":")[1].strip()[5:7]
-    print(first_month)
-    plt.ylabel('Temperature' + ' ' + first_year)
-    plt.legend()
-    plt.locator_params(axis='both', nbins=24) 
-    plt.tight_layout(pad=0) # fonctionne pas sur le premier?
-    plt.gcf().set_size_inches(32, 18) # pour le rendu dans le fichier
-    fn = 'output/month_'+first_year+'_'+first_month+".jpg"
-    print("INF: draw_temp_series: writing to '%s'" % fn )
-    plt.savefig(fn, dpi=100)
-    if bRender: plt.show()
-    
+    dictPerDay = {}
+    xs = []
+    ys = []
+    for key, datas in alldatas.items():
+        for d in datas:
+            nYear, nMonth, nDay, nHour,nMin,rTemp = d
+            if nYear < nYearMin or ( nYear == nYearMin and nMonth < nMonthMin):
+                continue
+            if nYear > nYearMax or ( nYear == nYearMax and nMonth > nMonthMax):
+                continue
+            #~ print("INF: analyse_sonde_temp: %d/%02d/%02d: %02dh%02d: temp: %5.2f" % (nYear, nMonth, nDay, nHour,nMin,rTemp))
+            xs.append(nHour+nMin/60)
+            ys.append(rTemp)
+            
+            my_date = datetime.datetime(nYear, nMonth, nDay) 
+            dayname = my_date.strftime("%A")
+
+            k = "%s: %d/%02d/%02d" % (dayname, nYear, nMonth, nDay)
+            if not k in dictPerDay:
+                dictPerDay[k] = ([],[])
+            dictPerDay[k][0].append(nHour+nMin/60)
+            dictPerDay[k][1].append(rTemp)
+            
+        #~ for k in dictPerDay:
+        #~ import matplotlib.pyplot as plt
+        #~ plt.plot(xs,ys)
+        #~ plt.ylabel( str(key) )
+        #~ plt.show()
+        if len(dictPerDay) > 0:
+            draw_temp_series(dictPerDay, bRender=bRender, strTitle = str(key))
+            dictPerDay = {}
 
     
     

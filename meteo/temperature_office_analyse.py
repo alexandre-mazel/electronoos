@@ -3,6 +3,10 @@
 
 # scp -P 11022 na@thenardier.fr:/home/na/save/office_temperature.txt C:/Users/alexa/dev/git/electronoos/meteo/data/
 
+# to retrieve data sent from logged data from various IOT device
+# scp -P 50022 na@thenardier.fr:/var/www/save/webdata.txt  C:/Users/alexa/dev/git/electronoos/meteo/data/
+
+
 import sys
 
 sys.path.append("../../obo/spider/")
@@ -22,24 +26,19 @@ def isListIn(word,list):
     return False
 
 def decode_file_sonde(strFilename):
+    """
+    return a list of dictionnary of values, eg: ("location","name of datas") => list of values = [year,month,day,hour, min, value]
+    """
+    
     bVerbose = 1
     bVerbose = 0
     
     f = open(strFilename,"rb")
-    occCity = common.OccCounter()
-    occWeather = common.OccCounter()
-    
-    dicoHelper = {} # city => HelperStat
-    
-    dicoStat = {} # dico per city and month => stat
-    
-    strStartDate = ""
-    strStopDate = ""
 
-    
     nNumLine = 0
     
-    allDatas = []
+    allDatas = {}
+    
     prevTemp = 0
     while 1:
         line = f.readline()
@@ -52,17 +51,48 @@ def decode_file_sonde(strFilename):
         
         for i in range(len(datas)):
             datas[i] = datas[i].strip()
+            
+        # office sonde line format: 2023/02/13: 15h54m10s: armoire: 22.375
+        # websave line format: 1735662269.80: MisBKit3: humid: 78.73
         
-        strDate, strTime, strCity, strTemp = datas[:4]
+        # duplicates in websave compared to office sonde: 1735662309.73: robot-enhanced-education.org: temp: 19.0
         
-        if bVerbose: print("strDate: '%s'" % strDate)
-        if bVerbose: print("strTime: '%s'" % strTime)
-        if bVerbose: print("strCity: '%s'" % strCity)
-        if bVerbose: print("strTemp: '%s'" % strTemp)
-        
-        strDate = strDate.decode()
-        strTime = strTime.decode()
-        strCity = strCity.decode()
+        if b"/" in datas[0]:
+            # office sonde format
+            strDate, strTime, strLocation, strValue = datas[:4]
+            
+            if bVerbose: print("strDate: '%s'" % strDate)
+            if bVerbose: print("strTime: '%s'" % strTime)
+            if bVerbose: print("strLocation: '%s'" % strLocation)
+            if bVerbose: print("strValue: '%s'" % strValue)
+            
+            strDate = strDate.decode()
+            strTime = strTime.decode()
+            strLocation = strLocation.decode()
+            datas_key = (strLocation, "temp")
+        else:
+            # web save
+            strEpoch, strHost, strMesureName, strValue = datas[:4]
+            
+            if bVerbose: print("strEpoch: '%s'" % strEpoch)
+            if bVerbose: print("strHost: '%s'" % strHost)
+            if bVerbose: print("strMesureName: '%s'" % strMesureName)
+            if bVerbose: print("strValue: '%s'" % strValue)
+            
+            strEpoch = strEpoch.decode()
+            strHost = strHost.decode()
+            strMesureName = strMesureName.decode()
+            strValue = strValue.decode()
+            strValue = strValue.replace("%22", "" ) # at once I've sent  &v="421"  instead of  &v=421
+            
+            strDateTime = common.epochToTimeStamp(float(strEpoch))
+            if bVerbose: print("strDateTime: '%s'" % strDateTime)
+            strDate,strTime = strDateTime.split(':')
+            strTime = strTime.strip()
+            
+            datas_key = (strHost, strMesureName)
+            
+
         strYear = strDate[0:4]
         strMonth = strDate[5:7]
         strDay = strDate[8:10]
@@ -76,8 +106,8 @@ def decode_file_sonde(strFilename):
         nDay = int(strDay)
         nHour = int(strHour)
         nMin = int(strMin)
-        rTemp = float(strTemp)
-        if bVerbose or nNumLine==0: print("DBG: integered: %d/%02d/%02d: %02dh%02d: temp: %5.2f" % (nYear, nMonth, nDay, nHour,nMin,rTemp))
+        rValue = float(strValue)
+        if bVerbose or nNumLine==0: print("DBG: integered: %d/%02d/%02d: %02dh%02d: value: %5.2f" % (nYear, nMonth, nDay, nHour,nMin,rValue))
         
         nNumLine += 1
         #~ if nNumLine > 100:
@@ -85,14 +115,16 @@ def decode_file_sonde(strFilename):
             
             
         # remove abberations
-        if rTemp < 1:
+        if rValue < 1 or rValue > 50000: # max is VOC 1...50000
             continue
             
         if 0:
-            # average on two values
-            rTemp = (prevTemp + rTemp)/2
-            prevTemp = rTemp
-        allDatas.append([nYear, nMonth, nDay, nHour,nMin,rTemp])
+            # average on two values (works only on sonde) (else we'll need many prevValues)
+            rValue = (prevTemp + rValue)/2
+            prevTemp = rValue
+            
+        if datas_key not in allDatas: allDatas[datas_key] = []
+        allDatas[datas_key].append([nYear, nMonth, nDay, nHour,nMin,rValue])
     
     f.close()
     
@@ -181,10 +213,21 @@ def analyse_sonde_temp( datas, nYearMin, nMonthMin, nYearMax = 2094, nMonthMax =
     
     
 strFilename = "data/office_temperature.txt"
+strFilename = "data/webdata.txt"
 datas = decode_file_sonde(strFilename)
+
 if 1:
-    for d in datas[-40:]:
-        print(d)
+    # draw some datas:
+    #~ print(datas.keys())
+    print("Last datas of each type:")
+    for k, v in datas.items():
+        print("key: %s" % str(k) )
+        for d in v[-40:]:
+            print(d)
+            
+key = list(datas.keys())[0]
+print("Rendering data for %s" % str(key) )
+datas = datas[key] # render first type
 
 datas = datas[-24*12*7:] # a peu pres la derniere semaine
 

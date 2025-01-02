@@ -282,7 +282,7 @@ def test_opencv_orb( bPrint = True ):
     img = numpy.zeros((h,w,1), numpy.uint8)
     for j in range(h):
         for i in range(w):
-            img[j,i,0] = math.sin(w*h)*1000
+            img[j,i,0] = (math.sin(w*h)*1000) % 256
     
     timeBegin = time.time();
     for i in range(20):
@@ -1501,6 +1501,35 @@ test_cpu_ram14G  : ####################   10.51s
 test_cpu_ram16G  : ####################   12.65s
 disk_read     1KB: ####################   7.00s (142.92 Mo/s)
 disk_read  1024KB: ####################   1.38s (726.17 Mo/s)
+
+
+*** Ordi gabriel portable gamer
+python version   : 3.13.1 (64bits) (8 core(s))
+cpu              : AMD Ryzen 5 2500U with Radeon Vega Mobile Gfx
+ram             : 11.94 / 14.90 GB
+test_cpu_int2    : ####################   1.03s
+test_cpu_float2  : ####################   0.16s
+test_crypt            : ####################   11.56s
+test_cpu_ram 2G  : ####################   0.67s
+test_cpu_ram 4G  : ####################   1.33s
+test_cpu_ram 6G  : ####################   2.12s
+test_cpu_ram 8G  : ####################   3.13s
+test_cpu_ram10G  : ####################   4.05s
+test_cpu_ram12G  : ####################   6.97s
+test_cpu_ram14G  : ####################   15.05s
+test_cpu_ram16G  : ####################   19.40s
+test_scipy_xxt   : ####################   2.23s (179.55x)
+opencv (orb)      : not found
+opencv (orb)    : not found
+opencv (orb)    : not found
+multiprocess x1 :  0.39s /  0.12s /  5.26s /  1.13s /  0.01s /  0.01s /  0.01s =>    6.93s (per thread:6.93s)
+multiprocess x4 :  0.40s /  0.12s /  5.30s /  1.34s /  0.02s /  0.02s /  0.01s =>   14.13s (per thread:3.53s)
+multiprocess x8 :  0.76s /  0.29s / 10.56s /  2.59s /  0.02s /  0.02s /  0.02s =>   28.40s (per thread:3.55s)
+multiprocess x32:  2.97s /  0.84s / 42.23s / 10.87s /  0.08s /  0.08s /  0.08s =>   85.55s (per thread:2.67s)
+disk_write    1KB: ####################   5.11s (195.62 Mo/s)
+disk_read     1KB: ####################   1.71s (585.41 Mo/s)
+disk_write 1024KB: ####################   2.85s (350.36 Mo/s)
+disk_read  1024KB: ####################   0.74s (1359.73 Mo/s)
 
 
 """

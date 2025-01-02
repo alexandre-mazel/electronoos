@@ -58,6 +58,7 @@ uint32_t hueToHexa( int nHue )
 
 void setup() 
 {
+  Serial.begin(115200);
   // FastLED.addLeds(leds, NUM_LEDS);
   FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS); 
 }
@@ -114,7 +115,7 @@ void strobo(int nDelay=100)
     leds[dot] = CRGB::Black;
   }
   FastLED.show();
-  delay(nDelay);
+  delay(nDelay*2); // because leds takes more time to turn off
 }
 
 void medusa(int nDelay=100)
@@ -131,25 +132,54 @@ void medusa(int nDelay=100)
   }
 }
 
+
+void beat(int nBpm)
+{
+  int nDelay = 1000L*60/(nBpm*2); // delay is half period
+  const int nTimeToSend = 2; // depend of the number of led, 2 is great for 2
+  for(int dot = 0;dot < NUM_LEDS; dot++)
+  { 
+    leds[dot] = CRGB::Blue;
+  }
+  FastLED.show();
+  delay(nDelay-nTimeToSend);
+
+  for(int dot = 0;dot < NUM_LEDS; dot++)
+  { 
+    leds[dot] = CRGB::Black;
+  }
+  FastLED.show();
+  delay(nDelay-nTimeToSend);
+}
+
 void loop()
 { 
-  for(int i = 0; i < 10; ++i )
+  for(int i = 10; i < 10; ++i )
   {
     chaser(10);
   }
 
-  for(int i = 0; i < 4; ++i )
+  for(int i = 10; i < 3; ++i )
   {
     medusa(100);
   }
 
-  for(int i = 0; i < 10; ++i )
+  for(int i = 10; i < 5; ++i )
   {
     serialGlow(100);
   }
 
-  for(int i = 0; i < 100; ++i )
+  for(int i = 10000; i < 2000; ++i )
   {
     strobo(20);
   }
+
+  for(int i = 0; i < 32; ++i )
+  {
+    beat(120);
+  }
+
+  static int32_t last = 0;
+  Serial.println(millis()-last);
+  last = millis();
 }

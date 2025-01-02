@@ -331,7 +331,7 @@ def test_opencv_orb_realcase( bPrint = True ):
     img = numpy.zeros((h,w,1), numpy.uint8)
     for j in range(h):
         for i in range(w):
-            img[j,i,0] = math.sin(w*h)*1000
+            img[j,i,0] = (math.sin(w*h)*1000)% 256
     
     try:
         img1 = cv2.imread( "test_perf_vga_01.png" )

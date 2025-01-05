@@ -36,6 +36,7 @@ def index(req):
     
     // test me with:
     http://engrenage.studio/record_data.py?dn=test&dv=421
+    http://engrenage.studio/record_data.py?dn=test&dv=421&dn2=test2&dv2=666.42
     """
     # warning: it search for a </html> to decide if it's html or plain text !!!!
     filename = req.filename
@@ -47,7 +48,7 @@ def index(req):
     txt += "<br>"
     #~ txt += "<p style = 'font-family:georgia,garamond,serif;font-size:56px'>"
     #~ txt += "<img src='img/logo_engrenage.png' width=320px />"
-    txt += "record data page<br>"
+    txt += "Record data page<br>"
 
     
     if bDebug:
@@ -86,8 +87,21 @@ def index(req):
     else:
         timestamp = time.time()
         
-    txt += "INF: recordData return: <br>"
-    txt += recordData(timestamp,strHostname,dataname, datavalue)
+    txt += "INF: recordData for '%s' return: <br>" % dataname
+    txt += recordData(timestamp,strHostname,dataname, datavalue) + "<br>"
+    
+    if "dn2" in dArgs:
+        # handle optionnal datanames and values, eg: dn2, dv2,  dn3, dv3, ...
+        strTemplateName = "dn%d"
+        strTemplateValue = "dv%d"
+        txt += "INF: optionnal datas received... <br>"
+        nNumVar = 2
+        while strTemplateName % nNumVar in dArgs:
+            dataname = dArgs[strTemplateName % nNumVar]
+            datavalue = dArgs[strTemplateValue % nNumVar]
+            txt += "INF:   recordData for '%s' return: <br>" % dataname
+            txt += recordData(timestamp,strHostname,dataname, datavalue) + "<br>"
+            nNumVar += 1
 
     txt += "</html>"
     return txt

@@ -410,7 +410,7 @@ def convertEpochToSpecificTimezone( timeEpoch, bRemoveNever=0 ):
     #~ if isRPI() and time.localtime().tm_isdst:
         #~ dtd += datetime.timedelta(hours=-2)
         
-    print("DBG: convertEpochToSpecificTimezone: avant: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
+    # print("DBG: convertEpochToSpecificTimezone: avant: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
     # on lui dit que c'est de l'utc
     #~ dtd = dtd.replace(tzinfo=datetime.timezone.utc)
     try:

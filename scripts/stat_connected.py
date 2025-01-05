@@ -1,5 +1,8 @@
 #!/usr/bin/python
 
+# to be run as:
+# sudo nohup /home/na/dev/git/electronoos/scripts/stat_connected.py &
+
 def logDebug(txt):
     pass
     #file = open("/home/na/pi_error.log", "at" )

@@ -282,7 +282,7 @@ def test_opencv_orb( bPrint = True ):
     img = numpy.zeros((h,w,1), numpy.uint8)
     for j in range(h):
         for i in range(w):
-            img[j,i,0] = math.sin(w*h)*1000
+            img[j,i,0] = (math.sin(w*h)*1000) % 256
     
     timeBegin = time.time();
     for i in range(20):
@@ -331,7 +331,7 @@ def test_opencv_orb_realcase( bPrint = True ):
     img = numpy.zeros((h,w,1), numpy.uint8)
     for j in range(h):
         for i in range(w):
-            img[j,i,0] = math.sin(w*h)*1000
+            img[j,i,0] = (math.sin(w*h)*1000)% 256
     
     try:
         img1 = cv2.imread( "test_perf_vga_01.png" )
@@ -604,7 +604,7 @@ test_disk_write: #################### 562.11s ( 6.79 Mo/s)
 test_disk_read : #################### 123.60s (30.86 Mo/s)
 
 
-D:\>python c:test_perf.py
+D:/>python c:test_perf.py
 INF: Due to low empty disk space, reducing disk test size to 439 MB
 python version : 3.8.2 (32bits) (4 core(s))
 test_cpu_int2    : ####################   1.06s
@@ -1279,28 +1279,28 @@ disk_read  1024KB: ####################   0.33s (3047.28 Mo/s)
 comparison test writing on ms tab 4:
 
 new sandisk fit mini usb 128Go sur port usb
-E:\>python c:test_perf.py 1000
+E:/>python c:test_perf.py 1000
 disk_write    1KB: ####################  19.55s (51.16 Mo/s)
 disk_read     1KB: ####################   3.59s (278.21 Mo/s)
 disk_write 1024KB: ####################  20.55s (48.66 Mo/s)
 disk_read  1024KB: ####################   0.67s (1488.13 Mo/s)
 
 microsd nintendo switch 128 avec adapteur usb de Sophie
-E:\>python c:test_perf.py 1000
+E:/>python c:test_perf.py 1000
 disk_write    1KB: ####################  72.02s (13.89 Mo/s)
 disk_read     1KB: ####################   3.81s (262.24 Mo/s)
 disk_write 1024KB: ####################  72.97s (13.70 Mo/s)
 disk_read  1024KB: ####################   0.47s (2133.94 Mo/s)
 
 microsd nintendo switch 128 dans slot microsd
-D:\>python c:test_perf.py 1000
+D:/>python c:test_perf.py 1000
 disk_write    1KB: ####################  16.71s (59.85 Mo/s)
 disk_read     1KB: ####################   3.34s (298.99 Mo/s)
 disk_write 1024KB: ####################  16.58s (60.31 Mo/s)
 disk_read  1024KB: ####################   0.44s (2283.54 Mo/s)
 
 microsd sandisk extreme 256 (celle de ms tab) dans slot microsd
-D:\>python c:test_perf.py 1000
+D:/>python c:test_perf.py 1000
 disk_write    1KB: ####################  17.18s (58.22 Mo/s)
 disk_read     1KB: ####################   3.38s (296.26 Mo/s)
 disk_write 1024KB: ####################  16.47s (60.70 Mo/s)
@@ -1501,6 +1501,31 @@ test_cpu_ram14G  : ####################   10.51s
 test_cpu_ram16G  : ####################   12.65s
 disk_read     1KB: ####################   7.00s (142.92 Mo/s)
 disk_read  1024KB: ####################   1.38s (726.17 Mo/s)
+
+
+*** Ordi gabriel portable gamer
+python version   : 3.13.1 (64bits) (8 core(s))
+cpu              : AMD Ryzen 5 2500U with Radeon Vega Mobile Gfx
+ram             : 11.94 / 14.90 GB
+test_cpu_int2    : ####################   1.03s
+test_cpu_float2  : ####################   0.16s
+test_crypt            : ####################   11.56s
+test_cpu_ram 2G  : ####################   0.67s
+test_cpu_ram 4G  : ####################   1.33s
+test_cpu_ram 6G  : ####################   2.12s
+test_cpu_ram 8G  : ####################   3.13s
+test_cpu_ram10G  : ####################   4.05s
+test_cpu_ram12G  : ####################   6.97s
+test_cpu_ram14G  : ####################   15.05s
+test_cpu_ram16G  : ####################   19.40s
+test_scipy_xxt   : ####################   2.23s (179.55x)
+test_orb4.10.0    : ####################   0.57s (175.56fps)
+test_orbcv imgs  : ####################   3.84s (26.06fps)
+test_orbcv bis   : ####################   1.62s (61.55fps)
+disk_write    1KB: ####################   22.69s (44 Mo/s)
+disk_read     1KB: ####################   19.55s (51 Mo/s)
+disk_write 1024KB: ####################   4.91s (203 Mo/s)
+disk_read  1024KB: ####################   0.67s (1492 Mo/s)
 
 
 """

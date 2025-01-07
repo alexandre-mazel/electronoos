@@ -83,6 +83,10 @@ def isListIn(word,list):
     return False
 
 def analyse(strFilename):
+    """
+    Compute best place to live AND
+    return a list of dictionnary of values, eg: ("location","temperature") => list of values = [year, month,day, hour, min, value]
+    """
     bVerbose = 0
     
     f = open(strFilename,"rb")
@@ -95,6 +99,8 @@ def analyse(strFilename):
     
     strStartDate = ""
     strStopDate = ""
+    
+    dict_out = {} # the dict to return
 
     
     nNumLine = 0
@@ -115,8 +121,12 @@ def analyse(strFilename):
         strCity = strCity.decode()
         strYear = strDate[0:4]
         strMonth = strDate[5:7]
+        strDay = strDate[8:10]
         strHour = strTime[0:2]
         nHour = int(strHour)
+        strMin =  strTime[3:4]
+        nMin = int(strMin)
+
         if bVerbose: print("nHour: %s" % nHour)
         
         nTemp = int(strTemp)
@@ -132,21 +142,50 @@ def analyse(strFilename):
         strWeather = "?"
         bRain = 0
         bSnow = 0
+        bSun = 0
+        nCondition = -1 # etat du plus au moins sympa, -1: unknown, 1: pluie, 2: neige, 3: nuage, 4: soleil
         if len(datas)>4:
             strWeather = datas[4].decode()
             strWeatherLo = strWeather.lower()
+            
+            if bVerbose: print( "DBG: strWeatherLo: '%s'" % strWeatherLo )
+            
+            nCondition = 3
+            
             if isListIn(strWeatherLo, ["pluie", "averse", "bruine", "orage", "cipitation"] ):
-                bRain = 1
+                bRain = True
+                nCondition = 1
             if isListIn(strWeatherLo, ["neige"] ):
-                bSnow = 1
+                bSnow = True
+                nCondition = 2
+            if isListIn(strWeatherLo, ["soleil","beau","ciel degage"] ):
+                bSun = True
+                nCondition = 4
+                
+            if bVerbose: 
+                if not bRain and not bSnow and not bSun:
+                    print( "DBG: check it is nuage: '%s'" % strWeatherLo )
+
         bRainOrSnow = bRain or bSnow
         occWeather.add(strWeather)
-        
+
+
+                
         if "Beziers" in strCity:
-            print(datas)
+            if bVerbose: print(datas)
         
         
         if bVerbose: print("bNight: %s" % bNight)
+        
+        key = (strCity,"temp")
+        if not key in dict_out:
+            dict_out[key] = []
+        dict_out[key].append( (strYear,strMonth, strDay, strHour, strMin, nTemp ) )
+        
+        key = (strCity,"condition")
+        if not key in dict_out:
+            dict_out[key] = []
+        dict_out[key].append( (strYear,strMonth, strDay, strHour, strMin, nCondition ) )
             
         bNewDay = 0 # new matinee
         
@@ -309,6 +348,8 @@ def analyse(strFilename):
     
     f.close()
     
+    return dict_out
+    
 # analyse - end
         
         
@@ -352,6 +393,11 @@ St Malo:
     
     
     
-    
-strFilename = "data/temperature.txt"
-analyse(strFilename)
+if __name__ == "__main__":
+    strFilename = "data/temperature.txt"
+    datas = analyse(strFilename)
+    if 1:
+        print("")
+        print("render_all_datas bloc begin")
+        import temperature_office_analyse
+        temperature_office_analyse.render_all_datas(datas)

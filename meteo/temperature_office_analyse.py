@@ -229,15 +229,25 @@ def render_all_datas( alldatas, nYearMin = 2024, nMonthMin = 12, nYearMax = 2094
     xs = []
     ys = []
     for key, datas in alldatas.items():
+        print(key)
+        if "unknown" in key[0]:
+            continue
+            
         for d in datas:
-            nYear, nMonth, nDay, nHour,nMin,rTemp = d
+            try:
+                nYear, nMonth, nDay, nHour,nMin,rValue = d
+            except ValueError:
+                print( "ERR: render_all_datas: Value error on key: %s, d:%s" % (key,d) )
+                assert(0)
+            if nDay < 2 or nDay > 10: # temp
+                continue
             if nYear < nYearMin or ( nYear == nYearMin and nMonth < nMonthMin):
                 continue
             if nYear > nYearMax or ( nYear == nYearMax and nMonth > nMonthMax):
                 continue
-            #~ print("INF: analyse_sonde_temp: %d/%02d/%02d: %02dh%02d: temp: %5.2f" % (nYear, nMonth, nDay, nHour,nMin,rTemp))
+            #~ print("INF: analyse_sonde_temp: %d/%02d/%02d: %02dh%02d: value: %5.2f" % (nYear, nMonth, nDay, nHour,nMin,rValue))
             xs.append(nHour+nMin/60)
-            ys.append(rTemp)
+            ys.append(rValue)
             
             my_date = datetime.datetime(nYear, nMonth, nDay) 
             dayname = my_date.strftime("%A")
@@ -246,7 +256,7 @@ def render_all_datas( alldatas, nYearMin = 2024, nMonthMin = 12, nYearMax = 2094
             if not k in dictPerDay:
                 dictPerDay[k] = ([],[])
             dictPerDay[k][0].append(nHour+nMin/60)
-            dictPerDay[k][1].append(rTemp)
+            dictPerDay[k][1].append(rValue)
             
         #~ for k in dictPerDay:
         #~ import matplotlib.pyplot as plt
@@ -259,44 +269,45 @@ def render_all_datas( alldatas, nYearMin = 2024, nMonthMin = 12, nYearMax = 2094
 
     
     
-    
-strFilename = "data/office_temperature.txt"
-strFilename = "data/webdata.txt"
-datas = decode_file_sonde(strFilename)
-
-if 1:
-    # draw some datas:
-    #~ print(datas.keys())
-    print("Last datas of each type:")
-    for k, v in datas.items():
-        print("key: %s" % str(k) )
-        for d in v[-40:]:
-            print(d)
-            
-if 0:
-    # just render temperature
-            
-    key = list(datas.keys())[0]
-    
-    print("Rendering data for %s" % str(key) )
-    datas = datas[key] # render first type
-
-    datas = datas[-24*12*7:] # a peu pres la derniere semaine
-
-    analyse_sonde_temp(datas, 2024,12)
-    #~ analyse_sonde_temp(datas, 2024,11,2024,11)
-    #~ analyse_sonde_temp(datas, 2024,7,2024,7)
-    #~ analyse_sonde_temp(datas, 2024,8,2024,8)
-    #~ analyse_sonde_temp(datas, 2023,12,2023,12)
-    #~ analyse_sonde_temp(datas, 2023,2,2023,2)
-
-    if 0:
-        # sort toutes les stats par mois
-        for y in [2023,2024]:
-            for m in range(1,13):
-                analyse_sonde_temp(datas,y,m,y,m,bRender=False)
-                
-else:
-    # render multi variable
-    render_all_datas(datas)
+if __name__ == "__main__":
         
+    strFilename = "data/office_temperature.txt"
+    strFilename = "data/webdata.txt"
+    datas = decode_file_sonde(strFilename)
+
+    if 1:
+        # draw some datas:
+        #~ print(datas.keys())
+        print("Last datas of each type:")
+        for k, v in datas.items():
+            print("key: %s" % str(k) )
+            for d in v[-40:]:
+                print(d)
+                
+    if 1:
+        # just render temperature
+                
+        key = list(datas.keys())[0]
+        
+        print("Rendering data for %s" % str(key) )
+        datas = datas[key] # render first type
+
+        datas = datas[-24*12*7:] # a peu pres la derniere semaine
+
+        analyse_sonde_temp(datas, 2024,12)
+        #~ analyse_sonde_temp(datas, 2024,11,2024,11)
+        #~ analyse_sonde_temp(datas, 2024,7,2024,7)
+        #~ analyse_sonde_temp(datas, 2024,8,2024,8)
+        #~ analyse_sonde_temp(datas, 2023,12,2023,12)
+        #~ analyse_sonde_temp(datas, 2023,2,2023,2)
+
+        if 0:
+            # sort toutes les stats par mois
+            for y in [2023,2024]:
+                for m in range(1,13):
+                    analyse_sonde_temp(datas,y,m,y,m,bRender=False)
+                    
+    else:
+        # render multi variable
+        render_all_datas(datas)
+            

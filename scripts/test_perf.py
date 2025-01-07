@@ -1412,6 +1412,7 @@ disk_read  1024KB: ####################   1.36s (2951.93 Mo/s)
 
 
 
+
 *** Dell kakashi Corto/Elsa (si sur batterie, mettre sur mode perf elevée):
 windows disk size 5000
 python version   : 3.10.4 (64bits) (16 core(s))
@@ -1427,35 +1428,6 @@ disk_read     1KB: ####################   17.74s (281 Mo/s)
 disk_write 1024KB: ####################   3.31s (1375 Mo/s)
 disk_read  1024KB: ####################   1.23s (4078 Mo/s)
 
-*** ExoScale instance Standard - Large
-
-ubuntu@VM-ef8b3a4e-a4fe-4560-9021-74a52faa6357:~/dev/git/electronoos/scripts$ python3 test_perf.py
-python version   : 3.10.12 (64bits) (4 core(s))
-cpu              : Intel Xeon Processor (Skylake)
-ram              : 7.24 / 7.75 GB
-test_cpu_int2    : ####################   0.35s
-test_cpu_float2  : ####################   0.08s
-test_crypt       : ####################   5.26s
-test_cpu_ram 2G  : ####################   1.20s
-test_cpu_ram 4G  : ####################   2.21s
-test_cpu_ram 6G  : ####################   3.65s
-test_cpu_ram 8G  : ####################   4.88s
-test_cpu_ram10G  : ####################   6.13s
-test_cpu_ram12G  : ####################   7.44s
-test_cpu_ram14G  : ####################   8.59s
-test_cpu_ram16G  :  Memory Error...
-test_scipy_xxt   : ####################   1.02s (393.63x)
-opencv (orb)      : not found
-opencv (orb)    : not found
-opencv (orb)    : not found
-multiprocess x1 :  0.39s /  0.12s /  5.26s /  1.13s /  0.01s /  0.01s /  0.01s =>    6.93s (per thread:6.93s)
-multiprocess x4 :  0.40s /  0.12s /  5.30s /  1.34s /  0.02s /  0.02s /  0.01s =>   14.13s (per thread:3.53s)
-multiprocess x8 :  0.76s /  0.29s / 10.56s /  2.59s /  0.02s /  0.02s /  0.02s =>   28.40s (per thread:3.55s)
-multiprocess x32:  2.97s /  0.84s / 42.23s / 10.87s /  0.08s /  0.08s /  0.08s =>   85.55s (per thread:2.67s)
-disk_write    1KB: ####################   5.11s (195.62 Mo/s)
-disk_read     1KB: ####################   1.71s (585.41 Mo/s)
-disk_write 1024KB: ####################   2.85s (350.36 Mo/s)
-disk_read  1024KB: ####################   0.74s (1359.73 Mo/s)
 
 *** don de concept: gros
 C:\dev\git\electronoos\scripts>python test_perf.py
@@ -1501,6 +1473,71 @@ test_cpu_ram14G  : ####################   10.51s
 test_cpu_ram16G  : ####################   12.65s
 disk_read     1KB: ####################   7.00s (142.92 Mo/s)
 disk_read  1024KB: ####################   1.38s (726.17 Mo/s)
+
+
+
+
+*** ExoScale instance Standard - Large
+
+ubuntu@VM-ef8b3a4e-a4fe-4560-9021-74a52faa6357:~/dev/git/electronoos/scripts$ python3 test_perf.py
+python version   : 3.10.12 (64bits) (4 core(s))
+cpu              : Intel Xeon Processor (Skylake)
+ram              : 7.24 / 7.75 GB
+test_cpu_int2    : ####################   0.35s
+test_cpu_float2  : ####################   0.08s
+test_crypt       : ####################   5.26s
+test_cpu_ram 2G  : ####################   1.20s
+test_cpu_ram 4G  : ####################   2.21s
+test_cpu_ram 6G  : ####################   3.65s
+test_cpu_ram 8G  : ####################   4.88s
+test_cpu_ram10G  : ####################   6.13s
+test_cpu_ram12G  : ####################   7.44s
+test_cpu_ram14G  : ####################   8.59s
+test_cpu_ram16G  :  Memory Error...
+test_scipy_xxt   : ####################   1.02s (393.63x)
+test_orb4.6.0    : ####################   0.18s (566.20fps)
+test_orbcv imgs  : ####################   0.66s (151.02fps)
+test_orbcv bis   : ####################   0.61s (164.29fps)
+multiprocess x1 :  0.39s /  0.12s /  5.26s /  1.13s /  0.01s /  0.01s /  0.01s =>    6.93s (per thread:6.93s)
+multiprocess x4 :  0.40s /  0.12s /  5.30s /  1.34s /  0.02s /  0.02s /  0.01s =>   14.13s (per thread:3.53s)
+multiprocess x8 :  0.76s /  0.29s / 10.56s /  2.59s /  0.02s /  0.02s /  0.02s =>   28.40s (per thread:3.55s)
+multiprocess x32:  2.97s /  0.84s / 42.23s / 10.87s /  0.08s /  0.08s /  0.08s =>   85.55s (per thread:2.67s)
+disk_write    1KB: ####################   5.11s (195.62 Mo/s)
+disk_read     1KB: ####################   1.71s (585.41 Mo/s)
+disk_write 1024KB: ####################   2.85s (350.36 Mo/s)
+disk_read  1024KB: ####################   0.74s (1359.73 Mo/s)
+
+
+*** Azure Server1 - "8 cores" 16 GB
+na@Server1:~/dev/git/electronoos/scripts$ python3 test_perf.py
+python version   : 3.12.3 (64bits) (4 core(s))
+cpu              : Intel(R) Xeon(R) Platinum 8272CL CPU @ 2.60GHz
+ram              : 12.34 / 15.57 GB
+test_cpu_int2    : ####################   0.63s
+test_cpu_float2  : ####################   0.08s
+test_crypt       : ####################   5.36s
+test_cpu_ram 2G  : ####################   0.32s
+test_cpu_ram 4G  : ####################   0.64s
+test_cpu_ram 6G  : ####################   0.96s
+test_cpu_ram 8G  : ####################   1.28s
+test_cpu_ram10G  : ####################   1.59s
+test_cpu_ram12G  : ####################   1.91s
+test_cpu_ram14G  : ####################   2.23s
+test_cpu_ram16G  : ####################   2.55s
+test_scipy_xxt   : ####################   1.00s (401.42x)
+test_orb4.6.0    : ####################   0.17s (596.29fps)
+test_orbcv imgs  : ####################   0.66s (152.03fps)
+test_orbcv bis   : ####################   0.65s (152.85fps)
+multiprocess x1 :  0.63s /  0.09s /  5.37s /  1.00s /  0.28s /  0.78s /  0.78s =>    8.92s (per thread:8.92s)
+multiprocess x4 :  1.33s /  0.18s /  5.87s /  1.97s /  0.55s /  1.40s /  1.40s =>   21.61s (per thread:5.40s)
+multiprocess x8 :  2.65s /  0.36s / 11.75s /  4.25s /  1.12s /  2.86s /  2.86s =>   47.46s (per thread:5.93s)
+multiprocess x32: 10.62s /  1.42s / 47.16s / 16.83s /  4.44s / 11.59s / 11.56s =>  151.08s (per thread:4.72s)
+disk_write    1KB: ####################   8.33s (120.02 Mo/s)
+disk_read     1KB: ####################   4.66s (214.56 Mo/s)
+disk_write 1024KB: ####################   7.39s (135.39 Mo/s)
+disk_read  1024KB: ####################   3.79s (263.53 Mo/s)
+
+
 
 
 *** Ordi gabriel portable gamer

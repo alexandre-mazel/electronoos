@@ -87,7 +87,8 @@ def analyse(strFilename):
     Compute best place to live AND
     return a list of dictionnary of values, eg: ("location","temperature") => list of values = [year, month,day, hour, min, value]
     """
-    bVerbose = 0
+    bVerbose = 1
+    #~ bVerbose = 0
     
     f = open(strFilename,"rb")
     occCity = common.OccCounter()
@@ -126,6 +127,10 @@ def analyse(strFilename):
         nHour = int(strHour)
         strMin =  strTime[3:4]
         nMin = int(strMin)
+        
+        if strYear == "\x00\x00\x00\x00'":
+            print("ERR: year is zeroed")
+            continue
 
         if bVerbose: print("nHour: %s" % nHour)
         
@@ -177,15 +182,15 @@ def analyse(strFilename):
         
         if bVerbose: print("bNight: %s" % bNight)
         
-        key = (strCity,"temp")
-        if not key in dict_out:
-            dict_out[key] = []
-        dict_out[key].append( (strYear,strMonth, strDay, strHour, strMin, nTemp ) )
-        
-        key = (strCity,"condition")
-        if not key in dict_out:
-            dict_out[key] = []
-        dict_out[key].append( (strYear,strMonth, strDay, strHour, strMin, nCondition ) )
+        # prepare data to be outtputed
+        dataToPost = ( int(strYear), int(strMonth), int( strDay) , nHour, nMin)
+        for namevalue,value in ( ("temp",nTemp), ("condition", nCondition) ):
+            key = (strCity,namevalue)
+            if not key in dict_out:
+                dict_out[key] = []
+            dict_out[key].append( dataToPost + (value,) )
+
+            
             
         bNewDay = 0 # new matinee
         

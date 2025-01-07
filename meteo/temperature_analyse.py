@@ -88,7 +88,7 @@ def analyse(strFilename):
     return a list of dictionnary of values, eg: ("location","temperature") => list of values = [year, month,day, hour, min, value]
     """
     bVerbose = 1
-    #~ bVerbose = 0
+    bVerbose = 0
     
     f = open(strFilename,"rb")
     occCity = common.OccCounter()
@@ -128,7 +128,7 @@ def analyse(strFilename):
         strMin =  strTime[3:4]
         nMin = int(strMin)
         
-        if strYear == "\x00\x00\x00\x00'":
+        if strYear == "\x00\x00\x00\x00":
             print("ERR: year is zeroed")
             continue
 

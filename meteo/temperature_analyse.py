@@ -405,4 +405,4 @@ if __name__ == "__main__":
         print("")
         print("render_all_datas bloc begin")
         import temperature_office_analyse
-        temperature_office_analyse.render_all_datas(datas)
+        temperature_office_analyse.render_all_datas(datas,2025,1)

@@ -230,7 +230,7 @@ def render_all_datas( alldatas, nYearMin = 2024, nMonthMin = 12, nYearMax = 2094
     ys = []
     for key, datas in alldatas.items():
         print(key)
-        if "unknown" in key[0]:
+        if not ("MisB" in key[0] or "Kremlin" in key[0]):
             continue
             
         for d in datas:
@@ -284,7 +284,7 @@ if __name__ == "__main__":
             for d in v[-40:]:
                 print(d)
                 
-    if 1:
+    if 0:
         # just render temperature
                 
         key = list(datas.keys())[0]
@@ -294,7 +294,7 @@ if __name__ == "__main__":
 
         datas = datas[-24*12*7:] # a peu pres la derniere semaine
 
-        analyse_sonde_temp(datas, 2024,12)
+        analyse_sonde_temp(datas, 2025,1)
         #~ analyse_sonde_temp(datas, 2024,11,2024,11)
         #~ analyse_sonde_temp(datas, 2024,7,2024,7)
         #~ analyse_sonde_temp(datas, 2024,8,2024,8)
@@ -309,5 +309,5 @@ if __name__ == "__main__":
                     
     else:
         # render multi variable
-        render_all_datas(datas)
+        render_all_datas(datas,2025,1)
             

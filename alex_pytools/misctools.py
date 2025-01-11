@@ -459,6 +459,30 @@ def convertTimeStampToEpoch(strTimeStamp):
     dtd = dtd.replace(tzinfo=None) # transforme en naif, on aurait pu aussi passer le 1 janvier de naif en utc
     return (dtd-datetime.datetime(1970,1,1)).total_seconds()
     
+def convertYmdHmsToEpoch(y,m,d,hour=0,min=0,sec=0):
+    """
+    assume: le timestamp est celui local, et on le stocke en epoch (qui est basé sur utc heure d'hiver)
+    """
+    
+    dtd = datetime.datetime(y, m, d, hour=hour, minute=min, second=sec)
+    # denaive l'heure
+    #~ print("DBG: convertTimeStampToEpoch: before: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
+    dtd = dtd.replace(tzinfo=getCurrentTimeZoneName())
+    # la passe en utc heure d'hiver, bug ? non semble ok
+    #~ if isRPI() and time.localtime().tm_isdst:
+        #~ dtd += datetime.timedelta(hours=-1)
+    #~ print("DBG: convertTimeStampToEpoch: after: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
+    # le passe en utc:
+    
+    #~ import pytz
+    #~ utc = pytz.timezone('UTC')
+    #~ dtd = utc.localize(dtd)
+    #~ dtd = dtd.replace(tzinfo=None)
+    dtd = dtd.astimezone(datetime.timezone.utc) # convert to utc
+    #~ print("DBG: convertTimeStampToEpoch: after2: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
+    dtd = dtd.replace(tzinfo=None) # transforme en naif, on aurait pu aussi passer le 1 janvier de naif en utc
+    return (dtd-datetime.datetime(1970,1,1)).total_seconds()
+    
 def getFilenameFromTime(timestamp=None):
   """
   get a string usable as a filename relative to the current datetime stamp.

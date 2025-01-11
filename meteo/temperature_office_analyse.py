@@ -1,6 +1,7 @@
 # analyse temperature file (from real sonde dans la piece)
 # elles sont sur REE, le serveur est a l'heure en hiver.
 
+# to retrieve data sent from rpi sonde
 # scp -P 11022 na@thenardier.fr:/home/na/save/office_temperature.txt C:/Users/alexa/dev/git/electronoos/meteo/data/
 
 # to retrieve data sent from logged data from various IOT device
@@ -155,6 +156,8 @@ def draw_temp_series(dictPerDay, bRender=True, bCloseAtEnd = True, strTitle = No
     
     strTitleGenerated = ""
     
+    listBestLabelX = [] # the goal is to take the labels of the curve going from the widest range
+    
     for k in dictPerDay:
         if k.count('/') > 2: # it's a date
             my_label = k.replace("2024/","" ).replace("2023/","" ).replace("2022/","" )
@@ -165,7 +168,29 @@ def draw_temp_series(dictPerDay, bRender=True, bCloseAtEnd = True, strTitle = No
             if len(strTitleGenerated) > 0:
                 strTitleGenerated += ", "
             strTitleGenerated += my_label
+            
+        if 1:
+            # change x labels
+            labelx_pos = []
+            labelx_txt = []
+            #~ labelx_txt: list[str] = [f'Val{v:0.2f}' for v in dictPerDay[k][0]]
+            prevxval = - 100
+            for xval in dictPerDay[k][0]:
+                if int(xval) > prevxval:
+                    prevxval = xval
+                    pos = int(xval)
+                    txt = str(int(xval)% 24)
+                    labelx_pos.append(pos)
+                    labelx_txt.append(txt)
+                #~ else:
+                    #~ labelx_pos.append(xval)
+                    #~ labelx_txt.append("")
+            if len(listBestLabelX) < len(labelx_pos):
+                listBestLabelX = labelx_pos
+                plt.xticks(labelx_pos, labelx_txt)
+            
         plt.plot(dictPerDay[k][0],dictPerDay[k][1],label = my_label)
+
         if 1:
             # local min & max
             for extremum,offset in [(min,-0.4),(max,+0.1)]:

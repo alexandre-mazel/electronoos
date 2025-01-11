@@ -425,5 +425,10 @@ if __name__ == "__main__":
             datas.update(added_datas)
             datas_of_interest = [("Le Kremlin-Bicetre","temp"),("MisBKit3","temp") ]
             #~ datas_of_interest.append(("MisBKit3","humid"))
-            temperature_office_analyse.render_all_datas(datas,y,m,d-3, sameGraphList = datas_of_interest)
+            if 1:
+                strFilename = "data/office_temperature.txt"
+                added_datas = temperature_office_analyse.decode_file_sonde(strFilename)
+                datas.update(added_datas)
+                datas_of_interest.append(("armoire","temp"))
+            temperature_office_analyse.render_all_datas(datas,y,m,d-8, sameGraphList = datas_of_interest)
     

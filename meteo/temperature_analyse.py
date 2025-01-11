@@ -5,6 +5,7 @@
 import sys
 
 sys.path.append("../../obo/spider/")
+sys.path.append("../alex_pytools/")
 
 import common
 import retrieve_pop3
@@ -405,4 +406,13 @@ if __name__ == "__main__":
         print("")
         print("render_all_datas bloc begin")
         import temperature_office_analyse
-        temperature_office_analyse.render_all_datas(datas,2025,1)
+        import misctools
+        
+        # affiche les 3 derniers jours:
+        y,m,d = misctools.getDay()
+        
+        if 0:
+            temperature_office_analyse.render_all_datas(datas,y,m,d-3)
+        
+        # affiche les 3 derniers jours de plusieurs donnees tout melange sur un seul graphe
+        temperature_office_analyse.render_all_datas(datas,y,m,d-3, sameGraphList = [("Beziers","temp"),("Le Kremlin-Bicetre","temp")])

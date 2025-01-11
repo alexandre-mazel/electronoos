@@ -219,9 +219,11 @@ def analyse_sonde_temp( alldatas, nYearMin, nMonthMin, nYearMax = 2094, nMonthMa
         
         
         
-def render_all_datas( alldatas, nYearMin = 2024, nMonthMin = 12, nYearMax = 2094, nMonthMax = 13, bRender=True ):
+def render_all_datas( alldatas, nYearMin = 2024, nMonthMin = 1, nDayMin = 1, nYearMax = 2094, nMonthMax = 13, nDayMax = 32, sameGraphList = [], bRender=True ):
     """
-    for each datas, for each week we want all days in one graph
+    for each datas, for each week we want all days in one graph. (nXxxMin and nXxxMax are included)
+    if sameGraphList != []: will render datas listed on only one graph for the whole period nYearMin, nMonthMin, nDayMin to nYearMax, nMonthMax, nDayMax.
+        eg: [("MisBKit3","temp"),("MisBKit3","humid")])
     """
     import matplotlib.pyplot as plt
     
@@ -230,7 +232,11 @@ def render_all_datas( alldatas, nYearMin = 2024, nMonthMin = 12, nYearMax = 2094
     ys = []
     for key, datas in alldatas.items():
         print(key)
-        if not ("MisB" in key[0] or "Kremlin" in key[0]):
+        
+        if sameGraphList == []  and not ("MisB" in key[0] or "Kremlin" in key[0]): # un peu temp
+            continue
+
+        if sameGraphList != [] and not key in sameGraphList:
             continue
             
         for d in datas:
@@ -239,13 +245,12 @@ def render_all_datas( alldatas, nYearMin = 2024, nMonthMin = 12, nYearMax = 2094
             except ValueError:
                 print( "ERR: render_all_datas: Value error on key: %s, d:%s" % (key,d) )
                 assert(0)
-            if nDay < 2 or nDay > 10: # temp
+
+            if nYear < nYearMin or ( nYear == nYearMin and nMonth < nMonthMin) or ( nYear == nYearMin and nMonth == nMonthMin and nDay < nDayMin):
                 continue
-            if nYear < nYearMin or ( nYear == nYearMin and nMonth < nMonthMin):
+            if nYear > nYearMax or ( nYear == nYearMax and nMonth > nMonthMax) or ( nYear == nYearMax and nMonth == nMonthMax and nDay > nDayMax ):
                 continue
-            if nYear > nYearMax or ( nYear == nYearMax and nMonth > nMonthMax):
-                continue
-            #~ print("INF: analyse_sonde_temp: %d/%02d/%02d: %02dh%02d: value: %5.2f" % (nYear, nMonth, nDay, nHour,nMin,rValue))
+            print("INF: render_all_datas: key: %s, %d/%02d/%02d: %02dh%02d: value: %5.2f" % (str(key),nYear, nMonth, nDay, nHour,nMin,rValue))
             xs.append(nHour+nMin/60)
             ys.append(rValue)
             

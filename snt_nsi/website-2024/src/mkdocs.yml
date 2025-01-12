@@ -30,7 +30,7 @@ nav:
           - TP2 - Identité numérique et cyber-violence: snt/03-reseaux-sociaux/tp2_identite_numerique_et_cyberviolence.md
       - Chapitre 4 - Donn&eacute;es et traitements:
           - TP1 - Turtle en Python: snt/04-processing/tp1_python_turtle.md
-          - TP2 - Turtle en Python: snt/04-processing/tp2_python_turtle2.md
+          - TP2 - Turtle en Python - Utilisation de boucles et fonctions: snt/04-processing/tp2_python_turtle2.md
       #~ - Chapitre 4 - Les données structurées:
           #~ - TP1 - Données ouvertes: snt/04-donnees-structurees/tp1-donnees-ouvertes.md
           #~ - TP2 - Les métadonnées:  snt/04-donnees-structurees/tp2-metadonnees.md

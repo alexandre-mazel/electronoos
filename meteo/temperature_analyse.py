@@ -5,8 +5,10 @@
 import sys
 
 sys.path.append("../../obo/spider/")
+sys.path.append("../alex_pytools/")
 
 import common
+import misctools
 import retrieve_pop3
 
 class HelperStat:
@@ -394,7 +396,7 @@ St Malo:
 [-283, 101, 384]
 """
     
-# a faire: par equipe de 2: quel est la meilleur combinaison par mois
+# a faire: par equipe de 2: quelle est la meilleur combinaison par mois
     
     
     
@@ -405,4 +407,28 @@ if __name__ == "__main__":
         print("")
         print("render_all_datas bloc begin")
         import temperature_office_analyse
-        temperature_office_analyse.render_all_datas(datas,2025,1)
+        
+        # affiche les 3 derniers jours:
+        y,m,d = misctools.getDay()
+        
+        if 0:
+            temperature_office_analyse.render_all_datas(datas,y,m,d-3)
+        
+        if 0:
+            # affiche les 3 derniers jours de plusieurs donnees tout melange sur un seul graphe
+            temperature_office_analyse.render_all_datas(datas,y,m,d-3, sameGraphList = [("Beziers","temp"),("Le Kremlin-Bicetre","temp")])
+        
+        if 1:
+            # affiche la comparaison entre temp du kb from la meteo et mon jardin
+            strFilename = "data/webdata.txt"
+            added_datas = temperature_office_analyse.decode_file_sonde(strFilename)
+            datas.update(added_datas)
+            datas_of_interest = [("Le Kremlin-Bicetre","temp"),("MisBKit3","temp") ]
+            #~ datas_of_interest.append(("MisBKit3","humid"))
+            if 1:
+                strFilename = "data/office_temperature.txt"
+                added_datas = temperature_office_analyse.decode_file_sonde(strFilename)
+                datas.update(added_datas)
+                datas_of_interest.append(("armoire","temp"))
+            temperature_office_analyse.render_all_datas(datas,y,m,d-8, sameGraphList = datas_of_interest)
+    

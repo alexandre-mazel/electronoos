@@ -16,7 +16,7 @@ def compareFolder( path1, path2 ):
     listFiles = sorted( os.listdir(path1) )
     for f in listFiles:
         absf1 = path1 + '/' + f
-        print(absf1 + "\r", end="")
+        print(absf1 + "    \r", end="")
         absf2 = path2 + '/' + f
         if os.path.isdir( absf1 ):
             nNbrFoldersTotal += 1
@@ -43,7 +43,7 @@ def compareFolder( path1, path2 ):
     lib = "GOOD"
     if nNbrMissingFolders > 0 or nNbrMissingFiles > 0 or nNbrFilesDifferentSize > 0:
         lib = "DIFF"
-    print("%s: '%s' and '%s'  =>  %4d,%4d,%4d,%4d,%4d" % ( lib, path1, path2, nNbrFoldersTotal, nNbrFilesTotal, nNbrMissingFolders, nNbrMissingFiles, nNbrFilesDifferentSize) )
+    print("%s: '%s' and '%s'  =>  %4d,%4d; %4d,%4d,%4d" % ( lib, path1, path2, nNbrFoldersTotal, nNbrFilesTotal, nNbrMissingFolders, nNbrMissingFiles, nNbrFilesDifferentSize) )
     return nNbrFoldersTotal, nNbrFilesTotal, nNbrMissingFolders, nNbrMissingFiles, nNbrFilesDifferentSize
                 
                 
@@ -68,8 +68,8 @@ if __name__ == "__main__":
     print("\nComparing '%s' and '%s'\n" % (path1,path2) )
     nNbrFoldersTotal, nNbrFilesTotal, nNbrMissingFolders, nNbrMissingFiles, nNbrFilesDifferentSize = compareFolder( path1, path2 )
 
-    print( "nNbrFoldersTotal: %d" % nNbrFoldersTotal )
-    print( "nNbrFilesTotal: %d" % nNbrFilesTotal )
-    print( "nNbrMissingFolders: %d" % nNbrMissingFolders )
-    print( "nNbrMissingFiles: %d" % nNbrMissingFiles )
-    print( "nNbrFilesDifferentSize: %d" % nNbrFilesDifferentSize )
+    print( "       nNbrFoldersTotal: %d" % nNbrFoldersTotal )
+    print( "       nNbrFilesTotal: %d" % nNbrFilesTotal )
+    print( "       nNbrMissingFolders: %d" % nNbrMissingFolders )
+    print( "       nNbrMissingFiles: %d" % nNbrMissingFiles )
+    print( "       nNbrFilesDifferentSize: %d" % nNbrFilesDifferentSize )

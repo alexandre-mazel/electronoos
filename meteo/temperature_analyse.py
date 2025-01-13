@@ -430,5 +430,5 @@ if __name__ == "__main__":
                 added_datas = temperature_office_analyse.decode_file_sonde(strFilename)
                 datas.update(added_datas)
                 datas_of_interest.append(("armoire","temp"))
-            temperature_office_analyse.render_all_datas(datas,y,m,d-8, sameGraphList = datas_of_interest)
+            temperature_office_analyse.render_all_datas(datas,y,m,d-1, sameGraphList = datas_of_interest)
     

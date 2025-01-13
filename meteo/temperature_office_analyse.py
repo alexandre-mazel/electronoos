@@ -222,7 +222,8 @@ def draw_temp_series(dictPerDay, bRender=True, bCloseAtEnd = True, strTitle = No
         print(first_month)
     except (IndexError,AttributeError) as err:
         # keys are not year and month
-        strTitle = strTitleGenerated
+        if strTitle == None: strTitle = ""
+        strTitle = strTitle + "__" + strTitleGenerated
         filenamepostfix = "series" # title is already in prefix
     
     if strTitle == None:
@@ -230,6 +231,7 @@ def draw_temp_series(dictPerDay, bRender=True, bCloseAtEnd = True, strTitle = No
         strPrefix = "temp"
     else:
         strPrefix = strTitle.replace("(","").replace(")","").replace(",","_").replace(" ", "").replace("'", "").replace("-", "").replace(".", "").lower()
+
     plt.ylabel(strTitle)
     plt.legend()
     plt.locator_params(axis='both', nbins=24) 
@@ -347,7 +349,8 @@ def render_all_datas( alldatas, nYearMin = 2024, nMonthMin = 1, nDayMin = 1, nYe
             dictPerDay = {}
             
     if bAllOnSameGraph:
-        draw_temp_series(dictPerDay, bRender=bRender, strTitle = str(key))
+        strTitle = "%4d_%02d_%02d" % (nYearMin,nMonthMin,nDayMin)
+        draw_temp_series(dictPerDay, bRender=bRender, strTitle=strTitle)
 
     
     

@@ -237,6 +237,8 @@ bool bMotor1_sign = 0;
 bool bPrevPush1 = 0;
 bool bPrevPush2 = 0;
 
+bool bTurboIsOn = 0;
+
 int anPrevReadValues[NBR_SENSORS];
 
 long int nPrevTimeIntoLoop = 0;
@@ -284,13 +286,33 @@ void loop()
         if( nSpoolDir != 0 )
         {
           int nMotor = 2;
-          int nTurbo = 4; // decide the turbo ratio
-          if(anReadValues[i+NBR_POTAR] == 0)
+          
+          if( 0 )
           {
-            nTurbo = 1;
+            // mode turbo is engaged just when pushing
+            int nTurbo = 4; // decide the turbo ratio
+            if(anReadValues[i+NBR_POTAR] == 0)
+            {
+              nTurbo = 1;
+            }
+            snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nSpoolDir,*apnSpeedArray[nMotor]*nTurbo);
+            sendSerialCommand(buf);
           }
-          snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nSpoolDir,*apnSpeedArray[nMotor]*nTurbo);
-          sendSerialCommand(buf);
+          else
+          {
+            // mode turbo is toggled by turbo switch
+            if(anReadValues[i+NBR_POTAR] == 1)
+            {
+              bTurboIsOn = ! bTurboIsOn;
+              int nNewSpeed = *apnSpeedArray[nMotor];
+              if( bTurboIsOn )
+              {
+                nNewSpeed = 420;
+              }
+              snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nSpoolDir,nNewSpeed);
+              sendSerialCommand(buf);
+            }
+          }
         }
       }
       else if (nSwitch == 1 && anReadValues[i+NBR_POTAR] )

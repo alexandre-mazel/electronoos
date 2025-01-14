@@ -359,6 +359,8 @@ if __name__ == "__main__":
     strFilename = "data/office_temperature.txt"
     strFilename = "data/webdata.txt"
     datas = decode_file_sonde(strFilename)
+    
+    year,month,day = misctools.getDay()
 
     if 1:
         # draw some datas:
@@ -392,7 +394,18 @@ if __name__ == "__main__":
                 for m in range(1,13):
                     analyse_sonde_temp(datas,y,m,y,m,bRender=False)
                     
-    else:
+    if 0:
         # render multi variable
         render_all_datas(datas,2025,1)
+        
+    if 1:
+        # render co2 datas
+        datas_of_interest = [("MisBKit4","tvoc"),("MisBKit4","eco2")]
+        datas_of_interest = [("MisBKit4","eco2")]
+        datas_of_interest = [("MisBKit4","tvoc")]
+        #~ datas_of_interest = [("MisBKit4","uba")]
+        datas_of_interest = [("MisBKit4","temp")]
+        datas_of_interest = [("MisBKit3","temp"),("MisBKit4","temp")]
+        #~ datas_of_interest = [("MisBKit3","humid"),("MisBKit4","humid")]
+        render_all_datas(datas,year,month,day-0, sameGraphList = datas_of_interest)
             

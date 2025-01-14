@@ -121,7 +121,7 @@ def decode_file_sonde(strFilename):
             
             
         # remove abberations
-        if rValue < 1 or rValue > 50000: # max is VOC 1...50000
+        if ( rValue < -100 ) or ( ( not "temp" in strMesureName.lower() ) and rValue < 1. ) or rValue > 50000: # max is VOC 1...50000
             continue
             
         # remove test
@@ -408,7 +408,7 @@ if __name__ == "__main__":
         #~ datas_of_interest = [("MisBKit4","uba")]
         datas_of_interest = [("MisBKit3","humid"),("MisBKit4","humid"),("MisBKit4","humid2")]
         
-        if 0:
+        if 1:
             # all temp !
             datas_of_interest = [("MisBKit3","temp"),("MisBKit4","temp"),("MisBKit4","temp2")]
             strFilename = "data/office_temperature.txt"
@@ -416,5 +416,5 @@ if __name__ == "__main__":
             datas.update(added_datas)
             datas_of_interest.append(("armoire","temp"))
             
-        render_all_datas(datas,year,month,day-0, sameGraphList = datas_of_interest)
+        render_all_datas(datas,year,month,day-1, sameGraphList = datas_of_interest)
             

@@ -88,6 +88,8 @@ def decode_file_sonde(strFilename):
             strMesureName = strMesureName.decode()
             strValue = strValue.decode()
             strValue = strValue.replace("%22", "" ) # at once I've sent  &v="421"  instead of  &v=421
+            if strValue == None or strValue == "None" :
+                continue
             
             strDateTime = common.epochToTimeStamp(float(strEpoch))
             if bVerbose: print("strDateTime: '%s'" % strDateTime)
@@ -401,11 +403,18 @@ if __name__ == "__main__":
     if 1:
         # render co2 datas
         datas_of_interest = [("MisBKit4","tvoc"),("MisBKit4","eco2")]
-        datas_of_interest = [("MisBKit4","eco2")]
-        datas_of_interest = [("MisBKit4","tvoc")]
+        #~ datas_of_interest = [("MisBKit4","eco2")]
+        #~ datas_of_interest = [("MisBKit4","tvoc")]
         #~ datas_of_interest = [("MisBKit4","uba")]
-        datas_of_interest = [("MisBKit4","temp")]
-        datas_of_interest = [("MisBKit3","temp"),("MisBKit4","temp")]
-        #~ datas_of_interest = [("MisBKit3","humid"),("MisBKit4","humid")]
+        datas_of_interest = [("MisBKit3","humid"),("MisBKit4","humid"),("MisBKit4","humid2")]
+        
+        if 0:
+            # all temp !
+            datas_of_interest = [("MisBKit3","temp"),("MisBKit4","temp"),("MisBKit4","temp2")]
+            strFilename = "data/office_temperature.txt"
+            added_datas = decode_file_sonde(strFilename)
+            datas.update(added_datas)
+            datas_of_interest.append(("armoire","temp"))
+            
         render_all_datas(datas,year,month,day-0, sameGraphList = datas_of_interest)
             

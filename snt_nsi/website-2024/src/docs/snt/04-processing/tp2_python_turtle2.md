@@ -17,7 +17,17 @@ description: Turtle2 - Utilisation de boucles et fonctions
         left(90)
         forward(100)
     ```
+    Voici un autre exemple de boucle avec l'utilisation d'une variable:
+    ``` py
+    from turtle import *
     
+    taille = 100
+    for i in range(4):
+        left(90)
+        forward(taille)
+        taille = taille + 100
+    ```
+     
 !!! info "Cours - Utilisation de fonctions"
 
     Les fonctions permettent de réutiliser plusieurs fois le même code, sans faire de copier/coller.
@@ -58,7 +68,7 @@ description: Turtle2 - Utilisation de boucles et fonctions
     </figure>
     2. Cliquer dans le menu **Fichier/Nouveau** (ou File/New)
     3. Puis dans le menu **Fichier/Enregistrer sous...*** (ou File/save as...)
-    4. Dans la fenetre qui apparait, enregistrez votre fichier dans **Documents/SNT/scripts** sous le nom **turtle_first.py**
+    4. Dans la fenetre qui apparait, enregistrez votre fichier dans **Documents/SNT/scripts** sous le nom **turtle_boucle.py**
     
     
 

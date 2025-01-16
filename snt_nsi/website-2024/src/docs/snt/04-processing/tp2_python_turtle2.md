@@ -27,6 +27,17 @@ description: Turtle2 - Utilisation de boucles et fonctions
         forward(taille)
         taille = taille + 100
     ```
+    Voici une boucle dans une boucle:
+    ``` py
+    from turtle import *
+    
+    taille = 20
+    for j in range(3):
+        for i in range(4):
+            left(90)
+            forward(taille)
+        taille = taille + 20
+    ```
      
 !!! info "Cours - Utilisation de fonctions"
 

@@ -11,7 +11,7 @@ Une des utilisations principales de l’informatique de nos jours est le **trait
 
 De tels traitements requierent souvent des logiciels de **gestion de base de données (SGDB)**, qui sont des programmes hautement spécialisés pour effectuer ce genre de tâches le plus efficacement et sûrement possible. L'étude plus détaillée des SGBD est au programme de terminale. Il est cependant facile de mettre en œuvre les opérations de bases sur certaines structures dans un langage de programmation comme Python.
 
-Il est en effet possible que de simples jeus de données soient **organisés en tables**. En informatique, une **table de données** correspondent à une liste de **p-uplets** nommés qui partagent les mêmes **descripteurs**. 
+Il est en effet possible que de simples jeux de données soient **organisés en tables**. En informatique, une **table de données** correspond à une liste de **p-uplets nommés** qui partagent les mêmes **descripteurs**. 
 
 !!! example "Exemple"
 	Par exemple on peut considérer la table suivante :
@@ -36,22 +36,22 @@ Il est en effet possible que de simples jeus de données soient **organisés en 
 
 ## Fichiers CSV
 
-Le format **CSV** (pour {==*Comma Separated Values*==}, soit en français *valeurs séparées par des virgules*) est un format très pratique pour représenter des données structurées.
+Le format **CSV** (pour *Comma Separated Values*, soit en français *valeurs séparées par des virgules*) est un format très pratique pour représenter des données structurées.
 
 Dans ce format, **chaque ligne représente un enregistrement** et, sur une même ligne, **les différents champs** de l’enregistrement sont **séparés par une virgule** (d’où le nom).
 
 Pour des raisons pratiques, il est possible en fait de spécifier le caractère de séparation entre chaque champ, qui peut donc être `:`, `;`, `/`, etc...
 
-Nous allons dans la suite de cette partie utiliser un fichier nommé `countries.csv`, téléchargeable [ici](countries.csv){: target = "_blank"}.
+Nous allons dans la suite de cette partie utiliser un fichier nommé `countries.csv`, téléchargeable [ici](assets/countries.csv){: target = "_blank"}.
 
 !!! question "Exercice 1"
 	
-	Une fois le fichier téléchargé, vous pouvez l'ouvrir avec `Notepad ++`.
+	Une fois le fichier téléchargé, vous pouvez l'ouvrir avec un éditeur de texte brut, comme `Notepad`, `Notepad ++` ou même `Thonny`.
 
 	=== "Enoncé"
 			
-		1. Quel est le symbole utilisé pour séparer les champs ?
-		2. Combien de champs différents sont présents et quesl sont leurs descripteurs ?
+		1. Quel est le symbole utilisé pour séparer les champs dans le fichier  `countries.csv`?
+		2. Combien de champs différents sont présents et quels sont leurs descripteurs ?
 		3. Il est aussi possible d'utiliser un **tableur** comme `LibreOffice.Calc` pour lire un fichier CSV. Vous pourrez constater que `LibreOffice.Calc` vous demande un certain nombre d'informations sur le contenu du fichier avant de l'ouvrir réellement. Quels intérêt voyez-vous à l'utilisation d'un tableur ? Quelles en sont les limites ?		
 		
 	=== "Réponses"
@@ -74,7 +74,7 @@ Nous allons dans la suite de cette partie utiliser un fichier nommé `countries.
 
 ### Lecture de base
 
-Un fichier `csv` étant un fichier texte, il est tout à fait possible de lire les données grâce aux méthodes classiques des fichiers(voir [ici](Miscellanees\Bases_Python\Fichiers_Textes.md){: target="_blank"}) :
+Un fichier `csv` étant un fichier texte, il est tout à fait possible de lire les données grâce aux méthodes classiques des fichiers(revoir votre cours sur les fichiers en Python<!-- [ici](Miscellanees\Bases_Python\Fichiers_Textes.md){: target="_blank"}-->) :
 
 ```python
 >>> with open('countries.csv','r',encoding='utf8',newline='') as file:
@@ -82,33 +82,33 @@ Un fichier `csv` étant un fichier texte, il est tout à fait possible de lire l
 		print(contenu)
 ```
 
-Le résultat est peu lisible, et difficilement exploitable ainsi. Mais il est tout à fait possible de reconstituer correctement chaque enregistrement, en utilisant des méthodes de chaines de caractères (*on se limite aux 5 premiers enregistrelments pour des raisons de lisbilités dans l'interpréteur*) :
+Le résultat est peu lisible, et difficilement exploitable ainsi. Mais il est tout à fait possible de reconstituer correctement chaque enregistrement, 
+en utilisant des méthodes de chaines de caractères (*on se limite aux 5 premiers enregistrements pour des raisons de lisbilités dans l'interpréteur*) :
 
 ```python
->>> formatedContent=[]
->>> for line in contenu[ :5] :
-		formatedContent.append(line.replace('\r\n','').split(';'))
+for line in contenu[:5] :
+		print( line.replace('\n','') )
+        
+"""
+ISO;Name;Capital_Id;Area;Population;Continent;Currency_Code;Currency_Name
+AD;Andorra;3041563;468;84000;EU;EUR;Euro
+AE;United Arab Emirates;292968;82880;4975593;AS;AED;Dirham
+AF;Afghanistan;1138958;647500;29121286;AS;AFN;Afghani
+AG;Antigua and Barbuda;3576022;443;86754;NA;XCD;Dollar
+"""
 ```
 On peut alors récupérer les **descripteurs** :
 
 ```python
->>> formatedContent[0]
-['ISO',
- 'Name',
- 'Capital_Id',
- 'Area',
- 'Population',
- 'Continent',
- 'Currency_Code',
- 'Currency_Name']
+print(contenu[0])
+# ISO;Name;Capital_Id;Area;Population;Continent;Currency_Code;Currency_Name
 ```
 
 Et le premier enregistrement :
 
-
 ```python
->>> formatedContent[1]
-['AD', 'Andorra', '3041563', '468', '84000', 'EU', 'EUR', 'Euro']
+print(contenu[1])
+# AD;Andorra;3041563;468;84000;EU;EUR;Euro
 ```
 
 Cependant cette solution n'est pas des plus efficace, car **le lien entre descripteurs et valeurs n'est pas direct**.
@@ -123,110 +123,125 @@ Le module `csv`  est un des modules présents dans toute installation Python. Co
 import csv
 ```
 
-Une fois importé, il offre de nombreuses possibilités, décrites dans [la doc Python](https://docs.python.org/fr/3.6/library/csv.html){: target="_blank"}, dont la méthode `DictReader` qui permet der récupérer les enregistrements sous la forme d'un {==**dictionnaire ordonné**==} :
+Une fois importé, il offre de nombreuses possibilités, décrites dans [la doc Python](https://docs.python.org/fr/3.6/library/csv.html){: target="_blank"}, 
+dont la méthode `reader` qui permet de récupérer les enregistrements un par un :
 
-```python 
-countries = []
-with open('countries.csv', 'r', encoding='utf8', newline='') as file :
-    reader = csv.DictReader(file, delimiter=";") # L'objet reader est un itérable. On précise le delimiteur à l'appel de DictReader
-    for line in reader :
-        countries.append(line)
+```python
+import csv
+import collections
+def load_csv_to_namedtuple( nom_fichier: str, nom_type_objet: str, csv_delimiter:str = ';' ) -> list:
+    """
+    Charge un fichier csv et la convertit en namedtuple.
+    Elle va cree un type de nammedtuple d'un type qui sera nomme nom_type_objet
+    Return: Une liste d'enregistrement sous la forme d'une liste de nammedtuple.
+    
+    - nom_fichier: nom d'un fichier existant de type csv
+    - nom_type_objet: nom du type d'enregistrement a creer
+    - csv_delimiter: specifie un autre delimiteur de champs dans le csv
+    """
+    
+    fichier = open( nom_fichier, "r" )
+    reader = csv.reader( fichier, delimiter = csv_delimiter, skipinitialspace = True  )
+
+    # creation du type de donnees
+    noms_des_champs = next( reader )
+    
+    ClassType = collections.namedtuple( nom_type_objet, noms_des_champs )  # get names from column headers
+
+    # lis et ajoute chaque enregistrement du fichier
+    liste_objets = []
+    for ligne in reader:
+        
+        # transforme les donnees contenant des " en chaines et les autres en int ou en float
+        for i in range(len(ligne)):
+            if ligne[i][0] == '"' and ligne[i][-1] == '"':
+                ligne[i] = ligne[i][1:-1]
+            
+            if not ligne[i].isnumeric():
+                pass
+            else:
+                if '.' in ligne[i]:
+                    ligne[i] = float(ligne[i])
+                else:
+                    ligne[i] = int(ligne[i])
+        # maintenant que toutes les donnees sont du bon type, on peut créer d'un appel un n-uplet nommé du bon type et l'ajouter à notre liste.
+        liste_objets.append( ClassType( *ligne ) )  # l'etoile permet de "derouler la liste" (unroll), ainsi chaque element de la liste devient un parametre de la fonction
+    
+    fichier.close()
+    
+    return liste_objets
+# load_csv_to_namedtuple - end
+
+# utilisation de la fonction load_csv_to_namedtuple pour lire le fichier et creer un tableau des pays:
+countries = load_csv_to_namedtuple( "countries.csv", "Country")
+
+print( "Nbr Countries:", len(countries) )
+# Nbr Countries: 243
+
 ```
 
-La variable `countries` fait donc référence à une liste de dictionnaires, ayant tous les mêmes descripteurs. Une fois le programme exécuté, on peut donc tester dans le shell les comandes suivantes :
+La variable `countries` fait donc référence à une liste de n-uplet nommés, ayant tous les mêmes descripteurs. Une fois le programme exécuté, on peut donc tester dans le shell les commandes suivantes :
 
 
 ```python
->>> countries[:5]
-[{    [{'ISO': 'AD',
-  'Name': 'Andorra',
-  'Capital_Id': '3041563',
-  'Area': '468',
-  'Population': '84000',
-  'Continent': 'EU',
-  'Currency_Code': 'EUR',
-  'Currency_Name': 'Euro'},
- {'ISO': 'AE',
-  'Name': 'United Arab Emirates',
-  'Capital_Id': '292968',
-  'Area': '82880',
-  'Population': '4975593',
-  'Continent': 'AS',
-  'Currency_Code': 'AED',
-  'Currency_Name': 'Dirham'},
- {'ISO': 'AF',
-  'Name': 'Afghanistan',
-  'Capital_Id': '1138958',
-  'Area': '647500',
-  'Population': '29121286',
-  'Continent': 'AS',
-  'Currency_Code': 'AFN',
-  'Currency_Name': 'Afghani'},
- {'ISO': 'AG',
-  'Name': 'Antigua and Barbuda',
-  'Capital_Id': '3576022',
-  'Area': '443',
-  'Population': '86754',
-  'Continent': 'NA',
-  'Currency_Code': 'XCD',
-  'Currency_Name': 'Dollar'},
- {'ISO': 'AI',
-  'Name': 'Anguilla',
-  'Capital_Id': '3573374',
-  'Area': '102',
-  'Population': '13254',
-  'Continent': 'NA',
-  'Currency_Code': 'XCD',
-  'Currency_Name': 'Dollar'}]
+print( countries[2] )
 
+# Country(ISO='AD', Name='Andorra', Capital_Id=3041563, Area=468, Population=84000, Continent='EU', Currency_Code='EUR', Currency_Name='Euro')
 ```
 
-On peut bien entendu connaître le nombre d'enregistrements contenus dans la variable countries :
+On peut bien entendu connaître le nombre d'enregistrements contenus dans la variable `countries` :
 
 ```python
->>> len(countries)
-243
+print( len(countries) )
+# 243
 ```
 
-On peut alors interroger cette variable à partir des descripteurs. Par exemple, nous pouvons chercher à obtenir la liste des pays dont la devise est en euro :
+On peut alors utiliser la liste `countries` pour faire des recherches, des calculs, des filtrages, des tris... 
+
+Par exemple, nous pouvons chercher à obtenir la liste des pays dont la devise est l'euro:
 
 ```python
->>> [c['Name'] for c in countries if c['Currency_Code'] == 'EUR']
-['Andorra',
- 'Austria',
- 'Aland Islands',
- 'Belgium',
- 'Saint Barthelemy',
- 'Cyprus',
- 'Germany',
- 'Estonia',
- 'Spain',
- 'Finland',
- 'France',
- 'French Guiana',
- 'Guadeloupe',
- 'Greece',
- 'Ireland',
- 'Italy',
- 'Kosovo',
- 'Lithuania',
- 'Luxembourg',
- 'Latvia',
- 'Monaco',
- 'Montenegro',
- 'Saint Martin',
- 'Martinique',
- 'Malta',
- 'Netherlands',
- 'Saint Pierre and Miquelon',
- 'Portugal',
- 'Reunion',
- 'Slovenia',
- 'Slovakia',
- 'San Marino',
- 'French Southern Territories',
- 'Vatican',
- 'Mayotte']
+for c in countries:
+    if c['Currency_Code'] == 'EUR':
+       print(c.Name)
+       
+"""
+Andorra
+Austria
+Aland Islands
+Belgium
+Saint Barthelemy
+Cyprus
+Germany
+Estonia
+Spain
+Finland
+France
+French Guiana
+Guadeloupe
+Greece
+Ireland
+Italy
+Kosovo
+Lithuania
+Luxembourg
+Latvia
+Monaco
+Montenegro
+Saint Martin
+Martinique
+Malta
+Netherlands
+Saint Pierre and Miquelon
+Portugal
+Reunion
+Slovenia
+Slovakia
+San Marino
+French Southern Territories
+Vatican
+Mayotte
+"""
 ```
 
 
@@ -236,414 +251,221 @@ On peut alors interroger cette variable à partir des descripteurs. Par exemple,
 
 
 	=== "Enoncé"
-		1. Écrire une compréhension de listes permettant de lister les codes de toutes les monnaies qui s’appellent `‘Dollar’`.
+		1. Écrire une boucle permettant de lister les codes de toutes les monnaies qui s’appellent `‘Dollar’`.
 		
-		2. Écrire une compréhension de listes permettant de lister les pays du continent Nord-Américain, sous la forme `Nom, Superficie, Population`
+		2. Écrire une boucle permettant de lister les pays du continent Nord-Américain, sous la forme `Nom, Superficie, Population`
 		
 	=== "Réponses"
 	
 		1. Le code :
 		
 			``` python
-			>>> [c['Currency_Code'] for c in countries if c['Currency_Name'] == 'Dollar']
-			['XCD', 'XCD', 'USD', 'AUD', 'BBD', 'BMD', 'BND', 'BSD', 'BZD','CAD', 'AUD',
-			'NZD', 'AUD', 'XCD', 'USD', 'FJD', 'USD', 'XCD', 'USD', 'GYD', 'HKD', 'JMD',
-			'AUD', 'XCD', 'KYD', 'XCD', 'LRD', 'USD', 'USD', 'XCD', 'NAD', 'AUD', 'AUD',
-			'NZD', 'NZD', 'NZD', 'USD', 'USD', 'SBD', 'SGD', 'SRD', 'USD', 'USD', 'USD',
-			'TTD', 'AUD', 'TWD', 'USD', 'XCD', 'USD', 'USD', 'ZWL']
+			for c in countries:
+               if c.Currency_Name == 'Dollar':
+                 print( c.Currency_Code )
+            """
+            XCD
+            XCD
+            USD
+            AUD
+            BBD
+            BMD
+            BND
+            BSD
+            BZD
+            CAD
+            AUD
+            ...
+            """
 			```
 			
 		2. Le code :
-			```python
-			>>> [c['Name'] for c in countries if c['Continent']=='NA']
-			    ['Antigua and Barbuda',
-			 'Anguilla',
-			 'Aruba',
-			 'Barbados',
-			 'Saint Barthelemy',
-			 'Bermuda',
-			 'Bahamas',
-			 'Belize',
-			 'Canada',
-			 'Costa Rica',
-			 'Cuba',
-			 'Curacao',
-			 'Dominica',
-			 'Dominican Republic',
-			 'Grenada',
-			 'Greenland',
-			 'Guadeloupe',
-			 'Guatemala',
-			 'Honduras',
-			 'Haiti',
-			 'Jamaica',
-			 'Saint Kitts and Nevis',
-			 'Cayman Islands',
-			 'Saint Lucia',
-			 'Saint Martin',
-			 'Martinique',
-			 'Montserrat',
-			 'Mexico',
-			 'Nicaragua',
-			 'Panama',
-			 'Saint Pierre and Miquelon',
-			 'Puerto Rico',
-			 'El Salvador',
-			 'Sint Maarten',
-			 'Turks and Caicos Islands',
-			 'Trinidad and Tobago',
-			 'United States',
-			 'Saint Vincent and the Grenadines',
-			 'British Virgin Islands',
-			 'U.S. Virgin Islands']
+			``` python
+            for c in countries:
+                if c.Continent == 'NA':
+                    print( c.Name, ", superficie:", c.Area, ", population:", c.Population )
+            """
+            Antigua and Barbuda , superficie: 443 , population: 86754
+            Anguilla , superficie: 102 , population: 13254
+            Aruba , superficie: 193 , population: 71566
+            Barbados , superficie: 431 , population: 285653
+            Saint Barthelemy , superficie: 21 , population: 8450
+            ...
+            """
 			```
 
 ### Les données numériques 
 
-Comment faire pour lister les pays dont la superficie est inférieure à 300 km² ? On pourrait penser à écrire une compréhension de liste identique à celles écrites précédfemment :
+Nous avons de la chance, notre fonction `load_csv_to_namedtuple` a convertit les types qui ressemblaient à des entiers en valeurs de type entière.
 
-
-```python
->>> [(c['Name'],c['Area']) for c in countries if c['Area']<300]
-	---------------------------------------------------------------------------
-
-    TypeError                                 Traceback (most recent call last)
-
-    <ipython-input-13-6debe1b6bf11> in <module>
-    ----> 1 [(c['Name'],c['Area']) for c in countries if c['Area']<300]
-    
-
-    <ipython-input-13-6debe1b6bf11> in <listcomp>(.0)
-    ----> 1 [(c['Name'],c['Area']) for c in countries if c['Area']<300]
-    
-
-    TypeError: '<' not supported between instances of 'str' and 'int'
-
-```
-    
-
-Mais nous avons un problème : les données extraites d'un fichier `csv` sont {==**toutes sous la forme de chaines de caractères**==}. Il faut donc **transtyper** certaines données pour parvenir au résultat escompté. D'après les 5 premiers enregistrements, la superficie semble être sous la forme d'un nombre entier, donc on teste :
-
-```python
->>> [(c['Name'],c['Area']) for c in countries if int(c['Area'])<300]
-
-
-    ---------------------------------------------------------------------------
-
-    ValueError                                Traceback (most recent call last)
-
-    <ipython-input-14-d2574c3771d7> in <module>
-    ----> 1 [(c['Name'],c['Area']) for c in countries if int(c['Area'])<300]
-    
-
-    <ipython-input-14-d2574c3771d7> in <listcomp>(.0)
-    ----> 1 [(c['Name'],c['Area']) for c in countries if int(c['Area'])<300]
-    
-
-    ValueError: invalid literal for int() with base 10: '6.5'
-```
-
-Mais encore une fois un problème apparâit : **les données ne sont pas toutes transtypables sous la forme entière**, chose que nous ne pouvions savoir avant de traiter. Il faut donc les convertir en flottant :
-
-```python
->>> [(c['Name'],c['Area']) for c in countries if float(c['Area'])<300]
-[('Anguilla', '102'),
-     ('American Samoa', '199'),
-     ('Aruba', '193'),
-     ('Saint Barthelemy', '21'),
-     ('Bermuda', '53'),
-     ('Cocos Islands', '14'),
-     ('Cook Islands', '240'),
-     ('Christmas Island', '135'),
-     ('Guernsey', '78'),
-     ('Gibraltar', '6.5'),
-     ('Jersey', '116'),
-     ('Saint Kitts and Nevis', '261'),
-     ('Cayman Islands', '262'),
-     ('Liechtenstein', '160'),
-     ('Monaco', '1.95'),
-     ('Saint Martin', '53'),
-     ('Marshall Islands', '181.3'),
-     ('Macao', '254'),
-     ('Montserrat', '102'),
-     ('Norfolk Island', '34.6'),
-     ('Nauru', '21'),
-     ('Niue', '260'),
-     ('Saint Pierre and Miquelon', '242'),
-     ('Pitcairn', '47'),
-     ('San Marino', '61.2'),
-     ('Sint Maarten', '21'),
-     ('Tuvalu', '26'),
-     ('Vatican', '0.44'),
-     ('British Virgin Islands', '153'),
-     ('Wallis and Futuna', '274')]
-```
+Nous allons tester de les utiliser comme critère de selection.
 
 !!! question "Exercice"
 	=== "Enoncé"
 
-		Écrire une compréhension de liste donnant le nom, le continent et la superficie des pays de plus de 100 millions d'habitants
+		Écrire un parcours de liste affichant le nom, le continent et la superficie des pays de plus de 100 millions d'habitants
 
 	=== "Réponse"
-
-		```python
-		>>> [(c['Name'],c['Continent'],c['Area']) for c in countries if float(c['Population'])>10**8]
-		[('Bangladesh', 'AS', '144000'),
-		('Brazil', 'SA', '8511965'),
-		('China', 'AS', '9596960'),
-		('Indonesia', 'AS', '1919440'),
-		('India', 'AS', '3287590'),
-		('Japan', 'AS', '377835'),
-		('Mexico', 'NA', '1972550'),
-		('Nigeria', 'AF', '923768'),
-		('Pakistan', 'AS', '803940'),
-		('Russia', 'EU', '17100000'),
-		('United States', 'NA', '9629091')]		
-		```
+    
+    ``` python
+    for c in countries:
+        if c.Population > 10**8:
+            print( c.Name, ": continent:", c.Continent, ", superficie:", c.Area, ", population:", c.Population )
+    """
+    Bangladesh : continent: AS , superficie: 144000 , population: 156118464
+    Brazil : continent: SA , superficie: 8511965 , population: 201103330
+    China : continent: AS , superficie: 9596960 , population: 1330044000
+    Indonesia : continent: AS , superficie: 1919440 , population: 242968342
+    India : continent: AS , superficie: 3287590 , population: 1173108018
+    ...
+    """
+    ```
 
 ### Trier les données
 
 Les résultats precédents sont encore peu lisibles, il serait préférable que les données obtenues soient triées. On va utiliser la fonction *built-in* `sorted` :
 
 ```python
->>> sorted([(c['Name'],c['Area']) for c in countries if float(c['Area'])<300])
-    [('American Samoa', '199'),
-     ('Anguilla', '102'),
-     ('Aruba', '193'),
-     ('Bermuda', '53'),
-     ('British Virgin Islands', '153'),
-     ('Cayman Islands', '262'),
-     ('Christmas Island', '135'),
-     ('Cocos Islands', '14'),
-     ('Cook Islands', '240'),
-     ('Gibraltar', '6.5'),
-     ('Guernsey', '78'),
-     ('Jersey', '116'),
-     ('Liechtenstein', '160'),
-     ('Macao', '254'),
-     ('Marshall Islands', '181.3'),
-     ('Monaco', '1.95'),
-     ('Montserrat', '102'),
-     ('Nauru', '21'),
-     ('Niue', '260'),
-     ('Norfolk Island', '34.6'),
-     ('Pitcairn', '47'),
-     ('Saint Barthelemy', '21'),
-     ('Saint Kitts and Nevis', '261'),
-     ('Saint Martin', '53'),
-     ('Saint Pierre and Miquelon', '242'),
-     ('San Marino', '61.2'),
-     ('Sint Maarten', '21'),
-     ('Tuvalu', '26'),
-     ('Vatican', '0.44'),
-     ('Wallis and Futuna', '274')]
+out = []
+for c in countries:
+    if c.Area < 300:
+        out.append(c)
+out_sorted = sorted(out)
+for c in out_sorted:
+    print(c)
+"""
+Country(ISO='AI', Name='Anguilla', Capital_Id=3573374, Area=102, Population=13254, Continent='NA', Currency_Code='XCD', Currency_Name='Dollar')
+Country(ISO='AS', Name='American Samoa', Capital_Id=5881576, Area=199, Population=57881, Continent='OC', Currency_Code='USD', Currency_Name='Dollar')
+Country(ISO='AW', Name='Aruba', Capital_Id=3577154, Area=193, Population=71566, Continent='NA', Currency_Code='AWG', Currency_Name='Guilder')
+Country(ISO='BL', Name='Saint Barthelemy', Capital_Id=3579132, Area=21, Population=8450, Continent='NA', Currency_Code='EUR', Currency_Name='Euro')
+Country(ISO='BM', Name='Bermuda', Capital_Id=3573197, Area=53, Population=65365, Continent='NA', Currency_Code='BMD', Currency_Name='Dollar')
+...
+"""
 ```
 
-On obtient bien une liste triée, mais par ordre alphabétique, ce qui est peu pertinent. En effet, pour trier une table, il faut préciser **selon quels critères**.
+On obtient bien une liste triée, mais par ordre alphabétique, ce qui est peu pertinent. En effet, pour trier une table, il faut préciser selon quels **critères**.
 
-On va donc passer un argument supplémentaire à la fonction `sorted` : une {==**clé de tri**==}. Dans Python, la clé **doit être une fonction** permettant d'extraire la valeur à trier. On va donc créer une fonction qui va renvoyer la valeur voulue selon l'enrtegistrement passé en paramètre. Ici on va passer un **tuple** `(Nom;Superficie)` et on veut donc trier selon l'élément d'indice 1 :
+On va donc passer un argument supplémentaire à la fonction `sorted` une **clé de tri**. 
+
+Dans Python, la clé doit être **une fonction** permettant d'extraire la valeur à trier. 
+On va donc créer une fonction qui va renvoyer la valeur voulue selon l'enregistrement passé en paramètre. 
+Ici on va passer un **enregistrement** et on veut donc trier selon l'élément Area:
 
 ```python
-def areaKey(c):
-    return float(c[1])
+def getArea(c):
+    return c.Area
 ```
 
-Puis on va passer cette fonction à la fonction `sorted` :
+Puis on va passer cette fonction à la fonction `sorted` dans le paramêtre `key`:
 
 
 ```python
->>> sorted([(c['Name'],c['Area']) for c in countries if float(c['Area'])<300],key = areaKey)
-[('Vatican', '0.44'),
-     ('Monaco', '1.95'),
-     ('Gibraltar', '6.5'),
-     ('Cocos Islands', '14'),
-     ('Saint Barthelemy', '21'),
-     ('Nauru', '21'),
-     ('Sint Maarten', '21'),
-     ('Tuvalu', '26'),
-     ('Norfolk Island', '34.6'),
-     ('Pitcairn', '47'),
-     ('Bermuda', '53'),
-     ('Saint Martin', '53'),
-     ('San Marino', '61.2'),
-     ('Guernsey', '78'),
-     ('Anguilla', '102'),
-     ('Montserrat', '102'),
-     ('Jersey', '116'),
-     ('Christmas Island', '135'),
-     ('British Virgin Islands', '153'),
-     ('Liechtenstein', '160'),
-     ('Marshall Islands', '181.3'),
-     ('Aruba', '193'),
-     ('American Samoa', '199'),
-     ('Cook Islands', '240'),
-     ('Saint Pierre and Miquelon', '242'),
-     ('Macao', '254'),
-     ('Niue', '260'),
-     ('Saint Kitts and Nevis', '261'),
-     ('Cayman Islands', '262'),
-     ('Wallis and Futuna', '274')]
+out_sorted = sorted(out, key = getArea)
+for c in out_sorted:
+    print(c)
+"""
+Country(ISO='VA', Name='Vatican', Capital_Id=6691831, Area=0.44, Population=921, Continent='EU', Currency_Code='EUR', Currency_Name='Euro')
+Country(ISO='MC', Name='Monaco', Capital_Id=2993458, Area=1.95, Population=32965, Continent='EU', Currency_Code='EUR', Currency_Name='Euro')
+Country(ISO='GI', Name='Gibraltar', Capital_Id=2411585, Area=6.5, Population=27884, Continent='EU', Currency_Code='GIP', Currency_Name='Pound')
+Country(ISO='CC', Name='Cocos Islands', Capital_Id=7304591, Area=14, Population=628, Continent='AS', Currency_Code='AUD', Currency_Name='Dollar')
+Country(ISO='BL', Name='Saint Barthelemy', Capital_Id=3579132, Area=21, Population=8450, Continent='NA', Currency_Code='EUR', Currency_Name='Euro')
+...
+"""
 ```
 
 ??? tips "Fonctions anonymes"
 
-	**Pour information**, il est possible de ne pas déclarer la fonction de tri avant de l'utiliser, en utilisant une **fonction anonyme** :
+	**Pour information**, il est possible de ne pas créer de fonction dédiée au tri, mais de créer une fonction *à la volée*, une **fonction anonyme** ou **lambda fonction** pour indiquer la valeur à utiliser comme critère de tri:
 
-	```python
-	>>> sorted([(c['Name'],c['Area']) for c in countries if float(c['Area'])<300],key = lambda x : float(x[1]))
-	[('Vatican', '0.44'),
-		 ('Monaco', '1.95'),
-		 ('Gibraltar', '6.5'),
-		 ('Cocos Islands', '14'),
-		 ('Saint Barthelemy', '21'),
-		 ('Nauru', '21'),
-		 ('Sint Maarten', '21'),
-		 ('Tuvalu', '26'),
-		 ('Norfolk Island', '34.6'),
-		 ('Pitcairn', '47'),
-		 ('Bermuda', '53'),
-		 ('Saint Martin', '53'),
-		 ('San Marino', '61.2'),
-		 ('Guernsey', '78'),
-		 ('Anguilla', '102'),
-		 ('Montserrat', '102'),
-		 ('Jersey', '116'),
-		 ('Christmas Island', '135'),
-		 ('British Virgin Islands', '153'),
-		 ('Liechtenstein', '160'),
-		 ('Marshall Islands', '181.3'),
-		 ('Aruba', '193'),
-		 ('American Samoa', '199'),
-		 ('Cook Islands', '240'),
-		 ('Saint Pierre and Miquelon', '242'),
-		 ('Macao', '254'),
-		 ('Niue', '260'),
-		 ('Saint Kitts and Nevis', '261'),
-		 ('Cayman Islands', '262'),
-		 ('Wallis and Futuna', '274')]
-	```
+    ```python
+    out_sorted = sorted(out, key = lambda x:x.Area)
+    for c in out_sorted:
+        print(c)
+    """
+    Country(ISO='VA', Name='Vatican', Capital_Id=6691831, Area=0.44, Population=921, Continent='EU', Currency_Code='EUR', Currency_Name='Euro')
+    Country(ISO='MC', Name='Monaco', Capital_Id=2993458, Area=1.95, Population=32965, Continent='EU', Currency_Code='EUR', Currency_Name='Euro')
+    Country(ISO='GI', Name='Gibraltar', Capital_Id=2411585, Area=6.5, Population=27884, Continent='EU', Currency_Code='GIP', Currency_Name='Pound')
+    Country(ISO='CC', Name='Cocos Islands', Capital_Id=7304591, Area=14, Population=628, Continent='AS', Currency_Code='AUD', Currency_Name='Dollar')
+    Country(ISO='BL', Name='Saint Barthelemy', Capital_Id=3579132, Area=21, Population=8450, Continent='NA', Currency_Code='EUR', Currency_Name='Euro')
+    ...
+    """
+    ```
 	
 	Il est aussi possible d'inverser l'ordre - donc d'obtenir un résultat par ordre décroissant :
 
-
-	```python
-	>>> sorted([(c['Name'],c['Area']) for c in countries if float(c['Area'])<300],key = lambda x : float(x[1]),reverse=True)
-	[('Wallis and Futuna', '274'),
-		 ('Cayman Islands', '262'),
-		 ('Saint Kitts and Nevis', '261'),
-		 ('Niue', '260'),
-		 ('Macao', '254'),
-		 ('Saint Pierre and Miquelon', '242'),
-		 ('Cook Islands', '240'),
-		 ('American Samoa', '199'),
-		 ('Aruba', '193'),
-		 ('Marshall Islands', '181.3'),
-		 ('Liechtenstein', '160'),
-		 ('British Virgin Islands', '153'),
-		 ('Christmas Island', '135'),
-		 ('Jersey', '116'),
-		 ('Anguilla', '102'),
-		 ('Montserrat', '102'),
-		 ('Guernsey', '78'),
-		 ('San Marino', '61.2'),
-		 ('Bermuda', '53'),
-		 ('Saint Martin', '53'),
-		 ('Pitcairn', '47'),
-		 ('Norfolk Island', '34.6'),
-		 ('Tuvalu', '26'),
-		 ('Saint Barthelemy', '21'),
-		 ('Nauru', '21'),
-		 ('Sint Maarten', '21'),
-		 ('Cocos Islands', '14'),
-		 ('Gibraltar', '6.5'),
-		 ('Monaco', '1.95'),
-		 ('Vatican', '0.44')]
-	```
+    ```python
+    out_sorted = sorted(out, key = lambda x:x.Area, reverse=True)
+    for c in out_sorted:
+        print(c)
+    """
+    Country(ISO='WF', Name='Wallis and Futuna', Capital_Id=4034821, Area=274, Population=16025, Continent='OC', Currency_Code='XPF', Currency_Name='Franc')
+    Country(ISO='KY', Name='Cayman Islands', Capital_Id=3580661, Area=262, Population=44270, Continent='NA', Currency_Code='KYD', Currency_Name='Dollar')
+    Country(ISO='KN', Name='Saint Kitts and Nevis', Capital_Id=3575551, Area=261, Population=51134, Continent='NA', Currency_Code='XCD', Currency_Name='Dollar')
+    Country(ISO='NU', Name='Niue', Capital_Id=4036284, Area=260, Population=2166, Continent='OC', Currency_Code='NZD', Currency_Name='Dollar')
+    Country(ISO='MO', Name='Macao', Capital_Id=1821274, Area=254, Population=449198, Continent='AS', Currency_Code='MOP', Currency_Name='Pataca')
+    ...
+    """
+    ```
 
 !!! question "Exercice"
 
 	=== "Enoncé"
 
-		1. Ecrire un code qui donne la liste des 5 états ayant la plus grande superficie, sous la forme `(Nom, Superficie)`
-		2. Ecrire un code qui donne la liste des 5 états ayant la plus petite superficie parmi les 20 états ayant la plus grande population, sous la forme `(Nom, population)`.
-		3. Écrire les instructions permettant de d’afficher les 8 pays possédant la plus grande densité de population, dans l’ordre inverse de densité, sous la forme `(Pays, population,superficie, densité)`.
+		1. Ecrire un code qui donne la liste des 5 états ayant la plus grande superficie, sous la forme `Nom: nom, Superficie: xxx`
+		2. Ecrire un code qui donne la liste des 5 états ayant la plus petite superficie parmi les 20 états ayant la plus grande population, sous la forme `Nom: nom, population: xxx, Superficie: xxx`.
+		3. Écrire les instructions permettant de d’afficher les 8 pays possédant la plus grande densité de population (habitants au km2), dans l’ordre inverse de densité décroissante, sous la forme `Pays: population, superficie, densité`.
 		
 	=== "Réponses"
-
+    
 		1. Le code :
-		
-		```python
-		>>> sorted([(c['Name'],c['Area']) for c in countries],key = lambda x : float(x[1]),reverse =True)[:5]
-		[('Russia', '17100000'),
-			 ('Canada', '9984670'),
-			 ('United States', '9629091'),
-			 ('China', '9596960'),
-			 ('Brazil', '8511965')]
-		```
-
+        ```python
+        for c in sorted(countries, key = lambda x:x.Area, reverse=True)[:5]:
+            print( "Nom:", c.Name, ", Superficie:", c.Area )
+        """
+        Nom: Russia , Superficie: 17100000
+        Nom: Canada , Superficie: 9984670
+        Nom: United States , Superficie: 9629091
+        Nom: China , Superficie: 9596960
+        Nom: Brazil , Superficie: 8511965
+        """
+        ```
+        
 		2. Le code :
 
 			```python
-			>>> sorted( sorted(countries,key = lambda x: float(x['Population']),reverse=True )[:20],key=lambda x :x['Area'])[:5]
-					[{'ISO': 'EG',
-			  'Name': 'Egypt',
-			  'Capital_Id': '360630',
-			  'Area': '1001450',
-			  'Population': '80471869',
-			  'Continent': 'AF',
-			  'Currency_Code': 'EGP',
-			  'Currency_Name': 'Pound'},
-			 {'ISO': 'ET',
-			  'Name': 'Ethiopia',
-			  'Capital_Id': '344979',
-			  'Area': '1127127',
-			  'Population': '88013491',
-			  'Continent': 'AF',
-			  'Currency_Code': 'ETB',
-			  'Currency_Name': 'Birr'},
-			 {'ISO': 'BD',
-			  'Name': 'Bangladesh',
-			  'Capital_Id': '1185241',
-			  'Area': '144000',
-			  'Population': '156118464',
-			  'Continent': 'AS',
-			  'Currency_Code': 'BDT',
-			  'Currency_Name': 'Taka'},
-			 {'ISO': 'IR',
-			  'Name': 'Iran',
-			  'Capital_Id': '112931',
-			  'Area': '1648000',
-			  'Population': '76923300',
-			  'Continent': 'AS',
-			  'Currency_Code': 'IRR',
-			  'Currency_Name': 'Rial'},
-			 {'ISO': 'RU',
-			  'Name': 'Russia',
-			  'Capital_Id': '524901',
-			  'Area': '17100000',
-			  'Population': '140702000',
-			  'Continent': 'EU',
-			  'Currency_Code': 'RUB',
-			  'Currency_Name': 'Ruble'}]
+            out = sorted( countries, key = lambda x:x.Population, reverse=True )[:20]
+            for c in sorted( out, key = lambda x:x.Area, reverse=False )[:5]:
+                print( "Nom:", c.Name, ", Population:", c.Population, ", Superficie:", c.Area )
+            """
+            Nom: Bangladesh , Population: 156118464 , Superficie: 144000
+            Nom: Philippines , Population: 99900177 , Superficie: 300000
+            Nom: Vietnam , Population: 89571130 , Superficie: 329560
+            Nom: Germany , Population: 81802257 , Superficie: 357021
+            Nom: Japan , Population: 127288000 , Superficie: 377835
+            """
 			```
-			
+        
 		3. Le code :
 		
 			```python
-			>>> sorted([(c['Name'],c['Area'], float(c['Population'])/float(c['Area'])) for c in countries], key = lambda x : x[2], reverse=True)[:8]
-			[('Monaco', '1.95', 16905.128205128207),
-			 ('Singapore', '692.7', 6786.5872672152445),
-			 ('Hong Kong', '1092', 6317.478021978022),
-			 ('Gibraltar', '6.5', 4289.846153846154),
-			 ('Vatican', '0.44', 2093.181818181818),
-			 ('Sint Maarten', '21', 1782.3333333333333),
-			 ('Macao', '254', 1768.4960629921259),
-			 ('Maldives', '300', 1318.8333333333333)]
+            out = []
+            for c in countries:
+                # ajoute des n-uplets non nommes
+                out.append( (c.Name,c.Area,c.Population,c.Population/c.Area) )
+            for c in sorted( out, key = lambda x:x[3], reverse=True )[:8]:
+                print( c )
+            """
+            Nom: Bangladesh , Population: 156118464 , Superficie: 144000
+            Nom: Philippines , Population: 99900177 , Superficie: 300000
+            Nom: Vietnam , Population: 89571130 , Superficie: 329560
+            Nom: Germany , Population: 81802257 , Superficie: 357021
+            Nom: Japan , Population: 127288000 , Superficie: 377835
+            """
 			```
 
 ### Fusions de tables
 
-Le fichier `cities.csv` téléchargeable [ici](cities.csv){: target="_blank"} contient une table des principales villes au niveayu mondial.
+Le fichier `cities.csv` téléchargeable [ici](assets/cities.csv){: target="_blank"} contient une table des principales villes au niveau mondial.
 
 !!! question "Exercice : exploration du fichier `cities.csv`"
 

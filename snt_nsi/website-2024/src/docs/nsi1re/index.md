@@ -3,6 +3,8 @@
 ## Chapitre 5 - Architecture
 - [TP1 - Composants d'un ordinateur](05-archi/tp1-compos_ordi.md)
 
+## Chapitre 12 - Données en tables
+- [TP1 - Composants d'un ordinateur](12-tables/csv.md)
 
 
 ## Extras

@@ -40,6 +40,10 @@ def replaceNameReplaceByNonAccentuatedChars(s):
                     ( "\\N{BULLET}", "o" ),
                     ( "\\N{DEGREE SIGN}", "o" ),
                     ( "\\N{FLEXED BICEPS}", "" ),
+                    ( "\\N{BLACK_RIGHT-POINTING_POINTER}", "-" ),
+                    ( "\\N{BLACK_LEFT-POINTING_POINTER}", "-" ),
+                    ( "\\N{FIREWORKS}", "-" ),
+                    ( "\\N{BIG_SOLIDUS}", "-" ),
                     
                 ]
     for a,b in trans:

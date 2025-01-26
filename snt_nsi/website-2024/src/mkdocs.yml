@@ -44,8 +44,6 @@ nav:
       - nsi1re/index.md
       - Chapitre 5 - Architecture:
           - TP1 - Architecture d'un ordinateur : nsi1re/05-archi/tp1-compos_ordi.md
-      - Extras:
-          - Initiation à pygame: nsi1re/0X-extras/01_initiation_pygame.md
       #~ - Chapitre 1 - Langages du Web:
           #~ - TP1 - Création d'une page web: nsi1re/01-langages-web/tp1-creation-page-web.md
       #~ - Chapitre 2 - Architecture des ordinateurs:
@@ -78,6 +76,9 @@ nav:
           #~ - Projet 1 - Présentez-vous: nsi1re/projets/prj-presentez-vous.md
           #~ - Projet 2 - Paysage aléatoire: nsi1re/projets/prj-paysage.md
           #~ - Projet 3 - Tableau 2D: nsi1re/projets/prj-tableau-2d.md
+          
+      - Extras:
+          - Initiation à pygame: nsi1re/0X-extras/01_initiation_pygame.md
 #~ not_in_nav: |
   #~ snt/02-web/prj-minisite-faq.md
   

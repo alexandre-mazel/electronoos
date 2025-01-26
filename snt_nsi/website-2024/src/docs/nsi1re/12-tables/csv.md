@@ -466,6 +466,7 @@ Country(ISO='BL', Name='Saint Barthelemy', Capital_Id=3579132, Area=21, Populati
             """
 			```
 
+<!--
 ### Fusions de tables
 
 Le fichier `cities.csv` téléchargeable [ici](assets/cities.csv){: target="_blank"} contient une table des principales villes au niveau mondial.
@@ -476,7 +477,7 @@ Le fichier `cities.csv` téléchargeable [ici](assets/cities.csv){: target="_bla
 
 		1. Quels sont les descripteurs de ce fichier ?
 		2. Ecrire un code sauvant dans une variable `cities` les enregistrements du fichiers `cities.csv`.
-		3. Ecrire une compréhension de liste donnant les villes françaises sous la forme `(Nom, population)`
+		3. Ecrire une boucle créant une liste donnant les villes françaises sous la forme `(Nom, population)`
 		
 	=== "Réponses"
 	
@@ -493,7 +494,8 @@ Le fichier `cities.csv` téléchargeable [ici](assets/cities.csv){: target="_bla
 		3. Le code :
 		
 			```python
-			[c for c in cities if c['Country_ISO']=='FR']
+			out = []
+            for c in 
 			```
 
 
@@ -658,3 +660,5 @@ Ainsi, on a obtenu un nouveau fichier `capitale.csv`, contenant les informations
 ## TP : Explorer IMDB
 
 Le TP pour l'année 2023-2024 se fait sur Capytale par [ce lien](https://capytale2.ac-paris.fr/web/c/4630-3627353){: target = "_blank"}.
+
+-->

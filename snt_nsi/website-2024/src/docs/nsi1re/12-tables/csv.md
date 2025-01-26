@@ -413,7 +413,7 @@ Country(ISO='BL', Name='Saint Barthelemy', Capital_Id=3579132, Area=21, Populati
 
 		1. Ecrire un code qui donne la liste des 5 états ayant la plus grande superficie, sous la forme `Nom: nom, Superficie: xxx`
 		2. Ecrire un code qui donne la liste des 5 états ayant la plus petite superficie parmi les 20 états ayant la plus grande population, sous la forme `Nom: nom, population: xxx, Superficie: xxx`.
-		3. Écrire les instructions permettant de d’afficher les 8 pays possédant la plus grande densité de population (habitants au km2), dans l’ordre inverse de densité décroissante, sous la forme `Pays: population, superficie, densité`.
+		3. Écrire les instructions permettant de d’afficher les 8 pays possédant la plus grande densité de population (habitants au km2), dans l’ordre inverse de densité décroissante, sous la forme `(Pays, population, superficie, densité)`.
 		
 	=== "Réponses"
     
@@ -455,11 +455,14 @@ Country(ISO='BL', Name='Saint Barthelemy', Capital_Id=3579132, Area=21, Populati
             for c in sorted( out, key = lambda x:x[3], reverse=True )[:8]:
                 print( c )
             """
-            Nom: Bangladesh , Population: 156118464 , Superficie: 144000
-            Nom: Philippines , Population: 99900177 , Superficie: 300000
-            Nom: Vietnam , Population: 89571130 , Superficie: 329560
-            Nom: Germany , Population: 81802257 , Superficie: 357021
-            Nom: Japan , Population: 127288000 , Superficie: 377835
+            ('Monaco', 1.95, 32965, 16905.128205128207)
+            ('Singapore', 692.7, 4701069, 6786.5872672152445)
+            ('Hong Kong', 1092, 6898686, 6317.478021978022)
+            ('Gibraltar', 6.5, 27884, 4289.846153846154)
+            ('Vatican', 0.44, 921, 2093.181818181818)
+            ('Sint Maarten', 21, 37429, 1782.3333333333333)
+            ('Macao', 254, 449198, 1768.4960629921259)
+            ('Maldives', 300, 395650, 1318.8333333333333)
             """
 			```
 

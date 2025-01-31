@@ -67,7 +67,7 @@ nav:
           #~ - TP3 - Format JSON: nsi1re/11-dictionnaires/tp3-format-json.md
       - Chapitre 12 - Données en table:
           #~ - Cours: nsi1re/12-tables/cours.md
-          - Cours: nsi1re/12-tables/csv.md
+          - Fichiers CSV: nsi1re/12-tables/csv.md
       #~ - Chapitre 14 - Le Web:
           #~ - Installation de PHP: nsi1re/14-web/langage-php.md
           #~ - TP1 - Formulaire HTML: nsi1re/14-web/tp1-formulaire-html.md

@@ -180,7 +180,7 @@ print( "Nbr Countries:", len(countries) )
 
 ```
 
-La variable `countries` fait donc référence à une liste de n-uplet nommés, ayant tous les mêmes descripteurs. Une fois le programme exécuté, on peut donc tester dans le shell les commandes suivantes :
+La variable `countries` fait donc référence à une liste de n-uplet nommés, ayant tous les mêmes descripteurs. Une fois le programme exécuté, on peut donc visualiser les données avec les commandes suivantes :
 
 
 ```python
@@ -413,7 +413,8 @@ Country(ISO='BL', Name='Saint Barthelemy', Capital_Id=3579132, Area=21, Populati
 
 		1. Ecrire un code qui donne la liste des 5 états ayant la plus grande superficie, sous la forme `Nom: nom, Superficie: xxx`
 		2. Ecrire un code qui donne la liste des 5 états ayant la plus petite superficie parmi les 20 états ayant la plus grande population, sous la forme `Nom: nom, population: xxx, Superficie: xxx`.
-		3. Écrire les instructions permettant de d’afficher les 8 pays possédant la plus grande densité de population (habitants au km2), dans l’ordre inverse de densité décroissante, sous la forme `(Pays, population, superficie, densité)`.
+		3. Écrire les instructions permettant d’afficher les 8 pays possédant la plus grande densité de population (habitants au km2), dans l’ordre inverse de densité décroissante, sous la forme `(Pays, population, superficie, densité)`.
+		4. Question subsidiaire, dont la réponse est à envoyer à votre professeur: Ecrire un code qui affiche la liste des pays dont la monnaie est l'euro d'une population comprise entre 1 et 2 Millions d'habitants et la surface est inférieur a 10000.
 		
 	=== "Réponses"
     

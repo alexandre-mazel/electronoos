@@ -5,7 +5,7 @@ import json
 import time
 import os
 
-# using a running ollana instance server
+# using a running ollama instance server
 # models seems to be stored (windows) in C:\Users\alexa\.ollama\models\blobs
 
 url = "http://localhost:11434/api/chat"
@@ -13,9 +13,64 @@ strModel = "llama3.2:1B" # size: 1.3GB, running: 2.2GB
 strModel = "llama3.2" # 3B? #size:  2.0GB, running: 3.5GB
 #~ strModel = "llama3.1:8B" # size: 4.7GB, running: 6.3GB
 #~ strModel = "llama3.1:8B-instruct" # size: 4.7GB, running: 6.3GB  # no size
+strModel = "llama3.3:70B" # size: GB, running:   # no size
 
 # todo test avec plus gros contexte:
 #   "options": {"num_ctx": 256000}
+
+# lister les modeles installé:
+# ollama list
+
+# voir les modeles existants:
+# https://ollama.com/library
+
+# pour recuperer d'autres modeles:
+# ollama pull llama3.3:70B
+
+
+"""
+Sur linux (eg: azure):
+cf https://www.linuxtricks.fr/wiki/ia-installer-un-modele-de-langage-llm-avec-ollama
+
+wget https://ollama.com/download/ollama-linux-arm64.tgz
+tar -C /usr -xvzf ollama-linux-amd64.tgz
+
+# Dans le cas d'une carte graphique AMD, on récupère des éléments additionnels :
+wget https://ollama.com/download/ollama-linux-amd64-rocm.tgz
+tar -C /usr -xvzf ollama-linux-amd64-rocm.tgz
+
+# chargé le serveur a la main:
+/usr/bin/ollama serve
+
+# les modeles sont stocké dans:
+/usr/share/ollama/.ollama/models
+
+# test rapide:
+ollama run llama3 "Résume moi Cyrano de Bergerac"
+# or 
+# ollama run llama3.2 "Summarize the following text:" < long-document.txt
+# or
+# ollama run llama3.2 "Analyze the sentiment of this customer review: 'The product is fantastic, but delivery was slow.'"
+# or
+# ollama run llava "What's in this image? /Users/jmorgan/Desktop/smile.png"
+# or
+# semble ne marcher qu'avec llava
+# ollama run llava "What's in this image? /home/na/dev/git/electronoos/data/logo_raspberry.jpg" # ou inconnus.jpg
+
+# par defaut il ecoute sur 11434:
+ss -unplat | grep 11434
+
+# pour qu'il ecoute sur toutes les ips:
+export "OLLAMA_HOST"=0.0.0.0 # non testé 
+
+# pour supprimer du serveur:
+rm /usr/bin/ollama
+rm -r /usr/share/ollama
+rm -r /usr/lib/ollama
+
+ollama run llama3.3:70B "Résume moi Cyrano de Bergerac"
+Error: model requires more system memory (45.5 GiB) than is available (5.5 GiB)
+"""
 
 class Conversation:
     

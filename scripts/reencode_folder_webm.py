@@ -26,7 +26,7 @@ def reencode(srcFilename):
     pathdst = path + os.sep + "mp3s" + os.sep
     try:
         os.makedirs(pathdst)
-    except: passlilud
+    except: pass
     basename = os.path.basename(srcFilename)    
     filenoext,ext = os.path.splitext(basename)
 

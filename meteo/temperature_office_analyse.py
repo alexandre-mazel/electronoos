@@ -1,7 +1,7 @@
 # analyse temperature file (from real sonde dans la piece)
 # elles sont sur REE, le serveur est a l'heure en hiver.
 
-# to retrieve data sent from rpi sonde
+# to retrieve data sent from rpi sonde (sur ree donc)
 # scp -P 11022 na@thenardier.fr:/home/na/save/office_temperature.txt C:/Users/alexa/dev/git/electronoos/meteo/data/
 
 # to retrieve data sent from logged data from various IOT device
@@ -194,8 +194,8 @@ def draw_temp_series(dictPerDay, bRender=True, bCloseAtEnd = True, strTitle = No
         plt.plot(dictPerDay[k][0],dictPerDay[k][1],label = my_label)
 
         if 1:
-            # local min & max
-            for extremum,offset in [(min,-0.4),(max,+0.1)]:
+            # local min & max et derniere mesure
+            for extremum,offset in [(min,-0.4),(max,+0.1),(lambda x:x[-1],x²x²+0.1)]:
                 idx = dictPerDay[k][1].index(extremum(dictPerDay[k][1]))
                 # x is hour with decimal since start or hour in absolute
                 nNumJour = int(dictPerDay[k][0][idx]/24)
@@ -416,5 +416,9 @@ if __name__ == "__main__":
             datas.update(added_datas)
             datas_of_interest.append(("armoire","temp"))
             
-        render_all_datas(datas,year,month,day-1, sameGraphList = datas_of_interest)
+        day -= 3 # how much day you want to see
+        if day < 0:
+            day += 31
+            month -= 1
+        render_all_datas(datas,year,month,day, sameGraphList = datas_of_interest)
             

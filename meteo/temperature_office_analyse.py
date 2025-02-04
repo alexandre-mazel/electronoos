@@ -194,8 +194,8 @@ def draw_temp_series(dictPerDay, bRender=True, bCloseAtEnd = True, strTitle = No
         plt.plot(dictPerDay[k][0],dictPerDay[k][1],label = my_label)
 
         if 1:
-            # local min & max
-            for extremum,offset in [(min,-0.4),(max,+0.1)]:
+            # local min & max et derniere mesure
+            for extremum,offset in [(min,-0.4),(max,+0.1),(lambda x:x[-1],x²x²+0.1)]:
                 idx = dictPerDay[k][1].index(extremum(dictPerDay[k][1]))
                 # x is hour with decimal since start or hour in absolute
                 nNumJour = int(dictPerDay[k][0][idx]/24)

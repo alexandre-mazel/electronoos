@@ -122,7 +122,7 @@ int OneWire_setup( void ) {
  * Fonction de lecture de la temperature via un capteur DS18B20.
  */
 byte OneWire_getTemperature( float *temperature, byte reset_search ) {
-  byte data[9], addr[8];
+  byte data[9], addr[9];
   // data[] : DonnÃ©es lues depuis le scratchpad
   // addr[] : Adresse du module 1-Wire dÃ©tectÃ©
   
@@ -139,7 +139,7 @@ byte OneWire_getTemperature( float *temperature, byte reset_search ) {
     return NO_SENSOR_FOUND;
   }
 
-#if 0
+#if 1
   Serial.print("DBG: addr: ");
 
   for(int i = 0; i < 9; i++)
@@ -191,22 +191,35 @@ byte OneWire_getTemperature( float *temperature, byte reset_search ) {
 // and return nbr of readed temperature
 int OneWire_getAllTemperature( float * pTemp1, float * pTemp2, float * pTemp3, float * pTemp4, float * pTemp5 )
 {
+  int nReaded = 0;
+
 #if USE_DALLAS
+
+  float * allTemp [] = { pTemp1, pTemp2, pTemp3, pTemp4, pTemp5 };
 
   sensors.requestTemperatures();
   // boucle sur tout les capteurs
+  float ** ppTemp = allTemp;
   for( int i = 0; i < 5; ++i)
   {
     float t = sensors.getTempCByIndex(i);
     if( t <= -40 ) break;
-    Serial.print(i);
-    Serial.print(": ");
-    Serial.print(t,1);
+    Serial.print("OneWire_getAllTemperature: ");
+    Serial.print( i );
+    Serial.print( ": ");
+    Serial.print( t, 1 );
     Serial.println( "C" );
+    if( *ppTemp != NULL )
+    {
+      **ppTemp = t;
+      ++nReaded;
+    }
+    ++ppTemp;
   }
   delay(1000);
 
 #else
+  // NDEV
   if( 1)
   {
     delay(1000);
@@ -235,5 +248,7 @@ int OneWire_getAllTemperature( float * pTemp1, float * pTemp2, float * pTemp3, f
     delay(10);
   }
 #endif // else DALLAS
+
+  return nReaded;
 
 }

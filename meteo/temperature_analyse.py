@@ -1,5 +1,5 @@
 # analyse temperature file (from meteo website)
-
+# sur rpi4
 # scp -P 14092 na@thenardier.fr:/home/na/save/temperature.txt C:/Users/alexa/dev/git/electronoos/meteo/data/
 
 import sys
@@ -423,7 +423,7 @@ if __name__ == "__main__":
             strFilename = "data/webdata.txt"
             added_datas = temperature_office_analyse.decode_file_sonde(strFilename)
             datas.update(added_datas)
-            datas_of_interest = [("Le Kremlin-Bicetre","temp"),("MisBKit3","temp"),("MisBKit4","temp"),("MisBKit4","temp2") ]
+            datas_of_interest = [("Le Kremlin-Bicetre","temp"),("Beziers","temp"),("MisBKit3","temp"),("MisBKit4","temp"),("MisBKit4","temp2") ]
             #~ datas_of_interest.append(("MisBKit3","humid"))
             if 1:
                 strFilename = "data/office_temperature.txt"

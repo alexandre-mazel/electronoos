@@ -66,7 +66,7 @@ def searchInOdt(filename, s):
     return nbr paragraph, nbr match
     """
     from odf import text, teletype
-    if ".odt" not in filename:
+    if ".odt" not in filename and ".odp" not in filename :
         return 0,0
     s = removeAccent(s.lower())
 
@@ -158,7 +158,7 @@ def searchInDocs(path,s,bRecurse=1,nVerbose=0):
             try:
                 if ext in [".docx",".doc"]:
                     nbrpara,match = searchInDocx( cfn,s )
-                elif ext == ".odt":
+                elif ext in [".odt",".odp"]:
                     nbrpara,match = searchInOdt( cfn,s )
                 elif ext == ".pdf":
                     nbrpara,match = searchInPdf( cfn,s )
@@ -195,7 +195,7 @@ def searchInDocs(path,s,bRecurse=1,nVerbose=0):
 #~ searchInDocs("test", "autoroute")
 
 if __name__ == "__main__":
-    print( "\n  Search in docx/odt v1.03 by Alma\n  Searching into .pdf, doc, docx and odt")
+    print( "\n  Search in docx/odt v1.03 by Alma\n  Searching into .pdf, doc, docx and odt and odp (not working totally)")
     if len(sys.argv) < 2:
         print( "  syntax: %s <string_to_match> [1 ou 2 (for verbose/extra verbose)]\n\n  eg: %s autoroute \n" % ((sys.argv[0],)*2))
         sys.exit(-1)

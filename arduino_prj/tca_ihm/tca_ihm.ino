@@ -307,7 +307,7 @@ void loop()
               int nNewSpeed = *apnSpeedArray[nMotor];
               if( bTurboIsOn )
               {
-                nNewSpeed = 420;
+                nNewSpeed = 410;
               }
               snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nSpoolDir,nNewSpeed);
               sendSerialCommand(buf);

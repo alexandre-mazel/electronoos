@@ -1,7 +1,7 @@
 # analyse temperature file (from real sonde dans la piece)
 # elles sont sur REE, le serveur est a l'heure en hiver.
 
-# to retrieve data sent from rpi sonde
+# to retrieve data sent from rpi sonde (sur ree donc)
 # scp -P 11022 na@thenardier.fr:/home/na/save/office_temperature.txt C:/Users/alexa/dev/git/electronoos/meteo/data/
 
 # to retrieve data sent from logged data from various IOT device
@@ -416,5 +416,9 @@ if __name__ == "__main__":
             datas.update(added_datas)
             datas_of_interest.append(("armoire","temp"))
             
-        render_all_datas(datas,year,month,day-1, sameGraphList = datas_of_interest)
+        day -= 3 # how much day you want to see
+        if day < 0:
+            day += 31
+            month -= 1
+        render_all_datas(datas,year,month,day, sameGraphList = datas_of_interest)
             

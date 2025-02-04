@@ -12,9 +12,12 @@ def recordData(timestamp, strHostname, dataname, datavalue ):
     """
     Record received data to disk
     """
-
         
     o = ""
+    
+    if "dummy" in dataname.lower():
+        return o
+        
     if 1:
         o += "DBG: hostname: '%s', dataname: '%s', value: %s, t: %.3f\n" % (strHostname,dataname,datavalue,timestamp)
         
@@ -37,6 +40,7 @@ def index(req):
     // test me with:
     http://engrenage.studio/record_data.py?dn=test&dv=421
     http://engrenage.studio/record_data.py?dn=test&dv=421&dn2=test2&dv2=666.42
+    http://engrenage.studio/record_data.py?dn=dummy&dv=-421&dn9=test_9&dv9=421_9&dn12=test_12&dv12=421_12
     """
     # warning: it search for a </html> to decide if it's html or plain text !!!!
     filename = req.filename
@@ -90,17 +94,24 @@ def index(req):
     txt += "INF: recordData for '%s' return: <br>" % dataname
     txt += recordData(timestamp,strHostname,dataname, datavalue) + "<br>"
     
-    if "dn2" in dArgs:
+    if "dn2" in dArgs or "dn1" in dArgs or "dn9" in dArgs:
         # handle optionnal datanames and values, eg: dn2, dv2,  dn3, dv3, ...
         strTemplateName = "dn%d"
         strTemplateValue = "dv%d"
         txt += "INF: optionnal datas received... <br>"
-        nNumVar = 2
-        while strTemplateName % nNumVar in dArgs:
-            dataname = dArgs[strTemplateName % nNumVar]
-            datavalue = dArgs[strTemplateValue % nNumVar]
-            txt += "INF:   recordData for '%s' return: <br>" % dataname
-            txt += recordData(timestamp,strHostname,dataname, datavalue) + "<br>"
+        nNumVar = 1
+        nNbrMissed = 0
+        while 1:
+            if strTemplateName % nNumVar in dArgs:
+                dataname = dArgs[strTemplateName % nNumVar]
+                datavalue = dArgs[strTemplateValue % nNumVar]
+                txt += "INF:   recordData for '%s' return: <br>" % dataname
+                txt += recordData(timestamp,strHostname,dataname, datavalue) + "<br>"
+                nNbrMissed = 0
+            else:
+                nNbrMissed += 1
+                if nNbrMissed > 10:
+                    break
             nNumVar += 1
 
     txt += "</html>"

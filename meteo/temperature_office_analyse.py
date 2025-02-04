@@ -195,7 +195,7 @@ def draw_temp_series(dictPerDay, bRender=True, bCloseAtEnd = True, strTitle = No
 
         if 1:
             # local min & max et derniere mesure
-            for extremum,offset in [(min,-0.4),(max,+0.1),(lambda x:x[-1],x²x²+0.1)]:
+            for extremum,offset in [(min,-0.4),(max,+0.1),(lambda x:x[-1],+0.1)]:
                 idx = dictPerDay[k][1].index(extremum(dictPerDay[k][1]))
                 # x is hour with decimal since start or hour in absolute
                 nNumJour = int(dictPerDay[k][0][idx]/24)
@@ -410,7 +410,7 @@ if __name__ == "__main__":
         
         if 1:
             # all temp !
-            datas_of_interest = [("MisBKit3","temp"),("MisBKit4","temp"),("MisBKit4","temp2")]
+            datas_of_interest = [("MisBKit3","temp"),("MisBKit4","temp"),("MisBKit4","temp2"),("MisBKit5","temp10"),("MisBKit5","temp11")]
             strFilename = "data/office_temperature.txt"
             added_datas = decode_file_sonde(strFilename)
             datas.update(added_datas)

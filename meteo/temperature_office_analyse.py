@@ -120,8 +120,8 @@ def decode_file_sonde(strFilename):
             #~ break
             
             
-        # remove abberations
-        if ( rValue < -100 ) or ( ( not "temp" in strMesureName.lower() ) and rValue < 1. ) or rValue > 50000: # max is VOC 1...50000
+        # remove abberations (85 is for a temp sonde who send 85 when initing)
+        if ( rValue < -100 ) or ("temp" in strMesureName.lower() and abs(rValue-85)<0.01) or ( ( not "temp" in strMesureName.lower() ) and rValue < 1. ) or rValue > 50000: # max is VOC 1...50000
             continue
             
         # remove test
@@ -195,8 +195,13 @@ def draw_temp_series(dictPerDay, bRender=True, bCloseAtEnd = True, strTitle = No
 
         if 1:
             # local min & max et derniere mesure
-            for extremum,offset in [(min,-0.4),(max,+0.1),(lambda x:x[-1],+0.1)]:
-                idx = dictPerDay[k][1].index(extremum(dictPerDay[k][1]))
+            #~ for extremum,offset in [(min,-0.4),(max,+0.1),(lambda x:x[-1],+0.1)]: # le -1 ne fonctionne pas car ce n'est pas forcement celle ci qui va sortir dans le find
+            for extremum,offset in [(min,-0.4),(max,+0.1),(lambda x:-421,+0.1)]: # donc on met un magic
+                value = extremum(dictPerDay[k][1])
+                if value != -421:
+                    idx = dictPerDay[k][1].index(value)
+                else:
+                    idx = len(dictPerDay[k][1])-1
                 # x is hour with decimal since start or hour in absolute
                 nNumJour = int(dictPerDay[k][0][idx]/24)
                 rHour = dictPerDay[k][0][idx] - ( nNumJour * 24 )

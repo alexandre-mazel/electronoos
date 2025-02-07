@@ -157,7 +157,7 @@ void setOpen( int nNumVanne, int bOpen)
 
 void readCfgFromEeproom()
 {
-  if(0)
+  if(1)
   {
     //write values (for the first time)
     Serial.println("\nWRITING TO EEPROM !\n");

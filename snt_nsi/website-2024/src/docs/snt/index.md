@@ -33,6 +33,7 @@
 ## Chapitre 4 - Donn&eacute;es et traitements (et Python)
 - [TP1 - Turtle](04-processing/tp1_python_turtle.md)
 - [TP2 - Turtle](04-processing/tp2_python_turtle2.md)
+- [TP3 - Compute-It](04-processing/tp2_python_compute_it.md)
 
 
 

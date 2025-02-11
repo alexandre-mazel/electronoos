@@ -270,7 +270,7 @@ def test_opencv_orb( bPrint = True ):
     try:
         import cv2
     except:
-        if bPrint: print( "opencv (orb)      : not found")
+        if bPrint: print( "opencv (for orb)      : not found")
         return 0
         
     import math
@@ -1536,6 +1536,35 @@ disk_write    1KB: ####################   8.33s (120.02 Mo/s)
 disk_read     1KB: ####################   4.66s (214.56 Mo/s)
 disk_write 1024KB: ####################   7.39s (135.39 Mo/s)
 disk_read  1024KB: ####################   3.79s (263.53 Mo/s)
+
+*** Azure Server2cpu - Standard F4as v6 (4 vcpus, 16 GiB memory) - "8 cores" 16 GB
+INF: Changing disk test size to 5000 MB
+python version   : 3.12.3 (64bits) (4 core(s))
+cpu              : AMD EPYC 9V74 80-Core Processor
+ram              : 15.00 / 15.61 GB
+test_cpu_int2    : ####################   0.30s
+test_cpu_float2  : ####################   0.05s
+test_crypt       : ####################   4.10s
+test_cpu_ram 2G  : ####################   0.08s
+test_cpu_ram 4G  : ####################   0.16s
+test_cpu_ram 6G  : ####################   0.25s
+test_cpu_ram 8G  : ####################   0.33s
+test_cpu_ram10G  : ####################   0.41s
+test_cpu_ram12G  : ####################   0.49s
+test_cpu_ram14G  : ####################   0.56s
+test_cpu_ram16G  : ####################   0.65s
+test_scipy_xxt   : ####################   0.48s (825.25x)
+test_orb4.6.0    : ####################   0.08s (1249.10fps)
+test_orbcv imgs  : ####################   0.32s (313.66fps)
+test_orbcv bis   : ####################   0.32s (315.63fps)
+multiprocess x1 :  0.31s /  0.05s /  4.10s /  0.46s /  0.16s /  0.43s /  0.42s =>    5.93s (per thread:5.93s)
+multiprocess x4 :  0.32s /  0.06s /  4.11s /  0.82s /  0.16s /  0.44s /  0.43s =>   12.27s (per thread:3.07s)
+multiprocess x8 :  0.63s /  0.11s /  8.22s /  1.90s /  0.32s /  0.88s /  0.88s =>   25.21s (per thread:3.15s)
+multiprocess x32:  2.52s /  0.44s / 32.92s /  7.29s /  1.30s /  3.62s /  3.61s =>   76.92s (per thread:2.40s)
+disk_write    1KB: ####################  81.11s (61.65 Mo/s)
+disk_read     1KB: ####################  20.04s (249.44 Mo/s)
+disk_write 1024KB: ####################  49.19s (101.64 Mo/s)
+disk_read  1024KB: ####################   0.80s (6252.09 Mo/s)
 
 
 

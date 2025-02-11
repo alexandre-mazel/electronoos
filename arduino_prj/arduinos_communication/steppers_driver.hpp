@@ -1,5 +1,5 @@
 // StepperDriver
-// manage many stepper pwm in a single loop, pure soft (so not completely precise)
+// Manage many stepper pwm in a single loop, pure soft command (no IRQ) (so not completely precise)
 // (c) A.Mazel 2023
 
 #ifndef _STEPPERS_DRIVER_H_

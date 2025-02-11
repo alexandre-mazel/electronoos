@@ -30,7 +30,10 @@ strModel = "llama3.3:70B" # size: GB, running:   # no size
 
 """
 Sur linux (eg: azure):
-cf https://www.linuxtricks.fr/wiki/ia-installer-un-modele-de-langage-llm-avec-ollama
+# methode rapide:
+curl -fsSL https://ollama.com/install.sh | sh
+
+ou sinon, cf https://www.linuxtricks.fr/wiki/ia-installer-un-modele-de-langage-llm-avec-ollama
 
 wget https://ollama.com/download/ollama-linux-arm64.tgz
 tar -C /usr -xvzf ollama-linux-amd64.tgz
@@ -40,7 +43,7 @@ wget https://ollama.com/download/ollama-linux-amd64-rocm.tgz
 tar -C /usr -xvzf ollama-linux-amd64-rocm.tgz
 
 # chargé le serveur a la main:
-/usr/bin/ollama serve
+/usr/bin/ollama serve # ou juste ollama serve
 
 # les modeles sont stocké dans:
 /usr/share/ollama/.ollama/models
@@ -55,7 +58,11 @@ ollama run llama3 "Résume moi Cyrano de Bergerac"
 # ollama run llava "What's in this image? /Users/jmorgan/Desktop/smile.png"
 # or
 # semble ne marcher qu'avec llava
-# ollama run llava "What's in this image? /home/na/dev/git/electronoos/data/logo_raspberry.jpg" # ou inconnus.jpg
+ollama run llava "What's in this image? /home/na/dev/git/electronoos/data/inconnus.jpg"
+ollama run llava "Que vois-t-on dans cette image? /home/na/dev/git/electronoos/data/inconnus.jpg"
+ollama run llava "What's in this image? /home/na/dev/git/electronoos/data/keys.jpg"
+ollama run llava "Que vois-t-on dans cette image? /home/na/dev/git/electronoos/data/keys.jpg"
+ollama run llava "What's in this image? /home/na/dev/git/electronoos/data/lions1.jpg"
 
 # par defaut il ecoute sur 11434:
 ss -unplat | grep 11434
@@ -70,6 +77,7 @@ rm -r /usr/lib/ollama
 
 ollama run llama3.3:70B "Résume moi Cyrano de Bergerac"
 Error: model requires more system memory (45.5 GiB) than is available (5.5 GiB)
+Error: model requires more system memory (43.7 GiB) than is available (30.4 GiB) (sur une machine a 32Go)
 """
 
 class Conversation:

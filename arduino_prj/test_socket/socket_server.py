@@ -57,7 +57,7 @@ while True:
             duration = time.time() - time_begin
             if duration > 5:
                 val_throughput = nbr_data_received / duration
-                print( "INF: from %s: data throughput: %.1f/s (total: %.2fM)" % (str(addr), val_throughput,total_data_received/(1000*1000)) )
+                print( "INF: from %s: data throughput: %.1f/s (total: %.2fM)" % (str(addr[0]), val_throughput,total_data_received/(1000*1000)) )
                 nbr_data_received = 0
                 time_begin = time.time()
 

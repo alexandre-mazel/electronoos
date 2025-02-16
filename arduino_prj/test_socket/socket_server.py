@@ -16,6 +16,7 @@ sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 num_port = 8090
 sock.bind(('0.0.0.0', num_port ))
 sock.listen(1)
+sock.setdefaulttimeout(1.0)
 
 print("INF: Serving socket on %s" % num_port )
 

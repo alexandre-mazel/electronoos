@@ -1,6 +1,7 @@
 import socket
 import time
 import datetime
+import os
 
 def getTimeStamp():
     """
@@ -23,6 +24,7 @@ total_data_received = 0
 while True:
     client, addr = sock.accept()
     sock.settimeout(5) # kill if read received no information after 5 sec
+    sock.setblocking(0)
     
     print("INF: %s: Client connected from %s..." % ( getTimeStamp(), str(addr) ) )
     
@@ -31,7 +33,10 @@ while True:
     time_begin = time.time()
     nbr_data_received = 0;
     while True:
-        content = client.recv(256)
+        flags = 0
+        if os.name != "nt":
+            flags |= socket.SOCK_NONBLOCK
+        content = client.recv(256,flags)
 
         if len(content) ==0:
            break

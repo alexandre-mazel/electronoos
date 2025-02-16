@@ -74,7 +74,7 @@ try:
         except OSError as err:
             import errno
             print(str(errno.errorcode))
-            if err.args[0] != errno.ETIMEDOUT and err.args[0] != errno.EAGAIN:
+            if err.args[0] != errno.ETIMEDOUT and err.args[0] != errno.EAGAIN and and err.args[0] != errno.WSAEWOULDBLOCK:
                 print( "ERR: while accepting: oserror: %s" % str(err) )
             time.sleep(2)
             continue

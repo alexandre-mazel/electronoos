@@ -15,6 +15,6 @@ description: Turtle2 - Utilisation de boucles et fonctions
     3. (Si il y a pleins de rond rouges, alors il faut cliquer dans le rond (blanc) contenant un 0)
     4. C'est vous l'ordinateur: Vous devez exécuter le programme qui se trouve sur la droite de la page en utilisant les touches de votre clavier.
     
-    En 1h, vous devriez arriver au moins jusqu'a l'étape 30.
+    En 1h, vous devriez arriver au moins jusqu'a l'étape 40.
 
 

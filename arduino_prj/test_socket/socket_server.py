@@ -57,7 +57,7 @@ while True:
             duration = time.time() - time_begin
             if duration > 5:
                 val_throughput = nbr_data_received / duration
-                print( "INF: data throughput: %.1f/s (total: %.2fM)" % (val_throughput,total_data_received/(1000*1000)) )
+                print( "INF: from %s: data throughput: %.1f/s (total: %.2fM)" % (str(addr), val_throughput,total_data_received/(1000*1000)) )
                 nbr_data_received = 0
                 time_begin = time.time()
 
@@ -66,9 +66,11 @@ while True:
     
 """
 Stat:
-Data received from 1 Esp32 (MisBKit 4) en burst: 
+Data received from 1 Esp32 (MisBKit 4) <-> mstab7 en wifi en burst: 
     - no wait: 1849-1954 bytes / sec.
     - no wait, check server connected between each bytes: 1739-1823 bytes / sec.
     - Teste non stop de 17h55 a 22h17 (4h20) sans coupure ni pertes de paquets. (avec les enfants qui font du wifi).
-    
+
+Data received from 1 Esp32 (MisBKit 4) <-> rpi5 en eth en burst:   
+    - no wait: 1849-1954 bytes / sec.
 """

@@ -32,7 +32,7 @@ def handle_client( conn, addr ):
            
         #~ print(content)
         for data in content:
-            print( "0x%x" % data )
+            #~ print( "0x%x" % data )
             if not ( data == nPrevData+1 or (data == 0 and nPrevData == 99) ):
                 print("ERR: %s: %s: data corrupted (data: %d, nPrevData: %d)" % ( getTimeStamp(), str(addr[0]), data, nPrevData ) )
                 conn.recv(4096) # flush all
@@ -73,7 +73,7 @@ try:
             conn, addr = sock.accept()
         except OSError as err:
             import errno
-            #~ print(str(errno.errorcode))
+            print(str(errno.errorcode))
             if err.args[0] != errno.ETIMEDOUT and err.args[0] != errno.EAGAIN:
                 print( "ERR: while accepting: oserror: %s" % str(err) )
             time.sleep(2)

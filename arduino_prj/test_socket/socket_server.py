@@ -24,9 +24,9 @@ def handle_client( conn, addr ):
     nbr_data_received = 0;
     while True:
         flags = 0
-        if os.name != "nt":
-            flags |= socket.SOCK_NONBLOCK
-        content = conn.recv(256,flags)
+        #~ if os.name != "nt":
+            #~ flags |= socket.SOCK_NONBLOCK
+        content = conn.recv(32,flags)
 
         if len(content) ==0:
            break

@@ -62,7 +62,7 @@ ollama run llava "What's in this image? /home/na/dev/git/electronoos/data/inconn
 ollama run llava "Que vois-t-on dans cette image? /home/na/dev/git/electronoos/data/inconnus.jpg"
 ollama run llava "What's in this image? /home/na/dev/git/electronoos/data/keys.jpg"
 ollama run llava "Que vois-t-on dans cette image? /home/na/dev/git/electronoos/data/keys.jpg"
-ollama run llava "What's in this image? /home/na/dev/git/electronoos/data/lions1.jpg"
+ollama run llava "What's in this image? /home/na/dev/git/electronoos/llama/guess.jpg"
 
 # par defaut il ecoute sur 11434:
 ss -unplat | grep 11434

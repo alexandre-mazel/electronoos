@@ -226,6 +226,13 @@ pas à le dire et je serais ravi de vous aider!
 -----
 na@Server2cpu:~$ ollama run llava "What's in this image? /home/na/dev/git/electronoos/data/keys.jpg"
  This is a picture of keys.
+ -----
+ na@Server2cpu:~/dev/git/electronoos$ ollama run llava "What's in this image? /home/na/dev/git/electronoos/llama/guess.jpg"
+Added image '/home/na/dev/git/electronoos/llama/guess.jpg'
+ The image shows a majestic lion standing with its mane blowing slightly.
+It appears to be a studio portrait of the lion, as indicated by the
+background that is not typical of a natural setting and gives the
+impression of a backdrop often used for photography.
 
 
 

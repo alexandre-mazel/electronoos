@@ -14,6 +14,7 @@ def getTimeStamp():
     
 def handle_client( conn, addr ):
     global total_data_received
+    global total_time_begin
     
     print("INF: %s: %s: Client connected from port %s ..." % ( getTimeStamp(), str(addr[0]), str(addr[1]) ) )
     
@@ -45,7 +46,10 @@ def handle_client( conn, addr ):
             duration = time.time() - time_begin
             if duration > 5:
                 val_throughput = nbr_data_received / duration
-                print( "INF: %s: %s: data throughput: %.1f/s (total: %.2fM)" % (getTimeStamp(), str(addr[0]), val_throughput,total_data_received/(1000*1000)) )
+                duration_total = time.time()-total_time_begin
+                val_throughput_total = total_data_received / duration_total
+                # print data throughput
+                print( "INF: %s: %s: %.1fB/s (total: %.1fB/s, %.2fMB %.2fmin)" % ( getTimeStamp(), str(addr[0]), val_throughput, val_throughput_total, total_data_received/(1000*1000), duration_total/60 ) )
                 nbr_data_received = 0
                 time_begin = time.time()
 
@@ -66,6 +70,7 @@ print("INF: Serving socket on %s" % num_port )
 
 total_data_received = 0
 all_threads = []
+total_time_begin = time.time()
 
 try:
     while True:
@@ -102,12 +107,17 @@ finally:
         t.join()
         
 """
-Stat:
+*** Stat monothread:
 Data received from 1 Esp32 (MisBKit 4) <-> mstab7 en wifi en burst: 
     - no wait: 1849-1954 bytes / sec.
     - no wait, check server connected between each bytes: 1739-1823 bytes / sec.
     - Teste non stop de 17h55 a 22h17 (4h20) sans coupure ni pertes de paquets. (avec les enfants qui font du wifi).
 
 Data received from 1 Esp32 (MisBKit 4) <-> rpi5 en eth en burst:   
-    - no wait: 1849-1954 bytes / sec.
+    - no wait: 553-930 bytes / sec.
+    
+*** Stat multithread:
+Data received from 2 Esp32 (MisBKit 4&5) <-> rpi5 en eth en burst:   
+    - no wait: after 1045 bytes  / sec 100k
+
 """

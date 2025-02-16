@@ -73,7 +73,7 @@ try:
             conn, addr = sock.accept()
         except OSError as err:
             import errno
-            print(str(errno.errorcode))
+            #~ print(str(errno.errorcode))
             if err.args[0] != errno.ETIMEDOUT and err.args[0] != errno.EAGAIN and (os.name == "nt" and err.args[0] != errno.WSAEWOULDBLOCK):
                 print( "ERR: while accepting: oserror: %s" % str(err) )
             time.sleep(2)

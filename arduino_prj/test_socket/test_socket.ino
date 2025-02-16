@@ -19,9 +19,14 @@ void setup()
 const char * host = "192.168.0.46";
 const uint16_t port = 8090;
 
+int nbr_loop = 0;
+
 void loop() 
 {
-  Serial.print( "INF:Connecting to " ); Serial.print( host ); Serial.print( ":" ); Serial.println( port ); 
+  Serial.print( "INF: Connecting to " ); Serial.print( host ); Serial.print( ":" ); Serial.println( port ); 
+  Serial.print( "INF: nbr_loop: " ); Serial.println( nbr_loop );
+
+  digitalWrite(ledPin, HIGH);
 
   if ( !wifi_client.connect(host, port) ) 
   {
@@ -44,7 +49,7 @@ void loop()
     // here test he's still connected (or so need to reconnect)
     wifi_client.write((unsigned char)(i%100));
     //delay(10); // 100 bytes per sec
-    if( 1 )
+    if( (nbr_loop % 2) == 0 )
     {
       if( !wifi_client.connected() )
       {
@@ -56,5 +61,7 @@ void loop()
 
   Serial.println( "Disconnecting..." );
   wifi_client.stop();
+  digitalWrite(ledPin, LOW);
   delay(10*1000);
+  nbr_loop += 1;
 }

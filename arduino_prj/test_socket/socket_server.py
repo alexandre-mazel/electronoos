@@ -1,11 +1,20 @@
 import socket
 import time
+import datetime
 
-sock = socket.socket()         
+def getTimeStamp():
+    """
+    return (hour,min,second)
+    """
+    datetimeObject = datetime.datetime.now()
+    return "%2dh%02dm%02d" % (datetimeObject.hour, datetimeObject.minute, datetimeObject.second)
+    
+sock = socket.socket()
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
 num_port = 8090
 sock.bind(('0.0.0.0', num_port ))
-sock.listen(0)
+sock.listen(1)
 
 print("INF: Serving socket on %s" % num_port )
 
@@ -13,8 +22,9 @@ total_data_received = 0
 
 while True:
     client, addr = sock.accept()
+    sock.settimeout(5) # kill if read received no information after 5 sec
     
-    print("INF: Client connected from %s..." % str(addr) )
+    print("INF: %s: Client connected from %s..." % ( getTimeStamp(), str(addr) ) )
     
     nPrevData = 99
     
@@ -26,11 +36,11 @@ while True:
         if len(content) ==0:
            break
            
-        #~ print(content)
+        print(content)
         for data in content:
             #~ print( "0x%x" % data )
             if not ( data == nPrevData+1 or (data == 0 and nPrevData == 99) ):
-                print("ERR: data xcorrupted (data: %d, nPrevData: %d)" % (data,nPrevData) )
+                print("ERR: data corrupted (data: %d, nPrevData: %d)" % (data,nPrevData) )
                 client.recv(4096) # flush all
                 break
             nPrevData = data
@@ -45,10 +55,14 @@ while True:
                 nbr_data_received = 0
                 time_begin = time.time()
 
-    print("Closing connection")
+    print("%s: Closing connection" % getTimeStamp() )
     client.close()
     
 """
 Stat:
-    - Data received from esp32 burst: 1849-1954 bytes / sec.
+Data received from 1 Esp32 (MisBKit 4) en burst: 
+    - no wait: 1849-1954 bytes / sec.
+    - no wait, check server connected between each bytes: 1739-1823 bytes / sec.
+    - Teste non stop de 17h55 a 22h17 (4h20) sans coupure ni pertes de paquets. (avec les enfants qui font du wifi).
+    
 """

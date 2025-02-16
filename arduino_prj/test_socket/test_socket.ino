@@ -27,7 +27,7 @@ void loop()
   {
     Serial.println( "Connection to host failed" );
 
-    delay(3000);
+    delay(3*1000);
     return;
   }
   Serial.println( "Connected to server successful!" );
@@ -39,18 +39,22 @@ void loop()
     wifi_client.print( "Hello from ESP32!" );
   }
   */
-  for( int i = 0; i < 100*30; ++i )
+  for( int i = 0; i < 100*100*30; ++i )
   {
     // here test he's still connected (or so need to reconnect)
     wifi_client.write((unsigned char)(i%100));
-    delay(10); // 100 bytes per sec
-    if( !wifi_client.connect )
+    //delay(10); // 100 bytes per sec
+    if( 1 )
     {
-      Serial.println( "ERR: Server lost!" );
+      if( !wifi_client.connected() )
+      {
+        Serial.println( "ERR: Server lost!" );
+        break;
+      }
     }
   }
 
   Serial.println( "Disconnecting..." );
   wifi_client.stop();
-  delay(100000);
+  delay(10*1000);
 }

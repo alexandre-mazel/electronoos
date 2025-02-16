@@ -1,19 +1,27 @@
 import socket
+import time
 
-s = socket.socket()         
+sock = socket.socket()         
 
 num_port = 8090
-s.bind(('0.0.0.0', num_port ))
-s.listen(0)  
+sock.bind(('0.0.0.0', num_port ))
+sock.listen(0)
 
 print("INF: Serving socket on %s" % num_port )
 
+total_data_received = 0
+
 while True:
-    client, addr = s.accept()
-    nPrevData = 
+    client, addr = sock.accept()
+    
+    print("INF: Client connected from %s..." % str(addr) )
+    
+    nPrevData = 99
+    
     time_begin = time.time()
+    nbr_data_received = 0;
     while True:
-        content = client.recv(32)
+        content = client.recv(256)
 
         if len(content) ==0:
            break
@@ -26,8 +34,21 @@ while True:
                 client.recv(4096) # flush all
                 break
             nPrevData = data
-                
-                
+        else:
+            # normal case
+            nbr_data_received += len(content)
+            total_data_received += len(content)
+            duration = time.time() - time_begin
+            if duration > 5:
+                val_throughput = nbr_data_received / duration
+                print( "INF: data throughput: %.1f/s (total: %.2fM)" % (val_throughput,total_data_received/(1000*1000)) )
+                nbr_data_received = 0
+                time_begin = time.time()
 
     print("Closing connection")
     client.close()
+    
+"""
+Stat:
+    - Data received from esp32 burst: 1849-1954 bytes / sec.
+"""

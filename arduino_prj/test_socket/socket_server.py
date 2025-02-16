@@ -16,7 +16,7 @@ sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 num_port = 8090
 sock.bind(('0.0.0.0', num_port ))
 sock.listen(1)
-sock.setdefaulttimeout(1.0)
+#~ sock.setdefaulttimeout(1.0)
 
 print("INF: Serving socket on %s" % num_port )
 
@@ -42,7 +42,7 @@ while True:
         if len(content) ==0:
            break
            
-        print(content)
+        #~ print(content)
         for data in content:
             #~ print( "0x%x" % data )
             if not ( data == nPrevData+1 or (data == 0 and nPrevData == 99) ):

@@ -88,7 +88,7 @@ def sendData100( conn, addr ):
         buf.append( i%100 ) # beurk
     buf = bytes( buf )
         
-    for i in range(10000):
+    for i in range(1000000):
         conn.send( buf )
         time.sleep( 0.0001 )  # depuis windows si trop rapide => BlockingIOError: [WinError 10035] Une operation non bloquante sur un socket n'a pas pu etre achevee immediatement.
         

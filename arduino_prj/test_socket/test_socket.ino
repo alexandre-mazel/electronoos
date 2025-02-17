@@ -37,7 +37,7 @@ void sendData100(int nNumLoop )
 
   for( int i = 0; i < 100*100*30; ++i )
   {
-    wifi_client.write((unsigned char*)buf,nSizeBuffer);  
+    wifi_client.write((unsigned char*)buf,nSizeBuffer);
     // wifi_client.write((unsigned char)(i%100));
   
     //delay(10); // 100 bytes per sec
@@ -53,10 +53,60 @@ void sendData100(int nNumLoop )
 }
 
 
-void receivingData100(int nNumLoop )
+void receiveData100(int nNumLoop )
 {
 
-  Serial.println( "Receiving data!" );
+  Serial.println( "INF: Receiving data!" );
+
+  const int nSizeBuffer = 100;
+
+  unsigned char nPrevData = 99;
+
+  long int nLenDataReceived = 0;
+
+  long int time_begin = millis();
+
+  while( 1 )
+  {
+    while( wifi_client.available() < nSizeBuffer )
+    {
+      //Serial.println("Waiting for packet...");
+      delay(0);
+    }
+
+    unsigned char buf[nSizeBuffer];
+    int nReaded = wifi_client.read((unsigned char*)buf,nSizeBuffer);
+    if( 0 )
+    {
+      Serial.print( "DBG: nReaded: " ); Serial.println( nReaded );
+      for( int i = 0; i < 10; ++i )
+      {
+        Serial.print( i ); Serial.print(": " ); Serial.println( buf[i] );
+      }
+    }
+    for( int i = 0; i < nReaded; ++i )
+    {
+      // Serial.print( i ); Serial.print(": " ); Serial.println( buf[i] );
+      if ( ! ( buf[i] == nPrevData+1 || ( buf[i] == 0 && nPrevData == 99 ) ) )
+      {
+        Serial.print("ERR: data corrupted (nPrevData: "); Serial.println( nPrevData );
+        wifi_client.flush(); // flush all
+        break;
+      }
+      nPrevData = buf[i];
+    }
+
+    nLenDataReceived += nReaded;
+    long int duration = millis() - time_begin;
+    Serial.println( duration );
+    if( duration > 5000 )
+    {
+      int throughput = nLenDataReceived * 1000 / duration;
+      Serial.print( "INF: throughput: "); Serial.println( throughput );
+      time_begin = millis();
+      nLenDataReceived = 0;
+    }
+  }
 
 }
 
@@ -81,8 +131,8 @@ void loop()
   }
   Serial.println( "Connected to server successful!" );
 
-  sendData100( nbr_loop );
-  //receiveData100( nbr_loop );
+  //sendData100( nbr_loop );
+  receiveData100( nbr_loop );
 
   Serial.println( "Disconnecting..." );
   wifi_client.stop();

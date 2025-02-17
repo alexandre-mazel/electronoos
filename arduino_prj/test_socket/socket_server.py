@@ -80,12 +80,26 @@ def receiveData100( conn, addr ):
                 print( "INF: %s: %s: %sB/s (total: %sB/s, %sB, %.2fmin)" % ( getTimeStamp(), str(addr[0]), smartFormatSize(val_throughput), smartFormatSize(val_throughput_total), smartFormatSize(total_data_received), duration_total/60 ) )
                 nbr_data_received = 0
                 time_begin = time.time()
+                
+def sendData100( conn, addr ):
+    print("INF: %s: %s: Sending data 100 to client" % ( getTimeStamp(), str(addr[0]) ) )
+    buf = []
+    for i in range( 100 ):
+        buf.append( i%100 ) # beurk
+    buf = bytes( buf )
+        
+    for i in range(100):
+        conn.send( buf )
+        time.sleep( 1. )
+        
+    print("INF: %s: %s: Sending data 100 to client - done" % ( getTimeStamp(), str(addr[0]) ) )
     
 def handle_client( conn, addr ):
     
     print("INF: %s: %s: Client connected from port %s ..." % ( getTimeStamp(), str(addr[0]), str(addr[1]) ) )
     
-    receiveData100( conn, addr )
+    #~ receiveData100( conn, addr )
+    sendData100( conn, addr )
 
     print("%s: %s: Closing connection" % (getTimeStamp(),str(addr[0]) ) )
     

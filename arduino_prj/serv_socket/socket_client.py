@@ -90,6 +90,8 @@ Puis en redressant l'ordi, j'ai eu mieux:
 20h39m51: nbr_exchange: 44.5 (223), Sent: 311.3B, Received: 44.5B
 
 # Real best: en optimisant un peu les tests et la boucle du python (et Motor => Mot)
+# even when Netflix running on the side (but not the same wifi nor channel)
+# no Netflix change nothing
 23h52m16: nbr_exchange: 64.8 (324), Sent: 323.8B, Received: 64.8B
 
 
@@ -99,6 +101,7 @@ Puis en redressant l'ordi, j'ai eu mieux:
 *** connection au client serveur sur  MisBKit4 sur Freebox depuis mstab7:
 # (pas de retour)
 23h32m25: nbr_exchange: 65.7 (329), Sent: 328.4B, Received: 0.000B
+# pas mieux
 
 
 

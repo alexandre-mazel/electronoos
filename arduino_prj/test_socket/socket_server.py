@@ -11,6 +11,17 @@ def getTimeStamp():
     datetimeObject = datetime.datetime.now()
     return "%2dh%02dm%02d" % (datetimeObject.hour, datetimeObject.minute, datetimeObject.second)
     
+def smartFormatSize( size ):
+    if size < 10:
+        return "%.3f" % size
+    if size < 1000:
+        return "%.1f" % size
+    if size < 1000*1000:
+        return "%.1fk" % (size/1000)
+    if size < 1000*1000*1000:
+        return "%.1fM" % (size/(1000*1000))
+        
+    return "%.1fG" % (size/(1000*1000*1000))
     
 def handle_client( conn, addr ):
     global total_data_received
@@ -26,7 +37,12 @@ def handle_client( conn, addr ):
         flags = 0
         #~ if os.name != "nt":
             #~ flags |= socket.SOCK_NONBLOCK
-        content = conn.recv(32,flags)
+        try:
+            content = conn.recv(32,flags)
+        except BaseException as err:
+            if (os.name == "nt" and err.args[0] != errno.WSAEWOULDBLOCK):
+                print( "ERR: while receving: error: %s" % str(err) )
+            continue
 
         if len(content) ==0:
            break
@@ -49,7 +65,7 @@ def handle_client( conn, addr ):
                 duration_total = time.time()-total_time_begin
                 val_throughput_total = total_data_received / duration_total
                 # print data throughput
-                print( "INF: %s: %s: %.1fB/s (total: %.1fB/s, %.2fMB, %.2fmin)" % ( getTimeStamp(), str(addr[0]), val_throughput, val_throughput_total, total_data_received/(1000*1000), duration_total/60 ) )
+                print( "INF: %s: %s: %sB/s (total: %sB/s, %sB, %.2fmin)" % ( getTimeStamp(), str(addr[0]), smartFormatSize(val_throughput), smartFormatSize(val_throughput_total), smartFormatSize(total_data_received), duration_total/60 ) )
                 nbr_data_received = 0
                 time_begin = time.time()
 
@@ -66,9 +82,10 @@ sock.listen(10)
 #~ sock.setdefaulttimeout(1.0)
 sock.setblocking(0)
 
-if os.name == "nt":
-    print("INF: Cette version multithread non bloquant ne fonctionne pas sous windows")
-    exit(-1)
+# Yes it works now under windows!
+#~ if os.name == "nt":
+    #~ print("INF: Cette version multithread non bloquant ne fonctionne pas sous windows")
+    #~ exit(-1)
 
 print("INF: Serving socket on %s" % num_port )
 

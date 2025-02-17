@@ -138,5 +138,8 @@ int createWifiAP( const char* SSID, const char* password )
   IPAddress IP = WiFi.softAPIP();
   Serial.print("INF: createWifiAP: Access Point IP address: "); Serial.println(IP);
 
+  byte encryption = WiFi.encryptionType();
+  Serial.print("Encryption Type: "); Serial.println(encryption,HEX);
+
   return 1;
 }

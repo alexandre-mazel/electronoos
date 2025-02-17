@@ -132,6 +132,8 @@ int createWifiAP( const char* SSID, const char* password )
 {
   Serial.print("INF: createWifiAP: Setting Access Point with SSID: "); Serial.println( SSID );
 
+  WiFi.mode( WIFI_AP );
+
   // Remove the password parameter, if you want the AP (Access Point) to be open
   const int channel = 1; // At home it's better on channel 1
   const int ssid_hidden = 0; // 1 for true

@@ -14,6 +14,8 @@ void start_server( void )
   server.begin();
 }
 
+unsigned char allMotorsPosition[6] = {100,101,102,103,104,105};
+
 void update_server( void )
 {
   WiFiClient client = server.available();   // Listen for incoming clients
@@ -61,18 +63,21 @@ void update_server( void )
         }
       }
       */
+      if( client.available() )
       {
         // currentLine is char *
         const int nSizeBuffer = 20;
         char buf[nSizeBuffer];
         int nReaded = client.read( (unsigned char*)buf, nSizeBuffer );
-        if(nMaxCurrentLine < nLenCurrentLine+nReaded)
+
+        if( nReaded > 0 )
         {
-          nReaded = nMaxCurrentLine - nLenCurrentLine;
-          Serial.print( "WRN: Overflow in line reading !" );
-        }
-        if(nReaded > 0)
-        {
+          if(nMaxCurrentLine < nLenCurrentLine+nReaded)
+          {
+            nReaded = nMaxCurrentLine - nLenCurrentLine;
+            Serial.print( "WRN: Overflow in line reading !" );
+          }
+
           //Serial.print( "DBG: nReaded: " ); Serial.println( nReaded );
           strncpy( &(currentLine[nLenCurrentLine]), buf, nReaded );
           nLenCurrentLine += nReaded;
@@ -99,8 +104,13 @@ void update_server( void )
         {
           // Serial.println( "" );
           // Serial.println( "INF: Motor position received, sending current one" );
-          client.write( 100 );
-          nbr_sent += 1;
+          if( 1 )
+          {
+            // send answer
+            // client.write( 100 ); // just 1 motor value
+            client.write( allMotorsPosition, 6 ); // all values
+            nbr_sent += 1;
+          }
           //currentLine = "";
           nLenCurrentLine = 0;
           currentLine[nLenCurrentLine] = '\0'; // moche
@@ -154,7 +164,13 @@ void setup()
   Serial.println ("" );
   Serial.println( "serv_socket v0.6" );
 
-  // connectToWifi();
+  // coupe le BT (mais ne fonctionne pas)
+//  esp_bluedroid_disable();
+//  esp_bluedroid_deinit();
+//  esp_bt_controller_disable();
+//  esp_bt_controller_deinit();
+
+  //connectToWifi();
   createWifiAP( getArduinoId() );
 
   start_server();

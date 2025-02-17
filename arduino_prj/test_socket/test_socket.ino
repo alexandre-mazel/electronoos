@@ -1,5 +1,6 @@
 #include <arduino.h>
 #include "wifi_network.hpp"
+#include "misbkit.hpp"
 
 const int ledPin = 13;
 
@@ -12,7 +13,8 @@ void setup()
   Serial.println ("" );
   Serial.println( "test_socket v0.6" );
 
-  connectToWifi();
+  // connectToWifi();
+  createWifiAP(getArduinoId());
 
 }
 
@@ -110,7 +112,7 @@ void receiveData100(int nNumLoop )
 
 }
 
-const char * host = "192.168.0.50"; // rpi5: "192.168.0.50", msttab7: "192.168.0.46"
+const char * host = "192.168.4.2"; // rpi5: "192.168.0.50", mstab7: "192.168.0.46", mstab7 AP MisBKit: 192.168.4.2
 const uint16_t port = 8090;
 
 int nbr_loop = 0;

@@ -1,76 +1,5 @@
 #include "wifi_network.hpp"
-
-#define USE_PREFS // Pref is the new things of esp32
-
-#ifdef USE_PREFS
-#   include <Preferences.h>
-    Preferences prefs;
-#else
-#    include <EEPROM.h>
-#endif // USE_PREFS
-
-
-void writeStringToEeprom(int nOffsetStart, const char* s)
-{
-  // write until a '\0' is found in the string
-
-  int nWritten = 0;
-
-#ifdef USE_PREFS
-    prefs.begin("Eeprom"); // a sort of namespace
-    nWritten = strlen(s);
-    prefs.putBytes("Eeprom_mykey",s,nWritten);  // keyname here for compatibility, but it's intended to be a key to have different variables)
-#else
-  const char * p = s;
-  while( *p )
-  {
-    EEPROM.write(nOffsetStart, *p); // update: write only if different (save a bit of ageing) - changed to write as update seems to be not available
-    ++nOffsetStart;
-    ++p;
-  }
-  EEPROM.write(nOffsetStart, *p); // write the null
-
-  EEPROM.commit(); // needed with ESP32 // yes but no => use Prefs
-
-  nWritten = int(p-s);
-#endif
-
-  Serial.print("DBG: writeStringToEeprom: written to eeprom: ");
-  Serial.print( nWritten );
-  Serial.println(" char(s)");
-}
-
-void readStringFromEeprom(int nOffsetStart, char* s)
-{
-  int nReaded = 0;
-
-  // read until a '\0' is found in Eeprom
-#ifdef USE_PREFS
-    prefs.begin("Eeprom");
-    nReaded = prefs.getBytesLength("Eeprom_mykey");
-    prefs.getBytes("Eeprom_mykey",s,nReaded);
-#else
-  char * p = s;
-  while( 1 )
-  {
-    char c = EEPROM.read(nOffsetStart);
-    *p = c;
-    ++nOffsetStart;
-    ++p;
-    Serial.println((int)c,HEX);
-    if( c == '\0' )
-    {
-      break;
-    }
-    nReaded = int(p-s);
-  }
-#endif
-
-Serial.print( "DBG: readStringFromEeprom: readed from eeprom: " );
-Serial.print( nReaded );
-Serial.println( " char(s)" );
-
-}
+#include "eeprom_prefs.hpp"
 
 
 // Enter your WiFi SSID and password
@@ -195,6 +124,19 @@ int connectToWifi( void )
   Serial.println("");
   Serial.println("Connected to WiFi");
   printWifiStatus();
+
+  return 1;
+}
+
+int createWifiAP( const char* SSID, const char* password )
+{
+  Serial.print("INF: createWifiAP: Setting Access Point with SSID: "); Serial.println( SSID );
+
+  // Remove the password parameter, if you want the AP (Access Point) to be open
+  WiFi.softAP(SSID, password);
+
+  IPAddress IP = WiFi.softAPIP();
+  Serial.print("INF: createWifiAP: Access Point IP address: "); Serial.println(IP);
 
   return 1;
 }

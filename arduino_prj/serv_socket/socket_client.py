@@ -25,7 +25,7 @@ strServerIP = "192.168.4.1"
 clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 clientsocket.connect( ( strServerIP, 8090 ) )
 
-clientsocket.send( b'hello' )
+clientsocket.send( b'Hello' )
 print( "INF: waiting for answer (1)..." )
 ret = clientsocket.recv( 32 )
 print( "INF: ret (1): ", ret )
@@ -35,7 +35,7 @@ nbr_received = 0
 nbr_sent = 0
 nbr_exchange = 0
 while 1:
-    data = b'Motor1' + uintToBytes(200)
+    data = b'Mot1' + uintToBytes(200)
     clientsocket.send( data )
     nbr_sent += len(data)
     
@@ -69,3 +69,19 @@ while 1:
         
     
 print( "INF: client disconnected" )
+
+"""
+Stat connection au client serveur AP MisBKit 4 depuis mstab7:
+
+Best:
+19h44m23: nbr_exchange: 6.2(31), Sent: 43.2B, Received: 6.165B
+
+Puis en redressant l'ordi, j'ai eu mieux:
+20h39m51: nbr_exchange: 44.5 (223), Sent: 311.3B, Received: 44.5B
+
+When no connection:
+Reponse de 192.168.4.1: octets=32 temps=191 ms TTL=64
+Reponse de 192.168.4.1: octets=32 temps=228 ms TTL=64
+Reponse de 192.168.4.1: octets=32 temps=58 ms TTL=64
+Reponse de 192.168.4.1: octets=32 temps=398 ms TTL=64
+"""

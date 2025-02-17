@@ -133,13 +133,16 @@ int createWifiAP( const char* SSID, const char* password )
   Serial.print("INF: createWifiAP: Setting Access Point with SSID: "); Serial.println( SSID );
 
   // Remove the password parameter, if you want the AP (Access Point) to be open
-  WiFi.softAP(SSID, password);
+  const int channel = 1; // At home it's better on channel 1
+  const int ssid_hidden = 0; // 1 for true
+  const int max_connection = 1;
+  WiFi.softAP(SSID, password, channel, ssid_hidden, max_connection);
 
   IPAddress IP = WiFi.softAPIP();
-  Serial.print("INF: createWifiAP: Access Point IP address: "); Serial.println(IP);
+  Serial.print( "INF: createWifiAP: Channel: " ); Serial.print( channel ); Serial.print( ", Access Point IP address: "); Serial.println(IP);
 
-  byte encryption = WiFi.encryptionType();
-  Serial.print("Encryption Type: "); Serial.println(encryption,HEX);
+  //byte encryption = WiFi.encryptionType();
+  //Serial.print( "Encryption Type: " ); Serial.println( encryption, HEX );
 
   return 1;
 }

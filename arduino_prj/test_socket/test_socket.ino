@@ -98,11 +98,11 @@ void receiveData100(int nNumLoop )
 
     nLenDataReceived += nReaded;
     long int duration = millis() - time_begin;
-    Serial.println( duration );
+    //Serial.println( duration );
     if( duration > 5000 )
     {
       int throughput = nLenDataReceived * 1000 / duration;
-      Serial.print( "INF: throughput: "); Serial.println( throughput );
+      Serial.print( "INF: throughput: "); Serial.print( throughput ); Serial.println( "B/sec" );
       time_begin = millis();
       nLenDataReceived = 0;
     }

@@ -88,9 +88,9 @@ def sendData100( conn, addr ):
         buf.append( i%100 ) # beurk
     buf = bytes( buf )
         
-    for i in range(100):
+    for i in range(10000):
         conn.send( buf )
-        time.sleep( 1. )
+        time.sleep( 0.0001 )  # depuis windows si trop rapide => BlockingIOError: [WinError 10035] Une operation non bloquante sur un socket n’a pas pu etre achevee immediatement.
         
     print("INF: %s: %s: Sending data 100 to client - done" % ( getTimeStamp(), str(addr[0]) ) )
     
@@ -173,13 +173,16 @@ Data received from 1 Esp32 (MisBKit 4) => rpi5 en eth en burst:
     - no wait: 553-930 bytes / sec.
     
 *** Stat multithread:
-Data received from 2 Esp32 (MisBKit 4&5) => rpi5 en eth en burst:   
+Data received from 2 Esp32 (MisBKit 4&5) => rpi5 en eth en burst:
     - no wait: after 1045 bytes  / sec 100k
     - Test non stop 10h10 sans coupure ni pertes de paquets: total: 1231.5B/s, 45.10MB, 610.35min.
     - Un dans la chambre de Corto, un au fond du jardin: total: 1816.8B/s, 3.74MB, 34.27min.
     - no wait: 64kB/s par paquet de 100.
     - no wait: 500kB/s par paquet de 1000.
     - no wait: 700kB/s par paquet de 5000.
+    
+Data received mstab7 => MisBKit 5:
+    - 6.7 - 8.1 kB/s avec un read par paquet de 100.
 
 
 

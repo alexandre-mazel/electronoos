@@ -193,9 +193,9 @@ Data received mstab7 => MisBKit 5:
     
 Data received rpi5 eth => MisBKit 5:
     - 379 - 382 kB/s avec un read par paquet de 10.
-    - 613 - 630 kB/s avec un read par paquet de 100.
-    - 616 - 630 kB/s avec un read par paquet de 1000.
-    - 616 - 630 kB/s avec un read par paquet de 2000.
+    - 714 - 754 kB/s avec un read par paquet de 100.
+    - 595 - 780 kB/s avec un read par paquet de 1000.
+    - 646 - 772 kB/s avec un read par paquet de 2000.
     - 121 - 522 kB/s avec un read par paquet de 5000. (oui etonnamment, c'est plus lent)
 
 

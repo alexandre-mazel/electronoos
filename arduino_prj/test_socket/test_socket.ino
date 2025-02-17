@@ -58,7 +58,7 @@ void receiveData100(int nNumLoop )
 
   Serial.println( "INF: Receiving data!" );
 
-  const int nSizeBuffer = 2000;
+  const int nSizeBuffer = 10;
 
   unsigned char nPrevData = 99;
 

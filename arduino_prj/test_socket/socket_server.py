@@ -108,61 +108,65 @@ def handle_client( conn, addr ):
     
     conn.close()
     
-sock = socket.socket()
-sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
-num_port = 8090
-sock.bind(('0.0.0.0', num_port ))
-sock.listen(10)
-#~ sock.setdefaulttimeout(1.0)
-sock.setblocking(0)
-
-# Yes it works now under windows!
-# even when client disconnect and reconnect
-#~ if os.name == "nt":
-    #~ print("INF: Cette version multithread non bloquant ne fonctionne pas sous windows")
-    #~ exit(-1)
-
-print("INF: Serving socket on %s" % num_port )
-
-total_data_received = 0
-all_threads = []
-total_time_begin = time.time()
-
-try:
-    while True:
-        try:
-            conn, addr = sock.accept()
-        except OSError as err:
-            import errno
-            #~ print(str(errno.errorcode))
-            if err.args[0] != errno.ETIMEDOUT and err.args[0] != errno.EAGAIN and (os.name == "nt" and err.args[0] != errno.WSAEWOULDBLOCK):
-                print( "ERR: while accepting: oserror: %s" % str(err) )
-            time.sleep(2)
-            continue
-        except Exception as err:
-            print( "ERR: while accepting: error: %s" % str(err) )
-            time.sleep(10)
-            continue
-        sock.settimeout(5) # kill if read received no information after 5 sec
-        sock.setblocking(0)
+if __name__ == "__main__":
         
-        print("INF: %s: Client connected from %s..." % ( getTimeStamp(), str(addr) ) )
+    sock = socket.socket()
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+    num_port = 8090
+    sock.bind(('0.0.0.0', num_port ))
+    sock.listen(10)
+    #~ sock.setdefaulttimeout(1.0)
+    sock.setblocking(0)
+
+    # Yes it works now under windows!
+    # even when client disconnect and reconnect
+    #~ if os.name == "nt":
+        #~ print("INF: Cette version multithread non bloquant ne fonctionne pas sous windows")
+        #~ exit(-1)
+
+    print("INF: Serving socket on %s" % num_port )
+
+    total_data_received = 0
+    all_threads = []
+    total_time_begin = time.time()
+
+    try:
+        while True:
+            try:
+                conn, addr = sock.accept()
+            except OSError as err:
+                import errno
+                #~ print(str(errno.errorcode))
+                if err.args[0] != errno.ETIMEDOUT and err.args[0] != errno.EAGAIN and (os.name == "nt" and err.args[0] != errno.WSAEWOULDBLOCK):
+                    print( "ERR: while accepting: oserror: %s" % str(err) )
+                time.sleep(2)
+                continue
+            except Exception as err:
+                print( "ERR: while accepting: error: %s" % str(err) )
+                time.sleep(10)
+                continue
+            sock.settimeout(5) # kill if read received no information after 5 sec
+            sock.setblocking(0)
+            
+            print("INF: %s: Client connected from %s..." % ( getTimeStamp(), str(addr) ) )
+            
+            t = threading.Thread(target=handle_client, args=(conn, addr))
+            t.start()
+            
+            all_threads.append(t)
+            print( "INF: nbr created thread(s): %d" % len(all_threads))
         
-        t = threading.Thread(target=handle_client, args=(conn, addr))
-        t.start()
+    except KeyboardInterrupt:
+        print("Stopped by Ctrl+C")
         
-        all_threads.append(t)
-        print( "INF: nbr created thread(s): %d" % len(all_threads))
-    
-except KeyboardInterrupt:
-    print("Stopped by Ctrl+C")
-    
-finally:
-    if sock:
-        sock.close()
-    for t in all_threads:
-        t.join()
+    finally:
+        if sock:
+            sock.close()
+        for t in all_threads:
+            t.join()
+
+
         
 """
 *** Stat monothread:

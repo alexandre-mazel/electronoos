@@ -18,32 +18,49 @@ void update_server( void )
 {
   WiFiClient client = server.available();   // Listen for incoming clients
 
-  if (client)  // If a new client connects,
+  if( client )  // If a new client connects,
   {                             
     Serial.println("INF: update_server: New Client.");        // print a message out in the serial port
+    long int time_begin = millis();
+    long int nbr_received = 0;
+    long int nbr_sent = 0;
+
     String currentLine = "";              // make a String to hold incoming data from the client
     while( client.connected() )            // loop while the client's connected
     {
       while( client.available() )             // if there's bytes to read from the client,
       {             
         char c = client.read();           // read a byte, then
-        Serial.write(c);                  // print it out the serial monitor
+        // Serial.write(c);                  // print it out the serial monitor
 
         currentLine += c;
+        nbr_received += 1;
       }
 
       if( currentLine.equals( "hello" ) )
       {
-        Serial.println( "" );
+        Serial.println( "Received Hello!" );
         client.write( "Hello to you!" );
         currentLine = "";
       }
       else if( strncmp( currentLine.c_str(), "Motor", 5 ) == 0 )
       {
-        Serial.println( "" );
-        Serial.println( "INF: Motor position received, sending current one" );
+        // Serial.println( "" );
+        // Serial.println( "INF: Motor position received, sending current one" );
         client.write( 100 );
+        nbr_sent += 1;
         currentLine = "";
+      }
+
+      long int duration = millis() - time_begin;
+      if( duration > 5000 )
+      {
+        float received = nbr_received / (float)duration;
+        float sent = nbr_sent / (float)duration;
+        Serial.print( "Received: " ); Serial.print( received, 3 ); Serial.print( "kB, Sent: " ); Serial.print( sent, 3 ); Serial.println( "kB" );
+        time_begin = millis();
+        nbr_received = 0;
+        nbr_sent = 0;
       }
     }
 
@@ -72,7 +89,5 @@ void setup()
 
 void loop() 
 {
-
   update_server();
-
 }

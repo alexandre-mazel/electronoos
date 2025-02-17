@@ -1,3 +1,16 @@
+"""
+Socket server device <=> computer
+Multi thread Version
+
+NB: disconnection and reconnection of client is working.
+
+Test1: the client send values from 0 to 100 regularly, the server check if all datas arrived.
+(it can be packet of any size: 1 bytes, 100 bytes, 5000 bytes...)
+
+
+(c) A.Mazel for EnsadLab 2024-2025
+"""
+
 import socket
 import time
 import datetime
@@ -83,6 +96,7 @@ sock.listen(10)
 sock.setblocking(0)
 
 # Yes it works now under windows!
+# even when client disconnect and reconnect
 #~ if os.name == "nt":
     #~ print("INF: Cette version multithread non bloquant ne fonctionne pas sous windows")
     #~ exit(-1)

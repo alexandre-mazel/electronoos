@@ -1,10 +1,13 @@
 """
-Version mono thread (dedicated to windows, but working on other OS).
+Socket server device <=> computer
+Mono thread Version (dedicated to windows, but working on other OS).
+
 NB: if a client dissappear, this version (windows limitation) doesn't detect it.
 So this script is stuck with the current connection.
 So you need to restart the script manually.
 On the client side, if the client detect the connection is lost, it will stop sending, reconnect and send again.
 (done on the MisBKit arduino code)
+(c) A.Mazel for EnsadLab 2024-2025
 """
 
 import socket

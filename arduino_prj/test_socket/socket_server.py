@@ -1,5 +1,5 @@
 """
-Socket server device <=> computer
+Socket: client device <=> server computer
 Multi thread Version
 
 NB: disconnection and reconnection of client is working.

@@ -58,7 +58,7 @@ void receiveData100(int nNumLoop )
 
   Serial.println( "INF: Receiving data!" );
 
-  const int nSizeBuffer = 1000;
+  const int nSizeBuffer = 2000;
 
   unsigned char nPrevData = 99;
 
@@ -101,8 +101,8 @@ void receiveData100(int nNumLoop )
     //Serial.println( duration );
     if( duration > 5000 )
     {
-      int throughput = nLenDataReceived * 1000 / duration;
-      Serial.print( "INF: throughput: "); Serial.print( throughput ); Serial.println( "B/sec" );
+      long int throughput = (nLenDataReceived) / duration;
+      Serial.print( "INF: throughput: "); Serial.print( throughput ); Serial.println( "kB/sec" );
       time_begin = millis();
       nLenDataReceived = 0;
     }

@@ -90,8 +90,11 @@ def sendData100( conn, addr ):
         
     for i in range(1000000):
         conn.send( buf )
-        time.sleep( 0.0001 )  # depuis windows si trop rapide => BlockingIOError: [WinError 10035] Une operation non bloquante sur un socket n'a pas pu etre achevee immediatement.
-        
+        time.sleep( 0.00001 )
+        if os.name == "nt" and 0:
+              # depuis windows si trop rapide => BlockingIOError: [WinError 10035] Une operation non bloquante sur un socket n'a pas pu etre achevee immediatement.
+              time.sleep( 0.0001 )
+            
     print("INF: %s: %s: Sending data100s to client - done" % ( getTimeStamp(), str(addr[0]) ) )
     
 def handle_client( conn, addr ):
@@ -167,7 +170,7 @@ Data received from 1 Esp32 (MisBKit 4) => mstab7 en wifi en burst:
     - no wait: 1849-1954 bytes / sec.
     - no wait, check server connected between each bytes: 1739-1823 bytes / sec.
     - Test non stop de 17h55 a 22h17 (4h20) sans coupure ni pertes de paquets (avec les enfants qui font du wifi).
-    - no wait: 700kB/s par paquet de 5000 (avec les enfants qui font du wifi).
+    - no wait: 700kB/s send par paquet de 5000 (avec les enfants qui font du wifi).
     
 Data received from 1 Esp32 (MisBKit 4) => rpi5 en eth en burst:   
     - no wait: 553-930 bytes / sec.
@@ -177,13 +180,23 @@ Data received from 2 Esp32 (MisBKit 4&5) => rpi5 en eth en burst:
     - no wait: after 1045 bytes  / sec 100k
     - Test non stop 10h10 sans coupure ni pertes de paquets: total: 1231.5B/s, 45.10MB, 610.35min.
     - Un dans la chambre de Corto, un au fond du jardin: total: 1816.8B/s, 3.74MB, 34.27min.
-    - no wait: 64kB/s par paquet de 100.
-    - no wait: 500kB/s par paquet de 1000.
-    - no wait: 700kB/s par paquet de 5000.
+    - no wait: 64kB/s send par paquet de 100.
+    - no wait: 500kB/s send paquet de 1000.
+    - no wait: 700kB/s send paquet de 5000.
     
 Data received mstab7 => MisBKit 5:
-    - 6.7 - 8.4 kB/s avec un read par paquet de 100.
-    - 6.7 - 8.4 kB/s avec un read par paquet de 1000.
+    -      5 - 6 kB/s avec un read par paquet de 10.
+    - 6.7 - 8.4 kB/s avec un read par paquet de 100. - vieux code plus precis sur le debit
+    -            6 kB/s avec un read par paquet de 1000.
+    -            6 kB/s avec un read par paquet de 2000.
+    -            6 kB/s avec un read par paquet de 5000 - plante a l'envoi (car lit pas assez vite?)
+    
+Data received rpi5 eth => MisBKit 5:
+    - 379 - 382 kB/s avec un read par paquet de 10.
+    - 613 - 630 kB/s avec un read par paquet de 100.
+    - 616 - 630 kB/s avec un read par paquet de 1000.
+    - 616 - 630 kB/s avec un read par paquet de 2000.
+    - 121 - 522 kB/s avec un read par paquet de 5000. (oui etonnamment, c'est plus lent)
 
 
 

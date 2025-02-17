@@ -16,7 +16,7 @@ void setup()
 
 }
 
-const char * host = "192.168.0.47"; // "192.168.0.50", "192.168.0.47"
+const char * host = "192.168.0.46"; // "192.168.0.50", "192.168.0.46"
 const uint16_t port = 8090;
 
 int nbr_loop = 0;

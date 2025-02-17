@@ -1,6 +1,16 @@
+"""
+Version mono thread (dedicated to windows, but working on other OS).
+NB: if a client dissappear, this version (windows limitation) doesn't detect it.
+So this script is stuck with the current connection.
+So you need to restart the script manually.
+On the client side, if the client detect the connection is lost, it will stop sending, reconnect and send again.
+(done on the MisBKit arduino code)
+"""
+
 import socket
 import time
 import datetime
+
 
 def getTimeStamp():
     """
@@ -36,7 +46,8 @@ while True:
         if len(content) ==0:
            break
            
-        print(content)
+        #~ print(content)
+        
         for data in content:
             #~ print( "0x%x" % data )
             if not ( data == nPrevData+1 or (data == 0 and nPrevData == 99) ):
@@ -51,7 +62,7 @@ while True:
             duration = time.time() - time_begin
             if duration > 5:
                 val_throughput = nbr_data_received / duration
-                print( "INF: data throughput: %.1f/s (total: %.2fM)" % (val_throughput,total_data_received/(1000*1000)) )
+                print( "INF: data throughput: %.1fB/s (total: %.2fM)" % (val_throughput,total_data_received/(1000*1000)) )
                 nbr_data_received = 0
                 time_begin = time.time()
 
@@ -59,10 +70,5 @@ while True:
     client.close()
     
 """
-Stat:
-Data received from 1 Esp32 (MisBKit 4) en burst: 
-    - no wait: 1849-1954 bytes / sec.
-    - no wait, check server connected between each bytes: 1739-1823 bytes / sec.
-    - Teste non stop de 17h55 a 22h17 (4h20) sans coupure ni pertes de paquets. (avec les enfants qui font du wifi).
-    
+Stat: cf a la fin de socket_server.py
 """

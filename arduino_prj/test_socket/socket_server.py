@@ -116,7 +116,8 @@ Data received from 1 Esp32 (MisBKit 4) => mstab7 en wifi en burst:
     - no wait: 1849-1954 bytes / sec.
     - no wait, check server connected between each bytes: 1739-1823 bytes / sec.
     - Test non stop de 17h55 a 22h17 (4h20) sans coupure ni pertes de paquets (avec les enfants qui font du wifi).
-
+    - no wait: 700kB/s par paquet de 5000 (avec les enfants qui font du wifi).
+    
 Data received from 1 Esp32 (MisBKit 4) => rpi5 en eth en burst:   
     - no wait: 553-930 bytes / sec.
     

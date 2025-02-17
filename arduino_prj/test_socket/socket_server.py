@@ -49,7 +49,7 @@ def handle_client( conn, addr ):
                 duration_total = time.time()-total_time_begin
                 val_throughput_total = total_data_received / duration_total
                 # print data throughput
-                print( "INF: %s: %s: %.1fB/s (total: %.1fB/s, %.2fMB %.2fmin)" % ( getTimeStamp(), str(addr[0]), val_throughput, val_throughput_total, total_data_received/(1000*1000), duration_total/60 ) )
+                print( "INF: %s: %s: %.1fB/s (total: %.1fB/s, %.2fMB, %.2fmin)" % ( getTimeStamp(), str(addr[0]), val_throughput, val_throughput_total, total_data_received/(1000*1000), duration_total/60 ) )
                 nbr_data_received = 0
                 time_begin = time.time()
 
@@ -65,6 +65,10 @@ sock.bind(('0.0.0.0', num_port ))
 sock.listen(10)
 #~ sock.setdefaulttimeout(1.0)
 sock.setblocking(0)
+
+if os.name == "nt":
+    print("INF: Cette version multithread non bloquant ne fonctionne pas sous windows")
+    exit(-1)
 
 print("INF: Serving socket on %s" % num_port )
 
@@ -108,16 +112,23 @@ finally:
         
 """
 *** Stat monothread:
-Data received from 1 Esp32 (MisBKit 4) <-> mstab7 en wifi en burst: 
+Data received from 1 Esp32 (MisBKit 4) => mstab7 en wifi en burst: 
     - no wait: 1849-1954 bytes / sec.
     - no wait, check server connected between each bytes: 1739-1823 bytes / sec.
-    - Teste non stop de 17h55 a 22h17 (4h20) sans coupure ni pertes de paquets. (avec les enfants qui font du wifi).
+    - Test non stop de 17h55 a 22h17 (4h20) sans coupure ni pertes de paquets (avec les enfants qui font du wifi).
 
-Data received from 1 Esp32 (MisBKit 4) <-> rpi5 en eth en burst:   
+Data received from 1 Esp32 (MisBKit 4) => rpi5 en eth en burst:   
     - no wait: 553-930 bytes / sec.
     
 *** Stat multithread:
-Data received from 2 Esp32 (MisBKit 4&5) <-> rpi5 en eth en burst:   
+Data received from 2 Esp32 (MisBKit 4&5) => rpi5 en eth en burst:   
     - no wait: after 1045 bytes  / sec 100k
+    - Test non stop 10h10 sans coupure ni pertes de paquets: total: 1231.5B/s, 45.10MB, 610.35min.
+    - Un dans la chambre de Corto, un au fond du jardin: total: 1816.8B/s, 3.74MB, 34.27min.
+    - no wait: 64kB/s par paquet de 100.
+    - no wait: 500kB/s par paquet de 1000.
+    - no wait: 700kB/s par paquet de 5000.
+
+
 
 """

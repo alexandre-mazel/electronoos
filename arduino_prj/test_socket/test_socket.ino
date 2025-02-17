@@ -16,7 +16,7 @@ void setup()
 
 }
 
-const char * host = "192.168.0.50";
+const char * host = "192.168.0.47"; // "192.168.0.50", "192.168.0.47"
 const uint16_t port = 8090;
 
 int nbr_loop = 0;
@@ -44,10 +44,20 @@ void loop()
     wifi_client.print( "Hello from ESP32!" );
   }
   */
+
+  const int nSizeBuffer = 5000;
+
+  unsigned char buf[nSizeBuffer];
+  for( int j = 0; j < nSizeBuffer; ++j )
+  {
+    buf[j] = j%100;
+  }
+
   for( int i = 0; i < 100*100*30; ++i )
   {
-    // here test he's still connected (or so need to reconnect)
-    wifi_client.write((unsigned char)(i%100));
+    wifi_client.write((unsigned char*)buf,nSizeBuffer);  
+    // wifi_client.write((unsigned char)(i%100));
+  
     //delay(10); // 100 bytes per sec
     if( (nbr_loop % 2) == 0 )
     {

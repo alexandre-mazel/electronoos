@@ -36,16 +36,15 @@ def smartFormatSize( size ):
         
     return "%.1fG" % (size/(1000*1000*1000))
     
-def handle_client( conn, addr ):
+def receiveData100( conn, addr ):
     global total_data_received
     global total_time_begin
     
-    print("INF: %s: %s: Client connected from port %s ..." % ( getTimeStamp(), str(addr[0]), str(addr[1]) ) )
-    
+    nbr_data_received = 0;
     nPrevData = 99
     
     time_begin = time.time()
-    nbr_data_received = 0;
+    
     while True:
         flags = 0
         #~ if os.name != "nt":
@@ -81,6 +80,12 @@ def handle_client( conn, addr ):
                 print( "INF: %s: %s: %sB/s (total: %sB/s, %sB, %.2fmin)" % ( getTimeStamp(), str(addr[0]), smartFormatSize(val_throughput), smartFormatSize(val_throughput_total), smartFormatSize(total_data_received), duration_total/60 ) )
                 nbr_data_received = 0
                 time_begin = time.time()
+    
+def handle_client( conn, addr ):
+    
+    print("INF: %s: %s: Client connected from port %s ..." % ( getTimeStamp(), str(addr[0]), str(addr[1]) ) )
+    
+    receiveData100( conn, addr )
 
     print("%s: %s: Closing connection" % (getTimeStamp(),str(addr[0]) ) )
     
@@ -131,6 +136,7 @@ try:
         t.start()
         
         all_threads.append(t)
+        print( "INF: nbr created thread(s): %d" % len(all_threads))
     
 except KeyboardInterrupt:
     print("Stopped by Ctrl+C")

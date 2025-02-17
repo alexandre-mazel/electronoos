@@ -16,26 +16,8 @@ void setup()
 
 }
 
-const char * host = "192.168.0.46"; // "192.168.0.50", "192.168.0.46"
-const uint16_t port = 8090;
-
-int nbr_loop = 0;
-
-void loop() 
+void sendData100(int nNumLoop )
 {
-  Serial.print( "INF: Connecting to " ); Serial.print( host ); Serial.print( ":" ); Serial.println( port ); 
-  Serial.print( "INF: nbr_loop: " ); Serial.println( nbr_loop );
-
-  digitalWrite(ledPin, HIGH);
-
-  if ( !wifi_client.connect(host, port) ) 
-  {
-    Serial.println( "Connection to host failed" );
-
-    delay(3*1000);
-    return;
-  }
-  Serial.println( "Connected to server successful!" );
 
   Serial.println( "Sending data!" );
   /*
@@ -59,7 +41,7 @@ void loop()
     // wifi_client.write((unsigned char)(i%100));
   
     //delay(10); // 100 bytes per sec
-    if( (nbr_loop % 2) == 0 )
+    if( (nNumLoop % 2) == 0 )
     {
       if( !wifi_client.connected() )
       {
@@ -68,6 +50,39 @@ void loop()
       }
     }
   }
+}
+
+
+void receivingData100(int nNumLoop )
+{
+
+  Serial.println( "Receiving data!" );
+
+}
+
+const char * host = "192.168.0.46"; // "192.168.0.50", "192.168.0.46"
+const uint16_t port = 8090;
+
+int nbr_loop = 0;
+
+void loop() 
+{
+  Serial.print( "INF: Connecting to " ); Serial.print( host ); Serial.print( ":" ); Serial.println( port ); 
+  Serial.print( "INF: nbr_loop: " ); Serial.println( nbr_loop );
+
+  digitalWrite(ledPin, HIGH);
+
+  if ( !wifi_client.connect(host, port) ) 
+  {
+    Serial.println( "Connection to host failed" );
+
+    delay(3*1000);
+    return;
+  }
+  Serial.println( "Connected to server successful!" );
+
+  sendData100( nbr_loop );
+  //receiveData100( nbr_loop );
 
   Serial.println( "Disconnecting..." );
   wifi_client.stop();

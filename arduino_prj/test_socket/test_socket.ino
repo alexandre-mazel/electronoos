@@ -110,7 +110,7 @@ void receiveData100(int nNumLoop )
 
 }
 
-const char * host = "192.168.0.46"; // "192.168.0.50", "192.168.0.46"
+const char * host = "192.168.0.50"; // rpi5: "192.168.0.50", msttab7: "192.168.0.46"
 const uint16_t port = 8090;
 
 int nbr_loop = 0;

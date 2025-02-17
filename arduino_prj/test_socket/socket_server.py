@@ -90,9 +90,9 @@ def sendData100( conn, addr ):
         
     for i in range(10000):
         conn.send( buf )
-        time.sleep( 0.00001 )  # depuis windows si trop rapide => BlockingIOError: [WinError 10035] Une operation non bloquante sur un socket n'a pas pu etre achevee immediatement.
+        time.sleep( 0.0001 )  # depuis windows si trop rapide => BlockingIOError: [WinError 10035] Une operation non bloquante sur un socket n'a pas pu etre achevee immediatement.
         
-    print("INF: %s: %s: Sending data 100 to client - done" % ( getTimeStamp(), str(addr[0]) ) )
+    print("INF: %s: %s: Sending data100s to client - done" % ( getTimeStamp(), str(addr[0]) ) )
     
 def handle_client( conn, addr ):
     

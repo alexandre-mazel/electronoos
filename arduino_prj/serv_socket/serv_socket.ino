@@ -63,7 +63,7 @@ void update_server( void )
         }
       }
       */
-      if( client.available() )
+      if( client.available() > 0 )
       {
         // currentLine is char *
         const int nSizeBuffer = 20;

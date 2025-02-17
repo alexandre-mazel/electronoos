@@ -89,7 +89,7 @@ Best:
 Puis en redressant l'ordi, j'ai eu mieux:
 20h39m51: nbr_exchange: 44.5 (223), Sent: 311.3B, Received: 44.5B
 
-# en optimisant un peu les tests et la boucle du python (et Motor => Mot)
+# Real best: en optimisant un peu les tests et la boucle du python (et Motor => Mot)
 23h52m16: nbr_exchange: 64.8 (324), Sent: 323.8B, Received: 64.8B
 
 

@@ -114,8 +114,8 @@ if __name__ == "__main__":
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
     num_port = 8090
-    sock.bind(('0.0.0.0', num_port ))
-    sock.listen(10)
+    sock.bind( ('0.0.0.0', num_port ) )
+    sock.listen( 10 )
     #~ sock.setdefaulttimeout(1.0)
     sock.setblocking(0)
 

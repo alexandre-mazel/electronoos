@@ -12,15 +12,15 @@ int status = WL_IDLE_STATUS;
 // use the numeric IP instead of the name for the server:
 //IPAddress server(74,125,232,128);  // numeric IP for Google (no DNS)
 
-char server_hostname[] = "engrenage.studio";    // name address for the server
-char server_hostname_mirror[] = "192.168.0.50";    // local in case of no external internet
-char path[]   = "/record_data.py";
+char dataserver_hostname[] = "engrenage.studio";    // name address for the server
+char dataserver_hostname_mirror[] = "192.168.0.50";    // local in case of no external internet
+char dataserver_path[]   = "/record_data.py";
 
 // Initialize the Ethernet client library
 // with the IP address and port of the server
 // that you want to connect to (port 80 is default for HTTP):
 WiFiClient wifi_client;
-int bDisconnected = false;
+//int bDisconnected = false;
 
 void scanNetworks()
 {
@@ -56,8 +56,9 @@ void retrievePassFromEeprom(char * password)
   // pass is written to eeprom in the first chars (padded with \0)
   // ASSUME: password is an already allocated area with enough chars !
   
+  
   // first time, call once to write your SSID:
-  writeStringToEeprom( 0,"lagrosseliberte666!" );
+  // writeStringToEeprom( 0,"***" );
 
   // dumpEeprom(); // to help debug
 

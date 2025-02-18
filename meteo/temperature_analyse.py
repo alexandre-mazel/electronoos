@@ -418,7 +418,7 @@ if __name__ == "__main__":
             # affiche les 3 derniers jours de plusieurs donnees tout melange sur un seul graphe
             temperature_office_analyse.render_all_datas(datas,y,m,d-3, sameGraphList = [("Beziers","temp"),("Le Kremlin-Bicetre","temp")])
         
-        if 1:
+        if 0:
             # affiche la comparaison entre temp du kb from la meteo et mon jardin
             strFilename = "data/webdata.txt"
             added_datas = temperature_office_analyse.decode_file_sonde(strFilename)
@@ -431,4 +431,12 @@ if __name__ == "__main__":
                 datas.update(added_datas)
                 datas_of_interest.append(("armoire","temp"))
             temperature_office_analyse.render_all_datas(datas,y,m,d-2, sameGraphList = datas_of_interest)
-    
+        
+        if 1:
+            # affiche la temperature du jardin dans la boite, hors de la boite et officielle.
+            strFilename = "data/webdata.txt"
+            added_datas = temperature_office_analyse.decode_file_sonde(strFilename)
+            datas.update(added_datas)
+            datas_of_interest = [("Le Kremlin-Bicetre","temp"),("ESP32_S01","temp10"),("ESP32_S01","temp11") ]
+
+            temperature_office_analyse.render_all_datas(datas,y,m,d-2, sameGraphList = datas_of_interest)

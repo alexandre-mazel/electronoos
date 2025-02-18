@@ -159,10 +159,26 @@ void setup()
 {
   Serial.begin(115200);
 
-  pinMode( ledPin, OUTPUT );
+  Serial.println ( "" );
+  Serial.println( "serv_socket v0.61" );
 
-  Serial.println ("" );
-  Serial.println( "serv_socket v0.6" );
+  if( 0 )
+  {
+    Serial.flush();
+    delay(1000); // wait before crashing (in case of)...
+    for( int i = 0; i < 5; ++i )
+    {
+      Serial.println("serv_socket v0.6: loop debug xiao");
+      Serial.flush();
+      delay(500);
+    }
+  }
+
+  if( isMisBKit() )
+  {
+    pinMode( ledPin, OUTPUT ); // Attention cette ligne fait planter le XIAO C3 !!!
+  }
+
 
   // coupe le BT (mais ne fonctionne pas)
 //  esp_bluedroid_disable();
@@ -172,6 +188,7 @@ void setup()
 
   //connectToWifi();
   createWifiAP( getArduinoId() );
+
 
   start_server();
 }

@@ -18,11 +18,13 @@ const char * getArduinoId( void )
 #ifdef USE_PREFS
   prefs.begin( "ID" );
 
+  // ATTENTION, j'ai eu des boards qui crashe si il n'y a pas cette prefs dans la rom !!!
+
   if( 0 )
   {
     // first time: write it!
     // Possible choice: "MisBKit5", "ESP32_C01"
-    const char strInitName[] = "MisBKit4"; // should be less than or equal 10 chars
+    const char strInitName[] = "ESP32_C01"; // should be less than or equal 10 chars
     prefs.putBytes( "Name", strInitName, strlen(strInitName) );
   }
 
@@ -38,4 +40,12 @@ const char * getArduinoId( void )
 
   return strName;
 
+}
+
+int isMisBKit( void )
+{
+  const char * s = getArduinoId();
+  if( strncmp( s, "MisBKit", 7 ) == 0 )
+    return 1;
+  return 0;
 }

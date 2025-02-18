@@ -7,6 +7,42 @@
 #endif // USE_PREFS
 
 
+
+
+void dumpEeprom(const int nSize = 64 ) 
+{
+  // dump first nSize bytes of eeprom
+
+  Serial.println( "DBG: dumpEeprom:" );
+
+#ifdef USE_PREFS
+    unsigned char * buf = (unsigned char*)malloc(nSize);
+    prefs.begin("Eeprom");
+    prefs.getBytes("Eeprom_mykey", buf, nSize);
+    for( int i = 0; i < nSize; ++i )
+    {
+      Serial.print("adr: ");
+      Serial.print(i);
+      Serial.print(": ");
+      Serial.println(buf[i]);
+    }
+    free(buf);
+#else
+  int address = 0;
+  while( address < nSize )
+  {
+    int value = EEPROM.read(address);
+    Serial.print(address);
+    Serial.print("\t");
+    Serial.print(value, DEC);
+    Serial.println();
+    ++address;
+  }
+#endif
+
+}
+
+
 void writeStringToEeprom( int nOffsetStart, const char* s )
 {
   // write until a '\0' is found in the string

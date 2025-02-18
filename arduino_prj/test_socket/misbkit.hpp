@@ -3,4 +3,6 @@
 
 const char * getArduinoId( void ); // return the name of the board from the eeprom
 
+int isMisBKit( void );
+
 #endif

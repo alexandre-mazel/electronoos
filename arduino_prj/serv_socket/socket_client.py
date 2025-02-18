@@ -110,4 +110,12 @@ Reponse de 192.168.4.1: octets=32 temps=191 ms TTL=64
 Reponse de 192.168.4.1: octets=32 temps=228 ms TTL=64
 Reponse de 192.168.4.1: octets=32 temps=58 ms TTL=64
 Reponse de 192.168.4.1: octets=32 temps=398 ms TTL=64
+
+# au final, en envoyant 5 val mot et retour 5 val mot
+# MisBKit4 server, mstab7 client: 
+12h58m22: nbr_exchange: 61.5 (308), Sent: 553.9B, Received: 369.3B
+
+# XIAO_C3-1 server, mstab7 client:
+12h55m34: nbr_exchange: 60.9 (305), Sent: 547.9B, Received: 365.3B
+NB: en redressant l'ordi ca fonctionne moins bien
 """

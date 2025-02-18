@@ -24,7 +24,7 @@ const char * getArduinoId( void )
   {
     // first time: write it!
     // Possible choice: "MisBKit5", "ESP32_C01"
-    const char strInitName[] = "ESP32_C01"; // should be less than or equal 10 chars
+    const char strInitName[] = "ESP32_S01"; // should be less than or equal 10 chars
     prefs.putBytes( "Name", strInitName, strlen(strInitName) );
   }
 

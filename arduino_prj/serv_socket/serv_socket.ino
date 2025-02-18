@@ -162,7 +162,7 @@ void setup()
   Serial.println ( "" );
   Serial.println( "serv_socket v0.61" );
 
-  if( 0 )
+  if( 1 )
   {
     Serial.flush();
     delay(1000); // wait before crashing (in case of)...

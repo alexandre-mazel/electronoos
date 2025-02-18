@@ -118,4 +118,8 @@ Reponse de 192.168.4.1: octets=32 temps=398 ms TTL=64
 # XIAO_C3-1 server, mstab7 client:
 12h55m34: nbr_exchange: 60.9 (305), Sent: 547.9B, Received: 365.3B
 NB: en redressant l'ordi ca fonctionne moins bien
+
+# XIAO_S3-1 server, mstab7 client:
+14h32m28: nbr_exchange: 54.6 (274), Sent: 491.8B, Received: 327.9B
+# pas mieux
 """

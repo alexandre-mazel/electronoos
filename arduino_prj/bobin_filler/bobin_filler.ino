@@ -339,11 +339,13 @@ void loop()
   //countFps();
   //delay(1);
 
-  long int nNumEvent = millis() / 1200;
+  long int nNumEvent = millis() / 1100;
   if( nPrevNumEvent != nNumEvent )
   {
     nPrevNumEvent = nNumEvent;
     Serial.print( "nNumEvent: " ); Serial.println( nNumEvent );
+
+    handleOrder( "##MOTOR_1_1_100" );
 
     if( nNumEvent % 2 == 0 )
     {

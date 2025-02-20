@@ -1,6 +1,7 @@
 // StepperDriver
 // Manage many stepper pwm in a single loop, pure soft command (no IRQ) (so not completely precise)
 // (c) A.Mazel 2023
+// Lien symbolique sous windows: mklink lien cible
 
 #ifndef _STEPPERS_DRIVER_H_
 #define _STEPPERS_DRIVER_H_

@@ -58,6 +58,8 @@ ollama run llama3 "Résume moi Cyrano de Bergerac"
 # ollama run llava "What's in this image? /Users/jmorgan/Desktop/smile.png"
 # or
 # ollama run llama3.2 "12 * 483 = 5796. Quels sont les autres ?"
+ollama run deepseek-coder:6.7b "12 * 483 = 5796. Quels sont les autres ?"
+
 # semble ne marcher qu'avec llava
 ollama run llava "What's in this image? /home/na/dev/git/electronoos/data/inconnus.jpg"
 ollama run llava "Que vois-t-on dans cette image? /home/na/dev/git/electronoos/data/inconnus.jpg"

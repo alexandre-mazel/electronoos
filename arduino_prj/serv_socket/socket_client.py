@@ -123,3 +123,8 @@ NB: en redressant l'ordi ca fonctionne moins bien
 14h32m28: nbr_exchange: 54.6 (274), Sent: 491.8B, Received: 327.9B
 # pas mieux
 """
+
+# scan for best channel automatic ?
+# led qui dit connect et recois un paquet (clignote)
+# lcd pour afficher l'ordi connecté :)
+# bien d'etre seul a pouvoir se connecter!

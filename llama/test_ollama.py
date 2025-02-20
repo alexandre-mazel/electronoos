@@ -57,12 +57,14 @@ ollama run llama3 "Résume moi Cyrano de Bergerac"
 # or
 # ollama run llava "What's in this image? /Users/jmorgan/Desktop/smile.png"
 # or
+# ollama run llama3.2 "12 * 483 = 5796. Quels sont les autres ?"
 # semble ne marcher qu'avec llava
 ollama run llava "What's in this image? /home/na/dev/git/electronoos/data/inconnus.jpg"
 ollama run llava "Que vois-t-on dans cette image? /home/na/dev/git/electronoos/data/inconnus.jpg"
 ollama run llava "What's in this image? /home/na/dev/git/electronoos/data/keys.jpg"
 ollama run llava "Que vois-t-on dans cette image? /home/na/dev/git/electronoos/data/keys.jpg"
 ollama run llava "What's in this image? /home/na/dev/git/electronoos/llama/guess.jpg"
+ollama run llama3.2-vision:11b "What's in this image? /home/na/dev/git/electronoos/llama/guess.jpg"
 
 # par defaut il ecoute sur 11434:
 ss -unplat | grep 11434
@@ -215,4 +217,27 @@ p = "summarize me this text: Le lycée doit son nom à l'écrivain et philosophe Vo
 #~ print(response)
 
 loop_dialog("Alexandre")
+
+"""
+
+na@Server2cpu:~$ ollama run llama3:latest "12 * 483 = 5796. Quels sont les autres ?. Give me the python code to generate other"
+You're interested in finding more products of the form `12 * X = Y`, where
+`X` is an integer.
+
+Here's some Python code to help you with that:
+```python
+def find_products():
+    for x in range(1, 1000):  # adjust this limit as needed
+        y = 12 * x
+        if str(y) == str(x) + "3":  # check if the product has a similar
+structure
+            print(f"{x} * {12} = {y}")
+
+find_products()
+```
+This code will generate products of the form `12 * X ...
+
+
+
+"""
 

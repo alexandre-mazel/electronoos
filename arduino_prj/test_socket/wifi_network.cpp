@@ -19,7 +19,7 @@ char dataserver_path[]   = "/record_data.py";
 // Initialize the Ethernet client library
 // with the IP address and port of the server
 // that you want to connect to (port 80 is default for HTTP):
-WiFiClient wifi_client;
+WiFiClient wifi_client; // ici il ne faudrait pas le creer quand on est en mode server, mais j'ai pas trop vu la difference
 //int bDisconnected = false;
 
 void scanNetworks()
@@ -136,7 +136,7 @@ int createWifiAP( const char* SSID, const char* password )
   WiFi.mode( WIFI_AP );
 
   // Remove the password parameter, if you want the AP (Access Point) to be open
-  const int channel = 1; // At home it's better on channel 1
+  const int channel = 10; // At home it's better on channel 1
   const int ssid_hidden = 0; // 1 for true
   const int max_connection = 1;
   WiFi.softAP(SSID, password, channel, ssid_hidden, max_connection);

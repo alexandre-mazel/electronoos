@@ -196,12 +196,14 @@ def draw_temp_series(dictPerDay, bRender=True, bCloseAtEnd = True, strTitle = No
         if 1:
             # local min & max et derniere mesure
             #~ for extremum,offset in [(min,-0.4),(max,+0.1),(lambda x:x[-1],+0.1)]: # le -1 ne fonctionne pas car ce n'est pas forcement celle ci qui va sortir dans le find
-            for extremum,offset in [(min,-0.4),(max,+0.1),(lambda x:-421,+0.1)]: # donc on met un magic
+            for extremum,offset in [(min,-0.6),(max,+0.1),(lambda x:-421,+0.0)]: # donc on met un magic
                 value = extremum(dictPerDay[k][1])
                 if value != -421:
                     idx = dictPerDay[k][1].index(value)
+                    xoffset = -0.5
                 else:
                     idx = len(dictPerDay[k][1])-1
+                    xoffset = +1.
                 # x is hour with decimal since start or hour in absolute
                 nNumJour = int(dictPerDay[k][0][idx]/24)
                 rHour = dictPerDay[k][0][idx] - ( nNumJour * 24 )
@@ -220,7 +222,7 @@ def draw_temp_series(dictPerDay, bRender=True, bCloseAtEnd = True, strTitle = No
                     strLabelToDraw = "Jour %d, Hour: %dh%02d: %.1f" % (nNumJour,nHour,nMin, dictPerDay[k][1][idx])
                 # plt.annotate('local max', xy=(2, 1), xytext=(3, 1.5), arrowprops=dict(facecolor='black', shrink=0.05),)
                 print(dictPerDay[k][0][idx])
-                plt.annotate( strLabelToDraw, xy=(dictPerDay[k][0][idx]-0.5, dictPerDay[k][1][idx]+offset))
+                plt.annotate( strLabelToDraw, xy=(dictPerDay[k][0][idx]+xoffset, dictPerDay[k][1][idx]+offset))
                 
     try:
         first_year = list(dictPerDay.keys())[0].split(":")[1].strip()[:4]

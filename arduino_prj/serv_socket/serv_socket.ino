@@ -6,23 +6,26 @@ const int ledPin = 13;
 
 
 const uint16_t port = 8090;
-WiFiServer server( port );
+WiFiServer wifi_server( port );
 
 void start_server( void )
 {
   Serial.print( "INF: start_server: Starting server on port " ); Serial.println( port );
-  server.begin();
+  wifi_server.begin();
+  wifi_server.setNoDelay(1); // test mais je suis pas sur que ca change qqchose
+  Serial.print( "INF: start_server: server nodelay: " ); Serial.println( wifi_server.getNoDelay() );
 }
 
 unsigned char allMotorsPosition[6] = {100,101,102,103,104,105};
 
 void update_server( void )
 {
-  WiFiClient client = server.available();   // Listen for incoming clients
+  WiFiClient client = wifi_server.available();   // Listen for incoming clients
+  wifi_server.setNoDelay(1);
 
   if( client )  // If a new client connects,
   {                             
-    Serial.println("INF: update_server: New Client.");        // print a message out in the serial port
+    Serial.println("INF: update_server: New Client.");       // print a message out in the serial port
     long int time_begin = millis();
     long int nbr_received = 0;
     long int nbr_sent = 0;
@@ -140,7 +143,7 @@ void update_server( void )
           delay(mils);
         else
           while ((currentMillis + mils) > millis()) {
-            server.handleClient();
+            wifi_server.handleClient();
         yield();
         }
       }
@@ -162,7 +165,7 @@ void setup()
   Serial.println ( "" );
   Serial.println( "serv_socket v0.61" );
 
-  if( 1 )
+  if( 0 )
   {
     Serial.flush();
     delay(1000); // wait before crashing (in case of)...

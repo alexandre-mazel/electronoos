@@ -53,7 +53,7 @@ class Game:
     def render_solution( self ):
         print(self.solution, "solution" )
         
-    def human_guess_start_new_game( self ):
+    def generate_random_solution( self ):
         for i in range(self.nbr_choice):
             color = random.randint(0,self.nbr_color-1)
             self.solution.append( color )
@@ -70,9 +70,9 @@ class Game:
             self.board[-1].append(int(c))
         return True
             
-    def human_guess_compute_goodbad( self ):
+    def compute_goodbad( self ):
         """
-        Return True when human has guess all correct
+        Return True when human last guess is all correct
         """
         
         if len(self.goodbad) == len(self.board):
@@ -95,7 +95,7 @@ class Game:
         return good == self.nbr_choice
         
     def human_guess_run_game( self ):
-        self.human_guess_start_new_game()
+        self.generate_random_solution()
         
         #~ self.render_solution()
         self.render_plate()
@@ -113,9 +113,9 @@ class Game:
                     break
                 print("Bad input, try again!")
             
-            is_finished = self.human_guess_compute_goodbad()
+            is_finished = self.compute_goodbad()
             
-            if nbr_turn > 7:
+            if nbr_turn > 9:
                 self.render_solution()
                 
             self.render_plate()
@@ -126,12 +126,44 @@ class Game:
                 break
                 
         print( "Game finished in %d turn(s)" % nbr_turn )
+        
+        
+    def cpu_guess_run_game( self, human_solution = [] ):
+        """
+        The computer need to guess the correct solution.
+        human_solution: the combination made by the human or [] to pick a random one
+        """
+        self.render_plate()
+        
+        if human_solution == []:
+            self.generate_random_solution()
+        else:
+            self.solution = human_solution
+        
+        nbr_turn = 0
+        while 1:
+            guess = self.computer_guess()
+        
+            is_finished = self.compute_goodbad()
+            
+            self.render_solution()
+                
+            self.render_plate()
+            
+            nbr_turn += 1
+            
+            if is_finished:
+                break
+                
+        print( "Game finished by computer in %d turn(s)" % nbr_turn )
+        
             
 # class Game - end
 
 def main():
     game = Game()
-    game.human_guess_run_game()
+    #~ game.human_guess_run_game()
+    game.cpu_guess_run_game([2,4,6,4])
         
 if __name__ == "__main__":
     main()

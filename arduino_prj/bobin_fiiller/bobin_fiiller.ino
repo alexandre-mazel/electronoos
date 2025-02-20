@@ -329,11 +329,41 @@ void sendSerialCommand(const char * msg)
   //Serial.println(millis());
 }
 
-
+long int nPrevNumEvent = -1;
+long int nCptBeforeNextEvent = -1;
+char szNextCommand[256];
 void loop() 
 {
   handleSerialCommand(); // takes around 2micros (when no command)
   updateMotorCommand(); // takes around 5micros (when no motors running)
   //countFps();
   //delay(1);
+
+  long int nNumEvent = millis() / 1200;
+  if( nPrevNumEvent != nNumEvent )
+  {
+    nPrevNumEvent = nNumEvent;
+    Serial.print( "nNumEvent: " ); Serial.println( nNumEvent );
+
+    if( nNumEvent % 2 == 0 )
+    {
+      handleOrder( "##MOTOR_0_0_0" );
+      strcpy( szNextCommand, "##MOTOR_0_1_380" );
+      nCptBeforeNextEvent = 1000;
+    }
+    else
+    {
+      handleOrder( "##MOTOR_0_0_0" );
+      strcpy( szNextCommand, "##MOTOR_0_-1_380" );
+      nCptBeforeNextEvent = 1000;
+    }
+  }
+  if( nCptBeforeNextEvent >  0 )
+  {
+    --nCptBeforeNextEvent;
+    if( nCptBeforeNextEvent == 0 )
+    {
+      handleOrder( szNextCommand );
+    }
+  }
 }

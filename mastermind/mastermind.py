@@ -32,6 +32,21 @@ def draw_mastermind_plate(screen, color_lists, position=(50, 50), peg_radius=20,
                 pygame.draw.circle(screen, COLOR_PALETTE[color_index], (x + i * spacing, y), peg_radius)
         y += spacing  # Move to the next row
 
+def goodbad( guess, solution):
+        good = 0
+        bad = 0
+        for idx,n in enumerate(guess):
+            if n == solution[idx]:
+                good += 1
+            else:
+                try:
+                    idxfound = solution.index(n)
+                    if idxfound != -1 and solution[idxfound] != guess[idxfound]:
+                        bad += 1
+                except ValueError as err:
+                    continue # not in list
+                    
+        return good, bad
 
 class Game:
     def __init__( self, nbr_choice = 4, nbr_color = 8 ):
@@ -77,22 +92,42 @@ class Game:
         
         if len(self.goodbad) == len(self.board):
             return
-        good = 0
-        bad = 0
-        for idx,n in enumerate(self.board[-1]):
-            if n == self.solution[idx]:
-                good += 1
-            else:
-                try:
-                    idxfound = self.solution.index(n)
-                    if idxfound != -1 and self.solution[idxfound] != self.board[-1][idxfound]:
-                        bad += 1
-                except ValueError as err:
-                    continue # not in list
+            
+        good,bad = goodbad(self.board[-1], self.solution)
+
 
         self.goodbad.append([good,bad])
         
         return good == self.nbr_choice
+        
+    def computer_guess( self ):
+        """
+        based only on previous guess and goodbad, the compute need to pick a choice
+        """
+        #~ if len(self.board) == 0:
+            #~ return [0,1,2,3]
+        #~ if len(self.board) == 1:
+            #~ return [4,5,6,7]
+            
+        #~ possible_combination = []
+        #~ for i in range(self.nbr_choice):
+            #~ possible_combination.append([])
+            #~ for j in range(self.nbr_color):
+                #~ possible_combination[-1].append(j)
+        #~ print(possible_combination)
+        
+        # compute all possible combination
+        all_possible = []
+        for i in range(self.nbr_color**self.nbr_choice):
+            choice = []
+            for j in range(self.nbr_choice):
+                choice.append(i%self.nbr_color)
+                i //= self.nbr_color
+            all_possible.append(choice)
+        print( "all_possible:", all_possible )
+            
+
+        return None
         
     def human_guess_run_game( self ):
         self.generate_random_solution()
@@ -143,6 +178,10 @@ class Game:
         nbr_turn = 0
         while 1:
             guess = self.computer_guess()
+            if guess == None:
+                print("Computer abort")
+                break
+            self.board.append(guess)
         
             is_finished = self.compute_goodbad()
             
@@ -161,9 +200,12 @@ class Game:
 # class Game - end
 
 def main():
-    game = Game()
+    #~ game = Game()
     #~ game.human_guess_run_game()
-    game.cpu_guess_run_game([2,4,6,4])
+    #~ game.cpu_guess_run_game([2,4,6,4])
+    
+    game = Game(2,3)
+    game.cpu_guess_run_game([2,0])
         
 if __name__ == "__main__":
     main()

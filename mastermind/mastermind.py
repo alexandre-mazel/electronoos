@@ -32,21 +32,99 @@ def draw_mastermind_plate(screen, color_lists, position=(50, 50), peg_radius=20,
                 pygame.draw.circle(screen, COLOR_PALETTE[color_index], (x + i * spacing, y), peg_radius)
         y += spacing  # Move to the next row
 
-def goodbad( guess, solution):
-        good = 0
-        bad = 0
-        for idx,n in enumerate(guess):
-            if n == solution[idx]:
-                good += 1
+def goodbad( guess, solution ):
+    """
+    Compute good bad for a guess
+    """
+    good = 0
+    bad = 0
+    for idx,n in enumerate(guess):
+        if n == solution[idx]:
+            good += 1
+        else:
+            try:
+                idxfound = solution.index(n)
+                if idxfound != -1 and solution[idxfound] != guess[idxfound]:
+                    bad += 1
+            except ValueError as err:
+                continue # not in list
+                
+    return good, bad
+        
+def allgoodbad( board, solution ):
+    """
+    compute all good bad for a board and a given solution
+    """
+    out = []
+    for guess in board:
+        out.append( goodbad(guess,solution) )
+    return out
+        
+def compute_next_shot( board, listgoodbad, nbr_choice, nbr_color ):
+    """
+    Decide what is the best guess to play
+    """
+    print("DBG: compute_next_shot: board: %s, listgoodbad: %s" % ( str(board), str(listgoodbad) ) )
+    possible_colors = [] # for each choice, probability of each color
+    for i in range(nbr_choice):
+        possible_colors.append([])
+        for j in range(nbr_color):
+            possible_colors[-1].append(1)
+    print("possible_colors:", possible_colors)
+    
+    for i in range(len(board)):
+        guess = board[i]
+        good,bad = listgoodbad[i]
+        proba = (bad / nbr_choice) + 3*(good / nbr_choice)
+        for n in guess:
+            for j in range(nbr_choice):
+                possible_colors[j][n] *= proba
+        
+    # based on proba, pick one color for each choice
+    print("possible_colors (2):", possible_colors)
+    cpt_same = 0
+    prev_guess = []
+    while 1:
+        new_guess = []
+        for i in range(nbr_choice):
+            s = sum(possible_colors[i])
+            pick = random.random()*s
+            cnt = 0
+            for j in range(nbr_color):
+                cnt += possible_colors[i][j]
+                print("pick: ", pick, ", cnt:", cnt )
+                if pick <= cnt:
+                    color = j
+                    print("play color:", color )
+                    new_guess.append(color)
+                    break
             else:
-                try:
-                    idxfound = solution.index(n)
-                    if idxfound != -1 and solution[idxfound] != guess[idxfound]:
-                        bad += 1
-                except ValueError as err:
-                    continue # not in list
-                    
-        return good, bad
+                assert(0)
+        print("DBG: compute_next_shot: new guess tentativ: ", new_guess, "possible_colors: ", possible_colors )
+        if not new_guess in board:
+            break
+        print("was in board:", board )
+        if new_guess == prev_guess:
+            cpt_same += 1
+            if cpt_same > 100:
+                print("NEW GUESS LOCKED, exiting")
+                print("rappel: compute_next_shot: board: %s, listgoodbad: %s" % ( str(board), str(listgoodbad) ) )
+                time.sleep(10)
+                break
+        else:
+            prev_guess = new_guess
+            
+    return new_guess
+        
+def simulate_play( shot, solution, board, nbr_choice, nbr_color ):
+    print("DBG: simulate_play: shot: %s, solution: %s, board: %s" % (str(shot), str(solution), str(board)) ) 
+    good,bad = goodbad( shot, solution )
+    if good == nbr_choice:
+        return 1
+    board.append( shot )
+    listgoodbad = allgoodbad(board,solution)
+    next_shot = compute_next_shot( board, listgoodbad, nbr_choice, nbr_color )
+    return 1+simulate_play( next_shot, solution, board[:], nbr_choice, nbr_color )
 
 class Game:
     def __init__( self, nbr_choice = 4, nbr_color = 8 ):
@@ -91,7 +169,7 @@ class Game:
         """
         
         if len(self.goodbad) == len(self.board):
-            return
+            return self.goodbad[0] == self.nbr_choice
             
         good,bad = goodbad(self.board[-1], self.solution)
 
@@ -125,9 +203,23 @@ class Game:
                 i //= self.nbr_color
             all_possible.append(choice)
         print( "all_possible:", all_possible )
-            
-
-        return None
+        
+        min_total = 10**10
+        min_guess = None
+        
+        for guess in all_possible:
+            total_nbr_shot = 0
+            for possible_solution in all_possible:
+                nbr_shot = simulate_play( guess, possible_solution, self.board[:], self.nbr_choice, self.nbr_color )
+                print("nbr_shot for guess %s: %d (with solution %s)\n" % (str(guess), nbr_shot, str(possible_solution) ) )
+                total_nbr_shot += nbr_shot
+            if total_nbr_shot < min_total:
+                min_total = total_nbr_shot
+                min_guess = guess
+        
+        print( "INF: min_guess: ", min_guess )
+        
+        return min_guess
         
     def human_guess_run_game( self ):
         self.generate_random_solution()

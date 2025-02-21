@@ -1,3 +1,5 @@
+import json
+import os
 import random
 import time
 
@@ -80,7 +82,7 @@ def compute_goodbad_compacted( guess, solution ):
                     bad += 1
             except ValueError as err:
                 continue # not in list
-    return good*8+bad # assume less than 16 color
+    return good*16+bad # assume less than 16 color
         
 def compute_allgoodbad( board, solution ):
     """
@@ -174,17 +176,23 @@ class MasterMindAI:
         self.possible_answers = []
         
         self.next_guesses = [] # all guess to follow, when no more, compute them on the fly
-        self.next_guesses.append( [] )
-        for i in range( self.nbr_choice ):
-            self.next_guesses[-1].append( i % self.nbr_color )
-        self.next_guesses[-1] = tuple(self.next_guesses[-1])
+        if 1:
+            # hard coding first guess
+            self.next_guesses.append( [] )
+            for i in range( self.nbr_choice ):
+                self.next_guesses[-1].append( i % self.nbr_color )
+            
+            # optim: mettre le premier en double ?
+            #~ self.next_guesses[-1][1] = self.next_guesses[-1][0]
+            
+            self.next_guesses[-1] = tuple(self.next_guesses[-1])
         
         for i in range(self.nbr_color**self.nbr_choice):
             answer = []
             for j in range(self.nbr_choice):
                 answer.append(i%self.nbr_color)
                 i //= self.nbr_color
-            self.possible_answers.append(tuple(answer))
+            self.possible_answers.append( tuple(answer) )
         print( "DBG: MasterMindAI.start_new_game: possible_answers: ", self.possible_answers )
         print( "DBG: MasterMindAI.start_new_game: possible_answers: len: ", len(self.possible_answers) )
         print( "DBG: MasterMindAI.start_new_game: next_guesses: ", self.next_guesses ) # 4096 for 4 choice in 8 colors
@@ -194,27 +202,45 @@ class MasterMindAI:
         ram_begin, _ = getAvailableRam()
         
         # a dict for each guess: for each answer, the associated goodbad
-        self.resultGuessAnswer = {}
         
-        
-        for guess in self.possible_answers:
-            d = {}
-            for answer in self.possible_answers:
-                goodbad = compute_goodbad_compacted( guess, answer )
-                d[answer] = goodbad
-            self.resultGuessAnswer[guess] = d
+        strPrecalcFilename = "ai_precalc_guess_answer_%d_%d.dat" % (self.nbr_choice,self.nbr_color)
+        if os.path.isfile( strPrecalcFilename ) and 0:
+            # ca marche pas, on ne peut pas sauver un dict de tuple, et c'est long a convertir en paire, il faudrait refaire toute l'ia en ne pas sauvant des tuples, mais des chaines de combinaisons
+            # bref, ca ne m'amuse pas trop...
+            print( "DBG: MasterMindAI.start_new_game: Using precalc from '%s'" % strPrecalcFilename )
+            f = open( strPrecalcFilename, "rt" )
+            json.load(f)
+            f.close()
+        else:
+            self.resultGuessAnswer = {}
+            
+            for guess in self.possible_answers:
+                d = {}
+                for answer in self.possible_answers:
+                    goodbad = compute_goodbad_compacted( guess, answer )
+                    d[answer] = goodbad
+                self.resultGuessAnswer[guess] = d
+            if 0:
+                # save to precalc file
+                print( "DBG: MasterMindAI.start_new_game: Saving precalc to '%s'" % strPrecalcFilename )
+                f = open( strPrecalcFilename, "wt" )
+                #~ dict_not_using_tuple_as_key = [ {'key': k, 'value': v} for k, v in self.resultGuessAnswer.items() ]
+                #~ dict_not_using_tuple_as_key = [ (k, v) for k, v in self.resultGuessAnswer.items() ]
+                #~ print(dict_not_using_tuple_as_key)
+                json.dump(self.resultGuessAnswer,f)
+                f.close()
             
         print( "DBG: generating resultGuessAnswer: takes %.2fs" % (time.time() - time_begin) ) # mstab7: for 4,8: 26s
         ram_end, _ = getAvailableRam()
         print( "DBG: generating resultGuessAnswer: takes %.3fGB RAM" % ( (ram_begin-ram_end)/(10**9) ) ) # mstab7: for 4,8: 1.7GB  - storing 1 int instead of a pair => 0.6GB
         
-    def compute_next_guess( self ):
+    def get_next_guess( self ):
         if len( self.next_guesses) > 0:
             guess = self.next_guesses.pop(0)
             return guess
         # compute on the fly
         # dumb guess: the first possible
-        print("WARNING: compute_next_guess: we should never goes here")
+        print("WARNING: get_next_guess: we should never goes here")
         time.sleep(3)
         return self.possible_answers[0]
         
@@ -222,7 +248,7 @@ class MasterMindAI:
         # remove from all possible answer
         # WRN: goodbad need to be a tuple
         
-        goodbad = goodbad[0] * 10 + goodbad[1]
+        goodbad = goodbad[0] * 16 + goodbad[1]
         
         time_begin = time.time()
         
@@ -278,16 +304,20 @@ class MasterMindAI:
         self.next_guesses.append(guess_min)
         
         print( "DBG: MasterMindAI.update_result_of_last_guess: takes %.2fs" % (time.time() - time_begin) )
-         
+        
+# MasterMindAI - end
         
 
-class Game:
+class MasterMindGame:
     def __init__( self, nbr_choice = 4, nbr_color = 8 ):
         """
         the color are 0..nbr_color-1
         """
         self.nbr_choice = nbr_choice
         self.nbr_color = nbr_color
+        self.reset()
+        
+    def reset( self ):
         self.board = []    # a list of a each guesses at each turn
         self.goodbad = [] # for each turn, the number of well placed and misplaced
         self.solution = [] # the good solution
@@ -381,8 +411,13 @@ class Game:
         return min_guess
     """
         
-    def human_guess_run_game( self ):
-        self.generate_random_solution()
+    def human_guess_run_game( self, forced_solution = [] ):
+        
+        self.reset()
+        if forced_solution == []:
+            self.generate_random_solution()
+        else:
+            self.solution = forced_solution
         
         #~ self.render_solution()
         self.render_plate()
@@ -420,6 +455,7 @@ class Game:
         The computer need to guess the correct solution.
         human_solution: the combination made by the human or [] to pick a random one
         """
+        self.reset()
         self.render_plate()
         
         if human_solution == []:
@@ -433,7 +469,7 @@ class Game:
         
         nbr_turn = 0
         while 1:
-            guess = ai.compute_next_guess()
+            guess = ai.get_next_guess()
             if guess == None:
                 print("Computer abort")
                 break
@@ -459,30 +495,63 @@ class Game:
             for guess in self.board:
                 print(guess, end=", ")
             print("")
+            
+        return nbr_turn
         
             
-# class Game - end
+# class MasterMindGame - end
 
 def main():
-    #~ game = Game()
-    #~ game.human_guess_run_game()
+    time_begin = time.time()
+    
+    if 1:
+        # joue contre l'ordinateur
+        game = MasterMindGame()
+        forced_solution = []
+        forced_solution = [3,2,0,2]
+        game.human_guess_run_game(forced_solution)
+        exit(1)
+    
     #~ game.cpu_guess_run_game([2,4,6,4])
     
     if 0:
-        game = Game(2,3)
+        game = MasterMindGame(2,3)
         game.cpu_guess_run_game([2,0])
     elif 0:
-        game = Game(2,3)
+        game = MasterMindGame(2,3)
         game.cpu_guess_run_game([1,2]) # Best: 3 turn(s) # (0, 1), (2, 0), (1, 2), 
-    else:
-        game = Game(4,8)
+    elif 1:
+        game = MasterMindGame(4,8)
         solution = [2,4,6,4] # Best: 5 turns # (0, 1, 2, 3), (5, 2, 4, 4), (4, 2, 7, 6), (6, 4, 4, 2), (2, 4, 6, 4), 
         #~ solution = [2,4,4,4] # Best: 4 turns # (0, 1, 2, 3), (5, 2, 4, 4), (4, 2, 6, 4), (2, 4, 4, 4)
         #~ solution = [4,4,4,4] # Best:  5 turns # (0, 1, 2, 3), (6, 5, 4, 4), (5, 5, 7, 4), (6, 5, 5, 5), (4, 4, 4, 4), 
         #~ solution = [6,5,4,3] # Best: 4 turn(s) # (0, 1, 2, 3), (5, 1, 4, 4), (0, 4, 6, 4), (6, 5, 4, 3), 
         #~ solution = [3,2,1,0] # Best: 2 turn(s) # (0, 1, 2, 3), (3, 2, 1, 0), 
         #~ solution = [3,2,0,1] # Best: 4 turn(s) # (0, 1, 2, 3), (3, 2, 1, 0), (2, 3, 1, 0), (3, 2, 0, 1), 
+        solution = [3,2,0,2] # Best: 4 turn(s) # (0, 1, 2, 3), (3, 2, 0, 0), (3, 2, 4, 0), (3, 2, 0, 2),
         game.cpu_guess_run_game( solution )
+    else:
+        # fait un petit bench avec des combinaisons differentes
+        nbr_choice = 4
+        nbr_color = 5 # shouldn't be less than nbr_choice
+        game = MasterMindGame(nbr_choice,nbr_color)
+        solutions = []
+        for i in range(nbr_color**nbr_choice):
+            answer = []
+            for j in range(nbr_choice):
+                answer.append(i%nbr_color)
+                i //= nbr_color
+            solutions.append( tuple(answer) )
+        nbr_total_turn = 0
+        for s in solutions:
+            nbr_total_turn += game.cpu_guess_run_game( s )
+        print("# nbr_total_turn: for %d,%d: %s" % (nbr_choice, nbr_color, nbr_total_turn) )
+        # nbr_total_turn: for 4,4: 981
+        # nbr_total_turn: for 4,4: 917 # (doubling the second at first)
+        # nbr_total_turn: for 4,5: 2592 403sec
+        # nbr_total_turn: for 4,5: 2548  # (doubling the second at first)
+        
+        print("total duration for all combination: %.1f" % (time.time()-time_begin))
         
 if __name__ == "__main__":
     main()

@@ -31,8 +31,24 @@ def draw_mastermind_plate(screen, color_lists, position=(50, 50), peg_radius=20,
             if 0 <= color_index < len(COLOR_PALETTE):
                 pygame.draw.circle(screen, COLOR_PALETTE[color_index], (x + i * spacing, y), peg_radius)
         y += spacing  # Move to the next row
+        
+def getAvailableRam():
+    #~ GB=1024*1024*1024.
+    try:
+        import psutil
+        infomem = psutil.virtual_memory()
+        avail = infomem.available
+        tot = infomem.total
+        #~ avail = tot-avail # seems like it's reverted at least on raspberry [but not exactly !?!]
+    except BaseException as err:
+        #~ print("ERR: %s" % err)
+        import os
+        avail = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_AVPHYS_PAGES') 
+        tot = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') 
+    return avail,tot
+    
 
-def goodbad( guess, solution ):
+def compute_goodbad( guess, solution ):
     """
     Compute good bad for a guess
     """
@@ -51,13 +67,13 @@ def goodbad( guess, solution ):
                 
     return good, bad
         
-def allgoodbad( board, solution ):
+def compute_allgoodbad( board, solution ):
     """
     compute all good bad for a board and a given solution
     """
     out = []
     for guess in board:
-        out.append( goodbad(guess,solution) )
+        out.append( compute_goodbad(guess,solution) )
     return out
         
 def compute_next_shot( board, listgoodbad, nbr_choice, nbr_color ):
@@ -109,7 +125,7 @@ def compute_next_shot( board, listgoodbad, nbr_choice, nbr_color ):
             if cpt_same > 100:
                 print("NEW GUESS LOCKED, exiting")
                 print("rappel: compute_next_shot: board: %s, listgoodbad: %s" % ( str(board), str(listgoodbad) ) )
-                time.sleep(10)
+                #time.sleep(10)
                 break
         else:
             prev_guess = new_guess
@@ -117,14 +133,117 @@ def compute_next_shot( board, listgoodbad, nbr_choice, nbr_color ):
     return new_guess
         
 def simulate_play( shot, solution, board, nbr_choice, nbr_color ):
-    print("DBG: simulate_play: shot: %s, solution: %s, board: %s" % (str(shot), str(solution), str(board)) ) 
-    good,bad = goodbad( shot, solution )
+    print("\nDBG: simulate_play: shot: %s, solution: %s, board: %s" % (str(shot), str(solution), str(board)) ) 
+    good,bad = compute_goodbad( shot, solution )
     if good == nbr_choice:
         return 1
+    if solution in board:
+        return 0 # should be stopped before
     board.append( shot )
-    listgoodbad = allgoodbad(board,solution)
+    listgoodbad = compute_allgoodbad(board,solution)
     next_shot = compute_next_shot( board, listgoodbad, nbr_choice, nbr_color )
     return 1+simulate_play( next_shot, solution, board[:], nbr_choice, nbr_color )
+    
+    
+class MasterMindAI:
+    def __init__( self ):
+        pass
+        
+    def start_new_game( self, nbr_choice = 4, nbr_color = 8 ):
+        
+        self.nbr_choice = nbr_choice
+        self.nbr_color = nbr_color
+        self.possible_answers = []
+        
+        self.next_guesses = [] # all guess to follow, when no more, compute them on the fly
+        self.next_guesses.append( [] )
+        for i in range( self.nbr_choice ):
+            self.next_guesses[-1].append( i % self.nbr_color )
+        self.next_guesses[-1] = tuple(self.next_guesses[-1])
+        
+        for i in range(self.nbr_color**self.nbr_choice):
+            answer = []
+            for j in range(self.nbr_choice):
+                answer.append(i%self.nbr_color)
+                i //= self.nbr_color
+            self.possible_answers.append(tuple(answer))
+        print( "DBG: MasterMindAI.start_new_game: possible_answers: ", self.possible_answers )
+        print( "DBG: MasterMindAI.start_new_game: possible_answers: len: ", len(self.possible_answers) )
+        print( "DBG: MasterMindAI.start_new_game: next_guesses: ", self.next_guesses ) # 4096 for 4 choice in 8 colors
+        
+        print( "DBG: generating resultGuessAnswer...")
+        time_begin = time.time()
+        ram_begin, _ = getAvailableRam()
+        
+        # a dict for each guess: for each answer, the associated goodbad
+        self.resultGuessAnswer = {}
+        
+        
+        for guess in self.possible_answers:
+            d = {}
+            for answer in self.possible_answers:
+                goodbad = compute_goodbad( guess, answer )
+                d[answer] = goodbad
+            self.resultGuessAnswer[guess] = d
+        print( "DBG: generating resultGuessAnswer: takes %.2fs" % (time.time() - time_begin) ) # mstab7: for 4,8: 26s
+        ram_end, _ = getAvailableRam()
+        print( "DBG: generating resultGuessAnswer: takes %.3fGB RAM" % ( (ram_begin-ram_end)/(10**9) ) ) # mstab7: for 4,8: 1.7GB
+        
+    def compute_next_guess( self ):
+        if len( self.next_guesses) > 0:
+            guess = self.next_guesses.pop(0)
+            return guess
+        # compute on the fly
+        # dumb guess: the first possible
+        # return self.possible_answers[0]
+        
+    def update_result_of_last_guess( self, guess, goodbad ):
+        # remove from all possible answer
+        # WRN: goodbad need to be a tuple
+        
+        print( "DBG: update_result_of_last_guess: starting...")
+        i = 0
+        while i < len( self.possible_answers ):
+            this_goodbad = compute_goodbad( guess, self.possible_answers[i] )
+            print( "DBG: update_result_of_last_guess: for answer: ", self.possible_answers[i], ", this_goodbad: ", this_goodbad, ", refgoodbad:", goodbad )
+            if  this_goodbad != goodbad or guess == tuple(self.possible_answers[i]):
+                del self.possible_answers[i]
+            else:
+                i += 1
+        print( "DBG: MasterMindAI.update_result_of_last_guess: possible_answers: %d: %s" % ( len( self.possible_answers ), self.possible_answers ) )
+        
+        # reduce dictionnary
+        dictGuessMaxNumberSameGoodBad  = {}
+        for guess, answergoodbad in self.resultGuessAnswer.items():
+            # remove deleted answer
+            for answer, goodbad in answergoodbad:
+                if answer not in self.possible_answers:
+                    del self.resultGuessAnswer[guess][answer]
+            # group answer giving same score
+            dictGoodBadAnswer = {}
+            for answer, goodbad in answerscore:
+                if goodbad not in dictScoreAnswer:
+                    dictGoodBadAnswer[goodbad] = 1
+                else:
+                    dictGoodBadAnswer[goodbad] += 1
+            valmax = max(dictGoodBadAnswer.values())
+            dictGuessMaxNumberSameGoodBad[guess] = valmax
+        # find key with the least maxvalue (the one which in the worst case of unknowing with solution it is will be the smaller)
+        val_min = 2**64
+        guess_min = None
+        for guess,val in dictGuessMaxNumberSameGoodBad:
+            if val_min > val:
+                val_min = val
+                guess = guess
+                
+        print( "DBG: update_result_of_last_guess: finishing with guess: %s" % guess )
+        self.next_guesses.append(guess)
+        
+            
+            
+                    
+         
+        
 
 class Game:
     def __init__( self, nbr_choice = 4, nbr_color = 8 ):
@@ -171,17 +290,21 @@ class Game:
         if len(self.goodbad) == len(self.board):
             return self.goodbad[0] == self.nbr_choice
             
-        good,bad = goodbad(self.board[-1], self.solution)
+        good,bad = compute_goodbad( self.board[-1], self.solution )
 
 
         self.goodbad.append([good,bad])
         
         return good == self.nbr_choice
         
+    def get_last_goodbad( self ):
+        return tuple(self.goodbad[-1])
+        
     def computer_guess( self ):
         """
         based only on previous guess and goodbad, the compute need to pick a choice
         """
+    """
         #~ if len(self.board) == 0:
             #~ return [0,1,2,3]
         #~ if len(self.board) == 1:
@@ -220,6 +343,7 @@ class Game:
         print( "INF: min_guess: ", min_guess )
         
         return min_guess
+    """
         
     def human_guess_run_game( self ):
         self.generate_random_solution()
@@ -266,10 +390,14 @@ class Game:
             self.generate_random_solution()
         else:
             self.solution = human_solution
+            
+            
+        ai = MasterMindAI()
+        ai.start_new_game( self.nbr_choice, self.nbr_color )
         
         nbr_turn = 0
         while 1:
-            guess = self.computer_guess()
+            guess = ai.compute_next_guess()
             if guess == None:
                 print("Computer abort")
                 break
@@ -286,6 +414,8 @@ class Game:
             if is_finished:
                 break
                 
+            ai.update_result_of_last_guess( guess, self.get_last_goodbad() )
+                
         print( "Game finished by computer in %d turn(s)" % nbr_turn )
         
             
@@ -296,8 +426,15 @@ def main():
     #~ game.human_guess_run_game()
     #~ game.cpu_guess_run_game([2,4,6,4])
     
-    game = Game(2,3)
-    game.cpu_guess_run_game([2,0])
+    if 0:
+        game = Game(2,3)
+        game.cpu_guess_run_game([2,0])
+    elif 0:
+        game = Game(2,3)
+        game.cpu_guess_run_game([1,2])
+    else:
+        game = Game(4,8)
+        game.cpu_guess_run_game([2,4,6,4])
         
 if __name__ == "__main__":
     main()

@@ -1023,6 +1023,21 @@ def smoothererstep( x, edge0 = 0, edge1 = 1 ):
     return x * x * x * x * (  x * ( x * ( (x*-20) +70)-84) + 35 )
     
     
+def getAvailableRam():
+    GB=1024*1024*1024.
+    try:
+        import psutil
+        infomem = psutil.virtual_memory()
+        avail = infomem.available
+        tot = infomem.total
+        #~ avail = tot-avail # seems like it's reverted at least on raspberry [but not exactly !?!]
+    except BaseException as err:
+        #~ print("ERR: %s" % err)
+        import os
+        avail = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_AVPHYS_PAGES') 
+        tot = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') 
+    return avail,tot
+    
 def playWav( strFilename, bWaitEnd = True, rSoundVolume = 1. ):
     """
     play a wav, return False on error

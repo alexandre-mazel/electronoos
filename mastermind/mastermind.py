@@ -66,6 +66,21 @@ def compute_goodbad( guess, solution ):
                 continue # not in list
                 
     return good, bad
+    
+def compute_goodbad_compacted( guess, solution ):
+    good = 0
+    bad = 0
+    for idx,n in enumerate(guess):
+        if n == solution[idx]:
+            good += 1
+        else:
+            try:
+                idxfound = solution.index(n)
+                if idxfound != -1 and solution[idxfound] != guess[idxfound]:
+                    bad += 1
+            except ValueError as err:
+                continue # not in list
+    return good*8+bad # assume less than 16 color
         
 def compute_allgoodbad( board, solution ):
     """
@@ -80,6 +95,7 @@ def compute_next_shot( board, listgoodbad, nbr_choice, nbr_color ):
     """
     Decide what is the best guess to play
     """
+"""
     print("DBG: compute_next_shot: board: %s, listgoodbad: %s" % ( str(board), str(listgoodbad) ) )
     possible_colors = [] # for each choice, probability of each color
     for i in range(nbr_choice):
@@ -131,7 +147,9 @@ def compute_next_shot( board, listgoodbad, nbr_choice, nbr_color ):
             prev_guess = new_guess
             
     return new_guess
-        
+"""
+
+"""
 def simulate_play( shot, solution, board, nbr_choice, nbr_color ):
     print("\nDBG: simulate_play: shot: %s, solution: %s, board: %s" % (str(shot), str(solution), str(board)) ) 
     good,bad = compute_goodbad( shot, solution )
@@ -143,7 +161,7 @@ def simulate_play( shot, solution, board, nbr_choice, nbr_color ):
     listgoodbad = compute_allgoodbad(board,solution)
     next_shot = compute_next_shot( board, listgoodbad, nbr_choice, nbr_color )
     return 1+simulate_play( next_shot, solution, board[:], nbr_choice, nbr_color )
-    
+"""
     
 class MasterMindAI:
     def __init__( self ):
@@ -182,12 +200,13 @@ class MasterMindAI:
         for guess in self.possible_answers:
             d = {}
             for answer in self.possible_answers:
-                goodbad = compute_goodbad( guess, answer )
+                goodbad = compute_goodbad_compacted( guess, answer )
                 d[answer] = goodbad
             self.resultGuessAnswer[guess] = d
+            
         print( "DBG: generating resultGuessAnswer: takes %.2fs" % (time.time() - time_begin) ) # mstab7: for 4,8: 26s
         ram_end, _ = getAvailableRam()
-        print( "DBG: generating resultGuessAnswer: takes %.3fGB RAM" % ( (ram_begin-ram_end)/(10**9) ) ) # mstab7: for 4,8: 1.7GB
+        print( "DBG: generating resultGuessAnswer: takes %.3fGB RAM" % ( (ram_begin-ram_end)/(10**9) ) ) # mstab7: for 4,8: 1.7GB  - storing 1 int instead of a pair => 0.6GB
         
     def compute_next_guess( self ):
         if len( self.next_guesses) > 0:
@@ -195,53 +214,70 @@ class MasterMindAI:
             return guess
         # compute on the fly
         # dumb guess: the first possible
-        # return self.possible_answers[0]
+        print("WARNING: compute_next_guess: we should never goes here")
+        time.sleep(3)
+        return self.possible_answers[0]
         
     def update_result_of_last_guess( self, guess, goodbad ):
         # remove from all possible answer
         # WRN: goodbad need to be a tuple
         
+        goodbad = goodbad[0] * 10 + goodbad[1]
+        
+        time_begin = time.time()
+        
         print( "DBG: update_result_of_last_guess: starting...")
+        
+        # Reduce impossible answer
         i = 0
         while i < len( self.possible_answers ):
-            this_goodbad = compute_goodbad( guess, self.possible_answers[i] )
-            print( "DBG: update_result_of_last_guess: for answer: ", self.possible_answers[i], ", this_goodbad: ", this_goodbad, ", refgoodbad:", goodbad )
+            this_goodbad = compute_goodbad_compacted( guess, self.possible_answers[i] )
+            #~ print( "DBG: update_result_of_last_guess: for answer: ", self.possible_answers[i], ", this_goodbad: ", this_goodbad, ", refgoodbad:", goodbad )
             if  this_goodbad != goodbad or guess == tuple(self.possible_answers[i]):
+                # remove this guess from the guess/max_number
+                del self.resultGuessAnswer[self.possible_answers[i]]
+                # remove this possible answer
                 del self.possible_answers[i]
+                
             else:
                 i += 1
         print( "DBG: MasterMindAI.update_result_of_last_guess: possible_answers: %d: %s" % ( len( self.possible_answers ), self.possible_answers ) )
+        
+        
+        # return # returning here will take the first possible_answer (fast but not optimal)
+        
+        
+        print( "DBG: MasterMindAI.update_result_of_last_guess: computing minmax..." )
         
         # reduce dictionnary
         dictGuessMaxNumberSameGoodBad  = {}
         for guess, answergoodbad in self.resultGuessAnswer.items():
             # remove deleted answer
-            for answer, goodbad in answergoodbad:
+            for answer in list(answergoodbad.keys()):
                 if answer not in self.possible_answers:
                     del self.resultGuessAnswer[guess][answer]
             # group answer giving same score
             dictGoodBadAnswer = {}
-            for answer, goodbad in answerscore:
-                if goodbad not in dictScoreAnswer:
+            for answer, goodbad in answergoodbad.items():
+                if goodbad not in dictGoodBadAnswer:
                     dictGoodBadAnswer[goodbad] = 1
                 else:
                     dictGoodBadAnswer[goodbad] += 1
             valmax = max(dictGoodBadAnswer.values())
             dictGuessMaxNumberSameGoodBad[guess] = valmax
+            
         # find key with the least maxvalue (the one which in the worst case of unknowing with solution it is will be the smaller)
         val_min = 2**64
         guess_min = None
-        for guess,val in dictGuessMaxNumberSameGoodBad:
+        for guess,val in dictGuessMaxNumberSameGoodBad.items():
             if val_min > val:
                 val_min = val
-                guess = guess
+                guess_min = guess
                 
-        print( "DBG: update_result_of_last_guess: finishing with guess: %s" % guess )
-        self.next_guesses.append(guess)
+        print( "DBG: update_result_of_last_guess: finishing with guess: %s (val_min: %d)" % (str(guess_min), val_min) )
+        self.next_guesses.append(guess_min)
         
-            
-            
-                    
+        print( "DBG: MasterMindAI.update_result_of_last_guess: takes %.2fs" % (time.time() - time_begin) )
          
         
 
@@ -418,6 +454,12 @@ class Game:
                 
         print( "Game finished by computer in %d turn(s)" % nbr_turn )
         
+        if 1:
+            print( "# Best: %d turn(s) # " % nbr_turn, end="" )
+            for guess in self.board:
+                print(guess, end=", ")
+            print("")
+        
             
 # class Game - end
 
@@ -431,10 +473,16 @@ def main():
         game.cpu_guess_run_game([2,0])
     elif 0:
         game = Game(2,3)
-        game.cpu_guess_run_game([1,2])
+        game.cpu_guess_run_game([1,2]) # Best: 3 turn(s) # (0, 1), (2, 0), (1, 2), 
     else:
         game = Game(4,8)
-        game.cpu_guess_run_game([2,4,6,4])
+        solution = [2,4,6,4] # Best: 5 turns # (0, 1, 2, 3), (5, 2, 4, 4), (4, 2, 7, 6), (6, 4, 4, 2), (2, 4, 6, 4), 
+        #~ solution = [2,4,4,4] # Best: 4 turns # (0, 1, 2, 3), (5, 2, 4, 4), (4, 2, 6, 4), (2, 4, 4, 4)
+        #~ solution = [4,4,4,4] # Best:  5 turns # (0, 1, 2, 3), (6, 5, 4, 4), (5, 5, 7, 4), (6, 5, 5, 5), (4, 4, 4, 4), 
+        #~ solution = [6,5,4,3] # Best: 4 turn(s) # (0, 1, 2, 3), (5, 1, 4, 4), (0, 4, 6, 4), (6, 5, 4, 3), 
+        #~ solution = [3,2,1,0] # Best: 2 turn(s) # (0, 1, 2, 3), (3, 2, 1, 0), 
+        #~ solution = [3,2,0,1] # Best: 4 turn(s) # (0, 1, 2, 3), (3, 2, 1, 0), (2, 3, 1, 0), (3, 2, 0, 1), 
+        game.cpu_guess_run_game( solution )
         
 if __name__ == "__main__":
     main()

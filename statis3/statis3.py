@@ -49,6 +49,17 @@ def replaceNameReplaceByNonAccentuatedChars(s):
     for a,b in trans:
         s = s.replace(a,b)
     return s
+    
+def cleanTitle( strTitle ):
+    while " - pupu" in strTitle:
+        strTitle = strTitle.replace( " - pupu", "" )
+    for strAtEnd in [ "- pup", "- pu", "- p" ]:
+        if strTitle[-len(strAtEnd):] == strAtEnd:
+            strTitle = strTitle[:-len(strAtEnd)]
+    while "  " in strTitle:
+        strTitle = strTitle.replace( "  ", " " )
+    strTitle = strTitle.strip()
+    return strTitle
 
 
 def getParentWindow( hWnd ):
@@ -142,6 +153,7 @@ def run_statis():
         strTitle = strTitle.encode("ascii", errors="namereplace").decode("ascii")
         strTitle = strTitle.replace( " * ", " - " ) # for unsaved document in scite
         strTitle = replaceNameReplaceByNonAccentuatedChars(strTitle)
+        strTitle = cleanTitle( strTitle )
         
         bPrivate = False
         if "Mozilla Firefox (navigation privee)" in strTitle:
@@ -159,7 +171,7 @@ def run_statis():
                 # seems like we stay 1 sec more on this window
                 statis3.addTime(strTitle,rTimeLoopSec)
 
-        if int(time.time())%20 == 0:
+        if int(time.time())%20 == 0 and 0:
             statis3.printAll()
             
         if time.time() - timeLastSave > 60:

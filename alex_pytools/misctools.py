@@ -1414,18 +1414,26 @@ def backupFile( filename, bQuiet = 0 ):
         if time.time() - modtime > onedayinsec:
             # fait un backup du backup
             try:
-                os.rename(filenamebak,filenamebak+".time_"+ str(int(modtime)))
+                strNewName = filenamebak+".time_"+ str(int(modtime))
+                if not bQuiet: print( "INF: backupFile: moving '%s' to stamped '%s'" % (filenamebak,strNewName)  )
+                os.rename(filenamebak,strNewName)
             except FileExistsError as err: 
                 print("WRN: backupFile: rename error (1): on a deja sauvé ce fichier, et pourtant il est encore la...\nerr:%s" % err)
         else:
             os.remove(filenamebak)
     try:
+        if not bQuiet: print( "INF: backupFile: moving '%s' to '%s'" % (filename,filenamebak)  )
         os.rename(filename,filenamebak)
     except FileExistsError as err: 
         print("WRN: backupFile: rename error (2): on a deja sauvé ce fichier, et pourtant il est encore la...\nerr:%s" % err)
+    if not bQuiet: print("INF: backupFile: ok" )
     
-#~ backupFile("/tmp/test.txt")
-#~ exit(1)
+if 0:
+    backupFile("/tmp/test.txt",bQuiet=0)
+    ftmptest=open("/tmp/test.txt","wt")
+    ftmptest.write(str(time.time()))
+    ftmptest.close()
+    exit(1)
 
 def eraseFiles( listFiles, strPath = "" ):
     """

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*- 
 
-import embedtools
+import time
 
 from embedtools import *
 
@@ -8,15 +8,19 @@ dictSentencesTuples = {
 	"J'ai faim": ("Je souhaiterai me sustenter", "y a til un restauran dans coin?" ),
 	"J'ai envie de faire pipi!":  ("ou sont les toilettes?", "ou se trouve les ptit coin"),
 	"Qui est le président de la france?": ( "Miterrand a été le président de la france entre 1981 et 1995", "Macron dirige notre pays a ce jour"),
-	 "Qui est le président des états unis?": ( "Trump is the american president", "Trump est le président americain")
+	 "Qui est le président des états unis?": ( "Trump is the american president", "Trump est le président americain"),
+	 "Je veux faire de l'internet": ( "Vous pouvez vous connecter sur notre réseau", "Le code du wifi est 123"),
+	 "J'ai 2 enfants": ( "J'ai un fils et une fille", "Mon grand s'appelle Corto et ma petite gaia"),
 }
 
 def test_perf_embed( strModelName ):
 	"""
 	return results of one model
 	"""
+	time_begin = time.time()
 	print( "" )
 	computeMaximum( strModelName )
+	coef_normalise = getNormalisation( strModelName )
 	dummy = llama3_embedding( "text", strModelName )
 	print( "INF: test_perf_embed: model '%s' has size %d" % ( strModelName, len( dummy ) ) )
 	
@@ -32,10 +36,11 @@ def test_perf_embed( strModelName ):
 			listSolution.append( ( s, v ) )
 			
 	# for each listQuestion, sort the list of solution
+	grand_total = 0
 	for question, v1 in listQuestion:
 		res = []
 		for s2,v2 in listSolution:
-			simi = compare_two_vect( v1,v2 )
+			simi = compare_two_vect( v1,v2 )/coef_normalise
 			res.append( (s2, simi) )
 		res = sorted( res, key = lambda x: x[1], reverse = True )
 		print( "%s => %s" % ( question, str(res) ) )
@@ -49,9 +54,10 @@ def test_perf_embed( strModelName ):
 			else:
 				tot -= score
 		print( "tot: %.3f" % tot )
-		
-	
-
+		grand_total += tot
+	duration = time.time() - time_begin
+	print( "grand_total: %.2f (%.2fs)" % ( grand_total, duration ) )
+	return grand_total, duration
 
 strModelToCompare = ["granite-embedding:30m", "granite-embedding:278m", "snowflake-arctic-embed2", "bge-large", "paraphrase-multilingual","bge-m3",
 "nomic-embed-text","mxbai-embed-large"]

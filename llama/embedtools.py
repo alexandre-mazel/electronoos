@@ -3,22 +3,41 @@ import numpy as np
 dictInfSup = {} # for each model it's inf/sup
 
 
+def getNormalisation( strModel ):
+    inf,sup = dictInfSup[strModel]
+    return sup-inf
+
+
 def computeMaximum( strModel ):
     """
     Compute maximum of a model (so we could normalise it later)
     """
-    txts = ["Hello boys, how are you?", "Comment tu va?", "Les chaussettes de l'archi duchesse sont elle seche ?", "2+2=4"]
-    inf = 2**32
-    sup = -2**32
-    for txt in txts:
-        v = llama3_embedding( txt, strModel )
-        inf = min(inf,min(v))
-        sup = max( sup, max(v) )
-    print( "DBG: computeMaximum for model '%s': inf: %.3f, sup: %.3f" % (strModel, inf, sup) )
-    dictInfSup[strModel] = (inf,sup)
+    if 0:
+        # on regarde les evolutions entre les valeurs des vecteurs
+        txts = ["Hello boys, how are you?", "Comment tu va?", "Les chaussettes de l'archi duchesse sont elle seche ?", "2+2=4"]
+        inf = 2**32
+        sup = -2**32
+        for txt in txts:
+            v = llama3_embedding( txt, strModel )
+            inf = min( inf,min(v) )
+            sup = max( sup, max(v) )
+        print( "DBG: computeMaximum for model '%s': inf: %.3f, sup: %.3f" % (strModel, inf, sup) )
+        dictInfSup[strModel] = (inf,sup)
+    else:
+        # on regarde la similitude max entre 2 phrases données
+        pair_sentences = [
+                ("J'ai froid", "je me caille"),
+                ( "I'm hungry", "I'm starving")
+        ]
+        maxi = 0
+        for t1, t2 in pair_sentences:
+            simi = compare_two_texts( t1, t2, strModel )
+            if simi > maxi:
+                maxi = simi
+        dictInfSup[strModel] = (0,maxi)
 
 def llama3_embedding(text, strModel ):
-    print( "INF: llama3_embedding: using model: '%s'" % strModel )
+    #~ print( "INF: llama3_embedding: using model: '%s'" % strModel )
     import ollama # to be run from ~/dev/llama_env + ollama server running internally
     
     out  = ollama.embeddings( model=strModel, prompt=text )

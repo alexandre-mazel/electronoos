@@ -1,4 +1,32 @@
 import numpy as np
+import os
+
+"""
+
+# Load the model
+model = SentenceTransformer("Linq-AI-Research/Linq-Embed-Mistral")
+
+# Each query must come with a one-sentence instruction that describes the task
+task = 'Given a question, retrieve Wikipedia passages that answer the question'
+prompt = f"Instruct: {task}\nQuery: "
+queries = [
+    "??? ??? ???? ?????",
+    "Who invented Hangul?"
+]
+passages = [
+    "?? ???? ??? ??? ??? ????? 1948? 9? ?? ???? ????? ??? X-10 ??????? ??? ?? ??? ? ????? ?????. ??? 1954? 6?? ???? ?????? ??? ???? ???? ???? ???? ??? ????? ??? ???? ????? ????? ?????, ??? ??? ??? ????? ??? ?? ???? ??? ??? ??? ?? ?(Calder Hall) ??? ????, 1956? 10? 17? ?? ??? ?????.",
+    "Hangul was personally created and promulgated by the fourth king of the Joseon dynasty, Sejong the Great.[1][2] Sejong's scholarly institute, the Hall of Worthies, is often credited with the work, and at least one of its scholars was heavily involved in its creation, but it appears to have also been a personal project of Sejong."
+]
+
+# Encode the queries and passages. We only use the prompt for the queries
+query_embeddings = model.encode(queries, prompt=prompt)
+passage_embeddings = model.encode(passages)
+
+# Compute the (cosine) similarity scores
+scores = model.similarity(query_embeddings, passage_embeddings) * 100
+print(scores.tolist())
+# [[73.72908782958984, 30.122787475585938], [29.15508460998535, 79.25375366210938]]
+"""
 
 dictInfSup = {} # for each model it's inf/sup
 
@@ -40,7 +68,15 @@ def llama3_embedding(text, strModel ):
     #~ print( "INF: llama3_embedding: using model: '%s'" % strModel )
     import ollama # to be run from ~/dev/llama_env + ollama server running internally
     
-    out  = ollama.embeddings( model=strModel, prompt=text )
+    try:
+        out  = ollama.embeddings( model=strModel, prompt=text )
+    except Exception as err:
+        err = str(err)
+        print( "WRN: llama3_embedding '%s': error occurs: %s" % (strModel, err)  )
+        if "not found" in err or "try pulling" in err:
+            print( "INF: llama3_embedding: Downloading model '%s'" % strModel )
+            os.system( "ollama pull %s" % strModel )
+            out  = ollama.embeddings( model=strModel, prompt=text )
     #~ print(out)
     return out['embedding']
     

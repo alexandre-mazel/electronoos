@@ -429,6 +429,7 @@ class MasterMindGame:
             while 1:
                 if nbr_turn == 0:
                     guess = "0123"
+                    guess = "0023"
                 else:
                     guess = input("your choice(eg: 0123) ?\n")
                 if self.human_guess_play(guess):
@@ -504,7 +505,7 @@ class MasterMindGame:
 def main():
     time_begin = time.time()
     
-    if 1:
+    if 0:
         # joue contre l'ordinateur
         game = MasterMindGame()
         forced_solution = []

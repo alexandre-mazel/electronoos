@@ -1,7 +1,5 @@
 # -*- coding: cp1252 -*-
 
-TODO: test and compare: ["granite-embedding:30m", "granite-embedding:278m", "snowflake-arctic-embed2", "bge-large", "paraphrase-multilingual","bge-m3",
-"nomic-embed-text","mxbai-embed-large"]
 
 if 0:
     import torch
@@ -58,72 +56,7 @@ strModel = "mxbai-embed-large" # size: 669MB, running: 704MB (output size: 1024)
 # https://github.com/meta-llama/llama-recipes/tree/main/recipes/use_cases/end2end-recipes/RAFT-Chatbot
 
 
-def llama3_embedding(text):
-    print( "INF: llama3: using model: '%s'" % strModel )
-    import ollama # to be run from ~/dev/llama_env + ollama server running internally
-    
-    out  = ollama.embeddings( model=strModel, prompt=text )
-    #~ print(out)
-    return out['embedding']
-    
-if 0:  
-    # use camembert to compare results
-    print("Using Camembert (size: 512)")
-    import sys
-    sys.path.append("../camembert/")
-    import sentence_embedding
-    def llama3_embedding(text):
-        return sentence_embedding.camEmbed(text)
-    
-
-def computeDistance(v1,v2):
-    #~ sum = 0
-    #~ for i in range(len(v1)):
-        #~ sum += abs(v1-v2)
-        
-    dist = np.linalg.norm(np.array(v1)-np.array(v2))
-    return dist
-        
-
-def compare_two_texts(t1,t2):
-    v1 = llama3_embedding(t1)
-    v2 = llama3_embedding(t2)
-    simi = np.dot(v1,v2)
-    print("'%s'  and  '%s'  => %s" % (t1,t2,simi) )
-    return simi
-    
-def compare_all(listText):
-    allv = []
-    for t in listText:
-        v = llama3_embedding(t)
-        allv.append(v)
-    
-    for j,t1 in enumerate(listText):
-        simi_maxi = 0
-        imaxi = 0
-        simi_maxi2 = 0 # 2nd best
-        imaxi2 = 0
-        for i,t2 in enumerate(listText):
-            if t1 == t2:
-                continue
-            #~ simi = np.dot(allv[i],allv[j])
-            #~ simi = 100-computeDistance(allv[i],allv[j])  # seems to return quite same results
-            simi = cosine_similarity([allv[i]],[allv[j]])[0][0]
-            #~ print(type(simi))
-            #~ print(simi.shape)
-            #~ print("  simi: %.2f for %s and %s" % (simi,t1,t2) )
-            if simi > simi_maxi:
-                simi_maxi2 = simi_maxi
-                imaxi2 = imaxi
-                simi_maxi = simi
-                imaxi = i
-            elif simi > simi_maxi2:
-                simi_maxi2 = simi
-                imaxi2 = i
-        print("Similar to '%s'  is  '%s'  with score %.2f" % (t1,listText[imaxi],simi_maxi) )
-        print("   2nd: is '%s'  with score %.2f (%.1f%%)" % (listText[imaxi2],simi_maxi2,simi_maxi2*100/simi_maxi) )
-        print("")
-
+# function moved to embedtools
     
 v1 = llama3_embedding("hi guys!")
 print("len vector: %s" % len(v1)) # vector is 768

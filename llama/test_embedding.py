@@ -1,5 +1,8 @@
 # -*- coding: cp1252 -*-
 
+TODO: test and compare: ["granite-embedding:30m", "granite-embedding:278m", "snowflake-arctic-embed2", "bge-large", "paraphrase-multilingual","bge-m3",
+"nomic-embed-text","mxbai-embed-large"]
+
 if 0:
     import torch
     from transformers import AutoTokenizer, AutoModelForCausalLM

@@ -148,6 +148,63 @@ personnage.
 La pièce "Cyrano de Bergerac" est considérée comme un classique de la
 littérature française et a été adaptée en plusieurs films, pièces de
 théâtre et opéras.
+-----
+ollama run llama3.3:70B "Résume moi Cyrano de Bergerac"
+
+"Cyrano de Bergerac" est une pièce de théâtre écrite par Edmond Rostand en
+1897. L'histoire se déroule au XVIIe siècle, à Paris et dans le sud-ouest
+de la France, pendant la guerre franco-espagnole. La pièce est inspirée de
+la vie réelle du dramaturge et épéiste français Savinien Cyrano de
+Bergerac, mais prend également des libertés pour créer une œuvre
+romantique et héroïque.
+
+### Résumé
+
+La pièce tourne autour de Cyrano de Bergerac, un homme exceptionnellement
+intelligent, poète et maître de l'épée. Il est connu pour son grand nez,
+qui le rend Complexé. Malgré cela, il a une confiance en soi inébranlable
+et une loyauté sans faille envers ses amis.
+
+Cyrano tombe amoureux de sa cousine, Roxane, mais il craint que son
+apparence physique, notamment son grand nez, le rende ridicule à ses yeux.
+Lorsque Christian de Neuvillette, un jeune et beau noble, arrive à Paris,
+Cyrano découvre que celui-ci est également amoureux de Roxane. Christian
+est maladroit avec les mots mais possède une beauté qui plaît à Roxane.
+
+Cyrano décide d'aider Christian à conquérir le cœur de Roxane en écrivant
+des lettres et des poèmes à sa place, lui permettant ainsi de séduire
+Roxane par la plume. Cependant, Roxane commence à se sentir attirée par
+l'esprit qui se cache derrière ces mots, sans savoir que c'est Cyrano qui
+les écrit.
+
+
+Au fil de l'histoire, Cyrano continue de soutenir Christian dans sa cour,
+même après leur mariage, tout en cachant son propre amour pour Roxane. La
+pièce atteint son point culminant lors d'une scène où Cyrano, blessé et
+mourant, récite une dernière fois les mots qu'il aurait aimé adresser à
+Roxane pendant des années.
+
+Finalement
+, Roxane découvre la vérité sur l'auteur des lettres et réalise
+trop tard son amour pour Cyrano. La pièce se termine sur la mort de
+Cyrano, entouré de ses amis et de Roxane, qui a compris trop tard le
+véritable amour qu'il lui portait.
+
+
+- **L'amour** :
+ Le thème principal, explorant les différents aspects de
+l'amour, de l'amour non partagé à l'amour égoïste.
+- **La beauté et la laideur** : Cyrano représente la beauté intérieure,
+tandis que Christian incarne la beauté physique.
+- **L'honneur et la loyauté** : Cyrano montre une loyauté inconditionnelle
+envers ses amis et son pays.
+
+"Cyrano de Bergerac" est considérée comme l'une des plus grandes pièces du
+théâtre français, célébrant l'amour, l'amitié et le courage avec élégance
+et humour. Elle a été adaptée à plusieurs reprises au cinéma et continue
+d'être jouée sur les scènes du monde entier.
+
+
 **************************************
 na@Server2cpu:~$ ollama show llava
   Model
@@ -233,6 +290,89 @@ Added image '/home/na/dev/git/electronoos/llama/guess.jpg'
 It appears to be a studio portrait of the lion, as indicated by the
 background that is not typical of a natural setting and gives the
 impression of a backdrop often used for photography.
+-----
+ollama run deepseek-coder:6.7b "12 * 483 = 5796. Quels sont les autres ? Donne moi aussi le code python"
+
+Bien sûr, je suis là pour vous aider. Voici un petit programme Python qui
+calcule toutes les multiples de 12 jusqu'à 483.
+
+```python
+for i in range(12, 484
+):
+    print(f"{i} * 483 = {i*483}")
+```
+
+Ce programme utilise une boucle `for` pour itérer sur tous les nombres
+entre 12 et 484. Pour chaque nombre, il calcule le produit du nombre avec
+483 et l'imprime dans la console. Le symbole de formattage f-string
+(`f""`) est utilisé pour intégrer des variables directement dans une
+chaîne de caractères.
+
+
+-----
+ollama run llama3.3:70B "12 * 483 = 5796. Quels sont les autres ? Donne moi aussi le code python"
+in screen) na@Server2cpu:~$ ollama run llama3.3:70B "12 * 483 = 5796. Quels son
+t les autres ? Donne moi aussi le code python"
+Il semble que vous cherchiez à trouver d'autres équations similaires à 12
+* 483 = 5796, où les chiffres de la réponse (5796) sont une permutation
+des chiffres des facteurs (12 et 483). C'est un problème classique qui
+peut être résolu en utilisant des algorithmes pour générer toutes les
+permutations possibles des facteurs et vérifier si le produit correspond à
+une permutation du résultat attendu.
+
+Voici un exemple de code Python qui pourrait être utilisé pour trouver
+d'autres exemples similaires :
+
+```python
+from itertools import permutations
+
+def trouve_permutations():
+    # Définition de la plage de nombres que l'on veut tester
+    for i in range(1, 1000):  # Vous pouvez ajuster cette plage selon vos
+besoins
+        for j in range(i+1, 1000):
+            produit = i * j
+            # Conversion des nombres en chaînes pour faciliter la
+comparaison
+            str_i = str(i)
+            str_j = str(j)
+            str_produit = str(produit)
+
+            # Vérification si les chiffres du produit sont une permutation
+des chiffres des facteurs
+            if sorted(str_i + str_j) == sorted(str_produit):
+                print(f"{i} * {j} = {produit}")
+
+trouve_exemples()
+```
+
+Ce code vérifie si les chiffres du produit d'un couple de nombres sont une
+permutation des chiffres de ces deux nombres, ce qui correspond plus
+étroitement à votre exemple initial. Vous pouvez ajuster la plage de
+nombres (`range`) selon vos besoins et la puissance de calcul disponible.
+Notez que l'exécution de ce code peut prendre un certain temps en raison
+du grand nombre d'opérations qu'il effectue.
+
+-----
+na@Server2cpu:~$ ollama run llama3:latest "12 * 483 = 5796. Quels sont les autres ?. Give me the python code to generate other"
+You're interested in finding more products of the form `12 * X = Y`, where
+`X` is an integer.
+
+Here's some Python code to help you with that:
+```python
+def find_products():
+    for x in range(1, 1000):  # adjust this limit as needed
+        y = 12 * x
+        if str(y) == str(x) + "3":  # check if the product has a similar
+structure
+            print(f"{x} * {12} = {y}")
+
+find_products()
+```
+This code will generate products of the form `12 * X ...
+
+---
+ollama run llama3.3:70B "genere moi une liste de paire de mot et de leur définition. Le format sera pour chaque ligne, un mot le caractere : puis sa définition. tout les mots doivent etre choisis dans le programme de NSI de premiere chapitre des collections et données en tables en python"
 
 
 

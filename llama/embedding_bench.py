@@ -67,31 +67,35 @@ def test_perf_embed( strModelName ):
 	return grand_total, duration, size_vector
 
 def run_bench():
-	# cf https://ollama.com/library?sort=newest
-	strModelToCompare = ["granite-embedding:30m", "granite-embedding:278m", "snowflake-arctic-embed2:568m", "snowflake-arctic-embed:335m",
-	"snowflake-arctic-embed:110m", "snowflake-arctic-embed:22m", "bge-large:335m", 
-	"paraphrase-multilingual:278m","bge-m3:567m", "nomic-embed-text","mxbai-embed-large:335m", "all-minilm:22m", "all-minilm:33m",
-	# "mistral-large:123b",   Require 73 GiB
-	"mistral-small:24b", 
-	# "r1-1776:671b", # model requires more system memory (444.5 GiB) than is available (61.3 GiB)
-	"openthinker:32b","olmo2:13b","olmo2:7b", "llama3.3:70B",
-	# "deepseek-r1:671b", # model requires more system memory (444.5 GiB)
-	"deepseek-r1:70b","deepseek-r1:8b", "deepseek-r1:1.5b",
-	"qwen2.5-coder:32b", "qwen2.5-coder:0.5b",
-	"olmo2:13b", "olmo2:7b","command-r7b:7b",
-	]
+    # cf https://ollama.com/library?sort=newest
+    strModelToCompare = ["granite-embedding:30m", "granite-embedding:278m", "snowflake-arctic-embed2:568m", "snowflake-arctic-embed:335m",
+    "snowflake-arctic-embed:110m", "snowflake-arctic-embed:22m", "bge-large:335m", 
+    "paraphrase-multilingual:278m","bge-m3:567m", "nomic-embed-text","mxbai-embed-large:335m", "all-minilm:22m", "all-minilm:33m",
+    # "mistral-large:123b",   Require 73 GiB
+    "mistral-small:24b", 
+    # "r1-1776:671b", # model requires more system memory (444.5 GiB) than is available (61.3 GiB)
+    "openthinker:32b","olmo2:13b","olmo2:7b", "llama3.3:70B",
+    # "deepseek-r1:671b", # model requires more system memory (444.5 GiB)
+    "deepseek-r1:70b","deepseek-r1:8b", "deepseek-r1:1.5b",
+    "qwen2.5-coder:32b", "qwen2.5-coder:0.5b",
+    "olmo2:13b", "olmo2:7b","command-r7b:7b",
+    ]
+    
+    # test juste une seule
+    strModelToCompare = ["paraphrase-multilingual:278m"]
 
-	conclusion = []
-	for mod in strModelToCompare:
-		ret = test_perf_embed( mod )
-		conclusion.append( (mod,*ret) )
-		
-	conclusion = sorted( conclusion, key = lambda x: x[1], reverse = True )
-		
-	print( "" )
-	for mod,perf,t,size in conclusion:
-		print( "%s: %.2f, %.2fs, %d" % (mod,perf,t,size) )
-		
+
+    conclusion = []
+    for mod in strModelToCompare:
+        ret = test_perf_embed( mod )
+        conclusion.append( (mod,*ret) )
+        
+    conclusion = sorted( conclusion, key = lambda x: x[1], reverse = True )
+        
+    print( "" )
+    for mod,perf,t,size in conclusion:
+        print( "%s: %.2f, %.2fs, %d" % (mod,perf,t,size) )
+        
 run_bench()
 
 """
@@ -130,5 +134,33 @@ qwen2.5-coder:32b: -4.94, 177.42s, 5120
 qwen2.5-coder:0.5b: -6.03, 8.08s, 896
 openthinker:32b: -6.32, 71.69s, 5120
 deepseek-r1:70b: -14.00, 16.15s, 2
+
+# ajout de j'ai soif
+paraphrase-multilingual:278m: 7.16, 2.17s, 768
+mxbai-embed-large:335m: 6.06, 2.51s, 1024
+granite-embedding:278m: 2.43, 0.34s, 768
+nomic-embed-text: 1.79, 1.20s, 768
+bge-large:335m: 1.65, 2.50s, 1024
+granite-embedding:30m: 1.59, 0.68s, 384
+bge-m3:567m: 0.61, 3.78s, 1024
+all-minilm:33m: 0.53, 0.42s, 384
+snowflake-arctic-embed:335m: 0.18, 2.49s, 1024
+snowflake-arctic-embed2:568m: -0.73, 4.52s, 1024
+all-minilm:22m: -1.30, 0.37s, 384
+olmo2:7b: -4.04, 18.55s, 4096
+olmo2:7b: -4.04, 18.16s, 4096
+deepseek-r1:8b: -4.97, 20.22s, 4096
+snowflake-arctic-embed:22m: -5.28, 0.37s, 384
+command-r7b:7b: -5.35, 21.58s, 4096
+llama3.3:70B: -6.05, 169.22s, 8192
+deepseek-r1:1.5b: -7.27, 6.72s, 1536
+snowflake-arctic-embed:110m: -7.39, 0.88s, 768
+olmo2:13b: -7.62, 25.33s, 5120
+olmo2:13b: -7.62, 32.10s, 5120
+mistral-small:24b: -7.90, 50.22s, 5120
+openthinker:32b: -10.75, 40.85s, 5120
+qwen2.5-coder:0.5b: -12.35, 2.55s, 896
+qwen2.5-coder:32b: -13.58, 74.47s, 5120
+deepseek-r1:70b: -18.00, 19.44s, 2
 
 """

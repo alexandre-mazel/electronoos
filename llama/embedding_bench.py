@@ -5,16 +5,17 @@ import time
 from embedtools import *
 
 dictSentencesTuples = {
-	"J'ai faim": ("Je souhaiterai me sustenter", "y a til un restauran dans coin?" ),
-	"J'ai envie de faire pipi!":  ("ou sont les toilettes?", "ou se trouve les ptit coin"),
-	"Qui est le président de la france?": ( "Miterrand a été le président de la france entre 1981 et 1995", "Macron dirige notre pays a ce jour"),
-	"Qui est le président des états unis?": ( "Trump is the american president", "Trump est le président americain"),
-	"Je veux faire de l'internet": ( "Vous pouvez vous connecter sur notre réseau", "Le code du wifi est 123"),
-	"J'ai 2 enfants": ( "J'ai un fils et une fille", "Mon grand s'appelle Corto et ma petite gaia"),
-	"My best friend is nammed niko": ("niko is my best pal", "I've got one BFF"),
-	"It's raining": ("there's no sun in the sky", "take an umbrella!"),
-	"I like to code": ("I'm fan of computer programming", "My passion is python"),
-	"Je suis fatigué": ("chuis crevé", "I'm exhausted"),
+    "J'ai faim": ("Je souhaiterai me sustenter", "y a til un restauran dans coin?" ),
+    "J'ai envie de faire pipi!":  ("ou sont les toilettes?", "ou se trouve les ptit coin"),
+    "Qui est le président de la france?": ( "Miterrand a été le président de la france entre 1981 et 1995", "Macron dirige notre pays a ce jour"),
+    "Qui est le président des états unis?": ( "Trump is the american president", "Trump est le président americain"),
+    "Je veux faire de l'internet": ( "Vous pouvez vous connecter sur notre réseau", "Le code du wifi est 123"),
+    "J'ai 2 enfants": ( "J'ai un fils et une fille", "Mon grand s'appelle Corto et ma petite gaia"),
+    "My best friend is nammed niko": ("niko is my best pal", "I've got one BFF"),
+    "It's raining": ("there's no sun in the sky", "take an umbrella!"),
+    "I like to code": ("I'm fan of computer programming", "My passion is python"),
+    "Je suis fatigué": ("chuis crevé", "I'm exhausted"),
+    "J'ai soif": ("j'ai la gorge séche!", "I'm thirsty"),
 }
 
 def test_perf_embed( strModelName ):
@@ -102,4 +103,32 @@ granite-embedding:30m: 3.15, 0.65s
 granite-embedding:278m: 2.32, 1.11s
 bge-m3: 2.02, 1.59s
 snowflake-arctic-embed2: 0.57, 1.85s
+
+paraphrase-multilingual:278m: 9.15, 1.11s, 768
+mxbai-embed-large:335m: 7.54, 2.35s, 1024
+nomic-embed-text: 5.40, 0.63s, 768
+bge-large:335m: 4.84, 1.13s, 1024
+granite-embedding:278m: 4.00, 1.36s, 768
+granite-embedding:30m: 3.43, 0.59s, 384
+all-minilm:33m: 3.00, 0.39s, 384
+bge-m3:567m: 2.31, 2.13s, 1024
+snowflake-arctic-embed:335m: 2.00, 1.11s, 1024
+all-minilm:22m: 1.79, 0.35s, 384
+snowflake-arctic-embed:110m: 1.49, 0.56s, 768
+snowflake-arctic-embed2:568m: 0.98, 3.31s, 1024
+command-r7b:7b: 0.16, 29.50s, 4096
+deepseek-r1:8b: -1.29, 30.55s, 4096
+olmo2:7b: -2.22, 16.29s, 4096
+olmo2:7b: -2.22, 16.21s, 4096
+mistral-small:24b: -2.53, 47.98s, 5120
+llama3.3:70B: -2.67, 159.01s, 8192
+snowflake-arctic-embed:22m: -3.27, 0.35s, 384
+deepseek-r1:1.5b: -3.34, 10.06s, 1536
+olmo2:13b: -4.01, 30.84s, 5120
+olmo2:13b: -4.01, 30.01s, 5120
+qwen2.5-coder:32b: -4.94, 177.42s, 5120
+qwen2.5-coder:0.5b: -6.03, 8.08s, 896
+openthinker:32b: -6.32, 71.69s, 5120
+deepseek-r1:70b: -14.00, 16.15s, 2
+
 """

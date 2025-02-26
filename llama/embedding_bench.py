@@ -50,7 +50,7 @@ def test_perf_embed( strModelName ):
 			simi = compare_two_vect( v1,v2 )/coef_normalise
 			res.append( (s2, simi) )
 		res = sorted( res, key = lambda x: x[1], reverse = True )
-		print( "%s => %s" % ( question, str(res) ) )
+		print( "%s => %s" % ( question, str(res[:4]) ) )
 		# compute score:
 		nbr_good_solution = len( dictSentencesTuples[question] )
 		# somme des n premiers (avec n = nbr_good_solution) si c'est un bon, on ajoute les points sinon on retranche
@@ -162,5 +162,8 @@ openthinker:32b: -10.75, 40.85s, 5120
 qwen2.5-coder:0.5b: -12.35, 2.55s, 896
 qwen2.5-coder:32b: -13.58, 74.47s, 5120
 deepseek-r1:70b: -18.00, 19.44s, 2
+
+Meme sur paraphrase-multilingual:278m:
+J'ai soif => [("I'm thirsty", 1.2155130592654564), ("I'm exhausted", 0.5298759541063871), ("j'ai la gorge séche!", 0.4518681150264819), 
 
 """

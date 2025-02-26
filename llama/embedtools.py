@@ -76,7 +76,11 @@ def llama3_embedding(text, strModel ):
         if "not found" in err or "try pulling" in err:
             print( "INF: llama3_embedding: Downloading model '%s'" % strModel )
             os.system( "ollama pull %s" % strModel )
-            out  = ollama.embeddings( model=strModel, prompt=text )
+            try:
+                out  = ollama.embeddings( model=strModel, prompt=text )
+            except Exception as err:
+                print( "WRN: llama3_embedding '%s': error occurs (2): %s" % (strModel, err)  )
+                return [1.,0.] # histoire d'avoir un truc qui ressemble a un vecteur un peu pourri
     #~ print(out)
     return out['embedding']
     

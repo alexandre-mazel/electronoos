@@ -14,18 +14,21 @@ dictSentencesTuples = {
 	"My best friend is nammed niko": ("niko is my best pal", "I've got one BFF"),
 	"It's raining": ("there's no sun in the sky", "take an umbrella!"),
 	"I like to code": ("I'm fan of computer programming", "My passion is python"),
+	"Je suis fatigué": ("chuis crevé", "I'm exhausted"),
 }
 
 def test_perf_embed( strModelName ):
 	"""
-	return results of one model
+	return results of one model:
+	note, duration, size of model
 	"""
 	time_begin = time.time()
 	print( "" )
 	computeMaximum( strModelName )
 	coef_normalise = getNormalisation( strModelName )
 	dummy = llama3_embedding( "text", strModelName )
-	print( "INF: test_perf_embed: model '%s' has size %d" % ( strModelName, len( dummy ) ) )
+	size_vector = len( dummy )
+	print( "INF: test_perf_embed: model '%s' has size %d" % ( strModelName, size_vector ) )
 	
 	# for each sentence its vector
 	listQuestion = []
@@ -60,7 +63,7 @@ def test_perf_embed( strModelName ):
 		grand_total += tot
 	duration = time.time() - time_begin
 	print( "grand_total: %.2f (%.2fs)" % ( grand_total, duration ) )
-	return grand_total, duration
+	return grand_total, duration, size_vector
 
 def run_bench():
 	# cf https://ollama.com/library?sort=newest
@@ -71,7 +74,8 @@ def run_bench():
 	"mistral-small:24b", 
 	# "r1-1776:671b", # model requires more system memory (444.5 GiB) than is available (61.3 GiB)
 	"openthinker:32b","olmo2:13b","olmo2:7b", "llama3.3:70B",
-	"deepseek-r1:671b", "deepseek-r1:70b","deepseek-r1:8b", "deepseek-r1:1.5b",
+	# "deepseek-r1:671b", # model requires more system memory (444.5 GiB)
+	"deepseek-r1:70b","deepseek-r1:8b", "deepseek-r1:1.5b",
 	"qwen2.5-coder:32b", "qwen2.5-coder:0.5b",
 	"olmo2:13b", "olmo2:7b","command-r7b:7b",
 	]
@@ -84,8 +88,8 @@ def run_bench():
 	conclusion = sorted( conclusion, key = lambda x: x[1], reverse = True )
 		
 	print( "" )
-	for mod,perf,t in conclusion:
-		print( "%s: %.2f, %.2fs" % (mod,perf,t) )
+	for mod,perf,t,size in conclusion:
+		print( "%s: %.2f, %.2fs, %d" % (mod,perf,t,size) )
 		
 run_bench()
 

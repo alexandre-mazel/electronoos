@@ -163,7 +163,33 @@ qwen2.5-coder:0.5b: -12.35, 2.55s, 896
 qwen2.5-coder:32b: -13.58, 74.47s, 5120
 deepseek-r1:70b: -18.00, 19.44s, 2
 
-Meme sur paraphrase-multilingual:278m:
-J'ai soif => [("I'm thirsty", 1.2155130592654564), ("I'm exhausted", 0.5298759541063871), ("j'ai la gorge séche!", 0.4518681150264819), 
+Meme sur paraphrase-multilingual:278m s'en sort pas trop sur j'ai soif:
+
+'J'ai froid'  and  'je me caille'  => 2.8595345530512675
+'I'm hungry'  and  'I'm starving'  => 8.466821471644218
+INF: test_perf_embed: model 'paraphrase-multilingual:278m' has size 768
+J'ai faim => [("I'm thirsty", 0.7923809705956506), ("I'm exhausted", 0.4834252014032695), ("j'ai la gorge séche!", 0.4214443468861655), ('y a til un restauran dans coin?', 0.4097194857729548)]
+tot: -1.276
+J'ai envie de faire pipi! => [("I'm thirsty", 0.6244056071941099), ('ou sont les toilettes?', 0.5259703783277306), ("I'm exhausted", 0.5194781354631381), ("j'ai la gorge séche!", 0.5023622428982034)]
+tot: -0.098
+Qui est le président de la france? => [('Miterrand a été le président de la france entre 1981 et 1995', 0.7446398305010291), ('Macron dirige notre pays a ce jour', 0.6515631185364261), ('Trump is the american president', 0.535406211748082), ('Trump est le président americain', 0.48915112992921356)]
+tot: 1.396
+Qui est le président des états unis? => [('Trump is the american president', 0.7493338340572933), ('Trump est le président americain', 0.6626388286772472), ('Macron dirige notre pays a ce jour', 0.3752802905838617), ('Miterrand a été le président de la france entre 1981 et 1995', 0.29201365479951824)]
+tot: 1.412
+Je veux faire de l'internet => [("I'm fan of computer programming", 0.518464281114967), ('Vous pouvez vous connecter sur notre réseau', 0.465968238648577), ('My passion is python', 0.30708735485375516), ("J'ai un fils et une fille", 0.26489765983253605)]
+tot: -0.052
+J'ai 2 enfants => [("J'ai un fils et une fille", 1.0169074593232685), ("Mon grand s'appelle Corto et ma petite gaia", 0.527087481403709), ("I've got one BFF", 0.4947460129958295), ("I'm exhausted", 0.42109624763046904)]
+tot: 1.544
+My best friend is nammed niko => [('niko is my best pal', 0.975828244601806), ("I've got one BFF", 0.45576643946085293), ("Mon grand s'appelle Corto et ma petite gaia", 0.378871708115092), ("J'ai un fils et une fille", 0.34977433746330305)]
+tot: 1.432
+It's raining => [('take an umbrella!', 0.7901310156989527), ("I'm thirsty", 0.48560923450108584), ("there's no sun in the sky", 0.39440805703970094), ("I'm exhausted", 0.286574000086776)]
+tot: 0.305
+I like to code => [("I'm fan of computer programming", 0.8877951140351171), ('My passion is python', 0.46945351077507935), ('Vous pouvez vous connecter sur notre réseau', 0.2988296985040168), ("J'ai un fils et une fille", 0.2611301787046304)]
+tot: 1.357
+Je suis fatigué => [("I'm exhausted", 1.0559149382119863), ("I'm thirsty", 0.6031465687296327), ("j'ai la gorge séche!", 0.5009767737447337), ("J'ai un fils et une fille", 0.36833398358574476)]
+tot: 0.453
+J'ai soif => [("I'm thirsty", 1.2155130592654564), ("I'm exhausted", 0.5298759541063871), ("j'ai la gorge séche!", 0.4518681150264819), ('ou sont les toilettes?', 0.38879305816375886)]
+tot: 0.686
+grand_total: 7.16 (0.58s)
 
 """

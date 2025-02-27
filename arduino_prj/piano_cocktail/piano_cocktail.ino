@@ -55,14 +55,15 @@ HX711 scale;
 
 // reglage pour barre de 3kg:
 
-float calibration_factor = 673.86; // 30g => 22000: 733 [une bouteille vide (celle de blanc orschwiller) peserait 448g; le plateau en fer 352g]
+float calibration_factor = 742.80; // 30g => 22000: 733 [une bouteille vide (celle de blanc orschwiller) peserait 448g; le plateau en fer 352g]
 // will be overwritten by EEPROM reading (so I put 100 to remember and test), to write it goto readCfgFromEeproom
 
 // la balance dans le sous sol: 733
 // balance a ochateau, section 1: 733 => 929 au lieu de 1030,cad la bonne valeur est entre 660 et 661 => 661
 // balance du oversized: 661 => 1140 au lieu de 1030/1036, mettre entre 727 et 732 => mettre 729
 
-// Balance numero 5 (futur nouvel assembleur 1): 673.86
+// Balance numero 4 (futur nouvel assembleur B): 742.80
+// Balance numero 5 (futur nouvel assembleur A): 673.86
 
 float old_calibration_factor = calibration_factor;
 

@@ -51,6 +51,8 @@ unsigned long fpsTimeLast = 0;
 #define dirPin3 43 //direction
 #define stepPin3 45 //step-pulse
 
+#define pin_switchContact 50
+
 
 void countFps()
 {
@@ -126,7 +128,7 @@ void setup()
 {
   Serial.begin(57600);
   Serial.println("");
-  Serial.println("Receive Command v0.6");
+  Serial.println("Bobin Filler v0.6");
 
   SERIAL_ORDER.begin(57600);
   
@@ -136,6 +138,8 @@ void setup()
   steppersDriver.setup(1,enaPin2,dirPin2,stepPin2,nStepPerRevolution);
   steppersDriver.setup(2,enaPin3,dirPin3,stepPin3,nStepPerRevolution);
   steppersDriver.initPins();
+
+  pinMode( pin_switchContact, INPUT );  
 }
 
 int isIntChar(const char c)
@@ -329,6 +333,11 @@ void sendSerialCommand(const char * msg)
   //Serial.println(millis());
 }
 
+const int kPhaseInit = 0;       // what we do first
+const int kPhasePutToGuide = 1; // first put the guide to the push contact button
+const int kPhaseFill = 2;
+int nPhase = kPhaseInit; // phase
+
 long int nPrevNumEvent = -1;
 long int nCptBeforeNextEvent = -1;
 char szNextCommand[256];
@@ -339,33 +348,53 @@ void loop()
   //countFps();
   //delay(1);
 
-  long int nNumEvent = millis() / 1100;
-  if( nPrevNumEvent != nNumEvent )
+  if( nPhase == kPhaseInit )
   {
-    nPrevNumEvent = nNumEvent;
-    Serial.print( "nNumEvent: " ); Serial.println( nNumEvent );
-
-    handleOrder( "##MOTOR_1_1_100" );
-
-    if( nNumEvent % 2 == 0 )
+    handleOrder( "##MOTOR_1_1_240" ); // start the motor to the bumper
+    nPhase = kPhasePutToGuide;
+  }
+  else if( nPhase == kPhasePutToGuide )
+  {
+    int nPushed = digitalRead( pin_switchContact );
+    Serial.print( "INF: current push button: " ); Serial.println( nPushed );
+    if( nPushed )
     {
-      handleOrder( "##MOTOR_0_0_0" );
-      strcpy( szNextCommand, "##MOTOR_0_1_380" );
-      nCptBeforeNextEvent = 1000;
-    }
-    else
-    {
-      handleOrder( "##MOTOR_0_0_0" );
-      strcpy( szNextCommand, "##MOTOR_0_-1_380" );
-      nCptBeforeNextEvent = 1000;
+      handleOrder( "##MOTOR_1_0_0" );
+      nPhase = kPhaseFill;
     }
   }
-  if( nCptBeforeNextEvent >  0 )
+  else
   {
-    --nCptBeforeNextEvent;
-    if( nCptBeforeNextEvent == 0 )
+    return;
+
+    long int nNumEvent = millis() / 1100;
+    if( nPrevNumEvent != nNumEvent )
     {
-      handleOrder( szNextCommand );
+      nPrevNumEvent = nNumEvent;
+      Serial.print( "nNumEvent: " ); Serial.println( nNumEvent );
+
+      handleOrder( "##MOTOR_1_1_100" );
+
+      if( nNumEvent % 2 == 0 )
+      {
+        handleOrder( "##MOTOR_0_0_0" );
+        strcpy( szNextCommand, "##MOTOR_0_1_380" );
+        nCptBeforeNextEvent = 1000;
+      }
+      else
+      {
+        handleOrder( "##MOTOR_0_0_0" );
+        strcpy( szNextCommand, "##MOTOR_0_-1_380" );
+        nCptBeforeNextEvent = 1000;
+      }
     }
-  }
+    if( nCptBeforeNextEvent >  0 )
+    {
+      --nCptBeforeNextEvent;
+      if( nCptBeforeNextEvent == 0 )
+      {
+        handleOrder( szNextCommand );
+      }
+    }
+  } // else case
 }

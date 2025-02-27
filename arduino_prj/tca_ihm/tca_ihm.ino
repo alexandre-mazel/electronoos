@@ -223,9 +223,9 @@ float * aprLimitArray[] = {&rNbrTwistLimit,&rNbrCollectLimit,&rNbrSpoolLimit};
 int * apnSpeedArray[] = {&nNbrTwistSpeed,&nNbrCollectSpeed,&nNbrSpoolSpeed};
 int * apnDirArray[] = {&nTwistDir,&nCollectDir,&nSpoolDir};
 // Switch routing
-int   anSwIndex[] = {1, 0, 2, 3}; // order is turbo, select, +, -
+int   anSwIndex[] = {2, 0, 1, 3}; // order is turbo, select, +, -
 // TriSwich routing
-int   anTriSwIndex[] = {2,1,0}; // how ordered are the triswitch compared to the motor number, anTriIndex[2] = 0 => the third tri switch is related to the twisting motor
+int   anTriSwIndex[] = {2,0,1}; // how ordered are the triswitch compared to the motor number, anTriIndex[2] = 0 => the third tri switch is related to the twisting motor
 int   anTriSwInverted[] = {-1,1,1}; // invert direction (miscabled) anTriSwInverted[0] = -1: the first switch is reverted
 
 int nNumLineEdited = 3;

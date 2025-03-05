@@ -67,6 +67,8 @@ nav:
           #~ - TP1 - Les données EXIF: nsi1re/11-dictionnaires/tp1-donnees-exif.md
           #~ - TP2 - Compteur de mots: nsi1re/11-dictionnaires/tp2-compteur-mots.md
           #~ - TP3 - Format JSON: nsi1re/11-dictionnaires/tp3-format-json.md
+      - Chapitre 8 - Languages:
+          - TP1 - Assembleur: nsi1re/08-languages/tp1-assembleur1.md
       - Chapitre 12 - Données en table:
           #~ - Cours: nsi1re/12-tables/cours.md
           - Fichiers CSV: nsi1re/12-tables/csv.md

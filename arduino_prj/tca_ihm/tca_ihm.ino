@@ -13,6 +13,8 @@
 
 #define NBR_MOTORS  3
 
+#define PIN_DIST_IR 8 // 8 is for D8
+
 
 #include <LiquidCrystal_I2C.h>
 
@@ -104,6 +106,8 @@ void setup()
 
   pLcd->init();                // initialize the lcd
   pLcd->backlight();           // Turn on backlight // sans eclairage on voit rien...
+
+  pinMode( PIN_DIST_IR, INPUT );
   
   Serial2.begin(57600);
 
@@ -202,6 +206,44 @@ void lcdPrint(float r)
   
 }
 
+int16_t avg_dist = 0;
+
+int16_t get_dist_ir( const int nPin )
+{
+  int16_t t = pulseIn(nPin, HIGH);
+ 
+  if (t == 0)
+  {
+    // pulseIn() did not detect the start of a pulse within 1 second.
+    Serial.println("timeout");
+    return -1;
+  }
+
+  if (t > 1850)
+  {
+    // No detection.
+    Serial.println(-1);
+    return -1;
+  }
+
+  // Valid pulse width reading. Convert pulse width in microseconds to distance in millimeters.
+  int16_t dist = (t - 1000) * 4;
+
+  // Limit minimum distance to 0.
+  if (dist < 0) { dist = 0; }
+
+  // cf pololu_dist_IR for explaination
+
+  //dist = (dist + 28.416 ) / 1.7241;
+  dist = (dist + 2 ) / 1.70; // based on pololu_distance_measurement_reglin.py en s'arretant a 700 (inclus)
+  //dist = (dist + 20 ) / 1.77; // based on pololu_distance_measurement_reglin.py en s'arretant a 600 (inclus) (moins bon pour 100 mais meilleur pour les autres)
+
+
+  avg_dist = ( avg_dist * 5 + dist * 1 ) / 6; // a 130cm de max, ca fait 1300mm, donc en max pour ne pas depasser int16, il ne faut pas filtrer a plus de 24
+
+  return avg_dist;
+}
+
 float rNbrTwist = 0;
 float rNbrTwistLimit = 1000;
 int nNbrTwistSpeed = 500;
@@ -217,8 +259,11 @@ float rNbrSpoolLimit = 1000;
 int nNbrSpoolSpeed = 100;
 int nSpoolDir = 0;
 
+float dist_slider_min = 100; // could be int, but all settings functions are taking float
+float dist_slider_max = 750;
+
 // array of pointer to help algorithm and settings
-float * aprPosArray[] = {&rNbrTwist,&rNbrCollect,&rNbrSpool};
+float * aprPosArray[] = {&rNbrTwist,&rNbrCollect,&rNbrSpool,&dist_slider_min,&dist_slider_max};
 float * aprLimitArray[] = {&rNbrTwistLimit,&rNbrCollectLimit,&rNbrSpoolLimit};
 int * apnSpeedArray[] = {&nNbrTwistSpeed,&nNbrCollectSpeed,&nNbrSpoolSpeed};
 int * apnDirArray[] = {&nTwistDir,&nCollectDir,&nSpoolDir};
@@ -367,6 +412,8 @@ void loop()
     }
   }
 
+  int16_t dist_slider = get_dist_ir(PIN_DIST_IR);
+
   memcpy(anPrevReadValues,anReadValues,sizeof(anPrevReadValues));
 
 
@@ -432,29 +479,40 @@ void loop()
     pLcd->setCursor(0, 0);
     pLcd->print("Twi ");
     lcdPrint(rNbrTwist);
-    pLcd->print("/");
-    lcdPrint(rNbrTwistLimit);
+    // pLcd->print("/");
+    // lcdPrint(rNbrTwistLimit);
     pLcd->print("");
     lcdPrint(nNbrTwistSpeed);
-    pLcd->print("rm");
+    pLcd->print("r"); // rpm
+
+    lcdPrint(dist_slider);
+    pLcd->print("mm");
+
 
     pLcd->setCursor(0, 1);
     pLcd->print("Col ");
     lcdPrint(rNbrCollect);
-    pLcd->print("/");
-    lcdPrint(rNbrCollectLimit);
+    // pLcd->print("/");
+    // lcdPrint(rNbrCollectLimit);
     pLcd->print("");
     lcdPrint(nNbrCollectSpeed);
-    pLcd->print("rm");
+    pLcd->print("r");
+
+    lcdPrint(dist_slider_min);
+    pLcd->print("mm");
 
     pLcd->setCursor(0, 2);
     pLcd->print("Spo ");
     lcdPrint(rNbrSpool);
-    pLcd->print("/");
-    lcdPrint(rNbrSpoolLimit);
+    // pLcd->print("/");
+    // lcdPrint(rNbrSpoolLimit);
     pLcd->print("");
     lcdPrint(nNbrSpoolSpeed);
-    pLcd->print("rm");
+    pLcd->print("r");
+
+
+    lcdPrint(dist_slider_max);
+    pLcd->print("mm");
 
     for(int i = 0; i < 4; ++i )
     {

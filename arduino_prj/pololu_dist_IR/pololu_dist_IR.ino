@@ -1,10 +1,10 @@
-const int pin_IR = 8; // 8 is for D8
+#define PIN_DIST_IR 8 // 8 is for D8
 
 void setup()
 {
   Serial.begin(115200);
   Serial.println("Pololu dist IR: begin");
-  pinMode(pin_IR, INPUT);
+  pinMode( PIN_DIST_IR, INPUT );
 }
 
 int16_t avg_dist = 0;
@@ -13,7 +13,7 @@ long int time_last_output = 0;
 
 int16_t get_dist_ir( const int nPin )
 {
-  int16_t t = pulseIn(nPin, HIGH);
+  int16_t t = pulseIn( nPin, HIGH );
  
   if (t == 0)
   {
@@ -45,7 +45,7 @@ int16_t get_dist_ir( const int nPin )
   //dist = (dist + 20 ) / 1.77; // based on pololu_distance_measurement_reglin.py en s'arretant a 600 (inclus) (moins bon pour 100 mais meilleur pour les autres)
 
 
-  avg_dist = ( avg_dist * 19 + dist * 1 ) / 20; // a 130cm de max, ca fait 1300mm, donc en max pour ne pas depasser int16, il ne faut pas filter a plus de 24
+  avg_dist = ( avg_dist * 19 + dist * 1 ) / 20; // a 130cm de max, ca fait 1300mm, donc en max pour ne pas depasser int16, il ne faut pas filtrer a plus de 24
 
 
   if( millis()-time_last_output > 1000 )
@@ -64,7 +64,7 @@ int16_t get_dist_ir( const int nPin )
 void loop()
 {
 
-  get_dist_ir( pin_IR );
+  get_dist_ir( PIN_DIST_IR );
 
   delay(10); // 10 => 100 Hz (le capteur est a 100 Hz minimum)
 }

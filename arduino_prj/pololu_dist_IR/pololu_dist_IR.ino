@@ -32,7 +32,15 @@ void loop()
     // Limit minimum distance to 0.
     if (dist < 0) { dist = 0; }
 
-    avg_dist = ( avg_dist * 9 + dist * 1 ) / 10;
+    // NB: le capteur a 6-7 mm d'epaisseur avec son socle. 
+    // mesure brute: different objet a 100mm: boite bleue jlpcb: 144 mm, piece support stepper imprimée en noire: 144, feuille de papier: 160.
+    // mesure brute: avec boite bleue jlpcb: 100mm => 144mm; 200 => 332; 300 => 526; 400 => 698; 500 => 873; 600 => 1024; 700 => 1156; 800 => 1269; 900 => 1204
+
+    // soit apres recalibration:
+    dist = (dist + 28.416 ) / 1.7241;
+
+
+    avg_dist = ( avg_dist * 19 + dist * 1 ) / 20; // a 130cm de max, ca fait 1300mm, donc en max pour ne pas depasser int16, il ne faut pas filter a plus de 24
   
 
     if( millis()-time_last_output > 1000 )
@@ -40,11 +48,11 @@ void loop()
       time_last_output = millis();
       Serial.print( "dist: " );
       Serial.print( dist );
-      Serial.print( ", avg_dist: " ); // NB: le capteur a 6-7 mm d'epaisseur avec son socle. mesure brute: 100mm => 144mm
+      Serial.print( ", avg_dist: " );
       Serial.print( avg_dist );
       Serial.println(" mm");
     }
   }
 
-  delay(1);
+  delay(10); // 10 => 100 Hz (le capteur est a 100 Hz minimum)
 }

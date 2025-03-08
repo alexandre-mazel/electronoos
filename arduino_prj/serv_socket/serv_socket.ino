@@ -1,6 +1,7 @@
 #include <arduino.h>
 #include "wifi_network.hpp" // lien symbolique vers le hpp ( creer en lancant un cmd en mode administrateur et la commande: mklink wifi_network.cpp ..\test_socket\wifi_network.cpp )
 #include "misbkit.hpp"
+#include "dynamixel_motor.hpp"
 
 const int ledPin = 13;
 
@@ -194,6 +195,9 @@ void setup()
 
 
   start_server();
+
+  // init motor
+  scanMotors();
 }
 
 

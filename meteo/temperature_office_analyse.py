@@ -417,7 +417,7 @@ if __name__ == "__main__":
         
         if 1:
             # all temp !
-            datas_of_interest = [("MisBKit3","temp"),("MisBKit4","temp"),("MisBKit4","temp2"),("MisBKit5","temp10"),("MisBKit5","temp11")]
+            datas_of_interest = [("MisBKit3","temp"),("MisBKit4","temp"),("MisBKit4","temp2"),("MisBKit5","temp10"),("MisBKit5","temp11"),("ESP32_C01","temp10"),("ESP32_C01","temp11")]
             strFilename = "data/office_temperature.txt"
             added_datas = decode_file_sonde(strFilename)
             datas.update(added_datas)

@@ -350,22 +350,22 @@ void loop()
 
   if( nPhase == kPhaseInit )
   {
-    handleOrder( "##MOTOR_1_1_240" ); // start the motor to the bumper
+    handleOrder( "##MOTOR_0_1_380" ); // start the motor to the bumper
     nPhase = kPhasePutToGuide;
   }
   else if( nPhase == kPhasePutToGuide )
   {
     int nPushed = digitalRead( pin_switchContact );
-    Serial.print( "INF: current push button: " ); Serial.println( nPushed );
+    //Serial.print( "INF: current push button: " ); Serial.println( nPushed ); // don't serial while driving motor !
     if( nPushed )
     {
-      handleOrder( "##MOTOR_1_0_0" );
+      handleOrder( "##MOTOR_0_0_0" );
       nPhase = kPhaseFill;
     }
   }
   else
   {
-    return;
+    //return;
 
     long int nNumEvent = millis() / 1100;
     if( nPrevNumEvent != nNumEvent )
@@ -378,13 +378,13 @@ void loop()
       if( nNumEvent % 2 == 0 )
       {
         handleOrder( "##MOTOR_0_0_0" );
-        strcpy( szNextCommand, "##MOTOR_0_1_380" );
+        strcpy( szNextCommand, "##MOTOR_0_-1_380" );
         nCptBeforeNextEvent = 1000;
       }
       else
       {
         handleOrder( "##MOTOR_0_0_0" );
-        strcpy( szNextCommand, "##MOTOR_0_-1_380" );
+        strcpy( szNextCommand, "##MOTOR_0_1_380" );
         nCptBeforeNextEvent = 1000;
       }
     }

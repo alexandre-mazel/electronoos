@@ -439,4 +439,4 @@ if __name__ == "__main__":
             datas.update(added_datas)
             datas_of_interest = [("Le Kremlin-Bicetre","temp"),("ESP32_C01","temp10"),("ESP32_C01","temp11") ]
 
-            temperature_office_analyse.render_all_datas(datas,y,m,d-4, sameGraphList = datas_of_interest)
+            temperature_office_analyse.render_all_datas(datas,y,m,d-3, sameGraphList = datas_of_interest)

@@ -126,5 +126,5 @@ NB: en redressant l'ordi ca fonctionne moins bien
 
 # scan for best channel automatic ?
 # led qui dit connect et recois un paquet (clignote)
-# lcd pour afficher l'ordi connecté :)
+# lcd pour afficher l'ordi connecte :)
 # bien d'etre seul a pouvoir se connecter!

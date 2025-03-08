@@ -1,7 +1,7 @@
 #include <FastLED.h> // FastLed Neopixel by David Madison and FastLed 3.9.8
 
-#define NUM_LEDS 60 // number of led present in your strip
-#define DATA_PIN 53 // digital pin of your arduino
+#define NUM_LEDS 16 // number of led present in your strip
+#define DATA_PIN 45 // digital pin of your arduino
 
 CRGB leds[NUM_LEDS];
 
@@ -152,8 +152,24 @@ void beat(int nBpm)
   delay(nDelay-nTimeToSend);
 }
 
+void full_on()
+{
+  Serial.println( "leds: fill_on");
+  for(int dot = 0;dot < NUM_LEDS; dot++)
+  { 
+    leds[dot] = CRGB::White;
+  }
+  FastLED.show();
+}
+
 void loop()
 { 
+  if( 1 )
+  {
+    full_on();
+    delay(1000);
+    return;
+  }
   for(int i = 10; i < 10; ++i )
   {
     chaser(10);

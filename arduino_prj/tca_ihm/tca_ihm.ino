@@ -267,6 +267,10 @@ void loop()
       }
       else
       {
+        if( bTurboIsOn ) // no change of speed when turbo is on (prevent bug: turbo is disabled by spurious potar change)
+        {
+          continue;
+        }
         *(apnSpeedArray[i]) = (int)( (anReadValues[i] *256L) / 1023); // put less to have more precision (was 20L)
       }
       if(*apnDirArray[i] != 0)

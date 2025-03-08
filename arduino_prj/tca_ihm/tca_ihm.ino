@@ -422,7 +422,7 @@ void loop()
   if((nNbrFrame%20)==0)
   //if(0)
   {
-    // debug
+    // debug buttons and potars
     Serial.print("DBG: values: ");
     for( int i = 0; i < NBR_SENSORS; ++i )
     {
@@ -445,6 +445,21 @@ void loop()
       Serial.print(anReadValues[i]);
       Serial.print(", ");
     }
+    Serial.println("");
+  }
+
+  if((nNbrFrame%20)==0)
+  //if(0)
+  {
+    // debug nbr turn and dist
+    Serial.print("DBG: pos motor: ");
+    for( int nMotor = 0; nMotor < NBR_MOTORS; ++nMotor )
+    {
+      Serial.print(*aprPosArray[nMotor]);
+      Serial.print(", ");
+    }
+    Serial.print("dist: ");
+    Serial.print(dist_slider);
     Serial.println("");
   }
 

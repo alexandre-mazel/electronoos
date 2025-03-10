@@ -37,7 +37,8 @@ nav:
           #~ - TP1 - Données ouvertes: snt/04-donnees-structurees/tp1-donnees-ouvertes.md
           #~ - TP2 - Les métadonnées:  snt/04-donnees-structurees/tp2-metadonnees.md
           #~ - TP3 - Stockage sur le Cloud: snt/04-donnees-structurees/tp-stockage-cloud.md
-      #~ - Chapitre 5 - Photographie numérique:
+      - Chapitre 5 - Photographie numérique:
+          - TP1 - Manipulation d'une image: snt/05-photographie-numerique/tp1-manipulation-image_capytale.md
           #~ - TP1 - Manipulation d'une image: snt/05-photographie-numerique/tp1-manipulation-image.md
           #~ - TP2 - Retouche d'une image: snt/05-photographie-numerique/tp-retouche-image.md
       #~ - Chapitre 6 - Cartographie:

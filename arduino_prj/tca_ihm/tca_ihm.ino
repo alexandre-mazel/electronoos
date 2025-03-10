@@ -259,9 +259,10 @@ float rNbrSpoolLimit = 1000;
 int nNbrSpoolSpeed = 100;
 int nSpoolDir = 0;
 
-float dist_slider_min = 170; // could be int, but all settings functions are taking float
-float dist_slider_max = 370;
-int nAutomaticSpoolRotationSpeed = 30;
+float dist_slider_min = 170+50; // could be int, but all settings functions are taking float
+float dist_slider_max = 370-50;
+const int nAutomaticSpoolRotationSpeedInit = 30;
+int nAutomaticSpoolRotationSpeed = nAutomaticSpoolRotationSpeedInit;
 bool bAutomaticSpoolMode = 0;
 long int timeNextAutomaticSpoolSpeedChangePossible = 0;  // we don't want to change speed to often
 
@@ -419,13 +420,20 @@ void loop()
         // when twisting it enables the automatic spool mode
         int bPrevAuto = bAutomaticSpoolMode;
         bAutomaticSpoolMode = nDirection != 0;
-        if( ! bAutomaticSpoolMode && bPrevAuto )
+        if( bAutomaticSpoolMode != bPrevAuto )
         {
-          // we stop the automatic spool mode so let's stop the spool motor !
-          int nMotor = 2;
-          int nDirection = 0;
-          snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nDirection,nAutomaticSpoolRotationSpeed);
-          sendSerialCommand(buf);
+          if( ! bAutomaticSpoolMode )
+          {
+            // we stop the automatic spool mode so let's stop the spool motor !
+            int nMotor = 2;
+            int nDirection = 0;
+            snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nDirection,nAutomaticSpoolRotationSpeed);
+            sendSerialCommand(buf);
+          }
+          else
+          {
+            nAutomaticSpoolRotationSpeed = nAutomaticSpoolRotationSpeedInit;
+          }
         }
       }
       *apnDirArray[nMotor] = nDirection;
@@ -442,20 +450,22 @@ void loop()
   {
     // automatic speed rotation
     int nNewSpeed = nAutomaticSpoolRotationSpeed;
+    const int nMinSpeed = 20;
+    const int nMaxSpeed = 40;
     if( dist_slider > dist_slider_max )
     {
-      nNewSpeed -= 4;
-      if( nNewSpeed < 10 )
+      nNewSpeed -= 2;
+      if( nNewSpeed < nMinSpeed )
       {
-        nNewSpeed = 10;
+        nNewSpeed = nMinSpeed;
       }
     }
     else if( dist_slider < dist_slider_min )
     {
       nNewSpeed += 4;
-      if( nNewSpeed > 100 )
+      if( nNewSpeed > nMaxSpeed )
       {
-        nNewSpeed = 100;
+        nNewSpeed = nMaxSpeed;
       }
     }
 

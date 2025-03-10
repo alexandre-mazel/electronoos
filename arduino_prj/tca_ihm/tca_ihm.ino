@@ -261,7 +261,7 @@ int nSpoolDir = 0;
 
 float dist_slider_min = 170; // could be int, but all settings functions are taking float
 float dist_slider_max = 370;
-float nAutomaticSpoolRotationSpeed = 30;
+int nAutomaticSpoolRotationSpeed = 30;
 bool bAutomaticSpoolMode = 0;
 long int timeNextAutomaticSpoolSpeedChangePossible = 0;  // we don't want to change speed to often
 
@@ -363,7 +363,7 @@ void loop()
               int nNewSpeed = *apnSpeedArray[nMotor];
               if( bTurboIsOn )
               {
-                nNewSpeed = 410;
+                nNewSpeed = 400;
               }
               snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nSpoolDir,nNewSpeed);
               sendSerialCommand(buf);
@@ -409,15 +409,24 @@ void loop()
     if(anReadValues[i+NBR_POTAR+NBR_SW] != anPrevReadValues[i+NBR_POTAR+NBR_SW] || (abSendMotorChange[nMotor]&&anReadValues[i+NBR_POTAR+NBR_SW]) ) // second &&, because we can enter the loop with the other direction of this triswitch
     {
       int nDirection = ((i%2)*2)-1;
-      if( nMotor == 0 )
-      {
-      // when twisting automatic spool mode is on
-        bAutomaticSpoolMode = nDirection != 0;
-      }
       nDirection *= anTriSwInverted[nMotor];
       if(anReadValues[i+NBR_POTAR+NBR_SW] == 0)
       {
         nDirection = 0;
+      }
+      if( nMotor == 0 )
+      {
+        // when twisting it enables the automatic spool mode
+        int bPrevAuto = bAutomaticSpoolMode;
+        bAutomaticSpoolMode = nDirection != 0;
+        if( ! bAutomaticSpoolMode && bPrevAuto )
+        {
+          // we stop the automatic spool mode so let's stop the spool motor !
+          int nMotor = 2;
+          int nDirection = 0;
+          snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nDirection,nAutomaticSpoolRotationSpeed);
+          sendSerialCommand(buf);
+        }
       }
       *apnDirArray[nMotor] = nDirection;
       snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nDirection,*apnSpeedArray[nMotor]);
@@ -507,7 +516,7 @@ void loop()
     }
     Serial.print("dist: ");
     Serial.print(dist_slider);
-    Serial.print("automatic: ");
+    Serial.print(", automatic: ");
     Serial.print(bAutomaticSpoolMode);
     Serial.println("");
   }

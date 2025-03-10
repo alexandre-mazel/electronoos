@@ -450,7 +450,7 @@ void loop()
   {
     // automatic speed rotation
     int nNewSpeed = nAutomaticSpoolRotationSpeed;
-    const int nMinSpeed = 20;
+    const int nMinSpeed = 0;
     const int nMaxSpeed = 40;
     if( dist_slider > dist_slider_max )
     {
@@ -474,7 +474,7 @@ void loop()
       Serial.print( "DBG: NEW spool speed: " );
       Serial.println( nNewSpeed );
       nAutomaticSpoolRotationSpeed = nNewSpeed;
-      timeNextAutomaticSpoolSpeedChangePossible = millis() + 5000;
+      timeNextAutomaticSpoolSpeedChangePossible = millis() + 4000;
       int nMotor = 2;
       int nDirection = 1;
       snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nDirection,nAutomaticSpoolRotationSpeed);

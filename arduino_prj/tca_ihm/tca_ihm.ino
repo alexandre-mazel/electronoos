@@ -259,8 +259,12 @@ float rNbrSpoolLimit = 1000;
 int nNbrSpoolSpeed = 100;
 int nSpoolDir = 0;
 
-float dist_slider_min = 100; // could be int, but all settings functions are taking float
-float dist_slider_max = 750;
+float dist_slider_min = 170+50; // could be int, but all settings functions are taking float
+float dist_slider_max = 370-50;
+const int nAutomaticSpoolRotationSpeedInit = 30;
+int nAutomaticSpoolRotationSpeed = nAutomaticSpoolRotationSpeedInit;
+bool bAutomaticSpoolMode = 0;
+long int timeNextAutomaticSpoolSpeedChangePossible = 0;  // we don't want to change speed to often
 
 // array of pointer to help algorithm and settings
 float * aprPosArray[] = {&rNbrTwist,&rNbrCollect,&rNbrSpool,&dist_slider_min,&dist_slider_max};
@@ -316,6 +320,10 @@ void loop()
         {
           continue;
         }
+        if( bAutomaticSpoolMode )
+        {
+          continue; // no change of potar when automatic spooling
+        }
         *(apnSpeedArray[i]) = (int)( (anReadValues[i] *256L) / 1023); // put less to have more precision (was 20L)
       }
       if(*apnDirArray[i] != 0)
@@ -356,7 +364,7 @@ void loop()
               int nNewSpeed = *apnSpeedArray[nMotor];
               if( bTurboIsOn )
               {
-                nNewSpeed = 410;
+                nNewSpeed = 400;
               }
               snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nSpoolDir,nNewSpeed);
               sendSerialCommand(buf);
@@ -397,6 +405,7 @@ void loop()
   {
     anReadValues[i+NBR_POTAR+NBR_SW] = digitalRead(PIN_SWTRI_BASE+i) == HIGH;
     int nMotor = anTriSwIndex[i/2];
+
     //Serial.print("mot: " ); Serial.print(nMotor); Serial.print(", sendchange:" ); Serial.println(abSendMotorChange[nMotor]);
     if(anReadValues[i+NBR_POTAR+NBR_SW] != anPrevReadValues[i+NBR_POTAR+NBR_SW] || (abSendMotorChange[nMotor]&&anReadValues[i+NBR_POTAR+NBR_SW]) ) // second &&, because we can enter the loop with the other direction of this triswitch
     {
@@ -405,6 +414,27 @@ void loop()
       if(anReadValues[i+NBR_POTAR+NBR_SW] == 0)
       {
         nDirection = 0;
+      }
+      if( nMotor == 0 )
+      {
+        // when twisting it enables the automatic spool mode
+        int bPrevAuto = bAutomaticSpoolMode;
+        bAutomaticSpoolMode = nDirection != 0;
+        if( bAutomaticSpoolMode != bPrevAuto )
+        {
+          if( ! bAutomaticSpoolMode )
+          {
+            // we stop the automatic spool mode so let's stop the spool motor !
+            int nMotor = 2;
+            int nDirection = 0;
+            snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nDirection,nAutomaticSpoolRotationSpeed);
+            sendSerialCommand(buf);
+          }
+          else
+          {
+            nAutomaticSpoolRotationSpeed = nAutomaticSpoolRotationSpeedInit;
+          }
+        }
       }
       *apnDirArray[nMotor] = nDirection;
       snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nDirection,*apnSpeedArray[nMotor]);
@@ -415,6 +445,42 @@ void loop()
   int16_t dist_slider = get_dist_ir(PIN_DIST_IR);
 
   memcpy(anPrevReadValues,anReadValues,sizeof(anPrevReadValues));
+
+  if( bAutomaticSpoolMode && millis() > timeNextAutomaticSpoolSpeedChangePossible )
+  {
+    // automatic speed rotation
+    int nNewSpeed = nAutomaticSpoolRotationSpeed;
+    const int nMinSpeed = 0;
+    const int nMaxSpeed = 40;
+    if( dist_slider > dist_slider_max )
+    {
+      nNewSpeed -= 2;
+      if( nNewSpeed < nMinSpeed )
+      {
+        nNewSpeed = nMinSpeed;
+      }
+    }
+    else if( dist_slider < dist_slider_min )
+    {
+      nNewSpeed += 4;
+      if( nNewSpeed > nMaxSpeed )
+      {
+        nNewSpeed = nMaxSpeed;
+      }
+    }
+
+    if( nNewSpeed != nAutomaticSpoolRotationSpeed )
+    {
+      Serial.print( "DBG: NEW spool speed: " );
+      Serial.println( nNewSpeed );
+      nAutomaticSpoolRotationSpeed = nNewSpeed;
+      timeNextAutomaticSpoolSpeedChangePossible = millis() + 4000;
+      int nMotor = 2;
+      int nDirection = 1;
+      snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nDirection,nAutomaticSpoolRotationSpeed);
+      sendSerialCommand(buf);
+    }
+  }
 
 
  // Serial.println(digitalRead(PIN_SW_BASE+0) == HIGH);
@@ -460,6 +526,8 @@ void loop()
     }
     Serial.print("dist: ");
     Serial.print(dist_slider);
+    Serial.print(", automatic: ");
+    Serial.print(bAutomaticSpoolMode);
     Serial.println("");
   }
 
@@ -522,12 +590,29 @@ void loop()
     // pLcd->print("/");
     // lcdPrint(rNbrSpoolLimit);
     pLcd->print("");
-    lcdPrint(nNbrSpoolSpeed);
+    if( bAutomaticSpoolMode )
+      lcdPrint( nAutomaticSpoolRotationSpeed );
+    else
+      lcdPrint( nNbrSpoolSpeed );
+      
     pLcd->print("r");
 
 
     lcdPrint(dist_slider_max);
     pLcd->print("mm");
+
+    if( 1 )
+    {
+      pLcd->setCursor(18, 3);
+      if( bAutomaticSpoolMode )
+      {
+        pLcd->print("A");
+      }
+      else
+      {
+        pLcd->print("M");
+      }
+    }
 
     for(int i = 0; i < 4; ++i )
     {

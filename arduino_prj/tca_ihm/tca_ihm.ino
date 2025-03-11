@@ -266,6 +266,10 @@ int nAutomaticSpoolRotationSpeed = nAutomaticSpoolRotationSpeedInit;
 bool bAutomaticSpoolMode = 0;
 long int timeNextAutomaticSpoolSpeedChangePossible = 0;  // we don't want to change speed to often
 
+float dist_slider_target = 270;
+int last_dist_slider = -1;
+long int last_time_dist_pos = millis();
+
 // array of pointer to help algorithm and settings
 float * aprPosArray[] = {&rNbrTwist,&rNbrCollect,&rNbrSpool,&dist_slider_min,&dist_slider_max};
 float * aprLimitArray[] = {&rNbrTwistLimit,&rNbrCollectLimit,&rNbrSpoolLimit};
@@ -452,6 +456,8 @@ void loop()
     int nNewSpeed = nAutomaticSpoolRotationSpeed;
     const int nMinSpeed = 0;
     const int nMaxSpeed = 40;
+
+    /*
     if( dist_slider > dist_slider_max )
     {
       nNewSpeed -= 2;
@@ -467,6 +473,43 @@ void loop()
       {
         nNewSpeed = nMaxSpeed;
       }
+    }
+    */
+
+    if( abs(dist_slider_target-dist_slider) > 10 && rNbrTwist < -50 )
+    {
+      if( last_dist_slider !=-1 ) // not first time
+      {
+        long int diff = last_dist_slider - dist_slider;
+        long int time_for_diff = millis() - last_time_dist_pos;
+        float diff_per_sec = ( diff * 1000 ) / time_for_diff;
+        if( dist_slider_target > dist_slider )
+        {
+          if( diff_per_sec < 0 )
+          {
+            // we need to do something to increase dist and so inc speed
+            nNewSpeed += 4;
+            if( nNewSpeed > nMaxSpeed )
+            {
+              nNewSpeed = nMaxSpeed;
+            }
+          }
+        }
+        else
+        {
+         if( diff_per_sec > 0 )
+          {
+            // we need to do something to decrease dist and so reduce speed
+            nNewSpeed -= 4;
+            if( nNewSpeed < nMinSpeed )
+            {
+              nNewSpeed = nMinSpeed;
+            }
+          }
+        }
+      } // not first time
+      last_dist_slider = dist_slider;
+      last_time_dist_pos = millis();
     }
 
     if( nNewSpeed != nAutomaticSpoolRotationSpeed )

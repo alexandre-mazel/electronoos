@@ -505,7 +505,7 @@ class MasterMindGame:
 def main():
     time_begin = time.time()
     
-    if 0:
+    if 1:
         # joue contre l'ordinateur
         game = MasterMindGame()
         forced_solution = []

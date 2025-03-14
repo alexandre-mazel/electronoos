@@ -455,7 +455,7 @@ void loop()
     // automatic speed rotation
     int nNewSpeed = nAutomaticSpoolRotationSpeed;
     const int nMinSpeed = 0;
-    const int nMaxSpeed = 40;
+    const int nMaxSpeed = 48;
 
     /*
     if( dist_slider > dist_slider_max )
@@ -476,19 +476,24 @@ void loop()
     }
     */
 
-    if( abs(dist_slider_target-dist_slider) > 10 && rNbrTwist < -50 )
+    if( abs(dist_slider_target-dist_slider) > 10 && abs(rNbrTwist) > 500 )
     {
       if( last_dist_slider !=-1 ) // not first time
       {
-        long int diff = last_dist_slider - dist_slider;
+        long int diff = dist_slider - last_dist_slider;
         long int time_for_diff = millis() - last_time_dist_pos;
         float diff_per_sec = ( diff * 1000 ) / time_for_diff;
-        if( dist_slider_target > dist_slider )
+        int dist_bonus = 0;
+        if( abs(dist_slider_target-dist_slider) > 20)
+        {
+          //dist_bonus = (abs(dist_slider_target-dist_slider) - 20)/4;
+        }
+        if( dist_slider < dist_slider_target  )
         {
           if( diff_per_sec < 0 )
           {
             // we need to do something to increase dist and so inc speed
-            nNewSpeed += 4;
+            nNewSpeed += 2 + dist_bonus;
             if( nNewSpeed > nMaxSpeed )
             {
               nNewSpeed = nMaxSpeed;
@@ -500,7 +505,7 @@ void loop()
          if( diff_per_sec > 0 )
           {
             // we need to do something to decrease dist and so reduce speed
-            nNewSpeed -= 4;
+            nNewSpeed -= 2 + dist_bonus;
             if( nNewSpeed < nMinSpeed )
             {
               nNewSpeed = nMinSpeed;

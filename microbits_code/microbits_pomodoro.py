@@ -20,7 +20,10 @@ def wait_time( timer_duration = 25*60):
         msg = smart_string(remain)
         print("remain:", remain, ", smart_string:", msg )
         if msg != prev_msg:
-            display.scroll( msg, wait=False, loop=True, delay = 80 )
+            if len(msg) > 1:
+                display.scroll( msg, wait=False, loop=True, delay = 100 )
+            else:
+                display.show( msg, wait=False )
             prev_msg = msg
     
         if remain < 1 or button_b.was_pressed():

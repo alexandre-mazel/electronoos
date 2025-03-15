@@ -27,13 +27,25 @@ def wait_time( timer_duration = 25*60):
             prev_msg = msg
     
         if remain < 1 or button_b.was_pressed():
+            global mode
+            mode = (mode + 1) % 2
+            return;
+            
+        if button_a.was_pressed():
             return
         sleep(1000)
 
+mode = 0 # 0: pomodoro, 1: juste 2 minutes pour du gainage
 while 1:
     minute_to_sec = 60
     #minute_to_sec = 1 # to test quickly
-    wait_time( 25 * minute_to_sec )
-    audio.play(Sound.YAWN)
-    wait_time( 5 * minute_to_sec )
-    audio.play(Sound.GIGGLE)
+    if mode == 0:
+        wait_time( 25 * minute_to_sec )
+        audio.play(Sound.YAWN)
+        if mode == 0:
+            wait_time( 5 * minute_to_sec )
+            audio.play(Sound.GIGGLE)
+    else:
+        wait_time( 2 * minute_to_sec )
+        audio.play(Sound.YAWN)
+        

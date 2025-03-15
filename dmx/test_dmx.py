@@ -1,4 +1,7 @@
-from dmx import DMX # git clone https://github.com/monzelr/dmx.git, cd dmx, pip install .
+from dmxal import DMX # git clone https://github.com/monzelr/dmx.git, cd dmx, pip install .
+import dmxal
+dmxal.set_verbose( True )
+
 # Tested on Windows 10, amd64, Python 3.8
 # Should also work on Linux, MacOS and on AARCH64 devices (ARM devices like Raspberry PI).
 # Tested by Alexandre: 
@@ -7,11 +10,12 @@ from dmx import DMX # git clone https://github.com/monzelr/dmx.git, cd dmx, pip 
 #Veritable puce FTDI importee du Royaume-Uni. 
 # Garantie de qualite 100 % garantie d'un an, entretien a vie
 # Puce FT232RL + levier de vitesse RS485 avec la meilleure compatibilite et stabilite.
-# Marque	Czgor?
+# Marque Czgor?
 # 20euros ttc sur Amazon
 # fonctionne pas
 # detecte comme FTSER2K sur port Com20 (forcage sur port 2 (pourquoi mes ports 3-19 sont réservé?par qui?)
 # dans FreeStyler X2: select DMXking USB DMX512-A?
+# ou Eurolite USB-DMX512-interface/update-adapter
 
 # Mes projos:
 # 60 lumières Par LED DMX, lumière de scène RGB de 90W 
@@ -28,12 +32,24 @@ from dmx import DMX # git clone https://github.com/monzelr/dmx.git, cd dmx, pip 
 # ch6: 0-50: open dmx, 51-100: selection des couleurs du programme, 101-150: sauter pour
 # ch7: vitesse
 # 
+#
+#A DMX terminator helps to reduce ‘noise’ on the DMX chain, and makes the light respond to 
+# control more accurately. It should be plugged in to the last fixture in any chain. For Terminator 
+# connections please see below:
+# cf le60_m.pdf
+"""
+An example from a Chinese LED PAR is the menu:
+1. A001 DMX Channel Address (001-512) | 10CH mode
+2. d001 DMX Channel Address (001-512) | 6CH mode 
+"""
+#
 # avec logiciel: Freestytle DMX512
+# fonctionne pas?
 
 import time
 
 print( "Running Dmx...")
-nNbrChannel = 512;
+nNbrChannel = 4;
 dmx = DMX( num_of_channels = nNbrChannel )
 print(dir(dmx))
 print("INF: dmx.is_connected(): ", dmx.is_connected() )
@@ -61,6 +77,16 @@ print("INF: dmx: starting" )
         :return None:
 """
 
+"""
+assuming the first fixture is DMX channel 1 and we are in 9 channel DMX 
+mode, the second fixture would need to be on channel 10, then the 3rd channel 19 and so on. 
+Some DMX controllers may group fixtures in lots of 16 channels – so in that case, fixture 1 on 
+11 
+7
+channel 1, fixture 2 on channel 17, 3 on 33, and so on. Refer to your DMX controllers’ 
+instruction manual on how best to manage your DMX channel allocation. 
+"""
+
 if 0:
     print("setting all channels to 127")
     for i in range(1, nNbrChannel):
@@ -70,7 +96,16 @@ if 0:
         dmx.send()
         time.sleep(1)
         
-if 1:
+if 0:
+    chan = 2
+    print("setting channel %d to all values" % chan )
+    for val in range(0,256):
+        print("setting channel %d to %d" % (chan,val) )    
+        dmx.set_data(chan, val)
+        dmx.send()
+        time.sleep(1)
+        
+if 0:
     chan = 2
     print("setting channel %d to all values" % chan )
     for val in range(0,256):
@@ -80,25 +115,26 @@ if 1:
         time.sleep(1)
         
 
-"""
-dmx.set_data(1, 0)
-dmx.set_data(2, 0)
-dmx.set_data(3, 0)
-dmx.set_data(4, 0)
+if 1:
+    print("fadein-fadeout")
+    dmx.set_data(1, 0)
+    dmx.set_data(2, 0)
+    dmx.set_data(3, 0)
+    dmx.set_data(4, 0)
 
-while True:
-    print(".")
-    for i in range(0, 255, 5):
-        dmx.set_data(1, i, auto_send=False)
-        dmx.set_data(2, i, auto_send=False)
-        dmx.set_data(3, i, auto_send=False)
-        dmx.set_data(4, i)
-        time.sleep(0.01)
+    time_wait = 1 # was 0.01
+    while True:
+        print(".")
+        for i in range(0, 255, 5):
+            dmx.set_data(1, i, auto_send=False)
+            dmx.set_data(2, i, auto_send=False)
+            dmx.set_data(3, i, auto_send=False)
+            dmx.set_data(4, i)
+            time.sleep(time_wait)
 
-    for i in range(255, 0, -5):
-        dmx.set_data(1, i, auto_send=False)
-        dmx.set_data(2, i, auto_send=False)
-        dmx.set_data(3, i, auto_send=False)
-        dmx.set_data(4, i)
-        time.sleep(0.01)
-"""
+        for i in range(255, 0, -5):
+            dmx.set_data(1, i, auto_send=False)
+            dmx.set_data(2, i, auto_send=False)
+            dmx.set_data(3, i, auto_send=False)
+            dmx.set_data(4, i)
+            time.sleep(time_wait)

@@ -1,3 +1,5 @@
+# pour tester, simuler et envoyer dans le programme:
+# https://python.microbit.org/v/3/reference/buttons
 from microbit import *
 import time
 

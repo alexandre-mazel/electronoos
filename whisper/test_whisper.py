@@ -36,11 +36,18 @@ seen in C:\\Python39\\Lib\\site-packages\\whisper\\audio.py:
         raise RuntimeError(f"Failed to load audio: {e.stderr.decode()}") from e
 """
 duration = time.time() - time_begin
-print("model loaded in %.2fs" % duration ) # mstab7 base: 0.85s, azure large: 
+print("model loaded in %.2fs" % duration ) # mstab7 base: 0.85s, azure large: 8.88s
 
 time_begin = time.time()
-#~ result = model.transcribe("on_the_fly_mehdi.wav")
-result = model.transcribe("on_the_fly_mehdi.wav", fp16=False, verbose=True) # , language="fr",
+
+soundname = "on_the_fly_mehdi.wav"
+soundname = "alex_test.wav"
+#~ soundname = "alex_test_en.wav"
+#~ result = model.transcribe(soundname)
+result = model.transcribe(soundname, fp16=False, verbose=True) # , language="fr",
+# for a 55s sound:
+# mstab7 base: 6.61s, azure large: 38.6s
+
 
 duration = time.time() - time_begin
 print("transcribed in %.2fs" % duration )
@@ -58,7 +65,7 @@ for s in result["segments"]:
     
     
 """
-Result model base on mstab7:
+*** Result model base on mstab7:
 
 Lang detected: fr
 Detail:
@@ -91,5 +98,41 @@ Detail:
 
 [50.0 --> 55.0]:  Normalement, c'est les thèmes de la dame d'entretiens, c'est les mêmes, sur qui ça arrive pas.
   temp: 0.00, avg_logprob: -0.38, compression_ratio: 1.11, no_speech_prob: 0.11
+  
+  
+*** Result model base on azure:
+
+Lang detected: fr
+Detail:
+[0.0 --> 3.74]:  Il dit à Maynard, ouais, ça doit être pas mal, ben voilà, ça doit être pareil.
+  temp: 0.00, avg_logprob: -0.30, compression_ratio: 1.52, no_speech_prob: 0.16
+
+[5.28 --> 6.24]:  Voilà, c'est pareil.
+  temp: 0.00, avg_logprob: -0.30, compression_ratio: 1.52, no_speech_prob: 0.16
+
+[7.640000000000001 --> 10.200000000000001]:  Sauf que c'est pas tagué, ça apparaît là.
+  temp: 0.00, avg_logprob: -0.30, compression_ratio: 1.52, no_speech_prob: 0.16
+
+[10.3 --> 13.4]:  Et là, ils ont pris un bout de texte d'un homme politique.
+  temp: 0.00, avg_logprob: -0.30, compression_ratio: 1.52, no_speech_prob: 0.16
+
+[15.06 --> 16.52]:  C'est ça, faire l'analyse des entretiens.
+  temp: 0.00, avg_logprob: -0.30, compression_ratio: 1.52, no_speech_prob: 0.16
+
+[18.2 --> 20.0]:  Est-ce que c'est clair pour tout le monde, ça ?
+  temp: 0.00, avg_logprob: -0.30, compression_ratio: 1.52, no_speech_prob: 0.16
+
+[21.16 --> 22.38]:  Ouais.
+  temp: 0.00, avg_logprob: -0.30, compression_ratio: 1.52, no_speech_prob: 0.16
+
+[22.38 --> 22.44]:  Ouais.
+  temp: 0.00, avg_logprob: -0.30, compression_ratio: 1.52, no_speech_prob: 0.16
+
+[22.44 --> 25.44]:  Ouais.
+  temp: 0.00, avg_logprob: -0.82, compression_ratio: 0.43, no_speech_prob: 0.07
+
+[52.44 --> 55.44]:  Tiens, c'est les mêmes, sauf que ça arrive pas dans...
+  temp: 0.00, avg_logprob: -0.14, compression_ratio: 0.89, no_speech_prob: 0.01
+
 
 """

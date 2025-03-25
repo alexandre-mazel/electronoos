@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import whisper # pip install openai-whisper
 import os
 import time
@@ -60,34 +62,34 @@ Result model base on mstab7:
 
 Lang detected: fr
 Detail:
-[0.0 --> 6.0]:  Il dit à mailleur, on voit, bah ça doit être pas mal, bah voilà ça doit être pareil.
+[0.0 --> 6.0]:  Il dit Ã  mailleur, on voit, bah Ã§a doit Ãªtre pas mal, bah voilÃ  Ã§a doit Ãªtre pareil.
   temp: 0.00, avg_logprob: -0.61, compression_ratio: 1.47, no_speech_prob: 0.32
 
-[7.0 --> 10.0]:  Surtout que c'est fatagé, ça appartient là.
+[7.0 --> 10.0]:  Surtout que c'est fatagÃ©, Ã§a appartient lÃ .
   temp: 0.00, avg_logprob: -0.61, compression_ratio: 1.47, no_speech_prob: 0.32
 
 [10.0 --> 13.0]:  Il a y compris un mot de texte d'un homme politique.
   temp: 0.00, avg_logprob: -0.61, compression_ratio: 1.47, no_speech_prob: 0.32
 
-[15.0 --> 17.0]:  C'est ça faire la née des entretiens.
+[15.0 --> 17.0]:  C'est Ã§a faire la nÃ©e des entretiens.
   temp: 0.00, avg_logprob: -0.61, compression_ratio: 1.47, no_speech_prob: 0.32
 
-[18.0 --> 20.0]:  Est-ce que c'est clair pour tout le monde, ça ?
+[18.0 --> 20.0]:  Est-ce que c'est clair pour tout le monde, Ã§a ?
   temp: 0.00, avg_logprob: -0.61, compression_ratio: 1.47, no_speech_prob: 0.32
 
 [22.0 --> 23.0]:  Ouais, ou pas ?
   temp: 0.00, avg_logprob: -0.61, compression_ratio: 1.47, no_speech_prob: 0.32
 
-[24.0 --> 34.0]:  Ok, donc, pas un zimé, il faut en transcrire à la main, pas à la main, si c'est pas à la main, c'est en local.
+[24.0 --> 34.0]:  Ok, donc, pas un zimÃ©, il faut en transcrire Ã  la main, pas Ã  la main, si c'est pas Ã  la main, c'est en local.
   temp: 0.00, avg_logprob: -0.25, compression_ratio: 1.63, no_speech_prob: 0.07
 
-[35.0 --> 40.0]:  Ensuite, il faut bien relire faire un zimé, découper le texte en petit goût.
+[35.0 --> 40.0]:  Ensuite, il faut bien relire faire un zimÃ©, dÃ©couper le texte en petit goÃ»t.
   temp: 0.00, avg_logprob: -0.25, compression_ratio: 1.63, no_speech_prob: 0.07
 
-[41.0 --> 50.0]:  Et ensuite, il faut présenter les discours des uns et des autres sur chacun des thèmes que vous avez découpé.
+[41.0 --> 50.0]:  Et ensuite, il faut prÃ©senter les discours des uns et des autres sur chacun des thÃ¨mes que vous avez dÃ©coupÃ©.
   temp: 0.00, avg_logprob: -0.25, compression_ratio: 1.63, no_speech_prob: 0.07
 
-[50.0 --> 55.0]:  Normalement, c'est les thèmes de la dame d'entretiens, c'est les mêmes, sur qui ça arrive pas.
+[50.0 --> 55.0]:  Normalement, c'est les thÃ¨mes de la dame d'entretiens, c'est les mÃªmes, sur qui Ã§a arrive pas.
   temp: 0.00, avg_logprob: -0.38, compression_ratio: 1.11, no_speech_prob: 0.11
 
 """

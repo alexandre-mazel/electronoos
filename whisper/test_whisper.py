@@ -42,7 +42,7 @@ time_begin = time.time()
 
 soundname = "on_the_fly_mehdi.wav"
 soundname = "alex_test.wav"
-soundname = "alex_test_en.wav"
+#~ soundname = "alex_test_en.wav"
 #~ result = model.transcribe(soundname)
 result = model.transcribe(soundname, fp16=False, verbose=True) # , language="fr",
 # for a 55s sound:
@@ -51,6 +51,8 @@ result = model.transcribe(soundname, fp16=False, verbose=True) # , language="fr"
 
 duration = time.time() - time_begin
 print("transcribed in %.2fs" % duration )
+
+print("soundname: %s" % soundname )
 
 print(f'The text in audio: \n {result["text"]}')
 print(f'Lang detected: {result["language"]}')
@@ -99,8 +101,16 @@ Detail:
 [50.0 --> 55.0]:  Normalement, c'est les thèmes de la dame d'entretiens, c'est les mêmes, sur qui ça arrive pas.
   temp: 0.00, avg_logprob: -0.38, compression_ratio: 1.11, no_speech_prob: 0.11
   
+
+Detail alex_test:
+[0.0 --> 5.6000000000000005]:  Ouais, je suis tout à fait d'accord, c'est trop pareil. Oui oui, tout à fait. Mais toi ? Ouais.
+  temp: 0.00, avg_logprob: -0.47, compression_ratio: 1.28, no_speech_prob: 0.26
+
+[7.36 --> 9.36]:  Je suis un peu d'accord, un puits.
+  temp: 0.00, avg_logprob: -0.47, compression_ratio: 1.28, no_speech_prob: 0.26
   
-*** Result model base on azure:
+  
+*** Result model large on azure:
 
 Lang detected: fr
 Detail:
@@ -133,6 +143,22 @@ Detail:
 
 [52.44 --> 55.44]:  Tiens, c'est les mêmes, sauf que ça arrive pas dans...
   temp: 0.00, avg_logprob: -0.14, compression_ratio: 0.89, no_speech_prob: 0.01
+  
+  
+# alex_test_en
+Detail:
+[0.0 --> 5.6000000000000005]:  Ouais, je suis tout à fait d'accord, c'est trop pareil. Oui oui, tout à fait. Mais toi ? Ouais.
+  temp: 0.00, avg_logprob: -0.47, compression_ratio: 1.28, no_speech_prob: 0.26
+
+[7.36 --> 9.36]:  Je suis un peu d'accord, un puits.
+  temp: 0.00, avg_logprob: -0.47, compression_ratio: 1.28, no_speech_prob: 0.26
+
+# alex_test_en
+Lang detected: en
+Detail:
+[0.0 --> 5.0]:  I'm totally agree with him
+  temp: 0.00, avg_logprob: -0.61, compression_ratio: 0.76, no_speech_prob: 0.04
+
 
 
 """

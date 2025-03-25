@@ -31,6 +31,8 @@ seen in C:\\Python39\\Lib\\site-packages\\whisper\\audio.py:
         raise RuntimeError(f"Failed to load audio: {e.stderr.decode()}") from e
 """
 
+print("model loaded...")
+
 #~ result = model.transcribe("on_the_fly_mehdi.wav")
 result = model.transcribe("on_the_fly_mehdi.wav", language="fr", fp16=False, verbose=True)
 

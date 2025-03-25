@@ -1,6 +1,10 @@
 import whisper # pip install openai-whisper
-#~ model = whisper.load_model("base")
-model = whisper.load_model("large")
+import os
+
+if os.name == "nt":
+    model = whisper.load_model("base")
+else:
+    model = whisper.load_model("large")
 
 """
 Cette fonction va entre autres appeller ffmpeg en cli:
@@ -38,5 +42,5 @@ print(f'Lang detected: \n {result["language"]}')
 
 print("Detail:")
 for s in result["segments"]:
-    print( "[%s --> %s]: %s" % (s.["start"], s.["end"], s.["text"]) )
-    print( "  temp: %.2f, avg_logprob: %.2f, compression_ratio: %.2f, no_speech_prob: %.2f" % (s.["temperature"], s.["avg_logprob"], s.["compression_ratio"], s.["no_speech_prob"] ) )
+    print( "[%s --> %s]: %s" % (s["start"], s["end"], s["text"]) )
+    print( "  temp: %.2f, avg_logprob: %.2f, compression_ratio: %.2f, no_speech_prob: %.2f\n" % (s["temperature"], s["avg_logprob"], s["compression_ratio"], s["no_speech_prob"] ) )

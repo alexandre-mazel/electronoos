@@ -266,7 +266,7 @@ int nAutomaticSpoolRotationSpeed = nAutomaticSpoolRotationSpeedInit;
 bool bAutomaticSpoolMode = 0;
 long int timeNextAutomaticSpoolSpeedChangePossible = 0;  // we don't want to change speed to often
 
-float dist_slider_target = 270;
+float dist_slider_target = 500; // was 270
 int last_dist_slider = -1;
 long int last_time_dist_pos = millis();
 

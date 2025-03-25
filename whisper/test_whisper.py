@@ -42,7 +42,7 @@ time_begin = time.time()
 
 soundname = "on_the_fly_mehdi.wav"
 soundname = "alex_test.wav"
-#~ soundname = "alex_test_en.wav"
+soundname = "alex_test_en.wav"
 #~ result = model.transcribe(soundname)
 result = model.transcribe(soundname, fp16=False, verbose=True) # , language="fr",
 # for a 55s sound:

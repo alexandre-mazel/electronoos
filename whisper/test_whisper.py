@@ -43,9 +43,11 @@ time_begin = time.time()
 
 soundname = "on_the_fly_mehdi.wav"
 #~ soundname = "alex_test.wav"
-#~ soundname = "alex_test_en.wav"
+soundname = "alex_test_en.wav" # si on force en francais, ca fait un moche résultat avec une expprod a 0.01: Final que je suis en batterie fossil sociale alors que 0.54 en anglais.
+#~ soundname = "alex_count_2.wav" # si on lui dit pas, il croit que c'est de l'anglais
+soundname = "alex_perfect.wav" # si on le force en francais, ca donne c'est donc parfait avec 0.41 si en anglais: expprob: 0.55.
 #~ result = model.transcribe(soundname)
-result = model.transcribe(soundname, fp16=False, verbose=True) # , language="fr",
+result = model.transcribe(soundname, fp16=False, verbose=True ) # , language="en"
 # for a 55s sound:
 # mstab7 base: 6.61s, azure large: 38.6s
 
@@ -64,7 +66,7 @@ print(f'Lang detected: {result["language"]}')
 print("Detail:")
 for s in result["segments"]:
     print( "[%s --> %s]: %s" % (s["start"], s["end"], s["text"]) )
-    print( "  temp: %.2f, avg_logprob: %.2f, expprob: %.2f,  compression_ratio: %.2f, no_speech_prob: %.2f\n" % (s["temperature"], s["avg_logprob"], math.exp(s["avg_logprob"]), s["compression_ratio"], s["no_speech_prob"] ) )
+    print( "  temper: %.2f, avg_logprob: %.2f, expprob: %.2f,  compression_ratio: %.2f, no_speech_prob: %.2f\n" % (s["temperature"], s["avg_logprob"], math.exp(s["avg_logprob"]), s["compression_ratio"], s["no_speech_prob"] ) )
     
     
 """

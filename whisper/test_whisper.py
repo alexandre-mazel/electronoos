@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import whisper # pip install openai-whisper
+import math
 import os
 import time
 
@@ -36,12 +37,12 @@ seen in C:\\Python39\\Lib\\site-packages\\whisper\\audio.py:
         raise RuntimeError(f"Failed to load audio: {e.stderr.decode()}") from e
 """
 duration = time.time() - time_begin
-print("model loaded in %.2fs" % duration ) # mstab7 base: 0.85s, azure large: 8.88s
+print("Model loaded in %.2fs" % duration ) # mstab7 base: 0.85s, azure large: 8.88s
 
 time_begin = time.time()
 
 soundname = "on_the_fly_mehdi.wav"
-soundname = "alex_test.wav"
+#~ soundname = "alex_test.wav"
 #~ soundname = "alex_test_en.wav"
 #~ result = model.transcribe(soundname)
 result = model.transcribe(soundname, fp16=False, verbose=True) # , language="fr",
@@ -50,9 +51,9 @@ result = model.transcribe(soundname, fp16=False, verbose=True) # , language="fr"
 
 
 duration = time.time() - time_begin
-print("transcribed in %.2fs" % duration )
+print("Transcribed in %.2fs" % duration )
 
-print("soundname: %s" % soundname )
+print("Soundname: %s" % soundname )
 
 print(f'The text in audio: \n {result["text"]}')
 print(f'Lang detected: {result["language"]}')
@@ -63,7 +64,7 @@ print(f'Lang detected: {result["language"]}')
 print("Detail:")
 for s in result["segments"]:
     print( "[%s --> %s]: %s" % (s["start"], s["end"], s["text"]) )
-    print( "  temp: %.2f, avg_logprob: %.2f, compression_ratio: %.2f, no_speech_prob: %.2f\n" % (s["temperature"], s["avg_logprob"], s["compression_ratio"], s["no_speech_prob"] ) )
+    print( "  temp: %.2f, avg_logprob: %.2f, expprob: %.2f,  compression_ratio: %.2f, no_speech_prob: %.2f\n" % (s["temperature"], s["avg_logprob"], math.exp(s["avg_logprob"]), s["compression_ratio"], s["no_speech_prob"] ) )
     
     
 """
@@ -102,13 +103,19 @@ Detail:
   temp: 0.00, avg_logprob: -0.38, compression_ratio: 1.11, no_speech_prob: 0.11
   
 
-Detail alex_test:
+Soundname: alex_test.wav
+Detail:
 [0.0 --> 5.6000000000000005]:  Ouais, je suis tout à fait d'accord, c'est trop pareil. Oui oui, tout à fait. Mais toi ? Ouais.
   temp: 0.00, avg_logprob: -0.47, compression_ratio: 1.28, no_speech_prob: 0.26
 
 [7.36 --> 9.36]:  Je suis un peu d'accord, un puits.
   temp: 0.00, avg_logprob: -0.47, compression_ratio: 1.28, no_speech_prob: 0.26
   
+Soundname: alex_test_en.wav:
+Lang detected: en
+Detail:
+[0.0 --> 4.0]:  What? I'm totally agree with him.
+  temp: 0.00, avg_logprob: -0.61, compression_ratio: 0.80, no_speech_prob: 0.17
   
 *** Result model large on azure:
 
@@ -144,21 +151,18 @@ Detail:
 [52.44 --> 55.44]:  Tiens, c'est les mêmes, sauf que ça arrive pas dans...
   temp: 0.00, avg_logprob: -0.14, compression_ratio: 0.89, no_speech_prob: 0.01
   
-  
-# alex_test_en
+Soundname: alex_test.wav
 Detail:
-[0.0 --> 5.6000000000000005]:  Ouais, je suis tout à fait d'accord, c'est trop pareil. Oui oui, tout à fait. Mais toi ? Ouais.
-  temp: 0.00, avg_logprob: -0.47, compression_ratio: 1.28, no_speech_prob: 0.26
 
-[7.36 --> 9.36]:  Je suis un peu d'accord, un puits.
-  temp: 0.00, avg_logprob: -0.47, compression_ratio: 1.28, no_speech_prob: 0.26
+[0.0 --> 10.200000000000001]:  ouais je suis tout à fait d'accord c'est trop pareil oui oui tout à fait et toi ouais je suis un peu d'accord avec lui
+  temp: 0.00, avg_logprob: -0.07, compression_ratio: 1.41, no_speech_prob: 0.00
+  
+Soundname: alex_test_en.wav:
 
-# alex_test_en
 Lang detected: en
 Detail:
 [0.0 --> 5.0]:  I'm totally agree with him
   temp: 0.00, avg_logprob: -0.61, compression_ratio: 0.76, no_speech_prob: 0.04
-
 
 
 """

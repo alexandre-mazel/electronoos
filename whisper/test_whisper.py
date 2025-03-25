@@ -30,7 +30,13 @@ seen in C:\\Python39\\Lib\\site-packages\\whisper\\audio.py:
 #~ result = model.transcribe("on_the_fly_mehdi.wav")
 result = model.transcribe("on_the_fly_mehdi.wav", language="fr", fp16=False, verbose=True)
 
-print(f' The text in video: \n {result["text"]}')
-print(dir(result))
-print(result)
-print(result.avg_logprob)
+print(f'The text in audio: \n {result["text"]}')
+print(f'Lang detected: \n {result["language"]}')
+#~ print(dir(result))
+#~ print(result)
+#~ print(result.avg_logprob)
+
+print("Detail:")
+for s in result["segments"]:
+    print( "[%s --> %s]: %s" % (s.["start"], s.["end"], s.["text"]) )
+    print( "  temp: %.2f, avg_logprob: %.2f, compression_ratio: %.2f, no_speech_prob: %.2f" % (s.["temperature"], s.["avg_logprob"], s.["compression_ratio"], s.["no_speech_prob"] ) )

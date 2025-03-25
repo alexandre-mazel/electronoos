@@ -4,7 +4,7 @@ model = whisper.load_model("large")
 
 """
 Cette fonction va entre autres appeller ffmpeg en cli:
-seen in C:\Python39\Lib\site-packages\whisper\audio.py:
+seen in C:\\Python39\\Lib\\site-packages\\whisper\\audio.py:
 
     # This launches a subprocess to decode audio while down-mixing
     # and resampling as necessary.  Requires the ffmpeg CLI in PATH.

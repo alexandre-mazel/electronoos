@@ -1860,6 +1860,19 @@ def eraseFileLongerLine(filename,sizemax):
 #~ exit(0)
 
 
+def is_zipped( filename ):
+    """
+    Is this file looks like a zipped file ?
+    """
+    f = open( filename, "rb" )
+    buf = f.read(4)
+    f.close()
+    if len(buf) < 4:
+        return False
+    #~ print( "DBG: is_zipped: buf: %s" % buf )
+    return buf[0] == 0x1F and buf[1] == 0x8B and buf[2] == 0x08 and buf[3] == 0x08
+
+
 def gaussian(x):
     # inspired by https://codepen.io/zapplebee/pen/ByvmMo
     # returns values along a bell curve from 0 - 1 - 0 with an input of 0 - 1.

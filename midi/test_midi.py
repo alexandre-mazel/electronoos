@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import mido # pip install mido (eg 1.3.3)
 import rtmidi # pip install python-rtmidi (required by mido)
 
@@ -14,3 +15,5 @@ with mido.open_input() as inport:
 # Korg Nano Kontrol 2: work directly (PnP style)
 # will issue value from control 0 to 71.
 # 0..127 for potar and slider, 127 when button is down
+
+

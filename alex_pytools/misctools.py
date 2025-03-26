@@ -1871,6 +1871,23 @@ def is_zipped( filename ):
         return False
     #~ print( "DBG: is_zipped: buf: %s" % buf )
     return buf[0] == 0x1F and buf[1] == 0x8B and buf[2] == 0x08 and buf[3] == 0x08
+    
+def smart_size_to_str( size ):
+    if size < 1000:
+        if isinstance(size,int):
+            return "%d" % size
+        if size < 10:
+            return "%.3f" % size
+            
+        return "%.1f" % size
+        
+    if size < 1000*1000:
+        return "%.1fk" % (size/1000)
+        
+    if size < 1000*1000*1000:
+        return "%.1fM" % (size/(1000*1000))
+        
+    return "%.1fG" % (size/(1000*1000*1000))
 
 
 def gaussian(x):

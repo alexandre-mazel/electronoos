@@ -1,4 +1,5 @@
 #include <LiquidCrystal.h>
+#include <LiquidCrystal_I2C.h>
 
 #define PIN_POTAR_BASE  A10 // first pin of the series
 #define PIN_SW_BASE     30
@@ -16,15 +17,15 @@
 #define PIN_DIST_IR 8 // 8 is for D8
 
 
-#include <LiquidCrystal_I2C.h>
-
-bool i2CAddrTest(uint8_t addr) {
-  Wire.begin();
-  Wire.beginTransmission(addr);
-  if (Wire.endTransmission() == 0) {
-    return true;
-  }
-  return false;
+bool i2CAddrTest(uint8_t addr) 
+{
+    Wire.begin();
+    Wire.beginTransmission( addr );
+    if( Wire.endTransmission() == 0 ) 
+    {
+        return true;
+    }
+    return false;
 }
 
 LiquidCrystal_I2C * pLcd = NULL;

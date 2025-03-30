@@ -279,7 +279,7 @@ void loop()
       nMotorId = anFoundMotorIds[nNumMotor];
       dxl.torqueOff(nMotorId);
       dxl.setOperatingMode(nMotorId, OP_VELOCITY);
-      dxl.setGoalVelocity(nMotorId, 0, UNIT_PERCENT); // sinon il peut y avoir un reste d'une autre commande, et le temps d'envoyer a tout les moteurs certains commencent a tourner dans l'autre sens (reste du coup d'avant)
+      dxl.setGoalVelocity(nMotorId, 0, UNIT_PERCENT); // sinon il peut y avoir un reste d'une autre commande, et le temps d'envoyer a tout les moteurs certains commencent a tourner dans l'autre sens (reste du coup d'avant) (bof la difference n'est pas claire)
       dxl.torqueOn(nMotorId);
     }
     for( int nNumMotor = 0; nNumMotor < nNbrFoundMotor; ++nNumMotor )

@@ -270,6 +270,36 @@ void loop()
       dxl.torqueOff(nMotorId);
     }
   }
+
+  if( 1 )
+  {
+    // all in one fast ping pong
+    for( int nNumMotor = 0; nNumMotor < nNbrFoundMotor; ++nNumMotor )
+    {
+      nMotorId = anFoundMotorIds[nNumMotor];
+      dxl.torqueOff(nMotorId);
+      dxl.setOperatingMode(nMotorId, OP_VELOCITY);
+      dxl.setGoalVelocity(nMotorId, 0, UNIT_PERCENT); // sinon il peut y avoir un reste d'une autre commande, et le temps d'envoyer a tout les moteurs certains commencent a tourner dans l'autre sens (reste du coup d'avant)
+      dxl.torqueOn(nMotorId);
+    }
+    for( int nNumMotor = 0; nNumMotor < nNbrFoundMotor; ++nNumMotor )
+    {
+      nMotorId = anFoundMotorIds[nNumMotor];
+      dxl.setGoalVelocity(nMotorId, 100, UNIT_PERCENT);
+    }
+    delay(2000);
+    for( int nNumMotor = 0; nNumMotor < nNbrFoundMotor; ++nNumMotor )
+    {
+      nMotorId = anFoundMotorIds[nNumMotor];
+      dxl.setGoalVelocity(nMotorId, 1023, UNIT_RAW);
+    }
+    delay(2000);
+    for( int nNumMotor = 0; nNumMotor < nNbrFoundMotor; ++nNumMotor )
+    {
+      nMotorId = anFoundMotorIds[nNumMotor];
+      dxl.torqueOff(nMotorId);
+    }
+  }
 }
 
 

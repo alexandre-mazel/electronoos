@@ -227,6 +227,23 @@ void setup() {
   dxl.setPortProtocolVersion((float)nNumProtocol);
   dxl.begin(nBaudRate);
 
+
+  if( 0 )
+  {
+    if( nNbrFoundMotor > 0 )
+    {
+      // Tested and working code to rename a servo id
+      int nSrc = 6;
+      int nDst = 9;
+      lcd_print_message( "WARNING: in 5 sec" );
+      lcd_print_message( "Write motor ID: ", nSrc );
+      lcd_print_message( "To ID: ", nDst );
+      delay( 6000 );
+      dxl.setID( nSrc,nDst );
+      lcd_print_message( "WRITED !!!" );
+    }
+  }
+
   DEBUG_SERIAL.println( "INF: setup finished" );
   
 }

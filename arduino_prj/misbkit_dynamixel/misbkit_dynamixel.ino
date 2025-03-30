@@ -65,7 +65,7 @@ void setup_lcd( const char * init_msg = NULL )
   {
     pLcd->print( init_msg );
   }
-  pLcd->print( "- setup_lcd finished -" );
+  pLcd->print( "setup_lcd finished" );
 }
 
 
@@ -88,7 +88,7 @@ void setup() {
   DEBUG_SERIAL.begin(115200);   //set debugging port baudrate to 115200bps
   while(!DEBUG_SERIAL);         //Wait until the serial port is opened
 
-  DEBUG_SERIAL.println( "misbkit_dynamixel.ino v0.61" );
+  DEBUG_SERIAL.println( "misbkit_dynamix v0.61" );
 
   DEBUG_SERIAL.println( "INF: Setup starting..." );
 

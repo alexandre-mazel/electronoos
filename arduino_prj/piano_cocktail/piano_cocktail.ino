@@ -119,9 +119,13 @@ void animateLcd()
 long int nTimeStartFill = 0;
 int bIsFilling = 0;
 
-unsigned char nMilliBeforeCut = 13; // 10 en version normal (maintenant 13), en oversize: 45 si slow, si rapide, mettre 100, et mettre
+unsigned char nMilliBeforeCut = 70; // 10 en version normal (maintenant 13), en oversize: 45 si slow, si rapide, mettre 100, et mettre
 
-bool bActivateHache  = 0; // activate on oversized
+bool bIsOversize = 1;
+
+bool bActivateHache  = bIsOversize; // activate on oversized
+
+int nWaitBetweenBottleMs = 1000; // was 5000, then 3000 (new: doubled when oversize)
 
 unsigned long hache_timeNextChange = 0;
 int hache_nNextIsOpen = 1;
@@ -144,7 +148,12 @@ void setOpen( int nNumVanne, int bOpen)
     
     // we will hache only if versing is on, so next hache will be after an opening
     hache_nNextIsOpen = 0;
-    hache_timeNextChange = millis()+hache_period_ms;
+
+    int nHacheTime = hache_period_ms;
+    if( bOpen )
+      nHacheTime /= 2; // we hache half the wait time
+
+    hache_timeNextChange = millis()+nHacheTime;
 
 
     if(bOpen)
@@ -160,7 +169,7 @@ void setOpen( int nNumVanne, int bOpen)
 
 void readCfgFromEeproom()
 {
-  if(0)
+  if(1)
   {
     //write values (for the first time)
     Serial.println("\nWRITING TO EEPROM !\n");
@@ -240,6 +249,11 @@ void setup() {
 
   //handleOrder("#Assemble_10_20_30"); // to test when not connected to the tablet
 
+  if( bIsOversize )
+  {
+    nWaitBetweenBottleMs *= 2;
+  }
+
 } // setup
 
 float last_measured = 0;
@@ -292,7 +306,6 @@ int isTargetDefined()
 }
 int check_if_must_stop_verse()
 {
-  const int nWaitBetweenBottleMs = 1000; // was 5000, then 3000
   // return 0 if not versing, 1 if versing, 2 if done
 
   if(!isTargetDefined())

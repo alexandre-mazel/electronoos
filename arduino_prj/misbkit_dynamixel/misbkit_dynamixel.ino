@@ -20,23 +20,13 @@ c:\Users\alexa\Documents\Arduino\libraries\DynamixelShield\src/DynamixelShield.h
 
 #include <DynamixelShield.h>
 
-#if defined(ARDUINO_AVR_UNO) || defined(ARDUINO_AVR_MEGA2560)
-  #include <SoftwareSerial.h>
-  SoftwareSerial soft_serial(7, 8); // DYNAMIXELShield UART RX/TX
-  #define DEBUG_SERIAL soft_serial
-#elif defined(ARDUINO_SAM_DUE) || defined(ARDUINO_SAM_ZERO)
-  #define DEBUG_SERIAL SerialUSB
-#else
-  #define DEBUG_SERIAL Serial
-#endif
 
-#if 0
-  #define MAX_BAUD 5
-  const int32_t baud[MAX_BAUD] = {57600, 115200, 1000000, 2000000, 3000000}; //  on my board it stuck at 2M id0
-#else
-  #define MAX_BAUD 4
-  const int32_t baud[MAX_BAUD] = {9600, 57600, 115200, 1000000}; // default for 430 is 57600
-#endif
+#define DEBUG_SERIAL Serial
+
+
+#define MAX_BAUD 4
+const int32_t baud[MAX_BAUD] = {9600, 57600, 115200, 1000000}; // default for 430 is 57600
+
 
 // config for misbkit:
 #define DXL_DIR_PIN 4
@@ -239,14 +229,15 @@ void setup() {
       lcd_print_message( "Write motor ID: ", nSrc );
       lcd_print_message( "To ID: ", nDst );
       delay( 6000 );
-      dxl.setID( nSrc,nDst );
+      
+      
       lcd_print_message( "WRITED !!!" );
     }
   }
 
   DEBUG_SERIAL.println( "INF: setup finished" );
   
-}
+} // setup
 
 void loop() 
 {
@@ -300,7 +291,7 @@ void loop()
       dxl.torqueOff(nMotorId);
     }
   }
-}
+} // loop
 
 
 void debug_on_lcd(void)

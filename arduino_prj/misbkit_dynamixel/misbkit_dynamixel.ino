@@ -16,6 +16,8 @@ C:\Users\alexa\dev\git\electronoos\arduino_prj\misbkit_dynamixel\misbkit_dynamix
 In file included from C:\Users\alexa\dev\git\electronoos\arduino_prj\misbkit_dynamixel\misbkit_dynamixel.ino:13:
 c:\Users\alexa\Documents\Arduino\libraries\DynamixelShield\src/DynamixelShield.h:41: note: this is the location of the previous definition
    #define DXL_DIR_PIN  2
+   
+   TODO: rename to MISBKIT_DXL_DIR_PIN (and test it works...)
 */
 
 #include <DynamixelShield.h>

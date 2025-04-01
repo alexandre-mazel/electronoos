@@ -17,6 +17,11 @@ def uintToBytes( n ):
     res = int.to_bytes( n, length=length, byteorder='big', signed=False )
     return res
     
+def sintToBytes( n ):
+    length = math.ceil(math.log(n, 256)) + 1 # +1 for the signed ?
+    res = int.to_bytes( n, length=length, byteorder='big', signed=True )
+    return res
+    
 def bytesToUInt( b ):
     int.from_bytes( b, byteorder='big', signed = False ) # for byteorder, we could also use sys.byteorder
 
@@ -36,12 +41,31 @@ time_begin = time.time()
 nbr_received = 0
 nbr_sent = 0
 nbr_exchange = 0
+"""
+Format of a moteur order:
+'Mot' then for each motor: 1 byte of command and 1 byte of parameter.
+Command: 
+- 'P': position
+- 'S': speed
+- 'I': change ID (NDEV)
+
+Parameter:
+- Seen as signed char: -128..127 (both for position or speed)
+"""
+nSimulatedMotorPos = 0
 while 1:
-    data = b'Mot' + uintToBytes(200)
-    if 1:
-        # simulate 5 extra motors
-        for i in range(5):
-            data += uintToBytes(200+1+i)
+    data = b'Mot'
+    if 0:
+        data += uintToBytes(200)
+        if 1:
+            # simulate 5 extra motors
+            for i in range(5):
+                data += uintToBytes(200+1+i)
+    else:
+        for i in range(6):
+            data += sintToBytes((nPos%256)-128
+            
+        nSimulatedMotorPos += 1
             
     clientsocket.send( data )
     nbr_sent += len(data)

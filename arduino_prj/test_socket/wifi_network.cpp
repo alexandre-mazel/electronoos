@@ -149,3 +149,15 @@ int createWifiAP( const char* SSID, const char* password )
 
   return 1;
 }
+
+const char * getCurrentIP( void )
+{
+  static char sz_ip[4*3+3+1];
+  IPAddress IP = WiFi.softAPIP();
+  // return (const char*)IP;
+  //const uint8_t* tip = IP.raw_address();
+  //sprintf( sz_ip, "%d.%d.%d.%d", tip[0], tip[1],tip[2],tip[3] );
+  sprintf( sz_ip, "%d.%d.%d.%d", IP[0], IP[1],IP[2],IP[3] );
+  return sz_ip;
+  
+}

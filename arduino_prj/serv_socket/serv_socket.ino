@@ -2,6 +2,7 @@
 #include "wifi_network.hpp" // lien symbolique vers le hpp ( creer en lancant un cmd en mode administrateur et la commande: mklink wifi_network.cpp ..\test_socket\wifi_network.cpp )
 #include "misbkit.hpp"
 #include "dynamixel_motor.hpp"
+#include "debug_lcd.hpp"
 
 const int ledPin = 13;
 
@@ -18,6 +19,16 @@ void start_server( void )
 }
 
 unsigned char allMotorsPosition[6] = {100,101,102,103,104,105};
+
+void handleMotorOrder( const char * pMotorsCommand )
+{
+  while( *pMotorsCommand !=! '\0' )
+  {
+    signed char command = *pMotorsCommand; ++pMotorsCommand;
+    signed char value =  *pMotorsCommand; ++pMotorsCommand;
+    // TODO
+  }
+}
 
 void update_server( void )
 {
@@ -108,6 +119,7 @@ void update_server( void )
         {
           // Serial.println( "" );
           // Serial.println( "INF: Motor position received, sending current one" );
+          handleMotorOrder(&currentLine[3]);
           if( 1 )
           {
             // send answer
@@ -159,12 +171,16 @@ void update_server( void )
   }
 }
 
+DyMotors dym;
+
 void setup()
 {
+  const char str_version[] = "serv_socket v0.61";
   Serial.begin(115200);
 
   Serial.println ( "" );
-  Serial.println( "serv_socket v0.61" );
+  Serial.println( str_version );
+  setup_lcd( str_version );
 
   if( 0 )
   {
@@ -193,11 +209,13 @@ void setup()
   //connectToWifi();
   createWifiAP( getArduinoId() );
 
+  lcd_print_message( getCurrentIP() );
+
 
   start_server();
 
   // init motor
-  scanMotors();
+  dym.init();
 }
 
 

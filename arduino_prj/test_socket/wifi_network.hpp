@@ -13,4 +13,6 @@ int connectToWifi( void );
 
 int createWifiAP( const char* SSID, const char* password = NULL ); // Leave NULL for no password
 
+const char * getCurrentIP( void );
+
 #endif

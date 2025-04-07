@@ -45,109 +45,115 @@ if 1:
     assert bytesToUInt( 0x81 ) == -127, "erreur bytesToUInt: 0x81"
     assert bytesToUInt( b'\x81' ) == -127, "erreur bytesToUInt: b0x81"
     
+    
+def sendAndReceiveOrder( strServerIP ):
+    
+    print( "INF: Connecting to '%s'" % strServerIP )
+    clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    clientsocket.connect( ( strServerIP, 8090 ) )
+
+    clientsocket.send( b'Hello' )
+    print( "INF: waiting for answer (1)..." )
+    ret = clientsocket.recv( 32 )
+    print( "INF: ret (1): ", ret )
+
+    time_begin = time.time()
+    nbr_received = 0
+    nbr_sent = 0
+    nbr_exchange = 0
+    """
+    Format of a moteur order:
+    'Mot' then for each motor: 1 byte of command and 1 byte of parameter.
+    Command: 
+    - 'P': position
+    - 'S': speed
+    - 'I': change ID (NDEV)
+
+    Parameter:
+    - Seen as signed char: -128..127 (both for position or speed)
+    """
+    nSimulatedMotorPos = 0
+    bVerbose = 0
+
+    while 1:
+        data = b'Mot'
+        if 0:
+            data += uintToBytes(200)
+            if 1:
+                # simulate 5 extra motors
+                for i in range(5):
+                    data += uintToBytes(200+1+i)
+        else:
+            for i in range(6):
+                if 0:
+                    data += b'P' # for a Position order => 5.5fps
+                elif 0:
+                    data += b'V' # for a Velocity order (if velocity compute everything, but don't send it => 10fps)
+                else:
+                    data += b'F' # for a Fake order (do nothing) => 30fps
+                data += sintToBytes((nSimulatedMotorPos%255)-127)
+                
+            nSimulatedMotorPos += 1
+                
+        if bVerbose: print("DBG: Sending data len(%d): %s" % (len(data),data) )
+        clientsocket.send( data )
+        nbr_sent += len(data)
+        
+        if 1:
+            # wait for the motor position
+            #~ print( "INF: waiting for answer..." )
+            
+            ret = clientsocket.recv( 32 )
+            nbr_received += len(ret)
+            if bVerbose: print( "INF: ret: %s" % (ret) )
+            
+            bSimulatedPosition = False
+            if bSimulatedPosition:        
+                ret0 = ret[0]
+                ret0 = bytesToUInt( ret[0] )
+                if bVerbose: print( "INF: ret: %s, ret0: %d, 0x%x" % (ret,ret0,ret0) )
+                
+                if ret0 != 100:
+                    print( "INF: answer should be 100 and it's not!" )
+                    break
+            else:
+                bOutputOneLineFor6 = 1
+                if ret[0:3] == b'Pos':
+                    # We receive 6 motor pos
+                    ret = ret[3:]
+                    for i in range(len(ret)):
+                        val = bytesToUInt( ret[i] )
+                        if bVerbose: print( "INF: val%d: %s, %d, 0x%x" % (i,val,val,val) )
+                        if bOutputOneLineFor6: print(str(val) + ", ",end="")
+                    if bOutputOneLineFor6: print("")
+                    
+                    
+                
+        nbr_exchange += 1
+            
+        duration = time.time() - time_begin
+        if duration > 5:
+            received = nbr_received / duration
+            sent = nbr_sent / duration
+            print( "%s: nbr_exchange: %.1f (%d), Sent: %sB, Received: %sB" % ( getTimeStamp(), nbr_exchange/duration, nbr_exchange, smartFormatSize(sent), smartFormatSize(received) ) )
+            time_begin = time.time()
+            nbr_exchange = 0
+            nbr_received = 0
+            nbr_sent = 0
+            
+        
+        #~ time.sleep(0.004) # 0.01 => 100 ordre et reception par sec (mais ca va plus vite si on attend 2 fois moins)
+        time.sleep(0.00001) # si c'est deja assez lent, ca sert a rien d'attendre ici
+            
+        if bVerbose: time.sleep( 5 ) # to help debugging
+        
+    print( "INF: client disconnected" )
+
+    
 strServerIP = "192.168.4.1"   # sur AP
 #~ strServerIP = "192.168.0.25" # sur Box
 
-print( "INF: Connecting to '%s'" % strServerIP )
-clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-clientsocket.connect( ( strServerIP, 8090 ) )
-
-clientsocket.send( b'Hello' )
-print( "INF: waiting for answer (1)..." )
-ret = clientsocket.recv( 32 )
-print( "INF: ret (1): ", ret )
-
-time_begin = time.time()
-nbr_received = 0
-nbr_sent = 0
-nbr_exchange = 0
-"""
-Format of a moteur order:
-'Mot' then for each motor: 1 byte of command and 1 byte of parameter.
-Command: 
-- 'P': position
-- 'S': speed
-- 'I': change ID (NDEV)
-
-Parameter:
-- Seen as signed char: -128..127 (both for position or speed)
-"""
-nSimulatedMotorPos = 0
-bVerbose = 0
-
-while 1:
-    data = b'Mot'
-    if 0:
-        data += uintToBytes(200)
-        if 1:
-            # simulate 5 extra motors
-            for i in range(5):
-                data += uintToBytes(200+1+i)
-    else:
-        for i in range(6):
-            if 0:
-                data += b'P' # for a Position order => 5.5fps
-            elif 0:
-                data += b'V' # for a Velocity order (if velocity compute everything, but don't send it => 10fps)
-            else:
-                data += b'F' # for a Fake order (do nothing) => 30fps
-            data += sintToBytes((nSimulatedMotorPos%255)-127)
-            
-        nSimulatedMotorPos += 1
-            
-    if bVerbose: print("DBG: Sending data len(%d): %s" % (len(data),data) )
-    clientsocket.send( data )
-    nbr_sent += len(data)
-    
-    if 1:
-        # wait for the motor position
-        #~ print( "INF: waiting for answer..." )
-        
-        ret = clientsocket.recv( 32 )
-        nbr_received += len(ret)
-        if bVerbose: print( "INF: ret: %s" % (ret) )
-        
-        bSimulatedPosition = False
-        if bSimulatedPosition:        
-            ret0 = ret[0]
-            ret0 = bytesToUInt( ret[0] )
-            if bVerbose: print( "INF: ret: %s, ret0: %d, 0x%x" % (ret,ret0,ret0) )
-            
-            if ret0 != 100:
-                print( "INF: answer should be 100 and it's not!" )
-                break
-        else:
-            bOutputOneLineFor6 = 1
-            if ret[0:3] == b'Pos':
-                # We receive 6 motor pos
-                ret = ret[3:]
-                for i in range(len(ret)):
-                    val = bytesToUInt( ret[i] )
-                    if bVerbose: print( "INF: val%d: %s, %d, 0x%x" % (i,val,val,val) )
-                    if bOutputOneLineFor6: print(str(val) + ", ",end="")
-                if bOutputOneLineFor6: print("")
-                
-                
-            
-    nbr_exchange += 1
-        
-    duration = time.time() - time_begin
-    if duration > 5:
-        received = nbr_received / duration
-        sent = nbr_sent / duration
-        print( "%s: nbr_exchange: %.1f (%d), Sent: %sB, Received: %sB" % ( getTimeStamp(), nbr_exchange/duration, nbr_exchange, smartFormatSize(sent), smartFormatSize(received) ) )
-        time_begin = time.time()
-        nbr_exchange = 0
-        nbr_received = 0
-        nbr_sent = 0
-        
-    
-    #~ time.sleep(0.004) # 0.01 => 100 ordre et reception par sec (mais ca va plus vite si on attend 2 fois moins)
-    time.sleep(0.00001) # si c'est deja assez lent, ca sert a rien d'attendre ici
-        
-    if bVerbose: time.sleep( 5 ) # to help debugging
-    
-print( "INF: client disconnected" )
+sendAndReceiveOrder( strServerIP )
 
 """
 Stat 

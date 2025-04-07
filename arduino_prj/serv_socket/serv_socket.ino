@@ -34,11 +34,11 @@ void handleMotorOrder( const char * pMotorsCommand )
     //Serial.print("DBG: handleMotorOrder: for motor " ); Serial.print(nNumMotor); Serial.print( ", command: " ); Serial.print( command ); Serial.print( ", value: " ); Serial.println( (int)value );
     if( command == 'P')
     {
-        dym.sendPosition( nNumMotor, value );
+      dym.sendPosition( nNumMotor, value );
     }
     else if( command == 'V')
     {
-        dym.sendPosition( nNumMotor, value );
+      dym.sendPosition( nNumMotor, value );
     }
     nNumMotor += 1;
   }
@@ -139,7 +139,11 @@ void update_server( void )
             // send answer
             // client.write( 100 ); // just 1 motor value
             //client.write( allMotorsSimulatedPosition, 6 ); // all values (simulated)
-            client.write( (uint8_t*)dym.getAllPositions(), 6 ); // all values (simulated)
+            static char sendpos[] = "PosXXXXXX";
+            
+            //client.write( (uint8_t*)dym.getAllPositions(), 6 ); // all values
+            memcpy( &sendpos[3], (uint8_t*)dym.getAllPositions(), 6 );
+            client.write( sendpos, 3+6 );
             nbr_sent += 1;
           }
           //currentLine = "";

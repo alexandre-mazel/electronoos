@@ -27,14 +27,24 @@ def sintToBytes( n ):
         length = math.ceil(math.log(abs(n*2), 256)) # length in bytes; *2 for the signed
     #~ print("DBG: sintToBytes: n: %d, length: %d" % (n,length) )
     res = int.to_bytes( n, length=length, byteorder='big', signed=True )
+    #~ print("DBG: sintToBytes: returning (2): %s (len:%s)" % (res,len(res) ) )
     return res
     
 def bytesToUInt( b ):
-    print("DBG: bytesToUInt: b: %s" % (b) )
+    #~ print("DBG: bytesToUInt: b: %s" % (b) )
     if isinstance(b,int):
-        return b
-    int.from_bytes( b, byteorder='big', signed = True ) # for byteorder, we could also use sys.byteorder
-
+        #~ print("DBG: bytesToUInt: is int!" )
+        if b < 128:
+            return b
+        return b - 256
+    res = int.from_bytes( b, byteorder='big', signed = True ) # for byteorder, we could also use sys.byteorder
+    #~ print("DBG: bytesToUInt: returning (2): %s" % res )
+    return res
+if 1:
+    assert bytesToUInt( 127 ) == 127, "erreur bytesToUInt: 127"
+    assert bytesToUInt( 0x81 ) == -127, "erreur bytesToUInt: 0x81"
+    assert bytesToUInt( b'\x81' ) == -127, "erreur bytesToUInt: b0x81"
+    
 strServerIP = "192.168.4.1"   # sur AP
 #~ strServerIP = "192.168.0.25" # sur Box
 
@@ -63,6 +73,8 @@ Parameter:
 - Seen as signed char: -128..127 (both for position or speed)
 """
 nSimulatedMotorPos = 0
+bVerbose = 0
+
 while 1:
     data = b'Mot'
     if 0:
@@ -73,11 +85,12 @@ while 1:
                 data += uintToBytes(200+1+i)
     else:
         for i in range(6):
-            data += b'P'
-            data += sintToBytes((nSimulatedMotorPos%256)-128)
+            data += b'P' # for a Position order
+            data += sintToBytes((nSimulatedMotorPos%255)-127)
             
         nSimulatedMotorPos += 1
             
+    if bVerbose: print("DBG: Sending data len(%d): %s" % (len(data),data) )
     clientsocket.send( data )
     nbr_sent += len(data)
     
@@ -87,21 +100,24 @@ while 1:
         
         ret = clientsocket.recv( 32 )
         nbr_received += len(ret)
-        print( "INF: ret: %s" % (ret) )
+        if bVerbose: print( "INF: ret: %s" % (ret) )
         
         bSimulatedPosition = False
         if bSimulatedPosition:        
             ret0 = ret[0]
             ret0 = bytesToUInt( ret[0] )
-            print( "INF: ret: %s, ret0: %d, 0x%x" % (ret,ret0,ret0) )
+            if bVerbose: print( "INF: ret: %s, ret0: %d, 0x%x" % (ret,ret0,ret0) )
             
             if ret0 != 100:
-                print( "INF: answer should be 100 and is wrong!" )
+                print( "INF: answer should be 100 and it's not!" )
                 break
         else:
-            for i in range(len(ret)):
-                val = bytesToUInt( ret[i] )
-                print( "INF: val%d: %s, %d, 0x%x" % (i,val,val,val) )
+            if ret[0:3] == b'Pos':
+                # We receive 6 motor pos
+                ret = ret[3:]
+                for i in range(len(ret)):
+                    val = bytesToUInt( ret[i] )
+                    if bVerbose: print( "INF: val%d: %s, %d, 0x%x" % (i,val,val,val) )
             
     nbr_exchange += 1
         
@@ -118,7 +134,7 @@ while 1:
     
     time.sleep(0.004) # 0.01 => 100 ordre et reception par sec (mais ca va plus vite si on attend 2 fois moins)
         
-    time.sleep( 5 ) # to help debugging
+    #~ time.sleep( 5 ) # to help debugging
     
 print( "INF: client disconnected" )
 

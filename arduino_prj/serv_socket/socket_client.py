@@ -12,6 +12,8 @@ import sys
 sys.path.append("../test_socket")
 from socket_server import getTimeStamp, smartFormatSize
 
+import graph_motor
+
 def uintToBytes( n ):
     if n == 0:
         length = 1
@@ -92,8 +94,10 @@ def sendAndReceiveOrder( strServerIP ):
                 else:
                     data += b'F' # for a Fake order (do nothing) => 30fps
                 data += sintToBytes((nSimulatedMotorPos%255)-127)
+                graph_motor.add_graph_order(i,nSimulatedMotorPos)
                 
             nSimulatedMotorPos += 1
+            
                 
         if bVerbose: print("DBG: Sending data len(%d): %s" % (len(data),data) )
         clientsocket.send( data )
@@ -117,15 +121,21 @@ def sendAndReceiveOrder( strServerIP ):
                     print( "INF: answer should be 100 and it's not!" )
                     break
             else:
-                bOutputOneLineFor6 = 1
+                
                 if ret[0:3] == b'Pos':
                     # We receive 6 motor pos
+                    
+                    bOutputOneLineFor6 = 1
+                    bOutputOneLineFor6 = 0
+                    
                     ret = ret[3:]
                     for i in range(len(ret)):
                         val = bytesToUInt( ret[i] )
+                        graph_motor.add_graph_pos(i,val)
                         if bVerbose: print( "INF: val%d: %s, %d, 0x%x" % (i,val,val,val) )
                         if bOutputOneLineFor6: print(str(val) + ", ",end="")
                     if bOutputOneLineFor6: print("")
+                    
                     
                     
                 

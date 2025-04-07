@@ -85,7 +85,12 @@ while 1:
                 data += uintToBytes(200+1+i)
     else:
         for i in range(6):
-            data += b'P' # for a Position order
+            if 0:
+                data += b'P' # for a Position order => 5.5fps
+            elif 0:
+                data += b'V' # for a Velocity order (if velocity compute everything, but don't send it => 10fps)
+            else:
+                data += b'F' # for a Fake order (do nothing) => 30fps
             data += sintToBytes((nSimulatedMotorPos%255)-127)
             
         nSimulatedMotorPos += 1
@@ -112,12 +117,17 @@ while 1:
                 print( "INF: answer should be 100 and it's not!" )
                 break
         else:
+            bOutputOneLineFor6 = 1
             if ret[0:3] == b'Pos':
                 # We receive 6 motor pos
                 ret = ret[3:]
                 for i in range(len(ret)):
                     val = bytesToUInt( ret[i] )
                     if bVerbose: print( "INF: val%d: %s, %d, 0x%x" % (i,val,val,val) )
+                    if bOutputOneLineFor6: print(str(val) + ", ",end="")
+                if bOutputOneLineFor6: print("")
+                
+                
             
     nbr_exchange += 1
         
@@ -132,9 +142,10 @@ while 1:
         nbr_sent = 0
         
     
-    time.sleep(0.004) # 0.01 => 100 ordre et reception par sec (mais ca va plus vite si on attend 2 fois moins)
+    #~ time.sleep(0.004) # 0.01 => 100 ordre et reception par sec (mais ca va plus vite si on attend 2 fois moins)
+    time.sleep(0.00001) # si c'est deja assez lent, ca sert a rien d'attendre ici
         
-    #~ time.sleep( 5 ) # to help debugging
+    if bVerbose: time.sleep( 5 ) # to help debugging
     
 print( "INF: client disconnected" )
 

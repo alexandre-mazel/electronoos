@@ -38,7 +38,11 @@ void handleMotorOrder( const char * pMotorsCommand )
     }
     else if( command == 'V')
     {
-      dym.sendPosition( nNumMotor, value );
+      dym.sendVelocity( nNumMotor, value );
+    }
+    else if( command == 'F') // fake order: do nothing !
+    {
+      // Nothing
     }
     nNumMotor += 1;
   }

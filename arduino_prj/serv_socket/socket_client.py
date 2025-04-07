@@ -13,17 +13,27 @@ sys.path.append("../test_socket")
 from socket_server import getTimeStamp, smartFormatSize
 
 def uintToBytes( n ):
-    length = math.ceil(math.log(n, 256))
+    if n == 0:
+        length = 1
+    else:
+        length = math.ceil(math.log(n, 256)) # length in bytes
     res = int.to_bytes( n, length=length, byteorder='big', signed=False )
     return res
     
 def sintToBytes( n ):
-    length = math.ceil(math.log(n, 256)) + 1 # +1 for the signed ?
+    if n == 0:
+        length = 1
+    else:
+        length = math.ceil(math.log(abs(n*2), 256)) # length in bytes; *2 for the signed
+    #~ print("DBG: sintToBytes: n: %d, length: %d" % (n,length) )
     res = int.to_bytes( n, length=length, byteorder='big', signed=True )
     return res
     
 def bytesToUInt( b ):
-    int.from_bytes( b, byteorder='big', signed = False ) # for byteorder, we could also use sys.byteorder
+    print("DBG: bytesToUInt: b: %s" % (b) )
+    if isinstance(b,int):
+        return b
+    int.from_bytes( b, byteorder='big', signed = True ) # for byteorder, we could also use sys.byteorder
 
 strServerIP = "192.168.4.1"   # sur AP
 #~ strServerIP = "192.168.0.25" # sur Box
@@ -63,7 +73,8 @@ while 1:
                 data += uintToBytes(200+1+i)
     else:
         for i in range(6):
-            data += sintToBytes((nPos%256)-128
+            data += b'P'
+            data += sintToBytes((nSimulatedMotorPos%256)-128)
             
         nSimulatedMotorPos += 1
             
@@ -73,16 +84,24 @@ while 1:
     if 1:
         # wait for the motor position
         #~ print( "INF: waiting for answer..." )
+        
         ret = clientsocket.recv( 32 )
         nbr_received += len(ret)
-        ret0 = ret[0]
-        #~ ret0 = bytesToUInt( ret[0] )
-        #~ print( "INF: ret: %s, ret0: %d, 0x%x" % (ret,ret0,ret0) )
+        print( "INF: ret: %s" % (ret) )
         
-        if ret0 != 100:
-            print( "INF: ret: %s, ret0: %d, 0x%x" % (ret, ret0, ret0 ) )
-            print( "INF: answer should be 100 and is wrong!" )
-            break
+        bSimulatedPosition = False
+        if bSimulatedPosition:        
+            ret0 = ret[0]
+            ret0 = bytesToUInt( ret[0] )
+            print( "INF: ret: %s, ret0: %d, 0x%x" % (ret,ret0,ret0) )
+            
+            if ret0 != 100:
+                print( "INF: answer should be 100 and is wrong!" )
+                break
+        else:
+            for i in range(len(ret)):
+                val = bytesToUInt( ret[i] )
+                print( "INF: val%d: %s, %d, 0x%x" % (i,val,val,val) )
             
     nbr_exchange += 1
         
@@ -99,6 +118,7 @@ while 1:
     
     time.sleep(0.004) # 0.01 => 100 ordre et reception par sec (mais ca va plus vite si on attend 2 fois moins)
         
+    time.sleep( 5 ) # to help debugging
     
 print( "INF: client disconnected" )
 

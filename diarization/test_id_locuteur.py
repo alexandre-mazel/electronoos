@@ -25,4 +25,15 @@ def extract_features_sound( filename ):
         print(S_dB)
         
 extract_features_sound("user_alex_1.wav")
+
+# idee, mais pas fini: extraire avec mfcc puis faire un training avec random forest ou ... pour différencier des bouts de textes
+# extrait depuis les timings venant de whisper, eg:
+"""
+[21:50.920 --> 21:53.580]  prouve que ça ne va pas être fait par un chat GPT ?
+[21:55.060 --> 21:57.360]  Déjà, parce que
+[21:57.360 --> 22:00.360]  je trouve que
+[22:00.360 --> 22:02.300]  chat GPT, la plupart du temps,
+[22:06.300 --> 22:07.640]  je trouve que
+[22:07.640 --> 22:10.620]  on arrive à voir quand même un petit peu
+"""
         

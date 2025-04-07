@@ -10,6 +10,9 @@ const int ledPin = 13;
 const uint16_t port = 8090;
 WiFiServer wifi_server( port );
 
+
+DyMotors dym;
+
 void start_server( void )
 {
   Serial.print( "INF: start_server: Starting server on port " ); Serial.println( port );
@@ -18,15 +21,26 @@ void start_server( void )
   Serial.print( "INF: start_server: server nodelay: " ); Serial.println( wifi_server.getNoDelay() );
 }
 
-unsigned char allMotorsPosition[6] = {100,101,102,103,104,105};
+unsigned char allMotorsSimulatedPosition[6] = {100,101,102,103,104,105};
 
 void handleMotorOrder( const char * pMotorsCommand )
 {
-  while( *pMotorsCommand !=! '\0' )
+  int nNumMotor = 0;
+  while( (*pMotorsCommand) != '\0' )
   {
-    signed char command = *pMotorsCommand; ++pMotorsCommand;
-    signed char value =  *pMotorsCommand; ++pMotorsCommand;
-    // TODO
+    char command = *pMotorsCommand; ++pMotorsCommand;
+    sbyte value =  *pMotorsCommand; ++pMotorsCommand;
+    
+    //Serial.print("DBG: handleMotorOrder: for motor " ); Serial.print(nNumMotor); Serial.print( ", command: " ); Serial.print( command ); Serial.print( ", value: " ); Serial.println( (int)value );
+    if( command == 'P')
+    {
+        dym.sendPosition( nNumMotor, value );
+    }
+    else if( command == 'V')
+    {
+        dym.sendPosition( nNumMotor, value );
+    }
+    nNumMotor += 1;
   }
 }
 
@@ -124,7 +138,8 @@ void update_server( void )
           {
             // send answer
             // client.write( 100 ); // just 1 motor value
-            client.write( allMotorsPosition, 6 ); // all values
+            //client.write( allMotorsSimulatedPosition, 6 ); // all values (simulated)
+            client.write( (uint8_t*)dym.getAllPositions(), 6 ); // all values (simulated)
             nbr_sent += 1;
           }
           //currentLine = "";
@@ -171,11 +186,10 @@ void update_server( void )
   }
 }
 
-DyMotors dym;
 
 void setup()
 {
-  const char str_version[] = "serv_socket v0.61";
+  const char str_version[] = "serv_socket v0.63";
   Serial.begin(115200);
 
   Serial.println ( "" );
@@ -216,6 +230,9 @@ void setup()
 
   // init motor
   dym.init();
+
+  lcd_print_message( "Serving on: ", getArduinoId() );
+  lcd_print_message( getCurrentIP() );
 }
 
 

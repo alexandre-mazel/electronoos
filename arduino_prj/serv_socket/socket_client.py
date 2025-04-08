@@ -12,7 +12,14 @@ import sys
 sys.path.append("../test_socket")
 from socket_server import getTimeStamp, smartFormatSize
 
-import graph_motor
+bGraph = 0
+bGraph = 1 # from 30fps to 10fps (with no real orders) from 5 to 4 with orders
+# updating one over 4 frames: from 30fps to 20fps
+# updating one over 10 frames: from 30fps to 25fps
+
+if bGraph: 
+    import graph_motor
+    graph_motor.create_graph()
 
 def uintToBytes( n ):
     if n == 0:
@@ -93,8 +100,9 @@ def sendAndReceiveOrder( strServerIP ):
                     data += b'V' # for a Velocity order (if velocity compute everything, but don't send it => 10fps)
                 else:
                     data += b'F' # for a Fake order (do nothing) => 30fps
-                data += sintToBytes((nSimulatedMotorPos%255)-127)
-                graph_motor.add_graph_order(i,nSimulatedMotorPos)
+                value_order =  (nSimulatedMotorPos%255)-127
+                data += sintToBytes(value_order)
+                if bGraph: graph_motor.add_graph_order(i,value_order)
                 
             nSimulatedMotorPos += 1
             
@@ -131,7 +139,7 @@ def sendAndReceiveOrder( strServerIP ):
                     ret = ret[3:]
                     for i in range(len(ret)):
                         val = bytesToUInt( ret[i] )
-                        graph_motor.add_graph_pos(i,val)
+                        if bGraph: graph_motor.add_graph_pos(i,val)
                         if bVerbose: print( "INF: val%d: %s, %d, 0x%x" % (i,val,val,val) )
                         if bOutputOneLineFor6: print(str(val) + ", ",end="")
                     if bOutputOneLineFor6: print("")
@@ -151,6 +159,8 @@ def sendAndReceiveOrder( strServerIP ):
             nbr_received = 0
             nbr_sent = 0
             
+            
+        if bGraph: graph_motor.refresh_render()
         
         #~ time.sleep(0.004) # 0.01 => 100 ordre et reception par sec (mais ca va plus vite si on attend 2 fois moins)
         time.sleep(0.00001) # si c'est deja assez lent, ca sert a rien d'attendre ici

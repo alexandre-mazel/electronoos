@@ -13,9 +13,10 @@ sys.path.append("../test_socket")
 from socket_server import getTimeStamp, smartFormatSize
 
 bGraph = 0
-bGraph = 1 # from 30fps to 10fps (with no real orders) from 5 to 4 with orders
+#~ bGraph = 1 # from 30fps to 10fps (with no real orders) from 5 to 4 with orders
 # updating one over 4 frames: from 30fps to 20fps
 # updating one over 10 frames: from 30fps to 25fps
+# now with all optims: 15 with real send orders
 
 if bGraph: 
     import graph_motor
@@ -95,9 +96,9 @@ def sendAndReceiveOrder( strServerIP ):
         else:
             for i in range(6):
                 if 0:
-                    data += b'P' # for a Position order => 5.5fps
-                elif 0:
-                    data += b'V' # for a Velocity order (if velocity compute everything, but don't send it => 10fps)
+                    data += b'P' # for a Position order => 5.5fps with optim (don't set to position mode if already set) => 20 fps
+                elif 1:
+                    data += b'V' # for a Velocity order (if velocity compute everything, but don't send it => 10fps) (optimised => 30fps)
                 else:
                     data += b'F' # for a Fake order (do nothing) => 30fps
                 value_order =  (nSimulatedMotorPos%255)-127

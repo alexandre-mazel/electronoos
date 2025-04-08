@@ -197,7 +197,7 @@ void update_server( void )
 
 void setup()
 {
-  const char str_version[] = "serv_socket v0.63";
+  const char str_version[] = "serv_socket v0.64";
   Serial.begin(115200);
 
   Serial.println ( "" );

@@ -21,6 +21,7 @@ bGraph = 1 # from 30fps to 10fps (with no real orders) from 5 to 4 with orders
 
 if bGraph: 
     import graph_motor
+    print( "INF: Graph mode is ON!" )
     graph_motor.create_graph()
 
 def uintToBytes( n ):
@@ -96,17 +97,17 @@ def sendAndReceiveOrder( strServerIP ):
                     data += uintToBytes(200+1+i)
         else:
             for i in range(6):
-                if 0:
+                if 1:
                     data += b'P' # for a Position order => 5.5fps with optim (don't set to position mode if already set) => 20 fps
-                elif 1:
+                elif 0:
                     data += b'V' # for a Velocity order (if velocity compute everything, but don't send it => 10fps) (optimised => 30fps)
                 else:
                     data += b'F' # for a Fake order (do nothing) => 30fps
-                value_order =  (nSimulatedMotorPos%255)-127
+                value_order =  ((nSimulatedMotorPos+i*10)%255)-127
                 data += sintToBytes(value_order)
                 if bGraph: graph_motor.add_graph_order(i,value_order)
                 
-            nSimulatedMotorPos += 1
+            nSimulatedMotorPos += 2
             
                 
         if bVerbose: print("DBG: Sending data len(%d): %s" % (len(data),data) )
@@ -155,7 +156,7 @@ def sendAndReceiveOrder( strServerIP ):
         if duration > 5:
             received = nbr_received / duration
             sent = nbr_sent / duration
-            print( "%s: nbr_exchange: %.1f (%d), Sent: %sB, Received: %sB" % ( getTimeStamp(), nbr_exchange/duration, nbr_exchange, smartFormatSize(sent), smartFormatSize(received) ) )
+            print( "%s: nbr_exchange: %.1f (%d), Sent: %sB, Received: %sB, Total: %sB" % ( getTimeStamp(), nbr_exchange/duration, nbr_exchange, smartFormatSize(sent), smartFormatSize(received), smartFormatSize(sent+received) ) )
             time_begin = time.time()
             nbr_exchange = 0
             nbr_received = 0

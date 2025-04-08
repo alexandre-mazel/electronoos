@@ -51,7 +51,7 @@ class GraphData:
         #~ print("DBG: refresh_render: len self.order: %d" % len( self.order) )
         
         self.nbr_render += 1
-        if (self.nbr_render % 6) != 0: # don't update graphe every time
+        if (self.nbr_render % 20) != 0: # don't update graphe every time
             return
         
         for i in range(nbr_motor):

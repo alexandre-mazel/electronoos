@@ -167,7 +167,7 @@ void update_server( void )
         nbr_sent = 0;
       }
 
-      delay( 2 ); // give back some time to the system // doesn't seem to change anything
+      delay( 1 ); // give back some time to the system // doesn't seem to change anything
 
       /*
       NTESTED:

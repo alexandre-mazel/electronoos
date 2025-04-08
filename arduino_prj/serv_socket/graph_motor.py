@@ -2,7 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 
-nbr_motor = 6
+nbr_motor = 5 # put number of motor you want to graph
+
 class GraphData:
     def __init__( self ):
         #~ self.t = [0]
@@ -67,12 +68,16 @@ def create_graph():
     graphData.create()
 
 def add_graph_order( idx_motor, val ):
+    if idx_motor >= len(graphData.order):
+        return
     del graphData.order[idx_motor][0]
     graphData.order[idx_motor].append(val)
     #~ graphData.update_added_data()
     pass
     
 def add_graph_pos( idx_motor, val ):
+    if idx_motor >= len(graphData.pos):
+        return
     del graphData.pos[idx_motor][0]
     graphData.pos[idx_motor].append(val)
     #~ graphData.update_added_data()

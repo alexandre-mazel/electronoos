@@ -13,10 +13,11 @@ sys.path.append("../test_socket")
 from socket_server import getTimeStamp, smartFormatSize
 
 bGraph = 0
-#~ bGraph = 1 # from 30fps to 10fps (with no real orders) from 5 to 4 with orders
+bGraph = 1 # from 30fps to 10fps (with no real orders) from 5 to 4 with orders
 # updating one over 4 frames: from 30fps to 20fps
 # updating one over 10 frames: from 30fps to 25fps
-# now with all optims: 15 with real send orders
+# now with all optims: 15 with real send orders (et meme 22fps avec la derniere optim)
+# mais tombe a 16fps si on met le graph en full screen)
 
 if bGraph: 
     import graph_motor

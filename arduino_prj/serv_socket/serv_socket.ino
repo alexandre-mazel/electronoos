@@ -48,6 +48,47 @@ void handleMotorOrder( const char * pMotorsCommand )
   }
 }
 
+#define PIN_LED       21 // not installed on our version
+
+#define PIN_BAT       A2 // A4/36 - ADC1
+
+#define PIN_AN_1      A3
+#define PIN_AN_2      A9
+#define PIN_AN_3      A7
+
+#define PIN_DIGI_1    12 // A8 - ADC2
+#define PIN_DIGI_2    27 // A6 - ADC2
+#define PIN_DIGI_3    15 // Digital IO
+
+void sensors_init()
+{
+  pinMode( PIN_LED, OUTPUT );
+  pinMode( PIN_BAT, INPUT );
+
+  pinMode( PIN_AN_1, INPUT );
+  pinMode( PIN_AN_2, INPUT );
+  pinMode( PIN_AN_3, INPUT );
+
+  pinMode( PIN_DIGI_1, INPUT );
+  pinMode( PIN_DIGI_2, INPUT );
+  pinMode( PIN_DIGI_3, INPUT );
+}
+
+
+void sensors_get( char * buf )
+{
+  // fill buf with the current sensor state (simulated 10 sensors)
+  buf[0] = (uint8_t)analogRead(PIN_AN_1)>>2;
+  buf[1] = (uint8_t)analogRead(PIN_AN_2)>>2;
+  buf[2] = (uint8_t)analogRead(PIN_AN_3)>>2;
+
+  buf[3] = (uint8_t)digitalRead(PIN_DIGI_1)>>2;
+  buf[4] = (uint8_t)digitalRead(PIN_DIGI_2)>>2;
+  buf[5] = (uint8_t)digitalRead(PIN_DIGI_3)>>2;
+
+  buf[10] = (uint8_t)analogRead(PIN_BAT)>>2;
+}
+
 void update_server( void )
 {
   WiFiClient client = wifi_server.available();   // Listen for incoming clients
@@ -143,11 +184,15 @@ void update_server( void )
             // send answer
             // client.write( 100 ); // just 1 motor value
             //client.write( allMotorsSimulatedPosition, 6 ); // all values (simulated)
-            static char sendpos[] = "PosXXXXXX";
+            //static char sendpos[] = "PosXXXXXX";
+            static char sendpos[] = "PosXXXXXX0123456789B"; // ajout de 10 capteurs et état de la batterie
             
             //client.write( (uint8_t*)dym.getAllPositions(), 6 ); // all values
             memcpy( &sendpos[3], (uint8_t*)dym.getAllPositions(), 6 );
-            client.write( sendpos, 3+6 );
+
+            sensors_get(&sendpos[9]);
+
+            client.write( sendpos, 3+6+10+1 );
             nbr_sent += 1;
           }
           //currentLine = "";
@@ -221,6 +266,8 @@ void setup()
     pinMode( ledPin, OUTPUT ); // Attention cette ligne fait planter le XIAO C3 !!!
   }
 
+  sensors_init();
+
 
   // coupe le BT (mais ne fonctionne pas)
 //  esp_bluedroid_disable();
@@ -241,6 +288,8 @@ void setup()
 
   lcd_print_message( "Serving on: ", getArduinoId() );
   lcd_print_message( getCurrentIP() );
+
+  
 }
 
 

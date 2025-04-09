@@ -28,8 +28,8 @@ class GraphData:
         color_list = ["red","blue", "orange", "yellow", "green","magenta"]
         color_list_dark = ["darkred","darkblue", "darkorange", "khaki", "darkgreen","darkmagenta"]
         for i in range(nbr_motor):
-            pos_plot, = ax.plot(self.t, self.pos[i], label="pos %d" % i, color=color_list[i])
             order_plot, = ax.plot(self.t, self.order[i], label="order %d" % i, color=color_list_dark[i])
+            pos_plot, = ax.plot(self.t, self.pos[i], label="pos %d" % i, color=color_list[i])
             order_plot.set_linestyle(':')
             self.pos_plots.append(pos_plot)
             self.order_plots.append(order_plot)

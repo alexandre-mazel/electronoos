@@ -97,13 +97,13 @@ def sendAndReceiveOrder( strServerIP ):
                     data += uintToBytes(200+1+i)
         else:
             for i in range(6):
-                if 1:
+                if 0:
                     data += b'P' # for a Position order => 5.5fps with optim (don't set to position mode if already set) => 20 fps
-                elif 0:
+                elif 1:
                     data += b'V' # for a Velocity order (if velocity compute everything, but don't send it => 10fps) (optimised => 30fps)
                 else:
                     data += b'F' # for a Fake order (do nothing) => 30fps
-                value_order =  ((nSimulatedMotorPos+i*10)%255)-127
+                value_order =  ((nSimulatedMotorPos-i*10)%255)-127
                 data += sintToBytes(value_order)
                 if bGraph: graph_motor.add_graph_order(i,value_order)
                 
@@ -120,7 +120,7 @@ def sendAndReceiveOrder( strServerIP ):
             
             ret = clientsocket.recv( 32 )
             nbr_received += len(ret)
-            if bVerbose: print( "INF: ret: %s" % (ret) )
+            if bVerbose or 0: print( "INF: ret: %s" % (ret) )
             
             bSimulatedPosition = False
             if bSimulatedPosition:        

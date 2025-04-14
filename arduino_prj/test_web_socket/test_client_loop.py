@@ -6,9 +6,12 @@ import sys
 sys.path.append("../test_socket")
 from socket_server import getTimeStamp, smartFormatSize
 
+strIP = "192.168.0.9"
+strIP = "192.168.4.1"
+
 
 async def msg_toggle():
-    async with websockets.connect('ws://192.168.0.9:8000/ws') as websocket:
+    async with websockets.connect('ws://'+strIP+':8000/ws') as websocket:
         #~ while 1:
         if 1:
             await websocket.send('toggle')
@@ -22,7 +25,7 @@ nbr_sent = 0
 
 async def msg_loop_motor():
     global time_begin, nbr_exchange, nbr_received, nbr_sent
-    async with websockets.connect('ws://192.168.0.9:8000/ws') as websocket:
+    async with websockets.connect('ws://'+strIP+':8000/ws') as websocket:
         while 1:
             #~ print("DBG: Looping...")
             if 0:

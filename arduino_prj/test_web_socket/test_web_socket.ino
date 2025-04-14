@@ -13,9 +13,15 @@
 #include <AsyncTCP.h> // install AsyncTCP by ESP32Async
 #include <ESPAsyncWebServer.h>
 
+#include "wifi_network.hpp" // lien symbolique vers le hpp ( creer en lancant un cmd en mode administrateur et la commande: ../generate_link_misbkit_prj.bat
+#include "misbkit.hpp"
+#include "dynamixel_motor.hpp"
+#include "debug_lcd.hpp"
+
 // Replace with your network credentials
-const char* ssid = "Liberte";
-const char* password = "lagrosseliberte666!";
+const char* my_ssid = "Liberte";
+const char* my_password = "lagrosseliberte666!";
+
 
 bool ledState = 0;
 const int ledPin = 13;
@@ -149,6 +155,49 @@ const char index_html[] PROGMEM = R"rawliteral(
 </html>
 )rawliteral";
 
+DyMotors dym;
+
+#define PIN_LED       21 // not installed on our version
+
+#define PIN_BAT       A2 // A4/36 - ADC1
+
+#define PIN_AN_1      A3
+#define PIN_AN_2      A9
+#define PIN_AN_3      A7
+
+#define PIN_DIGI_1    12 // A8 - ADC2
+#define PIN_DIGI_2    27 // A6 - ADC2
+#define PIN_DIGI_3    15 // Digital IO
+
+void sensors_init()
+{
+  pinMode( PIN_LED, OUTPUT );
+  pinMode( PIN_BAT, INPUT );
+
+  pinMode( PIN_AN_1, INPUT );
+  pinMode( PIN_AN_2, INPUT );
+  pinMode( PIN_AN_3, INPUT );
+
+  pinMode( PIN_DIGI_1, INPUT );
+  pinMode( PIN_DIGI_2, INPUT );
+  pinMode( PIN_DIGI_3, INPUT );
+}
+
+
+void sensors_get( char * buf )
+{
+  // fill buf with the current sensor state (simulated 10 sensors)
+  buf[0] = (uint8_t)analogRead(PIN_AN_1)>>2;
+  buf[1] = (uint8_t)analogRead(PIN_AN_2)>>2;
+  buf[2] = (uint8_t)analogRead(PIN_AN_3)>>2;
+
+  buf[3] = (uint8_t)digitalRead(PIN_DIGI_1)>>2;
+  buf[4] = (uint8_t)digitalRead(PIN_DIGI_2)>>2;
+  buf[5] = (uint8_t)digitalRead(PIN_DIGI_3)>>2;
+
+  buf[10] = (uint8_t)analogRead(PIN_BAT)>>2;
+}
+
 void notifyClients() {
   ws.textAll(String(ledState));
 }
@@ -165,7 +214,17 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
     if (strncmp((char*)data, "motor",5) == 0) {
       //ledState = !ledState;
       //notifyClients();
-      ws.textAll("1234560123456789B");
+      //ws.textAll("1234560123456789B");
+      // simulate good order received:
+      for(int i = 0; i < 5; ++i )
+      {
+        dym.sendPosition( i, 100 );
+      }
+      static char sendpos[] = "PosXXXXXX0123456789B"; // ajout de 10 capteurs et Ã©tat de la batterie
+      memcpy( &sendpos[3], (uint8_t*)dym.getAllPositions(), 6 );
+      sensors_get(&sendpos[9]);
+      static char sendpos_fake[] = "PosXXXXXX0123456789B"; // on ne peut pas recevoir des binaires en WebSocket! => TODO!
+      ws.textAll(sendpos_fake);
     }
   }
 }
@@ -219,24 +278,44 @@ void MotorHandler(AsyncWebServerRequest *request)
 }
 
 void setup(){
-  // Serial port for debugging purposes
+  const char str_version[] = "test_web_socket v0.64";
   Serial.begin(115200);
-  Serial.println( "test_web_socker: starting..." );
+
+  Serial.println ( "" );
+  Serial.println( str_version );
+  setup_lcd( str_version );
+
+  Serial.println ( "" );
+  Serial.println( str_version );
+  setup_lcd( str_version );
 
   pinMode(ledPin, OUTPUT);
   digitalWrite(ledPin, LOW);
   
-  // Connect to Wi-Fi
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
+  if(0)
+  {
+    // Connect to Wi-Fi
     Serial.println("Connecting to WiFi..");
+    WiFi.begin(my_ssid, my_password);
+    while (WiFi.status() != WL_CONNECTED) {
+      Serial.print(".");
+      delay(1000);
+    }
+    Serial.println("");
+    // Print ESP Local IP Address
+    Serial.println(WiFi.localIP());
+  }
+  else
+  {
+    createWifiAP( getArduinoId() );
   }
 
-  // Print ESP Local IP Address
-  Serial.println(WiFi.localIP());
+  lcd_print_message( getCurrentIP() );
 
   initWebSocket();
+
+  sensors_init();
+  dym.init();
 
   // Route for root / web page
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -245,9 +324,13 @@ void setup(){
 
   server.on("/motor", HTTP_GET,MotorHandler ); // Attention: ca c'est le handler html, le WebSocket est plus haut
 
+
   // Start server
   server.begin();
   Serial.println( "server started..." );
+
+  lcd_print_message( "Serving on: ", getArduinoId() );
+  lcd_print_message( getCurrentIP() );
 }
 
 void loop() {

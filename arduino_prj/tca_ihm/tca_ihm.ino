@@ -240,6 +240,8 @@ int16_t get_dist_ir( const int nPin )
   //dist = (dist + 20 ) / 1.77; // based on pololu_distance_measurement_reglin.py en s'arretant a 600 (inclus) (moins bon pour 100 mais meilleur pour les autres)
 
 
+  //dist ; // I calibrate with a blue box, but it seems to be a different result with the black slider
+
   avg_dist = ( avg_dist * 5 + dist * 1 ) / 6; // a 130cm de max, ca fait 1300mm, donc en max pour ne pas depasser int16, il ne faut pas filtrer a plus de 24
 
   return avg_dist;
@@ -267,7 +269,7 @@ int nAutomaticSpoolRotationSpeed = nAutomaticSpoolRotationSpeedInit;
 bool bAutomaticSpoolMode = 0;
 long int timeNextAutomaticSpoolSpeedChangePossible = 0;  // we don't want to change speed to often
 
-float dist_slider_target = 500; // was 270
+float dist_slider_target = 500; // was 500; // was 270
 int last_dist_slider = -1;
 long int last_time_dist_pos = millis();
 
@@ -630,7 +632,7 @@ void loop()
     lcdPrint(nNbrCollectSpeed);
     pLcd->print("r");
 
-    lcdPrint(dist_slider_min);
+    lcdPrint(dist_slider_target);
     pLcd->print("mm");
 
     pLcd->setCursor(0, 2);
@@ -647,8 +649,8 @@ void loop()
     pLcd->print("r");
 
 
-    lcdPrint(dist_slider_max);
-    pLcd->print("mm");
+    //lcdPrint(dist_slider_max);
+    //pLcd->print("mm");
 
     if( 1 )
     {

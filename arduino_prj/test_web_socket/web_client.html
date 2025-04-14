@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<script>
+// Connect to server
+ws = new WebSocket( "ws://127.0.0.1:8000/scoreboard" ) // Local server
+// ws = new WebSocket("wss://game.example.com/scoreboard") // Remote server
+
+ws.onopen = () => {
+    console.log( "Connection opened" )
+    ws.send( "Hi server, please send me the score of yesterday's game" )
+}
+
+ws.onmessage = ( event ) => {
+    console.log( "Data received: ", event.data )
+    //ws.close() // We got the score so we don't need the connection anymore
+}
+
+/*
+ws.addEventListener("message", (event) => {
+  console.log("Message from server: ", event.data);
+});
+*/
+ws.onclose = ( event ) => {
+    console.log( "Connection closed", event.code, event.reason, event.wasClean )
+}
+
+ws.onerror = () => {
+    console.log( "Connection closed due to error" )
+}
+
+function ask_for_update()
+{
+    console.log( "ask_for_update" )
+    ws.send( "Hi server, please send me the score of yesterday's game(2)" )
+}
+
+setTimeout( () => {ask_for_update()}, "3000" );
+
+
+</script>

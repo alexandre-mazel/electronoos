@@ -3,6 +3,9 @@
   Complete project details at https://RandomNerdTutorials.com/esp32-websocket-server-arduino/
   The above copyright notice and this permission notice shall be included in all
   copies or substantial portions of the Software.
+
+  // To test this:
+  // open http://192.168.0.9:8000/ from a browser (with the esp32 IP)
 *********/
 
 // Import required libraries
@@ -154,9 +157,15 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
     data[len] = 0;
+    //Serial.print("DBG: handleWebSocketMessage: data: "); Serial.println( (char*)data );
     if (strcmp((char*)data, "toggle") == 0) {
       ledState = !ledState;
       notifyClients();
+    }
+    if (strncmp((char*)data, "motor",5) == 0) {
+      //ledState = !ledState;
+      //notifyClients();
+      ws.textAll("1234560123456789B");
     }
   }
 }
@@ -185,7 +194,7 @@ void initWebSocket() {
 }
 
 String processor(const String& var){
-  Serial.println(var);
+  //Serial.println(var);
   if(var == "STATE"){
     if (ledState){
       return "ON";
@@ -195,6 +204,18 @@ String processor(const String& var){
     }
   }
   return String();
+}
+
+void MotorHandler(AsyncWebServerRequest *request)
+{
+  static char motors[] = "1234560123456789B";
+  Serial.println("DBG: received motors...");
+  String message;
+   if (request->hasParam("val")) {
+      message = request->getParam("val")->value();
+   }
+  Serial.println("Received message: " + message);
+  request->send_P(200, "text/plain", motors );
 }
 
 void setup(){
@@ -222,10 +243,7 @@ void setup(){
     request->send_P(200, "text/html", index_html, processor);
   });
 
-  server.on("/motor", HTTP_GET, [](AsyncWebServerRequest *request){
-    Serial.println("DBG: received motors...");
-    request->send_P(200, "text/html", index_html, processor);
-  });
+  server.on("/motor", HTTP_GET,MotorHandler ); // Attention: ca c'est le handler html, le WebSocket est plus haut
 
   // Start server
   server.begin();
@@ -234,5 +252,6 @@ void setup(){
 
 void loop() {
   ws.cleanupClients();
-  digitalWrite(ledPin, ledState);
+  digitalWrite(ledPin, ledState); // c'est bourrin, a chaque frame on réécris, meme si rien n'a changé!
+  delay(10);
 }

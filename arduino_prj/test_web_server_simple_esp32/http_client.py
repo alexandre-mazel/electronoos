@@ -5,9 +5,13 @@ import sys
 sys.path.append("../test_socket")
 from socket_server import getTimeStamp, smartFormatSize
 
-
-conn = http.client.HTTPConnection("192.168.0.9")
-
+try:
+    #~ conn = http.client.HTTPConnection("192.168.0.9")
+    conn = http.client.HTTPConnection("192.168.0.9:8000")
+except ConnectionRefusedError as err:
+    print("INF: Trying alternate connection...") # ca fonctionne pas de catcher le truc
+    conn = http.client.HTTPConnection("192.168.0.9:8000")
+    
 if 0:
     conn.request("GET", "/")
     r1 = conn.getresponse()
@@ -15,7 +19,6 @@ if 0:
 
     data1 = r1.read()  # This will return entire content.
 
-received_size = 0
 time_begin = time.time()
 nbr_exchange = 0
 nbr_received = 0

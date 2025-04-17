@@ -19,8 +19,8 @@
 #include "debug_lcd.hpp"
 
 // Replace with your network credentials
-const char* my_ssid = "Liberte";
-const char* my_password = "lagrosseliberte666!";
+//const char* my_ssid = "Liberte";
+//const char* my_password = "latodo";
 
 
 bool ledState = 0;
@@ -33,7 +33,7 @@ AsyncWebSocket ws("/ws");
 const char index_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE HTML><html>
 <head>
-  <title>ESP Web Server</title>
+  <title>MisBKit Web Server</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="data:,">
   <style>
@@ -103,21 +103,22 @@ const char index_html[] PROGMEM = R"rawliteral(
 </head>
 <body>
   <div class="topnav">
-    <h1>ESP WebSocket Server</h1>
+    <h1>BOARD_ID_    - WebSocket Server</h1>
   </div>
   <div class="content">
     <div class="card">
-      <h2>Output - GPIO 2</h2>
+      <h2>MisBKit Internal Led</h2>
       <p class="state">state: <span id="state">%STATE%</span></p>
       <p><button id="button" class="button">Toggle</button></p>
     </div>
   </div>
 <script>
-  var gateway = `ws://${window.location.hostname}:8000/ws`;
-  var websocket;
+  var gateway = 'ws://' + window.location.hostname + ':8000/ws';
+  var websocket = 0;
   window.addEventListener('load', onLoad);
   function initWebSocket() {
     console.log('Trying to open a WebSocket connection...');
+    console.log( "gateway: " + gateway );
     websocket = new WebSocket(gateway);
     websocket.onopen    = onOpen;
     websocket.onclose   = onClose;
@@ -132,6 +133,7 @@ const char index_html[] PROGMEM = R"rawliteral(
   }
   function onMessage(event) {
     var state;
+    console.log( "DBG: onMessage: Data received: ", event.data )
     if (event.data == "1"){
       state = "ON";
     }
@@ -150,6 +152,22 @@ const char index_html[] PROGMEM = R"rawliteral(
   function toggle(){
     websocket.send('toggle');
   }
+
+  function updateMotorsAndSensors(){
+    console.log("DBG: updateMotorsAndSensors: start" );
+    if( websocket == 0 )
+    {
+      console.log("DBG: updateMotorsAndSensors: no ws" );
+    }
+    else
+    {
+      console.log("DBG: updateMotorsAndSensors: sending motor command" );
+      websocket.send('motor');
+    }
+    setTimeout( updateMotorsAndSensors, 500 );
+  }
+
+  setTimeout( updateMotorsAndSensors, 2000 );
 </script>
 </body>
 </html>
@@ -277,6 +295,13 @@ void MotorHandler(AsyncWebServerRequest *request)
   request->send_P(200, "text/plain", motors );
 }
 
+void replace_in_buf( char * dst, const char * old_cz, const char * new_cz )
+{
+  // replace in dst the string old by string dst.
+  // don't change the size of dst!
+  // TODO
+}
+
 void setup(){
   const char str_version[] = "test_web_socket v0.64";
   Serial.begin(115200);
@@ -298,6 +323,7 @@ void setup(){
   if( bConnectToBoxFirst )
   {
     // Connect to Wi-Fi
+    /*
     Serial.println("Connecting to WiFi..");
     WiFi.begin(my_ssid, my_password);
     while (WiFi.status() != WL_CONNECTED) {
@@ -307,6 +333,8 @@ void setup(){
     Serial.println("");
     // Print ESP Local IP Address
     Serial.println(WiFi.localIP());
+    */
+    bConnected = connectToWifi();
   }
   if(!bConnected)
   {
@@ -325,7 +353,7 @@ void setup(){
     request->send_P(200, "text/html", index_html, processor);
   });
 
-  server.on("/motor", HTTP_GET,MotorHandler ); // Attention: ca c'est le handler html, le WebSocket est plus haut
+  server.on("/motor", HTTP_GET, MotorHandler ); // Attention: ca c'est le handler html, le WebSocket est plus haut
 
 
   // Start server
@@ -334,6 +362,9 @@ void setup(){
 
   lcd_print_message( "Serving on: ", getCurrentSSID() );
   lcd_print_message( getCurrentIP() );
+
+  // change xxx by getArduinoId
+  replace_in_buf( (char *)index_html,"BOARD_ID_   ","MISBKIT_TODO" ); // we plan to change an read only memory ! :)
 }
 
 void loop() {

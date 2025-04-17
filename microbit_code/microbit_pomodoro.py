@@ -1,5 +1,15 @@
-# pour tester, simuler et envoyer dans le programme:
-# https://python.microbit.org/v/3/reference/buttons
+"""
+Application de pomodoro, alterne des chronométrage de 25min puis 5min.
+Mode gainage: séquence de 2 min qui s'enchaine.
+
+IHM:
+bouton A: Alterne les 2 modes.
+bouton B: Saute a la fin du temps courant
+
+pour tester, simuler et envoyer dans la carte, depuis chrome:
+https://python.microbit.org/v/3/reference/buttons
+
+"""
 from microbit import *
 import time
 
@@ -29,12 +39,13 @@ def wait_time( timer_duration = 25*60):
             prev_msg = msg
     
         if remain < 1 or button_b.was_pressed():
+            return;
+            
+        if button_a.was_pressed():
             global mode
             mode = (mode + 1) % 2
             return;
             
-        if button_a.was_pressed():
-            return
         sleep(1000)
 
 mode = 0 # 0: pomodoro, 1: juste 2 minutes pour du gainage

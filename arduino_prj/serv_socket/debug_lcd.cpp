@@ -47,6 +47,37 @@ void lcd_print_message( const char * msg, int int_val )
   }
 }
 
+void lcd_print_message( const char * msg, const char * msg2 )
+{
+  // BEURK: un gros copié/collé!
+  int nNbrPrinted = 0;
+
+  pLcd->setCursor( 0,lcd_print_message_next_message );
+  nNbrPrinted = pLcd->print( msg );
+
+  Serial.print( "LCD: " ); Serial.print( msg );
+
+  
+  if( msg2 != NULL )
+  {
+    nNbrPrinted += pLcd->print( msg2 );
+    Serial.print( msg2 );
+  }
+  Serial.println( "" );
+
+  // erase end of line:
+  while( nNbrPrinted < 20 )
+  {
+    nNbrPrinted += pLcd->print( " " );
+  }
+
+  ++lcd_print_message_next_message;
+  if( lcd_print_message_next_message > 3 )
+  {
+    lcd_print_message_next_message = 0;
+  }
+}
+
 void setup_lcd( const char * init_msg )
 {
   uint8_t i2cAddr = 0x3F;
@@ -60,9 +91,9 @@ void setup_lcd( const char * init_msg )
   pLcd = new LiquidCrystal_I2C( i2cAddr, 20, 4 ); // 0x3F sur la version de base, 0x27 sur la version oversized
   pLcd->init();                // initialize the lcd
   pLcd->backlight();           // Turn on backlight // sans eclairage on voit rien...
+  lcd_print_message( "setup_lcd finished " );
   if( init_msg != NULL )
   {
     lcd_print_message( init_msg );
   }
-  lcd_print_message( "setup_lcd finished " );
 }

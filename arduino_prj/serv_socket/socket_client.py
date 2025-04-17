@@ -12,95 +12,171 @@ import sys
 sys.path.append("../test_socket")
 from socket_server import getTimeStamp, smartFormatSize
 
+bGraph = 0
+bGraph = 1 # from 30fps to 10fps (with no real orders) from 5 to 4 with orders
+# updating one over 4 frames: from 30fps to 20fps
+# updating one over 10 frames: from 30fps to 25fps
+# now with all optims: 15 with real send orders (et meme 22fps avec la derniere optim)
+# mais tombe a 16fps si on met le graph en full screen)
+
+if bGraph: 
+    import graph_motor
+    print( "INF: Graph mode is ON!" )
+    graph_motor.create_graph()
+
 def uintToBytes( n ):
-    length = math.ceil(math.log(n, 256))
+    if n == 0:
+        length = 1
+    else:
+        length = math.ceil(math.log(n, 256)) # length in bytes
     res = int.to_bytes( n, length=length, byteorder='big', signed=False )
     return res
     
 def sintToBytes( n ):
-    length = math.ceil(math.log(n, 256)) + 1 # +1 for the signed ?
+    if n == 0:
+        length = 1
+    else:
+        length = math.ceil(math.log(abs(n*2), 256)) # length in bytes; *2 for the signed
+    #~ print("DBG: sintToBytes: n: %d, length: %d" % (n,length) )
     res = int.to_bytes( n, length=length, byteorder='big', signed=True )
+    #~ print("DBG: sintToBytes: returning (2): %s (len:%s)" % (res,len(res) ) )
     return res
     
 def bytesToUInt( b ):
-    int.from_bytes( b, byteorder='big', signed = False ) # for byteorder, we could also use sys.byteorder
+    #~ print("DBG: bytesToUInt: b: %s" % (b) )
+    if isinstance(b,int):
+        #~ print("DBG: bytesToUInt: is int!" )
+        if b < 128:
+            return b
+        return b - 256
+    res = int.from_bytes( b, byteorder='big', signed = True ) # for byteorder, we could also use sys.byteorder
+    #~ print("DBG: bytesToUInt: returning (2): %s" % res )
+    return res
+if 1:
+    assert bytesToUInt( 127 ) == 127, "erreur bytesToUInt: 127"
+    assert bytesToUInt( 0x81 ) == -127, "erreur bytesToUInt: 0x81"
+    assert bytesToUInt( b'\x81' ) == -127, "erreur bytesToUInt: b0x81"
+    
+    
+def sendAndReceiveOrder( strServerIP ):
+    
+    print( "INF: Connecting to '%s'" % strServerIP )
+    clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    clientsocket.connect( ( strServerIP, 8090 ) )
 
-strServerIP = "192.168.4.1"   # sur AP
-#~ strServerIP = "192.168.0.25" # sur Box
+    clientsocket.send( b'Hello' )
+    print( "INF: waiting for answer (1)..." )
+    ret = clientsocket.recv( 32 )
+    print( "INF: ret (1): ", ret )
 
-print( "INF: Connecting to '%s'" % strServerIP )
-clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-clientsocket.connect( ( strServerIP, 8090 ) )
+    time_begin = time.time()
+    nbr_received = 0
+    nbr_sent = 0
+    nbr_exchange = 0
+    """
+    Format of a moteur order:
+    'Mot' then for each motor: 1 byte of command and 1 byte of parameter.
+    Command: 
+    - 'P': position
+    - 'S': speed
+    - 'I': change ID (NDEV)
 
-clientsocket.send( b'Hello' )
-print( "INF: waiting for answer (1)..." )
-ret = clientsocket.recv( 32 )
-print( "INF: ret (1): ", ret )
+    Parameter:
+    - Seen as signed char: -128..127 (both for position or speed)
+    """
+    nSimulatedMotorPos = 0
+    bVerbose = 0
 
-time_begin = time.time()
-nbr_received = 0
-nbr_sent = 0
-nbr_exchange = 0
-"""
-Format of a moteur order:
-'Mot' then for each motor: 1 byte of command and 1 byte of parameter.
-Command: 
-- 'P': position
-- 'S': speed
-- 'I': change ID (NDEV)
-
-Parameter:
-- Seen as signed char: -128..127 (both for position or speed)
-"""
-nSimulatedMotorPos = 0
-while 1:
-    data = b'Mot'
-    if 0:
-        data += uintToBytes(200)
+    while 1:
+        data = b'Mot'
+        if 0:
+            data += uintToBytes(200)
+            if 1:
+                # simulate 5 extra motors
+                for i in range(5):
+                    data += uintToBytes(200+1+i)
+        else:
+            for i in range(6):
+                if 0:
+                    data += b'P' # for a Position order => 5.5fps with optim (don't set to position mode if already set) => 20 fps
+                elif 0:
+                    data += b'V' # for a Velocity order (if velocity compute everything, but don't send it => 10fps) (optimised => 30fps)
+                else:
+                    data += b'F' # for a Fake order (do nothing) => 30fps
+                value_order =  ((nSimulatedMotorPos-i*10)%255)-127
+                data += sintToBytes(value_order)
+                if bGraph: graph_motor.add_graph_order(i,value_order)
+                
+            nSimulatedMotorPos += 2
+            
+                
+        if bVerbose: print("DBG: Sending data len(%d): %s" % (len(data),data) )
+        clientsocket.send( data )
+        nbr_sent += len(data)
+        
         if 1:
-            # simulate 5 extra motors
-            for i in range(5):
-                data += uintToBytes(200+1+i)
-    else:
-        for i in range(6):
-            data += sintToBytes((nPos%256)-128
+            # wait for the motor position
+            #~ print( "INF: waiting for answer..." )
             
-        nSimulatedMotorPos += 1
+            ret = clientsocket.recv( 32 )
+            nbr_received += len(ret)
+            if bVerbose or 0: print( "INF: ret: %s" % (ret) )
             
-    clientsocket.send( data )
-    nbr_sent += len(data)
-    
-    if 1:
-        # wait for the motor position
-        #~ print( "INF: waiting for answer..." )
-        ret = clientsocket.recv( 32 )
-        nbr_received += len(ret)
-        ret0 = ret[0]
-        #~ ret0 = bytesToUInt( ret[0] )
-        #~ print( "INF: ret: %s, ret0: %d, 0x%x" % (ret,ret0,ret0) )
-        
-        if ret0 != 100:
-            print( "INF: ret: %s, ret0: %d, 0x%x" % (ret, ret0, ret0 ) )
-            print( "INF: answer should be 100 and is wrong!" )
-            break
+            bSimulatedPosition = False
+            if bSimulatedPosition:        
+                ret0 = ret[0]
+                ret0 = bytesToUInt( ret[0] )
+                if bVerbose: print( "INF: ret: %s, ret0: %d, 0x%x" % (ret,ret0,ret0) )
+                
+                if ret0 != 100:
+                    print( "INF: answer should be 100 and it's not!" )
+                    break
+            else:
+                
+                if ret[0:3] == b'Pos':
+                    # We receive 6 motor pos
+                    
+                    bOutputOneLineFor6 = 1
+                    bOutputOneLineFor6 = 0
+                    
+                    ret = ret[3:]
+                    for i in range(len(ret)):
+                        val = bytesToUInt( ret[i] )
+                        if bGraph: graph_motor.add_graph_pos(i,val)
+                        if bVerbose: print( "INF: val%d: %s, %d, 0x%x" % (i,val,val,val) )
+                        if bOutputOneLineFor6: print(str(val) + ", ",end="")
+                    if bOutputOneLineFor6: print("")
+                    
+                    
+                    
+                
+        nbr_exchange += 1
             
-    nbr_exchange += 1
+        duration = time.time() - time_begin
+        if duration > 5:
+            received = nbr_received / duration
+            sent = nbr_sent / duration
+            print( "%s: nbr_exchange: %.1f (%d), Sent: %sB, Received: %sB, Total: %sB" % ( getTimeStamp(), nbr_exchange/duration, nbr_exchange, smartFormatSize(sent), smartFormatSize(received), smartFormatSize(sent+received) ) )
+            time_begin = time.time()
+            nbr_exchange = 0
+            nbr_received = 0
+            nbr_sent = 0
+            
+            
+        if bGraph: graph_motor.refresh_render()
         
-    duration = time.time() - time_begin
-    if duration > 5:
-        received = nbr_received / duration
-        sent = nbr_sent / duration
-        print( "%s: nbr_exchange: %.1f (%d), Sent: %sB, Received: %sB" % ( getTimeStamp(), nbr_exchange/duration, nbr_exchange, smartFormatSize(sent), smartFormatSize(received) ) )
-        time_begin = time.time()
-        nbr_exchange = 0
-        nbr_received = 0
-        nbr_sent = 0
+        #~ time.sleep(0.004) # 0.01 => 100 ordre et reception par sec (mais ca va plus vite si on attend 2 fois moins)
+        time.sleep(0.00001) # si c'est deja assez lent, ca sert a rien d'attendre ici
         
+        if bVerbose: time.sleep( 5 ) # to help debugging
+        
+    print( "INF: client disconnected" )
+
     
-    time.sleep(0.004) # 0.01 => 100 ordre et reception par sec (mais ca va plus vite si on attend 2 fois moins)
-        
-    
-print( "INF: client disconnected" )
+strServerIP = "192.168.4.1"  # sur AP
+strServerIP = "192.168.0.9" # sur Box
+
+sendAndReceiveOrder( strServerIP )
 
 """
 Stat 

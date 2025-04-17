@@ -4,6 +4,7 @@ import whisper # pip install openai-whisper
 import math
 import os
 import time
+import sys
 
 time_begin = time.time()
 
@@ -80,6 +81,15 @@ for s in result["segments"]:
     print( "[%s --> %s]: %s" % (s["start"], s["end"], s["text"]) )
     print( "  temper: %.2f, avg_logprob: %.2f, expprob: %.2f,  compression_ratio: %.2f, no_speech_prob: %.2f\n" % (s["temperature"], s["avg_logprob"], math.exp(s["avg_logprob"]), s["compression_ratio"], s["no_speech_prob"] ) )
     
+if 1:
+    filedst = soundname.replace(".wav",".out")
+    print("INF: output result to file '%s'" % filedst )
+    f = open(filedst,"wt",encoding="utf-8")
+    for s in result["segments"]:
+        txt = "[%.3f --> %.3f]: %s\n" % (s["start"], s["end"], s["text"])
+        txt += "  temper: %.2f, avg_logprob: %.2f, expprob: %.2f,  compression_ratio: %.2f, no_speech_prob: %.2f\n\n" % (s["temperature"], s["avg_logprob"], math.exp(s["avg_logprob"]), s["compression_ratio"], s["no_speech_prob"] )
+        f.write( txt )
+    f.close()
     
 """
 *** Result model base on mstab7:

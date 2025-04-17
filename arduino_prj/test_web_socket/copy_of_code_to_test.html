@@ -1,0 +1,221 @@
+<!DOCTYPE HTML><html>
+<head>
+  <title>MisBKit Web Server</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <style>
+  html {
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+  }
+  h1 {
+    font-size: 1.8rem;
+    color: white;
+  }
+  h2{
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #143642;
+  }
+  .topnav {
+    overflow: hidden;
+    background-color: #143642;
+  }
+  body {
+    margin: 0;
+  }
+  .content {
+    padding: 30px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .card {
+    background-color: #F8F7F9;;
+    box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);
+    padding-top:10px;
+    padding-bottom:20px;
+  }
+  .button {
+    padding: 15px 50px;
+    font-size: 24px;
+    text-align: center;
+    outline: none;
+    color: #fff;
+    background-color: #0f8b8d;
+    border: none;
+    border-radius: 5px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+   }
+   /*.button:hover {background-color: #0f8b8d}*/
+   .button:active {
+     background-color: #0f8b8d;
+     box-shadow: 2 2px #CDCDCD;
+     transform: translateY(2px);
+   }
+   .state {
+     font-size: 1.5rem;
+     color:#8c8c8c;
+     font-weight: bold;
+   }
+  </style>
+<title>ESP Web Server</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+</head>
+<body>
+  <div class="topnav">
+    <h1>BOARD_ID_    - WebSocket Server</h1>
+  </div>
+  <div class="content">
+    <div class="card">
+      <h2>MisBKit Internal Led</h2>
+      <p class="state">state: <span id="state">%STATE%</span></p>
+      <p><button id="button" class="button">Toggle</button></p>
+    </div>
+  </div>
+
+<canvas id="Motor1" width="600" height="400" 
+        style="border: 2px solid black"> 
+</canvas> 
+
+<script>
+  var gateway = 'ws://' + window.location.hostname + ':8000/ws';
+  var websocket = 0;
+  window.addEventListener('load', onLoad);
+  function initWebSocket() {
+    console.log('Trying to open a WebSocket connection...');
+    console.log( "gateway: " + gateway );
+    websocket = new WebSocket(gateway);
+    websocket.onopen    = onOpen;
+    websocket.onclose   = onClose;
+    websocket.onmessage = onMessage; // <-- add this line
+  }
+  function onOpen(event) {
+    console.log('Connection opened');
+  }
+  function onClose(event) {
+    console.log('Connection closed');
+    setTimeout(initWebSocket, 2000);
+  }
+  function onMessage(event) {
+    var state;
+    console.log( "DBG: onMessage: Data received: ", event.data )
+    if (event.data == "1"){
+      state = "ON";
+    }
+    else{
+      state = "OFF";
+    }
+    document.getElementById('state').innerHTML = state;
+  }
+  function onLoad(event) {
+    initWebSocket();
+    initButton();
+  }
+  function initButton() {
+    document.getElementById('button').addEventListener('click', toggle);
+  }
+  function toggle(){
+    websocket.send('toggle');
+  }
+
+  function updateMotorsAndSensors(){
+    console.log("DBG: updateMotorsAndSensors: start" );
+    if( websocket == 0 )
+    {
+      console.log("DBG: updateMotorsAndSensors: no ws" );
+    }
+    else
+    {
+      console.log("DBG: updateMotorsAndSensors: sending motor command" );
+      websocket.send('motor');
+    }
+    setTimeout( updateMotorsAndSensors, 500 );
+  }
+  
+   function gradient(a, b) { 
+        return (b.y-a.y)/(b.x-a.x); 
+    } 
+          
+    function bzCurve(ctx2d, points, f, t) { 
+        console.log("DBG: bzCurve: start" );
+        if (typeof(f) == 'undefined') f = 0.3; 
+        if (typeof(t) == 'undefined') t = 0.6; 
+      
+        ctx2d.beginPath(); 
+        ctx2d.moveTo(points[0].x, points[0].y); 
+      
+        var m = 0; 
+        var dx1 = 0; 
+        var dy1 = 0; 
+          
+        var preP = points[0]; 
+          
+        for (var i = 1; i < points.length; i++) { 
+            var curP = points[i]; 
+            nexP = points[i + 1]; 
+            if (nexP) { 
+                m = gradient(preP, nexP); 
+                dx2 = (nexP.x - curP.x) * -f; 
+                dy2 = dx2 * m * t; 
+            } else { 
+                dx2 = 0; 
+                dy2 = 0; 
+            } 
+              
+            ctx2d.bezierCurveTo( 
+                preP.x - dx1, preP.y - dy1, 
+                curP.x + dx2, curP.y + dy2, 
+                curP.x, curP.y 
+            ); 
+          
+            dx1 = dx2; 
+            dy1 = dy2; 
+            preP = curP; 
+        } 
+        ctx2d.stroke(); 
+    } 
+
+  //setTimeout( updateMotorsAndSensors, 2000 );
+  
+  var aaPosDevices = [];
+  var nNbrValByDevice = 300;
+  function initPosDevices()
+  {
+    for (var j = 0; j < 16; j++ )
+    { 
+        aaPosDevices.push([]);
+        for (var i = 0; i < nNbrValByDevice; i++ )
+        {
+            aaPosDevices[j].push({ x: i, y: i });
+        }
+    }
+  }
+  function updateDeviceVal(idx, pos)
+  {
+    aaPosDevices[idx].shift()
+    aaPosDevices[idx].push(pos);
+    var cv = document.getElementById("Motor1"); 
+    var ctx = cv.getContext("2d"); 
+    ctx.setLineDash([0]); 
+    ctx.lineWidth = 2; 
+    ctx.strokeStyle = "green"; 
+    bzCurve(ctx, aaPosDevices[idx], 0.3, 1); 
+  }
+  function simulateValue()
+  {
+    var d = new Date(); // for now
+    updateDeviceVal( 0, math.sin(d.getSeconds()) );
+    setTimeout( simulateValue, 200 );
+  }
+  initPosDevices();
+  setTimeout( simulateValue, 200 );
+</script>
+</body>
+</html>

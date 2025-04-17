@@ -112,6 +112,11 @@ const char index_html[] PROGMEM = R"rawliteral(
       <p><button id="button" class="button">Toggle</button></p>
     </div>
   </div>
+
+<canvas id="Motor1" width="600" height="400" 
+        style="border: 2px solid black"> 
+</canvas> 
+
 <script>
   var gateway = 'ws://' + window.location.hostname + ':8000/ws';
   var websocket = 0;

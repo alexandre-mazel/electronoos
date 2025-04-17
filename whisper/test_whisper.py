@@ -97,7 +97,7 @@ if 1:
     print("INF: output result to file '%s'" % filedst )
     f = open(filedst,"wt",encoding="utf-8")
     for s in result["segments"]:
-        txt = "%s\n" % (s["text"])
+        txt = "?: %s\n" % (s["text"])
         f.write( txt )
     f.close()
     

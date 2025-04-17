@@ -91,6 +91,16 @@ if 1:
         f.write( txt )
     f.close()
     
+    
+if 1:
+    filedst = soundname.replace(".wav","_compact.out")
+    print("INF: output result to file '%s'" % filedst )
+    f = open(filedst,"wt",encoding="utf-8")
+    for s in result["segments"]:
+        txt = "%s\n" % (s["text"])
+        f.write( txt )
+    f.close()
+    
 """
 *** Result model base on mstab7:
 

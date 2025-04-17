@@ -291,8 +291,11 @@ void setup(){
 
   pinMode(ledPin, OUTPUT);
   digitalWrite(ledPin, LOW);
+
+  int bConnectToBoxFirst = 1;
+  int bConnected = 0;
   
-  if(0)
+  if( bConnectToBoxFirst )
   {
     // Connect to Wi-Fi
     Serial.println("Connecting to WiFi..");
@@ -305,7 +308,7 @@ void setup(){
     // Print ESP Local IP Address
     Serial.println(WiFi.localIP());
   }
-  else
+  if(!bConnected)
   {
     createWifiAP( getArduinoId() );
   }
@@ -329,7 +332,7 @@ void setup(){
   server.begin();
   Serial.println( "server started..." );
 
-  lcd_print_message( "Serving on: ", getArduinoId() );
+  lcd_print_message( "Serving on: ", getCurrentSSID() );
   lcd_print_message( getCurrentIP() );
 }
 

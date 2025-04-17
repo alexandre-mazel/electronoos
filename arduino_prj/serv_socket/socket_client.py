@@ -99,7 +99,7 @@ def sendAndReceiveOrder( strServerIP ):
             for i in range(6):
                 if 0:
                     data += b'P' # for a Position order => 5.5fps with optim (don't set to position mode if already set) => 20 fps
-                elif 1:
+                elif 0:
                     data += b'V' # for a Velocity order (if velocity compute everything, but don't send it => 10fps) (optimised => 30fps)
                 else:
                     data += b'F' # for a Fake order (do nothing) => 30fps
@@ -167,14 +167,14 @@ def sendAndReceiveOrder( strServerIP ):
         
         #~ time.sleep(0.004) # 0.01 => 100 ordre et reception par sec (mais ca va plus vite si on attend 2 fois moins)
         time.sleep(0.00001) # si c'est deja assez lent, ca sert a rien d'attendre ici
-            
+        
         if bVerbose: time.sleep( 5 ) # to help debugging
         
     print( "INF: client disconnected" )
 
     
-strServerIP = "192.168.4.1"   # sur AP
-#~ strServerIP = "192.168.0.25" # sur Box
+strServerIP = "192.168.4.1"  # sur AP
+strServerIP = "192.168.0.9" # sur Box
 
 sendAndReceiveOrder( strServerIP )
 

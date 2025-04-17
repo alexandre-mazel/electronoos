@@ -275,8 +275,19 @@ void setup()
 //  esp_bt_controller_disable();
 //  esp_bt_controller_deinit();
 
-  //connectToWifi();
-  createWifiAP( getArduinoId() );
+  int bConnectToBoxFirst = 1;
+  int bConnected = 0;
+
+  if( bConnectToBoxFirst )
+  {
+    lcd_print_message( "Connecting to wifi" );
+    bConnected = connectToWifi();
+  }
+
+  if(!bConnected)
+  {
+    createWifiAP( getArduinoId() );
+  }
 
   lcd_print_message( getCurrentIP() );
 
@@ -286,7 +297,7 @@ void setup()
   // init motor
   dym.init();
 
-  lcd_print_message( "Serving on: ", getArduinoId() );
+  lcd_print_message( "Serving on: ", getCurrentSSID() );
   lcd_print_message( getCurrentIP() );
 
   

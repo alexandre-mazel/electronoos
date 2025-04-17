@@ -7,6 +7,9 @@ char ssid[] = "Liberte";              // your network SSID (name)
 char pass[32] = "la...";                // your network password (use for WPA, or use as key for WEP) - read from rom - assume enought space to store it!
 int keyIndex = 0;                     // your network key Index number (needed only for WEP)
 
+const char * pCurrentSSID = ssid;
+int bModeIsAP = 0;
+
 int status = WL_IDLE_STATUS;
 // if you don't want to use DNS (and reduce your sketch size)
 // use the numeric IP instead of the name for the server:
@@ -58,12 +61,12 @@ void retrievePassFromEeprom(char * password)
   
   
   // first time, call once to write your SSID:
-  // writeStringToEeprom( 0,"***" );
+  //writeStringToEeprom( 100,"***" );
 
   // dumpEeprom(); // to help debug
 
   // read it back
-  readStringFromEeprom( 0, password );
+  readStringFromEeprom( 100, password );
   int nLen = strlen(password);
   Serial.print("DBG: retrievePassFromEeprom: readed password has a length of ");
   Serial.print(nLen);
@@ -101,8 +104,6 @@ void printWifiStatus() {
 
 int connectToWifi( void )
 {
-  /* return 1 on success */
-
   // Set WiFi to station mode and disconnect from an AP if it was previously connected
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
@@ -117,14 +118,21 @@ int connectToWifi( void )
   Serial.println(ssid);
 
   WiFi.begin(ssid, pass);
+  int cpt = 0;
   while (WiFi.status() != WL_CONNECTED) {
       delay(500);
       Serial.print(".");
+      ++cpt;
+      if( cpt > 10 ) // 5 sec
+      {
+        Serial.println("\nConnection failed.");
+        return 0;
+      }
   }
 
-  Serial.println("");
-  Serial.println("Connected to WiFi");
+  Serial.println("\nConnected to WiFi");
   printWifiStatus();
+  bModeIsAP = 0;
 
   return 1;
 }
@@ -147,6 +155,9 @@ int createWifiAP( const char* SSID, const char* password )
   //byte encryption = WiFi.encryptionType();
   //Serial.print( "Encryption Type: " ); Serial.println( encryption, HEX );
 
+  pCurrentSSID = SSID; // TODO: Crado should copy it, as one day it can appear this char* isn't temporary
+  bModeIsAP = 1;
+
   return 1;
 }
 
@@ -154,10 +165,17 @@ const char * getCurrentIP( void )
 {
   static char sz_ip[4*3+3+1];
   IPAddress IP = WiFi.softAPIP();
+  if(!bModeIsAP)
+    IP = WiFi.localIP();
   // return (const char*)IP;
   //const uint8_t* tip = IP.raw_address();
   //sprintf( sz_ip, "%d.%d.%d.%d", tip[0], tip[1],tip[2],tip[3] );
   sprintf( sz_ip, "%d.%d.%d.%d", IP[0], IP[1],IP[2],IP[3] );
   return sz_ip;
   
+}
+
+const char * getCurrentSSID( void )
+{
+  return pCurrentSSID;
 }

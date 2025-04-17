@@ -41,14 +41,23 @@ print("Model loaded in %.2fs" % duration ) # mstab7 base: 0.85s, azure large: 8.
 
 time_begin = time.time()
 
-soundname = "on_the_fly_mehdi.wav"
-#~ soundname = "alex_test.wav"
-soundname = "alex_test_en.wav" # si on force en francais, ca fait un moche résultat avec une expprod a 0.01: Final que je suis en batterie fossil sociale alors que 0.54 en anglais.
-#~ soundname = "alex_count_2.wav" # si on lui dit pas, il croit que c'est de l'anglais
-soundname = "alex_perfect.wav" # si on le force en francais, ca donne c'est donc parfait avec 0.41 si en anglais: expprob: 0.55.
-soundname = "on_the_fly_mehdi2.wav"
-soundname = "C:/Users/alexa/perso/docs_nextcloud_edu/2024_09_DU_inspe/memoire_docs/record/josse.wav"
-soundname = "test_itw.wav"
+soundname = ""
+if len(sys.argv) > 1:
+    # syntaxe: <scriptname> <soundname>
+    # eg: pyt3 test_whisper.py ~/records/filipe.wav
+    soundname = sys.argv[1]
+    
+if soundname == "":
+
+    soundname = "on_the_fly_mehdi.wav"
+    #~ soundname = "alex_test.wav"
+    soundname = "alex_test_en.wav" # si on force en francais, ca fait un moche résultat avec une expprod a 0.01: Final que je suis en batterie fossil sociale alors que 0.54 en anglais.
+    #~ soundname = "alex_count_2.wav" # si on lui dit pas, il croit que c'est de l'anglais
+    soundname = "alex_perfect.wav" # si on le force en francais, ca donne c'est donc parfait avec 0.41 si en anglais: expprob: 0.55.
+    soundname = "on_the_fly_mehdi2.wav"
+    soundname = "C:/Users/alexa/perso/docs_nextcloud_edu/2024_09_DU_inspe/memoire_docs/record/josse.wav"
+    soundname = "test_itw.wav"
+    
 #~ result = model.transcribe(soundname)
 result = model.transcribe(soundname, fp16=False, verbose=True ) # , language="en"
 # for a 55s sound:

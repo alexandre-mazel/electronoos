@@ -1,4 +1,7 @@
 <!DOCTYPE HTML><html>
+<!-- Ce/Le fichier copy_of_code* permet de debugger vite fait dans un browser, quand c'est fini on le copie dans le .ino ou il atterira en ram -->
+<!-- Si on pouvait l'importer automatiquement depuis le ino, ca serait plus pratique... -->
+
 <head>
   <title>MisBKit Web Server</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -189,7 +192,9 @@
 
 function bzCurveY(ctx2d, times, points, f, t) { 
         // one list is time of point, points are values
-        console.log("DBG: bzCurve: start" );
+        console.log("DBG: bzCurveY: start" );
+        console.log( times );
+        console.log( points );
         if (typeof(f) == 'undefined') f = 0.3; 
         if (typeof(t) == 'undefined') t = 0.6; 
       
@@ -211,11 +216,11 @@ function bzCurveY(ctx2d, times, points, f, t) {
                 dx2 = 0; 
                 dy2 = 0; 
             } 
-              
+              //en train d'ecrire cette fonction pour n'avoir que 2 listes: une time et une avec des valeurs pour chaque capteurs et quand c'est fini on copie ce fichier dans le .ino
             ctx2d.bezierCurveTo( 
-                times[iPrep] - dx1, points[iPrep] - dy1, 
-                times[i] + dx2, points[i] + dy2, 
-                times[i], times[i]
+                times[iPrep] - dx1-times[0], points[iPrep] - dy1, 
+                times[i] + dx2-times[0], points[i] + dy2, 
+                times[i]-times[0], points[i]
             ); 
           
             dx1 = dx2; 
@@ -226,8 +231,27 @@ function bzCurveY(ctx2d, times, points, f, t) {
     }
   //setTimeout( updateMotorsAndSensors, 2000 );
   
+  function drawGraph(ctx2d, times, points, f, t) { 
+    w = ctx2d.canvas.clientWidth;
+    h = ctx2d.canvas.clientHeight;
+    //console.log(w);
+    ctx2d.clearRect(0, 0, w, h);
+    ctx2d.beginPath(); // reset lines
+    //ctx2d.moveTo( 0, h/2 );
+    // ctx2d.lineTo( w, h/2 );
+    dx = times[times.length-1] - times[0];
+    halfdy = 128+2;
+    ctx2d.moveTo( 0, h/2+points[i]*h/2/halfdy );
+    for (var i = 1; i < points.length; i++) 
+    {    
+        ctx2d.lineTo( (times[i]-times[0])*w/dx, h/2+points[i]*h/2/halfdy );
+    }
+    ctx2d.stroke();
+  }
+  
   var aaPosDevices = [];
-  var nNbrValByDevice = 300;
+  var aTimes = [];
+  var nNbrValByDevice = 100;
   function initPosDevices()
   {
     for (var j = 0; j < 16; j++ )
@@ -236,10 +260,22 @@ function bzCurveY(ctx2d, times, points, f, t) {
         for (var i = 0; i < nNbrValByDevice; i++ )
         {
             //aaPosDevices[j].push({ x: i, y: i });
-            aaPosDevices[j].push(i%256);
+            aaPosDevices[j].push( i%256 );
         }
     }
+    
+    for (var i = 0; i < nNbrValByDevice; i++ )
+    {
+        aTimes.push(Date.now()/1000-(nNbrValByDevice-i)/10)
+    }
   }
+  function addTimeToVal()
+  {
+    var d = new Date(); // for now
+    aTimes.shift()
+    aTimes.push(Date.now()/1000);
+  }
+  
   function updateDeviceVal(idx, pos)
   {
     aaPosDevices[idx].shift()
@@ -249,13 +285,13 @@ function bzCurveY(ctx2d, times, points, f, t) {
     ctx.setLineDash([0]); 
     ctx.lineWidth = 2; 
     ctx.strokeStyle = "green"; 
-    bzCurve(ctx, aaPosDevices[idx], 0.3, 1); 
+    drawGraph( ctx, aTimes, aaPosDevices[idx], 0.3, 1 ); 
   }
   function simulateValue()
   {
-    var d = new Date(); // for now
-    updateDeviceVal( 0, math.sin(d.getSeconds()) );
-    setTimeout( simulateValue, 200 );
+    addTimeToVal()
+    updateDeviceVal( 0, 128*Math.sin( Date.now()/(2*1000) ) );
+    setTimeout( simulateValue, 50 );
   }
   initPosDevices();
   setTimeout( simulateValue, 200 );

@@ -5,7 +5,7 @@
   copies or substantial portions of the Software.
 
   // To test this:
-  // open http://192.168.0.9:8000/ from a browser (with the esp32 IP)
+  // open http://192.168.0.9:9000/ from a browser (with the esp32 IP)
 *********/
 
 // Import required libraries
@@ -26,8 +26,8 @@
 bool ledState = 0;
 const int ledPin = 13;
 
-// Create AsyncWebServer object on port 80 or 8000
-const int nNumPort = 8000;
+// Create AsyncWebServer object on port 80 or 9000
+const int nNumPort = 9000;
 AsyncWebServer server(nNumPort);
 AsyncWebSocket ws("/ws");
 
@@ -124,13 +124,15 @@ input[type=range][orient=vertical] {
     <div class="card">
       <h2>MisBKit Connected: </h2>
       <p id="update_state">?</p>
+      <p id="fps">fps: ?</p>
+      <p><button id="button_connect" class="button">Reconnect/Disconnect</button></p>
     </div>
   </div>
   <div class="content">
     <div class="card">
       <h2>Internal Led</h2>
       <p class="state">state: <span id="state">%STATE%</span></p>
-      <p><button id="button" class="button">Toggle</button></p>
+      <p><button id="button_led" class="button">Toggle</button></p>
     </div>
   </div>
 
@@ -178,7 +180,7 @@ input[type=range][orient=vertical] {
 <br>
 
 <script>
-  var gateway = 'ws://' + window.location.hostname + ':8000/ws';
+  var gateway = 'ws://' + window.location.hostname + ':9000/ws';
   var websocket = 0;
   
   var aaPosDevices = [];
@@ -188,6 +190,8 @@ input[type=range][orient=vertical] {
   const nNbrMotorInterface = 6; // nbr motor and interface
   var aOrderMotor = []; // between -128 to 128
   var no_update_cpt = 0;
+  var nbr_update = 0;
+  var time_start_cpt_fps = 0;
   
   window.addEventListener('load', onLoad);
   function initWebSocket() {
@@ -202,6 +206,22 @@ input[type=range][orient=vertical] {
     websocket.onopen    = onOpen;
     websocket.onclose   = onClose;
     websocket.onmessage = onMessage; // <-- add this line
+    document.getElementById('button_connect').innerHTML = "Disconnect";
+  }
+  function toggleConnect()
+  {
+    if( websocket != 0 )
+    {
+        console.log( 'DBG: toggleConnect: disconnecting');
+        websocket.close();
+        websocket = 0;
+        document.getElementById('button_connect').innerHTML = "Reconnect";
+    }
+    else
+    {
+        console.log( 'DBG: toggleConnect: reconnecting');
+        initWebSocket();
+    }
   }
   function onOpen(event) {
     console.log('Connection opened');
@@ -212,7 +232,7 @@ input[type=range][orient=vertical] {
   }
   function onMessage(event) {
     var state;
-    console.log( "DBG: onMessage: Data received: ", event.data )
+    //console.log( "DBG: onMessage: Data received: ", event.data )
     if (event.data == "1"){
       state = "ON";
       document.getElementById('state').innerHTML = state;
@@ -236,16 +256,27 @@ input[type=range][orient=vertical] {
         // TODO: here: faire clignoter un petit point quelques part pour montrer qu'on est connecté est rafraichi (genre un truc qui s'estompe avec le temps)
         no_update_cpt = 0;
         document.getElementById('update_state').innerHTML = "connected";
-    }
+        nbr_update += 1;
+        if( Date.now() - time_start_cpt_fps > 5*1000 )
+        {
+            let fps = (nbr_update * 1000) / ( Date.now() - time_start_cpt_fps )
+            document.getElementById('fps').innerHTML = "fps: " + fps.toFixed(2);
+            time_start_cpt_fps = Date.now();
+            nbr_update = 0;
+        }
+        // prepare a new update send
+        setTimeout( updateMotorsAndSensors, 10 );
+    } // end Pos received
   }
   function onLoad(event) {
     initWebSocket();
     initButton();
   }
   function initButton() {
-    document.getElementById('button').addEventListener('click', toggle);
+    document.getElementById('button_led').addEventListener('click', toggleLed);
+    document.getElementById('button_connect').addEventListener('click', toggleConnect);
   }
-  function toggle(){
+  function toggleLed(){
     websocket.send('toggle');
   }
   
@@ -273,14 +304,14 @@ console.log( "b64_to_sint: CE: " + b64_to_sint( "CE" ) );
 console.log( "b64_to_sint: D+: " + b64_to_sint( "D+" ) );
 
   function updateMotorsAndSensors(){
-    console.log("DBG: updateMotorsAndSensors: start" );
+    //console.log("DBG: updateMotorsAndSensors: start" );
     if( websocket == 0 )
     {
       console.log("DBG: updateMotorsAndSensors: no ws" );
     }
     else
     {
-      console.log("DBG: updateMotorsAndSensors: sending motor command" );
+      //console.log("DBG: updateMotorsAndSensors: sending motor command" );
       var msg = 'motor_';
       for (var i = 0; i < nNbrMotorInterface; i++ )
       {
@@ -288,7 +319,7 @@ console.log( "b64_to_sint: D+: " + b64_to_sint( "D+" ) );
       }
       websocket.send( msg );
     }
-    setTimeout( updateMotorsAndSensors, 1000 );
+    // setTimeout( updateMotorsAndSensors, 50 ); // it's better to prepare an update after receiving datas, so we're not accumulating calls
   }
   
    function gradient(a, b) { 
@@ -392,7 +423,7 @@ function bzCurveY(ctx2d, times, points, f, t) {
     ctx2d.moveTo( 0, h/2+points[i]*h/2/halfdy );
     for (var i = 1; i < points.length; i++) 
     {    
-        ctx2d.lineTo( (times[i]-times[0])*w/dx, h/2+points[i]*h/2/halfdy );
+        ctx2d.lineTo( (times[i]-times[0])*w/dx, h/2 - points[i]*h/2/halfdy ); // - because the canvas is oriented to the bottom
     }
     ctx2d.stroke();
   }
@@ -449,6 +480,7 @@ function bzCurveY(ctx2d, times, points, f, t) {
   
   function updateDeviceVal(idx, pos)
   {
+    //console.log("DBG: updateDeviceVal: idx: " + idx + ", pos: " + pos );
     aaPosDevices[idx].shift()
     aaPosDevices[idx].push(pos);
     drawGraph( aListCtx[idx], aTimes, aaPosDevices[idx], 0.3, 1 ); 
@@ -492,6 +524,7 @@ if(0)
     let fakeevent = Object()
     fakeevent.data = "Pos_CcAnC3C8CiB.01234567890123456789B";
     onMessage(fakeevent)
+    setTimeout( ()=>{onMessage(fakeevent)}, 6000 );
 }
 </script>
 </body>
@@ -591,7 +624,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
     data[len] = 0;
-    Serial.print("DBG: handleWebSocketMessage: data: "); Serial.println( (char*)data );
+    //Serial.print("DBG: handleWebSocketMessage: data: "); Serial.println( (char*)data );
     if (strcmp((char*)data, "toggle") == 0) 
     {
       ledState = !ledState;
@@ -652,7 +685,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
           const int nFirstCharPosRet = 4;
           sint_to_b64( allMotorPos[i], &sendpos[nFirstCharPosRet+i*2] );
         }
-        Serial.print("DBG: handleWebSocketMessage: sendpos: "); Serial.println( sendpos );
+        //Serial.print("DBG: handleWebSocketMessage: sendpos: "); Serial.println( sendpos );
         ws.textAll(sendpos);
       }
     }

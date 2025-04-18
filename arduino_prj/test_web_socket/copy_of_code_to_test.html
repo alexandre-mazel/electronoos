@@ -86,7 +86,13 @@ input[type=range][orient=vertical] {
   </div>
   <div class="content">
     <div class="card">
-      <h2>MisBKit Internal Led</h2>
+      <h2>MisBKit Connected: </h2>
+      <p id="update_state">?</p>
+    </div>
+  </div>
+  <div class="content">
+    <div class="card">
+      <h2>Internal Led</h2>
       <p class="state">state: <span id="state">%STATE%</span></p>
       <p><button id="button" class="button">Toggle</button></p>
     </div>
@@ -145,6 +151,7 @@ input[type=range][orient=vertical] {
   var aListCtx = [];
   const nNbrMotorInterface = 6; // nbr motor and interface
   var aOrderMotor = []; // between -128 to 128
+  var no_update_cpt = 0;
   
   window.addEventListener('load', onLoad);
   function initWebSocket() {
@@ -172,11 +179,28 @@ input[type=range][orient=vertical] {
     console.log( "DBG: onMessage: Data received: ", event.data )
     if (event.data == "1"){
       state = "ON";
+      document.getElementById('state').innerHTML = state;
     }
-    else{
+    else if (event.data == "0"){
       state = "OFF";
+      document.getElementById('state').innerHTML = state;
     }
-    document.getElementById('state').innerHTML = state;
+    else if (event.data[0] == "P" && event.data[1] == "o" )
+    {
+        // Message has the style: "Pos_CcAnC3C8CiB.01234567890123456789B"
+        let msg = event.data;
+        addTimeToVal();
+        for (var i = 0; i < nNbrMotorInterface; i++ )
+        {
+            const start_pos = 4;
+            let val = b64_to_sint( msg.substring(start_pos+i*2,start_pos+i*2+2) );
+            updateDeviceVal( i, val );
+            
+        }
+        // TODO: here: faire clignoter un petit point quelques part pour montrer qu'on est connecté est rafraichi (genre un truc qui s'estompe avec le temps)
+        no_update_cpt = 0;
+        document.getElementById('update_state').innerHTML = "connected";
+    }
   }
   function onLoad(event) {
     initWebSocket();
@@ -408,9 +432,31 @@ function bzCurveY(ctx2d, times, points, f, t) {
     console.log("DBG: sliderChange: val_order: " + val_order );
     aOrderMotor[idx] = val_order;
   }
-  initPosDevices();
-  //setTimeout( simulateValue, 200 );
-  setTimeout( updateMotorsAndSensors, 2000 );
+  
+function refreshPage()
+{
+    if( no_update_cpt < 5 )
+    {
+        no_update_cpt += 1;
+        if( no_update_cpt == 5 )
+        {
+            document.getElementById('update_state').innerHTML = "lost";
+        }
+    }
+    
+    setTimeout( refreshPage, 1000 );
+}
+
+initPosDevices();
+setTimeout( refreshPage, 1000 );
+//setTimeout( simulateValue, 200 );
+setTimeout( updateMotorsAndSensors, 2000 );
+if(0)
+{
+    let fakeevent = Object()
+    fakeevent.data = "Pos_CcAnC3C8CiB.01234567890123456789B";
+    onMessage(fakeevent)
+}
 </script>
 </body>
 </html>

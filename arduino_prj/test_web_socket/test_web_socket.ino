@@ -5,7 +5,7 @@
   copies or substantial portions of the Software.
 
   // To test this:
-  // open http://192.168.0.9:80/ from a browser (with the esp32 IP)
+  // open http://192.168.0.9:8000/ from a browser (with the esp32 IP)
 *********/
 
 // Import required libraries
@@ -26,8 +26,9 @@
 bool ledState = 0;
 const int ledPin = 13;
 
-// Create AsyncWebServer object on port 80
-AsyncWebServer server(80);
+// Create AsyncWebServer object on port 80 or 8000
+const int nNumPort = 8000;
+AsyncWebServer server(nNumPort);
 AsyncWebSocket ws("/ws");
 
 
@@ -121,7 +122,13 @@ input[type=range][orient=vertical] {
   </div>
   <div class="content">
     <div class="card">
-      <h2>MisBKit Internal Led</h2>
+      <h2>MisBKit Connected: </h2>
+      <p id="update_state">?</p>
+    </div>
+  </div>
+  <div class="content">
+    <div class="card">
+      <h2>Internal Led</h2>
       <p class="state">state: <span id="state">%STATE%</span></p>
       <p><button id="button" class="button">Toggle</button></p>
     </div>
@@ -171,7 +178,7 @@ input[type=range][orient=vertical] {
 <br>
 
 <script>
-  var gateway = 'ws://' + window.location.hostname + ':80/ws';
+  var gateway = 'ws://' + window.location.hostname + ':8000/ws';
   var websocket = 0;
   
   var aaPosDevices = [];
@@ -180,6 +187,7 @@ input[type=range][orient=vertical] {
   var aListCtx = [];
   const nNbrMotorInterface = 6; // nbr motor and interface
   var aOrderMotor = []; // between -128 to 128
+  var no_update_cpt = 0;
   
   window.addEventListener('load', onLoad);
   function initWebSocket() {
@@ -207,11 +215,28 @@ input[type=range][orient=vertical] {
     console.log( "DBG: onMessage: Data received: ", event.data )
     if (event.data == "1"){
       state = "ON";
+      document.getElementById('state').innerHTML = state;
     }
-    else{
+    else if (event.data == "0"){
       state = "OFF";
+      document.getElementById('state').innerHTML = state;
     }
-    document.getElementById('state').innerHTML = state;
+    else if (event.data[0] == "P" && event.data[1] == "o" )
+    {
+        // Message has the style: "Pos_CcAnC3C8CiB.01234567890123456789B"
+        let msg = event.data;
+        addTimeToVal();
+        for (var i = 0; i < nNbrMotorInterface; i++ )
+        {
+            const start_pos = 4;
+            let val = b64_to_sint( msg.substring(start_pos+i*2,start_pos+i*2+2) );
+            updateDeviceVal( i, val );
+            
+        }
+        // TODO: here: faire clignoter un petit point quelques part pour montrer qu'on est connecté est rafraichi (genre un truc qui s'estompe avec le temps)
+        no_update_cpt = 0;
+        document.getElementById('update_state').innerHTML = "connected";
+    }
   }
   function onLoad(event) {
     initWebSocket();
@@ -443,9 +468,31 @@ function bzCurveY(ctx2d, times, points, f, t) {
     console.log("DBG: sliderChange: val_order: " + val_order );
     aOrderMotor[idx] = val_order;
   }
-  initPosDevices();
-  //setTimeout( simulateValue, 200 );
-  setTimeout( updateMotorsAndSensors, 2000 );
+  
+function refreshPage()
+{
+    if( no_update_cpt < 5 )
+    {
+        no_update_cpt += 1;
+        if( no_update_cpt == 5 )
+        {
+            document.getElementById('update_state').innerHTML = "lost";
+        }
+    }
+    
+    setTimeout( refreshPage, 1000 );
+}
+
+initPosDevices();
+setTimeout( refreshPage, 1000 );
+//setTimeout( simulateValue, 200 );
+setTimeout( updateMotorsAndSensors, 2000 );
+if(0)
+{
+    let fakeevent = Object()
+    fakeevent.data = "Pos_CcAnC3C8CiB.01234567890123456789B";
+    onMessage(fakeevent)
+}
 </script>
 </body>
 </html>
@@ -572,10 +619,10 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
       // real decoding and encoding
       if( 1 )
       {
-        // datas are: PXX with P: the command type: P: Position, V: Velocity, F: Fake; and XX: the b64 encoded position -127..127
+        // datas are: motor_PXX with P: the command type: P: Position, V: Velocity, F: Fake; and XX: the b64 encoded position -127..127
         for(int i = 0; i < NBR_MOTOR; ++i )
         {
-          const int nFirstCharPos = 5; // first char after Motor
+          const int nFirstCharPos = 6; // first char after Motor_
           char command = data[nFirstCharPos+i*3];
           sbyte val = b64_to_sint( (char*) & (data[nFirstCharPos+i*3+1]) );
           if( command == 'P' )
@@ -586,19 +633,23 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
           {
             dym.sendVelocity( i, val );
           }
-          else
+          else if( command == 'F' )
           {
             // Fake order
             // Nothing
           }
+          else
+          {
+            Serial.print( "DBG: handleWebSocketMessage: unknown command: " ); Serial.println( command );
+          }
         }
 
         // prepare answer
-        static char sendpos[] = "PosXXxxXXxxXXxx01234567890123456789B"; // TODO: Real answer for sensors (we duplicate size for them as they will be b64encoded also)
+        static char sendpos[] = "Pos_XXxxXXxxXXxx01234567890123456789B"; // TODO: Real answer for sensors (we duplicate size for them as they will be b64encoded also)
         const sbyte * allMotorPos = dym.getAllPositions();
         for(int i = 0; i < NBR_MOTOR; ++i )
         {
-          const int nFirstCharPosRet = 3;
+          const int nFirstCharPosRet = 4;
           sint_to_b64( allMotorPos[i], &sendpos[nFirstCharPosRet+i*2] );
         }
         Serial.print("DBG: handleWebSocketMessage: sendpos: "); Serial.println( sendpos );
@@ -632,7 +683,7 @@ void initWebSocket() {
 }
 
 String processor(const String& var){
-  //Serial.println(var);
+  Serial.print( "DBG: processor: var: " ); Serial.println( var );
   if(var == "STATE"){
     if (ledState){
       return "ON";
@@ -723,6 +774,7 @@ void setup(){
 
   lcd_print_message( "Serving on: ", getCurrentSSID() );
   lcd_print_message( getCurrentIP() );
+  lcd_print_message( "Port: ", nNumPort );
 
   // change xxx by getArduinoId
   replace_in_buf( (char *)index_html,"BOARD_ID_   ","MISBKIT_TODO" ); // we plan to change an read only memory ! :)

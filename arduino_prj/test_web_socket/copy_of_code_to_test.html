@@ -66,6 +66,15 @@
      color:#8c8c8c;
      font-weight: bold;
    }
+   
+input[type=range][orient=vertical] {
+    writing-mode: vertical-lr;
+    direction: rtl;
+    appearance: slider-vertical;
+    width: 16px;
+    vertical-align: bottom;
+    height: 410px;
+}
   </style>
 <title>ESP Web Server</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -83,9 +92,21 @@
     </div>
   </div>
 
-<canvas id="Motor1" width="600" height="400" 
+<canvas id="Motor1_graph" width="600" height="400" 
         style="border: 2px solid black"> 
 </canvas> 
+
+<input type="range" orient="vertical" id="Motor1_slider" list="steplist" onInput="sliderChange(this.id, this.value)" />
+<datalist id="steplist">
+    <option>50</option>
+</datalist>
+<br>
+
+<canvas id="Motor2_graph" width="600" height="400" 
+        style="border: 2px solid black"> 
+</canvas> 
+<input type="range" orient="vertical" id="Motor2_slider" list="steplist" onInput="sliderChange(this.id, this.value)" />
+<br>
 
 <script>
   var gateway = 'ws://' + window.location.hostname + ':8000/ws';
@@ -252,10 +273,11 @@ function bzCurveY(ctx2d, times, points, f, t) {
   var aaPosDevices = [];
   var aTimes = [];
   var nNbrValByDevice = 100;
+  var aListCtx = [];
   function initPosDevices()
   {
     for (var j = 0; j < 16; j++ )
-    { 
+    {
         aaPosDevices.push([]);
         for (var i = 0; i < nNbrValByDevice; i++ )
         {
@@ -267,6 +289,19 @@ function bzCurveY(ctx2d, times, points, f, t) {
     for (var i = 0; i < nNbrValByDevice; i++ )
     {
         aTimes.push(Date.now()/1000-(nNbrValByDevice-i)/10)
+    }
+    
+    var cv = document.getElementById("Motor1_graph"); 
+    aListCtx.push( cv.getContext("2d") );
+    
+    var cv2 = document.getElementById("Motor2_graph"); 
+    aListCtx.push( cv2.getContext("2d") );
+    
+    for (var i = 0; i < 2; i++ )
+    {
+        aListCtx[i].setLineDash([0]); 
+        aListCtx[i].lineWidth = 2; 
+        aListCtx[i].strokeStyle = "green"; 
     }
   }
   function addTimeToVal()
@@ -280,18 +315,19 @@ function bzCurveY(ctx2d, times, points, f, t) {
   {
     aaPosDevices[idx].shift()
     aaPosDevices[idx].push(pos);
-    var cv = document.getElementById("Motor1"); 
-    var ctx = cv.getContext("2d"); 
-    ctx.setLineDash([0]); 
-    ctx.lineWidth = 2; 
-    ctx.strokeStyle = "green"; 
-    drawGraph( ctx, aTimes, aaPosDevices[idx], 0.3, 1 ); 
+    drawGraph( aListCtx[idx], aTimes, aaPosDevices[idx], 0.3, 1 ); 
   }
   function simulateValue()
   {
     addTimeToVal()
     updateDeviceVal( 0, 128*Math.sin( Date.now()/(2*1000) ) );
+    updateDeviceVal( 1, 128*Math.sin( (Date.now()+3000)/(2*1000) ) );
     setTimeout( simulateValue, 50 );
+  }
+  
+  function sliderChange( id, val )
+  {
+    console.log("DBG: sliderChange: id: " + id, ", val: " + val );
   }
   initPosDevices();
   setTimeout( simulateValue, 200 );

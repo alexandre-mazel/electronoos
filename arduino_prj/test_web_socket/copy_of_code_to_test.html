@@ -96,7 +96,7 @@ input[type=range][orient=vertical] {
         style="border: 2px solid black"> 
 </canvas> 
 
-<input type="range" orient="vertical" id="Motor1_slider" list="steplist" onInput="sliderChange(this.id, this.value)" />
+<input type="range" orient="vertical" id="Motor1_slider" list="steplist" onInput="sliderChange(this.id, 0, this.value)" />
 <datalist id="steplist">
     <option>50</option>
 </datalist>
@@ -105,15 +105,55 @@ input[type=range][orient=vertical] {
 <canvas id="Motor2_graph" width="600" height="400" 
         style="border: 2px solid black"> 
 </canvas> 
-<input type="range" orient="vertical" id="Motor2_slider" list="steplist" onInput="sliderChange(this.id, this.value)" />
+<input type="range" orient="vertical" id="Motor2_slider" list="steplist" onInput="sliderChange(this.id, 1, this.value)" />
+<br>
+
+<canvas id="Motor3_graph" width="600" height="400" 
+        style="border: 2px solid black"> 
+</canvas> 
+<input type="range" orient="vertical" id="Motor3_slider" list="steplist" onInput="sliderChange(this.id, 2, this.value)" />
+<br>
+
+<canvas id="Motor4_graph" width="600" height="400" 
+        style="border: 2px solid black"> 
+</canvas> 
+<input type="range" orient="vertical" id="Motor4_slider" list="steplist" onInput="sliderChange(this.id, 3, this.value)" />
+<br>
+
+<canvas id="Motor5_graph" width="600" height="400" 
+        style="border: 2px solid black"> 
+</canvas> 
+<input type="range" orient="vertical" id="Motor5_slider" list="steplist" onInput="sliderChange(this.id, 4, this.value)" />
+<br>
+
+<canvas id="Motor6_graph" width="600" height="400" 
+        style="border: 2px solid black"> 
+</canvas> 
+<input type="range" orient="vertical" id="Motor6_slider" list="steplist" onInput="sliderChange(this.id, 5, this.value)" />
+
+
+
 <br>
 
 <script>
   var gateway = 'ws://' + window.location.hostname + ':8000/ws';
   var websocket = 0;
+  
+  var aaPosDevices = [];
+  var aTimes = [];
+  var nNbrValByDevice = 100;
+  var aListCtx = [];
+  const nNbrMotorInterface = 6; // nbr motor and interface
+  var aOrderMotor = []; // between -128 to 128
+  
   window.addEventListener('load', onLoad);
   function initWebSocket() {
-    console.log('Trying to open a WebSocket connection...');
+    if(window.location.hostname == "" )
+    {
+        console.log('WRN: initWebSocket: localhost detected so no websocket creation...');
+        return;
+    }
+    console.log('DBG: initWebSocket: Trying to open a WebSocket connection...');
     console.log( "gateway: " + gateway );
     websocket = new WebSocket(gateway);
     websocket.onopen    = onOpen;
@@ -148,6 +188,29 @@ input[type=range][orient=vertical] {
   function toggle(){
     websocket.send('toggle');
   }
+  
+const alphabet_b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+.";
+function sint_to_b64( val )
+{
+    // convert a val -127..127 to b64like encoded
+    val = val + 127;
+    return alphabet_b64[(val/64)>>0] + alphabet_b64[val%64]; // >> 0 for convert to int
+}
+function b64_to_sint( code )
+{
+    // revert operation than b64_to_sint
+    idx0 = alphabet_b64.indexOf( code[0] );
+    idx1 = alphabet_b64.indexOf( code[1] );
+    let val = idx0 * 64 + idx1;
+    val = val - 127;
+    return val;
+}
+console.log( "sint_to_b64: -127: " + sint_to_b64( -127 ) );
+console.log( "sint_to_b64: 5: " + sint_to_b64( 5 ) );
+console.log( "sint_to_b64: 127: " + sint_to_b64( 127 ) );
+console.log( "b64_to_sint: AA: " + b64_to_sint( "AA" ) );
+console.log( "b64_to_sint: CE: " + b64_to_sint( "CE" ) );
+console.log( "b64_to_sint: D+: " + b64_to_sint( "D+" ) );
 
   function updateMotorsAndSensors(){
     console.log("DBG: updateMotorsAndSensors: start" );
@@ -158,9 +221,14 @@ input[type=range][orient=vertical] {
     else
     {
       console.log("DBG: updateMotorsAndSensors: sending motor command" );
-      websocket.send('motor');
+      var msg = 'motor_';
+      for (var i = 0; i < nNbrMotorInterface; i++ )
+      {
+        msg += "P" + sint_to_b64(aOrderMotor[i]);
+      }
+      websocket.send( msg );
     }
-    setTimeout( updateMotorsAndSensors, 500 );
+    setTimeout( updateMotorsAndSensors, 1000 );
   }
   
    function gradient(a, b) { 
@@ -250,7 +318,6 @@ function bzCurveY(ctx2d, times, points, f, t) {
         } 
         ctx2d.stroke(); 
     }
-  //setTimeout( updateMotorsAndSensors, 2000 );
   
   function drawGraph(ctx2d, times, points, f, t) { 
     w = ctx2d.canvas.clientWidth;
@@ -270,10 +337,6 @@ function bzCurveY(ctx2d, times, points, f, t) {
     ctx2d.stroke();
   }
   
-  var aaPosDevices = [];
-  var aTimes = [];
-  var nNbrValByDevice = 100;
-  var aListCtx = [];
   function initPosDevices()
   {
     for (var j = 0; j < 16; j++ )
@@ -297,11 +360,24 @@ function bzCurveY(ctx2d, times, points, f, t) {
     var cv2 = document.getElementById("Motor2_graph"); 
     aListCtx.push( cv2.getContext("2d") );
     
-    for (var i = 0; i < 2; i++ )
+    var cv3 = document.getElementById("Motor3_graph"); 
+    aListCtx.push( cv3.getContext("2d") );
+    
+    var cv4 = document.getElementById("Motor4_graph"); 
+    aListCtx.push( cv4.getContext("2d") );
+    
+    var cv5 = document.getElementById("Motor5_graph"); 
+    aListCtx.push( cv5.getContext("2d") );
+    
+    var cv6 = document.getElementById("Motor6_graph"); 
+    aListCtx.push( cv6.getContext("2d") );
+    
+    for (var i = 0; i < nNbrMotorInterface; i++ )
     {
         aListCtx[i].setLineDash([0]); 
         aListCtx[i].lineWidth = 2; 
         aListCtx[i].strokeStyle = "green"; 
+        aOrderMotor.push( 0 );
     }
   }
   function addTimeToVal()
@@ -325,12 +401,16 @@ function bzCurveY(ctx2d, times, points, f, t) {
     setTimeout( simulateValue, 50 );
   }
   
-  function sliderChange( id, val )
+  function sliderChange( id, idx, val )
   {
     console.log("DBG: sliderChange: id: " + id, ", val: " + val );
+    let val_order = ((val * 254 / 100) - 127 )>>0;
+    console.log("DBG: sliderChange: val_order: " + val_order );
+    aOrderMotor[idx] = val_order;
   }
   initPosDevices();
-  setTimeout( simulateValue, 200 );
+  //setTimeout( simulateValue, 200 );
+  setTimeout( updateMotorsAndSensors, 2000 );
 </script>
 </body>
 </html>

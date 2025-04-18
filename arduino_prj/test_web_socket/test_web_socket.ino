@@ -5,7 +5,7 @@
   copies or substantial portions of the Software.
 
   // To test this:
-  // open http://192.168.0.9:8000/ from a browser (with the esp32 IP)
+  // open http://192.168.0.9:80/ from a browser (with the esp32 IP)
 *********/
 
 // Import required libraries
@@ -27,11 +27,16 @@ bool ledState = 0;
 const int ledPin = 13;
 
 // Create AsyncWebServer object on port 80
-AsyncWebServer server(8000);
+AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
+
+
 
 const char index_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE HTML><html>
+<!-- Ce/Le fichier copy_of_code* permet de debugger vite fait dans un browser, quand c'est fini on le copie dans le .ino ou il atterira en ram -->
+<!-- Si on pouvait l'importer automatiquement depuis le ino, ca serait plus pratique... -->
+
 <head>
   <title>MisBKit Web Server</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -96,6 +101,15 @@ const char index_html[] PROGMEM = R"rawliteral(
      color:#8c8c8c;
      font-weight: bold;
    }
+   
+input[type=range][orient=vertical] {
+    writing-mode: vertical-lr;
+    direction: rtl;
+    appearance: slider-vertical;
+    width: 16px;
+    vertical-align: bottom;
+    height: 410px;
+}
   </style>
 <title>ESP Web Server</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -113,16 +127,68 @@ const char index_html[] PROGMEM = R"rawliteral(
     </div>
   </div>
 
-<canvas id="Motor1" width="600" height="400" 
+<canvas id="Motor1_graph" width="600" height="400" 
         style="border: 2px solid black"> 
 </canvas> 
 
+<input type="range" orient="vertical" id="Motor1_slider" list="steplist" onInput="sliderChange(this.id, 0, this.value)" />
+<datalist id="steplist">
+    <option>50</option>
+</datalist>
+<br>
+
+<canvas id="Motor2_graph" width="600" height="400" 
+        style="border: 2px solid black"> 
+</canvas> 
+<input type="range" orient="vertical" id="Motor2_slider" list="steplist" onInput="sliderChange(this.id, 1, this.value)" />
+<br>
+
+<canvas id="Motor3_graph" width="600" height="400" 
+        style="border: 2px solid black"> 
+</canvas> 
+<input type="range" orient="vertical" id="Motor3_slider" list="steplist" onInput="sliderChange(this.id, 2, this.value)" />
+<br>
+
+<canvas id="Motor4_graph" width="600" height="400" 
+        style="border: 2px solid black"> 
+</canvas> 
+<input type="range" orient="vertical" id="Motor4_slider" list="steplist" onInput="sliderChange(this.id, 3, this.value)" />
+<br>
+
+<canvas id="Motor5_graph" width="600" height="400" 
+        style="border: 2px solid black"> 
+</canvas> 
+<input type="range" orient="vertical" id="Motor5_slider" list="steplist" onInput="sliderChange(this.id, 4, this.value)" />
+<br>
+
+<canvas id="Motor6_graph" width="600" height="400" 
+        style="border: 2px solid black"> 
+</canvas> 
+<input type="range" orient="vertical" id="Motor6_slider" list="steplist" onInput="sliderChange(this.id, 5, this.value)" />
+
+
+
+<br>
+
 <script>
-  var gateway = 'ws://' + window.location.hostname + ':8000/ws';
+  var gateway = 'ws://' + window.location.hostname + ':80/ws';
   var websocket = 0;
+  
+  var aaPosDevices = [];
+  var aTimes = [];
+  var nNbrValByDevice = 100;
+  var aListCtx = [];
+  const nNbrMotorInterface = 6; // nbr motor and interface
+  var aOrderMotor = []; // between -128 to 128
+  
   window.addEventListener('load', onLoad);
   function initWebSocket() {
-    console.log('Trying to open a WebSocket connection...');
+    if(window.location.hostname == "" )
+    {
+        console.log('WRN: initWebSocket: localhost detected so no websocket creation...');
+        return;
+    }
+    console.log('DBG: initWebSocket: Trying to open a WebSocket connection...');
     console.log( "gateway: " + gateway );
     websocket = new WebSocket(gateway);
     websocket.onopen    = onOpen;
@@ -157,6 +223,29 @@ const char index_html[] PROGMEM = R"rawliteral(
   function toggle(){
     websocket.send('toggle');
   }
+  
+const alphabet_b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+.";
+function sint_to_b64( val )
+{
+    // convert a val -127..127 to b64like encoded
+    val = val + 127;
+    return alphabet_b64[(val/64)>>0] + alphabet_b64[val%64]; // >> 0 for convert to int
+}
+function b64_to_sint( code )
+{
+    // revert operation than b64_to_sint
+    idx0 = alphabet_b64.indexOf( code[0] );
+    idx1 = alphabet_b64.indexOf( code[1] );
+    let val = idx0 * 64 + idx1;
+    val = val - 127;
+    return val;
+}
+console.log( "sint_to_b64: -127: " + sint_to_b64( -127 ) );
+console.log( "sint_to_b64: 5: " + sint_to_b64( 5 ) );
+console.log( "sint_to_b64: 127: " + sint_to_b64( 127 ) );
+console.log( "b64_to_sint: AA: " + b64_to_sint( "AA" ) );
+console.log( "b64_to_sint: CE: " + b64_to_sint( "CE" ) );
+console.log( "b64_to_sint: D+: " + b64_to_sint( "D+" ) );
 
   function updateMotorsAndSensors(){
     console.log("DBG: updateMotorsAndSensors: start" );
@@ -167,16 +256,204 @@ const char index_html[] PROGMEM = R"rawliteral(
     else
     {
       console.log("DBG: updateMotorsAndSensors: sending motor command" );
-      websocket.send('motor');
+      var msg = 'motor_';
+      for (var i = 0; i < nNbrMotorInterface; i++ )
+      {
+        msg += "P" + sint_to_b64(aOrderMotor[i]);
+      }
+      websocket.send( msg );
     }
-    setTimeout( updateMotorsAndSensors, 500 );
+    setTimeout( updateMotorsAndSensors, 1000 );
   }
+  
+   function gradient(a, b) { 
+        return (b.y-a.y)/(b.x-a.x); 
+    } 
 
+   function gradient4(x1,y1,x2,y2) { 
+        return (y2-y1)/(x2-x1); 
+    }
+    
+    function bzCurveXY(ctx2d, points, f, t) { 
+        // points are a list of (.x,.y)
+        console.log("DBG: bzCurve: start" );
+        if (typeof(f) == 'undefined') f = 0.3; 
+        if (typeof(t) == 'undefined') t = 0.6; 
+      
+        ctx2d.beginPath(); 
+        ctx2d.moveTo(points[0].x, points[0].y); 
+      
+        var m = 0; 
+        var dx1 = 0; 
+        var dy1 = 0; 
+          
+        var preP = points[0]; 
+          
+        for (var i = 1; i < points.length; i++) { 
+            var curP = points[i]; 
+            nexP = points[i + 1]; 
+            if (nexP) { 
+                m = gradient(preP, nexP); 
+                dx2 = (nexP.x - curP.x) * -f; 
+                dy2 = dx2 * m * t; 
+            } else { 
+                dx2 = 0; 
+                dy2 = 0; 
+            } 
+              
+            ctx2d.bezierCurveTo( 
+                preP.x - dx1, preP.y - dy1, 
+                curP.x + dx2, curP.y + dy2, 
+                curP.x, curP.y 
+            ); 
+          
+            dx1 = dx2; 
+            dy1 = dy2; 
+            preP = curP; 
+        } 
+        ctx2d.stroke(); 
+    } 
+
+function bzCurveY(ctx2d, times, points, f, t) { 
+        // one list is time of point, points are values
+        console.log("DBG: bzCurveY: start" );
+        console.log( times );
+        console.log( points );
+        if (typeof(f) == 'undefined') f = 0.3; 
+        if (typeof(t) == 'undefined') t = 0.6; 
+      
+        ctx2d.beginPath(); 
+        ctx2d.moveTo(times[0], points[0]); 
+      
+        var m = 0; 
+        var dx1 = 0; 
+        var dy1 = 0; 
+          
+        var iPrep = 0; 
+          
+        for (var i = 1; i < points.length; i++) {        
+            if (points[i + 1]) { 
+                m = gradient4(times[iPrep],points[iPrep],times[i+1],points[i+1]); 
+                dx2 = times[i+1]-times[i] * -f; 
+                dy2 = dx2 * m * t; 
+            } else { 
+                dx2 = 0; 
+                dy2 = 0; 
+            } 
+              //en train d'ecrire cette fonction pour n'avoir que 2 listes: une time et une avec des valeurs pour chaque capteurs et quand c'est fini on copie ce fichier dans le .ino
+            ctx2d.bezierCurveTo( 
+                times[iPrep] - dx1-times[0], points[iPrep] - dy1, 
+                times[i] + dx2-times[0], points[i] + dy2, 
+                times[i]-times[0], points[i]
+            ); 
+          
+            dx1 = dx2; 
+            dy1 = dy2; 
+            iPrep = i; 
+        } 
+        ctx2d.stroke(); 
+    }
+  
+  function drawGraph(ctx2d, times, points, f, t) { 
+    w = ctx2d.canvas.clientWidth;
+    h = ctx2d.canvas.clientHeight;
+    //console.log(w);
+    ctx2d.clearRect(0, 0, w, h);
+    ctx2d.beginPath(); // reset lines
+    //ctx2d.moveTo( 0, h/2 );
+    // ctx2d.lineTo( w, h/2 );
+    dx = times[times.length-1] - times[0];
+    halfdy = 128+2;
+    ctx2d.moveTo( 0, h/2+points[i]*h/2/halfdy );
+    for (var i = 1; i < points.length; i++) 
+    {    
+        ctx2d.lineTo( (times[i]-times[0])*w/dx, h/2+points[i]*h/2/halfdy );
+    }
+    ctx2d.stroke();
+  }
+  
+  function initPosDevices()
+  {
+    for (var j = 0; j < 16; j++ )
+    {
+        aaPosDevices.push([]);
+        for (var i = 0; i < nNbrValByDevice; i++ )
+        {
+            //aaPosDevices[j].push({ x: i, y: i });
+            aaPosDevices[j].push( i%256 );
+        }
+    }
+    
+    for (var i = 0; i < nNbrValByDevice; i++ )
+    {
+        aTimes.push(Date.now()/1000-(nNbrValByDevice-i)/10)
+    }
+    
+    var cv = document.getElementById("Motor1_graph"); 
+    aListCtx.push( cv.getContext("2d") );
+    
+    var cv2 = document.getElementById("Motor2_graph"); 
+    aListCtx.push( cv2.getContext("2d") );
+    
+    var cv3 = document.getElementById("Motor3_graph"); 
+    aListCtx.push( cv3.getContext("2d") );
+    
+    var cv4 = document.getElementById("Motor4_graph"); 
+    aListCtx.push( cv4.getContext("2d") );
+    
+    var cv5 = document.getElementById("Motor5_graph"); 
+    aListCtx.push( cv5.getContext("2d") );
+    
+    var cv6 = document.getElementById("Motor6_graph"); 
+    aListCtx.push( cv6.getContext("2d") );
+    
+    for (var i = 0; i < nNbrMotorInterface; i++ )
+    {
+        aListCtx[i].setLineDash([0]); 
+        aListCtx[i].lineWidth = 2; 
+        aListCtx[i].strokeStyle = "green"; 
+        aOrderMotor.push( 0 );
+    }
+  }
+  function addTimeToVal()
+  {
+    var d = new Date(); // for now
+    aTimes.shift()
+    aTimes.push(Date.now()/1000);
+  }
+  
+  function updateDeviceVal(idx, pos)
+  {
+    aaPosDevices[idx].shift()
+    aaPosDevices[idx].push(pos);
+    drawGraph( aListCtx[idx], aTimes, aaPosDevices[idx], 0.3, 1 ); 
+  }
+  function simulateValue()
+  {
+    addTimeToVal()
+    updateDeviceVal( 0, 128*Math.sin( Date.now()/(2*1000) ) );
+    updateDeviceVal( 1, 128*Math.sin( (Date.now()+3000)/(2*1000) ) );
+    setTimeout( simulateValue, 50 );
+  }
+  
+  function sliderChange( id, idx, val )
+  {
+    console.log("DBG: sliderChange: id: " + id, ", val: " + val );
+    let val_order = ((val * 254 / 100) - 127 )>>0;
+    console.log("DBG: sliderChange: val_order: " + val_order );
+    aOrderMotor[idx] = val_order;
+  }
+  initPosDevices();
+  //setTimeout( simulateValue, 200 );
   setTimeout( updateMotorsAndSensors, 2000 );
 </script>
 </body>
 </html>
 )rawliteral";
+
+
+
+
 
 DyMotors dym;
 
@@ -191,6 +468,8 @@ DyMotors dym;
 #define PIN_DIGI_1    12 // A8 - ADC2
 #define PIN_DIGI_2    27 // A6 - ADC2
 #define PIN_DIGI_3    15 // Digital IO
+
+#define NBR_MOTOR     6
 
 void sensors_init()
 {
@@ -225,29 +504,106 @@ void notifyClients() {
   ws.textAll(String(ledState));
 }
 
+int find_char( const char * buf, char ch )
+{
+  // find first char in buf, return position idx or -1 if not found
+  // buf must end with \0
+  const char * p =  buf;
+  while( *p )
+  {
+    if( *p == ch )
+    {
+      return p-buf;
+    }
+    ++p;
+  }
+  Serial.print( "DBG: find_char: char not found in buf: " ); Serial.println( ch );
+  return -1;
+}
+
+const char alphabet_b64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+.";
+void sint_to_b64( sbyte val, char * dst )
+{
+  // convert a val -127..127 to b64like encoded
+  int val2 = int(val) + 127;
+  dst[0] = alphabet_b64[val2/64];
+  dst[1] = alphabet_b64[val2%64];
+}
+
+sbyte b64_to_sint( const char * code )
+{
+    // revert operation than b64_to_uint
+    int idx0 = find_char( alphabet_b64, code[0] );
+    int idx1 = find_char( alphabet_b64, code[1] );
+    int val = (idx0 << 6) + idx1;
+    val = val - 127;
+    return sbyte(val);
+}
+
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
     data[len] = 0;
-    //Serial.print("DBG: handleWebSocketMessage: data: "); Serial.println( (char*)data );
-    if (strcmp((char*)data, "toggle") == 0) {
+    Serial.print("DBG: handleWebSocketMessage: data: "); Serial.println( (char*)data );
+    if (strcmp((char*)data, "toggle") == 0) 
+    {
       ledState = !ledState;
       notifyClients();
     }
-    if (strncmp((char*)data, "motor",5) == 0) {
-      //ledState = !ledState;
-      //notifyClients();
-      //ws.textAll("1234560123456789B");
-      // simulate good order received:
-      for(int i = 0; i < 5; ++i )
+    if (strncmp((char*)data, "motor",5) == 0) 
+    {
+      if( 0 )
       {
-        dym.sendPosition( i, 100 );
+        // fake decoding & encoding
+
+        //ws.textAll("1234560123456789B");
+        // simulate good order received:
+        for(int i = 0; i < 5; ++i )
+        {
+          dym.sendPosition( i, 100 );
+        }
+        static char sendpos[] = "PosXXXXXX0123456789B"; // ajout de 10 capteurs et Ã©tat de la batterie
+        memcpy( &sendpos[3], (uint8_t*)dym.getAllPositions(), 6 );
+        sensors_get(&sendpos[9]);
+        static char sendpos_fake[] = "PosXXXXXX0123456789B"; // on ne peut pas recevoir des binaires en WebSocket! => TODO!
+        ws.textAll(sendpos_fake);
       }
-      static char sendpos[] = "PosXXXXXX0123456789B"; // ajout de 10 capteurs et Ã©tat de la batterie
-      memcpy( &sendpos[3], (uint8_t*)dym.getAllPositions(), 6 );
-      sensors_get(&sendpos[9]);
-      static char sendpos_fake[] = "PosXXXXXX0123456789B"; // on ne peut pas recevoir des binaires en WebSocket! => TODO!
-      ws.textAll(sendpos_fake);
+
+      // real decoding and encoding
+      if( 1 )
+      {
+        // datas are: PXX with P: the command type: P: Position, V: Velocity, F: Fake; and XX: the b64 encoded position -127..127
+        for(int i = 0; i < NBR_MOTOR; ++i )
+        {
+          const int nFirstCharPos = 5; // first char after Motor
+          char command = data[nFirstCharPos+i*3];
+          sbyte val = b64_to_sint( (char*) & (data[nFirstCharPos+i*3+1]) );
+          if( command == 'P' )
+          {
+            dym.sendPosition( i, val );
+          }
+          else if( command == 'V' )
+          {
+            dym.sendVelocity( i, val );
+          }
+          else
+          {
+            // Fake order
+            // Nothing
+          }
+        }
+
+        // prepare answer
+        static char sendpos[] = "PosXXxxXXxxXXxx01234567890123456789B"; // TODO: Real answer for sensors (we duplicate size for them as they will be b64encoded also)
+        const sbyte * allMotorPos = dym.getAllPositions();
+        for(int i = 0; i < NBR_MOTOR; ++i )
+        {
+          const int nFirstCharPosRet = 3;
+          sint_to_b64( allMotorPos[i], &sendpos[nFirstCharPosRet+i*2] );
+        }
+        Serial.print("DBG: handleWebSocketMessage: sendpos: "); Serial.println( sendpos );
+        ws.textAll(sendpos);
+      }
     }
   }
 }
@@ -370,6 +726,24 @@ void setup(){
 
   // change xxx by getArduinoId
   replace_in_buf( (char *)index_html,"BOARD_ID_   ","MISBKIT_TODO" ); // we plan to change an read only memory ! :)
+
+  if( 1 )
+  {
+    // internal test:
+    char buf[] = "AA";
+    sint_to_b64( -127, buf );
+    Serial.print( "DBG: sint_to_b64: -127: " ); Serial.println( buf );
+
+    sint_to_b64( 5, buf );
+    Serial.print( "DBG: sint_to_b64: 5: " ); Serial.println( buf );
+
+    sint_to_b64( 127, buf );
+    Serial.print( "DBG: sint_to_b64: 127: " ); Serial.println( buf );
+
+    Serial.print( "DBG: b64_to_sint: AA: " ); Serial.println( b64_to_sint("AA") );
+    Serial.print( "DBG: b64_to_sint: CE: " ); Serial.println( b64_to_sint("CE") );
+    Serial.print( "DBG: b64_to_sint: D+: " ); Serial.println( b64_to_sint("D+") );
+  }
 }
 
 void loop() {

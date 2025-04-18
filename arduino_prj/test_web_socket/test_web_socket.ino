@@ -175,6 +175,17 @@ input[type=range][orient=vertical] {
 </canvas> 
 <input type="range" orient="vertical" id="Motor6_slider" list="steplist" onInput="sliderChange(this.id, 5, this.value)" />
 
+  <div class="content">
+    <div class="card">
+      <h2>Sensor </h2>
+      <p id="Sens1">Sensor1 value</p>
+      <p id="Sens2">Sensor2 value</p>
+      <p id="Sens3">Sensor3 value</p>
+      <p id="Sens4">Sensor4 value</p>
+      <p id="Sens5">Sensor5 value</p>
+      <p id="Sens6">Sensor6 value</p>
+    </div>
+  </div>
 
 
 <br>
@@ -187,7 +198,8 @@ input[type=range][orient=vertical] {
   var aTimes = [];
   var nNbrValByDevice = 100;
   var aListCtx = [];
-  const nNbrMotorInterface = 6; // nbr motor and interface
+  const nNbrMotorInterface = 6; // nbr motor with graph interface
+  const nNbrSensorInterface = 10; // nbr motor with just number
   var aOrderMotor = []; // between -128 to 128
   var no_update_cpt = 0;
   var nbr_update = 0;
@@ -207,6 +219,7 @@ input[type=range][orient=vertical] {
     websocket.onclose   = onClose;
     websocket.onmessage = onMessage; // <-- add this line
     document.getElementById('button_connect').innerHTML = "Disconnect";
+    setTimeout( updateMotorsAndSensors, 1000 );
   }
   function toggleConnect()
   {
@@ -228,11 +241,11 @@ input[type=range][orient=vertical] {
   }
   function onClose(event) {
     console.log('Connection closed');
-    setTimeout(initWebSocket, 2000);
+    //setTimeout(initWebSocket, 2000);
   }
   function onMessage(event) {
     var state;
-    //console.log( "DBG: onMessage: Data received: ", event.data )
+    console.log( "DBG: onMessage: Data received: ", event.data )
     if (event.data == "1"){
       state = "ON";
       document.getElementById('state').innerHTML = state;
@@ -251,7 +264,12 @@ input[type=range][orient=vertical] {
             const start_pos = 4;
             let val = b64_to_sint( msg.substring(start_pos+i*2,start_pos+i*2+2) );
             updateDeviceVal( i, val );
-            
+        }
+        for (var i = 0; i < nNbrSensorInterface; i++ )
+        {
+            const start_pos = 4+6*2;
+            let val = b64_to_ushint( msg.substring(start_pos+i*2,start_pos+i*2+2) );
+            updateSensorVal( i, val );
         }
         // TODO: here: faire clignoter un petit point quelques part pour montrer qu'on est connecté est rafraichi (genre un truc qui s'estompe avec le temps)
         no_update_cpt = 0;
@@ -296,12 +314,21 @@ function b64_to_sint( code )
     val = val - 127;
     return val;
 }
+function b64_to_ushint( code )
+{
+    // b64 to 0..4095
+    idx0 = alphabet_b64.indexOf( code[0] );
+    idx1 = alphabet_b64.indexOf( code[1] );
+    let val = idx0 * 64 + idx1;
+    return val;
+}
 console.log( "sint_to_b64: -127: " + sint_to_b64( -127 ) );
 console.log( "sint_to_b64: 5: " + sint_to_b64( 5 ) );
 console.log( "sint_to_b64: 127: " + sint_to_b64( 127 ) );
 console.log( "b64_to_sint: AA: " + b64_to_sint( "AA" ) );
 console.log( "b64_to_sint: CE: " + b64_to_sint( "CE" ) );
 console.log( "b64_to_sint: D+: " + b64_to_sint( "D+" ) );
+console.log( "b64_to_ushint: ..: " + b64_to_sint( ".." ) );
 
   function updateMotorsAndSensors(){
     //console.log("DBG: updateMotorsAndSensors: start" );
@@ -319,7 +346,7 @@ console.log( "b64_to_sint: D+: " + b64_to_sint( "D+" ) );
       }
       websocket.send( msg );
     }
-    // setTimeout( updateMotorsAndSensors, 50 ); // it's better to prepare an update after receiving datas, so we're not accumulating calls
+    // setTimeout( updateMotorsAndSensors, 50 ); // it's better to prepare an update after receiving datas, so we're not accumulating calls. Else: Arduino: "ERROR: Too many messages queued", then crash
   }
   
    function gradient(a, b) { 
@@ -485,6 +512,26 @@ function bzCurveY(ctx2d, times, points, f, t) {
     aaPosDevices[idx].push(pos);
     drawGraph( aListCtx[idx], aTimes, aaPosDevices[idx], 0.3, 1 ); 
   }
+  function updateSensorVal( idx, val )
+  {
+    if( idx == 0 )
+    {
+        document.getElementById('Sens1').innerHTML = val;
+    }
+    else if( idx == 1 )
+    {
+        document.getElementById('Sens2').innerHTML = val;
+    }
+    else if( idx == 2 )
+    {
+        document.getElementById('Sens3').innerHTML = val;
+    }
+    else if( idx == 3 )
+    {
+        document.getElementById('Sens4').innerHTML = val;
+    }
+  }
+  
   function simulateValue()
   {
     addTimeToVal()
@@ -518,11 +565,11 @@ function refreshPage()
 initPosDevices();
 setTimeout( refreshPage, 1000 );
 //setTimeout( simulateValue, 200 );
-setTimeout( updateMotorsAndSensors, 2000 );
+//setTimeout( updateMotorsAndSensors, 2000 );
 if(0)
 {
     let fakeevent = Object()
-    fakeevent.data = "Pos_CcAnC3C8CiB.01234567890123456789B";
+    fakeevent.data = "Pos_CcAnC3C8CiB.01..4567890123456789B";
     onMessage(fakeevent)
     setTimeout( ()=>{onMessage(fakeevent)}, 6000 );
 }
@@ -566,20 +613,6 @@ void sensors_init()
 }
 
 
-void sensors_get( char * buf )
-{
-  // fill buf with the current sensor state (simulated 10 sensors)
-  buf[0] = (uint8_t)analogRead(PIN_AN_1)>>2;
-  buf[1] = (uint8_t)analogRead(PIN_AN_2)>>2;
-  buf[2] = (uint8_t)analogRead(PIN_AN_3)>>2;
-
-  buf[3] = (uint8_t)digitalRead(PIN_DIGI_1)>>2;
-  buf[4] = (uint8_t)digitalRead(PIN_DIGI_2)>>2;
-  buf[5] = (uint8_t)digitalRead(PIN_DIGI_3)>>2;
-
-  buf[10] = (uint8_t)analogRead(PIN_BAT)>>2;
-}
-
 void notifyClients() {
   ws.textAll(String(ledState));
 }
@@ -619,6 +652,62 @@ sbyte b64_to_sint( const char * code )
     val = val - 127;
     return sbyte(val);
 }
+
+void ushint_to_b64( unsigned short int val, char * dst )
+{
+  // convert a val 0..4095 to b64like encoded
+  // overflow not handled!
+  
+  dst[0] = alphabet_b64[val/64];
+  dst[1] = alphabet_b64[val%64];
+}
+
+
+void sensors_get( char * buf )
+{
+  // fill buf with the current sensor state
+  buf[0] = (uint8_t)analogRead(PIN_AN_1)>>2;
+  buf[1] = (uint8_t)analogRead(PIN_AN_2)>>2;
+  buf[2] = (uint8_t)analogRead(PIN_AN_3)>>2;
+
+  buf[3] = (uint8_t)digitalRead(PIN_DIGI_1)>>2;
+  buf[4] = (uint8_t)digitalRead(PIN_DIGI_2)>>2;
+  buf[5] = (uint8_t)digitalRead(PIN_DIGI_3)>>2;
+
+  buf[10] = (uint8_t)analogRead(PIN_BAT)>>2;
+}
+
+void sensors_get_b64( char * buf )
+{
+  // fill buf with the current sensor state
+  // analogRead return a value in (0-1023 for 10 bits or 0-4095 for 12 bits).
+  int val;
+  val = analogRead(PIN_AN_1);
+  ushint_to_b64( val, &buf[0] );
+
+  val = analogRead(PIN_AN_2);
+  ushint_to_b64( val, &buf[2] );
+
+  val = analogRead(PIN_AN_3);
+  ushint_to_b64( val, &buf[4] );
+
+
+  val = analogRead(PIN_DIGI_1);
+  ushint_to_b64( val, &buf[6] );
+  
+  val = analogRead(PIN_DIGI_2);
+  ushint_to_b64( val, &buf[8] );
+  
+  val = analogRead(PIN_DIGI_3);
+  ushint_to_b64( val, &buf[10] );
+
+  
+  val = analogRead(PIN_DIGI_1);
+  ushint_to_b64( val, &buf[12] );
+
+  buf[19] = (uint8_t)analogRead(PIN_BAT)>>2;
+}
+
 
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
@@ -679,12 +768,13 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
 
         // prepare answer
         static char sendpos[] = "Pos_XXxxXXxxXXxx01234567890123456789B"; // TODO: Real answer for sensors (we duplicate size for them as they will be b64encoded also)
+        const int nFirstCharPosRet = 4;
         const sbyte * allMotorPos = dym.getAllPositions();
         for(int i = 0; i < NBR_MOTOR; ++i )
         {
-          const int nFirstCharPosRet = 4;
           sint_to_b64( allMotorPos[i], &sendpos[nFirstCharPosRet+i*2] );
         }
+        sensors_get_b64( &sendpos[nFirstCharPosRet+6*2] );
         //Serial.print("DBG: handleWebSocketMessage: sendpos: "); Serial.println( sendpos );
         ws.textAll(sendpos);
       }

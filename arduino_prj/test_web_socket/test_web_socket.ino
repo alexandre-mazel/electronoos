@@ -43,38 +43,38 @@ const char index_html[] PROGMEM = R"rawliteral(
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="data:,">
   <style>
-  html {
+html {
     font-family: Arial, Helvetica, sans-serif;
     text-align: center;
-  }
-  h1 {
+}
+h1 {
     font-size: 1.8rem;
     color: white;
-  }
-  h2{
+}
+h2{
     font-size: 1.5rem;
     font-weight: bold;
     color: #143642;
-  }
-  .topnav {
+}
+.topnav {
     overflow: hidden;
     background-color: #143642;
-  }
-  body {
+}
+body {
     margin: 0;
-  }
-  .content {
+}
+.content {
     padding: 30px;
     max-width: 600px;
     margin: 0 auto;
-  }
-  .card {
+}
+.card {
     background-color: #F8F7F9;;
     box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);
     padding-top:10px;
     padding-bottom:20px;
-  }
-  .button {
+}
+.button {
     padding: 15px 50px;
     font-size: 24px;
     text-align: center;
@@ -90,18 +90,18 @@ const char index_html[] PROGMEM = R"rawliteral(
     -ms-user-select: none;
     user-select: none;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
-   }
-   /*.button:hover {background-color: #0f8b8d}*/
-   .button:active {
+}
+/*.button:hover {background-color: #0f8b8d}*/
+.button:active {
      background-color: #0f8b8d;
      box-shadow: 2 2px #CDCDCD;
      transform: translateY(2px);
-   }
-   .state {
+}
+.state {
      font-size: 1.5rem;
      color:#8c8c8c;
      font-weight: bold;
-   }
+}
    
 input[type=range][orient=vertical] {
     writing-mode: vertical-lr;
@@ -111,6 +111,32 @@ input[type=range][orient=vertical] {
     vertical-align: bottom;
     height: 410px;
 }
+
+.sensor_div{
+height:30px;display: flex;margin: auto;
+width:30%% ;  /* pb with percentage sign so leave one space after the sign, so we can change it or not" */
+}
+
+.squarebox_div{
+margin: auto;
+}
+
+.squarebox {
+  height: 20px;
+  width: 20px;
+  margin-bottom: 15px;
+  margin: auto;
+  background-color:grey;
+  border-radius:3px;
+}
+
+.sensor_val_div{
+width:80%% ;
+}
+
+.sensor_val_p{
+text-align: left;margin: auto;padding:6px;
+}
   </style>
 <title>ESP Web Server</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -118,7 +144,7 @@ input[type=range][orient=vertical] {
 </head>
 <body>
   <div class="topnav">
-    <h1>BOARD_ID_    - WebSocket Server</h1>
+    <h1>%BOARD_ID% - WebSocket Server</h1>
   </div>
   <div class="content">
     <div class="card">
@@ -178,12 +204,12 @@ input[type=range][orient=vertical] {
   <div class="content">
     <div class="card">
       <h2>Sensor </h2>
-      <p id="Sens1">Sensor1 value</p>
-      <p id="Sens2">Sensor2 value</p>
-      <p id="Sens3">Sensor3 value</p>
-      <p id="Sens4">Sensor4 value</p>
-      <p id="Sens5">Sensor5 value</p>
-      <p id="Sens6">Sensor6 value</p>
+      <div class = "sensor_div" ><div class='squarebox_div'><div class='squarebox' id="Sens1_box"></div></div><div class="sensor_val_div"><p class="sensor_val_p" id="Sens1_val">Sensor1 value</p></div></div>
+      <div class = "sensor_div" ><div class='squarebox_div'><div class='squarebox' id="Sens2_box"></div></div><div class="sensor_val_div"><p class="sensor_val_p" id="Sens2_val">Sensor2 value</p></div></div>
+      <div class = "sensor_div" ><div class='squarebox_div'><div class='squarebox' id="Sens3_box"></div></div><div class="sensor_val_div"><p class="sensor_val_p" id="Sens3_val">Sensor3 value</p></div></div>
+      <div class = "sensor_div" ><div class='squarebox_div'><div class='squarebox' id="Sens4_box"></div></div><div class="sensor_val_div"><p class="sensor_val_p" id="Sens4_val">Sensor4 value</p></div></div>
+      <div class = "sensor_div" ><div class='squarebox_div'><div class='squarebox' id="Sens5_box"></div></div><div class="sensor_val_div"><p class="sensor_val_p" id="Sens5_val">Sensor5 value</p></div></div>
+      <div class = "sensor_div" ><div class='squarebox_div'><div class='squarebox' id="Sens6_box"></div></div><div class="sensor_val_div"><p class="sensor_val_p" id="Sens6_val">Sensor6 value</p></div></div>
     </div>
   </div>
 
@@ -204,6 +230,54 @@ input[type=range][orient=vertical] {
   var no_update_cpt = 0;
   var nbr_update = 0;
   var time_start_cpt_fps = 0;
+  
+  /**
+ * Convert a 12-bit value (0–4095) to a pseudo RGB color.
+ * @param {number} value - The 12-bit input value.
+ * @returns {{r: number, g: number, b: number}} - An object with RGB components (0–255).
+ */
+function pseudoColorFrom12Bit(value) {
+  // Clamp the input value to the 0–4095 range
+  value = Math.max(0, Math.min(4095, value));
+
+  // Normalize to 0–1
+  const normalized = value / 4095;
+
+  // Map the normalized value to a pseudo-color using a simple colormap
+  // Example: blue (low) -> cyan -> green -> yellow -> red (high)
+
+  let r = 0, g = 0, b = 0;
+
+  if (normalized < 0.25) {
+    // Blue to Cyan
+    r = 0;
+    g = normalized * 4 * 255;
+    b = 255;
+  } else if (normalized < 0.5) {
+    // Cyan to Green
+    r = 0;
+    g = 255;
+    b = (1 - (normalized - 0.25) * 4) * 255;
+  } else if (normalized < 0.75) {
+    // Green to Yellow
+    r = (normalized - 0.5) * 4 * 255;
+    g = 255;
+    b = 0;
+  } else {
+    // Yellow to Red
+    r = 255;
+    g = (1 - (normalized - 0.75) * 4) * 255;
+    b = 0;
+  }
+/*
+  return {
+    r: Math.round(r),
+    g: Math.round(g),
+    b: Math.round(b)
+  };
+  */
+  return "rgb("+r+","+g+","+b+")"
+}
   
   window.addEventListener('load', onLoad);
   function initWebSocket() {
@@ -245,7 +319,7 @@ input[type=range][orient=vertical] {
   }
   function onMessage(event) {
     var state;
-    console.log( "DBG: onMessage: Data received: ", event.data )
+    //console.log( "DBG: onMessage: Data received: ", event.data )
     if (event.data == "1"){
       state = "ON";
       document.getElementById('state').innerHTML = state;
@@ -514,21 +588,26 @@ function bzCurveY(ctx2d, times, points, f, t) {
   }
   function updateSensorVal( idx, val )
   {
+    let color = pseudoColorFrom12Bit(val);
     if( idx == 0 )
     {
-        document.getElementById('Sens1').innerHTML = val;
+        document.getElementById('Sens1_val').innerHTML = val;
+        document.getElementById('Sens1_box').style.background = color;
     }
     else if( idx == 1 )
     {
-        document.getElementById('Sens2').innerHTML = val;
+        document.getElementById('Sens2_val').innerHTML = val;
+        document.getElementById('Sens2_box').style.background = color;
     }
     else if( idx == 2 )
     {
-        document.getElementById('Sens3').innerHTML = val;
+        document.getElementById('Sens3_val').innerHTML = val;
+        document.getElementById('Sens3_box').style.background = color;
     }
     else if( idx == 3 )
     {
-        document.getElementById('Sens4').innerHTML = val;
+        document.getElementById('Sens4_val').innerHTML = val;
+        document.getElementById('Sens4_box').style.background = color;
     }
   }
   
@@ -815,7 +894,12 @@ String processor(const String& var){
       return "OFF";
     }
   }
-  return String();
+  if(var == "BOARD_ID")
+  {
+    return getArduinoId();
+  }
+  return "ERR: processor: var not found!";
+  //return String();
 }
 
 void MotorHandler(AsyncWebServerRequest *request)
@@ -834,7 +918,23 @@ void replace_in_buf( char * dst, const char * old_cz, const char * new_cz )
 {
   // replace in dst the string old by string dst.
   // don't change the size of dst!
-  // TODO
+  Serial.println("DBG: in replace buf");
+  char * p = dst;
+  int len_old = strlen(old_cz);
+  int len_new = strlen(new_cz);
+  Serial.println(len_old);
+  Serial.println(len_new);
+  while( *p )
+  {
+    if( strncmp(p,old_cz,len_old) == 0 )
+    {
+      Serial.println("found");
+      memcpy(p,new_cz,len_new);
+      p += len_old;
+    }
+    ++p;
+    Serial.println(int(p));
+  }
 }
 
 void setup(){
@@ -900,7 +1000,8 @@ void setup(){
   lcd_print_message( "Port: ", nNumPort );
 
   // change xxx by getArduinoId
-  replace_in_buf( (char *)index_html,"BOARD_ID_   ","MISBKIT_TODO" ); // we plan to change an read only memory ! :)
+  //replace_in_buf( (char *)index_html,"BOARD_ID_   ",getArduinoId() ); // we plan to change an read only memory ! :) => guru meditation (need to duplicate in ram or found another way)
+  //replace_in_buf( (char *)index_html,"% ;","%%;" ); // we plan to change an read only memory ! :)
 
   if( 1 )
   {

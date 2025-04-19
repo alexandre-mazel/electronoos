@@ -68,7 +68,6 @@
    }
    
 .squarebox {
-  float: left;
   height: 20px;
   width: 20px;
   margin-bottom: 15px;
@@ -150,8 +149,8 @@ input[type=range][orient=vertical] {
   <div class="content">
     <div class="card">
       <h2>Sensor </h2>
-      <div><div class='squarebox' style='background-color: blue'></div><p id="Sens1">Sensor1 value</p></div>
-      <div><div class='squarebox' style='background-color: red'></div><p id="Sens2">Sensor2 value</p></div>
+      <div style="border: 1px solid black;width:30%;height:30px;display: flex;margin: auto;"><div class='divsquarebox' style="border: 1px solid green;margin: auto;"><div class='squarebox' style='background-color: blue;margin: auto;'></div></div><div style="border: 1px solid black;width:80%"><p class="psensor" id="Sens1" style="border: 1px solid red;text-align: left;margin: auto;padding:4px;">Sensor1 value</p></div></div>
+      <div><div class='squarebox' style='background-color: red'></div><div><p id="Sens2">Sensor2 value</p></div></div>
       <p id="Sens3">Sensor3 value</p>
       <p id="Sens4">Sensor4 value</p>
       <p id="Sens5">Sensor5 value</p>

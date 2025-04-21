@@ -31,6 +31,7 @@ const int32_t baud[MAX_BAUD] = {9600, 57600, 115200, 1000000}; // default for 43
 
 
 // config for misbkit:
+#undef  DXL_DIR_PIN
 #define DXL_DIR_PIN 4
 // protocol: 1.0
 // baudrate: 57600
@@ -147,8 +148,7 @@ void setup() {
   DEBUG_SERIAL.print("DXL_DIR_PIN: ");
   DEBUG_SERIAL.println(DXL_DIR_PIN);
   
-  //for( int8_t protocol = 1; protocol < 3; ++ protocol ) 
-  for( int8_t protocol = 1; protocol < 2; ++protocol ) // increase search 
+  for( int8_t protocol = 1; protocol < 3; ++protocol ) // increase search 
   {
     // Set Port Protocol Version. This has to match with DYNAMIXEL protocol version.
 
@@ -222,15 +222,34 @@ void setup() {
 
   if( 0 )
   {
+    // Tested and working code to rename a servo id
     if( nNbrFoundMotor > 0 )
     {
-      // Tested and working code to rename a servo id
       int nSrc = 6;
       int nDst = 9;
       lcd_print_message( "WARNING: in 5 sec" );
       lcd_print_message( "Write motor ID: ", nSrc );
       lcd_print_message( "To ID: ", nDst );
       delay( 6000 );
+      dxl.setID( nSrc, nDst );
+      
+      
+      lcd_print_message( "WRITED !!!" );
+    }
+  }
+
+  if( 0 )
+  {
+    // Tested and working code to rename a servo id
+    if( nNbrFoundMotor > 0 )
+    {
+      int nID = 46;
+      int nNewBaudrate = 57600;
+      lcd_print_message( "WARNING: in 5 sec" );
+      lcd_print_message( "Change motor ID: ", nID );
+      lcd_print_message( "To BR: ", nNewBaudrate );
+      delay( 6000 );
+      dxl.setBaudrate( nID, nNewBaudrate );
       
       
       lcd_print_message( "WRITED !!!" );

@@ -115,6 +115,7 @@ input[type=range][orient=vertical] {
 .sensor_div{
 height:30px;display: flex;margin: auto;
 width:30%% ;  /* pb with percentage sign so leave one space after the sign, so we can change it or not" */
+display:none;
 }
 
 .squarebox_div{

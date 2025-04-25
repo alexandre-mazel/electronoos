@@ -1,6 +1,6 @@
 from dmxal import DMX # git clone https://github.com/monzelr/dmx.git, cd dmx, pip install .
 import dmxal
-dmxal.set_verbose( True )
+dmxal.set_verbose( False )
 
 # Tested on Windows 10, amd64, Python 3.8
 # Should also work on Linux, MacOS and on AARCH64 devices (ARM devices like Raspberry PI).
@@ -29,8 +29,13 @@ dmxal.set_verbose( True )
 # ch3: 0: G fermé, 1-255: G ouvert
 # ch4: 0: B fermé, 1-255: B ouvert
 # ch5: 0-9: pas de strobo, 10-255: strobo lent a rapide
-# ch6: 0-50: open dmx, 51-100: selection des couleurs du programme, 101-150: sauter pour
-# ch7: vitesse
+# ch6: 0-50: open dmx, 
+#         51-100: selection des couleurs du programme, 
+#         101-150: jump change
+#         151-200: gradual change
+#         201-250: pulse change
+#         251-255: voice control
+# ch7: vitesse: if ch6 set to voice control: R:0-30, G:31-61, B:62:92, W:93-123&216-247, Yellow: 124-154, Pink: 155-185, Cyan: 186-215, Color Transformation: 248-255
 # 
 #
 #A DMX terminator helps to reduce ‘noise’ on the DMX chain, and makes the light respond to 
@@ -46,10 +51,88 @@ An example from a Chinese LED PAR is the menu:
 # avec logiciel: Freestytle DMX512
 # fonctionne pas?
 
+# NE fonctionne PAS avec mon clone chinois BG00U0KFA, mais ok avec l'enttec et les projo et le dmx_tracker de Samuel
+
 import time
 
+def clamp(val,minval=0,maxval=255):
+    if val < minval:
+        return val
+    if val > maxval:
+        return maxval
+    return val
+    
+def hueToRGB( hue ):
+    """
+    Convert a hue 0..255, to rgb 3x 0..255
+    """
+    r = 0 
+    g = 0 
+    b = 0
+
+    hf = hue/42.5 # Not /60 as range is _not_ 0-360
+
+    i=int( hf )
+    f = hf - i
+    qv = 1 - f
+    tv = f
+
+# if python 10:
+    #~ match i:
+        #~ case 0: 
+            #~ r = 1
+            #~ g = tv
+            #~ break
+        #~ case 1: 
+            #~ r = qv;
+            #~ g = 1;
+            #~ break;
+        #~ case 2: 
+            #~ g = 1;
+            #~ b = tv;
+            #~ break;
+        #~ case 3: 
+            #~ g = qv;
+            #~ b = 1;
+            #~ break;
+        #~ case 4:
+            #~ r = tv;
+            #~ b = 1;
+            #~ break;
+        #~ case 5: 
+            #~ r = 1;
+            #~ b = qv;
+            #~ break;
+            
+    if i == 0:
+            r = 1
+            g = tv
+    elif i == 1:
+            r = qv;
+            g = 1;
+    elif i == 2:
+            g = 1;
+            b = tv;
+    elif i == 3:
+            g = qv;
+            b = 1;
+    elif i == 4:
+            r = tv;
+            b = 1;
+    elif i == 5:
+            r = 1;
+            b = qv;
+
+    ir = clamp(255*r)
+    ig = clamp(255*g)
+    ib = clamp(255*b)
+
+    return ir,ig,ib
+    
+# clamp - end
+
 print( "Running Dmx...")
-nNbrChannel = 4;
+nNbrChannel = 16; # le nbr que tu veux
 dmx = DMX( num_of_channels = nNbrChannel )
 print(dir(dmx))
 print("INF: dmx.is_connected(): ", dmx.is_connected() )
@@ -64,7 +147,7 @@ print("INF: dmx.device.description: ", dmx.device.description )
 print("INF: dmx.device.interface: ", dmx.device.interface )
 print("INF: dmx.device.device: ", dmx.device.device )
 print("INF: dmx.device.manufacturer: ", dmx.device.manufacturer )
-print("INF: dmx.device.serial_number: ", dmx.device.serial_number )
+print("INF: dmx.device.serial_number: ", dmx.device.serial_number ) # mon truc chinois: BG00U0KFA; l'enttect de l'ensad: EN172589A
 
 print("INF: dmx: starting" )
 
@@ -115,16 +198,16 @@ if 0:
         time.sleep(1)
         
 
-if 1:
-    print("fadein-fadeout")
+if 0:
+    print("fadein-fadeout device 1 a 4")
     dmx.set_data(1, 0)
     dmx.set_data(2, 0)
     dmx.set_data(3, 0)
     dmx.set_data(4, 0)
 
-    time_wait = 1 # was 0.01
+    time_wait = 0.001 # was 0.01
     while True:
-        print(".")
+        #print(".")
         for i in range(0, 255, 5):
             dmx.set_data(1, i, auto_send=False)
             dmx.set_data(2, i, auto_send=False)
@@ -138,3 +221,71 @@ if 1:
             dmx.set_data(3, i, auto_send=False)
             dmx.set_data(4, i)
             time.sleep(time_wait)
+            
+dev_id = 1
+if 0:
+    print( "fadein-fadeout device %d" % dev_id )
+    time_wait = 0.001
+    # regler la teinte a blanc:
+    for i in range(4):
+        dmx.set_data( dev_id+i, 255 )
+    while True:
+        print(".")
+        for i in range(0, 255, 1):
+            dmx.set_data( dev_id+1, i )
+            time.sleep(time_wait)
+        for i in range(255, 0, -1):
+            dmx.set_data( dev_id+1, i )
+            time.sleep(time_wait)
+            
+if 0:
+    # fonctionne nickel!
+    print( "meduse device %d" % dev_id )
+    time_wait = 0.001
+    # regler la teinte a blanc:
+    for i in range(4):
+        dmx.set_data( dev_id+i, 255 )
+        
+    while 1:
+        for i in range(255):
+            r,g,b= hueToRGB(i)
+            dmx.set_data(dev_id+1,r, auto_send=False)
+            dmx.set_data(dev_id+2,g, auto_send=False)
+            dmx.set_data(dev_id+3,b, auto_send=True)
+            time.sleep(time_wait)
+            
+if 0:
+    print( "fade strobo device %d" % dev_id )
+    time_wait = 0.1
+    # regler la teinte a blanc:
+    for i in range(4):
+        dmx.set_data( dev_id+i, 255 )
+        
+    # stop strobo (so all projos are synced)
+    dmx.set_data(dev_id+4,0)
+    time.sleep(1)
+        
+    while 1:
+        for i in range(10,255):
+            dmx.set_data(dev_id+4,i)
+            time.sleep(time_wait)
+        for i in range(255,10,-1):
+            dmx.set_data(dev_id+4,i)
+            time.sleep(time_wait)
+       
+if 0:                 
+    # ne fonctionne pas
+    print( "sound react device %d" % dev_id )
+    time_wait = 0.1
+    # regler la teinte a blanc:
+    for i in range(4):
+        dmx.set_data( dev_id+i, 255 )
+        
+    time.sleep(1)
+    
+    dmx.set_data(dev_id+5,251)
+    time.sleep(1)
+    dmx.set_data(dev_id+6,123)
+    time.sleep(1)
+
+    

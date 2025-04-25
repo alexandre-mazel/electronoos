@@ -27,19 +27,25 @@ h2{
 body {
     margin: 0;
 }
-.content {
-    padding: 30px;
-    max-width: 600px;
+.side_by_side {
+    display: flex;
+    width:50%%;
     margin: 0 auto;
+}
+.content {
+    padding: 20px;
+    max-width: 500px;
+    margin: 0 auto;
+    flex: 1 1 50%%;
 }
 .card {
     background-color: #F8F7F9;;
     box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);
-    padding-top:10px;
-    padding-bottom:20px;
+    padding-top:4px;
+    padding-bottom:10px;
 }
 .button {
-    padding: 15px 50px;
+    padding: 8px 20px;
     font-size: 24px;
     text-align: center;
     outline: none;
@@ -73,8 +79,15 @@ input[type=range][orient=vertical] {
     appearance: slider-vertical;
     width: 16px;
     vertical-align: bottom;
-    height: 410px;
+    height: 210px;
 }
+
+.motor_graph{
+    width:500px; 
+    height:200px; 
+    border: 2px solid black;
+}
+
 
 .sensor_div{
 height:30px;display: flex;margin: auto;
@@ -118,51 +131,44 @@ text-align: left;margin: auto;padding:6px;
       <p><button id="button_connect" class="button">Reconnect/Disconnect</button></p>
     </div>
   </div>
-  <div class="content">
-    <div class="card">
-      <h2>Internal Led</h2>
-      <p class="state">state: <span id="state">%STATE%</span></p>
-      <p><button id="button_led" class="button">Toggle</button></p>
-    </div>
+  <div class="side_by_side">
+      <div class="content">
+        <div class="card">
+          <h3>Internal Led</h3>
+          <p class="state">state: <span id="state">%STATE%</span></p>
+          <p><button id="button_led" class="button">Toggle</button></p>
+        </div>
+      </div>
+      <div class="content">
+        <div class="card">
+          <h3>Motor config</h3>
+          <p class="state">stiffness: <span id="state_stiffness">?</span></p>
+          <p><button id="button_toggle_stiffness" class="button">Toggle stiffness (ndev)</button></p>
+          <p><button id="button_toggle_lfos" class="button">Toggle LFOs</button></p>
+        </div>
+      </div>
   </div>
 
-<canvas id="Motor1_graph" width="600" height="400" 
-        style="border: 2px solid black"> 
-</canvas> 
-
+<canvas class="motor_graph" id="Motor1_graph"></canvas> 
 <input type="range" orient="vertical" id="Motor1_slider" list="steplist" onInput="sliderChange(this.id, 0, this.value)" />
 <datalist id="steplist">
     <option>50</option>
 </datalist>
-<br>
 
-<canvas id="Motor2_graph" width="600" height="400" 
-        style="border: 2px solid black"> 
-</canvas> 
+<canvas class="motor_graph" id="Motor2_graph"></canvas>
 <input type="range" orient="vertical" id="Motor2_slider" list="steplist" onInput="sliderChange(this.id, 1, this.value)" />
-<br>
 
-<canvas id="Motor3_graph" width="600" height="400" 
-        style="border: 2px solid black"> 
-</canvas> 
+<canvas class="motor_graph" id="Motor3_graph"></canvas>
 <input type="range" orient="vertical" id="Motor3_slider" list="steplist" onInput="sliderChange(this.id, 2, this.value)" />
-<br>
+<BR>
 
-<canvas id="Motor4_graph" width="600" height="400" 
-        style="border: 2px solid black"> 
-</canvas> 
+<canvas class="motor_graph" id="Motor4_graph"></canvas>
 <input type="range" orient="vertical" id="Motor4_slider" list="steplist" onInput="sliderChange(this.id, 3, this.value)" />
-<br>
 
-<canvas id="Motor5_graph" width="600" height="400" 
-        style="border: 2px solid black"> 
-</canvas> 
+<canvas class="motor_graph" id="Motor5_graph"></canvas>
 <input type="range" orient="vertical" id="Motor5_slider" list="steplist" onInput="sliderChange(this.id, 4, this.value)" />
-<br>
 
-<canvas id="Motor6_graph" width="600" height="400" 
-        style="border: 2px solid black"> 
-</canvas> 
+<canvas class="motor_graph" id="Motor6_graph"></canvas>
 <input type="range" orient="vertical" id="Motor6_slider" list="steplist" onInput="sliderChange(this.id, 5, this.value)" />
 
   <div class="content">
@@ -174,6 +180,8 @@ text-align: left;margin: auto;padding:6px;
       <div class = "sensor_div" ><div class='squarebox_div'><div class='squarebox' id="Sens4_box"></div></div><div class="sensor_val_div"><p class="sensor_val_p" id="Sens4_val">Sensor4 value</p></div></div>
       <div class = "sensor_div" ><div class='squarebox_div'><div class='squarebox' id="Sens5_box"></div></div><div class="sensor_val_div"><p class="sensor_val_p" id="Sens5_val">Sensor5 value</p></div></div>
       <div class = "sensor_div" ><div class='squarebox_div'><div class='squarebox' id="Sens6_box"></div></div><div class="sensor_val_div"><p class="sensor_val_p" id="Sens6_val">Sensor6 value</p></div></div>
+      <div class = "sensor_div" ><div class='squarebox_div'><div class='squarebox' id="Sens7_box"></div></div><div class="sensor_val_div"><p class="sensor_val_p" id="Sens7_val">Sensor7 value</p></div></div>
+      <div class = "sensor_div" ><div class='squarebox_div'><div class='squarebox' id="Sens8_box"></div></div><div class="sensor_val_div"><p class="sensor_val_p" id="Sens8_val">Sensor8 value</p></div></div>
     </div>
   </div>
 
@@ -194,6 +202,7 @@ text-align: left;margin: auto;padding:6px;
   var no_update_cpt = 0;
   var nbr_update = 0;
   var time_start_cpt_fps = 0;
+  var b_lfo_on = 0;
   
   /**
  * Convert a 12-bit value (0–4095) to a pseudo RGB color.
@@ -208,38 +217,21 @@ function pseudoColorFrom12Bit(value) {
   const normalized = value / 4095;
 
   // Map the normalized value to a pseudo-color using a simple colormap
-  // Example: blue (low) -> cyan -> green -> yellow -> red (high)
+  // Example: green (low) -> yellow -> red (high)
 
   let r = 0, g = 0, b = 0;
 
-  if (normalized < 0.25) {
-    // Blue to Cyan
-    r = 0;
-    g = normalized * 4 * 255;
-    b = 255;
-  } else if (normalized < 0.5) {
-    // Cyan to Green
-    r = 0;
-    g = 255;
-    b = (1 - (normalized - 0.25) * 4) * 255;
-  } else if (normalized < 0.75) {
+  if (normalized < 0.5) {
     // Green to Yellow
-    r = (normalized - 0.5) * 4 * 255;
+    r = normalized * 2 * 255;
     g = 255;
     b = 0;
   } else {
     // Yellow to Red
     r = 255;
-    g = (1 - (normalized - 0.75) * 4) * 255;
+    g = (1 - (normalized - 0.5)) * 255;
     b = 0;
   }
-/*
-  return {
-    r: Math.round(r),
-    g: Math.round(g),
-    b: Math.round(b)
-  };
-  */
   return "rgb("+r+","+g+","+b+")"
 }
   
@@ -331,10 +323,27 @@ function pseudoColorFrom12Bit(value) {
   function initButton() {
     document.getElementById('button_led').addEventListener('click', toggleLed);
     document.getElementById('button_connect').addEventListener('click', toggleConnect);
+    document.getElementById('button_toggle_lfos').addEventListener('click', toggleLFOs);
   }
   function toggleLed(){
     websocket.send('toggle');
   }
+  
+  function toggleLFOs(){
+    b_lfo_on = !b_lfo_on;
+    let text = "Activate LFOs";
+    if( b_lfo_on )
+    {
+        text = "De-activate LFOs";
+    }
+    document.getElementById('button_toggle_lfos').innerHTML = text;
+    
+    if( b_lfo_on )
+    {
+        setTimeout( updateLFOs, 100 );
+    }
+  }
+  
   
 const alphabet_b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+.";
 function sint_to_b64( val )
@@ -380,7 +389,7 @@ console.log( "b64_to_ushint: ..: " + b64_to_sint( ".." ) );
       var msg = 'motor_';
       for (var i = 0; i < nNbrMotorInterface; i++ )
       {
-        msg += "P" + sint_to_b64(aOrderMotor[i]);
+        msg += "P" + sint_to_b64(aOrderMotor[i]); // P for position, V for Velocity
       }
       websocket.send( msg );
     }
@@ -476,9 +485,11 @@ function bzCurveY(ctx2d, times, points, f, t) {
     }
   
   function drawGraph(ctx2d, times, points, f, t) { 
-    w = ctx2d.canvas.clientWidth;
-    h = ctx2d.canvas.clientHeight;
-    //console.log(w);
+    //w = ctx2d.canvas.clientWidth;
+    //h = ctx2d.canvas.clientHeight;
+    w = ctx2d.canvas.width;
+    h = ctx2d.canvas.height;
+    //console.log(h);
     ctx2d.clearRect(0, 0, w, h);
     ctx2d.beginPath(); // reset lines
     //ctx2d.moveTo( 0, h/2 );
@@ -550,30 +561,14 @@ function bzCurveY(ctx2d, times, points, f, t) {
     aaPosDevices[idx].push(pos);
     drawGraph( aListCtx[idx], aTimes, aaPosDevices[idx], 0.3, 1 ); 
   }
-  function updateSensorVal( idx, val )
-  {
-    let color = pseudoColorFrom12Bit(val);
-    if( idx == 0 )
-    {
-        document.getElementById('Sens1_val').innerHTML = val;
-        document.getElementById('Sens1_box').style.background = color;
-    }
-    else if( idx == 1 )
-    {
-        document.getElementById('Sens2_val').innerHTML = val;
-        document.getElementById('Sens2_box').style.background = color;
-    }
-    else if( idx == 2 )
-    {
-        document.getElementById('Sens3_val').innerHTML = val;
-        document.getElementById('Sens3_box').style.background = color;
-    }
-    else if( idx == 3 )
-    {
-        document.getElementById('Sens4_val').innerHTML = val;
-        document.getElementById('Sens4_box').style.background = color;
-    }
-  }
+function updateSensorVal( idx, val )
+{
+    if(idx>7) return;
+    let color = pseudoColorFrom12Bit(val*2); // *2 for more impactfull color
+    let name = "Sens"+(idx+1).toString();
+    document.getElementById(name+'_val').innerHTML = val;
+    document.getElementById(name+'_box').style.background = color;
+}
   
   function simulateValue()
   {
@@ -585,9 +580,9 @@ function bzCurveY(ctx2d, times, points, f, t) {
   
   function sliderChange( id, idx, val )
   {
-    console.log("DBG: sliderChange: id: " + id, ", val: " + val );
+    //console.log("DBG: sliderChange: id: " + id, ", val: " + val );
     let val_order = ((val * 254 / 100) - 127 )>>0;
-    console.log("DBG: sliderChange: val_order: " + val_order );
+    //console.log("DBG: sliderChange: val_order: " + val_order );
     aOrderMotor[idx] = val_order;
   }
   
@@ -605,6 +600,19 @@ function refreshPage()
     setTimeout( refreshPage, 1000 );
 }
 
+function updateLFOs()
+{
+    for (var i = 0; i < nNbrMotorInterface; i++ )
+    {
+        aOrderMotor[i] = ( 128*Math.sin(Date.now()*Math.PI/2000+Math.PI*i/nNbrMotorInterface) ) >>0; // >>0 to convert to int (sinon ca ne fonctionne pas je pense dans le sint_to_b64)
+    }
+    //console.log( "DBG: updateLFOs: mot0: " + aOrderMotor[0] + ", mot1: " + aOrderMotor[1] );
+    if( b_lfo_on )
+    {
+        setTimeout( updateLFOs, 50 ); // good to be before each motor value exchange
+    }
+}
+
 initPosDevices();
 setTimeout( refreshPage, 1000 );
 //setTimeout( simulateValue, 200 );
@@ -612,7 +620,7 @@ setTimeout( refreshPage, 1000 );
 if(0)
 {
     let fakeevent = Object()
-    fakeevent.data = "Pos_CcAnC3C8CiB.01..4567890123456789B";
+    fakeevent.data = "Pos_CcAnC3C8CiB.AAJATAfAmAvA3A..6789B";
     onMessage(fakeevent)
     setTimeout( ()=>{onMessage(fakeevent)}, 6000 );
 }

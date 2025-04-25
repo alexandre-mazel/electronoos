@@ -198,7 +198,7 @@ if 0:
         time.sleep(1)
         
 
-if 0:
+if 1:
     print("fadein-fadeout device 1 a 4")
     dmx.set_data(1, 0)
     dmx.set_data(2, 0)
@@ -238,7 +238,7 @@ if 0:
             dmx.set_data( dev_id+1, i )
             time.sleep(time_wait)
             
-if 0:
+if 1:
     # fonctionne nickel!
     print( "meduse device %d" % dev_id )
     time_wait = 0.001

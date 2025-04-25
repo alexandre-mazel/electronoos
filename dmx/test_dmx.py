@@ -198,7 +198,7 @@ if 0:
         time.sleep(1)
         
 
-if 1:
+if 0:
     print("fadein-fadeout device 1 a 4")
     dmx.set_data(1, 0)
     dmx.set_data(2, 0)
@@ -238,7 +238,7 @@ if 0:
             dmx.set_data( dev_id+1, i )
             time.sleep(time_wait)
             
-if 1:
+if 0:
     # fonctionne nickel!
     print( "meduse device %d" % dev_id )
     time_wait = 0.001
@@ -287,5 +287,21 @@ if 0:
     time.sleep(1)
     dmx.set_data(dev_id+6,123)
     time.sleep(1)
+    
+if 1:
+    print("midi controlled device 1 a 4 (4 slider of the noanokontrol2)")
+    # command by midi
+    import mido # pip install mido (eg 1.3.3)
+    import rtmidi # pip install python-rtmidi (required by mido)
+
+
+    # print all informations from Nano Kontrol2 (works!)
+    with mido.open_input() as inport:
+        for msg in inport:
+            if msg.channel >= 1:
+                id = dev_id+msg.channel - 1
+                val = msg.value * 2
+                print("id: %s, value: %s" % (id, val) )
+                dmx.set_data( id,val )
 
     

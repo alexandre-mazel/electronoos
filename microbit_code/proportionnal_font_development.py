@@ -1,17 +1,36 @@
-from microbit import *
-import neopixel
 
-nbr_leds = 16*16;
-leds = neopixel.NeoPixel(pin1, nbr_leds)
+simulated_screen = []
 
-def setpix( x, y, color ):
-    coef = 4
-    color = (color[0]//coef,color[1]//coef,color[2]//coef)  # dimming
-    if y % 2 == 1:
-        leds[x+y*16] = color
-    else:
-        leds[(15-x)+y*16] = color
+def init_screen():
+    for j in range(16):
+        simulated_screen.append([])
+        for i in range(16):
+            simulated_screen[j].append('.')
+            
+
+def reset_screen():
+    for j in range(16):
+        simulated_screen.append([])
+        for i in range(16):
+            simulated_screen[j][i] = '.'
+
+def setpix(x,y,color):
+    print("DBG: setpix(%d,%d,%s)" % (x,y,str(color)))
+    if x > 15 or y > 15:
+        return
+    c = 'x'
+    if color[0] > 127:
+        c = 'X'
         
+    simulated_screen[y][x] = c
+    
+def render_simulated_screen():
+    global simulated_screen
+    for j in range(len(simulated_screen)):
+        for i in range(len(simulated_screen[0])):
+            print(simulated_screen[j][i], end="")
+        print()
+
 """
 The font data from ASCII codes 32 to 126. Index padded by 32.
 Format (bit 0 = lowest bit):
@@ -67,63 +86,8 @@ def render_text(x,y,s,color=(255,255,255)):
     offset = 0
     for idx,c in enumerate(s):
         offset += render_char(offset+x,0+y,c) + 1
-        
-        
-def draw_tetris():
-    lblue = (80,80,255)
-    yellow = (255,255,40)
-    red = (255,0,0)
-    purple = (255,0,255)
-    dpurple = (4,0,4)
     
-    setpix(8,15,lblue)
-    setpix(8,14,lblue)
-    setpix(8,13,lblue)
-    setpix(8,12,lblue)
-    
-    setpix(9,15,yellow)
-    setpix(10,15,yellow)
-    setpix(9,14,yellow)
-    setpix(10,14,yellow)
-    
-    setpix(11,15,red)
-    setpix(11,14,red)
-    setpix(12,14,red)
-    setpix(12,13,red)
-
-            
-    setpix(9,5,dpurple)
-    setpix(10,5,dpurple)
-    setpix(11,5,dpurple)
-    setpix(10,4,dpurple)
-    
-    setpix(9,6,purple)
-    setpix(10,6,purple)
-    setpix(11,6,purple)
-    setpix(10,5,purple)
-
-
-    
-    
-    #render_text(0,0,"Tetris")
-    render_text(0,0,"63")
-    
-    
-    
-leds.fill((0,0,3)) # Toutes en bleue
-leds[0] = (63, 63, 0) # la premiere en fuchia
-leds.show()
-
-sleep(700)
-
-leds.fill((0,0,0)) # raz
-setpix(6,0,(255,0,255))
-setpix(6,1,(255,0,255))
-leds.show()
-sleep(700)
-
-leds.fill((0,0,0)) # raz
-draw_tetris()
-leds.show()
-
-display.show(Image.FABULOUS)
+init_screen()
+#render_text("Hello")
+render_text(0,0,"Tetris")
+render_simulated_screen()

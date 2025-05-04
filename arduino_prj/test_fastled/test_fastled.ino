@@ -339,6 +339,13 @@ void loop()
       drawImgs(aImgs_3,IMG_3_SIZE_X,IMG_3_SIZE_Y,1,32);
       delay(500);
     }
+    for(int i = 0; i < 8; ++i)
+    {
+      drawImgs(aImgs_4,IMG_4_SIZE_X,IMG_4_SIZE_Y,1,32);
+      delay(500);
+      drawImgs(aImgs_5,IMG_5_SIZE_X,IMG_5_SIZE_Y,1,32);
+      delay(500);
+    }
     return;
   }
 

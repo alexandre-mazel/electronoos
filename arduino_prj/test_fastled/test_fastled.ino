@@ -247,7 +247,7 @@ unsigned char mario_body_bitmap[16][16][3] = {
 // python C:\Users\alexa\dev\git\electronoos\generate_img\generate_img.py "C:\Users\alexa\dev\git\electronoos\data\bitmap_mario_head.png" "C:\Users\alexa\dev\git\electronoos\data\bitmap_mario_body.png"
 // copy \tmp\imgs.* C:\Users\alexa\dev\git\electronoos\arduino_prj\test_fastled\ /Y
 // ou avec walk:
-// python C:\Users\alexa\dev\git\electronoos\generate_img\generate_img.py "C:\Users\alexa\dev\git\electronoos\data\bitmap_mario_head.png" "C:\Users\alexa\dev\git\electronoos\data\bitmap_mario_body_walk_0.png" "C:\Users\alexa\dev\git\electronoos\data\bitmap_mario_body_walk_1.png" "C:\Users\alexa\dev\git\electronoos\data\bitmap_mario_body_walk_2.png" "C:\Users\alexa\dev\git\electronoos\data\bitmap_mario_body_walk_3.png"
+// python C:\Users\alexa\dev\git\electronoos\generate_img\generate_img.py "C:\Users\alexa\dev\git\electronoos\data\bitmap_mario_head.png" "C:\Users\alexa\dev\git\electronoos\data\bitmap_mario_body_walk_0.png" "C:\Users\alexa\dev\git\electronoos\data\bitmap_mario_body_walk_1.png" "C:\Users\alexa\dev\git\electronoos\data\bitmap_mario_body_walk_2.png" "C:\Users\alexa\dev\git\electronoos\data\bitmap_mario_body_walk_3.png" "C:\Users\alexa\dev\git\electronoos\data\bitmap_mario_body_2_walk_0.png" "C:\Users\alexa\dev\git\electronoos\data\bitmap_mario_body_2_walk_1.png"
 
 
 void drawbitmap16x16(unsigned char bitmap[16][16][3])
@@ -344,6 +344,13 @@ void loop()
       drawImgs(aImgs_4,IMG_4_SIZE_X,IMG_4_SIZE_Y,1,32);
       delay(500);
       drawImgs(aImgs_5,IMG_5_SIZE_X,IMG_5_SIZE_Y,1,32);
+      delay(500);
+    }
+    for(int i = 0; i < 8; ++i)
+    {
+      drawImgs(aImgs_6,IMG_6_SIZE_X,IMG_6_SIZE_Y,1,32);
+      delay(500);
+      drawImgs(aImgs_7,IMG_7_SIZE_X,IMG_7_SIZE_Y,1,32);
       delay(500);
     }
     return;

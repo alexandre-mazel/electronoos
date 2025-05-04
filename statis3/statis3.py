@@ -13,6 +13,7 @@ import misctools
 
 def replaceNameReplaceByNonAccentuatedChars(s):
     trans = [
+                    # ne pas mettre d'underscore ici
                     ( "\\N{LATIN CAPITAL LETTER E WITH ACUTE}", "E" ),
                     ( "\\N{LATIN CAPITAL LETTER E WITH GRAVE}", "E" ),
                     ( "\\N{LATIN CAPITAL LETTER E WITH CIRCUMFLEX}", "E" ),
@@ -21,8 +22,11 @@ def replaceNameReplaceByNonAccentuatedChars(s):
                     ( "\\N{LATIN SMALL LETTER A WITH GRAVE}", "a" ),
                     ( "\\N{LATIN SMALL LETTER C WITH CEDILLA}", "c" ),
                     ( "\\N{LATIN SMALL LETTER E WITH ACUTE}", "e" ),
+                    ( "\\N{LATIN SMALL LETTER E WITH DIAERESIS}", "e" ),
+                    ( "\\N{COMBINING ACUTE ACCENT}", "e" ),
                     ( "\\N{LATIN SMALL LETTER E WITH GRAVE}", "e" ),
                     ( "\\N{LATIN SMALL LETTER I WITH CIRCUMFLEX}", "i" ),
+                    ( "\\N{LATIN SMALL LETTER N WITH TILDE}", "n" ),
                     ( "\\N{LATIN SMALL LETTER O WITH CIRCUMFLEX}", "o" ),
                     ( "\\N{LEFT SINGLE QUOTATION MARK}", "'" ),
                     ( "\\N{RIGHT SINGLE QUOTATION MARK}", "'" ),
@@ -40,10 +44,10 @@ def replaceNameReplaceByNonAccentuatedChars(s):
                     ( "\\N{BULLET}", "o" ),
                     ( "\\N{DEGREE SIGN}", "o" ),
                     ( "\\N{FLEXED BICEPS}", "" ),
-                    ( "\\N{BLACK_RIGHT-POINTING_POINTER}", "-" ),
-                    ( "\\N{BLACK_LEFT-POINTING_POINTER}", "-" ),
+                    ( "\\N{BLACK RIGHT-POINTING POINTER}", "-" ),
+                    ( "\\N{BLACK LEFT-POINTING POINTER}", "-" ),
                     ( "\\N{FIREWORKS}", "-" ),
-                    ( "\\N{BIG_SOLIDUS}", "-" ),
+                    ( "\\N{BIG SOLIDUS}", "-" ),
                     
                 ]
     for a,b in trans:

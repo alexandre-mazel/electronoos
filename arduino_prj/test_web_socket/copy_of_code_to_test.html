@@ -613,6 +613,30 @@ function updateLFOs()
     }
 }
 
+if( 1 )
+{
+    // need chrome! (else firefox: Uncaught TypeError: navigator.requestMIDIAccess is not a function)(and also in https)
+    navigator.requestMIDIAccess().then((midiAccess) => {
+      Array.from(midiAccess.inputs).forEach((input) => {
+        input[1].onmidimessage = (msg) => {
+          //console.log(msg);
+          console.log("midi data: " + msg.data[0] + ", " + msg.data[1] + "," + msg.data[2] );
+          control = msg.data[1];
+          val = msg.data[2];
+          // control: 0..8: slider, 16..23: knob
+          // je ne met pas de modulo car c'est complique dans le static de l'esp32
+          if(control > 8)
+            control -= 8;
+          if(control > 8)
+            control -= 8;
+          val = val* 2 - 127
+          console.log("send to mot" + control + ",val: " + val );
+          aOrderMotor[control] = val;
+        };
+      });
+    });
+}
+
 initPosDevices();
 setTimeout( refreshPage, 1000 );
 //setTimeout( simulateValue, 200 );

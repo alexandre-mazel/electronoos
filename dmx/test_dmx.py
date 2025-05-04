@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from dmxal import DMX # git clone https://github.com/monzelr/dmx.git, cd dmx, pip install .
 import dmxal
 dmxal.set_verbose( False )
@@ -18,7 +20,10 @@ dmxal.set_verbose( False )
 # ou Eurolite USB-DMX512-interface/update-adapter
 
 # Mes projos:
-# 60 lumières Par LED DMX, lumière de scène RGB de 90W 
+# 60 lumières Par LED DMX, lumière de scène RGB de 90W
+# 32€TTC/Amazon
+# 750g
+# Conso: Eteint: 2.8w(elec+fan), full RGB: 52w
 #angle de faisceau 25degrees
 #7 canaux dmx: 
 # mode de controle: auto/master/dmx512
@@ -37,7 +42,17 @@ dmxal.set_verbose( False )
 #         251-255: voice control
 # ch7: vitesse: if ch6 set to voice control: R:0-30, G:31-61, B:62:92, W:93-123&216-247, Yellow: 124-154, Pink: 155-185, Cyan: 186-215, Color Transformation: 248-255
 # 
+# WKL-BEAM02: R+G+B+W 12W
+# 36€TTC/Amazon
+# 380g
+# Conso: Eteint: 3.6w(elec+fan), full W: 4.2w, full RGBW: 12.6w
+# ch1: 0-8: total off (but not the fan)
+#         9-134: RGBW dimmer from dark to bright
+#     135-239: Strobe from slow to fast (but not fast: 6Hz-80Hz)
+#     240-255: Combine ch1/ch2:ch3/ch4 et ch5 for RGBW mix
 #
+# ce petit spot, meme eteint relaye les commandes DMX.
+# 
 #A DMX terminator helps to reduce ‘noise’ on the DMX chain, and makes the light respond to 
 # control more accurately. It should be plugged in to the last fixture in any chain. For Terminator 
 # connections please see below:
@@ -263,6 +278,7 @@ if 0:
         
     # stop strobo (so all projos are synced)
     dmx.set_data(dev_id+4,0)
+    
     time.sleep(1)
         
     while 1:
@@ -300,7 +316,7 @@ if 1:
         for msg in inport:
             if msg.channel >= 1:
                 id = dev_id+msg.channel - 1
-                val = msg.value * 2
+                val = msg.value * 2+1
                 print("id: %s, value: %s" % (id, val) )
                 dmx.set_data( id,val )
 

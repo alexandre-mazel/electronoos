@@ -821,14 +821,14 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
         static char sendpos[] = "PosXXXXXX0123456789B"; // ajout de 10 capteurs et Ã©tat de la batterie
         memcpy( &sendpos[3], (uint8_t*)dym.getAllPositions(), 6 );
         sensors_get(&sendpos[9]);
-        static char sendpos_fake[] = "PosXXXXXX0123456789B"; // on ne peut pas recevoir des binaires en WebSocket! => TODO!
+        static char sendpos_fake[] = "PosXXXXXX0123456789B"; // on ne peut pas recevoir des binaires en WebSocket (format html)! => b64
         ws.textAll(sendpos_fake);
       }
 
       // real decoding and encoding
       if( 1 )
       {
-        // datas are: motor_PXX with P: the command type: P: Position, V: Velocity, F: Fake; and XX: the b64 encoded position -127..127
+        // datas format: motor_CXX_CXX_CXX_CXX_CXX_CXX with C: the command type: P: Position, V: Velocity, F: Fake; and XX: the b64 encoded position -127..127
         for(int i = 0; i < NBR_MOTOR; ++i )
         {
           const int nFirstCharPos = 6; // first char after Motor_

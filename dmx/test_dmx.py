@@ -162,7 +162,7 @@ print("INF: dmx.device.description: ", dmx.device.description )
 print("INF: dmx.device.interface: ", dmx.device.interface )
 print("INF: dmx.device.device: ", dmx.device.device )
 print("INF: dmx.device.manufacturer: ", dmx.device.manufacturer )
-print("INF: dmx.device.serial_number: ", dmx.device.serial_number ) # mon truc chinois: BG00U0KFA; l'enttect de l'ensad: EN172589A
+print("INF: dmx.device.serial_number: ", dmx.device.serial_number ) # mon truc chinois orange: BG00U0KFA; l'enttect de l'ensad: EN172589A, le noir qui clignote: BG0106SGA
 
 print("INF: dmx: starting" )
 
@@ -275,6 +275,7 @@ if 0:
     # regler la teinte a blanc:
     for i in range(4):
         dmx.set_data( dev_id+i, 255 )
+    #~ dmx.set_data( dev_id+2, 0 ) # pour un strobo rose
         
     # stop strobo (so all projos are synced)
     dmx.set_data(dev_id+4,0)
@@ -282,12 +283,31 @@ if 0:
     time.sleep(1)
         
     while 1:
+        print("inc...")
         for i in range(10,255):
             dmx.set_data(dev_id+4,i)
             time.sleep(time_wait)
+        print("dec...")
         for i in range(255,10,-1):
             dmx.set_data(dev_id+4,i)
             time.sleep(time_wait)
+            
+            
+if 1:
+    # allumé/eteint tres lent
+    print("slow on and off")
+    time_wait = 4
+    # regler la teinte a blanc:
+    for i in range(4):
+        dmx.set_data( dev_id+i, 255 )
+    while 1:
+        dmx.set_data( dev_id+0, 255 )
+        time.sleep(time_wait)
+        dmx.set_data( dev_id+0, 0 )
+        time.sleep(time_wait)
+    
+    
+    
        
 if 0:                 
     # ne fonctionne pas
@@ -304,7 +324,7 @@ if 0:
     dmx.set_data(dev_id+6,123)
     time.sleep(1)
     
-if 1:
+if 0:
     print("midi controlled device 1 a 4 (4 slider of the noanokontrol2)")
     # command by midi
     import mido # pip install mido (eg 1.3.3)

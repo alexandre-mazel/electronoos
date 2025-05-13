@@ -5,7 +5,7 @@
 # sur ree: 
 # find /sys/bus/w1/devices/ -name "28-*" -exec cat {}/w1_slave \; | grep "t=" | awk -F "t=" '{print $2/1000}'
 # 22.875
-# si rien, c'est qu'il y a un bug de capteur débranché.
+# si rien, c'est qu'il y a un bug de capteur debranche.
 
 # scp -P 11022 na@thenardier.fr:/home/na/save/office_temperature.txt C:/Users/alexa/dev/git/electronoos/meteo/data/
 

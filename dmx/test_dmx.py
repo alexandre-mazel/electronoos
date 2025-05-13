@@ -147,7 +147,7 @@ def hueToRGB( hue ):
 # clamp - end
 
 print( "Running Dmx...")
-nNbrChannel = 16; # le nbr que tu veux
+nNbrChannel = 256; # le nbr que tu veux
 dmx = DMX( num_of_channels = nNbrChannel )
 print(dir(dmx))
 print("INF: dmx.is_connected(): ", dmx.is_connected() )

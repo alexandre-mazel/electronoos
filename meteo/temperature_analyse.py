@@ -437,6 +437,6 @@ if __name__ == "__main__":
             strFilename = "data/webdata.txt"
             added_datas = temperature_office_analyse.decode_file_sonde(strFilename)
             datas.update(added_datas)
-            datas_of_interest = [("Le Kremlin-Bicetre","temp"),("ESP32_C01","temp10"),("ESP32_C01","temp11") ]
+            datas_of_interest = [("Le Kremlin-Bicetre","temp"),("ESP32_C01","temp10"),("ESP32_C01","temp11"),("armoire","temp") ] # armoire s'affiche plus ?
 
             temperature_office_analyse.render_all_datas(datas,y,m,d-3, sameGraphList = datas_of_interest)

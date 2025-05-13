@@ -90,13 +90,19 @@ class Room:
         return 1,1
         
     def update( self, heros_x, heros_y ):
+        """
+        return 1 si le terrain a change, 2 si on a gagne
+        """
         
         # handle door
         case = self.get_case_at( heros_x, heros_y )
-        if case >= kTypeDoor:
+        if case >= kTypeDoor and case <= kTypeDoor +26:
             num_terrain = case-kTypeDoor
             self.create_from_terrain(num_terrain)
-            return True
+            return 1
+            
+        if case >= kTypeSlip:
+            return 2
         
         # update camera
         scroll = 0
@@ -132,10 +138,8 @@ class Room:
         else:
             # camera lineaire
             self.inc_scroll = 2
-        
-            
                 
-        return False
+        return 0
         
     def render( self ):
         

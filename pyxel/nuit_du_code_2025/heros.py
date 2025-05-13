@@ -8,6 +8,13 @@ class Heros:
         self.v = v
         self.d = 2
         self.arme = arme
+        self.vie = 4
+        self.iframe = 0
+        
+    def degat(self):
+        if self.iframe == 0:
+            self.vie -= 1
+            self.iframe = 30
         
     def deplacement(self, _):
         x = self.x
@@ -47,9 +54,11 @@ class Heros:
                 self.d = 3
                 self.arme.attaque(self.d)
             
-            
+    
             
     def update(self):
+        if self.iframe > 0:
+            self.iframe -= 1
         self.attaquer()
         self.arme.update()
         

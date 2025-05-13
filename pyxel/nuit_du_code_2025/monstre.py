@@ -8,9 +8,17 @@ class Monstre:
         self.y=y
         self.d=0
         self.fr=0
+        self.bloc = 0
         
+        
+    def degat(self):
+        if self.bloc == 0:
+            self.bloc = 30
+            
+            
     def deplacement(self, coord_heros):
-        
+        if self.bloc > 0:
+            return self.x, self.y
         xh, yh = coord_heros
         
         dx=self.x-xh
@@ -45,6 +53,8 @@ class Monstre:
             self.fr=(self.fr + 1)%3
              
     def update(self):
+        if self.bloc > 0:
+            self.bloc -= 1
         self.frame()
 
     def draw(self, xlocal, ylocal):

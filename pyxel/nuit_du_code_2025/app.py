@@ -16,6 +16,7 @@ class App:
         self.heros = heros.Heros(self.init_pos[0],self.init_pos[1], arme.DragonSlayer(self.init_pos[0],self.init_pos[1], self))
         self.room = room.Room()
         self.room.create()
+        self.win = False
         self.personnages = [self.heros]
         #self.personnages.append(monstre.Monstre(56,56))
         pyxel.load("2.pyxres")
@@ -30,16 +31,44 @@ class App:
             if self.room.is_passable(x,y):
                 p.set_new_pos(x,y)
             p.update()
-        if self.room.update(self.heros.x,self.heros.y):
+        ret_update = self.room.update(self.heros.x,self.heros.y)
+        if ret_update == 1:
             self.heros.x,self.heros.y = self.init_pos[0],self.init_pos[1]
-            self.personnages.append(monstre.Monstre(*self.room.get_empty_space()))
+            self.personnages.append(Monstre(*self.room.get_empty_space()))
+        elif ret_update == 2:
+            self.win = True
+        self.morsure()
 
+    def screen_lost(self):
+        pyxel.cls(8)
+        for i in range(10):
+            msg = "YOU LOOSE!"
+            pyxel.text(44+5*pyxel.sin(pyxel.frame_count-1),50+20*pyxel.sin((pyxel.frame_count-1)*10),msg, 0)
+            pyxel.text(44+5*pyxel.sin(pyxel.frame_count),50+20*pyxel.sin(pyxel.frame_count*10),msg, 15)
+            
+    def screen_win(self):
+        pyxel.cls(5)
+        for i in range(10):
+            msg = "YEAH!!!\nYOU GOT YOUR SLIP BACK\n WELL DONE !"
+            pyxel.text(24+5*pyxel.sin(pyxel.frame_count-1),50+20*pyxel.sin((pyxel.frame_count-1)*10),msg, 0)
+            pyxel.text(24+5*pyxel.sin(pyxel.frame_count),50+20*pyxel.sin(pyxel.frame_count*10),msg, 9)
+        
 
     def draw(self):
+        if self.heros.vie < 1:
+            self.screen_lost()
+            #~ self.screen_win()
+            return
+        if self.win:
+            self.screen_win()
+            return
+            
         self.room.render()
         for p in self.personnages:
             xlocal, ylocal = self.room.conv_global_to_local(p.x,p.y)
             p.draw(xlocal,ylocal)
+        for i in range(self.heros.vie):
+            pyxel.blt(0+i*16, 0, 0, 112, 48, 16, 16, 2)
 
     def attaquer(self, x, y, h, w):
         indice = 1
@@ -58,6 +87,16 @@ class App:
                 del self.personnages[indice]
             else:
                 indice+=1
+                
+    def morsure(self):
+        for p in self.personnages[1:]:
+            points = [(p.x, p.y), (p.x+16, p.y), (p.x, p.y+16), (p.x+16,p.y+16)]
+            dead = False
+            for px, py in points:
+                if px >= self.heros.x and px <= self.heros.x+16 and py >= self.heros.y and py <= self.heros.y+16:
+                    print("AIE!!!")
+                    self.heros.degat()
+                    p.degat()
 
 
 

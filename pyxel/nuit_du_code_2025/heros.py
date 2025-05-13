@@ -63,19 +63,26 @@ class Heros:
         self.arme.update()
         
     def draw(self,x,y):
+        w = 16; h = 16
         if self.d == 1:
-            pyxel.blt(x, y, 0, 0, 16, 16, 16, 2)
-            if self.arme : 
-                self.arme.draw(x+12,y-4, self.d)
+            u = 0; v = 16
+            xa,ya = x+12,y-4
         elif self.d == 2:
-            pyxel.blt(x, y, 0, 160, 16, 16, 16, 2)
-            if self.arme : 
-                self.arme.draw(x+12,y+12, self.d)
+            u = 160; v = 16
+            xa,ya = x+12,y+12
         elif self.d == 3:
-            pyxel.blt(x, y, 0,0,16,-16, 16, 2)
-            if self.arme : 
-                self.arme.draw(x-12, y-4, self.d)
+            u = 0; v = 16
+            w = -16
+            xa,ya = x-12, y-4
         else:
-            if self.arme : 
-                self.arme.draw(x-8, y-4, self.d)
-            pyxel.blt(x, y, 0, 144, 16, -16, 16, 2)
+            u = 144; v = 16
+            w = -16
+            xa,ya = x-8, y-4
+
+        if self.iframe > 0 and self.iframe %2 == 0:
+            u = 80; v = 32
+                
+        pyxel.blt(x, y, 0, u, v, w, h, 2)
+        if self.arme : 
+            self.arme.draw(xa,ya, self.d)
+

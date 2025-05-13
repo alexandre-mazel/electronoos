@@ -91,7 +91,7 @@ class Room:
         
     def update( self, heros_x, heros_y ):
         """
-        return 1 si le terrain a change, 2 si on a gagne
+        return 1 si le terrain a change, 2 si on marche sur du feu, 3 si on a gagne
         """
         
         # handle door
@@ -102,6 +102,9 @@ class Room:
             return 1
             
         if case >= kTypeSlip:
+            return 3
+            
+        if case >= kTypeFire:
             return 2
         
         # update camera

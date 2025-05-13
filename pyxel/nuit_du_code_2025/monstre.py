@@ -49,7 +49,7 @@ class Monstre:
         
     def frame(self):
         if (pyxel.frame_count)%15==0:
-            print("dadsad")
+            #~ print("dadsad")
             self.fr=(self.fr + 1)%3
              
     def update(self):

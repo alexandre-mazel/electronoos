@@ -19,11 +19,13 @@ class App:
         self.win = False
         self.personnages = [self.heros]
         #self.personnages.append(monstre.Monstre(56,56))
-        pyxel.load("2.pyxres")
+        pyxel.load("2.pyxres",excl_sounds=False)
         
         pyxel.run(self.update, self.draw)
         
     def update(self):
+        if self.heros.vie < 0.1:
+            return
         #if pyxel.rndi(0,100) < 42:
         #    self.personnages.append(monstre.Monstre(rndi(0, self.room.w-16), pyxel.rndi(0,self.room.h-16)))
         for p in self.personnages:
@@ -34,8 +36,11 @@ class App:
         ret_update = self.room.update(self.heros.x,self.heros.y)
         if ret_update == 1:
             self.heros.x,self.heros.y = self.init_pos[0],self.init_pos[1]
-            self.personnages.append(Monstre(*self.room.get_empty_space()))
+            self.personnages.append(monstre.Monstre(*self.room.get_empty_space()))
         elif ret_update == 2:
+            self.heros.degat()
+            pyxel.play(ch=0, snd=3)
+        elif ret_update == 3:
             self.win = True
         self.morsure()
 
@@ -55,9 +60,10 @@ class App:
         
 
     def draw(self):
-        if self.heros.vie < 1:
+        if self.heros.vie < 0.1:
             self.screen_lost()
             #~ self.screen_win()
+            if pyxel.play_pos(0) == None: pyxel.play(ch=0, snd=2)
             return
         if self.win:
             self.screen_win()
@@ -67,7 +73,7 @@ class App:
         for p in self.personnages:
             xlocal, ylocal = self.room.conv_global_to_local(p.x,p.y)
             p.draw(xlocal,ylocal)
-        for i in range(self.heros.vie):
+        for i in range(int(self.heros.vie)):
             pyxel.blt(0+i*16, 0, 0, 112, 48, 16, 16, 2)
 
     def attaquer(self, x, y, h, w):
@@ -75,14 +81,15 @@ class App:
         while indice < len(self.personnages):
             p = self.personnages[indice]
             points = [(p.x, p.y), (p.x+16, p.y), (p.x, p.y+16), (p.x+16,p.y+16)]
-            print(points)
-            print(x, y, w, h)
-            print(self.heros.x, self.heros.y)
+            #~ print(points)
+            #~ print(x, y, w, h)
+            #~ print(self.heros.x, self.heros.y)
             dead = False
             for px, py in points:
                 if px >= x and px <= x+w and py >= y and py <= y+h:
                     dead = True
-                    print("IS DEAD !!!")
+                    self.heros.vie += 1
+                    #~ print("IS DEAD !!!")
             if dead:
                 del self.personnages[indice]
             else:
@@ -94,8 +101,9 @@ class App:
             dead = False
             for px, py in points:
                 if px >= self.heros.x and px <= self.heros.x+16 and py >= self.heros.y and py <= self.heros.y+16:
-                    print("AIE!!!")
+                    #~ print("AIE!!!")
                     self.heros.degat()
+                    if pyxel.play_pos(0) == None:  pyxel.play(ch=0, snd=4)
                     p.degat()
 
 

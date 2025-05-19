@@ -3,7 +3,8 @@
 
 #define PIN_POTAR_BASE  A10 // first pin of the series
 #define PIN_SW_BASE     30
-#define PIN_SWTRI_BASE  40
+//#define PIN_SWTRI_BASE  40
+const unsigned char SWTRI_PIN[] = {38,45,41,40,39,44}; // due to a broken switch i've messed all wire, and now they aren't contiguous
 
 
 #define NBR_POTAR   3
@@ -91,7 +92,9 @@ void setup()
 
   for( int i = 0; i < NBR_SWTRI*2; ++i )
   {
-    pinMode( PIN_SWTRI_BASE+i, INPUT );
+    //pinMode( PIN_SWTRI_BASE+i, INPUT );
+    pinMode( SWTRI_PIN[i], INPUT );
+    
   }
 
   uint8_t i2cAddr = 0x3F;
@@ -279,10 +282,14 @@ float * aprLimitArray[] = {&rNbrTwistLimit,&rNbrCollectLimit,&rNbrSpoolLimit};
 int * apnSpeedArray[] = {&nNbrTwistSpeed,&nNbrCollectSpeed,&nNbrSpoolSpeed};
 int * apnDirArray[] = {&nTwistDir,&nCollectDir,&nSpoolDir};
 // Switch routing
-int   anSwIndex[] = {2, 0, 1, 3}; // order is turbo, select, +, -
+int   anSwIndex[] = {3, 1, 2, 0}; // order is turbo, select, +, -
 // TriSwich routing
-int   anTriSwIndex[] = {2,0,1}; // how ordered are the triswitch compared to the motor number, anTriIndex[2] = 0 => the third tri switch is related to the twisting motor
-int   anTriSwInverted[] = {-1,1,1}; // invert direction (miscabled) anTriSwInverted[0] = -1: the first switch is reverted
+//int   anTriSwIndex[] = {2,0,1}; // how ordered are the triswitch compared to the motor number, anTriIndex[2] = 0 => the third tri switch is related to the twisting motor
+//int   anTriSwInverted[] = {-1,1,1}; // invert direction (miscabled) anTriSwInverted[0] = -1: the first switch is reverted
+int   anTriSwIndex[] = {0,1,2};
+int   anTriSwInverted[] = {1,1,1};
+
+int   anPotarIndex[] = {2,1,0};
 
 int nNumLineEdited = 3;
 float * prEdited = aprLimitArray[0];
@@ -312,12 +319,12 @@ void loop()
 
   for( int i = 0; i < NBR_POTAR; ++i )
   {
-    anReadValues[i] = analogRead(PIN_POTAR_BASE+i);
+    anReadValues[i] = analogRead(PIN_POTAR_BASE+anPotarIndex[i]);
     if(abs(anReadValues[i] - anPrevReadValues[i])>1) // avoid spurious change
     {
       if(i<2)
       {
-        int nVal = (int)( (anReadValues[i] *512L) / 1023);
+        int nVal = (int)( ((1023-anReadValues[i]) *512L) / 1023);
         nVal = (nVal / 4) * 4; // put entire step to help have same on both
         *(apnSpeedArray[i]) = nVal;
       }
@@ -331,7 +338,7 @@ void loop()
         {
           continue; // no change of potar when automatic spooling
         }
-        *(apnSpeedArray[i]) = (int)( (anReadValues[i] *256L) / 1023); // put less to have more precision (was 20L)
+        *(apnSpeedArray[i]) = (int)( ((1023-anReadValues[i]) *256L) / 1023); // put less to have more precision (was 20L)
       }
       if(*apnDirArray[i] != 0)
         abSendMotorChange[i] = 1;
@@ -410,7 +417,9 @@ void loop()
 
   for( int i = 0; i < NBR_SWTRI*2; ++i )
   {
-    anReadValues[i+NBR_POTAR+NBR_SW] = digitalRead(PIN_SWTRI_BASE+i) == HIGH;
+    //anReadValues[i+NBR_POTAR+NBR_SW] = digitalRead(PIN_SWTRI_BASE+i) == HIGH;
+    anReadValues[i+NBR_POTAR+NBR_SW] = digitalRead(SWTRI_PIN[i]) == HIGH;
+    
     int nMotor = anTriSwIndex[i/2];
 
     //Serial.print("mot: " ); Serial.print(nMotor); Serial.print(", sendchange:" ); Serial.println(abSendMotorChange[nMotor]);
@@ -449,7 +458,7 @@ void loop()
     }
   }
 
-  int16_t dist_slider = get_dist_ir(PIN_DIST_IR);
+  int16_t dist_slider = 0; //get_dist_ir(PIN_DIST_IR);
 
   memcpy(anPrevReadValues,anReadValues,sizeof(anPrevReadValues));
 

@@ -287,7 +287,7 @@ int   anSwIndex[] = {3, 1, 2, 0}; // order is turbo, select, +, -
 //int   anTriSwIndex[] = {2,0,1}; // how ordered are the triswitch compared to the motor number, anTriIndex[2] = 0 => the third tri switch is related to the twisting motor
 //int   anTriSwInverted[] = {-1,1,1}; // invert direction (miscabled) anTriSwInverted[0] = -1: the first switch is reverted
 int   anTriSwIndex[] = {0,1,2};
-int   anTriSwInverted[] = {1,1,1};
+int   anTriSwInverted[] = {-1,1,1}; // 1 or -1
 
 int   anPotarIndex[] = {2,1,0};
 
@@ -415,6 +415,7 @@ void loop()
     }
   }
 
+  int bLooksLikeCollecting = 0;
   for( int i = 0; i < NBR_SWTRI*2; ++i )
   {
     //anReadValues[i+NBR_POTAR+NBR_SW] = digitalRead(PIN_SWTRI_BASE+i) == HIGH;
@@ -455,10 +456,23 @@ void loop()
       *apnDirArray[nMotor] = nDirection;
       snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nDirection,*apnSpeedArray[nMotor]);
       sendSerialCommand(buf);
+      if( nMotor == 1 && *apnSpeedArray[nMotor] < 10 )
+      {
+        bLooksLikeCollecting = 1;
+      }
     }
   }
 
-  int16_t dist_slider = 0; //get_dist_ir(PIN_DIST_IR);
+  if(bLooksLikeCollecting)
+  {
+    int nMotor = 0;
+    int nDirection = 1;
+    *apnSpeedArray[nMotor] = 1;
+    snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nDirection,*apnSpeedArray[nMotor]);
+    sendSerialCommand(buf);
+  }
+
+  int16_t dist_slider = get_dist_ir(PIN_DIST_IR);
 
   memcpy(anPrevReadValues,anReadValues,sizeof(anPrevReadValues));
 
@@ -536,7 +550,7 @@ void loop()
       nAutomaticSpoolRotationSpeed = nNewSpeed;
       timeNextAutomaticSpoolSpeedChangePossible = millis() + 4000;
       int nMotor = 2;
-      int nDirection = 1;
+      int nDirection = -1;
       snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nDirection,nAutomaticSpoolRotationSpeed);
       sendSerialCommand(buf);
     }

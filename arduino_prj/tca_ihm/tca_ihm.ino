@@ -79,6 +79,8 @@ void countFps()
 void setup()
 {
   Serial.begin(57600);
+  
+  Serial.print("INF: TCA IHM v1.0");
 
   for( int i = 0; i < NBR_POTAR; ++i )
   {
@@ -306,6 +308,8 @@ int anPrevReadValues[NBR_SENSORS];
 
 long int nPrevTimeIntoLoop = 0;
 
+int bWasCollecting = 0;
+
 void loop()
 {
   // char buf[16];
@@ -415,7 +419,7 @@ void loop()
     }
   }
 
-  int bLooksLikeCollecting = 0;
+  int nLooksLikeCollecting = 0; // 1: it has started, 2: time to stop
   for( int i = 0; i < NBR_SWTRI*2; ++i )
   {
     //anReadValues[i+NBR_POTAR+NBR_SW] = digitalRead(PIN_SWTRI_BASE+i) == HIGH;
@@ -456,20 +460,39 @@ void loop()
       *apnDirArray[nMotor] = nDirection;
       snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nDirection,*apnSpeedArray[nMotor]);
       sendSerialCommand(buf);
-      if( nMotor == 1 && *apnSpeedArray[nMotor] < 10 )
+      if( nMotor == 1 && 0)
       {
-        bLooksLikeCollecting = 1;
+        Serial.println( *apnSpeedArray[nMotor] );
+        if( !bWasCollecting && *apnSpeedArray[nMotor] < 10 && *apnSpeedArray[nMotor] > 0 )
+        {
+          nLooksLikeCollecting = 1;
+        }
+        else if( bWasCollecting && *apnSpeedArray[nMotor] == 0 )
+        {
+          nLooksLikeCollecting = 2;
+        }
       }
     }
   }
 
-  if(bLooksLikeCollecting)
+  if( nLooksLikeCollecting != 0 && 0 )
   {
+    Serial.print( "DBG: nLooksLikeCollecting:" ); Serial.println( nLooksLikeCollecting );
     int nMotor = 0;
     int nDirection = 1;
-    *apnSpeedArray[nMotor] = 1;
+    if(nLooksLikeCollecting == 1 )
+    {
+      *apnSpeedArray[nMotor] = 1;
+      bWasCollecting = 1;
+    }
+    else
+    {
+      *apnSpeedArray[nMotor] = 0;
+      bWasCollecting = 0;
+    }
     snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nDirection,*apnSpeedArray[nMotor]);
     sendSerialCommand(buf);
+    
   }
 
   int16_t dist_slider = get_dist_ir(PIN_DIST_IR);

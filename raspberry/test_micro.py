@@ -5,8 +5,10 @@ import types
 config = types.SimpleNamespace()
 config.MIC_RATE = 48000
 config.FPS = 30
+config.min_treshold = 1e-7
+config.N_ROLLING_HISTORY = 2
 
-def microphone_update(audio_samples, min_treshold):
+def microphone_update(audio_samples ):
     global y_roll, prev_rms, prev_exp, prev_fps_update
     # Normalize samples between 0 and 1
     y = audio_samples / 2.0**15
@@ -16,9 +18,10 @@ def microphone_update(audio_samples, min_treshold):
     y_data = np.concatenate(y_roll, axis=0).astype(np.float32)
     
     vol = np.max(np.abs(y_data))
-    avg = np.avg(np.abs(y_data))
-    print("DBG: microphone_update: %s" % avg )
-    if vol < min_treshold:
+    avg = np.mean(np.abs(y_data))
+    print("DBG: microphone_update: max: %5.3f, avg: %5.3f" % (vol,avg) )
+    return
+    if vol < config.min_treshold:
         print('No audio input. Volume below threshold. Volume:', vol)
         #~ led.pixels = np.tile(0, (3, config.N_PIXELS))
         #~ led.update()
@@ -52,6 +55,8 @@ def microphone_update(audio_samples, min_treshold):
             r_curve.setData(y=led.pixels[0])
             g_curve.setData(y=led.pixels[1])
             b_curve.setData(y=led.pixels[2])
+            
+    return
     if config.USE_GUI:
         app.processEvents()
     
@@ -66,5 +71,8 @@ def microphone_update(audio_samples, min_treshold):
 samples_per_frame = int(config.MIC_RATE / config.FPS)
 
 
+# Array containing the rolling audio sample window
+y_roll = np.random.rand(config.N_ROLLING_HISTORY, samples_per_frame) / 1e16
+
 # Start listening to live audio stream
-microphone.start_stream(microphone_update)
+microphone.start_stream(microphone_update,config.MIC_RATE, config.FPS )

@@ -4,27 +4,50 @@ import pyaudio  # sudo apt install python3-pyaudio
 
 
 def listAudioInDevices():
+    """
+    return a list of pair device_index, name
+    """
     print("DBG: listAudioInDevices: starting...")
+    
+    # les lignes suivantes sortent pleins de garbages dans la sortie
+    # avec pleins de probleme de Jack Server et de JackShm
     p = pyaudio.PyAudio()
     info = p.get_host_api_info_by_index(0)
-    numdevices = info.get('deviceCount')
+    numdevices = info.get( 'deviceCount' )
+    
+    listAll = []
 
-    for i in range(0, numdevices):
+    first = 0
+    #~ first = 1
+    for i in range(first, numdevices):
+        print("INF: *** Testing device %s" % i )
         if (p.get_device_info_by_host_api_device_index(0, i).get('maxInputChannels')) > 0:
             print("Input Device id ", i, " - ", p.get_device_info_by_host_api_device_index(0, i).get('name'))
+            listAll.append((i,p.get_device_info_by_host_api_device_index(0, i).get('name')))
             
-    exit(1)
+    return listAll
+    
+def getDeviceByName(device_name):
+    listDevices = listAudioInDevices()
+    for idx,name in listDevices:
+        if device_name in name:
+            return idx
+    print("WRN: getDeviceByName: device '%s' not found" % device_name )
+    return -1
+    
 
 
-def start_stream(callback):
-    listAudioInDevices()
+def start_stream(callback, mic_rate, fps):
+    num_device = getDeviceByName("UMC404")
+    
     p = pyaudio.PyAudio()
-    frames_per_buffer = int(config.MIC_RATE / config.FPS)
+    frames_per_buffer = int(mic_rate / fps)
     stream = p.open(format=pyaudio.paInt16,
                     channels=1,
-                    rate=config.MIC_RATE,
+                    rate=mic_rate,
                     input=True,
-                    frames_per_buffer=frames_per_buffer)
+                    frames_per_buffer=frames_per_buffer,
+                    input_device_index= num_device )
     overflows = 0
     prev_ovf_time = time.time()
     while True:

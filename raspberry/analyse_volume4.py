@@ -32,17 +32,37 @@ def arr_to_str(a):
     return s
 
 
+buf = np.ndarray( shape=(1,4), dtype=np.float32 ) # with 4 random value at start
+
 def record_device(device_id):
+    
     def audio_callback(data, frames, time, status):
         """This is called (from a separate thread) for each audio block."""
+        global buf
         #~ if status:
             #~ print(status, file=sys.stderr)
         #~ audio_q.put(data.copy())
         #~ print("%s:%s" % (len(data[0]), frames) )
         #~ print(device_id,end="",flush=True)
-        moy = np.abs(data).mean(axis=0)
-        maxi = data.max(axis=0)
-        print( "moy: %s, maxi: %s" % (arr_to_str(moy),arr_to_str(maxi)) )
+        #~ print("type:", type(data)) # numpy.ndarray
+        #~ print("type:", type(data[0]), flush=True) # numpy.ndarray
+        #~ print("type:", type(data[0][0])) # float32
+        # data is a list of sample, for each sample 2 or 4 value (one per channel)
+        if 0:
+            # analyse on the fly, but buffer doesn't have all same length (from 23 to 384)
+            moy = np.abs(data).mean(axis=0) # axis=0 => mean for each channel
+            maxi = data.max(axis=0)
+            print( "moy: %s, maxi: %s" % (arr_to_str(moy),arr_to_str(maxi)) )
+        else:
+            # buffer them and analyse from time to time
+            buf = np.concatenate((buf,data))
+            size_analyse = 1024
+            if len(buf) > size_analyse:
+                bufana = buf[:size_analyse]
+                buf = buf[size_analyse:]
+                moy = np.abs(bufana).mean(axis=0) # axis=0 => mean for each channel
+                maxi = bufana.max(axis=0)
+                print( "moy: %s, maxi: %s" % (arr_to_str(moy),arr_to_str(maxi)) )
 
     file_name = join(rec_dir, f"rec_dev{device_id}_ch{channels}.wav")
 

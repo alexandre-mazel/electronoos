@@ -8,17 +8,17 @@ config.FPS = 30
 config.min_treshold = 1e-7
 config.N_ROLLING_HISTORY = 2
 
-def microphone_update(audio_samples ):
+def microphone_update( audio_samples ):
     global y_roll, prev_rms, prev_exp, prev_fps_update
     # Normalize samples between 0 and 1
     y = audio_samples / 2.0**15
     # Construct a rolling window of audio samples
-    y_roll[:-1] = y_roll[1:]
-    y_roll[-1, :] = np.copy(y)
-    y_data = np.concatenate(y_roll, axis=0).astype(np.float32)
+    #~ y_roll[:-1] = y_roll[1:]
+    #~ y_roll[-1, :] = np.copy(y)
+    #~ y_data = np.concatenate(y_roll, axis=0).astype(np.float32)
     
-    vol = np.max(np.abs(y_data))
-    avg = np.mean(np.abs(y_data))
+    vol = np.max(np.abs(y))
+    avg = np.mean(np.abs(y))
     print("DBG: microphone_update: max: %5.3f, avg: %5.3f" % (vol,avg) )
     return
     if vol < config.min_treshold:
@@ -65,6 +65,27 @@ def microphone_update(audio_samples ):
         if time.time() - 0.5 > prev_fps_update:
             prev_fps_update = time.time()
             print('FPS {:.0f} / {:.0f}'.format(fps, config.FPS))
+            
+            
+def sounds_update( audio_samples_multi ):
+    """
+    receive a list of channel, for each channel a list audio_samples
+    """
+    vols = []
+    avgs = []
+    for i, audio_samples in enumerate(audio_samples_multi):
+        y = audio_samples / 2.0**15
+        vol = np.max(np.abs(y))
+        avg = np.mean(np.abs(y))
+        vols.append(vol)
+        avgs.append(avg)
+    
+    print("DBG: sounds_update: ", end = "")      
+    for i,vol in enumerate(vols):
+        print("max: %5.3f, avg: %5.3f" % (vol,avgs[i]), end="" )
+    print("")
+        
+# sounds_update - end
 
 
 # Number of audio samples to read every time frame
@@ -74,5 +95,8 @@ samples_per_frame = int(config.MIC_RATE / config.FPS)
 # Array containing the rolling audio sample window
 y_roll = np.random.rand(config.N_ROLLING_HISTORY, samples_per_frame) / 1e16
 
-# Start listening to live audio stream
-microphone.start_stream(microphone_update,config.MIC_RATE, config.FPS )
+# Start listening to live audio stream (1)
+#~ microphone.start_stream(microphone_update,config.MIC_RATE, config.FPS )
+
+microphone.start_stream_multi(sounds_update,config.MIC_RATE, config.FPS )
+

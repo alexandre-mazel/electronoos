@@ -1,6 +1,7 @@
 import pyaudio
 import math
 import numpy as np
+import time
 
 import dmxal
 
@@ -50,6 +51,8 @@ def analyse_microphone_input():
                     frames_per_buffer=CHUNK)
     print ("recording started")
     Recordframes = []
+    
+    rmoyavg = 0
      
     while 1:
         data = stream.read(CHUNK)
@@ -61,11 +64,23 @@ def analyse_microphone_input():
         rmaxi = maxi/2**15
         moy = d.mean()
         rmoy = moy/2**15
+        rmoy *= 10
+        if rmoy > 1:
+            rmoy = 1
         #~ print("DBG: analyse_microphone_input: maxi: %d, %.2f" % (maxi,rmaxi) )
-        print("DBG: analyse_microphone_input: maxi: %.2f, moy: %.2f" % (rmaxi,rmoy) )
+        print("DBG: analyse_microphone_input: maxi: %.2f, moy: %.2f, moyavg: %.2f" % (rmaxi,rmoy,rmoyavg) )
+        
+        # rmoyavg: une energie qui redescend petit a petit
+        
+        if rmoyavg < rmoy:
+            rmoyavg = rmoy
+        else:
+            rmoyavg *= 0.99
 
-        dmx.set_data( dmx_id+0, int(rmaxi*255) )
-        dmx.set_data( dmx_id+1, int(rmoy*255) )
+        dmx.set_data( dmx_id+0, int(rmaxi*255), auto_send=False )
+        dmx.set_data( dmx_id+1, int(rmoyavg*255), auto_send=False )
+        dmx.set_data( dmx_id+2, int(time.time()*10)%255, auto_send=False ) # chaque 25s ca redevient rouge d'un coup et puis ca blanchit
+        dmx.set_data( dmx_id+3, int(time.time()*10)%255 )
         
     print ("recording stopped")
      

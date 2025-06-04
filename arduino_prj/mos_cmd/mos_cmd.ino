@@ -1,12 +1,5 @@
-void setup()
-{
-  Serial.begin(57600);
-  
-  Serial.println("INF: MOS Cmd v0.2");
-}
-
-// Ramping non linéaire : entrée entre 0 et 255, sortie entre 0 et 255
-// Entrée 128 ≈ Sortie 60
+// Non linear Ramping: input between 0 and 255, same output
+// but inputing 128 return ≈ 60
 unsigned char nonlinear_ramp(unsigned char input) {
     double gamma = 2.4;  // Exposant ajusté pour que 128 -> ~60
     double normalized_input = input / 255.0;
@@ -14,13 +7,21 @@ unsigned char nonlinear_ramp(unsigned char input) {
     return (unsigned char)(output + 0.5); // arrondi
 }
 
-void loop()
+void setup()
 {
+  Serial.begin(57600);
+  
+  Serial.println("INF: MOS Cmd v0.2");
+
   for(int i = 0; i < 256; ++i )
   {
     int n = nonlinear_ramp(i);
     Serial.print("ramping: "); Serial.print( i ); Serial.print(" => "); Serial.println( n );  
   }
+}
+
+void loop()
+{
   if(0)
   {
     // alternate strong and unstrong
@@ -45,7 +46,7 @@ void loop()
     }
   }
 
-  if(1)
+  if(0)
   {
     Serial.println("non linear ramping...");
     for(int i = 0; i < 256; ++i )
@@ -67,7 +68,7 @@ void loop()
     }
   }
 
-  if(1)
+  if(0)
   {
     Serial.println("very slow ramping...");
     analogWrite(9, 0);
@@ -76,6 +77,19 @@ void loop()
     {
       analogWrite(9, i);
       delay(1000); // on 20 sec
+    }
+  }
+  if(1)
+  {
+    // alternate strong on every of three
+    Serial.println("alternate 3");
+    for(int i = 0; i <3; ++i )
+    {
+      Serial.println(i);
+      analogWrite(8+i, 255);
+      delay(2000);
+      analogWrite(8+i, 0);
+      delay(100);
     }
   }
 }

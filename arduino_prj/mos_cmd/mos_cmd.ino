@@ -13,6 +13,8 @@ void setup()
   
   Serial.println("INF: MOS Cmd v0.2");
 
+  pinMode(LED_BUILTIN, OUTPUT);
+
   for(int i = 0; i < 256; ++i )
   {
     int n = nonlinear_ramp(i);
@@ -87,9 +89,28 @@ void loop()
     {
       Serial.println(i);
       analogWrite(8+i, 255);
+      digitalWrite(LED_BUILTIN, HIGH);
       delay(2000);
       analogWrite(8+i, 0);
+      digitalWrite(LED_BUILTIN, LOW);
       delay(100);
+    }
+  }
+
+  if(0)
+  {
+    // alternate strong on 1 for 10 sec then 2 off
+    Serial.println("x0 and 2");
+    for(int i = 0; i <3; ++i )
+    {
+      Serial.println("x0");
+      analogWrite(8, 255);
+      digitalWrite(LED_BUILTIN, HIGH);
+      delay(60000);
+      Serial.println("2");
+      analogWrite(8+i, 0);
+      digitalWrite(LED_BUILTIN, LOW);
+      delay(2000);
     }
   }
 }

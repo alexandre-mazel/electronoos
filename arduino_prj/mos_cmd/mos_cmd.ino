@@ -13,7 +13,7 @@ void setup()
 {
     Serial.begin( 57600 );
 
-    Serial.println("INF: MOS Cmd v0.3" );
+    Serial.println( "INF: MOS Cmd v0.3" );
 
     pinMode( LED_BUILTIN, OUTPUT );
 
@@ -34,33 +34,33 @@ void loop()
     {
         // alternate strong and unstrong
         Serial.println("full");
-        analogWrite(9, 255);
+        analogWrite( FIRST_PWM_PIN, 255 );
         delay(5000);
         Serial.println("quarter");
-        analogWrite(9, 60);
+        analogWrite( FIRST_PWM_PIN, 60 );
         delay(5000);
         Serial.println("off");
-        analogWrite(9, 0);
+        analogWrite( FIRST_PWM_PIN, 0 );
         delay(5000);
     }
 
     if(0)
     {
         Serial.println("ramping...");
-        for(int i = 0; i < 256; ++i )
+        for( int i = 0; i < 256; ++i  )
         {
-            analogWrite(9, i);
-            delay(40); // on 10 sec
+            analogWrite( FIRST_PWM_PIN, i );
+            delay(40); // total: 10 sec
         }
     }
 
     if(0)
     {
         Serial.println("non linear ramping...");
-        for(int i = 0; i < 256; ++i )
+        for( int i = 0; i < 256; ++i  )
         {
-            analogWrite(9, nonlinear_ramp(i));
-            delay(40); // on 10 sec
+            analogWrite( FIRST_PWM_PIN, nonlinear_ramp(i) );
+            delay(40); // total: 10 sec
         }
     }
 
@@ -69,10 +69,10 @@ void loop()
         Serial.println("slow ramping...");
         analogWrite(9, 0);
         delay(500);
-        for(int i = 0; i < 50; ++i )
+        for( int i = 0; i < 50; ++i  )
         {
-            analogWrite(9, i);
-            delay(200); // on 10 sec
+            analogWrite( FIRST_PWM_PIN, i );
+            delay(200); // total: 10 sec
         }
     }
 
@@ -81,10 +81,10 @@ void loop()
         Serial.println("very slow ramping...");
         analogWrite(9, 0);
         delay(500);
-        for(int i = 0; i < 20; ++i )
+        for( int i = 0; i < 20; ++i  )
         {
-            analogWrite(9, i);
-            delay(1000); // on 20 sec
+            analogWrite( FIRST_PWM_PIN, i );
+            delay(1000); // total: 20 sec
         }
     }
   
@@ -92,31 +92,31 @@ void loop()
     {
         // alternate strong on every of three
         Serial.println("alternate 3");
-        for(int i = 0; i <3; ++i )
+        for( int i = 0; i < 3; ++i  )
         {
             Serial.println(i);
-            analogWrite(FIRST_PWM_PIN+i, 255);
-            digitalWrite(LED_BUILTIN, HIGH);
+            analogWrite( FIRST_PWM_PIN+i, 255 );
+            digitalWrite( LED_BUILTIN, HIGH );
             delay(2000);
-            analogWrite(FIRST_PWM_PIN+i, 0);
-            digitalWrite(LED_BUILTIN, LOW);
+            analogWrite( FIRST_PWM_PIN+i, 0 );
+            digitalWrite( LED_BUILTIN, LOW );
             delay(100);
         }
     }
 
     if(0)
     {
-        // alternate strong on 1 for x0 sec then 2 off
+        // alternate strong on heater number 1 for x0 sec (eg 60sec), then 2 off
         Serial.println("x0 and 2");
-        for(int i = 0; i <3; ++i )
+        for( int i = 0; i < 3; ++i  )
         {
             Serial.println("x0");
-            analogWrite(FIRST_PWM_PIN, 255);
-            digitalWrite(LED_BUILTIN, HIGH);
+            analogWrite( FIRST_PWM_PIN, 255 );
+            digitalWrite( LED_BUILTIN, HIGH );
             delay(60000);
             Serial.println("2");
-            analogWrite(FIRST_PWM_PIN+i, 0);
-            digitalWrite(LED_BUILTIN, LOW);
+            analogWrite( FIRST_PWM_PIN+i, 0 );
+            digitalWrite( LED_BUILTIN, LOW );
             delay(2000);
         }
     }

@@ -13,6 +13,7 @@ import misctools
 
 def replaceNameReplaceByNonAccentuatedChars(s):
     trans = [
+                    # ne pas mettre d'underscore ici
                     ( "\\N{LATIN CAPITAL LETTER E WITH ACUTE}", "E" ),
                     ( "\\N{LATIN CAPITAL LETTER E WITH GRAVE}", "E" ),
                     ( "\\N{LATIN CAPITAL LETTER E WITH CIRCUMFLEX}", "E" ),
@@ -21,8 +22,11 @@ def replaceNameReplaceByNonAccentuatedChars(s):
                     ( "\\N{LATIN SMALL LETTER A WITH GRAVE}", "a" ),
                     ( "\\N{LATIN SMALL LETTER C WITH CEDILLA}", "c" ),
                     ( "\\N{LATIN SMALL LETTER E WITH ACUTE}", "e" ),
+                    ( "\\N{LATIN SMALL LETTER E WITH DIAERESIS}", "e" ),
+                    ( "\\N{COMBINING ACUTE ACCENT}", "e" ),
                     ( "\\N{LATIN SMALL LETTER E WITH GRAVE}", "e" ),
                     ( "\\N{LATIN SMALL LETTER I WITH CIRCUMFLEX}", "i" ),
+                    ( "\\N{LATIN SMALL LETTER N WITH TILDE}", "n" ),
                     ( "\\N{LATIN SMALL LETTER O WITH CIRCUMFLEX}", "o" ),
                     ( "\\N{LEFT SINGLE QUOTATION MARK}", "'" ),
                     ( "\\N{RIGHT SINGLE QUOTATION MARK}", "'" ),
@@ -40,11 +44,26 @@ def replaceNameReplaceByNonAccentuatedChars(s):
                     ( "\\N{BULLET}", "o" ),
                     ( "\\N{DEGREE SIGN}", "o" ),
                     ( "\\N{FLEXED BICEPS}", "" ),
+                    ( "\\N{BLACK RIGHT-POINTING POINTER}", "-" ),
+                    ( "\\N{BLACK LEFT-POINTING POINTER}", "-" ),
+                    ( "\\N{FIREWORKS}", "-" ),
+                    ( "\\N{BIG SOLIDUS}", "-" ),
                     
                 ]
     for a,b in trans:
         s = s.replace(a,b)
     return s
+    
+def cleanTitle( strTitle ):
+    while " - pupu" in strTitle:
+        strTitle = strTitle.replace( " - pupu", "" )
+    for strAtEnd in [ "- pup", "- pu", "- p" ]:
+        if strTitle[-len(strAtEnd):] == strAtEnd:
+            strTitle = strTitle[:-len(strAtEnd)]
+    while "  " in strTitle:
+        strTitle = strTitle.replace( "  ", " " )
+    strTitle = strTitle.strip()
+    return strTitle
 
 
 def getParentWindow( hWnd ):
@@ -138,6 +157,7 @@ def run_statis():
         strTitle = strTitle.encode("ascii", errors="namereplace").decode("ascii")
         strTitle = strTitle.replace( " * ", " - " ) # for unsaved document in scite
         strTitle = replaceNameReplaceByNonAccentuatedChars(strTitle)
+        strTitle = cleanTitle( strTitle )
         
         bPrivate = False
         if "Mozilla Firefox (navigation privee)" in strTitle:
@@ -155,7 +175,7 @@ def run_statis():
                 # seems like we stay 1 sec more on this window
                 statis3.addTime(strTitle,rTimeLoopSec)
 
-        if int(time.time())%20 == 0:
+        if int(time.time())%20 == 0 and 0:
             statis3.printAll()
             
         if time.time() - timeLastSave > 60:

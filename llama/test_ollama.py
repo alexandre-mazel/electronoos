@@ -5,7 +5,7 @@ import json
 import time
 import os
 
-# using a running ollana instance server
+# using a running ollama instance server
 # models seems to be stored (windows) in C:\Users\alexa\.ollama\models\blobs
 
 url = "http://localhost:11434/api/chat"
@@ -13,9 +13,80 @@ strModel = "llama3.2:1B" # size: 1.3GB, running: 2.2GB
 strModel = "llama3.2" # 3B? #size:  2.0GB, running: 3.5GB
 #~ strModel = "llama3.1:8B" # size: 4.7GB, running: 6.3GB
 #~ strModel = "llama3.1:8B-instruct" # size: 4.7GB, running: 6.3GB  # no size
+strModel = "llama3.3:70B" # size: GB, running:   # no size
 
 # todo test avec plus gros contexte:
 #   "options": {"num_ctx": 256000}
+
+# lister les modeles installé:
+# ollama list
+
+# voir les modeles existants:
+# https://ollama.com/library
+
+# pour recuperer d'autres modeles:
+# ollama pull llama3.3:70B
+
+
+"""
+Sur linux (eg: azure):
+# methode rapide:
+curl -fsSL https://ollama.com/install.sh | sh
+
+ou sinon, cf https://www.linuxtricks.fr/wiki/ia-installer-un-modele-de-langage-llm-avec-ollama
+
+wget https://ollama.com/download/ollama-linux-arm64.tgz
+tar -C /usr -xvzf ollama-linux-amd64.tgz
+
+# Dans le cas d'une carte graphique AMD, on récupère des éléments additionnels :
+wget https://ollama.com/download/ollama-linux-amd64-rocm.tgz
+tar -C /usr -xvzf ollama-linux-amd64-rocm.tgz
+
+# chargé le serveur a la main:
+/usr/bin/ollama serve # ou juste ollama serve
+
+# les modeles sont stocké dans:
+/usr/share/ollama/.ollama/models
+
+# test rapide:
+ollama run llama3 "Résume moi Cyrano de Bergerac"
+# or 
+# ollama run llama3.2 "Summarize the following text:" < long-document.txt
+# or
+# ollama run llama3.2 "Analyze the sentiment of this customer review: 'The product is fantastic, but delivery was slow.'"
+# or
+# ollama run llava "What's in this image? /Users/jmorgan/Desktop/smile.png"
+# or
+# ollama run llama3.2 "12 * 483 = 5796. Quels sont les autres ?"
+ollama run deepseek-coder:6.7b "12 * 483 = 5796. Quels sont les autres ? Donne moi aussi le code python"
+
+q:
+"genere moi une liste de paire de mot et de leur définition. Le format sera pour chaque ligne, un mot le caractere : puis sa définition. tout les mots doivent etre choisis dans le programme de NSI de premiere chapitre des collections et données en tables en python"
+
+# semble ne marcher qu'avec llava
+ollama run llava "What's in this image? /home/na/dev/git/electronoos/data/inconnus.jpg"
+ollama run llava "Que vois-t-on dans cette image? /home/na/dev/git/electronoos/data/inconnus.jpg"
+ollama run llava "What's in this image? /home/na/dev/git/electronoos/data/keys.jpg"
+ollama run llava "Que vois-t-on dans cette image? /home/na/dev/git/electronoos/data/keys.jpg"
+ollama run llava "What's in this image? /home/na/dev/git/electronoos/llama/guess.jpg"
+ollama run llama3.2-vision:11b "What's in this image? /home/na/dev/git/electronoos/llama/guess.jpg"
+
+# par defaut il ecoute sur 11434:
+ss -unplat | grep 11434
+
+# pour qu'il ecoute sur toutes les ips:
+export "OLLAMA_HOST"=0.0.0.0 # non testé 
+
+# pour supprimer du serveur:
+rm /usr/bin/ollama
+rm -r /usr/share/ollama
+rm -r /usr/lib/ollama
+
+ollama run llama3.3:70B "Résume moi Cyrano de Bergerac"
+Error: model requires more system memory (45.5 GiB) than is available (5.5 GiB)
+Error: model requires more system memory (43.7 GiB) than is available (30.4 GiB) (sur une machine a 32Go)
+# ok sur une machine a 64GB
+"""
 
 class Conversation:
     
@@ -152,4 +223,11 @@ p = "summarize me this text: Le lycée doit son nom à l'écrivain et philosophe Vo
 #~ print(response)
 
 loop_dialog("Alexandre")
+
+"""
+cf test_ollama_results.txt for the result
+
+
+
+"""
 

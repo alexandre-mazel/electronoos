@@ -2,7 +2,7 @@
 name = "website"
 version = "2.1.0"
 description = ""
-authors = ["Yannick Mulot <yannick.mulot@ac-creteil.fr>"]
+authors = ["Alexandre Mazel <alexandre.mazel@ac-paris.fr>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]

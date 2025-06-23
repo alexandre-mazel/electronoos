@@ -1,0 +1,143 @@
+#include <SPI.h>
+#include <Ethernet2.h>
+
+// Enter a MAC address and IP address for your controller below.
+// The IP address will be dependent on your local network.
+// gateway and subnet are optional:
+// http://www.instructables.com/id/How-to-measure-Arduino-network-performance/
+// On windows CMD: iperf -c 192.168.22.117 -w 16k -t 20 -i 2
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+IPAddress ip(192, 168, 22, 117);
+IPAddress gateway(192, 168, 22, 1);
+IPAddress dns_server(192, 168, 22, 1);
+IPAddress subnet(255, 255, 0, 0);
+EthernetServer server(5001);
+
+void setup() {
+
+  Ethernet.begin(mac, ip);
+  server.begin();
+  Serial.begin(9600);
+  while (!Serial) {
+  }
+
+  Serial.print("Iperf server address : ");
+  Serial.println(Ethernet.localIP());
+  Serial.println(" ");
+
+}
+
+void loop() {
+  byte buf[1024];
+  EthernetClient client = server.available();
+  if (client) {
+    Serial.println("Here is new client for check arduino performance");
+    while (client.connected()) {
+      if (client.available()) client.read(buf, 1024);
+    }
+    client.stop();
+    Serial.println("client disonnected");
+  }
+}
+
+
+/*
+danielt514
+Jun 2018post #1
+
+Hi,
+
+I got a W5500 on a Mega board. (pin 10 is used as SS). 2.66 Mbits/sec
+Also tested on ESP32 WI-FI 13.0 Mbits/sec
+Ethernet LAN8720 ESP32 36 Mbits/sec
+W5500 ESP32 12 Mbits/sec Good enough for me!
+All fine but i am curiour about my results using iperf to test it, can you try some Ethernet setups and share the results with this iperf code?
+
+Thanks
+
+#include <SPI.h>
+#include <Ethernet2.h>
+
+// Enter a MAC address and IP address for your controller below.
+// The IP address will be dependent on your local network.
+// gateway and subnet are optional:
+// http://www.instructables.com/id/How-to-measure-Arduino-network-performance/
+// On windows CMD: iperf -c 192.168.22.117 -w 16k -t 20 -i 2
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+IPAddress ip(192, 168, 22, 117);
+IPAddress gateway(192, 168, 22, 1);
+IPAddress dns_server(192, 168, 22, 1);
+IPAddress subnet(255, 255, 0, 0);
+EthernetServer server(5001);
+
+void setup() {
+
+  Ethernet.begin(mac, ip);
+  server.begin();
+  Serial.begin(9600);
+  while (!Serial) {
+  }
+
+  Serial.print("Iperf server address : ");
+  Serial.println(Ethernet.localIP());
+  Serial.println(" ");
+
+}
+
+void loop() {
+  byte buf[1024];
+  EthernetClient client = server.available();
+  if (client) {
+    Serial.println("Here is new client for check arduino performance");
+    while (client.connected()) {
+      if (client.available()) client.read(buf, 1024);
+    }
+    client.stop();
+    Serial.println("client disonnected");
+  }
+}
+
+On windows CMD:
+
+iperf -c 192.168.22.117 -w 16k -t 20 -i 2
+
+My results W5500/Mega:
+C:\Users\Quad>iperf -c 192.168.22.117 -w 16k -t 20 -i 2
+Client connecting to 192.168.22.117, TCP port 5001
+TCP window size: 16.0 KByte
+
+[ 3] local 192.168.22.115 port 50366 connected with 192.168.22.117 port 5001
+[ ID] Interval Transfer Bandwidth
+[ 3] 0.0- 2.0 sec 768 KBytes 3.15 Mbits/sec
+[ 3] 2.0- 4.0 sec 640 KBytes 2.62 Mbits/sec
+[ 3] 4.0- 6.0 sec 640 KBytes 2.62 Mbits/sec
+[ 3] 6.0- 8.0 sec 640 KBytes 2.62 Mbits/sec
+[ 3] 8.0-10.0 sec 640 KBytes 2.62 Mbits/sec
+[ 3] 10.0-12.0 sec 640 KBytes 2.62 Mbits/sec
+[ 3] 12.0-14.0 sec 640 KBytes 2.62 Mbits/sec
+[ 3] 14.0-16.0 sec 640 KBytes 2.62 Mbits/sec
+[ 3] 16.0-18.0 sec 640 KBytes 2.62 Mbits/sec
+[ 3] 18.0-20.0 sec 640 KBytes 2.62 Mbits/sec
+[ 3] 0.0-20.1 sec 6.38 MBytes 2.66 Mbits/sec
+
+On ESP32 WI-FI:
+C:\Users\Quad>iperf -c 192.168.22.143 -w 16k -t 20 -i 2 -p 5001
+Client connecting to 192.168.22.143, TCP port 5001
+TCP window size: 16.0 KByte
+
+[ 3] local 192.168.22.115 port 52743 connected with 192.168.22.143 port 5001
+[ ID] Interval Transfer Bandwidth
+[ 3] 0.0- 2.0 sec 2.50 MBytes 10.5 Mbits/sec
+[ 3] 2.0- 4.0 sec 3.00 MBytes 12.6 Mbits/sec
+[ 3] 4.0- 6.0 sec 3.12 MBytes 13.1 Mbits/sec
+[ 3] 6.0- 8.0 sec 3.12 MBytes 13.1 Mbits/sec
+[ 3] 8.0-10.0 sec 3.00 MBytes 12.6 Mbits/sec
+[ 3] 10.0-12.0 sec 2.88 MBytes 12.1 Mbits/sec
+[ 3] 12.0-14.0 sec 3.38 MBytes 14.2 Mbits/sec
+[ 3] 14.0-16.0 sec 3.38 MBytes 14.2 Mbits/sec
+[ 3] 16.0-18.0 sec 3.38 MBytes 14.2 Mbits/sec
+[ 3] 18.0-20.0 sec 3.38 MBytes 14.2 Mbits/sec
+[ 3] 0.0-20.0 sec 31.1 MBytes 13.0 Mbits/sec
+
+
+*/

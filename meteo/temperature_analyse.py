@@ -1,12 +1,14 @@
 # analyse temperature file (from meteo website)
-
+# sur rpi4
 # scp -P 14092 na@thenardier.fr:/home/na/save/temperature.txt C:/Users/alexa/dev/git/electronoos/meteo/data/
 
 import sys
 
 sys.path.append("../../obo/spider/")
+sys.path.append("../alex_pytools/")
 
 import common
+import misctools
 import retrieve_pop3
 
 class HelperStat:
@@ -83,6 +85,11 @@ def isListIn(word,list):
     return False
 
 def analyse(strFilename):
+    """
+    Compute best place to live AND
+    return a list of dictionnary of values, eg: ("location","temperature") => list of values = [year, month,day, hour, min, value]
+    """
+    bVerbose = 1
     bVerbose = 0
     
     f = open(strFilename,"rb")
@@ -95,6 +102,8 @@ def analyse(strFilename):
     
     strStartDate = ""
     strStopDate = ""
+    
+    dict_out = {} # the dict to return
 
     
     nNumLine = 0
@@ -115,8 +124,16 @@ def analyse(strFilename):
         strCity = strCity.decode()
         strYear = strDate[0:4]
         strMonth = strDate[5:7]
+        strDay = strDate[8:10]
         strHour = strTime[0:2]
         nHour = int(strHour)
+        strMin =  strTime[3:4]
+        nMin = int(strMin)
+        
+        if strYear == "\x00\x00\x00\x00":
+            print("ERR: year is zeroed")
+            continue
+
         if bVerbose: print("nHour: %s" % nHour)
         
         nTemp = int(strTemp)
@@ -132,21 +149,50 @@ def analyse(strFilename):
         strWeather = "?"
         bRain = 0
         bSnow = 0
+        bSun = 0
+        nCondition = -1 # etat du plus au moins sympa, -1: unknown, 1: pluie, 2: neige, 3: nuage, 4: soleil
         if len(datas)>4:
             strWeather = datas[4].decode()
             strWeatherLo = strWeather.lower()
+            
+            if bVerbose: print( "DBG: strWeatherLo: '%s'" % strWeatherLo )
+            
+            nCondition = 3
+            
             if isListIn(strWeatherLo, ["pluie", "averse", "bruine", "orage", "cipitation"] ):
-                bRain = 1
+                bRain = True
+                nCondition = 1
             if isListIn(strWeatherLo, ["neige"] ):
-                bSnow = 1
+                bSnow = True
+                nCondition = 2
+            if isListIn(strWeatherLo, ["soleil","beau","ciel degage"] ):
+                bSun = True
+                nCondition = 4
+                
+            if bVerbose: 
+                if not bRain and not bSnow and not bSun:
+                    print( "DBG: check it is nuage: '%s'" % strWeatherLo )
+
         bRainOrSnow = bRain or bSnow
         occWeather.add(strWeather)
-        
+
+
+                
         if "Beziers" in strCity:
-            print(datas)
+            if bVerbose: print(datas)
         
         
         if bVerbose: print("bNight: %s" % bNight)
+        
+        # prepare data to be outtputed
+        dataToPost = ( int(strYear), int(strMonth), int( strDay) , nHour, nMin)
+        for namevalue,value in ( ("temp",nTemp), ("condition", nCondition) ):
+            key = (strCity,namevalue)
+            if not key in dict_out:
+                dict_out[key] = []
+            dict_out[key].append( dataToPost + (value,) )
+
+            
             
         bNewDay = 0 # new matinee
         
@@ -309,6 +355,8 @@ def analyse(strFilename):
     
     f.close()
     
+    return dict_out
+    
 # analyse - end
         
         
@@ -348,10 +396,47 @@ St Malo:
 [-283, 101, 384]
 """
     
-# a faire: par equipe de 2: quel est la meilleur combinaison par mois
+# a faire: par equipe de 2: quelle est la meilleur combinaison par mois
     
     
     
-    
-strFilename = "data/temperature.txt"
-analyse(strFilename)
+if __name__ == "__main__":
+    strFilename = "data/temperature.txt"
+    datas = analyse(strFilename)
+    if 1:
+        print("")
+        print("render_all_datas bloc begin")
+        import temperature_office_analyse
+        
+        # affiche les 3 derniers jours:
+        y,m,d = misctools.getDay()
+        
+        if 0:
+            temperature_office_analyse.render_all_datas(datas,y,m,d-3)
+        
+        if 0:
+            # affiche les 3 derniers jours de plusieurs donnees tout melange sur un seul graphe
+            temperature_office_analyse.render_all_datas(datas,y,m,d-3, sameGraphList = [("Beziers","temp"),("Le Kremlin-Bicetre","temp")])
+        
+        if 0:
+            # affiche la comparaison entre temp du kb from la meteo et mon jardin
+            strFilename = "data/webdata.txt"
+            added_datas = temperature_office_analyse.decode_file_sonde(strFilename)
+            datas.update(added_datas)
+            datas_of_interest = [("Le Kremlin-Bicetre","temp"),("Beziers","temp"),("MisBKit3","temp"),("MisBKit4","temp"),("MisBKit4","temp2") ]
+            #~ datas_of_interest.append(("MisBKit3","humid"))
+            if 1:
+                strFilename = "data/office_temperature.txt"
+                added_datas = temperature_office_analyse.decode_file_sonde(strFilename)
+                datas.update(added_datas)
+                datas_of_interest.append(("armoire","temp"))
+            temperature_office_analyse.render_all_datas(datas,y,m,d-2, sameGraphList = datas_of_interest)
+        
+        if 1:
+            # affiche la temperature du jardin dans la boite, hors de la boite et officielle.
+            strFilename = "data/webdata.txt"
+            added_datas = temperature_office_analyse.decode_file_sonde(strFilename)
+            datas.update(added_datas)
+            datas_of_interest = [("Le Kremlin-Bicetre","temp"),("ESP32_C01","temp10"),("ESP32_C01","temp11"),("armoire","temp") ] # armoire s'affiche plus ?
+
+            temperature_office_analyse.render_all_datas(datas,y,m,d-3, sameGraphList = datas_of_interest)

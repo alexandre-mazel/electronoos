@@ -30,11 +30,15 @@ nav:
           - TP2 - Identité numérique et cyber-violence: snt/03-reseaux-sociaux/tp2_identite_numerique_et_cyberviolence.md
       - Chapitre 4 - Donn&eacute;es et traitements:
           - TP1 - Turtle en Python: snt/04-processing/tp1_python_turtle.md
+          - TP2 - Turtle en Python - Utilisation de boucles et fonctions: snt/04-processing/tp2_python_turtle2.md
+          - TP3 - Compute IT! - Python c'est vous: snt/04-processing/tp3_python_compute_it.md
+  
       #~ - Chapitre 4 - Les données structurées:
           #~ - TP1 - Données ouvertes: snt/04-donnees-structurees/tp1-donnees-ouvertes.md
           #~ - TP2 - Les métadonnées:  snt/04-donnees-structurees/tp2-metadonnees.md
           #~ - TP3 - Stockage sur le Cloud: snt/04-donnees-structurees/tp-stockage-cloud.md
-      #~ - Chapitre 5 - Photographie numérique:
+      - Chapitre 5 - Photographie numérique:
+          - TP1 - Manipulation d'une image: snt/05-photographie-numerique/tp1-manipulation-image_capytale.md
           #~ - TP1 - Manipulation d'une image: snt/05-photographie-numerique/tp1-manipulation-image.md
           #~ - TP2 - Retouche d'une image: snt/05-photographie-numerique/tp-retouche-image.md
       #~ - Chapitre 6 - Cartographie:
@@ -43,8 +47,6 @@ nav:
       - nsi1re/index.md
       - Chapitre 5 - Architecture:
           - TP1 - Architecture d'un ordinateur : nsi1re/05-archi/tp1-compos_ordi.md
-      - Extras:
-          - Initiation à pygame: nsi1re/0X-extras/01_initiation_pygame.md
       #~ - Chapitre 1 - Langages du Web:
           #~ - TP1 - Création d'une page web: nsi1re/01-langages-web/tp1-creation-page-web.md
       #~ - Chapitre 2 - Architecture des ordinateurs:
@@ -66,8 +68,11 @@ nav:
           #~ - TP1 - Les données EXIF: nsi1re/11-dictionnaires/tp1-donnees-exif.md
           #~ - TP2 - Compteur de mots: nsi1re/11-dictionnaires/tp2-compteur-mots.md
           #~ - TP3 - Format JSON: nsi1re/11-dictionnaires/tp3-format-json.md
-      #~ - Chapitre 12 - Données en table:
+      - Chapitre 8 - Languages:
+          - TP1 - Assembleur: nsi1re/08-languages/tp1-assembleur1.md
+      - Chapitre 12 - Données en table:
           #~ - Cours: nsi1re/12-tables/cours.md
+          - Fichiers CSV: nsi1re/12-tables/csv.md
       #~ - Chapitre 14 - Le Web:
           #~ - Installation de PHP: nsi1re/14-web/langage-php.md
           #~ - TP1 - Formulaire HTML: nsi1re/14-web/tp1-formulaire-html.md
@@ -76,6 +81,9 @@ nav:
           #~ - Projet 1 - Présentez-vous: nsi1re/projets/prj-presentez-vous.md
           #~ - Projet 2 - Paysage aléatoire: nsi1re/projets/prj-paysage.md
           #~ - Projet 3 - Tableau 2D: nsi1re/projets/prj-tableau-2d.md
+          
+      - Extras:
+          - Initiation à pygame: nsi1re/0X-extras/01_initiation_pygame.md
 #~ not_in_nav: |
   #~ snt/02-web/prj-minisite-faq.md
   

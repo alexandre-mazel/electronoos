@@ -1,8 +1,10 @@
 #include <LiquidCrystal.h>
+#include <LiquidCrystal_I2C.h>
 
 #define PIN_POTAR_BASE  A10 // first pin of the series
 #define PIN_SW_BASE     30
-#define PIN_SWTRI_BASE  40
+//#define PIN_SWTRI_BASE  40
+const unsigned char SWTRI_PIN[] = {38,45,41,40,39,44}; // due to a broken switch i've messed all wire, and now they aren't contiguous
 
 
 #define NBR_POTAR   3
@@ -13,16 +15,18 @@
 
 #define NBR_MOTORS  3
 
+#define PIN_DIST_IR 8 // 8 is for D8
 
-#include <LiquidCrystal_I2C.h>
 
-bool i2CAddrTest(uint8_t addr) {
-  Wire.begin();
-  Wire.beginTransmission(addr);
-  if (Wire.endTransmission() == 0) {
-    return true;
-  }
-  return false;
+bool i2CAddrTest(uint8_t addr) 
+{
+    Wire.begin();
+    Wire.beginTransmission( addr );
+    if( Wire.endTransmission() == 0 ) 
+    {
+        return true;
+    }
+    return false;
 }
 
 LiquidCrystal_I2C * pLcd = NULL;
@@ -75,6 +79,8 @@ void countFps()
 void setup()
 {
   Serial.begin(57600);
+  
+  Serial.print("INF: TCA IHM v1.0");
 
   for( int i = 0; i < NBR_POTAR; ++i )
   {
@@ -88,7 +94,9 @@ void setup()
 
   for( int i = 0; i < NBR_SWTRI*2; ++i )
   {
-    pinMode( PIN_SWTRI_BASE+i, INPUT );
+    //pinMode( PIN_SWTRI_BASE+i, INPUT );
+    pinMode( SWTRI_PIN[i], INPUT );
+    
   }
 
   uint8_t i2cAddr = 0x3F;
@@ -104,6 +112,8 @@ void setup()
 
   pLcd->init();                // initialize the lcd
   pLcd->backlight();           // Turn on backlight // sans eclairage on voit rien...
+
+  pinMode( PIN_DIST_IR, INPUT );
   
   Serial2.begin(57600);
 
@@ -202,6 +212,46 @@ void lcdPrint(float r)
   
 }
 
+int16_t avg_dist = 0;
+
+int16_t get_dist_ir( const int nPin )
+{
+  int16_t t = pulseIn(nPin, HIGH);
+ 
+  if (t == 0)
+  {
+    // pulseIn() did not detect the start of a pulse within 1 second.
+    Serial.println("timeout");
+    return -1;
+  }
+
+  if (t > 1850)
+  {
+    // No detection.
+    Serial.println(-1);
+    return -1;
+  }
+
+  // Valid pulse width reading. Convert pulse width in microseconds to distance in millimeters.
+  int16_t dist = (t - 1000) * 4;
+
+  // Limit minimum distance to 0.
+  if (dist < 0) { dist = 0; }
+
+  // cf pololu_dist_IR for explaination
+
+  //dist = (dist + 28.416 ) / 1.7241;
+  dist = (dist + 2 ) / 1.70; // based on pololu_distance_measurement_reglin.py en s'arretant a 700 (inclus)
+  //dist = (dist + 20 ) / 1.77; // based on pololu_distance_measurement_reglin.py en s'arretant a 600 (inclus) (moins bon pour 100 mais meilleur pour les autres)
+
+
+  //dist ; // I calibrate with a blue box, but it seems to be a different result with the black slider
+
+  avg_dist = ( avg_dist * 5 + dist * 1 ) / 6; // a 130cm de max, ca fait 1300mm, donc en max pour ne pas depasser int16, il ne faut pas filtrer a plus de 24
+
+  return avg_dist;
+}
+
 float rNbrTwist = 0;
 float rNbrTwistLimit = 1000;
 int nNbrTwistSpeed = 500;
@@ -217,16 +267,31 @@ float rNbrSpoolLimit = 1000;
 int nNbrSpoolSpeed = 100;
 int nSpoolDir = 0;
 
+float dist_slider_min = 170+50; // could be int, but all settings functions are taking float
+float dist_slider_max = 370-50;
+const int nAutomaticSpoolRotationSpeedInit = 30;
+int nAutomaticSpoolRotationSpeed = nAutomaticSpoolRotationSpeedInit;
+bool bAutomaticSpoolMode = 0;
+long int timeNextAutomaticSpoolSpeedChangePossible = 0;  // we don't want to change speed to often
+
+float dist_slider_target = 500; // was 500; // was 270
+int last_dist_slider = -1;
+long int last_time_dist_pos = millis();
+
 // array of pointer to help algorithm and settings
-float * aprPosArray[] = {&rNbrTwist,&rNbrCollect,&rNbrSpool};
+float * aprPosArray[] = {&rNbrTwist,&rNbrCollect,&rNbrSpool,&dist_slider_min,&dist_slider_max};
 float * aprLimitArray[] = {&rNbrTwistLimit,&rNbrCollectLimit,&rNbrSpoolLimit};
 int * apnSpeedArray[] = {&nNbrTwistSpeed,&nNbrCollectSpeed,&nNbrSpoolSpeed};
 int * apnDirArray[] = {&nTwistDir,&nCollectDir,&nSpoolDir};
 // Switch routing
-int   anSwIndex[] = {1, 0, 2, 3}; // order is turbo, select, +, -
+int   anSwIndex[] = {3, 1, 2, 0}; // order is turbo, select, +, -
 // TriSwich routing
-int   anTriSwIndex[] = {2,1,0}; // how ordered are the triswitch compared to the motor number, anTriIndex[2] = 0 => the third tri switch is related to the twisting motor
-int   anTriSwInverted[] = {-1,1,1}; // invert direction (miscabled) anTriSwInverted[0] = -1: the first switch is reverted
+//int   anTriSwIndex[] = {2,0,1}; // how ordered are the triswitch compared to the motor number, anTriIndex[2] = 0 => the third tri switch is related to the twisting motor
+//int   anTriSwInverted[] = {-1,1,1}; // invert direction (miscabled) anTriSwInverted[0] = -1: the first switch is reverted
+int   anTriSwIndex[] = {0,1,2};
+int   anTriSwInverted[] = {-1,1,1}; // 1 or -1
+
+int   anPotarIndex[] = {2,1,0};
 
 int nNumLineEdited = 3;
 float * prEdited = aprLimitArray[0];
@@ -237,9 +302,13 @@ bool bMotor1_sign = 0;
 bool bPrevPush1 = 0;
 bool bPrevPush2 = 0;
 
+bool bTurboIsOn = 0;
+
 int anPrevReadValues[NBR_SENSORS];
 
 long int nPrevTimeIntoLoop = 0;
+
+int bWasCollecting = 0;
 
 void loop()
 {
@@ -254,18 +323,26 @@ void loop()
 
   for( int i = 0; i < NBR_POTAR; ++i )
   {
-    anReadValues[i] = analogRead(PIN_POTAR_BASE+i);
+    anReadValues[i] = analogRead(PIN_POTAR_BASE+anPotarIndex[i]);
     if(abs(anReadValues[i] - anPrevReadValues[i])>1) // avoid spurious change
     {
       if(i<2)
       {
-        int nVal = (int)( (anReadValues[i] *512L) / 1023);
+        int nVal = (int)( ((1023-anReadValues[i]) *512L) / 1023);
         nVal = (nVal / 4) * 4; // put entire step to help have same on both
         *(apnSpeedArray[i]) = nVal;
       }
       else
       {
-        *(apnSpeedArray[i]) = (int)( (anReadValues[i] *256L) / 1023); // put less to have more precision (was 20L)
+        if( bTurboIsOn ) // no change of speed when turbo is on (prevent bug: turbo is disabled by spurious potar change)
+        {
+          continue;
+        }
+        if( bAutomaticSpoolMode )
+        {
+          continue; // no change of potar when automatic spooling
+        }
+        *(apnSpeedArray[i]) = (int)( ((1023-anReadValues[i]) *256L) / 1023); // put less to have more precision (was 20L)
       }
       if(*apnDirArray[i] != 0)
         abSendMotorChange[i] = 1;
@@ -284,13 +361,33 @@ void loop()
         if( nSpoolDir != 0 )
         {
           int nMotor = 2;
-          int nTurbo = 4; // decide the turbo ratio
-          if(anReadValues[i+NBR_POTAR] == 0)
+          
+          if( 0 )
           {
-            nTurbo = 1;
+            // mode turbo is engaged just when pushing
+            int nTurbo = 4; // decide the turbo ratio
+            if(anReadValues[i+NBR_POTAR] == 0)
+            {
+              nTurbo = 1;
+            }
+            snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nSpoolDir,*apnSpeedArray[nMotor]*nTurbo);
+            sendSerialCommand(buf);
           }
-          snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nSpoolDir,*apnSpeedArray[nMotor]*nTurbo);
-          sendSerialCommand(buf);
+          else
+          {
+            // mode turbo is toggled by turbo switch
+            if(anReadValues[i+NBR_POTAR] == 1)
+            {
+              bTurboIsOn = ! bTurboIsOn;
+              int nNewSpeed = *apnSpeedArray[nMotor];
+              if( bTurboIsOn )
+              {
+                nNewSpeed = 400;
+              }
+              snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nSpoolDir,nNewSpeed);
+              sendSerialCommand(buf);
+            }
+          }
         }
       }
       else if (nSwitch == 1 && anReadValues[i+NBR_POTAR] )
@@ -322,10 +419,14 @@ void loop()
     }
   }
 
+  int nLooksLikeCollecting = 0; // 1: it has started, 2: time to stop
   for( int i = 0; i < NBR_SWTRI*2; ++i )
   {
-    anReadValues[i+NBR_POTAR+NBR_SW] = digitalRead(PIN_SWTRI_BASE+i) == HIGH;
+    //anReadValues[i+NBR_POTAR+NBR_SW] = digitalRead(PIN_SWTRI_BASE+i) == HIGH;
+    anReadValues[i+NBR_POTAR+NBR_SW] = digitalRead(SWTRI_PIN[i]) == HIGH;
+    
     int nMotor = anTriSwIndex[i/2];
+
     //Serial.print("mot: " ); Serial.print(nMotor); Serial.print(", sendchange:" ); Serial.println(abSendMotorChange[nMotor]);
     if(anReadValues[i+NBR_POTAR+NBR_SW] != anPrevReadValues[i+NBR_POTAR+NBR_SW] || (abSendMotorChange[nMotor]&&anReadValues[i+NBR_POTAR+NBR_SW]) ) // second &&, because we can enter the loop with the other direction of this triswitch
     {
@@ -335,13 +436,148 @@ void loop()
       {
         nDirection = 0;
       }
+      if( nMotor == 0 )
+      {
+        // when twisting it enables the automatic spool mode
+        int bPrevAuto = bAutomaticSpoolMode;
+        bAutomaticSpoolMode = nDirection != 0;
+        if( bAutomaticSpoolMode != bPrevAuto )
+        {
+          if( ! bAutomaticSpoolMode )
+          {
+            // we stop the automatic spool mode so let's stop the spool motor !
+            int nMotor = 2;
+            int nDirection = 0;
+            snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nDirection,nAutomaticSpoolRotationSpeed);
+            sendSerialCommand(buf);
+          }
+          else
+          {
+            nAutomaticSpoolRotationSpeed = nAutomaticSpoolRotationSpeedInit;
+          }
+        }
+      }
       *apnDirArray[nMotor] = nDirection;
       snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nDirection,*apnSpeedArray[nMotor]);
       sendSerialCommand(buf);
+      if( nMotor == 1 && 0)
+      {
+        Serial.println( *apnSpeedArray[nMotor] );
+        if( !bWasCollecting && *apnSpeedArray[nMotor] < 10 && *apnSpeedArray[nMotor] > 0 )
+        {
+          nLooksLikeCollecting = 1;
+        }
+        else if( bWasCollecting && *apnSpeedArray[nMotor] == 0 )
+        {
+          nLooksLikeCollecting = 2;
+        }
+      }
     }
   }
 
+  if( nLooksLikeCollecting != 0 && 0 )
+  {
+    Serial.print( "DBG: nLooksLikeCollecting:" ); Serial.println( nLooksLikeCollecting );
+    int nMotor = 0;
+    int nDirection = 1;
+    if(nLooksLikeCollecting == 1 )
+    {
+      *apnSpeedArray[nMotor] = 1;
+      bWasCollecting = 1;
+    }
+    else
+    {
+      *apnSpeedArray[nMotor] = 0;
+      bWasCollecting = 0;
+    }
+    snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nDirection,*apnSpeedArray[nMotor]);
+    sendSerialCommand(buf);
+    
+  }
+
+  int16_t dist_slider = get_dist_ir(PIN_DIST_IR);
+
   memcpy(anPrevReadValues,anReadValues,sizeof(anPrevReadValues));
+
+  if( bAutomaticSpoolMode && millis() > timeNextAutomaticSpoolSpeedChangePossible )
+  {
+    // automatic speed rotation
+    int nNewSpeed = nAutomaticSpoolRotationSpeed;
+    const int nMinSpeed = 0;
+    const int nMaxSpeed = 48;
+
+    /*
+    if( dist_slider > dist_slider_max )
+    {
+      nNewSpeed -= 2;
+      if( nNewSpeed < nMinSpeed )
+      {
+        nNewSpeed = nMinSpeed;
+      }
+    }
+    else if( dist_slider < dist_slider_min )
+    {
+      nNewSpeed += 4;
+      if( nNewSpeed > nMaxSpeed )
+      {
+        nNewSpeed = nMaxSpeed;
+      }
+    }
+    */
+
+    if( abs(dist_slider_target-dist_slider) > 10 && abs(rNbrTwist) > 500 )
+    {
+      if( last_dist_slider !=-1 ) // not first time
+      {
+        long int diff = dist_slider - last_dist_slider;
+        long int time_for_diff = millis() - last_time_dist_pos;
+        float diff_per_sec = ( diff * 1000 ) / time_for_diff;
+        int dist_bonus = 0;
+        if( abs(dist_slider_target-dist_slider) > 20)
+        {
+          //dist_bonus = (abs(dist_slider_target-dist_slider) - 20)/4;
+        }
+        if( dist_slider < dist_slider_target  )
+        {
+          if( diff_per_sec < 0 )
+          {
+            // we need to do something to increase dist and so inc speed
+            nNewSpeed += 2 + dist_bonus;
+            if( nNewSpeed > nMaxSpeed )
+            {
+              nNewSpeed = nMaxSpeed;
+            }
+          }
+        }
+        else
+        {
+         if( diff_per_sec > 0 )
+          {
+            // we need to do something to decrease dist and so reduce speed
+            nNewSpeed -= 2 + dist_bonus;
+            if( nNewSpeed < nMinSpeed )
+            {
+              nNewSpeed = nMinSpeed;
+            }
+          }
+        }
+      } // not first time
+      last_dist_slider = dist_slider;
+      last_time_dist_pos = millis();
+    }
+
+    if( nNewSpeed != nAutomaticSpoolRotationSpeed )
+    {
+      Serial.print( "DBG: NEW spool speed: " );
+      Serial.println( nNewSpeed );
+      nAutomaticSpoolRotationSpeed = nNewSpeed;
+      timeNextAutomaticSpoolSpeedChangePossible = millis() + 4000;
+      int nMotor = 2;
+      int nDirection = -1;
+      snprintf(buf,nSizeBuf, "MOTOR_%d_%d_%d",nMotor,nDirection,nAutomaticSpoolRotationSpeed);
+      sendSerialCommand(buf);
+    }
+  }
 
 
  // Serial.println(digitalRead(PIN_SW_BASE+0) == HIGH);
@@ -349,7 +585,7 @@ void loop()
   if((nNbrFrame%20)==0)
   //if(0)
   {
-    // debug
+    // debug buttons and potars
     Serial.print("DBG: values: ");
     for( int i = 0; i < NBR_SENSORS; ++i )
     {
@@ -372,6 +608,23 @@ void loop()
       Serial.print(anReadValues[i]);
       Serial.print(", ");
     }
+    Serial.println("");
+  }
+
+  if((nNbrFrame%20)==0)
+  //if(0)
+  {
+    // debug nbr turn and dist
+    Serial.print("DBG: pos motor: ");
+    for( int nMotor = 0; nMotor < NBR_MOTORS; ++nMotor )
+    {
+      Serial.print(*aprPosArray[nMotor]);
+      Serial.print(", ");
+    }
+    Serial.print("dist: ");
+    Serial.print(dist_slider);
+    Serial.print(", automatic: ");
+    Serial.print(bAutomaticSpoolMode);
     Serial.println("");
   }
 
@@ -406,29 +659,57 @@ void loop()
     pLcd->setCursor(0, 0);
     pLcd->print("Twi ");
     lcdPrint(rNbrTwist);
-    pLcd->print("/");
-    lcdPrint(rNbrTwistLimit);
+    // pLcd->print("/");
+    // lcdPrint(rNbrTwistLimit);
     pLcd->print("");
     lcdPrint(nNbrTwistSpeed);
-    pLcd->print("rm");
+    pLcd->print("r"); // rpm
+
+    lcdPrint(dist_slider);
+    pLcd->print("mm");
+
 
     pLcd->setCursor(0, 1);
     pLcd->print("Col ");
     lcdPrint(rNbrCollect);
-    pLcd->print("/");
-    lcdPrint(rNbrCollectLimit);
+    // pLcd->print("/");
+    // lcdPrint(rNbrCollectLimit);
     pLcd->print("");
     lcdPrint(nNbrCollectSpeed);
-    pLcd->print("rm");
+    pLcd->print("r");
+
+    lcdPrint(dist_slider_target);
+    pLcd->print("mm");
 
     pLcd->setCursor(0, 2);
     pLcd->print("Spo ");
     lcdPrint(rNbrSpool);
-    pLcd->print("/");
-    lcdPrint(rNbrSpoolLimit);
+    // pLcd->print("/");
+    // lcdPrint(rNbrSpoolLimit);
     pLcd->print("");
-    lcdPrint(nNbrSpoolSpeed);
-    pLcd->print("rm");
+    if( bAutomaticSpoolMode )
+      lcdPrint( nAutomaticSpoolRotationSpeed );
+    else
+      lcdPrint( nNbrSpoolSpeed );
+      
+    pLcd->print("r");
+
+
+    //lcdPrint(dist_slider_max);
+    //pLcd->print("mm");
+
+    if( 1 )
+    {
+      pLcd->setCursor(18, 3);
+      if( bAutomaticSpoolMode )
+      {
+        pLcd->print("A");
+      }
+      else
+      {
+        pLcd->print("M");
+      }
+    }
 
     for(int i = 0; i < 4; ++i )
     {

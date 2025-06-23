@@ -55,12 +55,15 @@ HX711 scale;
 
 // reglage pour barre de 3kg:
 
-float calibration_factor = 661; // 30g => 22000: 733 [une bouteille vide (celle de blanc orschwiller) peserait 448g; le plateau en fer 352g]
+float calibration_factor = 742.80; // 30g => 22000: 733 [une bouteille vide (celle de blanc orschwiller) peserait 448g; le plateau en fer 352g]
 // will be overwritten by EEPROM reading (so I put 100 to remember and test), to write it goto readCfgFromEeproom
 
 // la balance dans le sous sol: 733
 // balance a ochateau, section 1: 733 => 929 au lieu de 1030,cad la bonne valeur est entre 660 et 661 => 661
 // balance du oversized: 661 => 1140 au lieu de 1030/1036, mettre entre 727 et 732 => mettre 729
+
+// Balance numero 4 (futur nouvel assembleur B): 742.80
+// Balance numero 5 (futur nouvel assembleur A): 673.86
 
 float old_calibration_factor = calibration_factor;
 
@@ -116,9 +119,13 @@ void animateLcd()
 long int nTimeStartFill = 0;
 int bIsFilling = 0;
 
-unsigned char nMilliBeforeCut = 13; // 10 en version normal (maintenant 13), en oversize: 45 si slow, si rapide, mettre 100, et mettre
+unsigned char nMilliBeforeCut = 70; // 10 en version normal (maintenant 13), en oversize: 45 si slow, si rapide, mettre 100, et mettre
 
-bool bActivateHache  = 0; // activate on oversized
+bool bIsOversize = 1;
+
+bool bActivateHache  = bIsOversize; // activate on oversized
+
+int nWaitBetweenBottleMs = 1000; // was 5000, then 3000 (new: doubled when oversize)
 
 unsigned long hache_timeNextChange = 0;
 int hache_nNextIsOpen = 1;
@@ -141,7 +148,12 @@ void setOpen( int nNumVanne, int bOpen)
     
     // we will hache only if versing is on, so next hache will be after an opening
     hache_nNextIsOpen = 0;
-    hache_timeNextChange = millis()+hache_period_ms;
+
+    int nHacheTime = hache_period_ms;
+    if( bOpen )
+      nHacheTime /= 2; // we hache half the wait time
+
+    hache_timeNextChange = millis()+nHacheTime;
 
 
     if(bOpen)
@@ -157,7 +169,7 @@ void setOpen( int nNumVanne, int bOpen)
 
 void readCfgFromEeproom()
 {
-  if(0)
+  if(1)
   {
     //write values (for the first time)
     Serial.println("\nWRITING TO EEPROM !\n");
@@ -237,6 +249,11 @@ void setup() {
 
   //handleOrder("#Assemble_10_20_30"); // to test when not connected to the tablet
 
+  if( bIsOversize )
+  {
+    nWaitBetweenBottleMs *= 2;
+  }
+
 } // setup
 
 float last_measured = 0;
@@ -289,7 +306,6 @@ int isTargetDefined()
 }
 int check_if_must_stop_verse()
 {
-  const int nWaitBetweenBottleMs = 1000; // was 5000, then 3000
   // return 0 if not versing, 1 if versing, 2 if done
 
   if(!isTargetDefined())

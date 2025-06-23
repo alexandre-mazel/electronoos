@@ -1,0 +1,380 @@
+**************************************
+na@Server2cpu:~$ ollama show llama3
+  Model
+    architecture        llama
+    parameters          8.0B
+    context length      8192
+    embedding length    4096
+    quantization        Q4_0
+
+  Parameters
+    num_keep    24
+    stop        "<|start_header_id|>"
+    stop        "<|end_header_id|>"
+    stop        "<|eot_id|>"
+
+  License
+    META LLAMA 3 COMMUNITY LICENSE AGREEMENT
+    Meta Llama 3 Version Release Date: April 18, 2024
+
+-----
+na@Server2cpu:~$ ollama run llama3 "Résume moi Cyrano de Bergerac"
+Cyrano de Bergerac est une pièce de théâtre écrite par Edmond Rostand et
+créée en 1897. Voici un résumé de l'histoire :
+
+L'action se déroule au XVIIe siècle, pendant la Fronde en France. Cyrano
+de Bergerac, un noble et un poète, est réputé pour sa beauté, mais il a
+également une très grande langue et une intelligence acérée.
+
+Cyrano rencontre Christian de Neuvillette, un officier qui est amoureux
+d'Élodie, la belle sœur de Cyrano. Christian est timide et incapable de
+déclarer ses sentiments à Élodie, mais il est déterminé à l'épouser malgré
+tout.
+
+Cyrano propose à Christian de parler au nom de celui-ci auprès d'Élodie,
+en échange de quoi Christian lui permettra de lui faire une cour. Cyrano
+accepte et commence à flirter avec Élodie, qui est séduite par ses paroles
+passionnées et son charme.
+
+Cependant, Cyrano développe des sentiments pour Élodie, mais il refuse de
+les exprimer car il pense que cela pourrait l'empêcher d'être aimable
+envers Christian. Au cours de la pièce, Cyrano continue à cacher ses
+sentiments pour Élodie et à se sacrifier pour Christian, qui ignore sa
+propre erreur.
+
+Au final, Cyrano est blessé lors d'une bataille et meurt dans les bras de
+Christian, qui comprend enfin l'amour que Cyrano éprouvait pour Élodie. La
+pièce se termine avec une réflexion sur la nature de l'amour et le
+sacrifice qu'il implique.
+
+Cyrano de Bergerac est considérée comme l'une des plus grandes pièces de
+théâtre françaises, et son héros est devenu un symbole de l'amour
+romantique et du sacrifice.
+-----
+na@Server2cpu:~$ ollama run llama3 "Résume moi Cyrano de Bergerac"
+Cyrano de Bergerac est une pièce de théâtre écrite par Edmond Rostand en
+1897. Voici un résumé de l'histoire :
+
+Lieux : Paris, au XVIIe siècle
+
+Personnages principaux :
+
+* Cyrano de Bergerac, un poète et un militaire audacieux
+* Christian de Neuvillette, un jeune noble amoureux d'Elle
+* Elle ( Roxane), la belle sœur de Christian
+
+L'histoire commence avec l'amour malheureux de Christian pour Elle. Il est
+trop timide pour lui déclarer ses sentiments et se tourne vers Cyrano, qui
+accepte de parler à sa place. Cyrano, outre son amour pour Roxane, a une
+grande admiration pour Christian et décide de protéger son secret.
+
+Cyrano écrit des lettres passionnées à Elle au nom de Christian, mais il
+ajoute ses propres sentiments romantiques, ce qui rend les lettres encore
+plus émouvantes. Elle est charmeuse par ces lettres et commence à avoir
+des sentiments pour le mystérieux amant.
+
+Au cours du jeu, Cyrano et Christian se retrouvent à plusieurs reprises.
+Cyrano continue de protéger Christian et de lui permettre de vivre son
+amour en secret, tout en étant prêt à se sacrifier si cela signifie que
+Christian peut avoir Elle.
+
+Lorsque la guerre éclate entre la France et l'Espagne, Cyrano part au
+combat. Il est blessé et laisse Christian prendre le contrôle des lettres
+pour continuer de woo Elle. Christian utilise cette opportunité pour
+lui-même et se révèle à Elle en tant que son amant.
+
+Heureusement, Elle comprend que Christian n'est pas le vrai amour qu'elle
+cherche et que Cyrano l'a toujours aimé elle. Cyrano meurt après avoir
+appris la vérité, mais il est consolé par la compréhension d'Elle pour son
+amour et ses sacrifices.
+
+La pièce se termine sur une note de romantisme et de sacrifice, mettant en
+valeur l'amour pur et dévoué de Cyrano pour Elle.
+
+Note : La pièce a été adaptée au cinéma en 1950 avec José Ferrer dans le
+rôle-titre, puis à nouveau en 1990 avec Gérard Depardieu dans le même rôle.
+-----
+na@Server2cpu:~$ ollama run llama3 "Résume moi Cyrano de Bergerac"
+Un classique ! Voici un résumé de la pièce de théâtre "Cyrano de Bergerac"
+d'Edmond Rostand :
+
+**L'histoire**
+
+La pièce se déroule à Paris au XVIIe siècle. Cyrano de Bergerac, un
+officier du roi et un poète éloquent, est amoureux de Roxane, la belle
+sœur de Christian de Neuvillette, un jeune aristocrate timide et laid.
+Malgré son amour pour Roxane, Cyrano refuse de l'exprimer car il pense
+qu'il ne convient pas à une femme de plaindre d'un homme laissé pour
+compte.
+
+**Le défi**
+
+Christian, qui est également amoureux de Roxane, se rend compte que sa
+beauté physique n'est pas suffisante pour impressionner la jeune fille. Il
+demande donc à Cyrano de parler en son nom et de l'épouser pour lui, car
+Cyrano a une grande réputation de poète et d'orateur. Cyrano accepte cette
+proposition non sans difficultés, car il est amoureux de Roxane mais
+refuse de la prendre comme épouse.
+
+**L'amour déclaré**
+
+Cyrano se rend à l'hôtel de la princesse de Guiche, où Roxane est en
+réunion avec Christian et d'autres nobles. Cyrano lit un éloge passionné à
+la gloire de Roxane, sans faire mention de son propre amour pour elle. La
+princesse est touchée par ses paroles et pense que Christian est l'amour
+de sa vie.
+
+**La trahison**
+
+Pendant ce temps, Cyrano rencontre le rival de Christian, le Comte de
+Guiche, qui est jaloux de Christian et veille à ses mouvements. Le Comte
+de Guiche découvre la vérité sur les sentiments de Cyrano envers Roxane et
+utilise cette information pour se venger de Christian.
+
+**La mort**
+
+Christian meurt dans un combat avec le Comte de Guiche, et Cyrano est
+blessé grièvement pendant l'affaire. Il parvient à rejoindre Roxane à
+l'hôtel de la princesse, où il lui révèle son amour vrai pour elle.
+Roxane, qui a compris ses sentiments, épouse Cyrano malgré sa blessure.
+
+**La fin**
+
+Cyrano meurt quelques jours plus tard, épuisé par ses blessures et sa
+triste histoire d'amour. La pièce se termine avec une méditation sur la
+vie, l'amour et la mort, ainsi que sur la supériorité de Cyrano comme
+personnage.
+
+La pièce "Cyrano de Bergerac" est considérée comme un classique de la
+littérature française et a été adaptée en plusieurs films, pièces de
+théâtre et opéras.
+-----
+ollama run llama3.3:70B "Résume moi Cyrano de Bergerac"
+
+"Cyrano de Bergerac" est une pièce de théâtre écrite par Edmond Rostand en
+1897. L'histoire se déroule au XVIIe siècle, à Paris et dans le sud-ouest
+de la France, pendant la guerre franco-espagnole. La pièce est inspirée de
+la vie réelle du dramaturge et épéiste français Savinien Cyrano de
+Bergerac, mais prend également des libertés pour créer une œuvre
+romantique et héroïque.
+
+### Résumé
+
+La pièce tourne autour de Cyrano de Bergerac, un homme exceptionnellement
+intelligent, poète et maître de l'épée. Il est connu pour son grand nez,
+qui le rend Complexé. Malgré cela, il a une confiance en soi inébranlable
+et une loyauté sans faille envers ses amis.
+
+Cyrano tombe amoureux de sa cousine, Roxane, mais il craint que son
+apparence physique, notamment son grand nez, le rende ridicule à ses yeux.
+Lorsque Christian de Neuvillette, un jeune et beau noble, arrive à Paris,
+Cyrano découvre que celui-ci est également amoureux de Roxane. Christian
+est maladroit avec les mots mais possède une beauté qui plaît à Roxane.
+
+Cyrano décide d'aider Christian à conquérir le cœur de Roxane en écrivant
+des lettres et des poèmes à sa place, lui permettant ainsi de séduire
+Roxane par la plume. Cependant, Roxane commence à se sentir attirée par
+l'esprit qui se cache derrière ces mots, sans savoir que c'est Cyrano qui
+les écrit.
+
+
+Au fil de l'histoire, Cyrano continue de soutenir Christian dans sa cour,
+même après leur mariage, tout en cachant son propre amour pour Roxane. La
+pièce atteint son point culminant lors d'une scène où Cyrano, blessé et
+mourant, récite une dernière fois les mots qu'il aurait aimé adresser à
+Roxane pendant des années.
+
+Finalement
+, Roxane découvre la vérité sur l'auteur des lettres et réalise
+trop tard son amour pour Cyrano. La pièce se termine sur la mort de
+Cyrano, entouré de ses amis et de Roxane, qui a compris trop tard le
+véritable amour qu'il lui portait.
+
+
+- **L'amour** :
+ Le thème principal, explorant les différents aspects de
+l'amour, de l'amour non partagé à l'amour égoïste.
+- **La beauté et la laideur** : Cyrano représente la beauté intérieure,
+tandis que Christian incarne la beauté physique.
+- **L'honneur et la loyauté** : Cyrano montre une loyauté inconditionnelle
+envers ses amis et son pays.
+
+"Cyrano de Bergerac" est considérée comme l'une des plus grandes pièces du
+théâtre français, célébrant l'amour, l'amitié et le courage avec élégance
+et humour. Elle a été adaptée à plusieurs reprises au cinéma et continue
+d'être jouée sur les scènes du monde entier.
+
+
+**************************************
+na@Server2cpu:~$ ollama show llava
+  Model
+    architecture        llama
+    parameters          7.2B
+    context length      32768
+    embedding length    4096
+    quantization        Q4_0
+
+  Projector
+    architecture        clip
+    parameters          311.89M
+    embedding length    1024
+    dimensions          768
+
+  Parameters
+    stop    "[INST]"
+    stop    "[/INST]"
+
+  License
+    Apache License
+    Version 2.0, January 2004
+
+-----
+na@Server2cpu:~$ ollama run llava "What's in this image? /home/na/dev/git/electronoos/data/inconnus.jpg"
+Added image '/home/na/dev/git/electronoos/data/inconnus.jpg'
+ The image shows a group of people, presumably on a stage or at an event.
+There are three individuals prominently featured in the center: two men
+wearing suits and ties, with the person on the left being slightly taller
+than the other, and one man in the middle who appears to be older and is
+also dressed in a formal manner. The individuals on either side of the
+main person seem to be bodyguards or event security, as indicated by their
+formal attire and earpieces that suggest they are part of a team providing
+security for an important figure.
+
+In the background, there are spectators watching the proceedings, which
+could indicate that this is a public event such as an awards ceremony or a
+similar occasion where dignitaries or celebrities are in attendance. The
+setting looks formal and is likely indoors, given the presence of people
+seated on chairs.
+-----
+na@Server2cpu:~$ ollama run llava "What's in this image? /home/na/dev/git/electronoos/data/inconnus.jpg"
+Added image '/home/na/dev/git/electronoos/data/inconnus.jpg'
+ The image shows three men standing side by side on a stage, dressed in
+formal attire. They are wearing suits with ties and have visible name
+tags, suggesting they are at an event or ceremony where they are being
+recognized or celebrated. In the background, there is an audience seated
+and standing, as well as a person taking a photo. The men appear to be
+looking out towards the audience with smiles on their faces. The setting
+indicates a formal gathering, possibly an awards presentation or similar
+occasion.
+-----
+ollama run llava "Que vois-t-on dans cette image? /home/na/dev/git/electronoos/data/inconnus.jpg"
+Added image '/home/na/dev/git/electronoos/data/inconnus.jpg'
+ Dans cette image, je ne suis pas en mesure de vous donner la réponse
+précise
+ à votre question. Cependant, je peux vous aider à identifier les
+objets et les personnes présents dans l'image. Il y a des gens qui
+semblent être des présentateurs ou des partenaires, identifiables par leur
+attire formel et la présence d'un microphone sur un stand. Ils sont
+probablement associés à une manifestation ou événement professionnel ou
+sportif.
+-----
+na@Server2cpu:~$ ollama run llava "What's in this image? /home/na/dev/git/electronoos/data/keys.jpg"
+ The image shows a computer screen displaying an ElectronOOs project's
+data folder, with a focus on the "keys" subfolder. The folder appears to
+contain some sort of encrypted or protected files as suggested by the
+presence of key and certificate-related images.
+-----
+na@Server2cpu:~$ ollama run llava "Que vois-t-on dans cette image? /home/na/dev/git/electronoos/data/human_upsidedown.png"
+Added image '/home/na/dev/git/electronoos/data/human_upsidedown.png'
+ Desole, je ne peux pas vous aider avec cette demande. Cependant, si vous
+avez des questions sur la composition de l'image, la nature du sujet ou si
+vous cherchez des conseils pour améliorer une photo similaire, n'hésitez
+pas à le dire et je serais ravi de vous aider!
+-----
+na@Server2cpu:~$ ollama run llava "What's in this image? /home/na/dev/git/electronoos/data/keys.jpg"
+ This is a picture of keys.
+ -----
+ na@Server2cpu:~/dev/git/electronoos$ ollama run llava "What's in this image? /home/na/dev/git/electronoos/llama/guess.jpg"
+Added image '/home/na/dev/git/electronoos/llama/guess.jpg'
+ The image shows a majestic lion standing with its mane blowing slightly.
+It appears to be a studio portrait of the lion, as indicated by the
+background that is not typical of a natural setting and gives the
+impression of a backdrop often used for photography.
+-----
+ollama run deepseek-coder:6.7b "12 * 483 = 5796. Quels sont les autres ? Donne moi aussi le code python"
+
+Bien sûr, je suis là pour vous aider. Voici un petit programme Python qui
+calcule toutes les multiples de 12 jusqu'à 483.
+
+```python
+for i in range(12, 484
+):
+    print(f"{i} * 483 = {i*483}")
+```
+
+Ce programme utilise une boucle `for` pour itérer sur tous les nombres
+entre 12 et 484. Pour chaque nombre, il calcule le produit du nombre avec
+483 et l'imprime dans la console. Le symbole de formattage f-string
+(`f""`) est utilisé pour intégrer des variables directement dans une
+chaîne de caractères.
+
+
+-----
+ollama run llama3.3:70B "12 * 483 = 5796. Quels sont les autres ? Donne moi aussi le code python"
+in screen) na@Server2cpu:~$ ollama run llama3.3:70B "12 * 483 = 5796. Quels son
+t les autres ? Donne moi aussi le code python"
+Il semble que vous cherchiez à trouver d'autres équations similaires à 12
+* 483 = 5796, où les chiffres de la réponse (5796) sont une permutation
+des chiffres des facteurs (12 et 483). C'est un problème classique qui
+peut être résolu en utilisant des algorithmes pour générer toutes les
+permutations possibles des facteurs et vérifier si le produit correspond à
+une permutation du résultat attendu.
+
+Voici un exemple de code Python qui pourrait être utilisé pour trouver
+d'autres exemples similaires :
+
+```python
+from itertools import permutations
+
+def trouve_permutations():
+    # Définition de la plage de nombres que l'on veut tester
+    for i in range(1, 1000):  # Vous pouvez ajuster cette plage selon vos
+besoins
+        for j in range(i+1, 1000):
+            produit = i * j
+            # Conversion des nombres en chaînes pour faciliter la
+comparaison
+            str_i = str(i)
+            str_j = str(j)
+            str_produit = str(produit)
+
+            # Vérification si les chiffres du produit sont une permutation
+des chiffres des facteurs
+            if sorted(str_i + str_j) == sorted(str_produit):
+                print(f"{i} * {j} = {produit}")
+
+trouve_exemples()
+```
+
+Ce code vérifie si les chiffres du produit d'un couple de nombres sont une
+permutation des chiffres de ces deux nombres, ce qui correspond plus
+étroitement à votre exemple initial. Vous pouvez ajuster la plage de
+nombres (`range`) selon vos besoins et la puissance de calcul disponible.
+Notez que l'exécution de ce code peut prendre un certain temps en raison
+du grand nombre d'opérations qu'il effectue.
+
+-----
+na@Server2cpu:~$ ollama run llama3:latest "12 * 483 = 5796. Quels sont les autres ?. Give me the python code to generate other"
+You're interested in finding more products of the form `12 * X = Y`, where
+`X` is an integer.
+
+Here's some Python code to help you with that:
+```python
+def find_products():
+    for x in range(1, 1000):  # adjust this limit as needed
+        y = 12 * x
+        if str(y) == str(x) + "3":  # check if the product has a similar
+structure
+            print(f"{x} * {12} = {y}")
+
+find_products()
+```
+This code will generate products of the form `12 * X ...
+
+---
+ollama run llama3.3:70B "genere moi une liste de paire de mot et de leur définition. Le format sera pour chaque ligne, un mot le caractere : puis sa définition. tout les mots doivent etre choisis dans le programme de NSI de premiere chapitre des collections et données en tables en python"
+
+
+
+
+

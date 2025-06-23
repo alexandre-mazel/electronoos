@@ -1,6 +1,12 @@
 # analyse temperature file (from real sonde dans la piece)
 # elles sont sur REE, le serveur est a l'heure en hiver.
 
+# to retrieve data sent from rpi sonde (sur ree donc)
+# sur ree: 
+# find /sys/bus/w1/devices/ -name "28-*" -exec cat {}/w1_slave \; | grep "t=" | awk -F "t=" '{print $2/1000}'
+# 22.875
+# si rien, c'est qu'il y a un bug de capteur debranche.
+
 # scp -P 11022 na@thenardier.fr:/home/na/save/office_temperature.txt C:/Users/alexa/dev/git/electronoos/meteo/data/
 
 # to retrieve data sent from logged data from various IOT device
@@ -12,6 +18,7 @@ import sys
 sys.path.append("../../obo/spider/")
 
 import common
+import misctools
 import retrieve_pop3
 import datetime
 
@@ -86,6 +93,8 @@ def decode_file_sonde(strFilename):
             strMesureName = strMesureName.decode()
             strValue = strValue.decode()
             strValue = strValue.replace("%22", "" ) # at once I've sent  &v="421"  instead of  &v=421
+            if strValue == None or strValue == "None" :
+                continue
             
             strDateTime = common.epochToTimeStamp(float(strEpoch))
             if bVerbose: print("strDateTime: '%s'" % strDateTime)
@@ -116,8 +125,8 @@ def decode_file_sonde(strFilename):
             #~ break
             
             
-        # remove abberations
-        if rValue < 1 or rValue > 50000: # max is VOC 1...50000
+        # remove abberations (85 is for a temp sonde who send 85 when initing)
+        if ( rValue < -100 ) or ("temp" in strMesureName.lower() and abs(rValue-85)<0.01) or ( ( not "temp" in strMesureName.lower() ) and rValue < 1. ) or rValue > 50000: # max is VOC 1...50000
             continue
             
         # remove test
@@ -147,35 +156,102 @@ def draw_point(list_x,list_y):
     plt.show()
     
 def draw_temp_series(dictPerDay, bRender=True, bCloseAtEnd = True, strTitle = None ):
+    """
+    Receive a dict of curvename => [x],[y] render all curves on the same graph
+    """
     import matplotlib.pyplot as plt
     
+    strTitleGenerated = ""
+    
+    listBestLabelX = [] # the goal is to take the labels of the curve going from the widest range
+    
     for k in dictPerDay:
-        my_label = k.replace("2024/","" ).replace("2023/","" ).replace("2022/","" )
-        # invert day et month
-        my_label = my_label[:-5] + my_label[-2:] + "/" + my_label[-5:-3]
-        plt.plot(dictPerDay[k][0],dictPerDay[k][1],label = my_label)
+        if k.count('/') > 2: # it's a date
+            my_label = k.replace("2024/","" ).replace("2023/","" ).replace("2022/","" )
+            # invert day et month
+            my_label = my_label[:-5] + my_label[-2:] + "/" + my_label[-5:-3]
+        else:
+            my_label = str(k)
+            if len(strTitleGenerated) > 0:
+                strTitleGenerated += ", "
+            strTitleGenerated += my_label
+            
         if 1:
-            # local min & max
-            for extremum,offset in [(min,-0.4),(max,+0.1)]:
-                idx = dictPerDay[k][1].index(extremum(dictPerDay[k][1]))
-                strLabelMin = my_label + '\n' + str(int(dictPerDay[k][0][idx])) + 'h' + "%02d: "%((dictPerDay[k][0][idx]%1)*60) + "%.1f"%   (dictPerDay[k][1][idx]) + '' 
+            # change x labels
+            labelx_pos = []
+            labelx_txt = []
+            #~ labelx_txt: list[str] = [f'Val{v:0.2f}' for v in dictPerDay[k][0]]
+            prevxval = - 100
+            for xval in dictPerDay[k][0]:
+                if int(xval) > prevxval:
+                    prevxval = xval
+                    pos = int(xval)
+                    txt = str(int(xval)% 24)
+                    labelx_pos.append(pos)
+                    labelx_txt.append(txt)
+                #~ else:
+                    #~ labelx_pos.append(xval)
+                    #~ labelx_txt.append("")
+            if len(listBestLabelX) < len(labelx_pos):
+                listBestLabelX = labelx_pos
+                plt.xticks(labelx_pos, labelx_txt)
+            
+        plt.plot(dictPerDay[k][0],dictPerDay[k][1],label = my_label)
+
+        if 1:
+            # local min & max et derniere mesure
+            #~ for extremum,offset in [(min,-0.4),(max,+0.1),(lambda x:x[-1],+0.1)]: # le -1 ne fonctionne pas car ce n'est pas forcement celle ci qui va sortir dans le find
+            for extremum,offset in [(min,-0.6),(max,+0.1),(lambda x:-421,+0.0)]: # donc on met un magic
+                value = extremum(dictPerDay[k][1])
+                if value != -421:
+                    idx = dictPerDay[k][1].index(value)
+                    xoffset = -0.5
+                else:
+                    idx = len(dictPerDay[k][1])-1
+                    xoffset = +1.
+                # x is hour with decimal since start or hour in absolute
+                nNumJour = int(dictPerDay[k][0][idx]/24)
+                rHour = dictPerDay[k][0][idx] - ( nNumJour * 24 )
+                nMin = int(rHour * 60) % 60
+                nHour = int(rHour)
+                nNumJour += 1
+                strMoment = ""
+                if nNumJour > 1:
+                    strMoment = "Jour %d " % nNumJour
+                strMoment += "%dh%02d: " % ( nHour, nMin)                
+                try:
+                    strLabelToDraw = my_label + '\n' + strMoment + "%.1f" % (dictPerDay[k][1][idx])
+                except ValueError as err:
+                    # value name is not a date
+                    # usefull code part ? working ?
+                    strLabelToDraw = "Jour %d, Hour: %dh%02d: %.1f" % (nNumJour,nHour,nMin, dictPerDay[k][1][idx])
                 # plt.annotate('local max', xy=(2, 1), xytext=(3, 1.5), arrowprops=dict(facecolor='black', shrink=0.05),)
-                plt.annotate( strLabelMin, xy=(dictPerDay[k][0][idx]-0.5, dictPerDay[k][1][idx]+offset))
+                print(dictPerDay[k][0][idx])
+                plt.annotate( strLabelToDraw, xy=(dictPerDay[k][0][idx]+xoffset, dictPerDay[k][1][idx]+offset))
                 
-    first_year = list(dictPerDay.keys())[0].split(":")[1].strip()[:4]
-    first_month = list(dictPerDay.keys())[0].split(":")[1].strip()[5:7]
-    print(first_month)
+    try:
+        first_year = list(dictPerDay.keys())[0].split(":")[1].strip()[:4]
+        first_month = list(dictPerDay.keys())[0].split(":")[1].strip()[5:7]
+        filenamepostfix = "month_" + first_year + '_' + first_month
+        print(first_month)
+    except (IndexError,AttributeError) as err:
+        # keys are not year and month
+        if strTitle == None: strTitle = ""
+        strTitle = strTitle + "__" + strTitleGenerated
+        filenamepostfix = "series" # title is already in prefix
+    
     if strTitle == None:
         strTitle = 'Temperature' + ' ' + first_year
         strPrefix = "temp"
     else:
         strPrefix = strTitle.replace("(","").replace(")","").replace(",","_").replace(" ", "").replace("'", "").replace("-", "").replace(".", "").lower()
+
     plt.ylabel(strTitle)
     plt.legend()
     plt.locator_params(axis='both', nbins=24) 
     plt.tight_layout(pad=0) # fonctionne pas sur le premier?
     plt.gcf().set_size_inches(32, 18) # pour le rendu dans le fichier
-    fn = ('output/%s_month_'% strPrefix) +first_year+'_'+first_month+".jpg"
+    fn = ('output/%s_'% strPrefix) +filenamepostfix+".jpg"
     print("INF: draw_temp_series: writing to '%s'" % fn )
     plt.savefig(fn, dpi=100)
     if bRender: plt.show()
@@ -219,84 +295,142 @@ def analyse_sonde_temp( alldatas, nYearMin, nMonthMin, nYearMax = 2094, nMonthMa
         
         
         
-def render_all_datas( alldatas, nYearMin = 2024, nMonthMin = 12, nYearMax = 2094, nMonthMax = 13, bRender=True ):
+def render_all_datas( alldatas, nYearMin = 2024, nMonthMin = 1, nDayMin = 1, nYearMax = 2094, nMonthMax = 13, nDayMax = 32, sameGraphList = [], bRender=True ):
     """
-    for each datas, for each week we want all days in one graph
+    for each datas, for each week we want all days in one graph. (nXxxMin and nXxxMax are included)
+    if sameGraphList != []: will render datas listed on only one graph for the whole period nYearMin, nMonthMin, nDayMin to nYearMax, nMonthMax, nDayMax.
+        eg: [("MisBKit3","temp"),("MisBKit3","humid")])
     """
     import matplotlib.pyplot as plt
     
     dictPerDay = {}
     xs = []
     ys = []
+    
+    nInitMin = misctools.convertYmdHmsToEpoch( nYearMin, nMonthMin, nDayMin )//60
+    
+    bAllOnSameGraph = sameGraphList != []
     for key, datas in alldatas.items():
+        print(key)
+        
+        if sameGraphList == []  and not ("MisB" in key[0] or "Kremlin" in key[0]): # un peu temp
+            continue
+
+        if sameGraphList != [] and not key in sameGraphList:
+            continue
+            
         for d in datas:
-            nYear, nMonth, nDay, nHour,nMin,rTemp = d
-            if nYear < nYearMin or ( nYear == nYearMin and nMonth < nMonthMin):
+            try:
+                nYear, nMonth, nDay, nHour,nMin,rValue = d
+            except ValueError:
+                print( "ERR: render_all_datas: Value error on key: %s, d:%s" % (key,d) )
+                assert(0)
+
+            if nYear < nYearMin or ( nYear == nYearMin and nMonth < nMonthMin) or ( nYear == nYearMin and nMonth == nMonthMin and nDay < nDayMin):
                 continue
-            if nYear > nYearMax or ( nYear == nYearMax and nMonth > nMonthMax):
+            if nYear > nYearMax or ( nYear == nYearMax and nMonth > nMonthMax) or ( nYear == nYearMax and nMonth == nMonthMax and nDay > nDayMax ):
                 continue
-            #~ print("INF: analyse_sonde_temp: %d/%02d/%02d: %02dh%02d: temp: %5.2f" % (nYear, nMonth, nDay, nHour,nMin,rTemp))
+            print("INF: render_all_datas: key: %s, %d/%02d/%02d: %02dh%02d: value: %5.2f" % (str(key),nYear, nMonth, nDay, nHour,nMin,rValue))
             xs.append(nHour+nMin/60)
-            ys.append(rTemp)
+            ys.append(rValue)
             
             my_date = datetime.datetime(nYear, nMonth, nDay) 
             dayname = my_date.strftime("%A")
 
-            k = "%s: %d/%02d/%02d" % (dayname, nYear, nMonth, nDay)
-            if not k in dictPerDay:
-                dictPerDay[k] = ([],[])
-            dictPerDay[k][0].append(nHour+nMin/60)
-            dictPerDay[k][1].append(rTemp)
+            if not bAllOnSameGraph:
+                k = "%s: %d/%02d/%02d" % (dayname, nYear, nMonth, nDay)
+                if not k in dictPerDay:
+                    dictPerDay[k] = ([],[])
+                dictPerDay[k][0].append(nHour+nMin/60)
+                dictPerDay[k][1].append(rValue)
+            else:
+                k = key
+                if not k in dictPerDay:
+                    dictPerDay[k] = ([],[])
+                nTimeHour = (misctools.convertYmdHmsToEpoch( nYear, nMonth, nDay, nHour,nMin )//60 - nInitMin)/60.
+                dictPerDay[k][0].append(nTimeHour)
+                dictPerDay[k][1].append(rValue)
+                
+                
             
         #~ for k in dictPerDay:
         #~ import matplotlib.pyplot as plt
         #~ plt.plot(xs,ys)
         #~ plt.ylabel( str(key) )
         #~ plt.show()
-        if len(dictPerDay) > 0:
+        if len(dictPerDay) > 0 and not bAllOnSameGraph:
             draw_temp_series(dictPerDay, bRender=bRender, strTitle = str(key))
             dictPerDay = {}
-
-    
-    
-    
-strFilename = "data/office_temperature.txt"
-strFilename = "data/webdata.txt"
-datas = decode_file_sonde(strFilename)
-
-if 1:
-    # draw some datas:
-    #~ print(datas.keys())
-    print("Last datas of each type:")
-    for k, v in datas.items():
-        print("key: %s" % str(k) )
-        for d in v[-40:]:
-            print(d)
             
-if 0:
-    # just render temperature
-            
-    key = list(datas.keys())[0]
+    if bAllOnSameGraph:
+        strTitle = "%4d_%02d_%02d" % (nYearMin,nMonthMin,nDayMin)
+        draw_temp_series(dictPerDay, bRender=bRender, strTitle=strTitle)
+
     
-    print("Rendering data for %s" % str(key) )
-    datas = datas[key] # render first type
-
-    datas = datas[-24*12*7:] # a peu pres la derniere semaine
-
-    analyse_sonde_temp(datas, 2024,12)
-    #~ analyse_sonde_temp(datas, 2024,11,2024,11)
-    #~ analyse_sonde_temp(datas, 2024,7,2024,7)
-    #~ analyse_sonde_temp(datas, 2024,8,2024,8)
-    #~ analyse_sonde_temp(datas, 2023,12,2023,12)
-    #~ analyse_sonde_temp(datas, 2023,2,2023,2)
-
-    if 0:
-        # sort toutes les stats par mois
-        for y in [2023,2024]:
-            for m in range(1,13):
-                analyse_sonde_temp(datas,y,m,y,m,bRender=False)
-                
-else:
-    # render multi variable
-    render_all_datas(datas)
+    
+if __name__ == "__main__":
         
+    strFilename = "data/office_temperature.txt"
+    strFilename = "data/webdata.txt"
+    datas = decode_file_sonde(strFilename)
+    
+    year,month,day = misctools.getDay()
+
+    if 1:
+        # draw some datas:
+        #~ print(datas.keys())
+        print("Last datas of each type:")
+        for k, v in datas.items():
+            print("key: %s" % str(k) )
+            for d in v[-40:]:
+                print(d)
+                
+    if 0:
+        # just render temperature
+                
+        key = list(datas.keys())[0]
+        
+        print("Rendering data for %s" % str(key) )
+        datas = datas[key] # render first type
+
+        datas = datas[-24*12*7:] # a peu pres la derniere semaine
+
+        analyse_sonde_temp(datas, 2025,1)
+        #~ analyse_sonde_temp(datas, 2024,11,2024,11)
+        #~ analyse_sonde_temp(datas, 2024,7,2024,7)
+        #~ analyse_sonde_temp(datas, 2024,8,2024,8)
+        #~ analyse_sonde_temp(datas, 2023,12,2023,12)
+        #~ analyse_sonde_temp(datas, 2023,2,2023,2)
+
+        if 0:
+            # sort toutes les stats par mois
+            for y in [2023,2024]:
+                for m in range(1,13):
+                    analyse_sonde_temp(datas,y,m,y,m,bRender=False)
+                    
+    if 0:
+        # render multi variable
+        render_all_datas(datas,2025,1)
+        
+    if 1:
+        # render co2 datas
+        datas_of_interest = [("MisBKit4","tvoc"),("MisBKit4","eco2")]
+        #~ datas_of_interest = [("MisBKit4","eco2")]
+        #~ datas_of_interest = [("MisBKit4","tvoc")]
+        #~ datas_of_interest = [("MisBKit4","uba")]
+        datas_of_interest = [("MisBKit3","humid"),("MisBKit4","humid"),("MisBKit4","humid2")]
+        
+        if 1:
+            # all temp !
+            datas_of_interest = [("MisBKit3","temp"),("MisBKit4","temp"),("MisBKit4","temp2"),("MisBKit5","temp10"),("MisBKit5","temp11"),("ESP32_C01","temp10"),("ESP32_C01","temp11")]
+            strFilename = "data/office_temperature.txt"
+            added_datas = decode_file_sonde(strFilename)
+            datas.update(added_datas)
+            datas_of_interest.append(("armoire","temp"))
+            
+        day -= 3 # how much day you want to see
+        if day < 0:
+            day += 31
+            month -= 1
+        render_all_datas(datas,year,month,day, sameGraphList = datas_of_interest)
+            

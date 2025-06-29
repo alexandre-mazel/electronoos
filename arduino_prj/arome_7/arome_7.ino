@@ -18,6 +18,7 @@ const char pad[3]  PROGMEM = { 0, 0, 0 };
 
 #include <FastLED.h> // FastLed Neopixel by David Madison and FastLed 3.9.8
 //#include <../../../../libraries/EEPROM/EEPROM.h> // => generate error when in a .c
+# found in  C:\Users\alexa\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\libraries\EEPROM\src
 
 const int nNbrReader = 3;
 const int nLenCode = 12;

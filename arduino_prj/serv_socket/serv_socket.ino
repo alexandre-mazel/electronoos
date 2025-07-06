@@ -249,12 +249,23 @@ void update_server( void )
 
 TaskHandle_t Task1;
 
+void setup_core0(void * pvParameters)
+{
+  Serial.print( "setup_core0() running on core " );
+  Serial.println( xPortGetCoreID() );
+
+  start_server();
+}
+
 void loop_core0(void * pvParameters)
 {
-  Serial.print("loop_core0() running on core ");
-  Serial.println(xPortGetCoreID());
-
-  update_server();
+  Serial.print( "loop_core0() running on core " );
+  Serial.println( xPortGetCoreID() );
+  while(1)
+  {
+    update_server();
+    delay(1);
+  }
 }
 
 
@@ -272,6 +283,7 @@ void setup()
   setup_lcd( str_version );
 #endif
 
+#ifdef XIAO
   if( 1 )
   {
     Serial.flush();
@@ -289,6 +301,7 @@ void setup()
       delay(250);
     }
   }
+#endif
 
 #ifndef XIAO
   if( isMisBKit() )
@@ -327,6 +340,18 @@ void setup()
 
   start_server();
 
+/*
+  xTaskCreatePinnedToCore(
+                   setup_core0,   // Task function. 
+                      "Task1",     // name of task.
+                      10000*10,       // Stack size of task
+                      NULL,        // parameter of the task
+                      1,           // priority of the task
+                      &Task1,      // Task handle to keep track of created task
+                      0 );         // pin task to core 0
+
+*/
+
   // init motor
   dym.init();
 
@@ -336,14 +361,16 @@ void setup()
   Serial.print("setup() running on core ");
   Serial.println(xPortGetCoreID());
 
-xTaskCreatePinnedToCore(
-                   loop_core0,   /* Task function. */
-                    "Task1",     /* name of task. */
-                    10000,       /* Stack size of task */
-                    NULL,        /* parameter of the task */
-                    5,           /* priority of the task */
-                    &Task1,      /* Task handle to keep track of created task */
-                    0 );         /* pin task to core 0 */
+/*
+  xTaskCreatePinnedToCore(
+                    loop_core0,   // Task function.
+                      "Task1",     // name of task.
+                      10000*10,       // Stack size of task
+                      NULL,        // parameter of the task
+                      1,           // priority of the task
+                      &Task1,      // Task handle to keep track of created task
+                      0 );         // pin task to core 0
+*/
 }
 
 
@@ -352,5 +379,5 @@ void loop()
   //Serial.print("loop() running on core ");
   //Serial.println(xPortGetCoreID());
 
-  //update_server();
+  update_server();
 }

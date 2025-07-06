@@ -13,7 +13,7 @@ sys.path.append("../test_socket")
 from socket_server import getTimeStamp, smartFormatSize
 
 bGraph = 0
-bGraph = 1 # from 30fps to 10fps (with no real orders) from 5 to 4 with orders
+#~ bGraph = 1 # from 30fps to 10fps (with no real orders) from 5 to 4 with orders
 # updating one over 4 frames: from 30fps to 20fps
 # updating one over 10 frames: from 30fps to 25fps
 # now with all optims: 15 with real send orders (et meme 22fps avec la derniere optim)
@@ -174,7 +174,7 @@ def sendAndReceiveOrder( strServerIP ):
 
     
 strServerIP = "192.168.4.1"  # sur AP
-strServerIP = "192.168.0.9" # sur Box
+#~ strServerIP = "192.168.0.9" # sur Box
 
 sendAndReceiveOrder( strServerIP )
 
@@ -222,6 +222,7 @@ NB: en redressant l'ordi ca fonctionne moins bien
 # XIAO_S3-1 server, mstab7 client:
 14h32m28: nbr_exchange: 54.6 (274), Sent: 491.8B, Received: 327.9B
 # pas mieux
+# retesté le 6 juil 2025 à Nissan (peu de wifi dans le coin): 57.6 (pas mieux) (SSID: ESP26..88)
 """
 
 # scan for best channel automatic ?

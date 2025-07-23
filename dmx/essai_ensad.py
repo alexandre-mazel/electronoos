@@ -1,27 +1,32 @@
 # -*- coding: utf-8 -*-
 
+import time
 from dmxal import DMX # git clone https://github.com/monzelr/dmx.git, cd dmx, pip install .
 import dmxal
 dmxal.set_verbose( False )
 
 
-print( "Running Dmx...")
-nNbrChannel = 256; # le nbr que tu veux
-dmx = DMX( num_of_channels = nNbrChannel )
-print(dir(dmx))
-print("INF: dmx.is_connected(): ", dmx.is_connected() )
-print("INF: dmx.num_of_channels: ", dmx.num_of_channels )
 
-print(dir(dmx.device))
-print("INF: dmx.device.name: ", dmx.device.name ) # COMx
-print("INF: dmx.device.vid: ", dmx.device.vid ) # EUROLITE_USB_DMX512_PRO_CABLE_INTERFACE = Device(vid=1027, pid=24577)
-print("INF: dmx.device.pid: ", dmx.device.pid ) # 24577
-print("INF: dmx.device.product: ", dmx.device.product ) # None
-print("INF: dmx.device.description: ", dmx.device.description ) # USB Serial Port (COMx)
-print("INF: dmx.device.interface: ", dmx.device.interface ) # None
-print("INF: dmx.device.device: ", dmx.device.device ) # COMx
-print("INF: dmx.device.manufacturer: ", dmx.device.manufacturer ) # FTDI
-print("INF: dmx.device.serial_number: ", dmx.device.serial_number ) # mon truc chinois orange: BG00U0KFA; l'enttec de l'ensad: EN172589A, le noir qui clignote: BG0106SGA
+nNbrChannel = 256; # le nbr que tu veux
+
+print("INF: dmx: initing..." )
+
+if 1:
+    dmx = DMX( num_of_channels = nNbrChannel )
+    print(dir(dmx))
+    print("INF: dmx.is_connected(): ", dmx.is_connected() )
+    print("INF: dmx.num_of_channels: ", dmx.num_of_channels )
+
+    print(dir(dmx.device))
+    print("INF: dmx.device.name: ", dmx.device.name ) # COMx
+    print("INF: dmx.device.vid: ", dmx.device.vid ) # EUROLITE_USB_DMX512_PRO_CABLE_INTERFACE = Device(vid=1027, pid=24577)
+    print("INF: dmx.device.pid: ", dmx.device.pid ) # 24577
+    print("INF: dmx.device.product: ", dmx.device.product ) # None
+    print("INF: dmx.device.description: ", dmx.device.description ) # USB Serial Port (COMx)
+    print("INF: dmx.device.interface: ", dmx.device.interface ) # None
+    print("INF: dmx.device.device: ", dmx.device.device ) # COMx
+    print("INF: dmx.device.manufacturer: ", dmx.device.manufacturer ) # FTDI
+    print("INF: dmx.device.serial_number: ", dmx.device.serial_number ) # mon truc chinois orange: BG00U0KFA; l'enttec de l'ensad: EN172589A, le noir qui clignote: BG0106SGA
 
 print("INF: dmx: starting" )
 
@@ -51,9 +56,10 @@ if 1:
         for val in [255,192,128,64]:
             print("setting all channels to %s" % val )
             for chan in range(1, nNbrChannel):
-                print("setting channel %d to %d" % (chan,val) )    
+                print("setting channel %d to value %d" % (chan,val) )    
                 dmx.set_data(chan, val)
                 dmx.send()
+            print("waiting...")
             time.sleep(5)
         
 

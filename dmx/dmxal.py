@@ -1,7 +1,7 @@
 """
 file to control dmx devices
 
-Copyright 2021 Rune Monzel
+Copyright 2021-2024 Rune Monzel & Alexandre Mazel
 """
 
 # internal python modules

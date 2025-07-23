@@ -61,8 +61,5 @@ if 1:
                 dmx.send()
             print("waiting...")
             time.sleep(5)
-        
-
-    
 
     

@@ -11,7 +11,7 @@ nNbrChannel = 256; # le nbr que tu veux
 
 print("INF: dmx: initing..." )
 
-if 1:
+try:
     dmx = DMX( num_of_channels = nNbrChannel )
     print(dir(dmx))
     print("INF: dmx.is_connected(): ", dmx.is_connected() )
@@ -28,6 +28,11 @@ if 1:
     print("INF: dmx.device.manufacturer: ", dmx.device.manufacturer ) # FTDI
     print("INF: dmx.device.serial_number: ", dmx.device.serial_number ) # mon truc chinois orange: BG00U0KFA; l'enttec de l'ensad: EN172589A, le noir qui clignote: BG0106SGA
 
+except BaseException as err:
+    print("ERR: During Initing: exception: err: %s" % str(err) )
+    print("Press a key to continue...")
+    dummy = input()
+    
 print("INF: dmx: starting" )
 
 # def set_data(self, channel_id: int, data: int, auto_send: bool = True) -> None:
@@ -42,24 +47,31 @@ print("INF: dmx: starting" )
 """
 assuming the first fixture is DMX channel 1 and we are in 9 channel DMX 
 mode, the second fixture would need to be on channel 10, then the 3rd channel 19 and so on. 
-Some DMX controllers may group fixtures in lots of 16 channels – so in that case, fixture 1 on 
+Some DMX controllers may group fixtures in lots of 16 channels - so in that case, fixture 1 on 
 11 
 7
-channel 1, fixture 2 on channel 17, 3 on 33, and so on. Refer to your DMX controllers’ 
+channel 1, fixture 2 on channel 17, 3 on 33, and so on. Refer to your DMX controllers' 
 instruction manual on how best to manage your DMX channel allocation. 
 """
 
-print("Starting Essai Ensad")
+print("Starting Essai Ensad...")
 
-if 1:
-    while 1:
-        for val in [255,192,128,64]:
-            print("setting all channels to %s" % val )
-            for chan in range(1, nNbrChannel):
-                print("setting channel %d to value %d" % (chan,val) )    
-                dmx.set_data(chan, val)
-                dmx.send()
-            print("waiting...")
-            time.sleep(5)
+try:
 
+    if 1:
+        while 1:
+            for val in [255,192,128,64]:
+                print("setting all channels to %s" % val )
+                for chan in range(1, nNbrChannel):
+                    print("setting channel %d to value %d" % (chan,val) )    
+                    dmx.set_data(chan, val)
+                    dmx.send()
+                print("waiting...")
+                time.sleep(5)
+
+except BaseException as err:
+    print("ERR: During Running: exception: err: %s" % str(err) )
+    print("Press a key to continue...")
+    dummy = input()
     
+print("Finished")

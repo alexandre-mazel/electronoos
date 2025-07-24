@@ -107,6 +107,8 @@ class DMX(object):
 
         self.break_us = 88                          # 88us < break condition < 1s -> not used in DMX implementation
         self.MAB_us = 8                             # 8us < Mark-After-Break < 1s -> not used in DMX implementation
+        
+        self.b_clear_channel_at_exit = True
 
         # Search for RS-485 devices, for this look into DEVICE_LIST
         self.ser = None
@@ -199,6 +201,9 @@ class DMX(object):
         :return num_of_channels: number of DMX channels which shall be used in the universe, the less channels the faster!
         """
         return self.__num_of_channels
+        
+    def set_clear_channel_at_exit( self, newval: bool ):
+        self.b_clear_channel_at_exit = newval
 
     @num_of_channels.setter
     def num_of_channels(self, num_of_channels: int) -> None:
@@ -275,9 +280,10 @@ class DMX(object):
         if isinstance(self.ser, serial.Serial):
             if self.ser.is_open:
                 if self.is_connected():
-                    self.num_of_channels = 512
-                    self.data = np.zeros([self.num_of_channels], np.uint8)
-                    self.send()
+                    if self.b_clear_channel_at_exit:
+                        self.num_of_channels = 512
+                        self.data = np.zeros([self.num_of_channels], np.uint8)
+                        self.send()
                 print("close serial port")
                 self.ser.close()
 

@@ -197,70 +197,15 @@ try:
         dmx.set_data(wash_id+3, 255) # dimmer a fond
         dmx.set_data(wash_id+6, 255) # blue a fond
         dmx.set_clear_channel_at_exit( False )
-        
-        if len(sys.argv) > 3:
+
+        numarg = 3
+        while len(sys.argv) > numarg:
             # change la valeur d' un chan avec une valeur specifique
-            specific_chan = int( sys.argv[2] )
-            specific_val = int( sys.argv[3] )
+            specific_chan = int( sys.argv[numarg-1] )
+            specific_val = int( sys.argv[numarg] )
             print("+ setting to set specific channel %d to value %d" % (specific_chan,specific_val) )
-            dmx.set_data(specific_chan, specific_val)
-            
-        if len(sys.argv) > 5:
-            # change la valeur d' un chan avec une valeur specifique
-            specific_chan = int( sys.argv[4] )
-            specific_val = int( sys.argv[5] )
-            print("+ setting to set specific channel %d to value %d" % (specific_chan,specific_val) )
-            dmx.set_data(specific_chan, specific_val)
-            
-        if len(sys.argv) > 7:
-            # change la valeur d' un chan avec une valeur specifique
-            specific_chan = int( sys.argv[6] )
-            specific_val = int( sys.argv[7] )
-            print("+ setting to set specific channel %d to value %d" % (specific_chan,specific_val) )
-            dmx.set_data(specific_chan, specific_val)
-            
-        if len(sys.argv) > 9:
-            # change la valeur d' un chan avec une valeur specifique
-            specific_chan = int( sys.argv[8] )
-            specific_val = int( sys.argv[9] )
-            print("+ setting to set specific channel %d to value %d" % (specific_chan,specific_val) )
-            dmx.set_data(specific_chan, specific_val)
-            
-        if len(sys.argv) > 11:
-            # change la valeur d' un chan avec une valeur specifique
-            specific_chan = int( sys.argv[10] )
-            specific_val = int( sys.argv[11] )
-            print("+ setting to set specific channel %d to value %d" % (specific_chan,specific_val) )
-            dmx.set_data(specific_chan, specific_val)
-            
-        if len(sys.argv) > 12:
-            # change la valeur d' un chan avec une valeur specifique
-            specific_chan = int( sys.argv[12] )
-            specific_val = int( sys.argv[13] )
-            print("+ setting to set specific channel %d to value %d" % (specific_chan,specific_val) )
-            dmx.set_data(specific_chan, specific_val)
-            
-        if len(sys.argv) > 14:
-            # change la valeur d' un chan avec une valeur specifique
-            specific_chan = int( sys.argv[14] )
-            specific_val = int( sys.argv[15] )
-            print("+ setting to set specific channel %d to value %d" % (specific_chan,specific_val) )
-            dmx.set_data(specific_chan, specific_val)
-            
-        if len(sys.argv) > 16:
-            # change la valeur d' un chan avec une valeur specifique
-            specific_chan = int( sys.argv[16] )
-            specific_val = int( sys.argv[17] )
-            print("+ setting to set specific channel %d to value %d" % (specific_chan,specific_val) )
-            dmx.set_data(specific_chan, specific_val)
-            
-            
-        if len(sys.argv) > 18:
-            # change la valeur d' un chan avec une valeur specifique
-            specific_chan = int( sys.argv[18] )
-            specific_val = int( sys.argv[19] )
-            print("+ setting to set specific channel %d to value %d" % (specific_chan,specific_val) )
-            dmx.set_data(specific_chan, specific_val)
+            dmx.set_data(specific_chan, specific_val)      
+            numarg += 2        
             
         dmx.send()
         time.sleep( 2 ) # just to be sure
@@ -269,72 +214,34 @@ try:
         print( "Done" )
             
     elif sys.argv[1][0] == 'd':
-        print("dim first param then specific")
+        print("dim first param speed in second then specific")
         dim_chan = int( sys.argv[2] )
         
-        if len(sys.argv) > 4:
+        numarg = 5
+        while len(sys.argv) > numarg:
             # change la valeur d' un chan avec une valeur specifique
-            specific_chan = int( sys.argv[3] )
-            specific_val = int( sys.argv[4] )
+            specific_chan = int( sys.argv[numarg-1] )
+            specific_val = int( sys.argv[numarg] )
             print("+ setting to set specific channel %d to value %d" % (specific_chan,specific_val) )
-            dmx.set_data(specific_chan, specific_val)
-            
-        if len(sys.argv) > 6:
-            # change la valeur d' un chan avec une valeur specifique
-            specific_chan = int( sys.argv[5] )
-            specific_val = int( sys.argv[6] )
-            print("+ setting to set specific channel %d to value %d" % (specific_chan,specific_val) )
-            dmx.set_data(specific_chan, specific_val)
-            
-        if len(sys.argv) > 8:
-            # change la valeur d' un chan avec une valeur specifique
-            specific_chan = int( sys.argv[7] )
-            specific_val = int( sys.argv[8] )
-            print("+ setting to set specific channel %d to value %d" % (specific_chan,specific_val) )
-            dmx.set_data(specific_chan,specific_val)
-            
-        if len(sys.argv) > 10:
-            # change la valeur d' un chan avec une valeur specifique
-            specific_chan = int( sys.argv[9] )
-            specific_val = int( sys.argv[10] )
-            print("+ setting to set specific channel %d to value %d" % (specific_chan,specific_val) )
-            dmx.set_data(specific_chan, specific_val)
-            
-        if len(sys.argv) > 12:
-            # change la valeur d' un chan avec une valeur specifique
-            specific_chan = int( sys.argv[11] )
-            specific_val = int( sys.argv[12] )
-            print("+ setting to set specific channel %d to value %d" % (specific_chan,specific_val) )
-            dmx.set_data(specific_chan,specific_val)
-            
-        if len(sys.argv) > 14:
-            # change la valeur d' un chan avec une valeur specifique
-            specific_chan = int( sys.argv[13] )
-            specific_val = int( sys.argv[14] )
-            print("+ setting to set specific channel %d to value %d" % (specific_chan,specific_val) )
-            dmx.set_data(specific_chan, specific_val)
-            
-        if len(sys.argv) > 16:
-            # change la valeur d' un chan avec une valeur specifique
-            specific_chan = int( sys.argv[15] )
-            specific_val = int( sys.argv[16] )
-            print("+ setting to set specific channel %d to value %d" % (specific_chan,specific_val) )
-            dmx.set_data(specific_chan, specific_val)
-            
-        if len(sys.argv) > 18:
-            # change la valeur d' un chan avec une valeur specifique
-            specific_chan = int( sys.argv[17] )
-            specific_val = int( sys.argv[18] )
-            print("+ setting to set specific channel %d to value %d" % (specific_chan,specific_val) )
-            dmx.set_data(specific_chan, specific_val)
+            dmx.set_data(specific_chan, specific_val)      
+            numarg += 2            
             
         while 1:
-            print("dimming")
+            if len(sys.argv) > 3:
+                duration = int(sys.argv[3])
+            else:
+                duration = 25
+            print( "dimming in %s second(s)" % duration )
             for val in range(255,0,-1):
                 print("dim channel %d to %d" % (dim_chan,val) )
                 dmx.set_data( dim_chan, val )
                 dmx.send()
-                time.sleep(25/255)
+                time.sleep(duration/255)
+            for val in range( 0,255 ):
+                print("dim channel %d to %d" % (dim_chan,val) )
+                dmx.set_data( dim_chan, val )
+                dmx.send()
+                time.sleep(duration/255)
                 
                 
 except BaseException as err:

@@ -203,6 +203,7 @@ class DMX(object):
         return self.__num_of_channels
         
     def set_clear_channel_at_exit( self, newval: bool ):
+        print( "INF: DmxAl: set_clear_channel_at_exit: changing value to %s" % newval )
         self.b_clear_channel_at_exit = newval
 
     @num_of_channels.setter

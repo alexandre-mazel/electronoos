@@ -218,6 +218,7 @@ def get_capacity():
     bVerbose = 0
     
     bRenderOneImageEachResolution = 1
+    bRenderOneImageEachResolution = 0
     
     hostname = get_hostname()
     
@@ -228,7 +229,7 @@ def get_capacity():
         
         id = 0
         
-        id = 3 # start from specific idx
+        #~ id = 3 # start from specific idx
         
         nbr_error = 0
         
@@ -376,9 +377,12 @@ name: 'DSHOW'
   resolution 960x720 @ 240 fps
     measured_fps: 14.2 fps
   resolution 1280x720 @ 240 fps
-    measured_fps: 1.0 fps
+    measured_fps: 9.4 fps
   resolution 1600x896 @ 240 fps    
     measured_fps: 7.0 fps <<<<<<<<<<<<
+  resolution 1920x1080 @ 240 fps
+    measured_fps: 4.6 fps
+
 """
 
 if __name__ == "__main__":

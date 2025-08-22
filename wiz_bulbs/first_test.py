@@ -43,7 +43,9 @@ async def main():
     await light.turn_on(PilotBuilder(brightness = 255))
 
     # Set bulb brightness (with async timeout)
-    timeout = 10
+    timeout = 1000
+    await asyncio.wait_for(light.turn_on(PilotBuilder(brightness = 10)), timeout)
+    
     await asyncio.wait_for(light.turn_on(PilotBuilder(brightness = 255)), timeout)
 
     # Set bulb to warm white

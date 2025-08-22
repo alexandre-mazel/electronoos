@@ -2,6 +2,8 @@ import asyncio
 
 from pywizlight import wizlight, PilotBuilder, discovery # pip install pywizlight # NB: Requires Python version >=3.7.
 
+import time
+
 async def main():
     """Sample code to work with bulbs."""
     
@@ -25,7 +27,7 @@ async def main():
             
     ip_bulb = "192.168.0.22"
     
-    print( "INF: connecting to %s" % ip_bulb )
+    print( "INF: connecting to %s ..." % ip_bulb )
 
     # Set up a standard light
     light = wizlight(ip_bulb)
@@ -36,11 +38,31 @@ async def main():
     # to run them from normal synchronous code, you can wrap them with
     # asyncio.run(..).
 
+    print("turn last settings")
     # Turn the light on into "rhythm mode"
     await light.turn_on(PilotBuilder())
     
+    time.sleep(1)
+    
     # Set bulb brightness
-    await light.turn_on(PilotBuilder(brightness = 255))
+    print("turn on")
+    await light.turn_on(PilotBuilder(brightness = 255,rgb = (255, 255, 255)))
+    
+    time.sleep(1)
+    
+    print("turn color")
+    await light.turn_on(PilotBuilder(rgb = (0, 128, 255)))
+    
+    time.sleep(1)
+    
+    # Set bulb brightness
+    print("turn off")
+    await light.turn_off()
+    
+    time.sleep(1)
+    
+    
+    #exit(0)
 
     # Set bulb brightness (with async timeout)
     timeout = 1000
@@ -57,7 +79,7 @@ async def main():
 
     # Get the current color temperature, RGB values
     state = await light.updateState()
-    print(state.get_colortemp())
+    print("Color temp:", state.get_colortemp())
     red, green, blue = state.get_rgb()
     print(f"red {red}, green {green}, blue {blue}")
 
@@ -66,7 +88,7 @@ async def main():
 
     # Get the name of the current scene
     state = await light.updateState()
-    print(state.get_scene())
+    print("Current state scene:", state.get_scene())
 
     # Get the features of the bulb
     bulb_type = await light.get_bulbtype()
@@ -81,8 +103,32 @@ async def main():
 
     # Turn the light off
     await light.turn_off()
-
-    # Do operations on multiple lights in parallel
+    
+    lig2 = wizlight("192.168.0.52")
+    await lig2.turn_on()
+    time.sleep(1)
+    await lig2.turn_off()
+    
+    time.sleep(1)
+    
+    # Do operations on multiple lights in parallel (python < 3.10, cf below)
+    
+    await asyncio.gather( light.turn_on(PilotBuilder(brightness = 255,rgb = (0, 255, 0))), 
+        lig2.turn_on(PilotBuilder(brightness = 255,rgb = (0, 255, 0))) )
+        
+        
+    time.sleep(1)
+    
+    pb_red = PilotBuilder(brightness = 255,rgb = (255, 0, 0))
+    await asyncio.gather( light.turn_on(pb_red), 
+        lig2.turn_on( pb_red ) )
+        
+    time.sleep(1)
+        
+    
+    await asyncio.gather( light.turn_off(), lig2.turn_off() )
+    
+    
     #bulb1 = wizlight("<your bulb1 ip>")
     #bulb2 = wizlight("<your bulb2 ip>")
     # --- DEPRECATED in 3.10 see [#140](https://github.com/sbidy/pywizlight/issues/140)

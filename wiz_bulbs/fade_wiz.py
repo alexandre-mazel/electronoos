@@ -51,7 +51,8 @@ async def fade_wiz(col1, col2, duration):
     
     print( "INF: fade_wiz: starting...")
     
-    ips_bulb = ["192.168.0.110","192.168.0.111","192.168.0.112"]
+    #~ ips_bulb = ["192.168.0.110","192.168.0.111","192.168.0.112"]
+    ips_bulb = ["192.168.0.110","192.168.0.112"]
     ips_bulb = ["192.168.0.112"]
     
     bulbs = []
@@ -92,9 +93,12 @@ async def fade_wiz(col1, col2, duration):
         time.sleep(0.001)
 
 loop = asyncio.get_event_loop()
+
+# reglage pour eclairage oeuvre.
+
 duration = 10 # in sec
 col_1 = (0, 0, 0, 255, 255)
-col_2 = (0, 5, 35, 0, 0)
+col_2 = (0, 5, 128, 0, 0)
 
 loop.run_until_complete(fade_wiz(col_1,col_2,duration))
 

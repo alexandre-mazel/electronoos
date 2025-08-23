@@ -32,7 +32,8 @@ def print_msg( msg ):
 r = 127
 g = 127
 b = 127
-bright = 255
+ww = 127 # warm white
+cw = 127 # cold white
 mute = 0
 modified = 0
 time_change = time.time()
@@ -41,7 +42,7 @@ bulbs = []
 
 async def update_lights():
     
-    global modified, bright, time_change, r, g, b, mute, bulbs
+    global modified, ww, cw, time_change, r, g, b, mute, bulbs
     
     bVerbose = 1
     bVerbose = 0
@@ -51,6 +52,7 @@ async def update_lights():
     if bVerbose: print( "INF: update_lights: starting...")
     
     ips_bulb = ["192.168.0.110","192.168.0.111","192.168.0.112"]
+    ips_bulb = ["192.168.0.112"]
     
     for ip in ips_bulb:
         print( "INF: update_lights: connecting to %s ..." % ip )
@@ -63,13 +65,19 @@ async def update_lights():
         if modified and (time.time() - time_change > 0.1 or time.time() - time_last_send > 0.5):
             modified = 0
             time_last_send = time.time()
-            print("sending, r: %s, g: %s, b: %s, mute: %s" % (r,g,b, mute))
+            #~ print("sending, r: %s, g: %s, b: %s, bright: %s, mute: %s" % (r,g,b, bright, mute))
+            print("sending, r: %s, g: %s, b: %s, ww: %s, cw: %s, mute: %s" % (r,g,b, ww, cw, mute))
             # b  = bulbs[0]
             for bulb in bulbs:
                 if mute:
                     await bulb.turn_off()
                 else:
-                    await bulb.turn_on(PilotBuilder(brightness = bright,rgb = (r, g, b)))
+                    #~ await bulb.turn_on(PilotBuilder(brightness = bright,rgb = (r, g, b))
+                    #~ await bulb.turn_on(PilotBuilder(rgbw = (r, g, b,bright)))
+                    #~ await bulb.turn_on(PilotBuilder(rgbww = (0,0,0,113,113)))
+                    await bulb.turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww)))
+                    
+                    
         #~ time.sleep(0.1)
         await asyncio.sleep(0.1)
         
@@ -79,7 +87,7 @@ def update_lights_thread():
         
 async def midi_control():
     
-    global modified, bright, time_change, r, g, b, mute, bulbs
+    global modified, ww, cw, time_change, r, g, b, mute, bulbs
     
     bVerbose = 1
     bVerbose = 0
@@ -117,7 +125,9 @@ async def midi_control():
                 elif id == 5:
                     b = val
                 elif id == 6:
-                    bright = val
+                    ww = val
+                elif id == 7:
+                    cw = val
                 modified = 1
                 time_change = time.time()
             if bVerbose: print("loop...")

@@ -26,6 +26,9 @@ async def main():
             await bulb.turn_off()
             
     ip_bulb = "192.168.0.22"
+    ip_bulb = "192.168.0.110"
+    ip_bulb = "192.168.0.80"
+    ip_bulb = "192.168.0.112"
     
     print( "INF: connecting to %s ..." % ip_bulb )
 
@@ -61,8 +64,12 @@ async def main():
     
     time.sleep(1)
     
+    #~ pbtest = PilotBuilder(rgb = (0, 128, 255),brightness = 255)
+    #~ pbtest = PilotBuilder(rgbw = (0, 128, 255,200))
+    #~ print("pbtest:",dir(pbtest))
     
-    #exit(0)
+    
+    exit(0)
 
     # Set bulb brightness (with async timeout)
     timeout = 1000

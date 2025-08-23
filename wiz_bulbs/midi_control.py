@@ -13,12 +13,14 @@ def print_msg( msg ):
     o += "hex: %s\n" % msg.hex()
     o += "is_cc: %s\n" % msg.is_cc()
     o += "channel: %s\n" % msg.channel
-    o += "control: %s\n" % msg.control
+    if hasattr(msg, "control"):
+        o += "control: %s\n" % msg.control
     o += "is_meta: %s\n" % msg.is_meta
     o += "is_realtime: %s\n" % msg.is_realtime
     o += "time: %s\n" % msg.time
     o += "type: %s\n" % msg.type
-    o += "value: %s\n" % msg.value
+    if hasattr(msg, "value"):
+        o += "value: %s\n" % msg.value
     
     print(o)
     
@@ -31,6 +33,7 @@ r = 127
 g = 127
 b = 127
 bright = 255
+mute = 0
 modified = 0
 time_change = time.time()
 
@@ -38,11 +41,14 @@ bulbs = []
 
 async def update_lights():
     
-    global modified, bright, time_change, r, g, b, bulbs
+    global modified, bright, time_change, r, g, b, mute, bulbs
+    
+    bVerbose = 1
+    bVerbose = 0
     
     time_last_send = time.time()
     
-    print( "INF: update_lights: starting...")
+    if bVerbose: print( "INF: update_lights: starting...")
     
     ips_bulb = ["192.168.0.110","192.168.0.111","192.168.0.112"]
     
@@ -53,14 +59,17 @@ async def update_lights():
     
     while 1:
     #~ if 1:
-        print( "INF: update_lights: modified:", modified)
+        if bVerbose: print( "INF: update_lights: modified:", modified)
         if modified and (time.time() - time_change > 0.1 or time.time() - time_last_send > 0.5):
             modified = 0
             time_last_send = time.time()
-            print("sending, r: %s, g: %s, b: %s" % (r,g,b))
+            print("sending, r: %s, g: %s, b: %s, mute: %s" % (r,g,b, mute))
             # b  = bulbs[0]
             for bulb in bulbs:
-                await bulb.turn_on(PilotBuilder(brightness = bright,rgb = (r, g, b)))
+                if mute:
+                    await bulb.turn_off()
+                else:
+                    await bulb.turn_on(PilotBuilder(brightness = bright,rgb = (r, g, b)))
         #~ time.sleep(0.1)
         await asyncio.sleep(0.1)
         
@@ -70,7 +79,10 @@ def update_lights_thread():
         
 async def midi_control():
     
-    global modified, bright, time_change, r, g, b, bulbs
+    global modified, bright, time_change, r, g, b, mute, bulbs
+    
+    bVerbose = 1
+    bVerbose = 0
     
     if 0:
         # check them
@@ -85,10 +97,19 @@ async def midi_control():
     with mido.open_input() as inport:
         for msg in inport:
             #~ print(print_msg(msg))
-            if msg.channel >= 1:
+            if msg.type == "note_on":
+                print("note_on")
+                mute = not mute
+                modified = 1
+                time_change = time.time()
+            elif msg.type == "note_off":
+                pass
+            elif msg.channel >= 1:
                 id = msg.channel - 1
                 val = msg.value * 2+1
-                print("id: %s, value: %s" % (id, val) )
+                if val == 1:
+                    val = 0
+                if bVerbose: print("id: %s, value: %s" % (id, val) )
                 if id == 3:
                     r = val
                 elif id == 4:
@@ -99,7 +120,7 @@ async def midi_control():
                     bright = val
                 modified = 1
                 time_change = time.time()
-            print("loop...")
+            if bVerbose: print("loop...")
             
         print("loop2...") # never pass...
         

@@ -1,33 +1,37 @@
 import cv2
 import time
+import os
 
 
 all_resolution_possible = [
     (160, 120),
 
-	(192, 144),
-	(256, 144),
+    (176, 144),
+    (192, 144),
+    (256, 144),
 
-	(240, 160),
+    (240, 160),
 
-	(320, 240),
-	(360, 240),
-	(384, 240),
-	(400, 240),
-	(432, 240),
+    (320, 240),
+    (360, 240),
+    (384, 240),
+    (400, 240),
+    (432, 240),
 
-	(480, 320),
+    (480, 320),
 
-	(480, 360),
-	(640, 360),
+    (480, 360),
+    (640, 360),
 
-	(600, 480),
-	(640, 480),
-	(720, 480),
-	(768, 480),
-	(800, 480),
-	(854, 480),
-	(960, 480),
+    (800, 448),
+
+    (600, 480),
+    (640, 480),
+    (720, 480),
+    (768, 480),
+    (800, 480),
+    (854, 480),
+    (960, 480),
 
 	(675, 540),
 	(960, 540),
@@ -61,35 +65,39 @@ all_resolution_possible = [
 	(1280, 864),
 	(1536, 864),
 
-	(1200, 896),
-	(1440, 896),
-	(1600, 896),
+    (600, 896),
+    (1200, 896),
+    (1440, 896),
+    (1600, 896),
 
-	(1200, 900),
-	(1440, 900),
-	(1600, 900),
+    (1200, 900),
+    (1440, 900),
+    (1600, 900),
 
-	(1280, 960),
-	(1440, 960),
-	(1536, 960),
+    ( 800,  960),
+    (1280, 960),
+    (1440, 960),
+    (1536, 960),
 
-	(1280, 1024),
-	(1600, 1024),
+    (800, 1024),
+    (1280, 1024),
+    (1600, 1024),
 
-	(1400, 1050),
-	(1680, 1050),
+    (1400, 1050),
+    (1680, 1050),
 
-	(1440, 1080),
-	(1920, 1080),
-	(2160, 1080),
-	(2280, 1080),
-	(2560, 1080),
+    ( 800, 1080),
+    (1440, 1080),
+    (1920, 1080),
+    (2160, 1080),
+    (2280, 1080),
+    (2560, 1080),
 
-	(2048, 1152),
+    (2048, 1152),
 
-	(1500, 1200),
-	(1600, 1200),
-	(1920, 1200),
+    (1500, 1200),
+    (1600, 1200),
+    (1920, 1200),
 
 	(1920, 1280),
 	(2048, 1280),
@@ -220,6 +228,12 @@ def get_capacity():
     bRenderOneImageEachResolution = 1
     bRenderOneImageEachResolution = 0
     
+    bSaveEachResolution = 1
+    bSaveEachResolution = 0
+    
+    if bSaveEachResolution:
+        print("WRN: bSaveEachResolution can alter fps computation" )
+    
     hostname = get_hostname()
     
     cap_mode = cv2.CAP_ANY
@@ -229,7 +243,7 @@ def get_capacity():
         
         id = 0
         
-        #~ id = 3 # start from specific idx
+        id = 3 # start from specific idx
         
         nbr_error = 0
         
@@ -261,6 +275,9 @@ def get_capacity():
                 # filter on just a forgotten height resolution
                 if 0 and (h != 720 or h != 896):
                     continue
+                    
+                if h < 720:
+                    continue
                             
                 cam.set( cv2.CAP_PROP_FRAME_WIDTH, w )
                 cam.set( cv2.CAP_PROP_FRAME_HEIGHT, h )
@@ -291,6 +308,11 @@ def get_capacity():
                                     if bRenderOneImageEachResolution:
                                         if nbr_image == 3: # les 2 premieres peuvent etre noires
                                             cv2.imshow( "cam %d %dx%d" % (numcam, getw, geth ), frame )
+                                            if bSaveEachResolution:
+                                                folder_name = "./webcam_output/"
+                                                try: os.makedirs(folder_name)
+                                                except FileExistsError: pass
+                                                cv2.imwrite( folder_name + "%d_%d_%dx%d.jpg" % (int(time.time()),numcam, getw, geth ), frame )
                                     nbr_image += 1
                             except cv2.error as err:
                                 if str(err) != last_err:
@@ -307,6 +329,7 @@ def get_capacity():
                         print( "    measured_fps: %.1f fps" % measured_fps )
                         if bRenderOneImageEachResolution: cv2.waitKey( 500 )
                 else:
+                    print("asked: %dx%d and received: %dx%d" % (w,h,getw,geth) )
                     if bVerbose: print( "    (tested %dx%d)" % (w,h) )
                     if bRenderOneImageEachResolution: cv2.waitKey( 100 )
 

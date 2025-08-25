@@ -47,13 +47,16 @@ if 0:
     exit(1)
 
 async def fade_wiz(col1, col2, duration):
-    """Sample code to work with bulbs."""
+    """
+    Fade between two colors.
+    colors are a tuple: r, g, b, ww, cw, brightness
+    """
     
     print( "INF: fade_wiz: starting...")
     
-    #~ ips_bulb = ["192.168.0.110","192.168.0.111","192.168.0.112"]
-    ips_bulb = ["192.168.0.110","192.168.0.112"]
-    ips_bulb = ["192.168.0.112"]
+    ips_bulb = ["192.168.0.110","192.168.0.111","192.168.0.112", "192.168.0.113", "192.168.0.114"]
+    #~ ips_bulb = ["192.168.0.110","192.168.0.112"]
+    #~ ips_bulb = ["192.168.0.112"]
     
     bulbs = []
     
@@ -64,9 +67,10 @@ async def fade_wiz(col1, col2, duration):
 
     time_begin = time.time()
     mute = 0
+    cpt = 0
     while time.time() - time_begin <=  duration:
         t = time.time() - time_begin
-        col = [0,0,0,0,0]
+        col = [0,0,0, 0,0, 0]
         coef0 = t / duration
         coef = coef0
         #~ coef = nonlinear_ramp( coef0 )
@@ -74,35 +78,101 @@ async def fade_wiz(col1, col2, duration):
         if coef > coef_presque:
             print("coef0: %.3f, coef: %.3f, presque: %.3f" % (coef0, coef, coef_presque) )
             coef = 1
-        for i in range(5):
-            col[i] = round(col_1[i] * (1-coef) + col_2[i] * coef)
+        for i in range(6):
+            col[i] = round(col1[i] * (1-coef) + col2[i] * coef)
             if col[i] < 0:
                 col[i] = 0
-        print( "t: %.4f coef0: %.3f, coef: %.3f, r g b ww cw: %s" % (t, coef0, coef, str(col)) )
+        print( "cpt: %d, t: %.4f coef0: %.3f, coef: %.3f, r g b ww cw bright: %s" % ( cpt, t, coef0, coef, str(col) ) )
         
-        for bulb in bulbs:
-            if mute:
-                await bulb.turn_off()
+        r, g, b,ww,cw, bright = col
+        
+        if r == 0 and g == 0 and b == 0 and ww == 0 and cw == 0 and bright == 0:
+            print( "INF: muting" )
+            mute = 1
+        else:
+            mute = 0
+        
+        if 0:
+            
+            for i,bulb in enumerate(bulbs):
+                if mute:
+                    await bulb.turn_off()
+                else:
+                    #~ await bulb.turn_on(PilotBuilder(brightness = bright,rgb = (r, g, b))
+                    #~ await bulb.turn_on(PilotBuilder(rgbw = (r, g, b,bright)))
+                    #~ await bulb.turn_on(PilotBuilder(rgbww = (0,0,0,113,113)))
+                    
+                    # on a a peu pres 233ms par appel
+                    # await just the last one (ca fonctionne pas)
+                    if i == len(bulbs)-1:
+                        await bulb.turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright))
+                    else:
+                        bulb.turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright))
+        else:
+            # on gagne grave: ca prend 260ms pour 3 appels
+            if mute == 0:
+                await asyncio.gather(
+                    bulbs[0].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                    bulbs[1].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                    bulbs[2].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                    bulbs[3].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                    bulbs[4].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                )
             else:
-                #~ await bulb.turn_on(PilotBuilder(brightness = bright,rgb = (r, g, b))
-                #~ await bulb.turn_on(PilotBuilder(rgbw = (r, g, b,bright)))
-                #~ await bulb.turn_on(PilotBuilder(rgbww = (0,0,0,113,113)))
-                r, g, b,ww,cw = col
-                await bulb.turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww)))
-    
-        time.sleep(0.001)
+                await asyncio.gather(
+                    bulbs[0].turn_off(),
+                    bulbs[1].turn_off(),
+                    bulbs[2].turn_off(),
+                    bulbs[3].turn_off(),
+                    bulbs[4].turn_off(),
+                )
+        cpt += 1
+        time.sleep(0.01)
+    print( "time per call: %.2fs" % ((time.time() - time_begin) / cpt) )
+        
 
 loop = asyncio.get_event_loop()
 
-# reglage pour eclairage oeuvre.
+if 0:
+    # reglage pour eclairage oeuvre.
 
-duration = 10 # in sec
-col_1 = (0, 0, 0, 255, 255)
-col_2 = (0, 5, 128, 0, 0)
+    duration = 10 # in sec
+    col_1 = (0, 0, 0, 255, 255)
+    col_2 = (0, 5, 128, 0, 0)
 
-loop.run_until_complete(fade_wiz(col_1,col_2,duration))
+    loop.run_until_complete(fade_wiz(col_1,col_2,duration))
 
-duration = 5 # in sec
-col_1 = (0, 5, 35, 0, 0)
-col_2 = (0, 5, 7, 0, 0)
-loop.run_until_complete(fade_wiz(col_1,col_2,duration))
+    duration = 5 # in sec
+    col_1 = (0, 5, 35, 0, 0)
+    col_2 = (0, 5, 7, 0, 0)
+    loop.run_until_complete(fade_wiz(col_1,col_2,duration))
+    
+if 0:
+    # reglage pour fade dans les bleus.
+
+    duration = 10 # in sec
+    col_1 = (0, 20, 255, 0, 0, 0)
+    col_2 = (0, 20, 255, 0, 0, 255)
+    loop.run_until_complete(fade_wiz(col_1,col_2,duration))
+    
+if 1:
+    # reglage pour fade red vers bleu
+
+    duration = 10 # in sec
+    col_1 = (0, 0, 255, 0, 0, 0)
+    col_2 = (255, 0, 0, 0, 0, 0)
+    #~ loop.run_until_complete(fade_wiz(col_1,col_2,duration))
+
+    col_1 = (0, 0, 255, 0, 0, 255)
+    col_2 = (0, 0, 0, 0, 0, 0)    
+    loop.run_until_complete(fade_wiz(col_1,col_2,duration))
+    #~ loop.run_until_complete(fade_wiz(col_2,col_1,duration))
+    
+if 0:
+    duration = 10 # in sec
+    col_1 = (10, 20, 30, 40, 200)
+    col_2 = (10, 20, 30, 40, 200)
+
+    loop.run_until_complete(fade_wiz(col_1,col_2,duration))
+
+    

@@ -5,7 +5,6 @@ from pywizlight import wizlight, PilotBuilder, discovery # pip install pywizligh
 import time
 
 """
-INF: connecting to 192.168.0.110 ...
 ['__class__', '__del__', '__delattr__', '__dict__', '__dir__', '__doc__'
 , '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '_
 _hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__
@@ -39,8 +38,8 @@ async def print_bulb( b ):
     o += "state2.get_speed: %s\n" % state.get_speed()
     o += "state2.get_ratio: %s\n" % state.get_ratio()
     o += "state2.get_power: %s\n" % state.get_power()
-    o += "state2.get_rgbw: %s\n" % state.get_rgbw()
-    o += "state2.get_rgbww: %s\n" % state.get_rgbww()
+    o += "state2.get_rgbw: %s\n" % str(state.get_rgbw())
+    o += "state2.get_rgbww: %s\n" % str(state.get_rgbww())
     print(dir(state))
     
     print(o)
@@ -60,14 +59,21 @@ async def main():
     await print_bulb(light)
     
     # je voulais connaitre le rgb du candle light mais pas possible car c'est un mode interne
-    while 0:
+    while 1:
 
         # Get the current color temperature, RGB values
         state = await light.updateState()
         print("Color temp:", state.get_colortemp())
-        red, green, blue = state.get_rgb()
-        print(f"red: {red}, green: {green}, blue: {blue}")
-        time.sleep(0.01)
+        if state.get_rgb() != None:
+            red, green, blue = state.get_rgb()
+            print(f"red: {red}, green: {green}, blue: {blue}")
+        
+        if state.get_rgbww() != None:
+            red, green, blue, cw, ww = state.get_rgbww()
+            brightness = state.get_brightness()
+            print(f"red: {red}, green: {green}, blue: {blue}, ww: {ww}, cw: {cw}, brightness: {brightness}")
+                
+        time.sleep(0.1)
 
 
 

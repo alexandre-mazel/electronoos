@@ -54,7 +54,7 @@ async def fade_wiz(col1, col2, duration):
     
     print( "INF: fade_wiz: starting...")
     
-    ips_bulb = ["192.168.0.110","192.168.0.111","192.168.0.112", "192.168.0.113", "192.168.0.114"]
+    ips_bulb = ["192.168.0.110","192.168.0.111","192.168.0.112", "192.168.0.113", "192.168.0.114", "192.168.0.120", "192.168.0.121"]
     #~ ips_bulb = ["192.168.0.110","192.168.0.112"]
     #~ ips_bulb = ["192.168.0.112"]
     
@@ -109,7 +109,7 @@ async def fade_wiz(col1, col2, duration):
                     else:
                         bulb.turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright))
         else:
-            # on gagne grave: ca prend 260ms pour 3 appels
+            # on gagne grave: ca prend 260ms pour 3 appels (270ms pour 7 appels)
             if mute == 0:
                 await asyncio.gather(
                     bulbs[0].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
@@ -117,6 +117,8 @@ async def fade_wiz(col1, col2, duration):
                     bulbs[2].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
                     bulbs[3].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
                     bulbs[4].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                    bulbs[5].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                    bulbs[6].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
                 )
             else:
                 await asyncio.gather(
@@ -125,6 +127,8 @@ async def fade_wiz(col1, col2, duration):
                     bulbs[2].turn_off(),
                     bulbs[3].turn_off(),
                     bulbs[4].turn_off(),
+                    bulbs[5].turn_off(),
+                    bulbs[6].turn_off(),
                 )
         cpt += 1
         time.sleep(0.01)
@@ -161,12 +165,12 @@ if 1:
     duration = 10 # in sec
     col_1 = (0, 0, 255, 0, 0, 0)
     col_2 = (255, 0, 0, 0, 0, 0)
-    #~ loop.run_until_complete(fade_wiz(col_1,col_2,duration))
+    loop.run_until_complete(fade_wiz(col_1,col_2,duration))
 
     col_1 = (0, 0, 255, 0, 0, 255)
     col_2 = (0, 0, 0, 0, 0, 0)    
     loop.run_until_complete(fade_wiz(col_1,col_2,duration))
-    #~ loop.run_until_complete(fade_wiz(col_2,col_1,duration))
+    loop.run_until_complete(fade_wiz(col_2,col_1,duration))
     
 if 0:
     duration = 10 # in sec

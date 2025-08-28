@@ -70,11 +70,11 @@ print("INF: dmx: initing..." )
 
 try:
     dmx = DMX( num_of_channels = nNbrChannel )
-    print(dir(dmx))
+    #~ print(dir(dmx))
     print("INF: dmx.is_connected(): ", dmx.is_connected() )
     print("INF: dmx.num_of_channels: ", dmx.num_of_channels )
 
-    print(dir(dmx.device))
+    #~ print(dir(dmx.device))
     print("INF: dmx.device.name: ", dmx.device.name ) # COMx
     print("INF: dmx.device.vid: ", dmx.device.vid ) # EUROLITE_USB_DMX512_PRO_CABLE_INTERFACE = Device(vid=1027, pid=24577)
     print("INF: dmx.device.pid: ", dmx.device.pid ) # 24577
@@ -227,21 +227,23 @@ try:
             numarg += 2            
             
         while 1:
+            maxval = 255
+            minval = 0
             if len(sys.argv) > 3:
                 duration = int(sys.argv[3])
             else:
                 duration = 25
-            print( "dimming in %s second(s)" % duration )
-            for val in range(255,0,-1):
+            print( "dimming in %s second(s) (%.2fs per step(s))" % (duration,duration/(maxval-minval)) )
+            for val in range(maxval,minval,-1):
                 print("dim channel %d to %d" % (dim_chan,val) )
                 dmx.set_data( dim_chan, val )
                 dmx.send()
-                time.sleep(duration/255)
-            for val in range( 0,255 ):
+                time.sleep(duration/(maxval-minval))
+            for val in range( minval,maxval ):
                 print("dim channel %d to %d" % (dim_chan,val) )
                 dmx.set_data( dim_chan, val )
                 dmx.send()
-                time.sleep(duration/255)
+                time.sleep(duration/(maxval-minval) )
                 
                 
 except BaseException as err:
@@ -250,3 +252,21 @@ except BaseException as err:
     dummy = input()
     
 print("Finished")
+
+
+"""
+Dimmer Botex 4 DDP-405
+- Avec la ledvance 36°: 
+  - Avec  le 0 ne fait pas 0.
+  - On a l'impression de voir la difference que de 0 a 100.
+
+- Ledvance 120°:
+  - 20: s'allume extremement faiblement
+  - 40: faible
+  - 100: fort
+  - moins de 150(120?): a fond
+
+Apres redémarrage de la 36 c'est bon, elle fonctionne comme la 120.
+Des fois elle repasse bizarrement dans le mode "pas eteignable".
+
+"""

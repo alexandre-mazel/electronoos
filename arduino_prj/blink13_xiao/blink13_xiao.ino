@@ -1,3 +1,5 @@
+// je crois que c'est que pour le S3 car le C3 n'a pas de led builtin
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);

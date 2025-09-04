@@ -108,7 +108,7 @@ theme:
     text: Roboto
   palette:
     - scheme: default
-      primary: indigo # change default color
+      primary: indigo # change default color # as seen on https://squidfunk.github.io/mkdocs-material/setup/changing-the-colors/
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode

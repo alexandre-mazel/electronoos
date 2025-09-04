@@ -19,6 +19,7 @@ bool i2CAddrTest( uint8_t addr )
 int lcd_print_message_next_message = 0;
 void lcd_print_message( const char * msg, int int_val )
 {
+  if( pLcd == NULL ) return;
   int nNbrPrinted = 0;
 
   pLcd->setCursor( 0,lcd_print_message_next_message );
@@ -50,6 +51,7 @@ void lcd_print_message( const char * msg, int int_val )
 void lcd_print_message( const char * msg, const char * msg2 )
 {
   // BEURK: un gros copié/collé!
+  if( pLcd == NULL ) return;
   int nNbrPrinted = 0;
 
   pLcd->setCursor( 0,lcd_print_message_next_message );
@@ -80,6 +82,9 @@ void lcd_print_message( const char * msg, const char * msg2 )
 
 void setup_lcd( const char * init_msg )
 {
+  Serial.print( "DBG: setup_lcd: starting..." );
+  Serial.flush();
+  
   uint8_t i2cAddr = 0x3F;
   if( ! i2CAddrTest( i2cAddr ) )
   {

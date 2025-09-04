@@ -373,6 +373,236 @@ This code will generate products of the form `12 * X ...
 
 ---
 ollama run llama3.3:70B "genere moi une liste de paire de mot et de leur définition. Le format sera pour chaque ligne, un mot le caractere : puis sa définition. tout les mots doivent etre choisis dans le programme de NSI de premiere chapitre des collections et données en tables en python"
+---
+llama run llama3.2 "Quelle question demanderait tu a un candidat pour un poste de vendeur de chaussures?"
+
+Excellente question !
+
+Pour un poste de vendeur de chaussures, je vous propose une série de
+questions qui permettraient d'évaluer les compétences et la personnalité
+du candidat. Voici quelques exemples :
+
+1. **Quelles sont vos raisons de vouloir travailler comme vendeur de
+chaussures ?**
+ * Cette question permet de comprendre les motivations et les objectifs du
+candidat.
+2. **Comment vous comporteriez-vous avec un client qui est en colère parce
+que son pied ne convient pas à une paire de chaussures ?**
+ * Cette question évalue la capacité du candidat à gérer les situations
+difficiles et à maintenir une attitude positive.
+3. **Quelles sont vos connaissances sur les différents types de chaussures
+(par exemple, running, skateboard, etc.) ?**
+ * Cette question permet d'évaluer la connaissance du candidat sur les
+produits que nous vendons.
+4. **Comment allez-vous présenter une paire de chaussures à un client qui
+est réticent à l'essayer ?**
+ * Cette question évalue la capacité du candidat à promouvoir les produits
+et à trouver des solutions pour répondre aux besoins du client.
+5. **Qu'est-ce que vous ferez si un client refuse de payer une paire de
+chaussures qui ne convient pas à son pied ?**
+ * Cette question permet d'évaluer la capacité du candidat à gérer les
+situations difficiles et à maintenir une attitude professionnelle.
+6. **Comment allez-vous contribuer à créer une expérience client
+exceptionnelle pour nos clients ?**
+ * Cette question évalue la capacité du candidat à se mettre à la place
+des clients et à trouver des solutions pour améliorer leur expérience.
+
+Ces questions permettraient de comprendre les compétences, la personnalité
+et les motivations du candidat, ainsi que son potentiel pour travailler en
+équipe et pour fournir.
+
+na@Server1:~/dev$ ollama run llama3.2 "^[[200~Quelle question demanderait tu a un candidat pour un poste de vendeur de chaussures? donne moi aussi les meilleurs réponses attendues."
+Excellente question !
+
+Pour un poste de vendeur de chaussures, il est important que le candidat
+puisse répondre à des questions qui évaluent ses compétences en vente, sa
+connaissance du produit et son capacité à travailler en équipe.
+
+Voici quelques exemples de questions que vous pourriez poser à un candidat
+pour un poste de vendeur de chaussures, ainsi que les meilleures réponses
+attendues :
+
+**Question 1 : Qu'est-ce qui vous motive à travailler dans une boutique de
+chaussures ?**
+
+Réponse attendue : « Je suis passionné par la mode et les chaussures.
+J'aime l'idée de aider les clients à trouver le bon produit pour leur
+style de vie. »
+
+Cette question permet d'évaluer la motivation du candidat envers le
+travail dans une boutique de chaussures.
+
+**Question 2 : Comment vous allez-vous assurer que les clients trouvent
+les bons produits qui répondent à leurs besoins ?**
+
+Réponse attendue : « Je vais leur poser des questions pour comprendre ce
+qu'ils recherchent, et ensuite je vais les aider à trouver les chaussures
+qui correspondent le mieux à leurs critères. »
+
+Cette question évalue la capacité du candidat à écouter et à comprendre
+les besoins des clients.
+
+**Question 3 : Qu'est-ce que vous ferez si un client est insatisfais d'un
+produit ?**
+
+Réponse attendue : « Je vais m'assurer qu'il se sente entendu et je vais
+lui proposer une alternative ou un remboursement. »
+
+Cette question permet d'évaluer la capacité du candidat à gérer les
+situations difficiles en vente.
+
+**Question 4 : Comment vous allez-vous interagir avec vos collègues pour
+atteindre les objectifs de vente ?**
+
+Réponse attendue : « Je vais travailler ensemble pour créer des promotions
+et des offres qui attireront plus de clients. »
+
+Cette question évalue la capacité du candidat à travailler en équipe et à
+communiquer de manière efficace.
+
+**Question 5 : Qu'est-ce que vous savez sur les tendances actuelles dans
+le domaine des chaussures ?**
+
+Réponse attendue : « Je suis au courant des dernières modes et des marques
+qui sont très populaires. Je vais utiliser ces connaissances pour
+recommander les produits les plus demandés aux clients. »
+
+Cette question permet d'évaluer la connaissance du candidat sur le domaine
+des chaussures.
+
+En résumé, les questions que vous pouvez poser à un candidat pour un poste
+de vendeur de chaussures devraient être centrées sur les compétences en
+vente, la connaissance du produit et la capacité à travailler en équipe.
+Les meilleures réponses attendues devraient être des exemples de comment
+le candidat peut appliquer ces compétences pour aider les clients et
+atteindre les objectifs de vente.
+
+
+candidat pour un poste de vendeur de chaussures :
+
+*   Qu'est-ce que tu sais sur les chaussures et leurs différents types ?
+    Réponse : Je connais les différentes catégories de chaussures, telles
+que des chaussures de sport, des chaussures de travail, des chaussures de
+mode, etc. Je comprends également les différentes fonctionnalités et
+caractéristiques de chaque type de chaussure.
+
+*   Comment vas-tu nous aider à trouver la paire de chaussures parfaite
+pour nos clients ?
+    Réponse : Pour commencer, je vais m'assurer que j'ai une bonne
+compréhension des besoins et des préférences de nos clients. Ensuite, je
+vais les aider à découvrir leurs objectifs et leurs attentes en matière de
+chaussures. Je vais également leur présenter différentes options de
+chaussures qui répondent à leurs besoins et à leurs budget.
+
+*   Quelles sont tes compétences en matière de vente ?
+    Réponse : Mes compétences en matière de vente incluent la capacité
+d'écouter activement, de comprendre les besoins des clients, de proposer
+des solutions personnalisées et de négocier des prix. Je suis également
+confiant dans ma capacité à présenter les produits de manière convaincante
+et à créer un sentiment de bien-être chez nos clients.
+
+*   Comment vas-tu gérer une situation où un client est insatisfait avec
+sa paire de chaussures ?
+    Réponse : Si un client est insatisfait avec sa paire de chaussures, je
+vais m'assurer que j'ai une bonne compréhension de la cause de leur
+insatisfaction. Je vais alors proposer des solutions alternatives ou des
+remises pour les aider à se sentir plus satisfaits. En cas d'insistance,
+je vais travailler avec le client pour trouver un solution qui lui
+convient.
+
+*   Qu'est-ce que tu sais sur notre marque et notre collection de
+chaussures ?
+    Réponse : Je connais la marque et sa philosophie. Je comprends
+également les différentes lignes et collections de chaussures que nous
+proposons, ainsi que leurs caractéristiques uniques et leurs avantages.
+
+*   Comment vas-tu interagir avec nos clients dans notre magasin ?
+    Réponse : Pour commencer, je vais m'assurer que j'ai une bonne
+compréhension des besoins de nos clients. Ensuite, je vais les accueillir
+chaleureusement et leur présenter différentes options de chaussures qui
+répondent à leurs besoins. Je vais également être attentif à leurs besoins
+et à leurs préférences, tout en créant un sentiment de bien-être chez nos
+clients.
+
+*   Qu'est-ce que tu sais sur les processus de vente en ligne ?
+    Réponse : Je connais les différents processus de vente en ligne, tels
+que la création d'un compte client, la sélection des produits, l'envoi des
+commandes et la gestion des retours.
+
+Autre version, plus structuré mais en fait bof:
+
+ollama run llama3.2 "Quelle question demanderait tu a un candidat pour un poste de vendeur de chaussures? donne moi aussi les meilleurs réponses attendues. fait moi une réponse structuré avec question et reponse séparé par des points virgules"
+Bien sûr, voici une liste de questions et de réponses attendues pour un
+candidat pour un poste de vendeur de chaussures :
+
+*   Qu'est-ce que tu sais sur les chaussures et leurs différents types ?
+    Réponse : Je connais les différentes catégories de chaussures, telles
+que des chaussures de sport, des chaussures de travail, des chaussures de
+mode, etc. Je comprends également les différentes fonctionnalités et
+caractéristiques de chaque type de chaussure.
+
+*   Comment vas-tu nous aider à trouver la paire de chaussures parfaite
+pour nos clients ?
+    Réponse : Pour commencer, je vais m'assurer que j'ai une bonne
+compréhension des besoins et des préférences de nos clients. Ensuite, je
+vais les aider à découvrir leurs objectifs et leurs attentes en matière de
+chaussures. Je vais également leur présenter différentes options de
+chaussures qui répondent à leurs besoins et à leurs budget.
+
+*   Quelles sont tes compétences en matière de vente ?
+    Réponse : Mes compétences en matière de vente incluent la capacité
+d'écouter activement, de comprendre les besoins des clients, de proposer
+des solutions personnalisées et de négocier des prix. Je suis également
+confiant dans ma capacité à présenter les produits de manière convaincante
+et à créer un sentiment de bien-être chez nos clients.
+
+*   Comment vas-tu gérer une situation où un client est insatisfait avec
+sa paire de chaussures ?
+    Réponse : Si un client est insatisfait avec sa paire de chaussures, je
+vais m'assurer que j'ai une bonne compréhension de la cause de leur
+insatisfaction. Je vais alors proposer des solutions alternatives ou des
+remises pour les aider à se sentir plus satisfaits. En cas d'insistance,
+je vais travailler avec le client pour trouver un solution qui lui
+convient.
+
+*   Qu'est-ce que tu sais sur notre marque et notre collection de
+chaussures ?
+    Réponse : Je connais la marque et sa philosophie. Je comprends
+également les différentes lignes et collections de chaussures que nous
+proposons, ainsi que leurs caractéristiques uniques et leurs avantages.
+
+*   Comment vas-tu interagir avec nos clients dans notre magasin ?
+    Réponse : Pour commencer, je vais m'assurer que j'ai une bonne
+compréhension des besoins de nos clients. Ensuite, je vais les accueillir
+chaleureusement et leur présenter différentes options de chaussures qui
+répondent à leurs besoins. Je vais également être attentif à leurs besoins
+et à leurs préférences, tout en créant un sentiment de bien-être chez nos
+clients.
+
+*   Qu'est-ce que tu sais sur les processus de vente en ligne ?
+    Réponse : Je connais les différents processus de vente en ligne, tels
+que la création d'un compte client, la sélection des produits, l'envoi des
+commandes et la gestion des retours.
+
+---
+na@Server1:~/dev$ ollama run llama3.2 "Redis moi plus joliment cette phrase: j'ai choisit Jean-Pierre car ce candidat avait les meilleurs notes, et Francois car il était bon en anglais, et c'est important l'anglais pour ce job"
+Voici une version plus fluide de la phrase :
+
+"J'ai sélectionné Jean-Pierre car ses notes étaient exceptionnelles,
+tandis que François a été choisi en raison de ses compétences en anglais,
+qui sont cruciales pour ce poste."
+
+Ou encore :
+
+"Je suis parti choisir entre les candidats Jean-Pierre et François.
+Jean-Pierre avait les meilleures notes, mais c'était François qui m'a
+convaincu avec son excellent niveau en anglais, ce qui est essentiel pour
+réussir dans ce job."
+
+J'ai essayé de rendre la phrase plus claire et concise, tout en gardant
+l'essentiel du message. J'ai également utilisé des termes plus formels
+pour donner un ton plus professionnel à la phrase.
+
 
 
 

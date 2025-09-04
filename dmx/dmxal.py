@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
+
 """
 file to control dmx devices
 
-Copyright 2021 Rune Monzel
+Copyright 2021-2024 Rune Monzel & Alexandre Mazel
 """
 
 # internal python modules
@@ -105,6 +107,8 @@ class DMX(object):
 
         self.break_us = 88                          # 88us < break condition < 1s -> not used in DMX implementation
         self.MAB_us = 8                             # 8us < Mark-After-Break < 1s -> not used in DMX implementation
+        
+        self.b_clear_channel_at_exit = True
 
         # Search for RS-485 devices, for this look into DEVICE_LIST
         self.ser = None
@@ -141,11 +145,12 @@ class DMX(object):
             raise ConnectionError("Could not find the RS-485 interface.")
 
         self.eurolite = False
+        self.opendmx = False
         if self.device.vid == EUROLITE_USB_DMX512_PRO_CABLE_INTERFACE.vid and \
            self.device.pid == EUROLITE_USB_DMX512_PRO_CABLE_INTERFACE.pid and \
-           1:
+           "EN1" == self.device.serial_number[:3]:
             self.eurolite = True
-            if verbose:
+            if verbose or 1:
                 print( "INF: Using EUROLITE_USB_DMX512_PRO_CABLE_INTERFACE interface" )
             self.start_byte = np.array([0x7E, 0x06, 0x01, 0x02, 0x00], np.uint8)
             self.end_byte = np.array([0xE7], np.uint8)
@@ -155,6 +160,27 @@ class DMX(object):
                                      parity=serial.PARITY_NONE,
                                      bytesize=serial.EIGHTBITS,
                                      stopbits=serial.STOPBITS_TWO
+                                     )
+        elif "BG0" == self.device.serial_number[:3]:
+            print( "INF: Using Open DMX interface" )
+            self.opendmx = True
+            # we send it manually: A break of at least 100us then Mark After Break (MAB) of 12 us => each bit is 4us donc 25 bit bas puis 3 bit haut, on va simplifier en octet => 29 but bas puis 3 haut, soit 0x00, 0x00, 0x00, 0x03
+            # On definit 2 stop bit a 1.
+            # et par defaut en serial communication on a toujours un start bit a 0, donc c'est bon
+            # mais peut etre que notre break est polluted par des stop bits qui vont etre inserted entre nos datas ? 
+            # et donc juste en dormant 100us, ca suffirait pas (ainsi ca envoi un signal vide)
+            #~ self.start_byte = np.array([0x00,0x00,0x00,0x03], np.uint8)
+            # bon au final, rien ne fonctionne en open dmx, et j'ai trouve zero lib qui fonctionnait!
+            self.start_byte = np.array([0x03], np.uint8)
+            self.end_byte = np.array([], np.uint8)
+            self.num_of_channels = num_of_channels
+            print(serial.__file__)
+            self.ser = serial.Serial(self.device.device,
+                                     baudrate=250000,
+                                     parity=serial.PARITY_NONE,
+                                     bytesize=serial.EIGHTBITS,
+                                     stopbits=serial.STOPBITS_TWO
+                                     #~ stopbits=serial.STOPBITS_NONE # j'aimerai mettre NONE ou ZERO pour tester, mais ca ne semble pas exister dans le protocole
                                      )
         else:
             self.start_byte = np.array([0x00], np.uint8)
@@ -175,6 +201,10 @@ class DMX(object):
         :return num_of_channels: number of DMX channels which shall be used in the universe, the less channels the faster!
         """
         return self.__num_of_channels
+        
+    def set_clear_channel_at_exit( self, newval: bool ):
+        print( "INF: DmxAl: set_clear_channel_at_exit: changing value to %s" % newval )
+        self.b_clear_channel_at_exit = newval
 
     @num_of_channels.setter
     def num_of_channels(self, num_of_channels: int) -> None:
@@ -251,9 +281,10 @@ class DMX(object):
         if isinstance(self.ser, serial.Serial):
             if self.ser.is_open:
                 if self.is_connected():
-                    self.num_of_channels = 512
-                    self.data = np.zeros([self.num_of_channels], np.uint8)
-                    self.send()
+                    if self.b_clear_channel_at_exit:
+                        self.num_of_channels = 512
+                        self.data = np.zeros([self.num_of_channels], np.uint8)
+                        self.send()
                 print("close serial port")
                 self.ser.close()
 

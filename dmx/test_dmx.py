@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+# 1. Install python
+# 2. Install lib: pip3 install serial pyserial numpy 
+
 from dmxal import DMX # git clone https://github.com/monzelr/dmx.git, cd dmx, pip install .
 import dmxal
 dmxal.set_verbose( False )
@@ -154,15 +157,15 @@ print("INF: dmx.is_connected(): ", dmx.is_connected() )
 print("INF: dmx.num_of_channels: ", dmx.num_of_channels )
 
 print(dir(dmx.device))
-print("INF: dmx.device.name: ", dmx.device.name )
+print("INF: dmx.device.name: ", dmx.device.name ) # COMx
 print("INF: dmx.device.vid: ", dmx.device.vid ) # EUROLITE_USB_DMX512_PRO_CABLE_INTERFACE = Device(vid=1027, pid=24577)
-print("INF: dmx.device.pid: ", dmx.device.pid )
-print("INF: dmx.device.product: ", dmx.device.product )
-print("INF: dmx.device.description: ", dmx.device.description )
-print("INF: dmx.device.interface: ", dmx.device.interface )
-print("INF: dmx.device.device: ", dmx.device.device )
-print("INF: dmx.device.manufacturer: ", dmx.device.manufacturer )
-print("INF: dmx.device.serial_number: ", dmx.device.serial_number ) # mon truc chinois orange: BG00U0KFA; l'enttect de l'ensad: EN172589A, le noir qui clignote: BG0106SGA
+print("INF: dmx.device.pid: ", dmx.device.pid ) # 24577
+print("INF: dmx.device.product: ", dmx.device.product ) # None
+print("INF: dmx.device.description: ", dmx.device.description ) # USB Serial Port (COMx)
+print("INF: dmx.device.interface: ", dmx.device.interface ) # None
+print("INF: dmx.device.device: ", dmx.device.device ) # COMx
+print("INF: dmx.device.manufacturer: ", dmx.device.manufacturer ) # FTDI
+print("INF: dmx.device.serial_number: ", dmx.device.serial_number ) # mon truc chinois orange: BG00U0KFA; l'enttec de l'ensad: EN172589A, le noir qui clignote: BG0106SGA
 
 print("INF: dmx: starting" )
 
@@ -238,6 +241,8 @@ if 0:
             time.sleep(time_wait)
             
 dev_id = 1
+print( "device %d" % dev_id )
+
 if 0:
     print( "fadein-fadeout device %d" % dev_id )
     time_wait = 0.001

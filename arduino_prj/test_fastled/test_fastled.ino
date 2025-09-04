@@ -1,7 +1,10 @@
 #include <FastLED.h> // FastLed Neopixel by David Madison and FastLed 3.9.8
 
-#define NUM_LEDS (16*16) // number of led present in your strip
-#define DATA_PIN 45 // digital pin of your arduino
+//#define NUM_LEDS (16*16) // number of led present in your strip
+#define NUM_LEDS 30
+
+//#define DATA_PIN 45 // digital pin of the connected led
+#define DATA_PIN 50
 
 CRGB leds[NUM_LEDS];
 
@@ -158,9 +161,19 @@ void beat(int nBpm)
 void full_on()
 {
   Serial.println( "leds: full_on");
-  for(int dot = 0;dot < NUM_LEDS; dot++)
+  for( int dot = 0; dot < NUM_LEDS; ++dot )
   { 
     leds[dot] = CRGB::White;
+  }
+  FastLED.show();
+}
+
+void full_one_color( struct CRGB one_color)
+{
+  Serial.println( "leds: full_one_color");
+  for( int dot = 0; dot < NUM_LEDS; ++dot )
+  { 
+    leds[dot] = one_color;
   }
   FastLED.show();
 }
@@ -316,14 +329,30 @@ void drawImgs(unsigned char * data, int w, int h, int bDontDrawWhite = 0, int di
 
 void loop()
 { 
-  if( 0 )
+  if( 1 )
   {
     full_on();
-    delay(1000);
-    return;
+    delay(3000);
+    //return;
   }
 
   if( 1 )
+  {
+    erase_all();
+    full_one_color(CRGB::Blue);
+    delay(3000);
+    //return;
+  }
+
+  if( 1 )
+  {
+    erase_all();
+    full_one_color(CRGB::Red);
+    delay(3000);
+    return;
+  }
+
+  if( 0 )
   {
     drawbitmap16x16(heart);
     //drawbitmap16x16(mario_body_bitmap);

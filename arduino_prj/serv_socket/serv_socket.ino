@@ -4,6 +4,8 @@
 #include "dynamixel_motor.hpp"
 #include "debug_lcd.hpp"
 
+#define XIAO
+
 const int ledPin = 13;
 
 
@@ -54,7 +56,12 @@ void handleMotorOrder( const char * pMotorsCommand )
 
 #define PIN_AN_1      A3
 #define PIN_AN_2      A9
-#define PIN_AN_3      A7
+
+#ifndef XIAO
+#define PIN_AN_3      A7 // NOT  PRESENT ON XIAO: TODO FOUND STH ELSE
+#else
+#define PIN_AN_3      A8
+#endif
 
 #define PIN_DIGI_1    12 // A8 - ADC2
 #define PIN_DIGI_2    27 // A6 - ADC2
@@ -240,33 +247,72 @@ void update_server( void )
 }
 
 
+TaskHandle_t Task1;
+
+void setup_core0(void * pvParameters)
+{
+  Serial.print( "setup_core0() running on core " );
+  Serial.println( xPortGetCoreID() );
+
+  start_server();
+}
+
+void loop_core0(void * pvParameters)
+{
+  Serial.print( "loop_core0() running on core " );
+  Serial.println( xPortGetCoreID() );
+  while(1)
+  {
+    update_server();
+    delay(1);
+  }
+}
+
+
 void setup()
 {
-  const char str_version[] = "serv_socket v0.64";
+  const char str_version[] = "serv_socket v0.65";
   Serial.begin(115200);
 
   Serial.println ( "" );
   Serial.println( str_version );
-  setup_lcd( str_version );
+  Serial.flush();
+  delay(1000);
 
-  if( 0 )
+#ifndef XIAO
+  setup_lcd( str_version );
+#endif
+
+#ifdef XIAO
+  if( 1 )
   {
     Serial.flush();
     delay(1000); // wait before crashing (in case of)...
-    for( int i = 0; i < 5; ++i )
+
+    pinMode( LED_BUILTIN, OUTPUT );
+
+    for( int i = 0; i < 6; ++i )
     {
       Serial.println("serv_socket v0.6: loop debug xiao");
       Serial.flush();
-      delay(500);
+      digitalWrite( LED_BUILTIN, HIGH );
+      delay(250);
+      digitalWrite( LED_BUILTIN, LOW );
+      delay(250);
     }
   }
+#endif
 
+#ifndef XIAO
   if( isMisBKit() )
   {
     pinMode( ledPin, OUTPUT ); // Attention cette ligne fait planter le XIAO C3 !!!
   }
 
-  sensors_init();
+  //sensors_init();
+#endif
+
+  
 
 
   // coupe le BT (mais ne fonctionne pas)
@@ -294,17 +340,44 @@ void setup()
 
   start_server();
 
+/*
+  xTaskCreatePinnedToCore(
+                   setup_core0,   // Task function. 
+                      "Task1",     // name of task.
+                      10000*10,       // Stack size of task
+                      NULL,        // parameter of the task
+                      1,           // priority of the task
+                      &Task1,      // Task handle to keep track of created task
+                      0 );         // pin task to core 0
+
+*/
+
   // init motor
   dym.init();
 
   lcd_print_message( "Serving on: ", getCurrentSSID() );
   lcd_print_message( getCurrentIP() );
 
-  
+  Serial.print("setup() running on core ");
+  Serial.println(xPortGetCoreID());
+
+/*
+  xTaskCreatePinnedToCore(
+                    loop_core0,   // Task function.
+                      "Task1",     // name of task.
+                      10000*10,       // Stack size of task
+                      NULL,        // parameter of the task
+                      1,           // priority of the task
+                      &Task1,      // Task handle to keep track of created task
+                      0 );         // pin task to core 0
+*/
 }
 
 
 void loop() 
 {
+  //Serial.print("loop() running on core ");
+  //Serial.println(xPortGetCoreID());
+
   update_server();
 }

@@ -126,7 +126,7 @@ print("")
 input("appuie sur entree pour commencer...")
 print("")
 
-st = score_table.ScoreTable(strGameName,True)
+st = score_table.ScoreTable(strGameName,True,encoding="cp1252")
 
 nbr_question = 8
 nbr_best = 20

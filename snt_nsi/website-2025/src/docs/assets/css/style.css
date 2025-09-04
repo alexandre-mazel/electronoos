@@ -1,0 +1,125 @@
+.missing {
+    border: 5px solid red;
+    color: red;
+    font-weight: bold;
+    padding: 10px;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+figure.illustration img {
+    width: 75%;
+    margin: 0 auto;
+}
+
+.shortcut {
+    float: right;
+}
+
+.icon {
+    background-position-y: bottom;
+    background-repeat: no-repeat;
+    display: inline-block;
+    height: 1em;
+}
+
+.icon.onedrive {
+    background-image: url("../images/onedrive_icon.svg");
+    width: 2.5ex;
+}
+
+.icon.file-explorer {
+    background-image: url("../images/explorer_icon.png");
+    background-size: contain;
+    width: 2ex;
+}
+
+.pronote-button {
+    background-color: #ebdbff;
+    border-radius: 10px;
+    color: #4a1b7f;
+    display: inline-block;
+    font-weight: bold;
+    padding: 5px 20px;
+}
+
+
+.md-typeset .keys .key-control:before,
+.md-typeset .keys .key-left-control:before,
+.md-typeset .keys .key-right-control:before {
+    content: "";
+    padding-right: 0;
+}
+
+/*
+Target admonition
+ */
+:root {
+    --md-admonition-icon--target: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>bullseye-arrow</title><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12C22,10.84 21.79,9.69 21.39,8.61L19.79,10.21C19.93,10.8 20,11.4 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4C12.6,4 13.2,4.07 13.79,4.21L15.4,2.6C14.31,2.21 13.16,2 12,2M19,2L15,6V7.5L12.45,10.05C12.3,10 12.15,10 12,10A2,2 0 0,0 10,12A2,2 0 0,0 12,14A2,2 0 0,0 14,12C14,11.85 14,11.7 13.95,11.55L16.5,9H18L22,5H19V2M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12H16A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8V6Z" /></svg>')
+}
+
+.md-typeset .admonition.target,
+.md-typeset details.target {
+    border-color: #C51162;
+}
+
+.md-typeset .target > .admonition-title,
+.md-typeset .target > summary {
+    background-color: #C511621a;
+}
+
+.md-typeset .target > .admonition-title::before,
+.md-typeset .target > summary::before {
+    background-color: #C51162;
+    -webkit-mask-image: var(--md-admonition-icon--target);
+    mask-image: var(--md-admonition-icon--target);
+}
+
+/*
+Console admonition
+*/
+:root {
+    --md-admonition-icon--console: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>console</title><path d="M20,19V7H4V19H20M20,3A2,2 0 0,1 22,5V19A2,2 0 0,1 20,21H4A2,2 0 0,1 2,19V5C2,3.89 2.9,3 4,3H20M13,17V15H18V17H13M9.58,13L5.57,9H8.4L11.7,12.3C12.09,12.69 12.09,13.33 11.7,13.72L8.42,17H5.59L9.58,13Z" /></svg>')
+}
+
+.md-typeset .admonition.console,
+.md-typeset details.console {
+    border-color: #9e9e9e;
+}
+
+.md-typeset .console > .admonition-title,
+.md-typeset .console > summary {
+    background-color: #9e9e9e1a;
+}
+
+.md-typeset .console > .admonition-title::before,
+.md-typeset .console > summary::before {
+    background-color: #9e9e9e;
+    -webkit-mask-image: var(--md-admonition-icon--console);
+    mask-image: var(--md-admonition-icon--console);
+}
+
+/*
+Help admonition
+ */
+
+:root {
+    --md-admonition-icon--help: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>lightbulb-on-outline</title><path d="M20,11H23V13H20V11M1,11H4V13H1V11M13,1V4H11V1H13M4.92,3.5L7.05,5.64L5.63,7.05L3.5,4.93L4.92,3.5M16.95,5.63L19.07,3.5L20.5,4.93L18.37,7.05L16.95,5.63M12,6A6,6 0 0,1 18,12C18,14.22 16.79,16.16 15,17.2V19A1,1 0 0,1 14,20H10A1,1 0 0,1 9,19V17.2C7.21,16.16 6,14.22 6,12A6,6 0 0,1 12,6M14,21V22A1,1 0 0,1 13,23H11A1,1 0 0,1 10,22V21H14M11,18H13V15.87C14.73,15.43 16,13.86 16,12A4,4 0 0,0 12,8A4,4 0 0,0 8,12C8,13.86 9.27,15.43 11,15.87V18Z" /></svg>')
+}
+
+.md-typeset .admonition.help,
+.md-typeset details.help {
+    border-color: #00bfa5;
+}
+
+.md-typeset .help > .admonition-title,
+.md-typeset .help > summary {
+    background-color: #00bfa51a;
+}
+
+.md-typeset .help > .admonition-title::before,
+.md-typeset .help > summary::before {
+    background-color: #00bfa5;
+    -webkit-mask-image: var(--md-admonition-icon--help);
+    mask-image: var(--md-admonition-icon--help);
+}

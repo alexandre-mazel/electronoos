@@ -38,6 +38,8 @@ def replaceNameReplaceByNonAccentuatedChars(s):
                     ( "\\N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK}", '"' ),
                     ( "\\N{FULLWIDTH COLON}", ':' ),
                     ( "\\N{FULLWIDTH QUESTION MARK}", '?' ),
+                    ( "\\N{LEFT DOUBLE QUOTATION MARK}", '?' ),
+                    ( "\\N{RIGHT DOUBLE QUOTATION MARK}", '?' ),
                     ( "\\N{NO-BREAK SPACE}", " " ),
                     ( "\\N{ZERO WIDTH SPACE}", " " ),
                     ( "\\N{EM DASH}", "-" ),

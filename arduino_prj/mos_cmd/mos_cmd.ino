@@ -7,7 +7,7 @@
 
 #ifdef MEGA
 
-  // Arduino Mega Case // ou aussi Arduino Pro Micro
+  // Arduino Mega Case
 # define PWM_PIN_1      8
 # define PWM_PIN_2      9
 # define PWM_PIN_3      10
@@ -18,8 +18,9 @@
 #ifdef PRO_MICRO
 # pragma message( "ATTENTION: C'est pour le PRO_MICRO qu'on compile!" )
 
-  // Arduino Mega Case // ou aussi Arduino Pro Micro
-  // il faut mettre les chiffres qui sont en bleus sur mon plan
+  // ou aussi Arduino Pro Micro
+
+  // il faut mettre les chiffres qui sont en bleus sur le schema de ma doc (en bleu c'est le numero "Arduino", la 6 c'est la A7, la 9 c'est la A9 et la 10 c'est la A10 sur le plan)
 # define PWM_PIN_1      6 // attention si on met A6 et qu'on le branche sur le 6 ca fonctionne mais pas en analogique (plusieurs chiffres pour une meme sortie mais qui active des modes differents)
 # define PWM_PIN_2      9
 # define PWM_PIN_3      10
@@ -27,7 +28,7 @@
 
 #endif // PRO_MICRO
 
-#ifdef MEGA
+#ifdef XIAO_C3
 
 // ca a fonctionne une fois et puis plus apres, mais pourtant ca semble bon
 
@@ -65,6 +66,9 @@ void setup()
     {
       pinMode( pin_output[j], OUTPUT );
     }
+#ifdef XIAO_C3
+    analogWriteResolution(8); // force PWM to use 8 bits resolution (NOT TESTED)
+#endif
 
     if( 0 )
     {
@@ -82,6 +86,17 @@ void loop()
 
     if( 1 )
     {
+      Serial.println("full on every of them (digital) !");
+      for( int j = 0; j < 3; ++j  )
+      {
+        digitalWrite( LED_BUILTIN, HIGH );
+        digitalWrite( pin_output[j], HIGH );
+      }
+      delay(3000);
+    }
+    
+    if( 1 )
+    {
       Serial.println("full on every of them");
       for( int j = 0; j < 3; ++j  )
       {
@@ -89,6 +104,12 @@ void loop()
         analogWrite( pin_output[j], ANALOG_MAX );
       }
       delay(3000);
+      // turn them off
+      for( int j = 0; j < 3; ++j  )
+      {
+        digitalWrite( LED_BUILTIN, LOW );
+        analogWrite( pin_output[j], 0 );
+      }
     }
 
     if( 0 )

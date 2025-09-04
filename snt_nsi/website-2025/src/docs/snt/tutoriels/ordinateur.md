@@ -61,11 +61,11 @@ Selon la configuration de votre ordinateur au moins deux des navigateurs web ci-
     3. Ajoutez la page à vos favoris en cliquant sur l'icône étoile :material-star-outline: à droite de la barre d'adresse
     4. Vérifiez que la page soit bien présente dans vos favoris en ouvrant un nouvel onglet
 
-!!! note "Ajout d'un favori vers `mulot-nsi.fr`"
+!!! note "Ajout d'un favori vers `thenardier`"
 
     Afin de pouvoir démarrer rapidement les travaux pratiques de SNT, il serait judicieux d'avoir ce site dans vos favoris : 
 
-    1. Accédez à la section SNT du site Mulot NSI en cliquant sur le lien suivant : [:material-link: mulot-nsi.fr](https://mulot-nsi.fr/snt/){:target="_blank"}
+    1. Accédez à la section SNT du site des TP de SNT en cliquant sur le lien suivant : [:material-link: thenardier.fr](http://thenardier.fr:8001/snt/){:target="_blank"}
     2. Ajoutez la page à vos favoris
     3. Vérifiez qu'elle soit bien présente dans vos favoris
 

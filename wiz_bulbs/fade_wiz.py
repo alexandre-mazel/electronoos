@@ -181,17 +181,17 @@ if 0:
 
     loop.run_until_complete(fade_wiz(col_1,col_2,duration))
     
-if 0:
+if 1:
     # reglage pour eclairage oeuvre #2: avec brightness bien gere.
     duration = 20 # in sec
     col_1 = (0,0,0,255,255,255)
     #~ col_1 = (0, 5, 60,0,0,40)
-    col_2 = (0, 5, 10, 90,90,90)
+    col_2 = (0, 5, 20, 90,90,90)
 
     loop.run_until_complete(fade_wiz(col_1,col_2,duration))
     
     duration2 = 30
-    col_3 = (0, 5, 50,0,0,40)
+    col_3 = (0, 5, 30,0,0,40)
     loop.run_until_complete(fade_wiz(col_2,col_3,duration2))
 
 
@@ -202,7 +202,9 @@ if 0:
     #~ loop.run_until_complete(fade_wiz(col_3,col_2,duration2))
     #~ loop.run_until_complete(fade_wiz(col_2,col_1,duration))
     
-    
-loop.run_until_complete(fade_wiz(col_2,col_3,duration2))
+if 0: 
+    # reglage rapide de couleur
+    col = (0, 5, 30,0,0,40)
+    loop.run_until_complete(fade_wiz(col,col,1))
 
     

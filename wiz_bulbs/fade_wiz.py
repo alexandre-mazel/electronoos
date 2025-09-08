@@ -183,24 +183,30 @@ if 0:
     
 if 1:
     # reglage pour eclairage oeuvre #2: avec brightness bien gere.
-    duration = 20 # in sec
+    duration = 20.6 # in sec
     col_1 = (0,0,0,255,255,255)
     #~ col_1 = (0, 5, 60,0,0,40)
     col_2 = (0, 5, 20, 90,90,90)
 
-    loop.run_until_complete(fade_wiz(col_1,col_2,duration))
+    #~ loop.run_until_complete(fade_wiz(col_1,col_2,duration))
     
     duration2 = 30
-    col_3 = (0, 5, 30,0,0,40)
-    loop.run_until_complete(fade_wiz(col_2,col_3,duration2))
+    col_3 = (0, 5, 29,6,6,44)
+    #~ loop.run_until_complete(fade_wiz(col_2,col_3,duration2))
+    
+    duration3 = 2.4
+    col_4 = (0, 5, 30,0,0,40)
+    #~ loop.run_until_complete(fade_wiz(col_3,col_4,duration3))
 
 
     # a voir si on fait le retoure plus rapide ou pas, avec un palier encore juste tres pres du full bleu qui est trop rapide,
     # [0, 5, 10, 94, 94, 94]
 
-    # retour
-    #~ loop.run_until_complete(fade_wiz(col_3,col_2,duration2))
-    #~ loop.run_until_complete(fade_wiz(col_2,col_1,duration))
+    # remontee
+    loop.run_until_complete(fade_wiz(col_4,col_4,5))  # pause sur la couleur
+    loop.run_until_complete(fade_wiz(col_4,col_3,duration3/2))
+    loop.run_until_complete(fade_wiz(col_3,col_2,duration2/3))
+    loop.run_until_complete(fade_wiz(col_2,col_1,duration/3))
     
 if 0: 
     # reglage rapide de couleur

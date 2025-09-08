@@ -54,9 +54,11 @@ async def fade_wiz(col1, col2, duration):
     
     print( "INF: fade_wiz: starting...")
     
-    ips_bulb = ["192.168.0.110","192.168.0.111","192.168.0.112", "192.168.0.113", "192.168.0.114", "192.168.0.120", "192.168.0.121"]
+    #~ ips_bulb = ["192.168.0.110","192.168.0.111","192.168.0.112", "192.168.0.113", "192.168.0.114", "192.168.0.120", "192.168.0.121"]
     #~ ips_bulb = ["192.168.0.110","192.168.0.112"]
     #~ ips_bulb = ["192.168.0.112"]
+    #~ ips_bulb = ["192.168.0.110","192.168.0.121"]
+    ips_bulb = ["192.168.0.110"]
     
     bulbs = []
     
@@ -113,22 +115,22 @@ async def fade_wiz(col1, col2, duration):
             if mute == 0:
                 await asyncio.gather(
                     bulbs[0].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
-                    bulbs[1].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
-                    bulbs[2].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
-                    bulbs[3].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
-                    bulbs[4].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
-                    bulbs[5].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
-                    bulbs[6].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                    #~ bulbs[1].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                    #~ bulbs[2].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                    #~ bulbs[3].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                    #~ bulbs[4].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                    #~ bulbs[5].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                    #~ bulbs[6].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
                 )
             else:
                 await asyncio.gather(
                     bulbs[0].turn_off(),
-                    bulbs[1].turn_off(),
-                    bulbs[2].turn_off(),
-                    bulbs[3].turn_off(),
-                    bulbs[4].turn_off(),
-                    bulbs[5].turn_off(),
-                    bulbs[6].turn_off(),
+                    #~ bulbs[1].turn_off(),
+                    #~ bulbs[2].turn_off(),
+                    #~ bulbs[3].turn_off(),
+                    #~ bulbs[4].turn_off(),
+                    #~ bulbs[5].turn_off(),
+                    #~ bulbs[6].turn_off(),
                 )
         cpt += 1
         time.sleep(0.01)
@@ -159,7 +161,7 @@ if 0:
     col_2 = (0, 20, 255, 0, 0, 255)
     loop.run_until_complete(fade_wiz(col_1,col_2,duration))
     
-if 1:
+if 0:
     # reglage pour fade red vers bleu
 
     duration = 10 # in sec
@@ -178,5 +180,29 @@ if 0:
     col_2 = (10, 20, 30, 40, 200)
 
     loop.run_until_complete(fade_wiz(col_1,col_2,duration))
+    
+if 0:
+    # reglage pour eclairage oeuvre #2: avec brightness bien gere.
+    duration = 20 # in sec
+    col_1 = (0,0,0,255,255,255)
+    #~ col_1 = (0, 5, 60,0,0,40)
+    col_2 = (0, 5, 10, 90,90,90)
+
+    loop.run_until_complete(fade_wiz(col_1,col_2,duration))
+    
+    duration2 = 30
+    col_3 = (0, 5, 50,0,0,40)
+    loop.run_until_complete(fade_wiz(col_2,col_3,duration2))
+
+
+    # a voir si on fait le retoure plus rapide ou pas, avec un palier encore juste tres pres du full bleu qui est trop rapide,
+    # [0, 5, 10, 94, 94, 94]
+
+    # retour
+    #~ loop.run_until_complete(fade_wiz(col_3,col_2,duration2))
+    #~ loop.run_until_complete(fade_wiz(col_2,col_1,duration))
+    
+    
+loop.run_until_complete(fade_wiz(col_2,col_3,duration2))
 
     

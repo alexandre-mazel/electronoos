@@ -7,8 +7,8 @@ description: Utiliser efficacement un logiciel permettant de préparer des diapo
 
 ## Introduction
 
-Pendant l'année vous devrez préparer un exposé.
-Ce tutoriel a pour objectif d'apprendre à faire des diapositives pour agrémenter votre exposé.
+Cette année en SNT, vous devrez préparer un exposé.
+Ce tutoriel a pour objectif d'apprendre à faire une présentation contenant des diapositives pour agrémenter votre exposé.
 
 Les fonctionnalités présentées seront à expérimenter depuis l'application **LibreOffice Impress** ou **Microsoft PowerPoint**.
 
@@ -74,7 +74,10 @@ travaux pratiques.
 !!! note "Mise en pratique: Choisir son thème"
 
     1. Au lancement de l'application une fenêtre apparait vous demandant de choisir un thème pour votre présentation, cela donnera un style à vos diapositives.
-    <div style="position: relative; padding-bottom: 56.25%; height: 0;"><iframe src="/assets/videos/explor.gif" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe></div>
+    <figure markdown>
+    ![Pad](images/diapo_01_model.png)
+    </figure>
+    
     2. Vous devez choisir le style qui convient à votre goût ou au thème choisi.
     3. Vous pouvez aussi choisir de fermer cette fenêtre sans choisir de thème afin d'avoir des diapositives neutres.
 
@@ -86,7 +89,9 @@ travaux pratiques.
 
     === "Méthode 1"
         1. Cliquer sur la petite icone en haut à gauche qui représente une disquette (comme dans les années 1997).
-        <div style="position: relative; padding-bottom: 56.25%; height: 0;"><iframe src="/assets/videos/explor.gif" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe></div>
+            <figure markdown>
+            ![Pad](images/diapo_02_save.png)
+            </figure>
         2. Naviguer jusqu'à votre dossier SNT/Tutoriels
     === "Méthode 2"
         1. Aller dans le menu Fichier puis enregistrer sous.

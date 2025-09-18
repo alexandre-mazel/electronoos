@@ -13,6 +13,7 @@ nav:
           - Windows: snt/tutoriels/windows.md
           - Saisie de texte: snt/tutoriels/saisie-de-texte.md
           - ENT: snt/tutoriels/ent.md
+          - Faire des diapositives pour un exposé: snt/tutoriels/diapos.md
           #~ - Python: snt/tutoriels/python.md
           - FAQ (windows): snt/tutoriels/faq.md
       - Chapitre 1 - Internet:

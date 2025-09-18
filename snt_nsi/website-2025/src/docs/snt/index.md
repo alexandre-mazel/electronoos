@@ -6,6 +6,8 @@
 - [L'environnement windows](tutoriels/windows.md)
 - [Saisir du texte](tutoriels/saisie-de-texte.md)
 - [FAQ (windows, explorateur de fichiers...)](tutoriels/faq.md)
+- [Saisir du texte](tutoriels/saisie-de-texte.md)
+- [Faire des diapositives pour un expos&eacute;](tutoriels/diapos.md)
 
 <!---
 - [L'Environnement Numérique de Travail (ENT)](tutoriels/ent.md)

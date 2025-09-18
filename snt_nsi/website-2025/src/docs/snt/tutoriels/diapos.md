@@ -129,7 +129,7 @@ travaux pratiques.
     ![Pad](images/diapo_03_select.png)
     </figure>
     
-    Créer votre diapositive de titre puis celle de sommaire.
+    Créer votre diapositive de titre, puis celle de sommaire.
     
     Pour cela vous pouvez aller chercher des images sur internet pour agrémenter vos diapositives de titre et sommaire.
     
@@ -137,7 +137,7 @@ travaux pratiques.
     
 ### Créez vos diapositives
 
-Vous allez maintenant devoir creer les diapositives permettant de rendre vivant votre exposé.
+Vous allez maintenant devoir créer les diapositives permettant de rendre vivant votre exposé.
 
 !!! info  "Comment faire des diapositives efficace ?"
 

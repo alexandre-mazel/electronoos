@@ -122,7 +122,16 @@ travaux pratiques.
 
 !!! note "Mise en pratique: Créer votre diapositive de titre et celle de votre sommaire"
 
-    A vous de créer le début de votre présentation. Pour cela vous pouvez aller chercher des images sur internet pour agrémenter vos diapositives de titre et sommaire.
+    A vous de créer le début de votre présentation. 
+    
+    Vous pouvez naviguer dans les diapositives en cliquant sur la gauche de votre écran.
+    <figure markdown>
+    ![Pad](images/diapo_03_select.png)
+    </figure>
+    
+    Créer votre diapositive de titre puis celle de sommaire.
+    
+    Pour cela vous pouvez aller chercher des images sur internet pour agrémenter vos diapositives de titre et sommaire.
     
     
     

@@ -123,38 +123,81 @@ print("Starting CCC...")
 """
 syntaxe: 
 """
+
+lustr_r = 0
+lustr_l = 1
+lustr_a = 2
+lustr_g = 3
+lustr_c = 4
+lustr_b = 5
+lustr_i = 6
+lustr_d = 7
+
 first_asserv = 38
 nbr_asserv = 8
 
-color = 0
-h = 0
-v = 0
 king_h = 0
 king_v = 1
 king_d = 3
 king_r = 4
+king_focus = 9
+
+color = 0
+h = 0
+v = 0
 cpt = 1
+focus = 0
 while 1:
     print("color: %d" % color )
     for idx in range( first_asserv, first_asserv+nbr_asserv ):
         first_chan = (idx - first_asserv) * 16 + 380
         #~ print("first_chan:", first_chan )
         dmx.set_data(first_chan+king_h, h )
-        dmx.set_data(first_chan+king_v, v ) 
+        dmx.set_data(first_chan+king_v, v )
         dmx.set_data(first_chan+king_d, 255 ) 
-        dmx.set_data(first_chan+king_r+(color+0)%4, 255 )  
+        dmx.set_data(first_chan+king_r+(color+0)%4, 255 ) 
         dmx.set_data(first_chan+king_r+(color+1)%4, 0 )  
         dmx.set_data(first_chan+king_r+(color+2)%4, 0 )  
-        dmx.set_data(first_chan+king_r+(color+3)%4, 0 )  
+        dmx.set_data(first_chan+king_r+(color+3)%4, 0 ) 
+        dmx.set_data(first_chan+king_focus, focus )
+
+    chan_lustr = 10
+    dmx.set_data(chan_lustr+lustr_d, 255 )
+    r  = g = b = w = 0
+    if color == 0:
+        r = 255
+    elif color == 1:
+        g = 255
+    elif color == 2:
+        b = 255
+    elif color == 3:
+        w = 255
+        
+    if 1:
+        # test rgb
+        dmx.set_data(chan_lustr+lustr_l, r )
+        dmx.set_data(chan_lustr+lustr_a, g )
+        dmx.set_data(chan_lustr+lustr_c, b )
+    else:
+        # test laci
+        dmx.set_data(chan_lustr+lustr_l, r )
+        dmx.set_data(chan_lustr+lustr_a, g )
+        dmx.set_data(chan_lustr+lustr_c, b )
+        dmx.set_data(chan_lustr+lustr_i, w )
+    
     dmx.send()
     
     cpt += 1
     if cpt % 10 == 0:
         color += 1
+        color %= 4
     h += 2
     h %= 256
     v += 1
     v %= 256
+    
+    focus += 10
+    focus %= 256
     
     time.sleep(0.1)
     

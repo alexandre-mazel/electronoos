@@ -28,6 +28,8 @@ def replaceNameReplaceByNonAccentuatedChars(s):
                     ( "\\N{LATIN SMALL LETTER I WITH CIRCUMFLEX}", "i" ),
                     ( "\\N{LATIN SMALL LETTER N WITH TILDE}", "n" ),
                     ( "\\N{LATIN SMALL LETTER O WITH CIRCUMFLEX}", "o" ),
+                    ( "\\N{LATIN SMALL LETTER O WITH DIAERESIS}", "o" ),
+                    ( "\\N{LATIN CAPITAL LETTER O WITH STROKE}", "O" ),
                     ( "\\N{LEFT SINGLE QUOTATION MARK}", "'" ),
                     ( "\\N{RIGHT SINGLE QUOTATION MARK}", "'" ),
                     ( "\\N{FULLWIDTH QUOTATION MARK}", "'" ),
@@ -36,6 +38,8 @@ def replaceNameReplaceByNonAccentuatedChars(s):
                     ( "\\N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK}", '"' ),
                     ( "\\N{FULLWIDTH COLON}", ':' ),
                     ( "\\N{FULLWIDTH QUESTION MARK}", '?' ),
+                    ( "\\N{LEFT DOUBLE QUOTATION MARK}", '?' ),
+                    ( "\\N{RIGHT DOUBLE QUOTATION MARK}", '?' ),
                     ( "\\N{NO-BREAK SPACE}", " " ),
                     ( "\\N{ZERO WIDTH SPACE}", " " ),
                     ( "\\N{EM DASH}", "-" ),
@@ -48,6 +52,12 @@ def replaceNameReplaceByNonAccentuatedChars(s):
                     ( "\\N{BLACK LEFT-POINTING POINTER}", "-" ),
                     ( "\\N{FIREWORKS}", "-" ),
                     ( "\\N{BIG SOLIDUS}", "-" ),
+                    ( "\\N{BIG REVERSE SOLIDUS}", "-" ), # c'est cense etre l'anti slash, mais on met juste un -
+                    
+                    ( "\\N{HANGUL SYLLABLE HAE}", "X" ), # caractere coréen qui veut dire spring
+                    ( "\\N{HANGUL SYLLABLE SEOG}", "X" ), # qui veut dire night (ou l'inverse) #faire un code qui change tout les HANGUL_SYLLABLE_* par rien ou X
+                    
+                    
                     
                 ]
     for a,b in trans:

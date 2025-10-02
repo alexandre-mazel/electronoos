@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+# 1. Install python
+# 2. Install lib: pip3 install serial pyserial numpy 
+
 from dmxal import DMX # git clone https://github.com/monzelr/dmx.git, cd dmx, pip install .
 import dmxal
 dmxal.set_verbose( False )

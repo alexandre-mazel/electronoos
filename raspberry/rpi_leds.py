@@ -117,6 +117,8 @@ if __name__ == '__main__':
             while 1:
                 colorFull( strip, 0xFFFFFF )
                 time.sleep(1)
+                colorFull( strip, 0x0000FF )
+                time.sleep(1)
                 colorFull( strip, 0x0 )
                 time.sleep(1)
                 

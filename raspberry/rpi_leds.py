@@ -24,6 +24,9 @@ LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
 LED_COUNT      = 383 * 3# 383 par barres ?
 
+ORDER = neopixel.RGB # default (TODO: test !) (could also be GRB)
+ORDER = neopixel.RGBW # When using RGBW (could also be GRBW)
+
 
 # Define functions which animate LEDs in various ways.
 def colorFull(strip, color):
@@ -98,7 +101,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Create NeoPixel object with appropriate configuration.
-    strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
+    strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL, pixel_order=ORDER)
     # Intialize the library (must be called once before other functions).
     strip.begin()
 

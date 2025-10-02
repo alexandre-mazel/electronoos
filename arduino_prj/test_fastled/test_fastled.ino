@@ -1,12 +1,36 @@
 #include <FastLED.h> // FastLed Neopixel by David Madison and FastLed 3.9.8
 
 //#define NUM_LEDS (16*16) // number of led present in your strip
-#define NUM_LEDS (16*2)
+#define NUM_LEDS (16)
 
 //#define DATA_PIN 45 // digital pin of the connected led
-#define DATA_PIN A10
+//#define DATA_PIN A10
+#define DATA_PIN 45
 
 CRGB leds[NUM_LEDS];
+
+void printHexa2( unsigned char u )
+{
+  // print u with a leading 0 if needed
+  if( u < 16 )
+  {
+    Serial.print("0");
+  }
+  Serial.print(u,HEX);
+}
+
+void printCRGB( CRGB c )
+{
+  Serial.print("0x");
+  printHexa2( c.raw[2] );
+  printHexa2( c.raw[1] );
+  printHexa2( c.raw[0] );
+}
+void printCRGBln( CRGB c )
+{
+  printCRGB( c );
+  Serial.println("");
+}
 
 
 uint32_t hueToHexa( int nHue )
@@ -173,7 +197,11 @@ void full_on()
 
 void full_one_color( struct CRGB one_color)
 {
-  Serial.println( "leds: full_one_color");
+  //one_color.raw[0] = 0;
+  //one_color.raw[1] = 0;
+  //one_color.raw[2] = 0xFF;
+  Serial.print( "leds: full_one_color: ");
+  printCRGBln( one_color );
   for( int dot = 0; dot < NUM_LEDS; ++dot )
   { 
     leds[dot] = one_color;
@@ -335,6 +363,14 @@ void loop()
   if( 1 )
   {
     full_on();
+    delay(3000);
+    //return;
+  }
+
+  if( 1 )
+  {
+    erase_all();
+    full_one_color(CRGB::White);
     delay(3000);
     //return;
   }

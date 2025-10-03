@@ -71,21 +71,25 @@ lustr_i = 6      #  indigo
 lustr_d = 7     # dim
 
 first_asserv = 38
+first_asserv_dmx = 380
 nbr_asserv = 8
 
 king_h = 0      # horiz
 king_v = 1      # vertic
 king_d = 3      # dim
 king_r = 4      # r (then g then b)
+king_g = 5
+king_b = 6
 king_focus = 9
 
 
 
 def test_all_lustr( dmx, first, nbr, offset, duration = 0.5 ):
     print( "INF: test_all_lustr: starting" )
+    all_together = 1
     for i in range( first, first+nbr ):
         print( "INF: test_all_lustr: spot %d" % i )
-        dmx.rtz()
+        if not all_together: dmx.rtz()
         num_start = i * offset
         for chan in range(7):
             dmx.set_data(num_start+lustr_r, (255 if chan==0 else 0) )
@@ -95,9 +99,27 @@ def test_all_lustr( dmx, first, nbr, offset, duration = 0.5 ):
             dmx.set_data(num_start+lustr_c, (255 if chan==4 else 0) )
             dmx.set_data(num_start+lustr_b, (255 if chan==5 else 0) )
             dmx.set_data(num_start+lustr_i, (255 if chan==6 else 0) )
-            dmx.set_data(num_start+lustr_d, 255 )
+            dmx.set_data(num_start+lustr_d, 40 )
             dmx.send()
-            time.sleep(duration)
+            if not all_together: time.sleep(duration)
+            
+def test_all_asserv( dmx, first, nbr, offset, duration = 0.5 ):
+    print( "INF: test_all_asserv: starting" )
+    all_together = 1
+    for i in range( first, first+nbr ):
+        if not all_together: dmx.rtz()
+        num_start = (i-first) * offset + first_asserv_dmx
+        print( "INF: test_all_asserv: spot %d (dmx: %d)" % (i,num_start) )
+        for chan in range(3):
+            dmx.set_data(num_start+king_h, int(time.time()%60) ) # qu'a chaque fois il tourne un peu
+            dmx.set_data(num_start+king_v, 127 )
+            dmx.set_data(num_start+king_r, (255 if chan==0 else 0) )
+            dmx.set_data(num_start+king_g, (255 if chan==1 else 0) )
+            dmx.set_data(num_start+king_b, (255 if chan==2 else 0) )
+            dmx.set_data(num_start+king_d, 40 )
+            dmx.send()
+            if not all_together: time.sleep(duration)
+
 
 
 
@@ -174,6 +196,7 @@ offset_lustr = 10 # nbr a multiplier entre chaque DMX
 
 first_asserv = 38
 nbr_asserv = 8
+offset_asserv = 16
 
 
 color = 0
@@ -183,9 +206,13 @@ cpt = 1
 focus = 0
 
 
+dmx.rtz()
+if 1: exit() # shutdown all
 if 1: test_all_lustr( dmx, first_lustr,nbr_lustr,offset_lustr)
+if 1: test_all_asserv( dmx, first_asserv,nbr_asserv,offset_asserv)
 
-time.sleep(100)
+print("sleeping")
+time.sleep(10*60)
 
 
 

@@ -48,7 +48,7 @@ if 0:
 
 async def fade_wiz(col1, col2, duration):
     """
-    Fade between two colors.
+    Fade between two colors: col1 => col2
     colors are a tuple: r, g, b, ww, cw, brightness
     """
     
@@ -59,6 +59,7 @@ async def fade_wiz(col1, col2, duration):
     #~ ips_bulb = ["192.168.0.112"]
     #~ ips_bulb = ["192.168.0.110","192.168.0.121"]
     ips_bulb = ["192.168.0.110"]
+    ips_bulb = ["192.168.9.223"]
     
     bulbs = []
     
@@ -181,7 +182,7 @@ if 0:
 
     loop.run_until_complete(fade_wiz(col_1,col_2,duration))
     
-if 1:
+if 0:
     # reglage pour eclairage oeuvre #2: avec brightness bien gere.
     duration = 20.6 # in sec
     col_1 = (0,0,0,255,255,255)
@@ -212,5 +213,19 @@ if 0:
     # reglage rapide de couleur
     col = (0, 5, 30,0,0,40)
     loop.run_until_complete(fade_wiz(col,col,1))
+    
+    
+if 1: 
+    # reglage rapide de communication
+    col_1 = (0,0,0,255,255,255)
+    col_2 = (0,255,0,0,0,255)
+    col_3 = (0,0,255,0,0,255)
+    col_4 = (0,0,255,0,0,0)
+    col_off = (0,0,0,0,0,0)
+    loop.run_until_complete(fade_wiz(col_1,col_2,3))
+    loop.run_until_complete(fade_wiz(col_2,col_3,3))
+    loop.run_until_complete(fade_wiz(col_3,col_4,7))
+    #~ loop.run_until_complete(fade_wiz(col_4,col_4,2)) # force to call it
+    #~ loop.run_until_complete(fade_wiz(col_off,col_off,2)) # force to call it
 
     

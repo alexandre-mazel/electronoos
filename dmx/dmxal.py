@@ -270,6 +270,9 @@ class DMX(object):
         data = np.concatenate((self.start_byte, self.data, self.end_byte)).tobytes()
         self.ser.write(data)
         self.ser.flush()
+        
+    def rtz( self ) -> None:
+        self.data = np.zeros([self.num_of_channels], np.uint8)
 
     def __del__(self) -> None:
         """

@@ -60,6 +60,49 @@ import sys
 from dmxal import DMX # git clone https://github.com/monzelr/dmx.git, cd dmx, pip install .
 import dmxal
 
+
+lustr_r = 0     # red
+lustr_l = 1     # lime
+lustr_a = 2     # amber
+lustr_g = 3     # green
+lustr_c = 4     # cyan
+lustr_b = 5     # blue
+lustr_i = 6      #  indigo
+lustr_d = 7     # dim
+
+first_asserv = 38
+nbr_asserv = 8
+
+king_h = 0      # horiz
+king_v = 1      # vertic
+king_d = 3      # dim
+king_r = 4      # r (then g then b)
+king_focus = 9
+
+
+
+def test_all_lustr( dmx, first, nbr, offset, duration = 0.5 ):
+    print( "INF: test_all_lustr: starting" )
+    for i in range( first, first+nbr ):
+        print( "INF: test_all_lustr: spot %d" % i )
+        dmx.rtz()
+        num_start = i * offset
+        for chan in range(7):
+            dmx.set_data(num_start+lustr_r, (255 if chan==0 else 0) )
+            dmx.set_data(num_start+lustr_l, (255 if chan==1 else 0) )
+            dmx.set_data(num_start+lustr_a, (255 if chan==2 else 0) )
+            dmx.set_data(num_start+lustr_g, (255 if chan==3 else 0) )
+            dmx.set_data(num_start+lustr_c, (255 if chan==4 else 0) )
+            dmx.set_data(num_start+lustr_b, (255 if chan==5 else 0) )
+            dmx.set_data(num_start+lustr_i, (255 if chan==6 else 0) )
+            dmx.set_data(num_start+lustr_d, 255 )
+            dmx.send()
+            time.sleep(duration)
+
+
+
+
+
 dmxal.set_verbose( False )
 
 
@@ -124,68 +167,69 @@ print("Starting CCC...")
 syntaxe: 
 """
 
-lustr_r = 0
-lustr_l = 1
-lustr_a = 2
-lustr_g = 3
-lustr_c = 4
-lustr_b = 5
-lustr_i = 6
-lustr_d = 7
+first_lustr = 1
+nbr_lustr = 33
+offset_lustr = 10 # nbr a multiplier entre chaque DMX
+
 
 first_asserv = 38
 nbr_asserv = 8
 
-king_h = 0
-king_v = 1
-king_d = 3
-king_r = 4
-king_focus = 9
 
 color = 0
 h = 0
 v = 0
 cpt = 1
 focus = 0
-while 1:
-    print("color: %d" % color )
-    for idx in range( first_asserv, first_asserv+nbr_asserv ):
-        first_chan = (idx - first_asserv) * 16 + 380
-        #~ print("first_chan:", first_chan )
-        dmx.set_data(first_chan+king_h, h )
-        dmx.set_data(first_chan+king_v, v )
-        dmx.set_data(first_chan+king_d, 255 ) 
-        dmx.set_data(first_chan+king_r+(color+0)%4, 255 ) 
-        dmx.set_data(first_chan+king_r+(color+1)%4, 0 )  
-        dmx.set_data(first_chan+king_r+(color+2)%4, 0 )  
-        dmx.set_data(first_chan+king_r+(color+3)%4, 0 ) 
-        dmx.set_data(first_chan+king_focus, focus )
 
-    chan_lustr = 10
-    dmx.set_data(chan_lustr+lustr_d, 255 )
-    r  = g = b = w = 0
-    if color == 0:
-        r = 255
-    elif color == 1:
-        g = 255
-    elif color == 2:
-        b = 255
-    elif color == 3:
-        w = 255
+
+if 1: test_all_lustr( dmx, first_lustr,nbr_lustr,offset_lustr)
+
+time.sleep(100)
+
+
+
+if 0:
+    # all asserv
+    while 1:
+        print("color: %d" % color )
+        for idx in range( first_asserv, first_asserv+nbr_asserv ):
+            first_chan = (idx - first_asserv) * 16 + 380
+            #~ print("first_chan:", first_chan )
+            dmx.set_data(first_chan+king_h, h )
+            dmx.set_data(first_chan+king_v, v )
+            dmx.set_data(first_chan+king_d, 255 ) 
+            dmx.set_data(first_chan+king_r+(color+0)%4, 255 ) 
+            dmx.set_data(first_chan+king_r+(color+1)%4, 0 )  
+            dmx.set_data(first_chan+king_r+(color+2)%4, 0 )  
+            dmx.set_data(first_chan+king_r+(color+3)%4, 0 ) 
+            dmx.set_data(first_chan+king_focus, focus )
+
+        chan_lustr = 10
+        dmx.set_data(chan_lustr+lustr_d, 255 )
+        r  = g = b = w = 0
+        if color == 0:
+            r = 255
+        elif color == 1:
+            g = 255
+        elif color == 2:
+            b = 255
+        elif color == 3:
+            w = 255
+            
+        if 1:
+            # test rgb
+            dmx.set_data(chan_lustr+lustr_l, r )
+            dmx.set_data(chan_lustr+lustr_a, g )
+            dmx.set_data(chan_lustr+lustr_c, b )
+        else:
+            # test laci
+            dmx.set_data(chan_lustr+lustr_l, r )
+            dmx.set_data(chan_lustr+lustr_a, g )
+            dmx.set_data(chan_lustr+lustr_c, b )
+            dmx.set_data(chan_lustr+lustr_i, w )
         
-    if 1:
-        # test rgb
-        dmx.set_data(chan_lustr+lustr_l, r )
-        dmx.set_data(chan_lustr+lustr_a, g )
-        dmx.set_data(chan_lustr+lustr_c, b )
-    else:
-        # test laci
-        dmx.set_data(chan_lustr+lustr_l, r )
-        dmx.set_data(chan_lustr+lustr_a, g )
-        dmx.set_data(chan_lustr+lustr_c, b )
-        dmx.set_data(chan_lustr+lustr_i, w )
-    
-    dmx.send()
+        dmx.send()
     
     cpt += 1
     if cpt % 10 == 0:

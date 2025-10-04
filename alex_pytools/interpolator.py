@@ -215,9 +215,9 @@ def test_interpolator():
     nbr_interpolator = 100000
     im = InterpolatorManager(nbr_interpolator)
     
-    if 0:
+    if 1:
         for n in range( nbr_interpolator ):
-            im.get(n).set( 1000, 5 )
+            im.get(n).set( 1000, 5, interpolation = interpolation_sinus2 )
     
     im.get(0).set( 1000, 5 )
     im.get(1).set( 1000, 5, interpolation = interpolation_sinus )
@@ -234,12 +234,12 @@ def test_interpolator():
         print( "DBG: im.update takes %.4fs" % update_duration )
         """ 
         Duration:
-        mstab7:  ~ 0.05 for 100k running, 0.01 when all are stopped
+        mstab7:  ~ 0.05 for 100k running linear, 0.08 for 100k running sinus, 0.085 for 100k running sinus2, 0.01 when all are stopped
         """
         
         print("interpolator0: val: ", im.get(0).get_val())
         time.sleep(1)
         
 if __name__ == "__main__":
-    draw_interpolator()
-    #~ test_interpolator()
+    #~ draw_interpolator()
+    test_interpolator()

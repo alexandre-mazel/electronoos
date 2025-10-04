@@ -31,6 +31,7 @@ class Device(object):
     """
     class to describe further RS-485 devices
     """
+    
     def __init__(self, vid=0, pid=0, serial_number=None):
         """
         :param vid: vendor ID
@@ -109,6 +110,8 @@ class DMX(object):
         self.MAB_us = 8                             # 8us < Mark-After-Break < 1s -> not used in DMX implementation
         
         self.b_clear_channel_at_exit = True
+        
+        self.set_optimised( False )
 
         # Search for RS-485 devices, for this look into DEVICE_LIST
         self.ser = None
@@ -239,8 +242,14 @@ class DMX(object):
             if self.device in devices:
                 connected = True
         return connected
+        
+    def set_data( self, channel_id: int, data: int, auto_send: bool = True ):
+        """
+        Will call set_data_not_optimised or set_data_optimised selon le cas
+        """
+        print( "ERR: DmxAl: internal error: set_optimised must be called at least once!") 
 
-    def set_data(self, channel_id: int, data: int, auto_send: bool = True) -> None:
+    def __set_data_not_optimised__(self, channel_id: int, data: int, auto_send: bool = True ) -> None:
         """
 
         :param channel_id: the channel ID as integer value between 1 and 511
@@ -259,6 +268,15 @@ class DMX(object):
 
         if auto_send:
             self.send()
+            
+    def __set_data_optimised__(self, channel_id: int, data: int) -> None:
+        self.data[channel_id-1] = data
+        
+    def set_optimised( self, activate ):
+        if activate:
+            self.set_data = self.__set_data_optimised__ # remove 3 tests and the send by default !
+        else:
+            self.set_data = self.__set_data_not_optimised__
 
     def send(self) -> None:
         """
@@ -266,10 +284,15 @@ class DMX(object):
 
         :return None:
         """
-        if verbose: print( "DBG: Sending..." )
+        if verbose: 
+            print( "DBG: Sending..." )
+            time_begin = time.time()
         data = np.concatenate((self.start_byte, self.data, self.end_byte)).tobytes()
         self.ser.write(data)
         self.ser.flush()
+        if verbose: 
+            duration = time.time() - time_begin
+            print( "DBG: Sent in %3fs" % (duration) )
         
     def rtz( self ) -> None:
         self.data = np.zeros([self.num_of_channels], np.uint8)

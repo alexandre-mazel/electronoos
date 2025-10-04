@@ -152,7 +152,14 @@ def init_dmx( nbr_channel_to_use = 512 ):
         print("INF: dmx.device.interface: ", dmx.device.interface ) # None
         print("INF: dmx.device.device: ", dmx.device.device ) # COMx
         print("INF: dmx.device.manufacturer: ", dmx.device.manufacturer ) # FTDI
-        print("INF: dmx.device.serial_number: ", dmx.device.serial_number ) # mon truc chinois orange: BG00U0KFA; l'enttec de l'ensad: EN172589A, le noir qui clignote: BG0106SGA
+        print("INF: dmx.device.serial_number: ", dmx.device.serial_number ) 
+        """
+        - mon truc chinois orange: BG00U0KFA
+        - l'enttec de l'ensad: EN172589A
+        - le noir qui clignote: BG0106SGA
+        - l'enttec num4: EN495728A
+        """
+
 
     except BaseException as err:
         print("ERR: During Initing: exception: err: %s" % str(err) )

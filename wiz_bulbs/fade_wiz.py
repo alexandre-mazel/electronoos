@@ -59,7 +59,7 @@ async def fade_wiz(col1, col2, duration, just_one_call = False):
     #~ ips_bulb = ["192.168.0.112"]
     #~ ips_bulb = ["192.168.0.110","192.168.0.121"]
     ips_bulb = ["192.168.0.110"]
-    ips_bulb = ["192.168.9.223"]
+    ips_bulb = ["192.168.9.222"]
     
     bulbs = []
     

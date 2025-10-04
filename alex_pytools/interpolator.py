@@ -8,9 +8,16 @@ mode_loop = 1
 mode_pingpong = 2
 
 interpolation_linear = 0
-interpolation_sinus = 1
+interpolation_sinus = 1          # accelerate slowly, decelerate slowly
+interpolation_sinus2 = 1          # accelerate very slowly, decelerate very slowly
+interpolation_halfsinus = 3   # accelerate quickly, decelerate slowly
 
 math.pi2 = math.pi / 2
+
+def precise_sleep(duration_sec):
+    target = time.perf_counter() + duration_sec
+    while time.perf_counter() < target:
+        pass
 
 
 class Interpolator:
@@ -62,6 +69,7 @@ class Interpolator:
                 ( self.is_running, self.mode, self.interpolation, self.start_time, self.stop_time, self.duration, self.start_val ) )
             
         # compute the new value
+        reverse = 0
         if self.mode == mode_normal:
             coef = (time.time() - self.start_time) / self.duration
             if coef > 1:
@@ -77,12 +85,29 @@ class Interpolator:
             if coef > 1:
                 # reverse mode
                 coef = 2-coef
+                reverse = 1
         
-        if self.interpolation != interpolation_sinus:
+        if self.interpolation == interpolation_linear:
             self.val = self.start_val + coef * (self.stop_val-self.start_val)
-        else:
-            self.val = self.start_val + math.sin(coef*math.pi2) * (self.stop_val-self.start_val)
-        
+            
+        elif self.interpolation == interpolation_sinus:
+            if not reverse:
+                self.val = self.start_val + (math.sin(coef*math.pi-math.pi2)+1)/2 * (self.stop_val-self.start_val)
+            else:
+                self.val = self.start_val + ( 1 - math.sin((1-coef)*math.pi-math.pi2) )/2 * (self.stop_val-self.start_val)
+                
+        elif self.interpolation == interpolation_sinus2:
+            if not reverse:
+                self.val = self.start_val + ((math.sin(coef*math.pi-math.pi2)+1)/2)**4 * (self.stop_val-self.start_val)
+            else:
+                self.val = self.start_val + (( 1 - math.sin((1-coef)*math.pi-math.pi2) )/2)**4 * (self.stop_val-self.start_val)
+                
+                
+        elif self.interpolation == interpolation_halfsinus:
+            if not reverse:
+                self.val = self.start_val + math.sin(coef*math.pi2) * (self.stop_val-self.start_val)
+            else:
+                self.val = self.start_val + ( 1 - math.sin((1-coef)*math.pi2) ) * (self.stop_val-self.start_val)
         
         if verbose: print( "DBG: Interpolator.update: coef: %.3f, val: %3f" % ( coef, self.val ) )
         
@@ -114,11 +139,12 @@ class InterpolatorManager:
 # class InterpolatorManager - end
 
 def draw_interpolator():
+    import numpy as np
     import matplotlib.pyplot as plt
 
     # Generate data
     t = 0
-    nbr_interpolator = 6
+    nbr_interpolator = 12
     im = InterpolatorManager( nbr_interpolator )
     im.get(0).set( 1000, 1 )
     im.get(1).set( 1000, 1, mode = mode_loop )
@@ -126,17 +152,26 @@ def draw_interpolator():
     im.get(3).set( 1000, 1, interpolation = interpolation_sinus )
     im.get(4).set( 1000, 1, interpolation = interpolation_sinus, mode = mode_loop )
     im.get(5).set( 1000, 1, interpolation = interpolation_sinus, mode = mode_pingpong )
+    im.get(6).set( 1000, 1, interpolation = interpolation_sinus2 )
+    im.get(7).set( 1000, 1, interpolation = interpolation_sinus2, mode = mode_loop )
+    im.get(8).set( 1000, 1, interpolation = interpolation_sinus2, mode = mode_pingpong )
+    im.get(9).set( 1000, 1, interpolation = interpolation_halfsinus )
+    im.get(10).set( 1000, 1, interpolation = interpolation_halfsinus, mode = mode_loop )
+    im.get(11).set( 1000, 1, interpolation = interpolation_halfsinus, mode = mode_pingpong )
     values = []
     for i in range( nbr_interpolator ):
         values.append( [] )
     
+    # on aurait aimer faire du temps réel, mais on est un peu loin de ca.
     ts  = []
-    for t in range( 2000 ):
+    for t in range( 4000 ):
         ts.append(t/1000)
         im.update()
         for i in range( nbr_interpolator ):
-            values[i].append( im.get(i).get_val() )
-        time.sleep( 1/1000 )
+            values[i].append( im.get(i).get_val() - 2000 * i )
+        #~ time.sleep( 1/1000 )
+        #~ time.sleep( 0.000001 ) # le sleep est tres lent et peu précis
+        precise_sleep( 1/1000 )
 
     # Plot
     plt.figure(figsize=(10,6))
@@ -146,6 +181,12 @@ def draw_interpolator():
     plt.plot(ts, values[3], label="sinus normal")
     plt.plot(ts, values[4], label="sinus loop")
     plt.plot(ts, values[5], label="sinus pingpong")
+    plt.plot(ts, values[6], label="sinus2 normal")
+    plt.plot(ts, values[7], label="sinus2 loop")
+    plt.plot(ts, values[8], label="sinus2 pingpong")
+    plt.plot(ts, values[9], label="halfsinus normal")
+    plt.plot(ts, values[10], label="halfsinus loop")
+    plt.plot(ts, values[11], label="halfsinus pingpong")
 
     # Limit y range
     #~ plt.ylim(-10, 10)
@@ -153,9 +194,21 @@ def draw_interpolator():
     plt.title("Interpolator")
     plt.xlabel("t")
     plt.ylabel("val")
-    plt.legend()
+    
+    plt.yticks(np.arange(-2000*nbr_interpolator, 2000, 1000)) # show horizontal grid bar
+    #~ plt.gca().get_yaxis().set_visible(False) # hide y axis
+    plt.gca().set_yticklabels([]) # hide the labels but keep the ticks/grid
+    
+    #~ plt.legend()
+    plt.legend(loc="upper right")
+    plt.tight_layout(pad=0) # fonctionne pas sur le premier?
     plt.grid(True)
+    
+    fn = 'datas/interpolator.png'
+    plt.savefig(fn, dpi=100)
+    
     plt.show()
+
 
 
 def test_interpolator():

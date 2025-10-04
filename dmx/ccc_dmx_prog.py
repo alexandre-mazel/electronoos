@@ -27,5 +27,6 @@ def prog_ccc( dm, nbr_chan ):
 
 if __name__ == "__main__":
     dmx_device = None
+    
     #~ dmx_device = init_dmx(492+16)
     prog_ccc(dmx_device, nbr_chan)

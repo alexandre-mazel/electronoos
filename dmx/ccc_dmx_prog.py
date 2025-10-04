@@ -19,6 +19,9 @@ pip3 install serial pyserial numpy
 "Copyright" 2025 Alexandre Mazel
 """
 
+def send_some_order( im: interpolator.InterpolatorManager ):
+    pass # from time to time envoyer un truc dans l'interpolateur
+
 def prog_ccc( dm, nbr_chan ):
     im = interpolator.InterpolatorManager( nbr_chan )
     
@@ -26,16 +29,18 @@ def prog_ccc( dm, nbr_chan ):
     #~ dmxal.set_verbose( True )
     print("looping...")
     while 1:
+        
         print(".", end="")
+        
+        send_some_order(im)
+        
         im.update()
         for i in range( 1, nbr_chan ):
             dm.set_data(i,im.get(i).get_val(), auto_send = False)
         dm.send()
         time.sleep(0.1)
-        
 
-
-
+# prog_ccc - end
 
 if __name__ == "__main__":
     dmx_device = None

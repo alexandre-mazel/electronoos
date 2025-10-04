@@ -46,7 +46,7 @@ if 0:
         print( "%.3f => %.3f" % (coef, nonlinear_ramp(coef) ))
     exit(1)
 
-async def fade_wiz(col1, col2, duration):
+async def fade_wiz(col1, col2, duration, just_one_call = False):
     """
     Fade between two colors: col1 => col2
     colors are a tuple: r, g, b, ww, cw, brightness
@@ -78,7 +78,7 @@ async def fade_wiz(col1, col2, duration):
         coef = coef0
         #~ coef = nonlinear_ramp( coef0 )
         coef_presque = (duration - 0.2) / duration # presque a fond # 0.2 is a rough approx of the time to send command
-        if coef > coef_presque:
+        if coef > coef_presque or just_one_call:
             print("coef0: %.3f, coef: %.3f, presque: %.3f" % (coef0, coef, coef_presque) )
             coef = 1
         for i in range(6):
@@ -133,10 +133,20 @@ async def fade_wiz(col1, col2, duration):
                     #~ bulbs[5].turn_off(),
                     #~ bulbs[6].turn_off(),
                 )
+                if 0:
+                    print( "INF: ultraforce muting" )
+                    await bulbs[0].turn_off()
+                    
         cpt += 1
-        time.sleep(0.01)
-    print( "time per call: %.2fs" % ((time.time() - time_begin) / cpt) )
         
+        if just_one_call:
+            break
+            
+        time.sleep(0.01)
+    
+    print( "time per call: %.2fs" % ((time.time() - time_begin) / cpt) )
+    
+# fade_wiz - end
 
 loop = asyncio.get_event_loop()
 
@@ -225,7 +235,8 @@ if 1:
     loop.run_until_complete(fade_wiz(col_1,col_2,3))
     loop.run_until_complete(fade_wiz(col_2,col_3,3))
     loop.run_until_complete(fade_wiz(col_3,col_4,7))
-    #~ loop.run_until_complete(fade_wiz(col_4,col_4,2)) # force to call it
-    #~ loop.run_until_complete(fade_wiz(col_off,col_off,2)) # force to call it
+    # essaye de forcer la lampe a s'eteindre
+    loop.run_until_complete(fade_wiz(col_4,col_off,2)) # force to call it
+    loop.run_until_complete(fade_wiz(col_off,col_off,1,just_one_call=True))
 
     

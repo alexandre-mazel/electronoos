@@ -21,10 +21,12 @@ pip3 install serial pyserial numpy
 
 def send_some_order( im: interpolator.InterpolatorManager ):
     pass # from time to time envoyer un truc dans l'interpolateur
+    for i in range(10):
+        im.get(10+i).set( 250, 10 )
 
 def prog_ccc( dm, nbr_chan ):
     im = interpolator.InterpolatorManager( nbr_chan )
-    
+    send_some_order(im)
     # update and set values:
     #~ dmxal.set_verbose( True )
     print("looping...")
@@ -32,7 +34,7 @@ def prog_ccc( dm, nbr_chan ):
         
         print(".", end="")
         
-        send_some_order(im)
+        #~ send_some_order(im)
         
         im.update()
         for i in range( 1, nbr_chan ):

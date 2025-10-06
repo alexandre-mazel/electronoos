@@ -82,6 +82,15 @@ king_g = 5
 king_b = 6
 king_focus = 9
 
+first_she_dmx = 492
+
+she_h = 0      # X: when looking to the lcd, it looks at you, then goes to the right, 83: demi tour, 170: tour complet
+she_v = 1      # Y: 0: look at you, 127: vertical, 255: autre coté
+she_d = 2
+she_r = 3      # r (then g then b)
+she_g = 4
+she_b = 5
+
 
 
 def test_all_lustr( dm, first, nbr, offset, duration = 0.5 ):
@@ -122,6 +131,24 @@ def test_all_asserv( dm, first, nbr, offset, duration = 0.5 ):
             dm.set_data(num_start+king_d, 40 )
             dm.send()
             if not all_together: time.sleep(duration)
+            
+def test_all_she( dm, first, nbr, offset, duration = 0.5 ):
+    print( "INF: test_all_she: starting" )
+    all_together = 1
+    for i in range( first, first+nbr ):
+        if not all_together: dm.rtz()
+        num_start = (i-first) * offset + first_she_dmx
+        print( "INF: test_all_she: spot %d (dmx: %d)" % (i,num_start) )
+        for chan in range(3):
+            dm.set_data(num_start+she_h, int(time.time()%60)  ) # sint(time.time()%60) ) # qu'a chaque fois il tourne un peu
+            dm.set_data(num_start+she_v, 127 )
+            dm.set_data(num_start+she_r, (255 if chan==0 else 0) )
+            dm.set_data(num_start+she_g, (255 if chan==1 else 0) )
+            dm.set_data(num_start+she_b, (255 if chan==2 else 0) )
+            dm.set_data(num_start+she_d, 40 )
+            dm.send()
+            if not all_together: time.sleep(duration)
+            #~ exit(1)
 
 
 
@@ -203,7 +230,10 @@ def test_ccc( dmx_device ):
     
 
     print("Starting CCC...")
+    
     dm = dmx_device
+    dm.set_clear_channel_at_exit( False )
+    dm.set_optimised( True )
 
     first_lustr = 1
     nbr_lustr = 33
@@ -213,7 +243,9 @@ def test_ccc( dmx_device ):
     first_asserv = 38
     nbr_asserv = 8
     offset_asserv = 16
+    
 
+    first_she = 45
 
     color = 0
     h = 0
@@ -222,13 +254,29 @@ def test_ccc( dmx_device ):
     focus = 0
 
 
-    dmx.rtz()
-    if 1: exit() # shutdown all
-    if 1: test_all_lustr( dmx, first_lustr,nbr_lustr,offset_lustr)
-    if 1: test_all_asserv( dmx, first_asserv,nbr_asserv,offset_asserv)
+    dm.rtz()
+    if 0:
+        # eteins tout
+        dm.send()
+        exit(1)
+    
+    if 0:
+        print( "Quick test chan1" )
+        
+        for i in range(4):
+            dm.set_data(1+i,255)
+        dm.send()
+        time.sleep(10)
+        exit()
 
-    print("sleeping")
-    time.sleep(10*60)
+    #~ if 1: exit() # shutdown all
+    if 1: test_all_lustr( dm, first_lustr,nbr_lustr,offset_lustr)
+    if 1: test_all_asserv( dm, first_asserv,nbr_asserv,offset_asserv)
+    if 1: test_all_she(dm, first_she, 1, offset_asserv)
+            
+    if 0:
+        print("sleeping")
+        time.sleep(10*60)
 
 
 

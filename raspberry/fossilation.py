@@ -1,3 +1,4 @@
+import datetime
 import sys
 from os.path import join
 from queue import Queue
@@ -11,6 +12,27 @@ from soundfile import SoundFile
 
 import numpy
 import numpy as np
+
+
+import rpi_leds
+
+def getTimeStamp():
+    """
+    
+    # REM: linux command:
+    # timedatectl list-timezones: list all timezones
+    # sudo timedatectl set-timezone Europe/Paris => set paris
+    """
+    datetimeObject = datetime.datetime.now()
+    strTimeStamp = datetimeObject.strftime( "%Y/%m/%d: %Hh%Mm%Ss" )
+    return strTimeStamp
+    
+def log( msg ):
+    fn = "/home/na/log/fossi.log"
+    fn = open(fn,"at")
+    fn.write( getTimeStamp() + ": " + msg + "\n" )
+    fn.close()
+    
 
 
 def file_writing_thread(*, q, **soundfile_args):
@@ -38,12 +60,13 @@ buf = np.ndarray( shape=(1,4), dtype=np.float32 ) # with 4 random value at start
 
 avg = [0,0,0,0]
 nbr_callback = 0
+strip = None
 
 def record_device(device_id):
     
     def audio_callback(data, frames, time, status):
         """This is called (from a separate thread) for each audio block."""
-        global buf, avg, nbr_callback
+        global buf, avg, nbr_callback, strip
         #~ if status:
             #~ print(status, file=sys.stderr)
         #~ audio_q.put(data.copy())
@@ -58,6 +81,9 @@ def record_device(device_id):
         
         if nbr_callback < 1000:
             return # skip first buffers with cheat(s)
+            
+        if nbr_callback & 0x1 != 0:
+            return # keep only one on a lot of them
             
         if 0:
             # analyse on the fly, but buffer doesn't have all same length (from 23 to 384)
@@ -76,17 +102,41 @@ def record_device(device_id):
 
                 for i in range(4):
                     coef = 0.99 # resilience coef
+                    coef = 0.9
                     avg[i] = avg[i] * coef + maxi[i] * (1-coef)
                     
                 lim_print = 4
-                print( "moy:%s max:%s avg:%s" % ( arr_to_str(moy,lim_print), arr_to_str(maxi,lim_print), arr_to_str(avg,lim_print) ) )
-
+                out = "moy:%s max:%s avg:%s" % ( arr_to_str(moy,lim_print), arr_to_str(maxi,lim_print), arr_to_str(avg,lim_print) )
+                print(  out )
+                
+                leds = [0,0,0,0]
+                for i in range(4):
+                    val = min(255,int(avg[i]*200))
+                    val = min(val,255)
+                    #~ val = 12
+                    leds[i] = val
+                    
+                if 0:
+                    # indic la valeur
+                    print( "leds: %s" % leds )
+                    for i in range(255):
+                        #~ strip.setPixelColor(i, val<<24)
+                        strip.setPixelColor( i, 0xFFFFFFFF if i in leds else 0 )
+                else:
+                    val = min(255,int(avg[3]*200*4))
+                    print("val: %s" % val )
+                    #~ log( out + "val: " + str(val) )
+                    color = val<<24
+                    for i in range(rpi_leds.nbr_leds):
+                        #~ strip.setPixelColor(i, val<<24)
+                        strip.setPixelColor( i, color )                    
+                strip.show()
+            
     file_name = join(rec_dir, f"rec_dev{device_id}_ch{channels}.wav")
 
     print("#" * 40)
     stream = InputStream(
         samplerate=fs, device=device_id, channels=channels, callback=audio_callback
-        #~ samplerate=fs, device="hw:2,0", channels=channels, callback=audio_callback
     )
     stream.start()
     print(f"started stream {stream} ...")
@@ -113,8 +163,12 @@ def record_device(device_id):
 if __name__ == "__main__":
     fs = 44100
     channels = 2
-    channels = 4 # j'ai tente avec 4 chan et un seul device, et ca fonctionne !!!
+    channels = 4
     rec_dir = "./"
+    
+    log( "start" )
+    
+    strip = rpi_leds.init_strip(rpi_leds.nbr_leds)
 
     try:
         record_device(device_id=1) # record channel 1 et 2

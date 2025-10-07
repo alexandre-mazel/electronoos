@@ -6,7 +6,10 @@
 # various animations on a strip of NeoPixels.
 
  # a lancer en sudo, sinon ca: RuntimeError: ws2811_init failed with code -5 (mmap() failed)
-
+ # ou alors, faire un: sudo usermod -aG audio,video,gpio,plugdev pi
+ #  sudo usermod -aG audio,video,gpio,plugdev username
+ # ici: sudo usermod -aG gpio na
+ 
 import time
 from rpi_ws281x import *
 import argparse
@@ -24,8 +27,15 @@ LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
 LED_COUNT      = 383 * 3# 383 par barres ?
 
-ORDER = neopixel.RGB # default (TODO: test !) (could also be GRB)
-ORDER = neopixel.RGBW # When using RGBW (could also be GRBW)
+nbr_leds = LED_COUNT
+
+#~ ORDER = rpi_ws281x.RGB # default (TODO: test !) (could also be GRB)
+STRIP_TYPE = None
+STRIP_TYPE = rpi_ws281x.RGBW # When using RGBW (could also be GRBW)
+
+import _rpi_ws281x as ws
+#~ print(dir(ws))
+STRIP_TYPE = ws.SK6812_STRIP_GRBW
 
 
 # Define functions which animate LEDs in various ways.
@@ -37,7 +47,7 @@ def colorFull(strip, color):
     strip.show()
 
 # Define functions which animate LEDs in various ways.
-def colorWipe(strip, color, wait_ms=50):
+def colorWipe(strip, color, wait_ms=10):
     """Wipe color across display a pixel at a time."""
     for i in range(strip.numPixels()):
         strip.setPixelColor(i, color)
@@ -92,6 +102,22 @@ def theaterChaseRainbow(strip, wait_ms=50):
             time.sleep(wait_ms/1000.0)
             for i in range(0, strip.numPixels(), 3):
                 strip.setPixelColor(i+q, 0)
+                
+def init_strip( nbr_leds ):
+    """
+    Init strip with standard settings
+    """
+    
+    print( "INF: init_strip: initing strip with %d led(s)" % nbr_leds )
+    
+    # Create NeoPixel object with appropriate configuration.
+    strip = Adafruit_NeoPixel( nbr_leds, LED_PIN, LED_FREQ_HZ, LED_DMA, 
+        LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL, strip_type=STRIP_TYPE, 
+        #~ use_gpiochip=True # permits to use it without root privilege
+    )
+    # Intialize the library (must be called once before other functions).
+    strip.begin()
+    return strip
 
 # Main program logic follows:
 if __name__ == '__main__':
@@ -100,10 +126,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--clear', action='store_true', help='clear the display on exit')
     args = parser.parse_args()
 
-    # Create NeoPixel object with appropriate configuration.
-    strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL, pixel_order=ORDER)
-    # Intialize the library (must be called once before other functions).
-    strip.begin()
+    strip = init_strip( LED_COUNT )
 
     print ('Press Ctrl-C to quit.')
     if not args.clear:
@@ -117,7 +140,15 @@ if __name__ == '__main__':
             while 1:
                 colorFull( strip, 0xFFFFFF )
                 time.sleep(1)
+                colorFull( strip, 0xFF000000 )
+                time.sleep(1)
+                colorFull( strip, 0xFFFFFFFF )
+                time.sleep(1)
                 colorFull( strip, 0x0000FF )
+                time.sleep(1)
+                colorFull( strip, 0x00FF00 )
+                time.sleep(1)
+                colorFull( strip, 0xFF0000 )
                 time.sleep(1)
                 colorFull( strip, 0x0 )
                 time.sleep(1)

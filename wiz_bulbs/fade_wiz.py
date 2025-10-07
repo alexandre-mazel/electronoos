@@ -46,7 +46,7 @@ if 0:
         print( "%.3f => %.3f" % (coef, nonlinear_ramp(coef) ))
     exit(1)
 
-async def fade_wiz(col1, col2, duration, just_one_call = False):
+async def fade_wiz(col1, col2, duration, just_one_call = False, ips_bulb = None ):
     """
     Fade between two colors: col1 => col2
     colors are a tuple: r, g, b, ww, cw, brightness
@@ -54,12 +54,17 @@ async def fade_wiz(col1, col2, duration, just_one_call = False):
     
     print( "INF: fade_wiz: starting...")
     
-    #~ ips_bulb = ["192.168.0.110","192.168.0.111","192.168.0.112", "192.168.0.113", "192.168.0.114", "192.168.0.120", "192.168.0.121"]
-    #~ ips_bulb = ["192.168.0.110","192.168.0.112"]
-    #~ ips_bulb = ["192.168.0.112"]
-    #~ ips_bulb = ["192.168.0.110","192.168.0.121"]
-    ips_bulb = ["192.168.0.110"]
-    ips_bulb = ["192.168.9.222"]
+    if ips_bulb == None:
+        
+        #~ ips_bulb = ["192.168.0.110","192.168.0.111","192.168.0.112", "192.168.0.113", "192.168.0.114", "192.168.0.120", "192.168.0.121"]
+        #~ ips_bulb = ["192.168.0.110","192.168.0.112"]
+        #~ ips_bulb = ["192.168.0.112"]
+        #~ ips_bulb = ["192.168.0.110","192.168.0.121"]
+        #~ ips_bulb = ["192.168.0.110"]
+        ips_bulb = ["192.168.9.204"]
+        ips_bulb = ["192.168.9.205"]
+        ips_bulb = ["192.168.9.204","192.168.9.205"]
+        ips_bulb = ["192.168.9.204"]
     
     bulbs = []
     
@@ -150,6 +155,9 @@ async def fade_wiz(col1, col2, duration, just_one_call = False):
 
 loop = asyncio.get_event_loop()
 
+col_off = (0,0,0,0,0,0)
+col_full = (0,0,0,255,255,255)
+
 if 0:
     # reglage pour eclairage oeuvre.
 
@@ -224,14 +232,30 @@ if 0:
     col = (0, 5, 30,0,0,40)
     loop.run_until_complete(fade_wiz(col,col,1))
     
+if 0: 
+    # test rapide
+    col1 = (0, 0, 255,0,0,255)
+    col2 = (0, 255, 0,0,0,255)
+    col3 = (0, 0, 255,0,0,255)
+    loop.run_until_complete(fade_wiz(col1,col2,2))
+    loop.run_until_complete(fade_wiz(col2,col3,2))
+    loop.run_until_complete(fade_wiz(col3,col_off,2))
     
-if 1: 
+if 1:
+    # allume toutes:
+    for ip_last in range(204,220):
+        ip = "192.168.9.%d" % ip_last
+        loop.run_until_complete(fade_wiz(col_full,col_off,1,ips_bulb=[ip]))
+        
+        
+    
+    
+if 0: 
     # reglage rapide de communication
     col_1 = (0,0,0,255,255,255)
     col_2 = (0,255,0,0,0,255)
     col_3 = (0,0,255,0,0,255)
     col_4 = (0,0,255,0,0,0)
-    col_off = (0,0,0,0,0,0)
     loop.run_until_complete(fade_wiz(col_1,col_2,3))
     loop.run_until_complete(fade_wiz(col_2,col_3,3))
     loop.run_until_complete(fade_wiz(col_3,col_4,7))

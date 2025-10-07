@@ -19,6 +19,7 @@ if __name__ == "__main__":
 dm = dmx_device
 
 chan = king_41
+#~ chan = king_40
 
 # pour chaque tranche, comment tomber sur la commande qui correspond au prog du spot.
 # on veut: luminosite,  R G B,  col extra, col extra2, col extra3, X et Y.
@@ -28,13 +29,23 @@ conv_spot = conv_king
 # print all informations from Nano Kontrol2 (works!)
 with mido.open_input() as inport:
     for msg in inport:
-        print(msg)
+        #~ print(msg)
         cmd = msg.channel
+        if hasattr(msg,"note"):
+            if msg.note == 45:
+                if msg.velocity == 127:
+                    print("recorded: ")
+                    for i in range( 16 ):
+                        print( "%d, " % dm.get_data( chan+i ), end = "" )
+                    print( "" )
+                continue
         if msg.control == 16:
             cmd = 0
         val = msg.value*2
         cmd_conv = conv_spot[cmd]
         print("send: %d, conv %d to %d" % (cmd,cmd_conv, val) )
-        dm.set_data( chan+cmd_conv, val ) 
+        dm.set_data( chan+cmd_conv, val )
         dm.send()
+        
+        
         

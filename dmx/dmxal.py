@@ -277,6 +277,9 @@ class DMX(object):
             self.set_data = self.__set_data_optimised__ # remove 3 tests and the send by default !
         else:
             self.set_data = self.__set_data_not_optimised__
+            
+    def get_data( self, channel_id: int ):
+        return self.data[channel_id-1]
 
     def send(self) -> None:
         """

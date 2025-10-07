@@ -70,10 +70,7 @@ lustr_b = 5     # blue
 lustr_i = 6      #  indigo
 lustr_d = 7     # dim
 
-first_asserv = 38
-first_asserv_dmx = 380
-nbr_asserv = 8
-
+# mode 16chan
 king_h = 0      # horiz
 king_v = 1      # vertic
 king_d = 3      # dim
@@ -82,8 +79,8 @@ king_g = 5
 king_b = 6
 king_focus = 9
 
-first_she_dmx = 492
 
+# mode 10chan
 she_h = 0      # X: when looking to the lcd, it looks at you, then goes to the right, 83: demi tour, 170: tour complet
 she_v = 1      # Y: 0: look at you, 127: vertical, 255: autre coté
 she_d = 2
@@ -91,6 +88,20 @@ she_r = 3      # r (then g then b)
 she_g = 4
 she_b = 5
 
+first_lustr = 1
+nbr_lustr = 33
+offset_lustr = 10 # nbr a multiplier entre chaque DMX
+
+first_asserv = 38
+nbr_asserv = 7
+first_asserv_dmx = 380
+offset_asserv = 16
+
+king_40 = 412
+king_41 = 428
+
+first_she = 45
+first_she_dmx = 492
 
 
 def test_all_lustr( dm, first, nbr, offset, duration = 0.5 ):
@@ -115,6 +126,7 @@ def test_all_lustr( dm, first, nbr, offset, duration = 0.5 ):
             dm.send()
             if not all_together: time.sleep(duration)
             
+            
 def test_all_asserv( dm, first, nbr, offset, duration = 0.5 ):
     print( "INF: test_all_asserv: starting" )
     all_together = 1
@@ -131,6 +143,7 @@ def test_all_asserv( dm, first, nbr, offset, duration = 0.5 ):
             dm.set_data(num_start+king_d, 40 )
             dm.send()
             if not all_together: time.sleep(duration)
+            
             
 def test_all_she( dm, first, nbr, offset, duration = 0.5 ):
     print( "INF: test_all_she: starting" )
@@ -234,18 +247,6 @@ def test_ccc( dmx_device ):
     dm = dmx_device
     dm.set_clear_channel_at_exit( False )
     dm.set_optimised( True )
-
-    first_lustr = 1
-    nbr_lustr = 33
-    offset_lustr = 10 # nbr a multiplier entre chaque DMX
-
-
-    first_asserv = 38
-    nbr_asserv = 8
-    offset_asserv = 16
-    
-
-    first_she = 45
 
     color = 0
     h = 0

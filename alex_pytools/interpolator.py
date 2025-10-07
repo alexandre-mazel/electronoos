@@ -60,7 +60,7 @@ class Interpolator:
     def update( self ):
         
         verbose = 1
-        verbose = 0
+        #~ verbose = 0
         
         if not self.is_running: return
         
@@ -70,22 +70,26 @@ class Interpolator:
             
         # compute the new value
         reverse = 0
-        if self.mode == mode_normal:
-            coef = (time.time() - self.start_time) / self.duration
-            if coef > 1:
-                coef = 1
-                self.is_running = False
-        elif self.mode == mode_loop:
-            coef = (time.time() - self.start_time) / self.duration
-            coef = coef % 1 # modulo in float !
-        elif self.mode == mode_pingpong:
-            coef = (time.time() - self.start_time) / self.duration
-            coef %= 2
-            if verbose: print( "DBG: Interpolator.update: pingpong: coef intermediate: %.3f" % coef )
-            if coef > 1:
-                # reverse mode
-                coef = 2-coef
-                reverse = 1
+        if self.duration < 0.00001:
+            coef = 1
+            self.is_running = False #even for ping pong
+        else:
+            if self.mode == mode_normal:
+                coef = (time.time() - self.start_time) / self.duration
+                if coef > 1:
+                    coef = 1
+                    self.is_running = False
+            elif self.mode == mode_loop:
+                coef = (time.time() - self.start_time) / self.duration
+                coef = coef % 1 # modulo in float !
+            elif self.mode == mode_pingpong:
+                coef = (time.time() - self.start_time) / self.duration
+                coef %= 2
+                if verbose: print( "DBG: Interpolator.update: pingpong: coef intermediate: %.3f" % coef )
+                if coef > 1:
+                    # reverse mode
+                    coef = 2-coef
+                    reverse = 1
         
         if self.interpolation == interpolation_linear:
             self.val = self.start_val + coef * (self.stop_val-self.start_val)
@@ -135,6 +139,12 @@ class InterpolatorManager:
             
     def get( self,  num ):
         return self.interpolators[num]
+        
+    def is_all_finished( self ):
+        for interp in self.interpolators:
+            if interp.is_running:
+                return False
+        return True
              
 # class InterpolatorManager - end
 

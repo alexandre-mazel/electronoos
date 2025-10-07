@@ -72,7 +72,7 @@ def send_some_order( im: interpolator.InterpolatorManager, time_demo ):
                 im.get(king_41+king_r).set( 255, duration )
                 im.get(king_41+king_g).set( 255, 0.5, mode=mode_pingpong )
                 
-        if 1:
+        if 0:
             if time_sec == 3 and 1:
                 # un balayage du 41 (avant)
                 duration = 2
@@ -97,6 +97,36 @@ def send_some_order( im: interpolator.InterpolatorManager, time_demo ):
                 im.get(king_41+king_h).set( 160, duration )
                 im.get(king_41+king_v).set( 170, duration )
                 im.get(king_41+king_r).set( 0, duration )
+           
+        # test she vibes
+        if 0:
+            if time_sec == 1 and 1:
+                print( "INF: time: %d, sending order for first_she" % time_sec )
+                im.get(first_she_dmx+she_h).set( 0, 0 )
+                im.get(first_she_dmx+she_v).set( 0, 0 )
+                im.get(first_she_dmx+she_b).set( 255, 0 )
+                im.get(first_she_dmx+she_d).set( 40, 0 )
+                
+                
+            if time_sec == 2 and 1:
+                # balayage du 41 (apres)
+                duration = 5
+                print( "INF: time: %d, sending order for first_she" % time_sec )
+                im.get(first_she_dmx+she_h).set( 30, duration )
+                im.get(first_she_dmx+she_v).set( 20, 2, mode=interpolator.mode_pingpong, interpolation=interpolator.interpolation_sinus2 )
+                
+        # faire dire bonjour a tout les asserv
+        if 1:
+            if time_sec == 1 and 1:
+                print( "INF: time: %d, sending order for all asserv!" % time_sec )
+                duration = 10
+                for i in range(nbr_asserv+1):
+                    chan = first_asserv_dmx + offset_asserv * i
+                    interpolation = interpolator.interpolation_sinus2
+                    im.get(chan+king_h).set( 60, duration, mode=interpolator.mode_pingpong, interpolation=interpolation )
+                    im.get(chan+king_v).set( 40, duration, mode=interpolator.mode_pingpong, interpolation=interpolation )
+                    im.get(chan+king_b).set( 255, 3 )
+                    im.get(chan+king_d).set( 40, 3 )
                 
 
 def prog_ccc( dm, nbr_chan ):

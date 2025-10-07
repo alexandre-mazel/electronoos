@@ -60,7 +60,7 @@ class Interpolator:
     def update( self ):
         
         verbose = 1
-        #~ verbose = 0
+        verbose = 0
         
         if not self.is_running: return
         

@@ -92,6 +92,8 @@ first_lustr = 1
 nbr_lustr = 33
 offset_lustr = 10 # nbr a multiplier entre chaque DMX
 
+fossi_dmx = [10*offset_lustr,11*offset_lustr,12*offset_lustr,13*offset_lustr]
+
 first_asserv = 38
 nbr_asserv = 7
 first_asserv_dmx = 380

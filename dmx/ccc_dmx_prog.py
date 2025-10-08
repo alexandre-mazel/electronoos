@@ -22,6 +22,11 @@ pip3 install serial pyserial numpy
 
 time_prev_sec = 0
 
+cycle_jour = 0
+cycle_nuit = 1
+prev_cycle = -1
+
+
 # setup pou king 40 vers cartel
 # 82,162, 0, 254, 254, 254, 254, 
 
@@ -31,7 +36,17 @@ time_prev_sec = 0
 # - 3ieme: 156, 162
 #  - dernier cartel: 240, 92 ou 160, 170 (idem)
 
-def send_some_order( im: interpolator.InterpolatorManager, time_demo ):
+def send_orders_fossilation( im, duration, brightness, r, g, b ):
+    print("INF: send_orders_fossilation" )
+    mode=interpolator.mode_pingpong
+    interpolation=interpolator.interpolation_sinus2
+    for chan in fossi_dmx:
+        im.get( chan+lustr_r ).set( r, duration, mode=mode, interpolation=interpolation )
+        im.get( chan+lustr_g ).set( g, duration, mode=mode, interpolation=interpolation )
+        im.get( chan+lustr_b ).set( b, duration, mode=mode, interpolation=interpolation )
+        im.get( chan+lustr_d ).set( brightness, duration, mode=mode, interpolation=interpolation )
+
+def send_some_order_test( im: interpolator.InterpolatorManager, time_demo: float ):
     # from time to time envoyer un truc dans l'interpolateur
     global time_prev_sec
     time_sec = int(time_demo)
@@ -109,7 +124,6 @@ def send_some_order( im: interpolator.InterpolatorManager, time_demo ):
                 
                 
             if time_sec == 2 and 1:
-                # balayage du 41 (apres)
                 duration = 5
                 print( "INF: time: %d, sending order for first_she" % time_sec )
                 im.get(first_she_dmx+she_h).set( 30, duration )
@@ -127,6 +141,73 @@ def send_some_order( im: interpolator.InterpolatorManager, time_demo ):
                     im.get(chan+king_v).set( 40, duration, mode=interpolator.mode_pingpong, interpolation=interpolation )
                     im.get(chan+king_b).set( 255, 3 )
                     im.get(chan+king_d).set( 40, 3 )
+                    
+            if time_sec == 1 and 1:
+                send_orders_fossilation( im, 3, 255, 0, 255, 255 )
+                
+                
+def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: float ):
+    
+    global time_prev_sec, prev_cycle
+    
+    time_sec = int(time_demo)
+    if time_sec == time_prev_sec:
+        return
+        
+    time_prev_sec = time_sec
+        
+    len_cycle = 20
+    cycle = (time_sec // len_cycle)%2
+    time_cycle = time_sec % len_cycle
+    
+    if prev_cycle != cycle:
+        # premiere phase du cycle
+        prev_cycle = cycle
+        if cycle == cycle_jour:
+            print("jour")
+        else:
+            print("nuit")
+            
+    print("time_cycle: %s" % time_cycle )
+        
+    if 1:
+        # autre phase du cycle
+        if cycle == cycle_jour:
+            if time_cycle == 1:
+                print( "INF: time: %d, sending order for spot41" % time_sec )
+                duration = 1
+                im.get(king_41+king_h).set( 144, duration )
+                im.get(king_41+king_v).set( 156, duration )
+                im.get(king_41+king_d).set( 255, duration )
+                im.get(king_41+king_b).set( 255, duration )
+                im.get(king_41+king_r).set( 255, duration )
+                #~ im.get(king_41+king_g).set( 255, 0.5, mode=interpolator.mode_pingpong )
+                im.get(king_41+king_g).set( 255, duration )
+                    
+            if time_cycle == 3:
+                print( "INF: time: %d, sending order for spot41" % time_sec )
+                duration = 3
+                im.get(king_41+king_h).set( 156, duration )
+                im.get(king_41+king_v).set( 162, duration )
+                
+                
+            if time_cycle == 6:
+                print( "INF: time: %d, sending order for spot41" % time_sec )
+                duration = 3
+                im.get(king_41+king_h).set( 160, duration )
+                im.get(king_41+king_v).set( 170, duration )
+        else:
+            if time_cycle == 0:
+                duration = 4
+                #~ im.get(king_41+king_h).set( 160, duration )
+                im.get(king_41+king_v).set( 127, duration )
+                im.get(king_41+king_d).set( 30, duration )
+                im.get(king_41+king_b).set( 255, duration )
+            if time_cycle == 5:
+                im.get(king_41+king_h).set( 140, 2.5, mode=interpolator.mode_pingpong )
+                im.get(king_41+king_v).set( 147, 3.05, mode=interpolator.mode_pingpong )
+            
+                
                 
 
 def prog_ccc( dm, nbr_chan ):
@@ -145,7 +226,8 @@ def prog_ccc( dm, nbr_chan ):
 
         #~ print(".")
         
-        send_some_order(im, time_demo)
+        #~ send_some_order_test(im, time_demo)
+        send_order_oscillation(im, time_demo)
         
         im.update()
         for i in range( 1, nbr_chan ):
@@ -153,7 +235,7 @@ def prog_ccc( dm, nbr_chan ):
         dm.send()
         time.sleep(0.1)
         
-        if time_demo > 8 and im.is_all_finished():
+        if time_demo > 60 and im.is_all_finished():
             break
 
 # prog_ccc - end

@@ -65,6 +65,11 @@ async def fade_wiz(col1, col2, duration, just_one_call = False, ips_bulb = None 
         ips_bulb = ["192.168.9.205"]
         ips_bulb = ["192.168.9.204","192.168.9.205"]
         ips_bulb = ["192.168.9.204"]
+        
+        ips_bulb = []
+        for ip_last in range(201,207):
+            ip = "192.168.9.%d" % ip_last
+            ips_bulb.append(ip)
     
     bulbs = []
     
@@ -121,21 +126,21 @@ async def fade_wiz(col1, col2, duration, just_one_call = False, ips_bulb = None 
             if mute == 0:
                 await asyncio.gather(
                     bulbs[0].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
-                    #~ bulbs[1].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
-                    #~ bulbs[2].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
-                    #~ bulbs[3].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
-                    #~ bulbs[4].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
-                    #~ bulbs[5].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                    bulbs[1].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                    bulbs[2].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                    bulbs[3].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                    bulbs[4].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                    bulbs[5].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
                     #~ bulbs[6].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
                 )
             else:
                 await asyncio.gather(
                     bulbs[0].turn_off(),
-                    #~ bulbs[1].turn_off(),
-                    #~ bulbs[2].turn_off(),
-                    #~ bulbs[3].turn_off(),
-                    #~ bulbs[4].turn_off(),
-                    #~ bulbs[5].turn_off(),
+                    bulbs[1].turn_off(),
+                    bulbs[2].turn_off(),
+                    bulbs[3].turn_off(),
+                    bulbs[4].turn_off(),
+                    bulbs[5].turn_off(),
                     #~ bulbs[6].turn_off(),
                 )
                 if 0:
@@ -156,6 +161,9 @@ async def fade_wiz(col1, col2, duration, just_one_call = False, ips_bulb = None 
 loop = asyncio.get_event_loop()
 
 col_off = (0,0,0,0,0,0)
+col_blue = (0,0,255,0,0,255)
+col_green = (0,255,0,0,0,255)
+col_red = (255,0,0,0,0,255)
 col_full = (0,0,0,255,255,255)
 
 if 0:
@@ -242,10 +250,21 @@ if 0:
     loop.run_until_complete(fade_wiz(col3,col_off,2))
     
 if 1:
-    # allume toutes:
-    for ip_last in range(204,220):
+    # arc en ciel
+    for i in range(10):
+        duration = 3
+        loop.run_until_complete(fade_wiz(col_full,col_blue,duration))
+        loop.run_until_complete(fade_wiz(col_blue,col_green,duration))    
+        loop.run_until_complete(fade_wiz(col_green,col_red,duration))    
+        loop.run_until_complete(fade_wiz(col_red,col_full,duration))
+    loop.run_until_complete(fade_wiz(col_full,col_off,duration))
+    
+if 0:
+    # allume toutes une par une
+    for ip_last in range(201,207):
         ip = "192.168.9.%d" % ip_last
-        loop.run_until_complete(fade_wiz(col_full,col_off,1,ips_bulb=[ip]))
+        loop.run_until_complete(fade_wiz(col_full,col_blue,1,ips_bulb=[ip]))
+        loop.run_until_complete(fade_wiz(col_blue,col_off,1,ips_bulb=[ip]))
         
         
     

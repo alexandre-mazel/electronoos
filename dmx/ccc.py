@@ -73,12 +73,15 @@ lustr_d = 7     # dim
 # mode 16chan
 king_h = 0      # horiz
 king_v = 1      # vertic
+king_xyspeed = 2      # 0: false, 255: flow
 king_d = 3      # dim
 king_r = 4      # r (then g then b)
 king_g = 5
 king_b = 6
 king_w = 7
 king_focus = 9
+king_fine_h = 12
+king_fine_v = 13
 
 
 # mode 10chan

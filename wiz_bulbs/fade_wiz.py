@@ -208,7 +208,7 @@ if 0:
 
     loop.run_until_complete(fade_wiz(col_1,col_2,duration))
     
-if 0:
+if 1:
     # reglage pour eclairage oeuvre #2: avec brightness bien gere.
     duration = 20.6 # in sec
     col_1 = (0,0,0,255,255,255)
@@ -249,7 +249,7 @@ if 0:
     loop.run_until_complete(fade_wiz(col2,col3,2))
     loop.run_until_complete(fade_wiz(col3,col_off,2))
     
-if 1:
+if 0:
     # arc en ciel
     for i in range(10):
         duration = 3

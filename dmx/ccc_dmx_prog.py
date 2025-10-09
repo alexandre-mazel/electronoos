@@ -216,6 +216,9 @@ range_random_40_mur = 5
 range_random_40_sol = 30
 
 
+v_41_sol = 120
+
+
 def jour_40( im, time_cycle ):
     spot = king_40
     total_mur = 60 # 60
@@ -298,67 +301,127 @@ Panneau1: 2 cartels: focus 36, cartel1: hv: 94,160, cartel2: 101, 162
 Panneau2: 6 cartels: cartel1: focus 32, 138, 152, cartel2: 144, 153, c3: 150,158, 
                                c4: 152, 162, focus 30, c5: 158, 166, c6: 160,170, foc 26
 
-aleatoire autour du sol 88, 115
+aleatoire autour du sol 88, 115 pas possible, mord trop sur oscillation, 
+                                        new: focus 40, 102,142 puis 120, 136,   170, 142  170, 176
 aleatoire mur: entre p1c2, coin 104,160,foc68, puis fond du mur: 172,192 (alternate: capteur 164,190)
 
 1min sol, 1min Panneau2, 1min Panneau1, 1 min mur large, 1min P2 a P1 aller/retour.
 """
 
-def jour_40( im, time_cycle ):
-    spot = king_40
-    total_mur = 60 # 60
-    total_cartel = 90
+def jour_41( im, time_cycle ):
+    spot = king_41
     total_sol = 60 # 60
-    time_cartel2 = total_mur + total_cartel + total_sol
-    if time_cycle == 1:
-        print( "INF: time: %d, sending order for jour spot40 (mur)" % time_cycle )
-        dur = 1
-        im.get(spot+king_d).set( 255, dur )
-        im.get(spot+king_r).set( 255, dur )
-        im.get(spot+king_g).set( 255, dur )
-        im.get(spot+king_b).set( 144, dur )
-        im.get(spot+king_w).set( 255, dur )
-        im.get(spot+king_focus).set( 200, dur )
-        im.get(spot+king_h).set( h_40_mur-range_random_40_mur*3, dur )
-        im.get(spot+king_v).set( v_40_mur-range_random_40_mur, dur )
-        
-    if time_cycle == 2:
-        im.get(spot+king_h).set( h_40_mur+range_random_40_mur*3, 8, mode = mp, interpolation=is2 )
-        im.get(spot+king_v).set( v_40_mur+range_random_40_mur, 14, mode = mp, interpolation=is2 )
-        im.get(spot+king_focus).set( 118, 14, mode = mp, interpolation=is2 ) # en meme temps que la hauteur, on change le focus
+    total_pan2 = 60
+    total_pan1 = 60
+    time_mur = total_sol + total_pan2 + total_pan1
+    time_p2p1 = time_mur + 60
     
-    if time_cycle == total_mur or time_cycle == time_cartel2:
-        print( "INF: time: %d, sending order for jour spot40 (cartel)" % time_cycle )
-        dur = 10
-        im.get(spot+king_focus).set( 200, dur )
-        im.get(spot+king_h).set( 158, dur )
-        im.get(spot+king_v).set( 100, dur )
-        
-    if time_cycle == total_mur+10 or time_cycle == time_cartel2+10:
-        im.get(spot+king_focus).set( focus_serre_40, 5 )
-        
-    if time_cycle == total_mur+10+30 or time_cycle == time_cartel2+10+30:
-        dur = 30
-        im.get(spot+king_h).set( 168, dur )
-        im.get(spot+king_v).set( 102, dur )
+    duree_pan_mur = 15 # duree entre chaque point de passage du mur
+    duree_pan2_per_cartel = 12 #60/5
+    #~ duree_pan2_per_cartel = 2
+    
+    if 1:
+        # skip sol
+        total_sol = 6
+        duree_pan_mur = 1
 
-    if time_cycle == total_mur+total_cartel:
-        print( "INF: time: %d, sending order for jour spot40 (sol)" % time_cycle )
-        dur = 10
-        im.get(spot+king_focus).set( 200, 2 )
+    if time_cycle == 1:
+        print( "INF: time: %d, sending order for jour spot41 (sol)" % time_cycle )
+        dur = duree_pan_mur
         im.get(spot+king_d).set( 255, dur )
         im.get(spot+king_r).set( 255, dur )
         im.get(spot+king_g).set( 255, dur )
         im.get(spot+king_b).set( 144, dur )
         im.get(spot+king_w).set( 255, dur )
-        im.get(spot+king_h).set( h_40_sol, dur )
-        im.get(spot+king_v).set( v_40_sol-range_random_40_sol, dur )
+        im.get(spot+king_focus).set( 40, dur )
+        im.get(spot+king_h).set( 102, dur )
+        im.get(spot+king_v).set( 142, dur )
         
-    if time_cycle == total_mur+total_cartel+10+2:
-        im.get(spot+king_focus).set( focus_serre_40, 4 )
-        #~ im.get(spot+king_h).set( 128+range_random*3, 8, mode = mp, interpolation=is2 )
-        im.get(spot+king_v).set( v_40_sol+range_random_40_sol, 14, mode = mp, interpolation=is2 )
+    if time_cycle == 1+duree_pan_mur:
+        dur = duree_pan_mur
+        im.get(spot+king_h).set( 120, dur )
+        im.get(spot+king_v).set( 136, dur )
+        
+    if time_cycle == 1+duree_pan_mur*2:
+        dur = duree_pan_mur
+        im.get(spot+king_h).set( 170, dur )
+        im.get(spot+king_v).set( 142, dur )
+        
+        
+    if time_cycle == 1+duree_pan_mur*3:
+        dur = duree_pan_mur
+        im.get(spot+king_h).set( 170, dur )
+        im.get(spot+king_v).set( 176, dur )
+        
+    reduc = 0.5 #check pas de ecrasement
+        
+    if time_cycle == total_sol:
+        print( "INF: time: %d, sending order for jour spot41 (panneau2)" % time_cycle )
+        dur = 1
+        im.get(spot+king_focus).set( 32, dur )
+        im.get(spot+king_h).set( 138, dur )
+        im.get(spot+king_v).set( 152, dur )
+        #~ im.get(spot+king_xyspeed).set( 255, 1 ) # ca n'empeche pas les accoups lie au saut de 1
+        
+    if time_cycle == total_sol + 3 + duree_pan2_per_cartel:
+        print( "INF: time: %d, sending order for jour spot41 (panneau2) - p2" % time_cycle )
+        dur = duree_pan2_per_cartel-reduc
+        im.get(spot+king_h).set( 144, dur )
+        im.get(spot+king_v).set( 153, dur )
+        
+    if time_cycle == total_sol + 3 + duree_pan2_per_cartel*2:
+        print( "INF: time: %d, sending order for jour spot41 (panneau2) - p3" % time_cycle )
+        dur = duree_pan2_per_cartel-reduc
+        im.get(spot+king_h).set( 150, dur )
+        im.get(spot+king_v).set( 158, dur )
+        
+    if time_cycle == total_sol + 3 + duree_pan2_per_cartel*3:
+        print( "INF: time: %d, sending order for jour spot41 (panneau2) - p4" % time_cycle )
+        dur = duree_pan2_per_cartel-reduc
+        im.get(spot+king_h).set( 152, dur )
+        im.get(spot+king_v).set( 162, dur )
+        im.get(spot+king_focus).set( 30, dur )
+        
+    if time_cycle == total_sol + 3 + duree_pan2_per_cartel*4:
+        print( "INF: time: %d, sending order for jour spot41 (panneau2) - p5" % time_cycle )
+        dur = duree_pan2_per_cartel-reduc
+        im.get(spot+king_h).set( 158, dur )
+        im.get(spot+king_v).set( 166, dur )
+        
+    if time_cycle == total_sol + 3 + duree_pan2_per_cartel*5:
+        print( "INF: time: %d, sending order for jour spot41 (panneau2) - p6" % time_cycle )
+        dur = duree_pan2_per_cartel-reduc
+        im.get(spot+king_h).set( 160, dur )
+        im.get(spot+king_v).set( 170, dur )
+        im.get(spot+king_focus).set( 26, dur )
+        
+        
 
+def jour_41_test( im, time_cycle ):
+    spot = king_41
+    total_sol = 60 # 60
+    total_pan2 = 60
+    total_pan1 = 60
+    time_mur = total_sol + total_pan2 + total_pan1
+    time_p2p1 = time_mur + 60
+
+
+    rand = 20
+    if time_cycle == 1:
+        print( "INF: time: %d, sending order for jour spot41 (oeuvre sin)" % time_cycle )
+        dur = 2
+        im.get(spot+king_d).set( 255, dur )
+        im.get(spot+king_r).set( 255, dur )
+        im.get(spot+king_g).set( 255, dur )
+        im.get(spot+king_b).set( 144, dur )
+        im.get(spot+king_w).set( 255, dur )
+        im.get(spot+king_focus).set( 40, dur )
+        im.get(spot+king_h).set( 152-rand, dur )
+        im.get(spot+king_v).set( 162-rand, dur )
+        
+    if time_cycle == 4:
+        im.get(spot+king_h).set( 152+rand, 4, mode = mp, interpolation=is1 )
+        im.get(spot+king_v).set( 162+rand, 4, mode = mp, interpolation=is1 )
         
 
 def a_fond_pour_les_artistes( im ):
@@ -438,8 +501,25 @@ def prog_ccc( dm, nbr_chan ):
         send_order_oscillation(im, time_demo)
         
         im.update()
+        print("val h: %.3f, v: %.3f" % (im.get(king_41+king_h).get_val(),im.get(king_41+king_v).get_val()) )
         for i in range( 1, nbr_chan ):
-            dm.set_data( i, im.get(i).get_val() )
+            val = im.get(i).get_val()
+            if i == king_41+king_fine_v and 0:
+                val = im.get(king_41+king_v).get_val()
+                floatingpart = val - int(val)
+                valdmx = int(floatingpart * 255)
+                #~ print("val: %s, floatingpart: %.3f, valdmx: %s" % (val,floatingpart,valdmx ) )
+                val = valdmx
+                
+            # dans les h ca fait trembler et c'est pas beau
+            if i == king_41+king_fine_h and 0:
+                val = im.get(king_41+king_h).get_val()
+                floatingpart = val - int(val)
+                valdmx = int(floatingpart * 255)
+                #~ print("val: %s, floatingpart: %.3f, valdmx: %s" % (val,floatingpart,valdmx ) )
+                val = valdmx
+            dm.set_data( i, int(val) )
+            
         dm.send()
         time.sleep(0.1)
         

@@ -144,7 +144,73 @@ def send_some_order_test( im: interpolator.InterpolatorManager, time_demo: float
                     
             if time_sec == 1 and 1:
                 send_orders_fossilation( im, 3, 255, 0, 255, 255 )
-                
+            
+
+"""
+jour 5min nuit 5min
+king40:
+
+jour:
+couleur: tout a fond, bleu a 144.
+focus serre a 32, focus large a 118
+cartel1: 158,100, et 2: 168, 102
+puis va au coin 154, 98 avec focus large.
+aleatoire autour de 128,106 puis aleatoire autour du sol 92, 106. puis retourne au mur.
+1min mur, 1.5cartel 1 sol, 1.5cartel.
+
+nuit:
+"""
+
+def jour40( im, time_cycle ):
+    spot = king40
+    if time_cycle == 1:
+        print( "INF: time: %d, sending order for jour spot40" % time_cycle )
+        duration = 1
+        im.get(spot+king_h).set( 144, duration )
+        im.get(spot+king_v).set( 156, duration )
+        im.get(king_41+king_d).set( 255, duration )
+        im.get(king_41+king_b).set( 255, duration )
+        im.get(king_41+king_r).set( 255, duration )
+        #~ im.get(king_41+king_g).set( 255, 0.5, mode=interpolator.mode_pingpong )
+        im.get(king_41+king_g).set( 255, duration )
+        
+def jour_41( im, time_cycle ):
+    if time_cycle == 1:
+        print( "INF: time: %d, sending order for spot41" % time_sec )
+        duration = 1
+        im.get(king_41+king_h).set( 144, duration )
+        im.get(king_41+king_v).set( 156, duration )
+        im.get(king_41+king_d).set( 255, duration )
+        im.get(king_41+king_b).set( 255, duration )
+        im.get(king_41+king_r).set( 255, duration )
+        #~ im.get(king_41+king_g).set( 255, 0.5, mode=interpolator.mode_pingpong )
+        im.get(king_41+king_g).set( 255, duration )
+            
+    if time_cycle == 3:
+        print( "INF: time: %d, sending order for spot41" % time_sec )
+        duration = 3
+        im.get(king_41+king_h).set( 156, duration )
+        im.get(king_41+king_v).set( 162, duration )
+        
+        
+    if time_cycle == 6:
+        print( "INF: time: %d, sending order for spot41" % time_sec )
+        duration = 3
+        im.get(king_41+king_h).set( 160, duration )
+        im.get(king_41+king_v).set( 170, duration )
+        
+def nuit_41(im, time_cycle ):
+    if time_cycle == 0:
+        duration = 4
+        #~ im.get(king_41+king_h).set( 160, duration )
+        im.get(king_41+king_v).set( 127, duration )
+        im.get(king_41+king_d).set( 30, duration )
+        im.get(king_41+king_b).set( 255, duration )
+    if time_cycle == 5:
+        im.get(king_41+king_h).set( 140, 2.5, mode=interpolator.mode_pingpong )
+        im.get(king_41+king_v).set( 147, 3.05, mode=interpolator.mode_pingpong )
+        
+
                 
 def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: float ):
     
@@ -173,39 +239,11 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
     if 1:
         # autre phase du cycle
         if cycle == cycle_jour:
-            if time_cycle == 1:
-                print( "INF: time: %d, sending order for spot41" % time_sec )
-                duration = 1
-                im.get(king_41+king_h).set( 144, duration )
-                im.get(king_41+king_v).set( 156, duration )
-                im.get(king_41+king_d).set( 255, duration )
-                im.get(king_41+king_b).set( 255, duration )
-                im.get(king_41+king_r).set( 255, duration )
-                #~ im.get(king_41+king_g).set( 255, 0.5, mode=interpolator.mode_pingpong )
-                im.get(king_41+king_g).set( 255, duration )
-                    
-            if time_cycle == 3:
-                print( "INF: time: %d, sending order for spot41" % time_sec )
-                duration = 3
-                im.get(king_41+king_h).set( 156, duration )
-                im.get(king_41+king_v).set( 162, duration )
-                
-                
-            if time_cycle == 6:
-                print( "INF: time: %d, sending order for spot41" % time_sec )
-                duration = 3
-                im.get(king_41+king_h).set( 160, duration )
-                im.get(king_41+king_v).set( 170, duration )
+            jour40( time_cycle )
+            jour41( time_cycle )
+            
         else:
-            if time_cycle == 0:
-                duration = 4
-                #~ im.get(king_41+king_h).set( 160, duration )
-                im.get(king_41+king_v).set( 127, duration )
-                im.get(king_41+king_d).set( 30, duration )
-                im.get(king_41+king_b).set( 255, duration )
-            if time_cycle == 5:
-                im.get(king_41+king_h).set( 140, 2.5, mode=interpolator.mode_pingpong )
-                im.get(king_41+king_v).set( 147, 3.05, mode=interpolator.mode_pingpong )
+            nuit41( time_cycle )
             
                 
                 
@@ -235,7 +273,7 @@ def prog_ccc( dm, nbr_chan ):
         dm.send()
         time.sleep(0.1)
         
-        if time_demo > 60 and im.is_all_finished():
+        if time_demo > 120 and im.is_all_finished():
             break
 
 # prog_ccc - end

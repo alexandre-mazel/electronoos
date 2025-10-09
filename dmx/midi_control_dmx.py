@@ -19,11 +19,11 @@ if __name__ == "__main__":
 dm = dmx_device
 
 chan = king_41
-#~ chan = king_40
+chan = king_40
 
 # pour chaque tranche, comment tomber sur la commande qui correspond au prog du spot.
 # on veut: luminosite,  R G B,  col extra, col extra2, col extra3, X et Y.
-conv_king =  [king_d,  king_r, king_g, king_b,   king_focus, 0,  0, king_h, king_v]
+conv_king =  [king_d,  king_r, king_g, king_b, king_w,  king_focus, 0,  king_h, king_v]
 conv_spot = conv_king
 
 # print all informations from Nano Kontrol2 (works!)

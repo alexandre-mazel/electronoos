@@ -77,6 +77,7 @@ king_d = 3      # dim
 king_r = 4      # r (then g then b)
 king_g = 5
 king_b = 6
+king_w = 7
 king_focus = 9
 
 

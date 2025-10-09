@@ -160,17 +160,25 @@ focus serre a 32, focus large a 118
 cartel1: 158,100, et 2: 168, 102
 puis va au coin 154, 98 avec focus large.
 aleatoire autour du mur 128,106
-aleatoire autour du sol 92, 106 - en fait h a 84 pour etre bien avec le moteur centré
+aleatoire autour du sol 92, 106 - en fait h a 88 pour etre bien avec le moteur centré
 1min mur, 1.5cartel, 1 sol, 1.5cartel.
 
 nuit:
+1min sol plus ouvert, 1min mur, 1 min mur2, 1 min sol
 """
 
-def jour40( im, time_cycle ):
+h_40_mur = 128
+v_40_mur = 106
+
+h_40_sol = 88
+v_40_sol = 115
+
+range_random_40_mur = 5
+range_random_40_sol = 30
+
+def jour_40( im, time_cycle ):
     spot = king_40
-    range_random_mur = 5
-    range_random_sol = 30
-    total_mur = 6 # 60
+    total_mur = 60 # 60
     total_cartel = 90
     total_sol = 60 # 60
     time_cartel2 = total_mur + total_cartel + total_sol
@@ -183,12 +191,12 @@ def jour40( im, time_cycle ):
         im.get(spot+king_b).set( 144, dur )
         im.get(spot+king_w).set( 255, dur )
         im.get(spot+king_focus).set( 200, dur )
-        im.get(spot+king_h).set( 128-range_random_mur*3, dur )
-        im.get(spot+king_v).set( 106-range_random_mur, dur )
+        im.get(spot+king_h).set( h_40_mur-range_random_40_mur*3, dur )
+        im.get(spot+king_v).set( v_40_mur-range_random_40_mur, dur )
         
     if time_cycle == 2:
-        im.get(spot+king_h).set( 128+range_random_mur*3, 8, mode = mp, interpolation=is2 )
-        im.get(spot+king_v).set( 106+range_random_mur, 14, mode = mp, interpolation=is2 )
+        im.get(spot+king_h).set( h_40_mur+range_random_40_mur*3, 8, mode = mp, interpolation=is2 )
+        im.get(spot+king_v).set( v_40_mur+range_random_40_mur, 14, mode = mp, interpolation=is2 )
         im.get(spot+king_focus).set( 118, 14, mode = mp, interpolation=is2 ) # en meme temps que la hauteur, on change le focus
     
     if time_cycle == total_mur or time_cycle == time_cartel2:
@@ -215,15 +223,33 @@ def jour40( im, time_cycle ):
         im.get(spot+king_g).set( 255, dur )
         im.get(spot+king_b).set( 144, dur )
         im.get(spot+king_w).set( 255, dur )
-        im.get(spot+king_h).set( 88, dur )
-        im.get(spot+king_v).set( 115-range_random_sol, dur )
+        im.get(spot+king_h).set( h_40_sol, dur )
+        im.get(spot+king_v).set( v_40_sol-range_random_40_sol, dur )
         
     if time_cycle == total_mur+total_cartel+10+2:
         im.get(spot+king_focus).set( 36, 4 )
         #~ im.get(spot+king_h).set( 128+range_random*3, 8, mode = mp, interpolation=is2 )
-        im.get(spot+king_v).set( 115+range_random_sol, 14, mode = mp, interpolation=is2 )
+        im.get(spot+king_v).set( v_40_sol+range_random_40_sol, 14, mode = mp, interpolation=is2 )
       
-
+def nuit_40( im, time_cycle ):
+    spot = king_40
+    total_mur = 60 # 60
+    if time_cycle == 1:
+        print( "INF: time: %d, sending order for nuit spot40 (sol)" % time_cycle )
+        dur = 1
+        im.get(spot+king_d).set( 255, dur )
+        im.get(spot+king_r).set( 0, dur )
+        im.get(spot+king_g).set( 0, dur )
+        im.get(spot+king_b).set( 255, dur )
+        im.get(spot+king_w).set( 0, dur )
+        im.get(spot+king_focus).set( 200, dur )
+        im.get(spot+king_h).set( h_40_sol, dur )
+        im.get(spot+king_v).set( v_40_sol-range_random_40_sol, dur )
+        
+    if time_cycle == 10+2:
+        im.get(spot+king_focus).set( 36, 4 )
+        #~ im.get(spot+king_h).set( 128+range_random*3, 8, mode = mp, interpolation=is2 )
+        im.get(spot+king_v).set( v_40_sol+range_random_40_sol, 14, mode = mp, interpolation=is2 )
         
         
 def jour_41( im, time_cycle ):
@@ -290,6 +316,8 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
     cycle = (time_sec // len_cycle)%2
     time_cycle = time_sec % len_cycle
     
+    #~ cycle += 1 #inverse jour et nuit
+    
     if prev_cycle != cycle:
         # premiere phase du cycle
         prev_cycle = cycle
@@ -303,12 +331,15 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
     if 1:
         # autre phase du cycle
         if cycle == cycle_jour:
-            jour40( im, time_cycle )
-            #~ jour41( im, time_cycle )
+            pass
+            jour_40( im, time_cycle )
+            #~ jour_41( im, time_cycle )
+            
             
         else:
-            #~ nuit41( im, time_cycle )
             pass
+            nuit_40( im, time_cycle )
+            #~ nuit_41( im, time_cycle )
             
                 
                 

@@ -26,6 +26,10 @@ cycle_jour = 0
 cycle_nuit = 1
 prev_cycle = -1
 
+mp = interpolator.mode_pingpong
+is1 = interpolator.interpolation_sinus
+is2 = interpolator.interpolation_sinus2
+
 
 # setup pou king 40 vers cartel
 # 82,162, 0, 254, 254, 254, 254, 
@@ -155,24 +159,53 @@ couleur: tout a fond, bleu a 144.
 focus serre a 32, focus large a 118
 cartel1: 158,100, et 2: 168, 102
 puis va au coin 154, 98 avec focus large.
-aleatoire autour de 128,106 puis aleatoire autour du sol 92, 106. puis retourne au mur.
+aleatoire autour du mur 128,106
+aleatoire autour du sol 92, 106
 1min mur, 1.5cartel 1 sol, 1.5cartel.
 
 nuit:
 """
 
 def jour40( im, time_cycle ):
-    spot = king40
+    spot = king_40
+    range_random = 5
+    total_mur = 6
     if time_cycle == 1:
-        print( "INF: time: %d, sending order for jour spot40" % time_cycle )
-        duration = 1
-        im.get(spot+king_h).set( 144, duration )
-        im.get(spot+king_v).set( 156, duration )
-        im.get(king_41+king_d).set( 255, duration )
-        im.get(king_41+king_b).set( 255, duration )
-        im.get(king_41+king_r).set( 255, duration )
-        #~ im.get(king_41+king_g).set( 255, 0.5, mode=interpolator.mode_pingpong )
-        im.get(king_41+king_g).set( 255, duration )
+        print( "INF: time: %d, sending order for jour spot40 (mur)" % time_cycle )
+        dur = 1
+        im.get(spot+king_d).set( 255, dur )
+        im.get(spot+king_r).set( 255, dur )
+        im.get(spot+king_g).set( 255, dur )
+        im.get(spot+king_b).set( 144, dur )
+        im.get(spot+king_w).set( 255, dur )
+        im.get(spot+king_focus).set( 200, dur )
+        im.get(spot+king_h).set( 128-range_random*3, dur )
+        im.get(spot+king_v).set( 106-range_random, dur )
+        
+    if time_cycle == 2:
+        im.get(spot+king_h).set( 128+range_random*3, 8, mode = mp, interpolation=is2 )
+        im.get(spot+king_v).set( 106+range_random, 14, mode = mp, interpolation=is2 )
+        im.get(spot+king_focus).set( 118, 14, mode = mp, interpolation=is2 ) # en meme temps que la hauteur, on change le focus
+        
+
+    if time_cycle == total_mur:
+        print( "INF: time: %d, sending order for jour spot40 (sol)" % time_cycle )
+        dur = 1
+        im.get(spot+king_d).set( 255, dur )
+        im.get(spot+king_r).set( 255, dur )
+        im.get(spot+king_g).set( 255, dur )
+        im.get(spot+king_b).set( 144, dur )
+        im.get(spot+king_w).set( 255, dur )
+        im.get(spot+king_focus).set( 36, dur )
+        im.get(spot+king_h).set( 92, dur )
+        im.get(spot+king_v).set( 106-range_random, dur )
+        
+    if time_cycle == total_mur+2:
+        #~ im.get(spot+king_h).set( 128+range_random*3, 8, mode = mp, interpolation=is2 )
+        im.get(spot+king_v).set( 106+range_random, 14, mode = mp, interpolation=is2 )
+      
+
+        
         
 def jour_41( im, time_cycle ):
     if time_cycle == 1:
@@ -234,16 +267,17 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
         else:
             print("nuit")
             
-    print("time_cycle: %s" % time_cycle )
+    print( "time_cycle: %s" % time_cycle )
         
     if 1:
         # autre phase du cycle
         if cycle == cycle_jour:
-            jour40( time_cycle )
-            jour41( time_cycle )
+            jour40( im, time_cycle )
+            #~ jour41( im, time_cycle )
             
         else:
-            nuit41( time_cycle )
+            #~ nuit41( im, time_cycle )
+            pass
             
                 
                 
@@ -269,7 +303,7 @@ def prog_ccc( dm, nbr_chan ):
         
         im.update()
         for i in range( 1, nbr_chan ):
-            dm.set_data(i,im.get(i).get_val())
+            dm.set_data( i, im.get(i).get_val() )
         dm.send()
         time.sleep(0.1)
         

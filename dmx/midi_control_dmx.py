@@ -3,6 +3,20 @@ from ccc import *
 import mido # pip install mido (eg 1.3.3)
 import rtmidi # pip install python-rtmidi (required by mido)
 
+def a_fond_pour_les_artistes( dm ):
+    dur = 0
+    for n in range(14,33):
+        chan = n*offset_lustr
+        dm.set_data(chan+lustr_d, 255 )
+        dm.set_data(chan+lustr_r, 255 )
+        dm.set_data(chan+lustr_l, 255 )
+        dm.set_data(chan+lustr_a, 255 )
+        dm.set_data(chan+lustr_g, 255 )
+        dm.set_data(chan+lustr_c, 255 )
+        dm.set_data(chan+lustr_b, 255 )
+        dm.set_data(chan+lustr_i, 255 )
+    dm.send()
+
 if __name__ == "__main__":
     dmx_device = None
     nbr_chan = 492+16 # how much did we use ?
@@ -18,8 +32,11 @@ if __name__ == "__main__":
 
 dm = dmx_device
 
-chan = king_41
+a_fond_pour_les_artistes( dm )
+
 chan = king_40
+chan = king_41
+
 
 # pour chaque tranche, comment tomber sur la commande qui correspond au prog du spot.
 # on veut: luminosite,  R G B,  col extra, col extra2, col extra3, X et Y.

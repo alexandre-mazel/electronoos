@@ -160,16 +160,20 @@ focus serre a 32, focus large a 118
 cartel1: 158,100, et 2: 168, 102
 puis va au coin 154, 98 avec focus large.
 aleatoire autour du mur 128,106
-aleatoire autour du sol 92, 106
-1min mur, 1.5cartel 1 sol, 1.5cartel.
+aleatoire autour du sol 92, 106 - en fait h a 84 pour etre bien avec le moteur centré
+1min mur, 1.5cartel, 1 sol, 1.5cartel.
 
 nuit:
 """
 
 def jour40( im, time_cycle ):
     spot = king_40
-    range_random = 5
-    total_mur = 6
+    range_random_mur = 5
+    range_random_sol = 30
+    total_mur = 6 # 60
+    total_cartel = 90
+    total_sol = 60 # 60
+    time_cartel2 = total_mur + total_cartel + total_sol
     if time_cycle == 1:
         print( "INF: time: %d, sending order for jour spot40 (mur)" % time_cycle )
         dur = 1
@@ -179,30 +183,45 @@ def jour40( im, time_cycle ):
         im.get(spot+king_b).set( 144, dur )
         im.get(spot+king_w).set( 255, dur )
         im.get(spot+king_focus).set( 200, dur )
-        im.get(spot+king_h).set( 128-range_random*3, dur )
-        im.get(spot+king_v).set( 106-range_random, dur )
+        im.get(spot+king_h).set( 128-range_random_mur*3, dur )
+        im.get(spot+king_v).set( 106-range_random_mur, dur )
         
     if time_cycle == 2:
-        im.get(spot+king_h).set( 128+range_random*3, 8, mode = mp, interpolation=is2 )
-        im.get(spot+king_v).set( 106+range_random, 14, mode = mp, interpolation=is2 )
+        im.get(spot+king_h).set( 128+range_random_mur*3, 8, mode = mp, interpolation=is2 )
+        im.get(spot+king_v).set( 106+range_random_mur, 14, mode = mp, interpolation=is2 )
         im.get(spot+king_focus).set( 118, 14, mode = mp, interpolation=is2 ) # en meme temps que la hauteur, on change le focus
+    
+    if time_cycle == total_mur or time_cycle == time_cartel2:
+        print( "INF: time: %d, sending order for jour spot40 (cartel)" % time_cycle )
+        dur = 10
+        im.get(spot+king_focus).set( 200, dur )
+        im.get(spot+king_h).set( 158, dur )
+        im.get(spot+king_v).set( 100, dur )
         
+    if time_cycle == total_mur+10 or time_cycle == time_cartel2+10:
+        im.get(spot+king_focus).set( 32, 5 )
+        
+    if time_cycle == total_mur+10+30 or time_cycle == time_cartel2+10+30:
+        dur = 30
+        im.get(spot+king_h).set( 168, dur )
+        im.get(spot+king_v).set( 102, dur )
 
-    if time_cycle == total_mur:
+    if time_cycle == total_mur+total_cartel:
         print( "INF: time: %d, sending order for jour spot40 (sol)" % time_cycle )
-        dur = 1
+        dur = 10
+        im.get(spot+king_focus).set( 200, 2 )
         im.get(spot+king_d).set( 255, dur )
         im.get(spot+king_r).set( 255, dur )
         im.get(spot+king_g).set( 255, dur )
         im.get(spot+king_b).set( 144, dur )
         im.get(spot+king_w).set( 255, dur )
-        im.get(spot+king_focus).set( 36, dur )
-        im.get(spot+king_h).set( 92, dur )
-        im.get(spot+king_v).set( 106-range_random, dur )
+        im.get(spot+king_h).set( 88, dur )
+        im.get(spot+king_v).set( 115-range_random_sol, dur )
         
-    if time_cycle == total_mur+2:
+    if time_cycle == total_mur+total_cartel+10+2:
+        im.get(spot+king_focus).set( 36, 4 )
         #~ im.get(spot+king_h).set( 128+range_random*3, 8, mode = mp, interpolation=is2 )
-        im.get(spot+king_v).set( 106+range_random, 14, mode = mp, interpolation=is2 )
+        im.get(spot+king_v).set( 115+range_random_sol, 14, mode = mp, interpolation=is2 )
       
 
         
@@ -244,6 +263,18 @@ def nuit_41(im, time_cycle ):
         im.get(king_41+king_v).set( 147, 3.05, mode=interpolator.mode_pingpong )
         
 
+def a_fond_pour_les_artistes( im ):
+    dur = 0
+    for n in range(14,33):
+        chan = n*offset_lustr
+        im.get(chan+lustr_d).set( 255, dur )
+        im.get(chan+lustr_r).set( 255, dur )
+        im.get(chan+lustr_l).set( 255, dur )
+        im.get(chan+lustr_a).set( 255, dur )
+        im.get(chan+lustr_g).set( 255, dur )
+        im.get(chan+lustr_c).set( 255, dur )
+        im.get(chan+lustr_b).set( 255, dur )
+        im.get(chan+lustr_i).set( 255, dur )
                 
 def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: float ):
     
@@ -255,7 +286,7 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
         
     time_prev_sec = time_sec
         
-    len_cycle = 20
+    len_cycle = 60*5
     cycle = (time_sec // len_cycle)%2
     time_cycle = time_sec % len_cycle
     
@@ -290,6 +321,8 @@ def prog_ccc( dm, nbr_chan ):
 
     # update and set values:
     #~ dmxal.set_verbose( True )
+    
+    a_fond_pour_les_artistes(im)
 
     print("looping...")
     while 1:
@@ -307,7 +340,7 @@ def prog_ccc( dm, nbr_chan ):
         dm.send()
         time.sleep(0.1)
         
-        if time_demo > 120 and im.is_all_finished():
+        if time_demo > 600 and im.is_all_finished():
             break
 
 # prog_ccc - end

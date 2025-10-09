@@ -6,6 +6,8 @@ import time
 mode_normal = 0
 mode_loop = 1
 mode_pingpong = 2
+mode_random = 3
+mode_perlin = 3
 
 interpolation_linear = 0
 interpolation_sinus = 1          # accelerate slowly, decelerate slowly
@@ -154,11 +156,13 @@ def draw_interpolator():
 
     # Generate data
     t = 0
-    nbr_interpolator = 12
+    nbr_interpolator = 14
     im = InterpolatorManager( nbr_interpolator )
     im.get(0).set( 1000, 1 )
     im.get(1).set( 1000, 1, mode = mode_loop )
     im.get(2).set( 1000, 1, mode = mode_pingpong )
+    im.get(2).set( 1000, 1, mode = mode_random )
+    im.get(2).set( 1000, 1, mode = mode_perlin )
     im.get(3).set( 1000, 1, interpolation = interpolation_sinus )
     im.get(4).set( 1000, 1, interpolation = interpolation_sinus, mode = mode_loop )
     im.get(5).set( 1000, 1, interpolation = interpolation_sinus, mode = mode_pingpong )
@@ -188,15 +192,17 @@ def draw_interpolator():
     plt.plot(ts, values[0], label="normal")
     plt.plot(ts, values[1], label="loop")
     plt.plot(ts, values[2], label="pingpong")
-    plt.plot(ts, values[3], label="sinus normal")
-    plt.plot(ts, values[4], label="sinus loop")
-    plt.plot(ts, values[5], label="sinus pingpong")
-    plt.plot(ts, values[6], label="sinus2 normal")
-    plt.plot(ts, values[7], label="sinus2 loop")
-    plt.plot(ts, values[8], label="sinus2 pingpong")
-    plt.plot(ts, values[9], label="halfsinus normal")
-    plt.plot(ts, values[10], label="halfsinus loop")
-    plt.plot(ts, values[11], label="halfsinus pingpong")
+    plt.plot(ts, values[3], label="random")
+    plt.plot(ts, values[4], label="perlin")
+    plt.plot(ts, values[5], label="sinus normal")
+    plt.plot(ts, values[6], label="sinus loop")
+    plt.plot(ts, values[7], label="sinus pingpong")
+    plt.plot(ts, values[8], label="sinus2 normal")
+    plt.plot(ts, values[9], label="sinus2 loop")
+    plt.plot(ts, values[10], label="sinus2 pingpong")
+    plt.plot(ts, values[11], label="halfsinus normal")
+    plt.plot(ts, values[12], label="halfsinus loop")
+    plt.plot(ts, values[13], label="halfsinus pingpong")
 
     # Limit y range
     #~ plt.ylim(-10, 10)
@@ -251,5 +257,5 @@ def test_interpolator():
         time.sleep(1)
         
 if __name__ == "__main__":
-    #~ draw_interpolator()
-    test_interpolator()
+    draw_interpolator()
+    #~ test_interpolator()

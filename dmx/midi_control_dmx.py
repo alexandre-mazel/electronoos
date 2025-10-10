@@ -34,8 +34,9 @@ dm = dmx_device
 
 a_fond_pour_les_artistes( dm )
 
-chan = king_40
-chan = king_41
+chan = king_38
+#~ chan = king_40
+#~ chan = king_41
 
 
 # pour chaque tranche, comment tomber sur la commande qui correspond au prog du spot.

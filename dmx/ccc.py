@@ -103,6 +103,7 @@ nbr_asserv = 7
 first_asserv_dmx = 380
 offset_asserv = 16
 
+king_38 = 380
 king_40 = 412
 king_41 = 428
 

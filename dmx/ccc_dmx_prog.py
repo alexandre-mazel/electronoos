@@ -218,6 +218,38 @@ range_random_40_sol = 30
 
 v_41_sol = 120
 
+"""
+33s, Panneau1: 173, 86, f34 tourne autour de ca 172 a 176 bas 88 a 85.
+17s: Sol1: A: 188,118 f42, B: 202, 114
+33s: Panneau2: 198, 102, f20
+17s: Sol2: A: 222, 120, f34 B: 244, 106, f34
+33s: Panneau3: 238, 92, f36
+17s: Sol3: 238, 116, f42
+
+
+"""
+
+def jour_38( im, time_cycle ):
+    spot = king_38
+    time_1 = 33
+    time_2 = 17
+    
+    if time_cycle == 1:
+        print( "INF: time: %d, sending order for jour spot38 (P1)" % time_cycle )
+        dur = 4
+        im.get(spot+king_d).set( 255, dur )
+        im.get(spot+king_r).set( 255, dur )
+        im.get(spot+king_g).set( 255, dur )
+        im.get(spot+king_b).set( 144, dur )
+        im.get(spot+king_w).set( 255, dur )
+        im.get(spot+king_focus).set( 34, dur )
+        im.get(spot+king_h).set( 174, dur )
+        im.get(spot+king_v).set( 87, dur )
+        
+    if time_cycle == 1 + 6:
+        im.get(spot+king_h).set( 176, 8, mode = mp, interpolation=is2 )
+        im.get(spot+king_v).set( 85, 14, mode = mp, interpolation=is2 )
+
 
 def jour_40( im, time_cycle ):
     spot = king_40
@@ -318,7 +350,7 @@ def jour_41( im, time_cycle ):
     
     duree_pan_mur = 15 # duree entre chaque point de passage du mur
     duree_pan2_per_cartel = 12 #60/5
-    #~ duree_pan2_per_cartel = 2
+    duree_pan2_per_cartel = 2
     
     if 1:
         # skip sol
@@ -425,6 +457,7 @@ def jour_41_test( im, time_cycle ):
         
 
 def a_fond_pour_les_artistes( im ):
+    print("a_fond_pour_les_artistes")
     dur = 0
     for n in range(14,33):
         chan = n*offset_lustr
@@ -436,6 +469,11 @@ def a_fond_pour_les_artistes( im ):
         im.get(chan+lustr_c).set( 255, dur )
         im.get(chan+lustr_b).set( 255, dur )
         im.get(chan+lustr_i).set( 255, dur )
+    
+    print("first_she_dmx:", first_she_dmx )
+    im.get(first_she_dmx+she_d).set( 255, dur )
+    im.get(first_she_dmx+she_r).set( 255, dur )
+    
                 
 def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: float ):
     
@@ -467,8 +505,9 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
         # autre phase du cycle
         if cycle == cycle_jour:
             pass
+            jour_38( im, time_cycle )
             #~ jour_40( im, time_cycle )
-            jour_41( im, time_cycle )
+            #~ jour_41( im, time_cycle )
             
             
         else:
@@ -489,6 +528,8 @@ def prog_ccc( dm, nbr_chan ):
     #~ dmxal.set_verbose( True )
     
     a_fond_pour_les_artistes(im)
+    
+    cpt = 0
 
     print("looping...")
     while 1:
@@ -501,27 +542,34 @@ def prog_ccc( dm, nbr_chan ):
         send_order_oscillation(im, time_demo)
         
         im.update()
-        print("val h: %.3f, v: %.3f" % (im.get(king_41+king_h).get_val(),im.get(king_41+king_v).get_val()) )
+        #~ print("val h: %.3f, v: %.3f" % (im.get(king_38+king_h).get_val(),im.get(king_38+king_v).get_val()) )
+        #~ print("val h: %.3f, v: %.3f" % (im.get(king_41+king_h).get_val(),im.get(king_41+king_v).get_val()) )
         for i in range( 1, nbr_chan ):
             val = im.get(i).get_val()
-            if i == king_41+king_fine_v and 0:
-                val = im.get(king_41+king_v).get_val()
-                floatingpart = val - int(val)
-                valdmx = int(floatingpart * 255)
-                #~ print("val: %s, floatingpart: %.3f, valdmx: %s" % (val,floatingpart,valdmx ) )
-                val = valdmx
-                
-            # dans les h ca fait trembler et c'est pas beau
-            if i == king_41+king_fine_h and 0:
-                val = im.get(king_41+king_h).get_val()
-                floatingpart = val - int(val)
-                valdmx = int(floatingpart * 255)
-                #~ print("val: %s, floatingpart: %.3f, valdmx: %s" % (val,floatingpart,valdmx ) )
-                val = valdmx
+            
+            if 1 and (cpt & 15) == 0 and 0:
+                # lissage, using finetune
+                for chan in [king_38]:
+                    if i == chan+king_fine_v and 1:
+                        val = im.get(chan+king_v).get_val()
+                        floatingpart = val - int(val)
+                        valdmx = int(floatingpart * 255)
+                        print("val: %s, floatingpart: %.3f, valdmx: %s" % (val,floatingpart,valdmx ) )
+                        val = valdmx
+                        
+                    # dans les h sur le 41 ca fait trembler et c'est pas beau
+                    if i == chan+king_fine_h and 1:
+                        val = im.get(chan+king_h).get_val()
+                        floatingpart = val - int(val)
+                        valdmx = int(floatingpart * 255)
+                        print("val: %s, floatingpart: %.3f, valdmx: %s" % (val,floatingpart,valdmx ) )
+                        val = valdmx
+                        
             dm.set_data( i, int(val) )
             
         dm.send()
         time.sleep(0.1)
+        cpt += 1
         
         if time_demo > 600 and im.is_all_finished():
             break

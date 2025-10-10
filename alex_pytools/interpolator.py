@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 
 import math
+import noise
+import random
 import time
 
 mode_normal = 0
 mode_loop = 1
 mode_pingpong = 2
 mode_random = 3
-mode_perlin = 3
+mode_perlin = 4
 
 interpolation_linear = 0
 interpolation_sinus = 1          # accelerate slowly, decelerate slowly
@@ -92,6 +94,10 @@ class Interpolator:
                     # reverse mode
                     coef = 2-coef
                     reverse = 1
+            elif self.mode == mode_random:
+                coef = random.random()
+            elif self.mode == mode_perlin:
+                coef = ( noise.getSimplexNoise( (time.time() - self.start_time)/ self.duration, y = time.time() ) + 1 ) / 2 # y = time.time() to add a variety to each random
         
         if self.interpolation == interpolation_linear:
             self.val = self.start_val + coef * (self.stop_val-self.start_val)
@@ -156,22 +162,23 @@ def draw_interpolator():
 
     # Generate data
     t = 0
+    n = 0
     nbr_interpolator = 14
     im = InterpolatorManager( nbr_interpolator )
-    im.get(0).set( 1000, 1 )
-    im.get(1).set( 1000, 1, mode = mode_loop )
-    im.get(2).set( 1000, 1, mode = mode_pingpong )
-    im.get(2).set( 1000, 1, mode = mode_random )
-    im.get(2).set( 1000, 1, mode = mode_perlin )
-    im.get(3).set( 1000, 1, interpolation = interpolation_sinus )
-    im.get(4).set( 1000, 1, interpolation = interpolation_sinus, mode = mode_loop )
-    im.get(5).set( 1000, 1, interpolation = interpolation_sinus, mode = mode_pingpong )
-    im.get(6).set( 1000, 1, interpolation = interpolation_sinus2 )
-    im.get(7).set( 1000, 1, interpolation = interpolation_sinus2, mode = mode_loop )
-    im.get(8).set( 1000, 1, interpolation = interpolation_sinus2, mode = mode_pingpong )
-    im.get(9).set( 1000, 1, interpolation = interpolation_halfsinus )
-    im.get(10).set( 1000, 1, interpolation = interpolation_halfsinus, mode = mode_loop )
-    im.get(11).set( 1000, 1, interpolation = interpolation_halfsinus, mode = mode_pingpong )
+    im.get(n).set( 1000, 1 ); n += 1
+    im.get(n).set( 1000, 1, mode = mode_loop ); n += 1
+    im.get(n).set( 1000, 1, mode = mode_pingpong ); n += 1
+    im.get(n).set( 1000, 1, mode = mode_random ); n += 1
+    im.get(n).set( 1000, 1, mode = mode_perlin ); n += 1
+    im.get(n).set( 1000, 1, interpolation = interpolation_sinus ); n += 1
+    im.get(n).set( 1000, 1, interpolation = interpolation_sinus, mode = mode_loop ); n += 1
+    im.get(n).set( 1000, 1, interpolation = interpolation_sinus, mode = mode_pingpong ); n += 1
+    im.get(n).set( 1000, 1, interpolation = interpolation_sinus2 ); n += 1
+    im.get(n).set( 1000, 1, interpolation = interpolation_sinus2, mode = mode_loop ); n += 1
+    im.get(n).set( 1000, 1, interpolation = interpolation_sinus2, mode = mode_pingpong ); n += 1
+    im.get(n).set( 1000, 1, interpolation = interpolation_halfsinus ); n += 1
+    im.get(n).set( 1000, 1, interpolation = interpolation_halfsinus, mode = mode_loop ); n += 1
+    im.get(n).set( 1000, 1, interpolation = interpolation_halfsinus, mode = mode_pingpong ); n += 1
     values = []
     for i in range( nbr_interpolator ):
         values.append( [] )
@@ -185,24 +192,34 @@ def draw_interpolator():
             values[i].append( im.get(i).get_val() - 2000 * i )
         #~ time.sleep( 1/1000 )
         #~ time.sleep( 0.000001 ) # le sleep est tres lent et peu précis
+        if t == 3000:
+            # send another command plus rapide
+            n = 0
+            im.get(n).set( 1000, 0.25, start_val = 0, mode = mode_normal ); n += 1
+            im.get(n).set( 1000, 0.25, start_val = 0, mode = mode_loop ); n += 1
+            im.get(n).set( 1000, 0.25, start_val = 0, mode = mode_pingpong ); n += 1
+            im.get(n).set( 1000, 0.25, start_val = 0, mode = mode_random ); n += 1
+            im.get(n).set( 1000, 0.25, start_val = 0, mode = mode_perlin )
+            
         precise_sleep( 1/1000 )
 
     # Plot
+    n = 0
     plt.figure(figsize=(10,6))
-    plt.plot(ts, values[0], label="normal")
-    plt.plot(ts, values[1], label="loop")
-    plt.plot(ts, values[2], label="pingpong")
-    plt.plot(ts, values[3], label="random")
-    plt.plot(ts, values[4], label="perlin")
-    plt.plot(ts, values[5], label="sinus normal")
-    plt.plot(ts, values[6], label="sinus loop")
-    plt.plot(ts, values[7], label="sinus pingpong")
-    plt.plot(ts, values[8], label="sinus2 normal")
-    plt.plot(ts, values[9], label="sinus2 loop")
-    plt.plot(ts, values[10], label="sinus2 pingpong")
-    plt.plot(ts, values[11], label="halfsinus normal")
-    plt.plot(ts, values[12], label="halfsinus loop")
-    plt.plot(ts, values[13], label="halfsinus pingpong")
+    plt.plot(ts, values[n], label="normal"); n +=1
+    plt.plot(ts, values[n], label="loop"); n +=1
+    plt.plot(ts, values[n], label="pingpong"); n +=1
+    plt.plot(ts, values[n], label="random"); n +=1
+    plt.plot(ts, values[n], label="perlin"); n +=1
+    plt.plot(ts, values[n], label="sinus normal"); n +=1
+    plt.plot(ts, values[n], label="sinus loop"); n +=1
+    plt.plot(ts, values[n], label="sinus pingpong"); n +=1
+    plt.plot(ts, values[n], label="sinus2 normal"); n +=1
+    plt.plot(ts, values[n], label="sinus2 loop"); n +=1
+    plt.plot(ts, values[n], label="sinus2 pingpong"); n +=1
+    plt.plot(ts, values[n], label="halfsinus normal"); n +=1
+    plt.plot(ts, values[n], label="halfsinus loop"); n +=1
+    plt.plot(ts, values[n], label="halfsinus pingpong"); n +=1
 
     # Limit y range
     #~ plt.ylim(-10, 10)

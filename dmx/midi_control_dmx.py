@@ -35,10 +35,10 @@ dm = dmx_device
 a_fond_pour_les_artistes( dm )
 
 chan = king_38
-#~ chan = king_39
+chan = king_39
 #~ chan = king_40
-chan = king_41
-chan = king_44
+#~ chan = king_41
+#~ chan = king_44
 
 
 # pour chaque tranche, comment tomber sur la commande qui correspond au prog du spot.
@@ -65,7 +65,7 @@ with mido.open_input() as inport:
             cmd = 0
         val = msg.value*2
         cmd_conv = conv_spot[cmd]
-        print("send: %d, conv %d to %d" % (cmd,cmd_conv, val) )
+        print("chan:%d, send: %d, conv %d: val: %d" % (chan+cmd_conv, cmd,cmd_conv, val) )
         dm.set_data( chan+cmd_conv, val )
         dm.send()
         

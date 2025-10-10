@@ -352,6 +352,8 @@ couleur nuit: drgbw: 18, 0, 82, 248, 118
      :pos3: 0, 128
      :pos4: 72, 102
      :pos5: 80, 74
+     
+    rouge a 178
 """
 
         
@@ -405,7 +407,90 @@ def nuit_38( im, time_cycle ):
         im.get(spot+king_h).set( 80, dur )
         im.get(spot+king_v).set( 74, dur )
 
+"""
+P1: 63, 227, f34
+balaye: f96, d56 en passant par le point 84,212 et en finissant par 97, 212
+P2: 105, 224, f52
 
+rouge a 230
+
+"""
+
+def jour_39( im, time_cycle ):
+    spot = king_39
+    time_1 = 12 # 110
+    time_2 = 20
+    time_3 = 20 # 120
+    
+    # loop at 150s (2.5min)
+    time_cycle %= 150
+    
+    if time_cycle == 1:
+        print( "INF: time: %d, sending order for jour spot39 (P1)" % time_cycle )
+        dur = 10
+        im.get(spot+king_d).set( jour_d, dur )
+        im.get(spot+king_r).set( 230, dur )
+        im.get(spot+king_g).set( jour_g, dur )
+        im.get(spot+king_b).set( jour_b, dur )
+        im.get(spot+king_w).set( jour_w, dur )
+        im.get(spot+king_focus).set( 34, dur )
+        im.get(spot+king_h).set( 63, dur )
+        im.get(spot+king_v).set( 227, dur )
+        
+    if time_cycle == time_1:
+        print( "INF: time: %d, sending order for jour spot39 (baisse d et f)" % time_cycle )
+        dur = 4
+        im.get(spot+king_focus).set( 96, dur )
+        im.get(spot+king_d).set( 56, dur )
+        
+    if time_cycle == time_1:
+        print( "INF: time: %d, sending order for jour spot39 (balaye centre)" % time_cycle )
+        dur = time_2
+        im.get(spot+king_h).set( 84, dur )
+        im.get(spot+king_v).set( 212, dur )
+        
+    if time_cycle == time_1+time_2:
+        print( "INF: time: %d, sending order for jour spot39 (balaye fin)" % time_cycle )
+        dur = time_2-4 # pourquoi doit on enlever autant de temps juste pour qu'il ait le temps d'arriver ?
+        im.get(spot+king_h).set( 97, dur )
+        im.get(spot+king_v).set( 212, dur )
+        
+    if time_cycle == time_1+time_2*2:
+        print( "INF: time: %d, sending order for jour spot39 (P2)" % time_cycle )
+        dur = 10
+        im.get(spot+king_h).set( 105, dur )
+        im.get(spot+king_v).set( 224, dur )
+        # on restera fixe time_3 - 10 sec
+        
+    if time_cycle == time_1+time_2*2+5:
+        print( "INF: time: %d, sending order for jour spot39 (a fond)" % time_cycle )
+        dur = 3
+        im.get(spot+king_focus).set( 52, dur )
+        im.get(spot+king_d).set( 255, dur )
+        # on restera fixe time_3 - 10 sec
+        
+    if time_cycle == time_1+time_2*2+time_3 - 8:
+        print( "INF: time: %d, sending order for jour spot39 (cut)" % time_cycle )
+        dur = 10
+        im.get(spot+king_d).set( 0, dur )
+        
+    if time_cycle == time_1+time_2*2+time_3:
+        print( "INF: time: %d, sending order for jour spot39 (P1 hidden)" % time_cycle )
+        dur = 4
+        im.get(spot+king_h).set( 63, dur )
+        im.get(spot+king_v).set( 227, dur )
+        
+    if time_cycle == time_1+time_2*2+time_3 + 6:
+        print( "INF: time: %d, sending order for jour spot39 (P1 turnon)" % time_cycle )
+        dur = 5
+        im.get(spot+king_d).set( 255, dur )
+    
+        
+        
+        
+
+        
+        
 
 def jour_40( im, time_cycle ):
     spot = king_40
@@ -861,17 +946,19 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
         if cycle == cycle_jour:
             pass
             #~ jour_38( im, time_cycle )
+            jour_39( im, time_cycle )
             #~ jour_40( im, time_cycle )
             #~ jour_41( im, time_cycle )
-            jour_44( im, time_cycle )
+            #~ jour_44( im, time_cycle )
             
             
         else:
             pass
             #~ nuit_38( im, time_cycle )
+            nuit_39( im, time_cycle )
             #~ nuit_40( im, time_cycle )
             #~ nuit_41( im, time_cycle )
-            nuit_44( im, time_cycle )
+            #~ nuit_44( im, time_cycle )
             
                 
                 
@@ -901,6 +988,7 @@ def prog_ccc( dm, nbr_chan ):
         
         im.update()
         #~ print("val h: %.3f, v: %.3f" % (im.get(king_38+king_h).get_val(),im.get(king_38+king_v).get_val()) )
+        print("val h: %.3f, v: %.3f" % (im.get(king_39+king_h).get_val(),im.get(king_39+king_v).get_val()) )
         #~ print("val h: %.3f, v: %.3f" % (im.get(king_41+king_h).get_val(),im.get(king_41+king_v).get_val()) )
         for i in range( 1, nbr_chan ):
             val = im.get(i).get_val()

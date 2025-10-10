@@ -62,9 +62,8 @@ time_start_fadein = duration_nuit - duration_fadein
 # - 3ieme: 156, 162
 #  - dernier cartel: 240, 92 ou 160, 170 (idem)
 
-def force_nuit( im, spot ):
-    print("force_nuit")
-    dur = 3
+def force_nuit( im, spot, dur = 3 ):
+    print("force_nuit for spot chan %d in %d" % (spot, dur) )
     im.get(spot+king_d).set( nuit_d, dur )
     im.get(spot+king_r).set( nuit_r, dur )
     im.get(spot+king_g).set( nuit_g, dur )
@@ -72,7 +71,7 @@ def force_nuit( im, spot ):
     im.get(spot+king_w).set( nuit_w, dur )
 
 def force_jour( im, spot, dur = 3 ):
-    print("force_jour")
+    print("force_jour for spot chan %d in %d" % (spot, dur) )
     im.get(spot+king_d).set( jour_d, dur )
     im.get(spot+king_r).set( jour_r, dur )
     im.get(spot+king_g).set( jour_g, dur )
@@ -245,6 +244,9 @@ nuit:
 
 h_40_mur = 128
 v_40_mur = 106
+
+h_40_cartel = 158
+v_40_cartel = 100
 
 h_40_sol = 88
 v_40_sol = 115
@@ -644,7 +646,7 @@ def nuit_40( im, time_cycle ):
         im.get(spot+king_g).set( nuit_g, dur )
         im.get(spot+king_b).set( nuit_b, dur )
         im.get(spot+king_w).set( nuit_w, dur )
-        im.get(spot+king_focus).set( 200, dur )
+        im.get(spot+king_focus).set( 210, dur )
         im.get(spot+king_h).set( h_40_sol, dur )
         im.get(spot+king_v).set( v_40_sol-range_random_40_sol, dur )
         
@@ -654,6 +656,22 @@ def nuit_40( im, time_cycle ):
         im.get(spot+king_v).set( v_40_sol+range_random_40_sol, 14, mode = mp, interpolation=is2 )
         
       
+def fadein_40( im, time_cycle ):
+    spot = king_40
+    time_1 = 10
+    
+    if time_cycle == 1:
+        force_nuit( im, spot )
+        dur = duration_fadein
+    
+        print( "INF: time: %d, sending order for fadein spot40 (mur1)" % time_cycle )
+        im.get(spot+king_h).set( h_40_cartel, time_1 )
+        im.get(spot+king_v).set( v_40_cartel, time_1 )
+        
+    if time_cycle == time_1:
+        force_jour( im, spot, duration_fadein-time_1 )
+
+        
 """
 king41
 Panneau1: 2 cartels: focus 36, cartel1: hv: 94,160, cartel2: 101, 162
@@ -1010,7 +1028,7 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
     cycle = (time_sec // len_cycle)%2
     time_cycle = time_sec % len_cycle
     
-    if 0:
+    if 1:
         # patch pour tester rapidement
         #~ cycle += 1 #inverse jour et nuit - commence par la nuit
         # passe sur la nuit apre 10sec
@@ -1030,7 +1048,8 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
     
     if 1:
         # test fadein
-        fadein_39( im, time_cycle )
+        #~ fadein_39( im, time_cycle )
+        fadein_40( im, time_cycle )
         return
         
     if 1:
@@ -1038,7 +1057,7 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
         if cycle == cycle_jour:
             pass
             #~ jour_38( im, time_cycle )
-            jour_39( im, time_cycle )
+            #~ jour_39( im, time_cycle )
             #~ jour_40( im, time_cycle )
             #~ jour_41( im, time_cycle )
             #~ jour_44( im, time_cycle )
@@ -1047,8 +1066,8 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
         else:
             pass
             #~ nuit_38( im, time_cycle )
-            nuit_39( im, time_cycle )
-            #~ nuit_40( im, time_cycle )
+            #~ nuit_39( im, time_cycle )
+            nuit_40( im, time_cycle )
             #~ nuit_41( im, time_cycle )
             #~ nuit_44( im, time_cycle )
             

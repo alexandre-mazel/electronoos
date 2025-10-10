@@ -19,7 +19,6 @@ pip3 install serial pyserial numpy
 "Copyright" 2025 Alexandre Mazel
 """
 
-
 time_prev_sec = 0
 
 cycle_jour = 0
@@ -219,20 +218,24 @@ range_random_40_sol = 30
 v_41_sol = 120
 
 """
-33s, Panneau1: 173, 86, f34 tourne autour de ca 172 a 176 bas 88 a 85.
-17s: Sol1: A: 188,118 f42, B: 202, 114
-33s: Panneau2: 198, 102, f20
-17s: Sol2: A: 222, 120, f34 B: 244, 106, f34
-33s: Panneau3: 238, 92, f36
-17s: Sol3: 238, 116, f42
-
+29s, Panneau1: 173-3, 86, f34 tourne autour de ca 172-3 a 176-6 bas 88 a 85.
+11s: Sol1: A: 188-18,118 f42, B: 202-32, 114
+29s: Panneau2: 198-28, 102, f20
+11s: Sol2: A: 222-52, 120, f34 B: 244-74, 106, f34
+29s: Panneau3: 238-66, 92, f36
+#~ 11s: Sol3: 238-68, 116, f42
+30s + 11: mezzanine1 option: 201-31, 36, f68 tourner entre 198-28 36 et 204-34 38
 
 """
 
 def jour_38( im, time_cycle ):
     spot = king_38
-    time_1 = 33
-    time_2 = 17
+    time_1 = 29
+    time_2 = 11
+    time_3 = 30
+    
+    # loop at 150s (2.5min)
+    time_cycle %= 150
     
     if time_cycle == 1:
         print( "INF: time: %d, sending order for jour spot38 (P1)" % time_cycle )
@@ -243,12 +246,75 @@ def jour_38( im, time_cycle ):
         im.get(spot+king_b).set( 144, dur )
         im.get(spot+king_w).set( 255, dur )
         im.get(spot+king_focus).set( 34, dur )
-        im.get(spot+king_h).set( 174, dur )
+        im.get(spot+king_h).set( 2, dur )
         im.get(spot+king_v).set( 87, dur )
         
-    if time_cycle == 1 + 6:
-        im.get(spot+king_h).set( 176, 8, mode = mp, interpolation=is2 )
+    if time_cycle == 6:
+        im.get(spot+king_h).set( 6, 8, mode = mp, interpolation=is2 )
         im.get(spot+king_v).set( 85, 14, mode = mp, interpolation=is2 )
+        
+    if time_cycle == time_1:
+        print( "INF: time: %d, sending order for jour spot38 (Sol1A)" % time_cycle )
+        dur = 5
+        im.get(spot+king_h).set( 18, dur )
+        im.get(spot+king_v).set( 118, dur )
+        im.get(spot+king_focus).set( 42, dur )
+        
+    if time_cycle == time_1 + 6:
+        print( "INF: time: %d, sending order for jour spot38 (Sol1B)" % time_cycle )
+        dur = 6
+        im.get(spot+king_h).set( 32, dur )
+        im.get(spot+king_v).set( 114, dur )
+        im.get(spot+king_focus).set( 42, dur )
+        
+    if time_cycle == time_1 + time_2:
+        print( "INF: time: %d, sending order for jour spot38 (P2)" % time_cycle )
+        dur = 3
+        im.get(spot+king_h).set( 28, dur )
+        im.get(spot+king_v).set( 102, dur )
+        im.get(spot+king_focus).set( 20, dur )
+        
+    if time_cycle == time_1 + time_2 + time_1:
+        print( "INF: time: %d, sending order for jour spot38 (Sol2A)" % time_cycle )
+        dur = 5
+        im.get(spot+king_h).set( 52, dur )
+        im.get(spot+king_v).set( 120, dur )
+        im.get(spot+king_focus).set( 34, dur )
+        
+    if time_cycle == time_1 + time_2 + time_1 + 6:
+        print( "INF: time: %d, sending order for jour spot38 (Sol2B)" % time_cycle )
+        dur = 6
+        im.get(spot+king_h).set( 74, dur )
+        im.get(spot+king_v).set( 106, dur )
+        
+    if time_cycle == time_1 + time_2 + time_1 + time_2:
+        print( "INF: time: %d, sending order for jour spot38 (P3)" % time_cycle )
+        dur = 6
+        im.get(spot+king_h).set( 66, dur )
+        im.get(spot+king_v).set( 92, dur )
+        im.get(spot+king_focus).set( 36, dur )
+        
+    if time_cycle == time_1 + time_2 + time_1 + time_2 + time_1:
+        print( "INF: time: %d, sending order for jour spot38 (S3)" % time_cycle )
+        dur = 6
+        im.get(spot+king_h).set( 68, dur )
+        im.get(spot+king_v).set( 116, dur )
+        im.get(spot+king_focus).set( 42, dur )
+        
+    if time_cycle == time_1 + time_2 + time_1 + time_2 + time_1 + time_2:
+        print( "INF: time: %d, sending order for jour spot38 (Mezza)" % time_cycle )
+        dur = 10
+        im.get(spot+king_h).set( 28, dur )
+        im.get(spot+king_v).set( 36, dur )
+        im.get(spot+king_focus).set( 68, dur )
+        
+    if time_cycle == time_1 + time_2 + time_1 + time_2 + time_1 + time_2 + 6:
+        print( "INF: time: %d, sending order for jour spot38 (Mezza)" % time_cycle )
+        im.get(spot+king_h).set( 34, 8, mode = mp, interpolation=is2 )
+        #~ im.get(spot+king_v).set( 85, 14, mode = mp, interpolation=is2 )
+        
+        
+
 
 
 def jour_40( im, time_cycle ):
@@ -547,14 +613,14 @@ def prog_ccc( dm, nbr_chan ):
         for i in range( 1, nbr_chan ):
             val = im.get(i).get_val()
             
-            if 1 and (cpt & 15) == 0 and 0:
+            if 1 and (cpt & 0) == 0 and 1:
                 # lissage, using finetune
                 for chan in [king_38]:
                     if i == chan+king_fine_v and 1:
                         val = im.get(chan+king_v).get_val()
                         floatingpart = val - int(val)
                         valdmx = int(floatingpart * 255)
-                        print("val: %s, floatingpart: %.3f, valdmx: %s" % (val,floatingpart,valdmx ) )
+                        #~ print("val: %s, floatingpart: %.3f, valdmx: %s" % (val,floatingpart,valdmx ) )
                         val = valdmx
                         
                     # dans les h sur le 41 ca fait trembler et c'est pas beau
@@ -562,13 +628,15 @@ def prog_ccc( dm, nbr_chan ):
                         val = im.get(chan+king_h).get_val()
                         floatingpart = val - int(val)
                         valdmx = int(floatingpart * 255)
-                        print("val: %s, floatingpart: %.3f, valdmx: %s" % (val,floatingpart,valdmx ) )
+                        #~ print("val: %s, floatingpart: %.3f, valdmx: %s" % (val,floatingpart,valdmx ) )
                         val = valdmx
                         
             dm.set_data( i, int(val) )
             
         dm.send()
+        
         time.sleep(0.1)
+        
         cpt += 1
         
         if time_demo > 600 and im.is_all_finished():

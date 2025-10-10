@@ -71,7 +71,7 @@ lustr_i = 6      #  indigo
 lustr_d = 7     # dim
 
 # mode 16chan
-king_h = 0      # horiz
+king_h = 0      # horiz, on peut enlever 170 (ou 171?) et on a le meme resultat!
 king_v = 1      # vertic
 king_xyspeed = 2      # 0: false, 255: flow
 king_d = 3      # dim
@@ -104,6 +104,7 @@ first_asserv_dmx = 380
 offset_asserv = 16
 
 king_38 = 380
+king_39 = 396
 king_40 = 412
 king_41 = 428
 
@@ -211,7 +212,7 @@ def init_dmx( nbr_channel_to_use = 512 ):
     except BaseException as err:
         print("ERR: During Initing: exception: err: %s" % str(err) )
         print("Press a key to continue...")
-        dummy = input()
+        #~ dummy = input()
         class FakeDmx:
             def __init__(self): pass
             def set_data( self, chan, val): pass

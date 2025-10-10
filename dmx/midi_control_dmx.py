@@ -35,6 +35,7 @@ dm = dmx_device
 a_fond_pour_les_artistes( dm )
 
 chan = king_38
+#~ chan = king_39
 #~ chan = king_40
 #~ chan = king_41
 

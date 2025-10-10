@@ -62,6 +62,15 @@ time_start_fadein = duration_nuit - duration_fadein
 # - 3ieme: 156, 162
 #  - dernier cartel: 240, 92 ou 160, 170 (idem)
 
+def force_nuit( im, spot ):
+    print("force_nuit")
+    dur = 3
+    im.get(spot+king_d).set( 128, dur )
+    im.get(spot+king_r).set( nuit_r, dur )
+    im.get(spot+king_g).set( nuit_g, dur )
+    im.get(spot+king_b).set( nuit_b, dur )
+    im.get(spot+king_w).set( nuit_w, dur )
+
 def send_orders_fossilation( im, duration, brightness, r, g, b ):
     print("INF: send_orders_fossilation" )
     mode=interpolator.mode_pingpong
@@ -695,18 +704,15 @@ def nuit_44( im, time_cycle ):
     spot = king_44
     time_1 = 20
     time_2 = 40
-    time_3 =  ( ( 300 - time_1 - time_2 )/2 // 5 )
-    
-    # loop at 150s (2.5min)
-    time_cycle %= 150
+    time_3 =  ( ( 300 - time_1 - time_2 )/2 // 6 )
     
     time_end = time_start_fadein - time_1
     if time_cycle >= time_end:
         
         if time_cycle == time_end:
             print( "INF: time: %d, sending order for nuit spot44 (P1): preparation fin de nuit" % time_cycle )
-            im.get(spot+king_h).set( 86, time_1 )
-            im.get(spot+king_v).set( 204, time_1 )
+            im.get(spot+king_h).set( 79, time_1-3 )
+            im.get(spot+king_v).set( 230, time_1-3 )
             
         if time_cycle == time_start_fadein:
             print( "INF: time: %d, sending order for nuit: debut fadein" % time_cycle )
@@ -806,8 +812,17 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
     
     global time_prev_sec, prev_cycle
     
-    if time_demo > 2:
-        time_demo += 250 # jump to fin du jour
+    jump_to_end_of_night = 1
+    #~ jump_to_end_of_night = 0
+    
+    jump_to = 1
+    #~ jump_to = 0
+    
+    if jump_to_end_of_night and int(time_demo) == 3: force_nuit(im,king_44)
+    
+    if jump_to and time_demo > 2:
+        time_demo += 550 # jump to fin du jour
+        
     
     time_sec = int(time_demo)
     

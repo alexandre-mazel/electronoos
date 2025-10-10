@@ -313,7 +313,64 @@ def jour_38( im, time_cycle ):
         im.get(spot+king_h).set( 34, 8, mode = mp, interpolation=is2 )
         #~ im.get(spot+king_v).set( 85, 14, mode = mp, interpolation=is2 )
         
+"""
+couleur nuit: drgbw: 18, 0, 82, 248, 118
+6s: pos1: 8, 104, f56?
+     :pos2: 8, 128
+     :pos3: 0, 128
+     :pos4: 72, 102
+     :pos5: 80, 74
+"""
         
+def nuit_38( im, time_cycle ):
+    spot = king_38
+    time_1 = 6
+    
+    # loop at 150s (2.5min)
+    time_cycle_loop = time_cycle % 30
+    
+    if time_cycle_loop == 1:
+        print( "INF: time: %d, sending order for nuit spot38 (Pos1)" % time_cycle )
+        dur = 6
+        if time_cycle == 1:
+            print("first time: arrivee sur zone")
+            dur = 60
+        im.get(spot+king_d).set( 18+50, dur )
+        im.get(spot+king_r).set( 0, dur )
+        im.get(spot+king_g).set( 82, dur )
+        im.get(spot+king_b).set( 248, dur )
+        im.get(spot+king_w).set( 118, dur )
+        im.get(spot+king_focus).set( 56, dur )
+        im.get(spot+king_h).set( 8, dur )
+        im.get(spot+king_v).set( 104, dur )
+        
+    if time_cycle < 60:
+        # ne rien faire d'autres on attend d'arrivée sur zone
+        return
+        
+    if time_cycle_loop == time_1:
+        print( "INF: time: %d, sending order for nuit spot38 (Pos2)" % time_cycle )
+        dur = time_1-1
+        im.get(spot+king_h).set( 8, dur )
+        im.get(spot+king_v).set( 128, dur )
+        
+    if time_cycle_loop == time_1*2:
+        print( "INF: time: %d, sending order for nuit spot38 (Pos3)" % time_cycle )
+        dur = time_1-1
+        im.get(spot+king_h).set( 0, dur )
+        im.get(spot+king_v).set( 128, dur )
+        
+    if time_cycle_loop == time_1*3:
+        print( "INF: time: %d, sending order for nuit spot38 (Pos4)" % time_cycle )
+        dur = time_1-1
+        im.get(spot+king_h).set( 72, dur )
+        im.get(spot+king_v).set( 102, dur )
+        
+    if time_cycle_loop == time_1*4:
+        print( "INF: time: %d, sending order for nuit spot38 (Pos5)" % time_cycle )
+        dur = time_1-1
+        im.get(spot+king_h).set( 80, dur )
+        im.get(spot+king_v).set( 74, dur )
 
 
 
@@ -521,6 +578,86 @@ def jour_41_test( im, time_cycle ):
         im.get(spot+king_h).set( 152+rand, 4, mode = mp, interpolation=is1 )
         im.get(spot+king_v).set( 162+rand, 4, mode = mp, interpolation=is1 )
         
+        
+
+"""
+t1: Panneau1: 79, 230, f34
+01: 86,224,f56
+02 100,224,
+sol1: 104, 186, f156
+sol2: 64,172, f112
+O3: 60,206, f66, d24
+O4: 74,206, f80,d58,
+"""
+
+def jour_44( im, time_cycle ):
+    spot = king_44
+    time_1 = 60
+    time_2 = 10
+    time_3 = 16
+    
+    # loop at 150s (2.5min)
+    time_cycle %= 150
+    
+    if time_cycle == 1:
+        print( "INF: time: %d, sending order for jour spot44 (P1)" % time_cycle )
+        dur = 10
+        im.get(spot+king_d).set( 255, dur )
+        im.get(spot+king_r).set( 255, dur )
+        im.get(spot+king_g).set( 255, dur )
+        im.get(spot+king_b).set( 144, dur )
+        im.get(spot+king_w).set( 255, dur )
+        im.get(spot+king_focus).set( 34, dur )
+        im.get(spot+king_h).set( 79, dur )
+        im.get(spot+king_v).set( 230, dur )
+
+    if time_cycle == time_1:
+        print( "INF: time: %d, sending order for jour spot44 (O1)" % time_cycle )
+        dur = time_2
+        im.get(spot+king_h).set( 86, dur )
+        im.get(spot+king_v).set( 224, dur )
+        im.get(spot+king_focus).set( 56, dur )
+        
+        
+    if time_cycle == time_1+time_2:
+        print( "INF: time: %d, sending order for jour spot44 (O2)" % time_cycle )
+        dur = time_2
+        im.get(spot+king_h).set( 100, dur )
+        im.get(spot+king_v).set( 224, dur )
+        
+    if time_cycle == time_1+time_2+time_3:
+        print( "INF: time: %d, sending order for jour spot44 (Sol1)" % time_cycle )
+        dur = time_2
+        im.get(spot+king_h).set( 104, dur )
+        im.get(spot+king_v).set( 186, dur )
+        im.get(spot+king_focus).set( 156, dur )
+        
+    if time_cycle == time_1+time_2+time_3*2:
+        print( "INF: time: %d, sending order for jour spot44 (Sol2)" % time_cycle )
+        dur = time_2
+        im.get(spot+king_h).set( 64, dur )
+        im.get(spot+king_v).set( 172, dur )
+        im.get(spot+king_focus).set( 112, dur )
+        im.get(spot+king_d).set( 58, dur )
+        
+    if time_cycle == time_1+time_2+time_3*3:
+        print( "INF: time: %d, sending order for jour spot44 (O3)" % time_cycle )
+        dur = time_2
+        im.get(spot+king_h).set( 60, dur )
+        im.get(spot+king_v).set( 206, dur )
+        im.get(spot+king_focus).set( 66, dur )
+        im.get(spot+king_d).set( 24, dur )
+        
+    if time_cycle == time_1+time_2+time_3*4:
+        print( "INF: time: %d, sending order for jour spot44 (O4)" % time_cycle )
+        dur = time_2
+        im.get(spot+king_h).set( 74, dur )
+        im.get(spot+king_v).set( 206, dur )
+        im.get(spot+king_focus).set( 80, dur )
+        im.get(spot+king_d).set( 58, dur )
+
+
+        
 
 def a_fond_pour_les_artistes( im ):
     print("a_fond_pour_les_artistes")
@@ -571,13 +708,15 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
         # autre phase du cycle
         if cycle == cycle_jour:
             pass
-            jour_38( im, time_cycle )
+            #~ jour_38( im, time_cycle )
             #~ jour_40( im, time_cycle )
             #~ jour_41( im, time_cycle )
+            jour_44( im, time_cycle )
             
             
         else:
             pass
+            #~ nuit_38( im, time_cycle )
             #~ nuit_40( im, time_cycle )
             #~ nuit_41( im, time_cycle )
             

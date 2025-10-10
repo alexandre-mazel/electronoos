@@ -30,6 +30,29 @@ is1 = interpolator.interpolation_sinus
 is2 = interpolator.interpolation_sinus2
 
 
+
+jour_d = 255
+jour_r = 255
+jour_g = 255
+jour_b = 144
+jour_w=255
+    
+"""
+Nuit: 5min: dont 60s pour descendre au noir, 217s de noir, puis 23s pour remonter.
+"""
+
+nuit_d = 18
+nuit_r = 0
+nuit_g = 82
+nuit_b = 248
+nuit_w=118
+
+duration_nuit = 300
+duration_fadeout = 60
+duration_fadein = 23
+time_start_fadein = duration_nuit - duration_fadein
+
+
 # setup pou king 40 vers cartel
 # 82,162, 0, 254, 254, 254, 254, 
 
@@ -240,11 +263,11 @@ def jour_38( im, time_cycle ):
     if time_cycle == 1:
         print( "INF: time: %d, sending order for jour spot38 (P1)" % time_cycle )
         dur = 4
-        im.get(spot+king_d).set( 255, dur )
-        im.get(spot+king_r).set( 255, dur )
-        im.get(spot+king_g).set( 255, dur )
-        im.get(spot+king_b).set( 144, dur )
-        im.get(spot+king_w).set( 255, dur )
+        im.get(spot+king_d).set( jour_d, dur )
+        im.get(spot+king_r).set( jour_r, dur )
+        im.get(spot+king_g).set( jour_g, dur )
+        im.get(spot+king_b).set( jour_b, dur )
+        im.get(spot+king_w).set( jour_w, dur )
         im.get(spot+king_focus).set( 34, dur )
         im.get(spot+king_h).set( 2, dur )
         im.get(spot+king_v).set( 87, dur )
@@ -321,6 +344,7 @@ couleur nuit: drgbw: 18, 0, 82, 248, 118
      :pos4: 72, 102
      :pos5: 80, 74
 """
+
         
 def nuit_38( im, time_cycle ):
     spot = king_38
@@ -335,11 +359,11 @@ def nuit_38( im, time_cycle ):
         if time_cycle == 1:
             print("first time: arrivee sur zone")
             dur = 60
-        im.get(spot+king_d).set( 18+50, dur )
-        im.get(spot+king_r).set( 0, dur )
-        im.get(spot+king_g).set( 82, dur )
-        im.get(spot+king_b).set( 248, dur )
-        im.get(spot+king_w).set( 118, dur )
+        im.get(spot+king_d).set( nuit_d, dur )
+        im.get(spot+king_r).set( nuit_r, dur )
+        im.get(spot+king_g).set( nuit_g, dur )
+        im.get(spot+king_b).set( nuit_b, dur )
+        im.get(spot+king_w).set( nuit_w, dur )
         im.get(spot+king_focus).set( 56, dur )
         im.get(spot+king_h).set( 8, dur )
         im.get(spot+king_v).set( 104, dur )
@@ -383,11 +407,11 @@ def jour_40( im, time_cycle ):
     if time_cycle == 1:
         print( "INF: time: %d, sending order for jour spot40 (mur)" % time_cycle )
         dur = 1
-        im.get(spot+king_d).set( 255, dur )
-        im.get(spot+king_r).set( 255, dur )
-        im.get(spot+king_g).set( 255, dur )
-        im.get(spot+king_b).set( 144, dur )
-        im.get(spot+king_w).set( 255, dur )
+        im.get(spot+king_d).set( jour_d, dur )
+        im.get(spot+king_r).set( jour_r, dur )
+        im.get(spot+king_g).set( jour_g, dur )
+        im.get(spot+king_b).set( jour_b, dur )
+        im.get(spot+king_w).set( jour_w, dur )
         im.get(spot+king_focus).set( 200, dur )
         im.get(spot+king_h).set( h_40_mur-range_random_40_mur*3, dur )
         im.get(spot+king_v).set( v_40_mur-range_random_40_mur, dur )
@@ -435,11 +459,11 @@ def nuit_40( im, time_cycle ):
     if time_cycle == 1:
         print( "INF: time: %d, sending order for nuit spot40 (sol)" % time_cycle )
         dur = 1
-        im.get(spot+king_d).set( 255, dur )
-        im.get(spot+king_r).set( 0, dur )
-        im.get(spot+king_g).set( 0, dur )
-        im.get(spot+king_b).set( 255, dur )
-        im.get(spot+king_w).set( 0, dur )
+        im.get(spot+king_d).set( nuit_d, dur )
+        im.get(spot+king_r).set( nuit_r, dur )
+        im.get(spot+king_g).set( nuit_g, dur )
+        im.get(spot+king_b).set( nuit_b, dur )
+        im.get(spot+king_w).set( nuit_w, dur )
         im.get(spot+king_focus).set( 200, dur )
         im.get(spot+king_h).set( h_40_sol, dur )
         im.get(spot+king_v).set( v_40_sol-range_random_40_sol, dur )
@@ -483,11 +507,11 @@ def jour_41( im, time_cycle ):
     if time_cycle == 1:
         print( "INF: time: %d, sending order for jour spot41 (sol)" % time_cycle )
         dur = duree_pan_mur
-        im.get(spot+king_d).set( 255, dur )
-        im.get(spot+king_r).set( 255, dur )
-        im.get(spot+king_g).set( 255, dur )
-        im.get(spot+king_b).set( 144, dur )
-        im.get(spot+king_w).set( 255, dur )
+        im.get(spot+king_d).set( jour_d, dur )
+        im.get(spot+king_r).set( jour_r, dur )
+        im.get(spot+king_g).set( jour_g, dur )
+        im.get(spot+king_b).set( jour_b, dur )
+        im.get(spot+king_w).set( jour_w, dur )
         im.get(spot+king_focus).set( 40, dur )
         im.get(spot+king_h).set( 102, dur )
         im.get(spot+king_v).set( 142, dur )
@@ -565,11 +589,11 @@ def jour_41_test( im, time_cycle ):
     if time_cycle == 1:
         print( "INF: time: %d, sending order for jour spot41 (oeuvre sin)" % time_cycle )
         dur = 2
-        im.get(spot+king_d).set( 255, dur )
-        im.get(spot+king_r).set( 255, dur )
-        im.get(spot+king_g).set( 255, dur )
-        im.get(spot+king_b).set( 144, dur )
-        im.get(spot+king_w).set( 255, dur )
+        im.get(spot+king_d).set( jour_d, dur )
+        im.get(spot+king_r).set( jour_r, dur )
+        im.get(spot+king_g).set( jour_g, dur )
+        im.get(spot+king_b).set( jour_b, dur )
+        im.get(spot+king_w).set( jour_w, dur )
         im.get(spot+king_focus).set( 40, dur )
         im.get(spot+king_h).set( 152-rand, dur )
         im.get(spot+king_v).set( 162-rand, dur )
@@ -582,8 +606,8 @@ def jour_41_test( im, time_cycle ):
 
 """
 t1: Panneau1: 79, 230, f34
-01: 86,224,f56
-02 100,224,
+01: 86,224, f56, d126
+02 100,224, d62
 sol1: 104, 186, f156
 sol2: 64,172, f112
 O3: 60,206, f66, d24
@@ -594,19 +618,20 @@ def jour_44( im, time_cycle ):
     spot = king_44
     time_1 = 60
     time_2 = 10
-    time_3 = 16
+    time_3 = 13
+    # (13*5+10+60)*2 = 270: on recommence la boucle pendant 30 sec sur le cartel 1
     
     # loop at 150s (2.5min)
-    time_cycle %= 150
+    time_cycle %= (time_1+time_2+time_3*5)
     
     if time_cycle == 1:
         print( "INF: time: %d, sending order for jour spot44 (P1)" % time_cycle )
         dur = 10
-        im.get(spot+king_d).set( 255, dur )
-        im.get(spot+king_r).set( 255, dur )
-        im.get(spot+king_g).set( 255, dur )
-        im.get(spot+king_b).set( 144, dur )
-        im.get(spot+king_w).set( 255, dur )
+        im.get(spot+king_d).set( jour_d, dur )
+        im.get(spot+king_r).set( jour_r, dur )
+        im.get(spot+king_g).set( jour_g, dur )
+        im.get(spot+king_b).set( jour_b, dur )
+        im.get(spot+king_w).set( jour_w, dur )
         im.get(spot+king_focus).set( 34, dur )
         im.get(spot+king_h).set( 79, dur )
         im.get(spot+king_v).set( 230, dur )
@@ -617,13 +642,14 @@ def jour_44( im, time_cycle ):
         im.get(spot+king_h).set( 86, dur )
         im.get(spot+king_v).set( 224, dur )
         im.get(spot+king_focus).set( 56, dur )
-        
+        im.get(spot+king_d).set( 126, dur )
         
     if time_cycle == time_1+time_2:
         print( "INF: time: %d, sending order for jour spot44 (O2)" % time_cycle )
         dur = time_2
         im.get(spot+king_h).set( 100, dur )
         im.get(spot+king_v).set( 224, dur )
+        im.get(spot+king_d).set( 62, dur )
         
     if time_cycle == time_1+time_2+time_3:
         print( "INF: time: %d, sending order for jour spot44 (Sol1)" % time_cycle )
@@ -657,6 +683,104 @@ def jour_44( im, time_cycle ):
         im.get(spot+king_d).set( 58, dur )
 
 
+"""
+puis meme boucle, mais sans passer par le cartel panneau1 (on va ajouter un sol0)
+Sol0:86, 204, f128 puis saute.
+
+avant le fadein: on va sur P1 en gardant focus et couleur de nuit. puis pendant fadein on bouge pas.
+
+"""
+
+def nuit_44( im, time_cycle ):
+    spot = king_44
+    time_1 = 20
+    time_2 = 40
+    time_3 =  ( ( 300 - time_1 - time_2 )/2 // 5 )
+    
+    # loop at 150s (2.5min)
+    time_cycle %= 150
+    
+    time_end = time_start_fadein - time_1
+    if time_cycle >= time_end:
+        
+        if time_cycle == time_end:
+            print( "INF: time: %d, sending order for nuit spot44 (P1): preparation fin de nuit" % time_cycle )
+            im.get(spot+king_h).set( 86, time_1 )
+            im.get(spot+king_v).set( 204, time_1 )
+            
+        if time_cycle == time_start_fadein:
+            print( "INF: time: %d, sending order for nuit: debut fadein" % time_cycle )
+            dur = duration_fadein
+            im.get(spot+king_d).set( jour_d, dur )
+            im.get(spot+king_r).set( jour_r, dur )
+            im.get(spot+king_g).set( jour_g, dur )
+            im.get(spot+king_b).set( jour_b, dur )
+            im.get(spot+king_w).set( jour_w, dur )
+            im.get(spot+king_focus).set( 34, dur )
+            
+        return
+            
+    time_cycle = time_cycle % (time_1+time_2+time_3*6)
+    
+    duration_tombe_densite_moitie = 3
+    if time_cycle == 1:
+        print( "INF: time: %d, sending order for nuit spot44 (Sol1)" % time_cycle )
+        dur = time_1-2
+        im.get(spot+king_d).set( 128, duration_tombe_densite_moitie )
+        im.get(spot+king_r).set( nuit_r, duration_fadeout )
+        im.get(spot+king_g).set( nuit_g, duration_fadeout )
+        im.get(spot+king_b).set( nuit_b, duration_fadeout )
+        im.get(spot+king_w).set( nuit_w, duration_fadeout )
+        im.get(spot+king_focus).set( 128, dur )
+        im.get(spot+king_h).set( 86, dur )
+        im.get(spot+king_v).set( 204, dur )
+        
+    if time_cycle == 1+duration_tombe_densite_moitie:
+        print( "INF: time: %d, sending order for nuit spot44 (Sol1)" % time_cycle )
+        im.get(spot+king_d).set( nuit_d, duration_fadeout-duration_tombe_densite_moitie )
+
+    if time_cycle == time_1:
+        print( "INF: time: %d, sending order for nuit spot44 (O2)" % time_cycle )
+        dur = time_2
+        im.get(spot+king_h).set( 100, dur )
+        im.get(spot+king_v).set( 224, dur )
+        
+    if time_cycle == time_1+time_2:
+        print( "INF: time: %d, sending order for nuit spot44 (Sol1)" % time_cycle )
+        dur = time_3
+        im.get(spot+king_h).set( 104, dur )
+        im.get(spot+king_v).set( 186, dur )
+        
+    if time_cycle == time_1+time_2+time_3:
+        print( "INF: time: %d, sending order for nuit spot44 (Sol2)" % time_cycle )
+        dur = time_3
+        im.get(spot+king_h).set( 64, dur )
+        im.get(spot+king_v).set( 172, dur )
+        
+    if time_cycle == time_1+time_2+time_3*2:
+        print( "INF: time: %d, sending order for nuit spot44 (O3)" % time_cycle )
+        dur = time_3
+        im.get(spot+king_h).set( 60, dur )
+        im.get(spot+king_v).set( 206, dur )
+        
+    if time_cycle == time_1+time_2+time_3*3:
+        print( "INF: time: %d, sending order for nuit spot44 (O4)" % time_cycle )
+        dur = time_3
+        im.get(spot+king_h).set( 74, dur )
+        im.get(spot+king_v).set( 206, dur )
+        
+    if time_cycle == time_1+time_2+time_3*4:
+        print( "INF: time: %d, sending order for nuit spot44 (Sol1)" % time_cycle )
+        dur = time_3
+        im.get(spot+king_h).set( 104, dur )
+        im.get(spot+king_v).set( 186, dur )
+        
+    if time_cycle == time_1+time_2+time_3*5:
+        print( "INF: time: %d, sending order for nuit spot44 (O1)" % time_cycle )
+        dur = time_3
+        im.get(spot+king_h).set( 86, dur )
+        im.get(spot+king_v).set( 224, dur )
+ 
         
 
 def a_fond_pour_les_artistes( im ):
@@ -677,14 +801,21 @@ def a_fond_pour_les_artistes( im ):
     im.get(first_she_dmx+she_d).set( 255, dur )
     im.get(first_she_dmx+she_r).set( 255, dur )
     
-                
+          
 def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: float ):
     
     global time_prev_sec, prev_cycle
     
+    if time_demo > 2:
+        time_demo += 250 # jump to fin du jour
+    
     time_sec = int(time_demo)
+    
+    
     if time_sec == time_prev_sec:
         return
+        
+
         
     time_prev_sec = time_sec
         
@@ -692,7 +823,13 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
     cycle = (time_sec // len_cycle)%2
     time_cycle = time_sec % len_cycle
     
-    #~ cycle += 1 #inverse jour et nuit - commence par la nuit
+    if 0:
+        # patch pour tester rapidement
+        #~ cycle += 1 #inverse jour et nuit - commence par la nuit
+        # passe sur la nuit apre 10sec
+        if time_sec > 12: # car la plupart des premiers mouvement du jour sont en 10 sec
+            time_cycle -= 12
+            cycle += 1
     
     if prev_cycle != cycle:
         # premiere phase du cycle
@@ -719,6 +856,7 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
             #~ nuit_38( im, time_cycle )
             #~ nuit_40( im, time_cycle )
             #~ nuit_41( im, time_cycle )
+            nuit_44( im, time_cycle )
             
                 
                 

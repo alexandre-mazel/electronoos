@@ -813,10 +813,10 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
     global time_prev_sec, prev_cycle
     
     jump_to_end_of_night = 1
-    #~ jump_to_end_of_night = 0
+    jump_to_end_of_night = 0
     
     jump_to = 1
-    #~ jump_to = 0
+    jump_to = 0
     
     if jump_to_end_of_night and int(time_demo) == 3: force_nuit(im,king_44)
     

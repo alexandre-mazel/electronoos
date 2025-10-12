@@ -219,8 +219,9 @@ def init_dmx( nbr_channel_to_use = 512 ):
         class FakeDmx:
             def __init__(self): pass
             def set_data( self, chan, val): pass
-            def send( self): print("FakeDmx.send...")
+            def send( self): pass; #print("FakeDmx.send...")
             def set_clear_channel_at_exit(self,newval): pass
+            def set_optimised(self,newval): pass
         dmx = FakeDmx()
         
         

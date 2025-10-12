@@ -88,6 +88,8 @@ long int last_time_seen = 0;
 
 void loop()
 {
+  if( 0 )
+  {
     if( millis() - last_time_seen > 30*1000 ) // 30sec without someone => need someone to activate
     {
       Serial.println( "Waiting for someone...");
@@ -100,6 +102,7 @@ void loop()
       Serial.println( "Seen someone or something !");
       last_time_seen = millis();
     }
+  }
 
     //delay(200);
     //return;

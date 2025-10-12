@@ -12,8 +12,8 @@ import time
 from typing import Union
 
 # external python modules
-import serial
-import serial.tools.list_ports
+import serial # sudo pip3 install py-serial --break-system-packages
+import serial.tools.list_ports # si il ne trouve pas tools, alors il faut  enlever serial # sudo pip3 uninstall serial --break-system-packages  
 import numpy as np
 
 verbose = False

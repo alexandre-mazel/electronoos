@@ -2,6 +2,8 @@
 
 from ccc import *
 
+import datetime
+
 import sys
 sys.path.append("../alex_pytools/")
 import interpolator
@@ -27,16 +29,20 @@ sudo date -s '@1759832799'
 
 """
 
+hour_demo_begin = 8 # premiere heure ou la demo commence
+hour_demo_end = 24  # premiere heure ou la demo s'arrete
+
 time_prev_sec = 0
 
 cycle_jour = 0
 cycle_fadeout = 1
 cycle_nuit = 2
 cycle_fadein = 3
+cycle_mute = 4 # la nuit on fait rien
 prev_cycle = -2
 
 def cycle_to_lib( cycle ):
-    return ["jour", "fadeout", "nuit", "fadein", "unknown"][cycle] # -1 => unknown
+    return ["jour", "fadeout", "nuit", "fadein", "mute", "unknown"][cycle] # -1 => unknown
 
 
         
@@ -1348,37 +1354,86 @@ def a_fond_pour_les_artistes( im ):
     im.get(first_she_dmx+she_d).set( 255, dur )
     im.get(first_she_dmx+she_r).set( 255, dur )
     
+    
+def get_demo_times():
+    """
+    Return demo_time, num_cycle, time_in_cycle
+    """
+    
+    datetimeObject = datetime.datetime.now()
+    h,m,s = datetimeObject.hour, datetimeObject.minute, datetimeObject.second 
+    if h < hour_demo_begin or h >= hour_demo_end:
+        return 0, cycle_mute, 0
+    time_demo = (h-hour_demo_begin)*60*60+m*60+s
+    
+    time_demo *= 10 # to debug quicker
+
+    
+    time_sec = int( time_demo )
+    
+    time_cycle = time_sec % duration_loop
+
+    if time_cycle <  duration_jour:
+        cycle = cycle_jour
+    elif time_cycle <  duration_jour+duration_fadeout:
+        cycle = cycle_fadeout
+        time_cycle -= duration_jour
+    elif time_cycle <  duration_jour+duration_fadeout+duration_nuit:
+        cycle = cycle_nuit
+        time_cycle -= duration_jour+duration_fadeout
+    else:
+        cycle = cycle_fadein
+        time_cycle -= duration_jour+duration_fadeout+duration_nuit
+        
+    return time_sec, cycle, time_cycle
+    
           
 def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: float ):
     
     global time_prev_sec, prev_cycle
         
     
-    time_sec = int(time_demo)
-    
-    
-    if time_sec == time_prev_sec:
-        return        
-        
-    time_prev_sec = time_sec
-    
-    time_cycle = time_sec
-    
-    #~ if 1:  time_cycle += duration_jour # jump sur fadeout
-    #~ if 1:  time_cycle += duration_jour+duration_fadeout # jump sur nuit
-    #~ if 1:  time_cycle += duration_jour+duration_fadeout+duration_nuit # jump sur fadein
-    
-    time_cycle = time_cycle % duration_loop
+    if 0:
+        # temps depuis le lancement
 
-    
-    if time_cycle <  duration_jour:
-        cycle = cycle_jour
-    elif time_cycle <  duration_jour+duration_fadeout:
-        cycle = cycle_fadeout
-    elif time_cycle <  duration_jour+duration_fadeout+duration_nuit:
-        cycle = cycle_nuit
+        time_sec = int(time_demo)
+        
+        
+        if time_sec == time_prev_sec:
+            return        
+            
+        time_prev_sec = time_sec
+        
+        time_cycle = time_sec
+        
+        #~ if 1:  time_cycle += duration_jour # jump sur fadeout
+        #~ if 1:  time_cycle += duration_jour+duration_fadeout # jump sur nuit
+        #~ if 1:  time_cycle += duration_jour+duration_fadeout+duration_nuit # jump sur fadein
+        
+        time_cycle = time_cycle % duration_loop
+
+        
+        if time_cycle <  duration_jour:
+            cycle = cycle_jour
+        elif time_cycle <  duration_jour+duration_fadeout:
+            cycle = cycle_fadeout
+        elif time_cycle <  duration_jour+duration_fadeout+duration_nuit:
+            cycle = cycle_nuit
+        else:
+            cycle = cycle_fadein
     else:
-        cycle = cycle_fadein
+        # temps lié a l'heure
+        time_sec, cycle, time_cycle = get_demo_times()
+        
+        if cycle == cycle_mute:
+            print("muted...")
+            time.sleep(1)
+            return
+        
+        if time_sec == time_prev_sec:
+            return       
+
+        time_prev_sec = time_sec
         
     
     if prev_cycle != cycle:
@@ -1429,7 +1484,7 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
             fadein_44( im, time_cycle)
             
                 
-                
+
 
 def prog_ccc( dm, nbr_chan ):
 

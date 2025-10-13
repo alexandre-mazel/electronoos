@@ -1,8 +1,15 @@
 import asyncio
 
+import pywizlight
 from pywizlight import wizlight, PilotBuilder, discovery # pip install pywizlight # NB: Requires Python version >=3.7.
 
 import time
+
+col_off = (0,0,0,0,0,0)
+col_blue = (0,0,255,0,0,255)
+col_green = (0,255,0,0,0,255)
+col_red = (255,0,0,0,0,255)
+col_full = (0,0,0,255,255,255)
 
 # ramp between 0 and 1 but nonlinear (avec un ventre haut)
 # speed at first then slow
@@ -46,13 +53,13 @@ if 0:
         print( "%.3f => %.3f" % (coef, nonlinear_ramp(coef) ))
     exit(1)
 
-async def fade_wiz(col1, col2, duration, just_one_call = False, ips_bulb = None ):
+async def fade_all_wiz(col1, col2, duration, just_one_call = False, ips_bulb = None ):
     """
     Fade between two colors: col1 => col2
     colors are a tuple: r, g, b, ww, cw, brightness
     """
     
-    print( "INF: fade_wiz: starting...")
+    print( "INF: fade_all_wiz: starting...")
     
     if ips_bulb == None:
         
@@ -83,7 +90,7 @@ async def fade_wiz(col1, col2, duration, just_one_call = False, ips_bulb = None 
     bulbs = []
     
     for ip in ips_bulb:
-        print( "INF: fade_wiz: connecting to %s ..." % ip )
+        print( "INF: fade_all_wiz: connecting to %s ..." % ip )
         bulbs.append(wizlight(ip))
         
 
@@ -132,31 +139,47 @@ async def fade_wiz(col1, col2, duration, just_one_call = False, ips_bulb = None 
                         bulb.turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright))
         else:
             # on gagne grave: ca prend 260ms pour 3 appels (270ms pour 7 appels)
-            if mute == 0:
-                #~ await asyncio.gather(
-                    #~ bulbs[0].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
-                    #~ bulbs[1].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
-                    #~ bulbs[2].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
-                    #~ bulbs[3].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
-                    #~ bulbs[4].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
-                    #~ bulbs[5].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
-                    #~ bulbs[6].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
-                #~ )
-                await asyncio.gather( *(bulb.turn_on(PilotBuilder(rgbww=(r, g, b, cw, ww), brightness=bright)) for bulb in bulbs) )
-            else:
-                #~ await asyncio.gather(
-                    #~ bulbs[0].turn_off(),
-                    #~ bulbs[1].turn_off(),
-                    #~ bulbs[2].turn_off(),
-                    #~ bulbs[3].turn_off(),
-                    #~ bulbs[4].turn_off(),
-                    #~ bulbs[5].turn_off(),
-                    #~ bulbs[6].turn_off(),
-                #~ )
-                await asyncio.gather(  *(bulb.turn_off() for bulb in bulbs) )
-                if 0:
-                    print( "INF: ultraforce muting" )
-                    await bulbs[0].turn_off()
+            try:
+                if mute == 0:
+                    #~ await asyncio.gather(
+                        #~ bulbs[0].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                        #~ bulbs[1].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                        #~ bulbs[2].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                        #~ bulbs[3].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                        #~ bulbs[4].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                        #~ bulbs[5].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                        #~ bulbs[6].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                    #~ )
+                    results = await asyncio.gather( *(bulb.turn_on(PilotBuilder(rgbww=(r, g, b, cw, ww), brightness=bright)) for bulb in bulbs), return_exceptions=True )
+                else:
+                    #~ await asyncio.gather(
+                        #~ bulbs[0].turn_off(),
+                        #~ bulbs[1].turn_off(),
+                        #~ bulbs[2].turn_off(),
+                        #~ bulbs[3].turn_off(),
+                        #~ bulbs[4].turn_off(),
+                        #~ bulbs[5].turn_off(),
+                        #~ bulbs[6].turn_off(),
+                    #~ )
+                    results = await asyncio.gather(  *(bulb.turn_off() for bulb in bulbs), return_exceptions=True )
+                    if 0:
+                        print( "INF: ultraforce muting" )
+                        await bulbs[0].turn_off()
+            except pywizlight.exceptions.WizLightTimeOutError as err:
+                print("INF: While sending command: err:", str(err) ) # throw when return_exceptions isn't true
+                
+            print( "results:", results )
+            # clean bad ip
+            i = 0
+            while i < len( ips_bulb ):
+                if results[i] != None:
+                    del results[i]
+                    del bulbs[i]
+                    del ips_bulb[i]
+                    continue
+                i += 1
+            print( "ips_bulb after results:", ips_bulb )
+                
                     
         cpt += 1
         
@@ -167,137 +190,138 @@ async def fade_wiz(col1, col2, duration, just_one_call = False, ips_bulb = None 
     
     print( "time per call: %.2fs" % ((time.time() - time_begin) / cpt) )
     
-# fade_wiz - end
-
-loop = asyncio.get_event_loop()
-
-col_off = (0,0,0,0,0,0)
-col_blue = (0,0,255,0,0,255)
-col_green = (0,255,0,0,0,255)
-col_red = (255,0,0,0,0,255)
-col_full = (0,0,0,255,255,255)
-
-if 0:
-    # reglage pour eclairage oeuvre.
-
-    duration = 10 # in sec
-    col_1 = (0, 0, 0, 255, 255)
-    col_2 = (0, 5, 128, 0, 0)
-
-    loop.run_until_complete(fade_wiz(col_1,col_2,duration))
-
-    duration = 5 # in sec
-    col_1 = (0, 5, 35, 0, 0)
-    col_2 = (0, 5, 7, 0, 0)
-    loop.run_until_complete(fade_wiz(col_1,col_2,duration))
+    return ips_bulb
     
-if 0:
-    # reglage pour fade dans les bleus.
+# fade_all_wiz - end
 
-    duration = 10 # in sec
-    col_1 = (0, 20, 255, 0, 0, 0)
-    col_2 = (0, 20, 255, 0, 0, 255)
-    loop.run_until_complete(fade_wiz(col_1,col_2,duration))
-    
-if 0:
-    # reglage pour fade red vers bleu
+def test_wiz():
 
-    duration = 10 # in sec
-    col_1 = (0, 0, 255, 0, 0, 0)
-    col_2 = (255, 0, 0, 0, 0, 0)
-    loop.run_until_complete(fade_wiz(col_1,col_2,duration))
-
-    col_1 = (0, 0, 255, 0, 0, 255)
-    col_2 = (0, 0, 0, 0, 0, 0)    
-    loop.run_until_complete(fade_wiz(col_1,col_2,duration))
-    loop.run_until_complete(fade_wiz(col_2,col_1,duration))
-    
-if 0:
-    duration = 10 # in sec
-    col_1 = (10, 20, 30, 40, 200)
-    col_2 = (10, 20, 30, 40, 200)
-
-    loop.run_until_complete(fade_wiz(col_1,col_2,duration))
-    
-if 1:
-    # reglage pour eclairage oeuvre #2: avec brightness bien gere.
-    duration = 20.6 # in sec
-    col_1 = (0,0,0,255,255,255)
-    #~ col_1 = (0, 5, 60,0,0,40)
-    col_2 = (0, 5, 20, 90,90,90)
-
-    #~ loop.run_until_complete(fade_wiz(col_1,col_2,duration))
-    
-    duration2 = 30
-    col_3 = (0, 5, 29,6,6,44)
-    #~ loop.run_until_complete(fade_wiz(col_2,col_3,duration2))
-    
-    duration3 = 2.4
-    col_4 = (0, 5, 30,0,0,40)
-    #~ col_4 = (0, 0, 255,0,0,255) # full bleue developpeur
-    #~ loop.run_until_complete(fade_wiz(col_3,col_4,duration3))
+    loop = asyncio.get_event_loop()
 
 
-    # a voir si on fait le retoure plus rapide ou pas, avec un palier encore juste tres pres du full bleu qui est trop rapide,
-    # [0, 5, 10, 94, 94, 94]
 
-    # remontee
-    loop.run_until_complete(fade_wiz(col_4,col_4,5))  # pause sur la couleur
-    
+    if 0:
+        # reglage pour eclairage oeuvre.
+
+        duration = 10 # in sec
+        col_1 = (0, 0, 0, 255, 255)
+        col_2 = (0, 5, 128, 0, 0)
+
+        loop.run_until_complete(fade_all_wiz(col_1,col_2,duration))
+
+        duration = 5 # in sec
+        col_1 = (0, 5, 35, 0, 0)
+        col_2 = (0, 5, 7, 0, 0)
+        loop.run_until_complete(fade_all_wiz(col_1,col_2,duration))
+        
+    if 0:
+        # reglage pour fade dans les bleus.
+
+        duration = 10 # in sec
+        col_1 = (0, 20, 255, 0, 0, 0)
+        col_2 = (0, 20, 255, 0, 0, 255)
+        loop.run_until_complete(fade_all_wiz(col_1,col_2,duration))
+        
+    if 0:
+        # reglage pour fade red vers bleu
+
+        duration = 10 # in sec
+        col_1 = (0, 0, 255, 0, 0, 0)
+        col_2 = (255, 0, 0, 0, 0, 0)
+        loop.run_until_complete(fade_all_wiz(col_1,col_2,duration))
+
+        col_1 = (0, 0, 255, 0, 0, 255)
+        col_2 = (0, 0, 0, 0, 0, 0)    
+        loop.run_until_complete(fade_all_wiz(col_1,col_2,duration))
+        loop.run_until_complete(fade_all_wiz(col_2,col_1,duration))
+        
+    if 0:
+        duration = 10 # in sec
+        col_1 = (10, 20, 30, 40, 200)
+        col_2 = (10, 20, 30, 40, 200)
+
+        loop.run_until_complete(fade_all_wiz(col_1,col_2,duration))
+        
     if 1:
-        loop.run_until_complete(fade_wiz(col_4,col_3,duration3/2))
-        loop.run_until_complete(fade_wiz(col_3,col_2,duration2/3))
-        loop.run_until_complete(fade_wiz(col_2,col_1,duration/3))
-        
-        loop.run_until_complete(fade_wiz(col_1,col_off,duration/3))
-    
-    
-    
-if 0: 
-    # reglage rapide de couleur
-    col = (0, 5, 30,0,0,40)
-    loop.run_until_complete(fade_wiz(col,col,1))
-    
-if 0: 
-    # test rapide
-    col1 = (0, 0, 255,0,0,255)
-    col2 = (0, 255, 0,0,0,255)
-    col3 = (0, 0, 255,0,0,255)
-    loop.run_until_complete(fade_wiz(col1,col2,2))
-    loop.run_until_complete(fade_wiz(col2,col3,2))
-    loop.run_until_complete(fade_wiz(col3,col_off,2))
-    
-if 0:
-    # arc en ciel
-    for i in range(10):
-        duration = 3
-        loop.run_until_complete(fade_wiz(col_full,col_blue,duration))
-        loop.run_until_complete(fade_wiz(col_blue,col_green,duration))    
-        loop.run_until_complete(fade_wiz(col_green,col_red,duration))    
-        loop.run_until_complete(fade_wiz(col_red,col_full,duration))
-    loop.run_until_complete(fade_wiz(col_full,col_off,duration))
-    
-if 0:
-    # allume toutes une par une
-    for ip_last in range(201,207):
-        ip = "192.168.9.%d" % ip_last
-        loop.run_until_complete(fade_wiz(col_full,col_blue,1,ips_bulb=[ip]))
-        loop.run_until_complete(fade_wiz(col_blue,col_off,1,ips_bulb=[ip]))
-        
-        
-    
-    
-if 0: 
-    # reglage rapide de communication
-    col_1 = (0,0,0,255,255,255)
-    col_2 = (0,255,0,0,0,255)
-    col_3 = (0,0,255,0,0,255)
-    col_4 = (0,0,255,0,0,0)
-    loop.run_until_complete(fade_wiz(col_1,col_2,3))
-    loop.run_until_complete(fade_wiz(col_2,col_3,3))
-    loop.run_until_complete(fade_wiz(col_3,col_4,7))
-    # essaye de forcer la lampe a s'eteindre
-    loop.run_until_complete(fade_wiz(col_4,col_off,2)) # force to call it
-    loop.run_until_complete(fade_wiz(col_off,col_off,1,just_one_call=True))
+        # reglage pour eclairage oeuvre #2: avec brightness bien gere.
+        duration = 20.6 # in sec
+        col_1 = (0,0,0,255,255,255)
+        #~ col_1 = (0, 5, 60,0,0,40)
+        col_2 = (0, 5, 20, 90,90,90)
 
-    
+        #~ loop.run_until_complete(fade_all_wiz(col_1,col_2,duration))
+        
+        duration2 = 30
+        col_3 = (0, 5, 29,6,6,44)
+        #~ loop.run_until_complete(fade_all_wiz(col_2,col_3,duration2))
+        
+        duration3 = 2.4
+        col_4 = (0, 5, 30,0,0,40)
+        #~ col_4 = (0, 0, 255,0,0,255) # full bleue developpeur
+        #~ loop.run_until_complete(fade_all_wiz(col_3,col_4,duration3))
+
+
+        # a voir si on fait le retoure plus rapide ou pas, avec un palier encore juste tres pres du full bleu qui est trop rapide,
+        # [0, 5, 10, 94, 94, 94]
+
+        # remontee
+        loop.run_until_complete(fade_all_wiz(col_4,col_4,5))  # pause sur la couleur
+        
+        if 1:
+            loop.run_until_complete(fade_all_wiz(col_4,col_3,duration3/2))
+            loop.run_until_complete(fade_all_wiz(col_3,col_2,duration2/3))
+            loop.run_until_complete(fade_all_wiz(col_2,col_1,duration/3))
+            
+            loop.run_until_complete(fade_all_wiz(col_1,col_off,duration/3))
+        
+        
+        
+    if 0: 
+        # reglage rapide de couleur
+        col = (0, 5, 30,0,0,40)
+        loop.run_until_complete(fade_all_wiz(col,col,1))
+        
+    if 0: 
+        # test rapide
+        col1 = (0, 0, 255,0,0,255)
+        col2 = (0, 255, 0,0,0,255)
+        col3 = (0, 0, 255,0,0,255)
+        loop.run_until_complete(fade_all_wiz(col1,col2,2))
+        loop.run_until_complete(fade_all_wiz(col2,col3,2))
+        loop.run_until_complete(fade_all_wiz(col3,col_off,2))
+        
+    if 0:
+        # arc en ciel
+        for i in range(10):
+            duration = 3
+            loop.run_until_complete(fade_all_wiz(col_full,col_blue,duration))
+            loop.run_until_complete(fade_all_wiz(col_blue,col_green,duration))    
+            loop.run_until_complete(fade_all_wiz(col_green,col_red,duration))    
+            loop.run_until_complete(fade_all_wiz(col_red,col_full,duration))
+        loop.run_until_complete(fade_all_wiz(col_full,col_off,duration))
+        
+    if 0:
+        # allume toutes une par une
+        for ip_last in range(201,207):
+            ip = "192.168.9.%d" % ip_last
+            loop.run_until_complete(fade_all_wiz(col_full,col_blue,1,ips_bulb=[ip]))
+            loop.run_until_complete(fade_all_wiz(col_blue,col_off,1,ips_bulb=[ip]))
+            
+            
+        
+        
+    if 0: 
+        # reglage rapide de communication
+        col_1 = (0,0,0,255,255,255)
+        col_2 = (0,255,0,0,0,255)
+        col_3 = (0,0,255,0,0,255)
+        col_4 = (0,0,255,0,0,0)
+        loop.run_until_complete(fade_all_wiz(col_1,col_2,3))
+        loop.run_until_complete(fade_all_wiz(col_2,col_3,3))
+        loop.run_until_complete(fade_all_wiz(col_3,col_4,7))
+        # essaye de forcer la lampe a s'eteindre
+        loop.run_until_complete(fade_all_wiz(col_4,col_off,2)) # force to call it
+        loop.run_until_complete(fade_all_wiz(col_off,col_off,1,just_one_call=True))
+
+if __name__ == "__main__":
+    test_wiz()

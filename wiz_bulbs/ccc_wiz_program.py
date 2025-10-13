@@ -53,7 +53,7 @@ def run_demo():
             continue
             
         time_retry_ip = 20*60
-        time_retry_ip = 20 # to check in demo
+        #~ time_retry_ip = 20 # to check quickly in test mode
         if time.time() - time_last_check_ip > time_retry_ip:
             time_last_check_ip = time.time()
             print( "Recreating IPs" )
@@ -70,11 +70,11 @@ def run_demo():
             if cycle == cycle_jour:
                 pass
             if cycle == cycle_fadeout or ( is_first_time and cycle == cycle_nuit ):
-                loop.run_until_complete(fade_all_wiz(col_jour,col_nuit,duration_fadeout,ips_bulb=ips_bulb))
+                loop.run_until_complete(fade_all_wiz(col_jour,col_nuit,duration_fadeout-1,ips_bulb=ips_bulb))
             if cycle == cycle_nuit:
                 pass
             if cycle == cycle_fadein or ( is_first_time and cycle == cycle_jour ):
-                loop.run_until_complete(fade_all_wiz(col_nuit,col_jour,duration_fadein,ips_bulb=ips_bulb))
+                loop.run_until_complete(fade_all_wiz(col_nuit,col_jour,duration_fadein-1,ips_bulb=ips_bulb))
         else:
             # autre phase du cycle
             pass

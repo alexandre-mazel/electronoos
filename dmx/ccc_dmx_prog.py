@@ -1366,7 +1366,7 @@ def get_demo_times():
         return 0, cycle_mute, 0
     time_demo = (h-hour_demo_begin)*60*60+m*60+s
     
-    time_demo *= 10 # to debug quicker
+    #~ time_demo *= 10 # to debug quicker
 
     
     time_sec = int( time_demo )
@@ -1391,9 +1391,10 @@ def get_demo_times():
 def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: float ):
     
     global time_prev_sec, prev_cycle
-        
     
-    if 0:
+    is_demo_time_from_start = False
+    
+    if is_demo_time_from_start:
         # temps depuis le lancement
 
         time_sec = int(time_demo)
@@ -1456,7 +1457,7 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
             
             
         elif cycle == cycle_fadeout:
-            time_cycle -= duration_jour
+            if is_demo_time_from_start: time_cycle -= duration_jour
             fadeout_38( im, time_cycle)
             fadeout_39( im, time_cycle)
             fadeout_40( im, time_cycle)
@@ -1466,7 +1467,7 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
 
             
         elif cycle == cycle_nuit:
-            time_cycle -= duration_jour+duration_fadeout
+            if is_demo_time_from_start: time_cycle -= duration_jour+duration_fadeout
             nuit_38( im, time_cycle )
             nuit_39( im, time_cycle )
             nuit_40( im, time_cycle )
@@ -1475,7 +1476,7 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
             nuit_44( im, time_cycle )
             
         else: #  fadein
-            time_cycle -= duration_jour+duration_fadeout+duration_nuit
+            if is_demo_time_from_start: time_cycle -= duration_jour+duration_fadeout+duration_nuit
             fadein_38( im, time_cycle )
             fadein_39( im, time_cycle )
             fadein_40( im, time_cycle )

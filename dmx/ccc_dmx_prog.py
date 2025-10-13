@@ -1486,7 +1486,23 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
             fadein_44( im, time_cycle)
             
                 
+def getTimeStamp():
+    """
+    
+    # REM: linux command:
+    # timedatectl list-timezones: list all timezones
+    # sudo timedatectl set-timezone Europe/Paris => set paris
+    """
+    datetimeObject = datetime.datetime.now()
+    strTimeStamp = datetimeObject.strftime( "%Y/%m/%d: %Hh%Mm%Ss" )
+    return strTimeStamp
 
+def log( msg ):
+    fn = "/home/na/log/fossi.log"
+    fn = open(fn,"at")
+    fn.write( getTimeStamp() + ": " + msg + "\n" )
+    fn.close()
+    
 
 def prog_ccc( dm, nbr_chan ):
 
@@ -1500,6 +1516,8 @@ def prog_ccc( dm, nbr_chan ):
     #~ a_fond_pour_les_ss(im)
     
     cpt = 0
+    
+    log( "start" )
 
     print("looping...")
     while 1:

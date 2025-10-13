@@ -268,11 +268,11 @@ def test_wiz():
         loop.run_until_complete(fade_all_wiz(col_4,col_4,5))  # pause sur la couleur
         
         if 1:
-            loop.run_until_complete(fade_all_wiz(col_4,col_3,duration3/2))
-            loop.run_until_complete(fade_all_wiz(col_3,col_2,duration2/3))
-            loop.run_until_complete(fade_all_wiz(col_2,col_1,duration/3))
+            #~ loop.run_until_complete(fade_all_wiz(col_4,col_3,duration3/2))
+            #~ loop.run_until_complete(fade_all_wiz(col_3,col_2,duration2/3))
+            #~ loop.run_until_complete(fade_all_wiz(col_2,col_1,duration/3))
             
-            loop.run_until_complete(fade_all_wiz(col_1,col_off,duration/3))
+            loop.run_until_complete(fade_all_wiz(col_1,col_off,2))
         
         
         

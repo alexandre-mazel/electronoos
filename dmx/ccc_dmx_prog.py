@@ -3,7 +3,10 @@
 
 from ccc import *
 
+import ast
 import datetime
+
+import os
 
 import sys
 sys.path.append("../alex_pytools/")
@@ -1498,10 +1501,40 @@ def getTimeStamp():
     return strTimeStamp
 
 def log( msg ):
+    if os.name == "nt": return
     fn = "/home/pi/logs/ccc_dmx_prog.log"
     fn = open(fn,"at")
     fn.write( getTimeStamp() + ": " + msg + "\n" )
     fn.close()
+    
+    
+import socket
+import threading
+import queue
+
+def run_server_in_thread(host="0.0.0.0", port=9000):
+    """Run a simple TCP server in a background thread that collects messages."""
+    messages = queue.Queue()
+
+    def handle_client(conn, addr):
+        with conn:
+            while True:
+                data = conn.recv(1024)
+                if not data:
+                    break
+                messages.put((addr, data.decode().strip()))
+
+    def server_thread():
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.bind((host, port))
+            s.listen()
+            print(f"Server listening on {host}:{port}")
+            while True:
+                conn, addr = s.accept()
+                threading.Thread(target=handle_client, args=(conn, addr), daemon=True).start()
+
+    threading.Thread(target=server_thread, daemon=True).start()
+    return messages
     
 
 def prog_ccc( dm, nbr_chan ):
@@ -1518,9 +1551,24 @@ def prog_ccc( dm, nbr_chan ):
     cpt = 0
     
     log( "start" )
+    
+    msgs = run_server_in_thread()
+    print("Server running - checking for messages without blocking...")
 
     print("looping...")
     while 1:
+        
+        try:
+            addr, msg = msgs.get_nowait()  # 👈 non-blocking
+            print(f"SOCKET: Received from {addr}: {msg}")
+            print(len(msg))
+            msg = ast.literal_eval(msg)
+            chan, value, dur = msg
+            print(f"SOCKET: Sending DMX command: chan: {chan}, value: {value}, dur: {dur}")
+            im.get(chan).set( value, dur )
+        except queue.Empty:
+            # No messages yet, continue doing other stuff
+            pass
         
         time_demo = time.time() - time_begin
         

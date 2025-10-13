@@ -411,7 +411,7 @@ couleur nuit: drgbw: 18, 0, 82, 248, 118
 def fadeout_38( im, time_cycle ):
     spot = king_38
     
-    if time_cycle_loop == 1:
+    if time_cycle == 1:
         print( "INF: time: %d, sending order for fadeout spot38 (arrivee sur zone)" % time_cycle )
         force_nuit( im, spot, 60 )
         dur = 60
@@ -452,7 +452,8 @@ def nuit_38( im, time_cycle ):
         im.get(spot+king_v).set( 74, dur )
 
 def fadein_38( im, time_cycle ):
-    force_nuit( im, king_38, duration_fadein )
+    if time_cycle == 1:
+        force_nuit( im, king_38, duration_fadein )
     nuit_38( im, time_cycle + duration_nuit )
     
 """
@@ -536,7 +537,7 @@ def jour_39( im, time_cycle ):
         
 def fadeout_39( im, time_cycle ):
     spot = king_39
-    jour_39( im, time_cycle + duration_jour )
+    #~ jour_39( im, time_cycle + duration_jour )
     
     if time_cycle == 1:
         print( "INF: time: %d, sending order for fadeout spot39 (fadeout)" % time_cycle )
@@ -677,6 +678,12 @@ def jour_40( im, time_cycle ):
         im.get(spot+king_focus).set( focus_serre_40, 4 )
         #~ im.get(spot+king_h).set( 128+range_random*3, 8, mode = mp, interpolation=is2 )
         im.get(spot+king_v).set( v_40_sol+range_random_40_sol, 14, mode = mp, interpolation=is2 )
+        
+def fadeout_40( im, time_cycle ):
+    if time_cycle == 1:
+        force_penombre(im, king_40)
+    jour_40( im, time_cycle + duration_jour )
+
       
 def nuit_40( im, time_cycle ):
     spot = king_40
@@ -1224,7 +1231,8 @@ def jour_44( im, time_cycle ):
         
         
 def fadeout_44( im, time_cycle ):
-    force_penombre(im, king_44)
+    if time_cycle == 1:
+        force_penombre(im, king_44)
     jour_44( im, time_cycle + duration_jour )
 
 
@@ -1376,7 +1384,7 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
     if prev_cycle != cycle:
         # premiere phase du cycle
         prev_cycle = cycle
-        print("*** Premiere phase de",  cycle_to_lib(cycle) )
+        print("\n*** Premiere phase de",  cycle_to_lib(cycle) )
             
     print( "time_cycle: %s" % time_cycle )
         
@@ -1440,6 +1448,8 @@ def prog_ccc( dm, nbr_chan ):
     while 1:
         
         time_demo = time.time() - time_begin
+        
+        #~ time_demo *= 10 # to debug quicker
 
         #~ print(".")
         

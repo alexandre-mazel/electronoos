@@ -25,7 +25,7 @@ cycle_jour = 0
 cycle_fadeout = 1
 cycle_nuit = 2
 cycle_fadein = 3
-prev_cycle = -1
+prev_cycle = -2
 
 def cycle_to_lib( cycle ):
     return ["jour", "fadeout", "nuit", "fadein", "unknown"][cycle] # -1 => unknown
@@ -38,10 +38,14 @@ duration_fadeout = 60
 duration_nuit = 217
 duration_fadein = 23
 
+densite_fadeout_moitie = 50
+duration_densite_fadeout_moitie = 3
+
+
 if 1:
     # shorten
     duration_jour = 30+30
-    duration_fadeout = 30
+    duration_fadeout = 60
     duration_nuit = 20
     duration_fadein = 23
 
@@ -98,6 +102,14 @@ def force_jour( im, spot, dur = 3 ):
     im.get(spot+king_g).set( jour_g, dur )
     im.get(spot+king_b).set( jour_b, dur )
     im.get(spot+king_w).set( jour_w, dur )
+    
+def force_penombre( im, spot, dur = duration_densite_fadeout_moitie ):
+    print("force_penombre for spot chan %d in duration %d" % (spot, dur) )
+    im.get(spot+king_d).set( densite_fadeout_moitie, dur )
+    im.get(spot+king_r).set( nuit_r, dur )
+    im.get(spot+king_g).set( nuit_g, dur )
+    im.get(spot+king_b).set( nuit_b, dur )
+    im.get(spot+king_w).set( nuit_w, dur )
     
 def send_orders_fossilation( im, duration, brightness, r, g, b ):
     print("INF: send_orders_fossilation" )
@@ -534,7 +546,7 @@ def nuit_39( im, time_cycle ):
         print( "INF: time: %d, sending order for nuit spot39 (fadeout)" % time_cycle )
         dur = duration_fadeout
         
-        im.get(spot+king_d).set( 50, duration_tombe_densite_moitie )
+        im.get(spot+king_d).set( densite_fadeout_moitie, duration_tombe_densite_moitie )
         im.get(spot+king_r).set( nuit_r, dur )
         im.get(spot+king_g).set( nuit_g, dur )
         im.get(spot+king_b).set( nuit_b, dur )
@@ -833,7 +845,7 @@ etagere: debut: 216, 126 fin: 217, 188
 
 changement symetrie:
 60s: P1: 168, 88, f38 puis 176, 88
-pierre: 180, 104
+pierre: 180, 104, d70
 rotation: 180, 128 qui devient 128, 128 
 etagere debut: 128, 134 fin: 130, 72
 
@@ -843,9 +855,10 @@ etagere debut: 128, 134 fin: 130, 72
 
 def jour_42( im, time_cycle ):
     spot = king_42
-    duration_p1 = 8
-    duration_transition = 14
-    duration_etagere = 30
+    duration_p1 = 60 # 60
+    duration_transition = 18
+    duration_etagere = 32
+    duration_retour = 10
     #~ total_mur = 60 # 60
     #~ total_cartel = 90
     #~ total_sol = 60 # 60
@@ -853,7 +866,8 @@ def jour_42( im, time_cycle ):
     
     margin = 2
     
-    duration_total = duration_p1 + duration_transition + duration_etagere
+    duration_total = duration_p1 + duration_transition + duration_etagere + duration_retour
+    #~ print( "INF: jour_42: duration_total:", duration_total )
     
     time_cycle %= duration_total
     
@@ -862,25 +876,27 @@ def jour_42( im, time_cycle ):
         force_jour(im, spot)
         dur = 3
         im.get(spot+king_focus).set( 38, dur )
-        im.get(spot+king_h).set( 84-margin, dur )
-        im.get(spot+king_v).set( 172, dur )
+        im.get(spot+king_h).set( 168-margin, dur )
+        im.get(spot+king_v).set( 88, dur )
         
     if time_cycle == 7:
         print( "INF: time: %d, sending order for jour spot42 (P1-move)" % time_cycle )
         dur = 8
-        im.get(spot+king_h).set( 92+margin+7, dur, mode = mp, interpolation=is2 ) # on ajoute pour mieux activer la zone
-        im.get(spot+king_v).set( 171, dur, mode = mp, interpolation=is2 )
+        im.get(spot+king_h).set( 176+margin+7, dur, mode = mp, interpolation=is2 ) # on ajoute pour mieux activer la zone
+        im.get(spot+king_v).set( 88, dur, mode = mp, interpolation=is2 )
         
     if time_cycle == duration_p1:
         print( "INF: time: %d, sending order for jour spot42 (pierre)" % time_cycle )
-        dur = 2
-        im.get(spot+king_h).set( 100, dur )
-        im.get(spot+king_v).set( 156, dur )
+        dur = 3
+        im.get(spot+king_d).set( 70, dur+2 )
+        im.get(spot+king_h).set( 180, dur )
+        im.get(spot+king_v).set( 104, dur )
         
-    if time_cycle == duration_p1+5:
+        
+    if time_cycle == duration_p1+10:
         print( "INF: time: %d, sending order for jour spot42 (pierre-trans1)" % time_cycle )
         dur = 8
-        im.get(spot+king_h).set( 200, dur )
+        im.get(spot+king_h).set( 128, dur )
         im.get(spot+king_v).set( 128, dur )
         
     #~ if time_cycle == duration_p1+6+20:
@@ -892,17 +908,116 @@ def jour_42( im, time_cycle ):
     if time_cycle == duration_p1+duration_transition:
         print( "INF: time: %d, sending order for jour spot42 (etagere-debut)" % time_cycle )
         dur = 3
-        im.get(spot+king_h).set( 216, dur )
-        im.get(spot+king_v).set( 126, dur )
+        im.get(spot+king_h).set( 128, dur )
+        im.get(spot+king_v).set( 134, dur )
         
     if time_cycle == duration_p1+duration_transition+5:
         print( "INF: time: %d, sending order for jour spot42 (etagere-fin)" % time_cycle )
         dur = duration_etagere-3
         im.get(spot+king_focus).set( 38, dur )
-        im.get(spot+king_h).set( 217, dur )
-        im.get(spot+king_v).set( 188, dur )
+        im.get(spot+king_h).set( 130, dur )
+        im.get(spot+king_v).set( 72, dur )
+        
+    if time_cycle == duration_p1+duration_transition+duration_etagere:
+        print( "INF: time: %d, sending order for jour spot42 (retour)" % time_cycle )
+        dur = duration_retour-1
+        im.get(spot+king_h).set( 168-margin, dur )
+        im.get(spot+king_v).set( 88, dur )
+
+"""
+pareil ,mais a la place du panneau, on va sur la bruyere.
+bruyere: 162 100 f38
+"""
         
 
+def fadeout_42( im, time_cycle, is_nuit = False ):
+    spot = king_42
+    duration_bruyere = 6 # 60
+    duration_transition = 18
+    duration_etagere = 32
+    duration_retour = 10
+    
+    if is_nuit: duration_bruyere = 30
+    
+
+    if time_cycle == 1 and not is_nuit:
+        print( "INF: time: %d, sending order for fadeout spot42 (set)" % time_cycle )
+        force_jour(im, spot, 0.5)
+        dur = 0.5
+        im.get(spot+king_focus).set( 38, dur )
+        im.get(spot+king_h).set( 168, dur )
+        im.get(spot+king_v).set( 88, dur )
+        
+    if time_cycle == 3:
+        force_penombre(im, spot)
+        dur = duration_bruyere
+        print( "INF: time: %d, sending order for fadeout spot42 (bruyere) (is_nuit:%s)" % (time_cycle,is_nuit) )
+        im.get(spot+king_h).set( 162, dur )
+        im.get(spot+king_v).set( 100, dur )
+        
+    if time_cycle == 3+duration_densite_fadeout_moitie+1:
+        force_nuit( im, spot, duration_nuit-duration_densite_fadeout_moitie )
+
+        
+    if time_cycle == 3+duration_bruyere:
+        print( "INF: time: %d, sending order for fadeout spot42 (pierre)" % time_cycle )
+        dur = 3
+        im.get(spot+king_d).set( 70, dur+2 )
+        im.get(spot+king_h).set( 180, dur )
+        im.get(spot+king_v).set( 104, dur )
+        
+        
+    if time_cycle == duration_bruyere+10:
+        print( "INF: time: %d, sending order for fadeout spot42 (pierre-trans1)" % time_cycle )
+        dur = 8
+        im.get(spot+king_h).set( 128, dur )
+        im.get(spot+king_v).set( 128, dur )
+        
+    #~ if time_cycle == duration_p1+6+20:
+        #~ print( "INF: time: %d, sending order for jour spot42 (pierre-trans2)" % time_cycle )
+        #~ dur = 3
+        #~ im.get(spot+king_h).set( 200, dur )
+        #~ im.get(spot+king_v).set( 128, dur )
+        
+    if time_cycle == duration_bruyere+duration_transition:
+        print( "INF: time: %d, sending order for fadeout spot42 (etagere-debut)" % time_cycle )
+        dur = 3
+        im.get(spot+king_h).set( 128, dur )
+        im.get(spot+king_v).set( 134, dur )
+        
+    if time_cycle == duration_bruyere+duration_transition+5:
+        print( "INF: time: %d, sending order for fadeout spot42 (etagere-fin)" % time_cycle )
+        dur = duration_etagere-3
+        im.get(spot+king_focus).set( 38, dur )
+        im.get(spot+king_h).set( 130, dur )
+        im.get(spot+king_v).set( 72, dur )
+        
+def nuit_42( im, time_cycle ):
+    # comme fadeout
+    fadeout_42( im, time_cycle, is_nuit = True )
+    
+def fadein_42( im, time_cycle ):
+    spot = king_42
+    
+    time_1 = 10
+    time_2 = duration_fadein-time_1
+    
+    if time_cycle == 1:
+        force_nuit( im, spot )
+        dur = 5
+    
+        print( "INF: time: %d, sending order for fadein spot42 (bruyere)" % time_cycle )
+        im.get(spot+king_h).set( 162, dur )
+        im.get(spot+king_v).set( 100, dur )
+        
+    if time_cycle == time_1:
+        print( "INF: time: %d, sending order for fadein spot42 (P1)" % time_cycle )
+        dur = time_2
+        force_jour( im, spot, dur )
+        im.get(spot+king_h).set( 168, dur//2 )
+        im.get(spot+king_v).set( 88, dur//2 )
+        im.get(spot+king_focus).set( 38, dur//2 )
+    
         
         
 """
@@ -1113,7 +1228,11 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
         
     time_prev_sec = time_sec
     
-    time_cycle = time_sec % duration_loop 
+    time_cycle = time_sec
+    
+    #~ if 1:  time_cycle += duration_jour # jump sur fadeout
+    
+    time_cycle = time_sec % duration_loop
 
     
     if time_cycle <  duration_jour:
@@ -1147,6 +1266,7 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
             
         elif cycle == cycle_fadeout:
             time_cycle -= duration_jour
+            fadeout_42( im, time_cycle)
 
             
         elif cycle == cycle_nuit:
@@ -1156,11 +1276,13 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
             nuit_40( im, time_cycle )
             #~ nuit_41( im, time_cycle )
             #~ nuit_44( im, time_cycle )
+            nuit_42( im, time_cycle )
             
         else: #  fadein
             time_cycle -= duration_jour+duration_fadeout+duration_nuit
             fadein_39( im, time_cycle )
             fadein_40( im, time_cycle )
+            fadein_42( im, time_cycle)
             
                 
                 

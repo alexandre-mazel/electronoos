@@ -56,6 +56,7 @@ async def fade_wiz(col1, col2, duration, just_one_call = False, ips_bulb = None 
     
     if ips_bulb == None:
         
+        ips_bulb = []
         #~ ips_bulb = ["192.168.0.110","192.168.0.111","192.168.0.112", "192.168.0.113", "192.168.0.114", "192.168.0.120", "192.168.0.121"]
         #~ ips_bulb = ["192.168.0.110","192.168.0.112"]
         #~ ips_bulb = ["192.168.0.112"]
@@ -65,7 +66,12 @@ async def fade_wiz(col1, col2, duration, just_one_call = False, ips_bulb = None 
         ips_bulb = ["192.168.9.205"]
         ips_bulb = ["192.168.9.204","192.168.9.205"]
         ips_bulb = ["192.168.9.211"]
-        ips_bulb = ["192.168.9.211","192.168.9.212","192.168.9.213","192.168.9.215","192.168.9.216"]
+        ips_bulb_rail2 = ["192.168.9.208","192.168.9.211","192.168.9.212","192.168.9.213","192.168.9.215","192.168.9.216"]
+        ips_bulb_rail3 = ["192.168.9.218","192.168.9.219","192.168.9.220","192.168.9.221"]
+        
+        ips_bulb = []
+        ips_bulb.extend( ips_bulb_rail2 )
+        ips_bulb.extend( ips_bulb_rail3 )
         
         if 0:
             ips_bulb = []
@@ -132,8 +138,8 @@ async def fade_wiz(col1, col2, duration, just_one_call = False, ips_bulb = None 
                     bulbs[2].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
                     bulbs[3].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
                     bulbs[4].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
-                    #~ bulbs[5].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
-                    #~ bulbs[6].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                    bulbs[5].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                    bulbs[6].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
                 )
             else:
                 await asyncio.gather(
@@ -142,8 +148,8 @@ async def fade_wiz(col1, col2, duration, just_one_call = False, ips_bulb = None 
                     bulbs[2].turn_off(),
                     bulbs[3].turn_off(),
                     bulbs[4].turn_off(),
-                    #~ bulbs[5].turn_off(),
-                    #~ bulbs[6].turn_off(),
+                    bulbs[5].turn_off(),
+                    bulbs[6].turn_off(),
                 )
                 if 0:
                     print( "INF: ultraforce muting" )
@@ -225,7 +231,7 @@ if 1:
     
     duration3 = 2.4
     col_4 = (0, 5, 30,0,0,40)
-    col_4 = (0, 0, 255,0,0,255) # full bleue developpeur
+    #~ col_4 = (0, 0, 255,0,0,255) # full bleue developpeur
     #~ loop.run_until_complete(fade_wiz(col_3,col_4,duration3))
 
 
@@ -235,7 +241,7 @@ if 1:
     # remontee
     loop.run_until_complete(fade_wiz(col_4,col_4,5))  # pause sur la couleur
     
-    if 0:
+    if 1:
         loop.run_until_complete(fade_wiz(col_4,col_3,duration3/2))
         loop.run_until_complete(fade_wiz(col_3,col_2,duration2/3))
         loop.run_until_complete(fade_wiz(col_2,col_1,duration/3))

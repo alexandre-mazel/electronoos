@@ -22,6 +22,9 @@ pip3 install serial pyserial numpy
 # copy to Oscillation RPI:
 scp ccc_dmx_prog.py na@192.168.9.102:/home/na/dev/git/electronoos/dmx/
 
+# mettre l'heure:
+sudo date -s '@1759832799'
+
 """
 
 time_prev_sec = 0
@@ -47,7 +50,7 @@ densite_fadeout_moitie = 50
 duration_densite_fadeout_moitie = 4
 
 
-if 1:
+if 0:
     # shorten
     duration_jour = 30+30+30+100
     duration_fadeout = 60
@@ -405,31 +408,24 @@ couleur nuit: drgbw: 18, 0, 82, 248, 118
 """
 
         
+def fadeout_38( im, time_cycle ):
+    spot = king_38
+    
+    if time_cycle_loop == 1:
+        print( "INF: time: %d, sending order for fadeout spot38 (arrivee sur zone)" % time_cycle )
+        force_nuit( im, spot, 60 )
+        dur = 60
+        im.get(spot+king_focus).set( 56, dur//2 )
+        im.get(spot+king_h).set( 8, dur )
+        im.get(spot+king_v).set( 104, dur )
+
+        
 def nuit_38( im, time_cycle ):
     spot = king_38
     time_1 = 6
     
     # loop at 150s (2.5min)
     time_cycle_loop = time_cycle % 30
-    
-    if time_cycle_loop == 1:
-        print( "INF: time: %d, sending order for nuit spot38 (Pos1)" % time_cycle )
-        dur = 6
-        if time_cycle == 1:
-            print("first time: arrivee sur zone")
-            dur = 60
-        im.get(spot+king_d).set( nuit_d, dur )
-        im.get(spot+king_r).set( nuit_r, dur )
-        im.get(spot+king_g).set( nuit_g, dur )
-        im.get(spot+king_b).set( nuit_b, dur )
-        im.get(spot+king_w).set( nuit_w, dur )
-        im.get(spot+king_focus).set( 56, dur )
-        im.get(spot+king_h).set( 8, dur )
-        im.get(spot+king_v).set( 104, dur )
-        
-    if time_cycle < 60:
-        # ne rien faire d'autres on attend d'arrivée sur zone
-        return
         
     if time_cycle_loop == time_1:
         print( "INF: time: %d, sending order for nuit spot38 (Pos2)" % time_cycle )
@@ -455,6 +451,10 @@ def nuit_38( im, time_cycle ):
         im.get(spot+king_h).set( 80, dur )
         im.get(spot+king_v).set( 74, dur )
 
+def fadein_38( im, time_cycle ):
+    force_nuit( im, king_38, duration_fadein )
+    nuit_38( im, time_cycle + duration_nuit )
+    
 """
 P1: 63, 227, f34
 balaye: f96, d56 en passant par le point 84,212 et en finissant par 97, 212
@@ -534,6 +534,22 @@ def jour_39( im, time_cycle ):
         im.get(spot+king_d).set( 255, dur )
     
         
+def fadeout_39( im, time_cycle ):
+    spot = king_39
+    jour_39( im, time_cycle + duration_jour )
+    
+    if time_cycle == 1:
+        print( "INF: time: %d, sending order for fadeout spot39 (fadeout)" % time_cycle )
+        dur = 6
+        print( "INF: time: %d, sending order for fadeout spot39 (etagere debut)" % time_cycle )
+        force_penombre( im, spot )
+        im.get(spot+king_h).set( 70, dur )
+        im.get(spot+king_v).set( 216, dur )
+        im.get(spot+king_focus).set( 102, dur )
+        
+    if time_cycle == 1 + duration_densite_fadeout_moitie:
+        im.get(spot+king_d).set( nuit_d, duration_fadeout - duration_densite_fadeout_moitie )
+        
         
 def nuit_39( im, time_cycle ):
     spot = king_39
@@ -548,22 +564,11 @@ def nuit_39( im, time_cycle ):
         print("tweaked time_cycle:", time_cycle )
     
     if time_cycle == 1:
-        print( "INF: time: %d, sending order for nuit spot39 (fadeout)" % time_cycle )
-        dur = duration_fadeout
-        
-        im.get(spot+king_d).set( densite_fadeout_moitie, duration_tombe_densite_moitie )
-        im.get(spot+king_r).set( nuit_r, dur )
-        im.get(spot+king_g).set( nuit_g, dur )
-        im.get(spot+king_b).set( nuit_b, dur )
-        im.get(spot+king_w).set( nuit_w, dur )
-        
         print( "INF: time: %d, sending order for nuit spot39 (etagere debut)" % time_cycle )
-        im.get(spot+king_h).set( 70, time_1 )
-        im.get(spot+king_v).set( 216, time_1 )
-        im.get(spot+king_focus).set( 102, time_1 )
-        
-    if time_cycle == 1 + duration_tombe_densite_moitie:
-        im.get(spot+king_d).set( nuit_d, duration_fadeout - duration_tombe_densite_moitie )
+        dur = time_1
+        im.get(spot+king_h).set( 70, dur )
+        im.get(spot+king_v).set( 216, dur )
+        im.get(spot+king_focus).set( 102, dur )
 
     if time_cycle == time_1+2:
         print( "INF: time: %d, sending order for nuit spot39 (balaye centre)" % time_cycle )
@@ -740,7 +745,7 @@ def jour_41( im, time_cycle ):
     
     duration_total = duration_p1 + duration_p2 + duration_sol
     
-    print( "INF: jour_41: duration_total:", duration_total )
+    #~ print( "INF: jour_41: duration_total:", duration_total )
     
     time_cycle %= duration_total
     
@@ -1216,6 +1221,11 @@ def jour_44( im, time_cycle ):
         im.get(spot+king_v).set( 206, dur )
         im.get(spot+king_focus).set( 80, dur )
         im.get(spot+king_d).set( 58, dur )
+        
+        
+def fadeout_44( im, time_cycle ):
+    force_penombre(im, king_44)
+    jour_44( im, time_cycle + duration_jour )
 
 
 """
@@ -1231,26 +1241,6 @@ def nuit_44( im, time_cycle ):
     time_1 = 20
     time_2 = 40
     time_3 =  ( ( 300 - time_1 - time_2 )/2 // 6 )
-    
-    time_end = time_start_fadein - time_1
-    if time_cycle >= time_end:
-        
-        if time_cycle == time_end:
-            print( "INF: time: %d, sending order for nuit spot44 (P1): preparation fin de nuit" % time_cycle )
-            im.get(spot+king_h).set( 79, time_1-3 )
-            im.get(spot+king_v).set( 230, time_1-3 )
-            
-        if time_cycle == time_start_fadein:
-            print( "INF: time: %d, sending order for nuit: debut fadein" % time_cycle )
-            dur = duration_fadein
-            im.get(spot+king_d).set( jour_d, dur )
-            im.get(spot+king_r).set( jour_r, dur )
-            im.get(spot+king_g).set( jour_g, dur )
-            im.get(spot+king_b).set( jour_b, dur )
-            im.get(spot+king_w).set( jour_w, dur )
-            im.get(spot+king_focus).set( 34, dur )
-            
-        return
             
     time_cycle = time_cycle % (time_1+time_2+time_3*6)
     
@@ -1313,7 +1303,24 @@ def nuit_44( im, time_cycle ):
         im.get(spot+king_h).set( 86, dur )
         im.get(spot+king_v).set( 224, dur )
  
+def fadein_44( im, time_cycle ):
+    spot = king_44
+    time_1 = 7
+    if time_cycle == time_1:
+        print( "INF: time: %d, sending order for fadein spot44 (P1): preparation fin de nuit" % time_cycle )
+        im.get(spot+king_h).set( 79, time_1-3 )
+        im.get(spot+king_v).set( 230, time_1-3 )
         
+    if time_cycle == duration_fadein - time_1:
+        print( "INF: time: %d, sending order for fadein spot44: debut fadein" % time_cycle )
+        dur = duration_fadein - time_1
+        im.get(spot+king_d).set( jour_d, dur )
+        im.get(spot+king_r).set( jour_r, dur )
+        im.get(spot+king_g).set( jour_g, dur )
+        im.get(spot+king_b).set( jour_b, dur )
+        im.get(spot+king_w).set( jour_w, dur )
+        im.get(spot+king_focus).set( 34, dur )
+                
 
 def a_fond_pour_les_artistes( im ):
     print("a_fond_pour_les_artistes")
@@ -1351,7 +1358,7 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
     
     #~ if 1:  time_cycle += duration_jour # jump sur fadeout
     #~ if 1:  time_cycle += duration_jour+duration_fadeout # jump sur nuit
-    if 1:  time_cycle += duration_jour+duration_fadeout+duration_nuit # jump sur fadein
+    #~ if 1:  time_cycle += duration_jour+duration_fadeout+duration_nuit # jump sur fadein
     
     time_cycle = time_cycle % duration_loop
 
@@ -1377,36 +1384,41 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
         # autre phase du cycle
         if cycle == cycle_jour:
             pass
-            #~ jour_38( im, time_cycle )
-            #~ jour_39( im, time_cycle )
-            #~ jour_40( im, time_cycle )
+            jour_38( im, time_cycle )
+            jour_39( im, time_cycle )
+            jour_40( im, time_cycle )
             jour_41( im, time_cycle )
-            #~ jour_44( im, time_cycle )
-            #~ jour_42( im, time_cycle)
-            #~ jour_44( im, time_cycle )
+            jour_42( im, time_cycle)
+            jour_44( im, time_cycle )
             
             
         elif cycle == cycle_fadeout:
             time_cycle -= duration_jour
+            fadeout_38( im, time_cycle)
+            fadeout_39( im, time_cycle)
+            fadeout_40( im, time_cycle)
             fadeout_41( im, time_cycle)
-            #~ fadeout_42( im, time_cycle)
+            fadeout_42( im, time_cycle)
+            fadeout_44( im, time_cycle)
 
             
         elif cycle == cycle_nuit:
             time_cycle -= duration_jour+duration_fadeout
-            #~ nuit_38( im, time_cycle )
-            #~ nuit_39( im, time_cycle )
-            #~ nuit_40( im, time_cycle )
+            nuit_38( im, time_cycle )
+            nuit_39( im, time_cycle )
+            nuit_40( im, time_cycle )
             nuit_41( im, time_cycle )
-            #~ nuit_44( im, time_cycle )
-            #~ nuit_42( im, time_cycle )
+            nuit_42( im, time_cycle )
+            nuit_44( im, time_cycle )
             
         else: #  fadein
             time_cycle -= duration_jour+duration_fadeout+duration_nuit
-            #~ fadein_39( im, time_cycle )
-            #~ fadein_40( im, time_cycle )
+            fadein_38( im, time_cycle )
+            fadein_39( im, time_cycle )
+            fadein_40( im, time_cycle )
             fadein_41( im, time_cycle)
-            #~ fadein_42( im, time_cycle)
+            fadein_42( im, time_cycle)
+            fadein_44( im, time_cycle)
             
                 
                 

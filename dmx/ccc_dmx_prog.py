@@ -31,7 +31,7 @@ sudo date -s '@1759832799'
 """
 
 hour_demo_begin = 8 # premiere heure ou la demo commence
-hour_demo_end = 24  # premiere heure ou la demo s'arrete
+hour_demo_end = 25  # premiere heure ou la demo s'arrete
 
 time_prev_sec = 0
 

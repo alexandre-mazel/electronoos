@@ -57,7 +57,7 @@ ZQ02253-Moving-Head-Light
 
 import time
 import sys
-from dmxal import DMX # git clone https://github.com/monzelr/dmx.git, cd dmx, pip install .
+from dmxal import DMX # git clone https://github.com/monzelr/dmx.git, cd dmx, pip install . # non j'ai fait ma version, ca fonctionne bien, prendre celle du dossier courant
 import dmxal
 
 

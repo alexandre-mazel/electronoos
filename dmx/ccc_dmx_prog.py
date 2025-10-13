@@ -1498,7 +1498,7 @@ def getTimeStamp():
     return strTimeStamp
 
 def log( msg ):
-    fn = "/home/na/log/fossi.log"
+    fn = "/home/na/logs/ccc_dmx_prog.log"
     fn = open(fn,"at")
     fn.write( getTimeStamp() + ": " + msg + "\n" )
     fn.close()

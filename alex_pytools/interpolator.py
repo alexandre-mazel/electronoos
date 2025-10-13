@@ -13,7 +13,7 @@ mode_perlin = 4
 
 interpolation_linear = 0
 interpolation_sinus = 1          # accelerate slowly, decelerate slowly
-interpolation_sinus2 = 1          # accelerate very slowly, decelerate very slowly
+interpolation_sinus2 = 2          # accelerate very slowly, decelerate very slowly
 interpolation_halfsinus = 3   # accelerate quickly, decelerate slowly
 
 math.pi2 = math.pi / 2

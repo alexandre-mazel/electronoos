@@ -107,8 +107,8 @@ king_38 = 380
 king_39 = 396
 king_40 = 412
 king_41 = 428
-king_42 = 434
-king_43 = 450
+king_42 = 444
+king_43 = 460
 king_44 = 476
 
 first_she = 45

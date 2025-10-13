@@ -22,10 +22,36 @@ pip3 install serial pyserial numpy
 time_prev_sec = 0
 
 cycle_jour = 0
-cycle_nuit = 1
+cycle_fadeout = 1
+cycle_nuit = 2
+cycle_fadein = 3
 prev_cycle = -1
 
+def cycle_to_lib( cycle ):
+    return ["jour", "fadeout", "nuit", "fadein", "unknown"][cycle] # -1 => unknown
+
+
+        
+        
+duration_jour = 60*5 # 60*5
+duration_fadeout = 60
+duration_nuit = 217
+duration_fadein = 23
+
+if 1:
+    # shorten
+    duration_jour = 30+30
+    duration_fadeout = 30
+    duration_nuit = 20
+    duration_fadein = 23
+
+duration_loop = duration_jour + duration_fadeout + duration_nuit + duration_fadein
+
+print("INF: duration_loop:", duration_loop )
+
 mp = interpolator.mode_pingpong
+mr = interpolator.mode_random
+mper = interpolator.mode_perlin
 is1 = interpolator.interpolation_sinus
 is2 = interpolator.interpolation_sinus2
 
@@ -47,11 +73,6 @@ nuit_g = 82
 nuit_b = 248
 nuit_w=118
 
-duration_nuit = 300
-duration_fadeout = 60
-duration_fadein = 23
-time_start_fadein = duration_nuit - duration_fadein
-
 
 # setup pou king 40 vers cartel
 # 82,162, 0, 254, 254, 254, 254, 
@@ -63,7 +84,7 @@ time_start_fadein = duration_nuit - duration_fadein
 #  - dernier cartel: 240, 92 ou 160, 170 (idem)
 
 def force_nuit( im, spot, dur = 3 ):
-    print("force_nuit for spot chan %d in %d" % (spot, dur) )
+    print("force_nuit for spot chan %d in duration %d" % (spot, dur) )
     im.get(spot+king_d).set( nuit_d, dur )
     im.get(spot+king_r).set( nuit_r, dur )
     im.get(spot+king_g).set( nuit_g, dur )
@@ -71,7 +92,7 @@ def force_nuit( im, spot, dur = 3 ):
     im.get(spot+king_w).set( nuit_w, dur )
 
 def force_jour( im, spot, dur = 3 ):
-    print("force_jour for spot chan %d in %d" % (spot, dur) )
+    print("force_jour for spot chan %d in duration: %d" % (spot, dur) )
     im.get(spot+king_d).set( jour_d, dur )
     im.get(spot+king_r).set( jour_r, dur )
     im.get(spot+king_g).set( jour_g, dur )
@@ -802,7 +823,88 @@ def jour_41_test( im, time_cycle ):
         im.get(spot+king_v).set( 162+rand, 4, mode = mp, interpolation=is1 )
         
         
+        
+"""
+Spot 42:
+60s: P1: 84, 172, f38 puis 92,171 perlin entre les deux.
+pierre: 100, 156
+rotation, en v128
+etagere: debut: 216, 126 fin: 217, 188
 
+changement symetrie:
+60s: P1: 168, 88, f38 puis 176, 88
+pierre: 180, 104
+rotation: 180, 128 qui devient 128, 128 
+etagere debut: 128, 134 fin: 130, 72
+
+"""
+
+
+
+def jour_42( im, time_cycle ):
+    spot = king_42
+    duration_p1 = 8
+    duration_transition = 14
+    duration_etagere = 30
+    #~ total_mur = 60 # 60
+    #~ total_cartel = 90
+    #~ total_sol = 60 # 60
+    #~ time_cartel2 = total_mur + total_cartel + total_sol
+    
+    margin = 2
+    
+    duration_total = duration_p1 + duration_transition + duration_etagere
+    
+    time_cycle %= duration_total
+    
+    if time_cycle == 1:
+        print( "INF: time: %d, sending order for jour spot42 (P1)" % time_cycle )
+        force_jour(im, spot)
+        dur = 3
+        im.get(spot+king_focus).set( 38, dur )
+        im.get(spot+king_h).set( 84-margin, dur )
+        im.get(spot+king_v).set( 172, dur )
+        
+    if time_cycle == 7:
+        print( "INF: time: %d, sending order for jour spot42 (P1-move)" % time_cycle )
+        dur = 8
+        im.get(spot+king_h).set( 92+margin+7, dur, mode = mp, interpolation=is2 ) # on ajoute pour mieux activer la zone
+        im.get(spot+king_v).set( 171, dur, mode = mp, interpolation=is2 )
+        
+    if time_cycle == duration_p1:
+        print( "INF: time: %d, sending order for jour spot42 (pierre)" % time_cycle )
+        dur = 2
+        im.get(spot+king_h).set( 100, dur )
+        im.get(spot+king_v).set( 156, dur )
+        
+    if time_cycle == duration_p1+5:
+        print( "INF: time: %d, sending order for jour spot42 (pierre-trans1)" % time_cycle )
+        dur = 8
+        im.get(spot+king_h).set( 200, dur )
+        im.get(spot+king_v).set( 128, dur )
+        
+    #~ if time_cycle == duration_p1+6+20:
+        #~ print( "INF: time: %d, sending order for jour spot42 (pierre-trans2)" % time_cycle )
+        #~ dur = 3
+        #~ im.get(spot+king_h).set( 200, dur )
+        #~ im.get(spot+king_v).set( 128, dur )
+        
+    if time_cycle == duration_p1+duration_transition:
+        print( "INF: time: %d, sending order for jour spot42 (etagere-debut)" % time_cycle )
+        dur = 3
+        im.get(spot+king_h).set( 216, dur )
+        im.get(spot+king_v).set( 126, dur )
+        
+    if time_cycle == duration_p1+duration_transition+5:
+        print( "INF: time: %d, sending order for jour spot42 (etagere-fin)" % time_cycle )
+        dur = duration_etagere-3
+        im.get(spot+king_focus).set( 38, dur )
+        im.get(spot+king_h).set( 217, dur )
+        im.get(spot+king_v).set( 188, dur )
+        
+
+        
+        
 """
 t1: Panneau1: 79, 230, f34
 01: 86,224, f56, d126
@@ -1001,56 +1103,34 @@ def a_fond_pour_les_artistes( im ):
 def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: float ):
     
     global time_prev_sec, prev_cycle
-    
-    jump_to_end_of_night = 1
-    jump_to_end_of_night = 0
-    
-    jump_to = 1
-    jump_to = 0
-    
-    if jump_to_end_of_night and int(time_demo) == 3: force_nuit(im,king_44)
-    
-    if jump_to and time_demo > 2:
-        time_demo += 280 # jump to fin du jour
         
     
     time_sec = int(time_demo)
     
     
     if time_sec == time_prev_sec:
-        return
-        
-
+        return        
         
     time_prev_sec = time_sec
-        
-    len_cycle = 60*5
-    cycle = (time_sec // len_cycle)%2
-    time_cycle = time_sec % len_cycle
     
-    if 1:
-        # patch pour tester rapidement
-        #~ cycle += 1 #inverse jour et nuit - commence par la nuit
-        # passe sur la nuit apre 10sec
-        if time_sec > 12: # car la plupart des premiers mouvement du jour sont en 10 sec
-            time_cycle -= 12
-            cycle += 1
+    time_cycle = time_sec % duration_loop 
+
+    
+    if time_cycle <  duration_jour:
+        cycle = cycle_jour
+    elif time_cycle <  duration_jour+duration_fadeout:
+        cycle = cycle_fadeout
+    elif time_cycle <  duration_jour+duration_fadeout+duration_nuit:
+        cycle = cycle_nuit
+    else:
+        cycle = cycle_fadein
     
     if prev_cycle != cycle:
         # premiere phase du cycle
         prev_cycle = cycle
-        if cycle == cycle_jour:
-            print("jour")
-        else:
-            print("nuit")
+        print("*** Premiere phase de",  cycle_to_lib(cycle) )
             
     print( "time_cycle: %s" % time_cycle )
-    
-    if 1:
-        # test fadein
-        #~ fadein_39( im, time_cycle )
-        fadein_40( im, time_cycle )
-        return
         
     if 1:
         # autre phase du cycle
@@ -1061,15 +1141,26 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
             #~ jour_40( im, time_cycle )
             #~ jour_41( im, time_cycle )
             #~ jour_44( im, time_cycle )
+            jour_42( im, time_cycle)
+            #~ jour_44( im, time_cycle )
             
             
-        else:
-            pass
+        elif cycle == cycle_fadeout:
+            time_cycle -= duration_jour
+
+            
+        elif cycle == cycle_nuit:
+            time_cycle -= duration_jour+duration_fadeout
             #~ nuit_38( im, time_cycle )
             #~ nuit_39( im, time_cycle )
             nuit_40( im, time_cycle )
             #~ nuit_41( im, time_cycle )
             #~ nuit_44( im, time_cycle )
+            
+        else: #  fadein
+            time_cycle -= duration_jour+duration_fadeout+duration_nuit
+            fadein_39( im, time_cycle )
+            fadein_40( im, time_cycle )
             
                 
                 
@@ -1083,7 +1174,7 @@ def prog_ccc( dm, nbr_chan ):
     # update and set values:
     #~ dmxal.set_verbose( True )
     
-    a_fond_pour_les_artistes(im)
+    #~ a_fond_pour_les_ss(im)
     
     cpt = 0
 

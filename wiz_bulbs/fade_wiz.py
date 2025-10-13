@@ -64,12 +64,13 @@ async def fade_wiz(col1, col2, duration, just_one_call = False, ips_bulb = None 
         ips_bulb = ["192.168.9.204"]
         ips_bulb = ["192.168.9.205"]
         ips_bulb = ["192.168.9.204","192.168.9.205"]
-        ips_bulb = ["192.168.9.204"]
+        ips_bulb = ["192.168.9.211"]
         
-        ips_bulb = []
-        for ip_last in range(201,207):
-            ip = "192.168.9.%d" % ip_last
-            ips_bulb.append(ip)
+        if 0:
+            ips_bulb = []
+            for ip_last in range(201,207):
+                ip = "192.168.9.%d" % ip_last
+                ips_bulb.append(ip)
     
     bulbs = []
     
@@ -126,21 +127,21 @@ async def fade_wiz(col1, col2, duration, just_one_call = False, ips_bulb = None 
             if mute == 0:
                 await asyncio.gather(
                     bulbs[0].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
-                    bulbs[1].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
-                    bulbs[2].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
-                    bulbs[3].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
-                    bulbs[4].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
-                    bulbs[5].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                    #~ bulbs[1].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                    #~ bulbs[2].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                    #~ bulbs[3].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                    #~ bulbs[4].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
+                    #~ bulbs[5].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
                     #~ bulbs[6].turn_on(PilotBuilder(rgbww = (r, g, b,cw,ww),brightness=bright)),
                 )
             else:
                 await asyncio.gather(
                     bulbs[0].turn_off(),
-                    bulbs[1].turn_off(),
-                    bulbs[2].turn_off(),
-                    bulbs[3].turn_off(),
-                    bulbs[4].turn_off(),
-                    bulbs[5].turn_off(),
+                    #~ bulbs[1].turn_off(),
+                    #~ bulbs[2].turn_off(),
+                    #~ bulbs[3].turn_off(),
+                    #~ bulbs[4].turn_off(),
+                    #~ bulbs[5].turn_off(),
                     #~ bulbs[6].turn_off(),
                 )
                 if 0:

@@ -3,11 +3,11 @@ from ccc import *
 import mido # pip install mido (eg 1.3.3)
 import rtmidi # pip install python-rtmidi (required by mido)
 
-def a_fond_pour_les_artistes( dm ):
+def a_fond_pour_les_artistes( dm, densite = 255 ):
     dur = 0
     for n in range(14,33):
         chan = n*offset_lustr
-        dm.set_data(chan+lustr_d, 255 )
+        dm.set_data(chan+lustr_d, densite )
         dm.set_data(chan+lustr_r, 255 )
         dm.set_data(chan+lustr_l, 255 )
         dm.set_data(chan+lustr_a, 255 )
@@ -32,13 +32,13 @@ if __name__ == "__main__":
 
 dm = dmx_device
 
-#~ a_fond_pour_les_artistes( dm )
+#~ a_fond_pour_les_artistes( dm, 20 )
 
 chan = king_38
 chan = king_39
 chan = king_40
 chan = king_41
-chan = king_42
+#~ chan = king_42
 #~ chan = king_43
 #~ chan = king_44
 

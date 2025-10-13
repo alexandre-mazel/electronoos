@@ -18,4 +18,6 @@ def send_values(host="127.0.0.1", port=9000, values=(421)):
 
 if __name__ == "__main__":
     # send a channel, a value and a time
-    send_values(values=(200, 33, 1.0))
+    host = "127.0.0.1"
+    host = "192.168.0.60"
+    send_values(host=host,values=(200, 33, 1.0))

@@ -755,8 +755,8 @@ sol cote porte: 170,182, f26, sol cote mur: 100, 144, f26 sol transition: 156,14
 def jour_41( im, time_cycle ):
     spot = king_41
     
-    duration_p1 = 60 # 60
-    duration_p2 = 36
+    duration_p1 = 49 # 60
+    duration_p2 = 34 # 36
     duration_sol = 32
     
     
@@ -803,7 +803,7 @@ def jour_41( im, time_cycle ):
         
     if time_cycle == duration_p1+29:
         print( "INF: time: %d, sending order for jour spot41 (P2-c6)" % time_cycle )
-        dur = 7
+        dur = 5
         im.get(spot+king_focus).set( 26, dur )
         im.get(spot+king_h).set( 160, dur )
         im.get(spot+king_v).set( 170, dur )
@@ -1339,9 +1339,10 @@ def fadein_44( im, time_cycle ):
         im.get(spot+king_w).set( jour_w, dur )
         im.get(spot+king_focus).set( 34, dur )
                 
+# fossilation: 89, 21, 157, 0, 0, 0,0,123 - basse: d77, haute: 165
 def fossilation_jour( im, time_cycle ):
     spots = [100,110,120,130]
-    colors = (89, 21, 157, 0, 0, 0, 0, 77)
+    colors = (89, 21, 157, 0, 0, 0, 0, 77+20+10)
     if time_cycle == 1:
         print( "INF: time: %d, sending order for jour fossi: set" % time_cycle )
         dur = 4
@@ -1351,11 +1352,50 @@ def fossilation_jour( im, time_cycle ):
                 
     # other cycle
     for i in range(4):
-        if time_cycle == 4 + i * 2:
+        if time_cycle == 4 + i * 4:
             print( "INF: time: %d, sending order for jour fossi spot %d: sinus" % (time_cycle,i) )
-            dur = 8
-            im.get(spots[i]+lustr_d).set( 165, dur, mode = mp, interpolation=is2 )
+            dur = 16
+            im.get(spots[i]+lustr_d).set( 165+45+40, dur, mode = mp, interpolation=is2 )
             
+            
+# fossilation nuit: 0, 0, 169, 0, 0, 149, 33, 207, basse: d105, haute: d175
+            
+def fossilation_nuit( im, time_cycle ):
+    spots = [100,110,120,130]
+    colors = (0, 0, 169, 0, 0, 149, 33, 105)
+    colors = (0, 0, 83, 0, 0, 255, 35, 105)
+    if time_cycle == 1:
+        print( "INF: time: %d, sending order for nuit fossi: set" % time_cycle )
+        dur = 4
+        for spot in spots:
+            for idx_color,color in enumerate(colors):
+                im.get(spot+idx_color).set( color, dur )
+                
+    # other cycle
+    for i in range(4):
+        if time_cycle == 4 + i * 4:
+            print( "INF: time: %d, sending order for nuit fossi spot %d: sinus" % (time_cycle,i) )
+            dur = 16
+            im.get(spots[i]+lustr_d).set( 175, dur, mode = mp, interpolation=is2 )
+            
+
+def lustr_fadeout( im, time_cycle, duration = duration_fadeout ):
+    
+    lavande = (9, 47, 0, 0, 73, 171, 255, 105)
+    
+    if time_cycle == 1:
+        print( "INF: time: %d, sending order for fadeout/nuit lustr_nuit" % (time_cycle) )
+        dur = duration
+        colors = lavande
+        for n in range( 1,35 ):
+            chan = n*offset_lustr
+            for idx_color, color in enumerate(colors):
+                im.get(chan+idx_color).set( color, dur )
+                
+    
+def lustr_nuit( im, time_cycle ):
+    lustr_fadeout( im, time_cycle, 3 )
+
 
 
 def a_fond_pour_les_artistes( im ):
@@ -1422,7 +1462,7 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
 
         time_sec = int(time_demo)
         
-        #~ time_sec += 300 # debug
+        time_sec += 350 # debug
         
         
         if time_sec == time_prev_sec:
@@ -1490,6 +1530,8 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
             fadeout_41( im, time_cycle)
             fadeout_42( im, time_cycle)
             fadeout_44( im, time_cycle)
+            lustr_fadeout( im, time_cycle )
+            
 
             
         elif cycle == cycle_nuit:
@@ -1500,6 +1542,8 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
             nuit_41( im, time_cycle )
             nuit_42( im, time_cycle )
             nuit_44( im, time_cycle )
+            fossilation_nuit( im, time_cycle )
+            lustr_nuit( im, time_cycle )
             
         else: #  fadein
             if is_demo_time_from_start: time_cycle -= duration_jour+duration_fadeout+duration_nuit

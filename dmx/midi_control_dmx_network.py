@@ -11,6 +11,10 @@ import socket
 """
 Couleur pour phospho en nuit: indigo3, d:255
 fossilation: 89, 21, 157, 0, 0, 0,0,123 - basse: d77, haute: 165
+fossilation nuit: 0, 0, 169, 0, 0, 149, 33, 207, basse: d105, haute: 175
+new nuit:          0, 0, 83, 0, 0, 255, 35, 161, meme ecart
+
+lavande (mode nuit): 9, 47, 0, 0, 73, 171, 255, 105
 
 """
 
@@ -111,10 +115,14 @@ while 1:
         modified = 0
         values = (r,l,a,g,c,b,i,d)
         print("values:", values )
-        send_values(host=host,values=values, chan=100)
-        send_values(host=host,values=values, chan=110)
-        send_values(host=host,values=values, chan=120)
-        send_values(host=host,values=values, chan=130)
+        if 0:
+            # fossilation
+            send_values(host=host,values=values, chan=100)
+            send_values(host=host,values=values, chan=110)
+            send_values(host=host,values=values, chan=120)
+            send_values(host=host,values=values, chan=130)
+        else:
+            send_values(host=host,values=values, chan=180)
         
     time.sleep(0.4)
         

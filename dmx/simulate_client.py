@@ -37,10 +37,12 @@ if __name__ == "__main__":
     val = 255
     if len(sys.argv)>1:
         chan = int(sys.argv[1])
+    if len(sys.argv)>2:
+        val = int(sys.argv[2])
     # send a channel, a value and a time
     #~ send_values(host=host,values=(181, 255, 1.0))
     #~ for i in range(1, 33):
         #~ set_color( i*10, 0 )
-    set_color( 220, 255 )
+    set_color( chan, val )
     #~ set_indigo( 80, 255 )
     #~ set_indigo( 90, 255 )

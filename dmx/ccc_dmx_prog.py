@@ -1339,13 +1339,32 @@ def fadein_44( im, time_cycle ):
         im.get(spot+king_w).set( jour_w, dur )
         im.get(spot+king_focus).set( 34, dur )
                 
+def fossilation_jour( im, time_cycle ):
+    spots = [100,110,120,130]
+    colors = (89, 21, 157, 0, 0, 0, 0, 77)
+    if time_cycle == 1:
+        print( "INF: time: %d, sending order for jour fossi: set" % time_cycle )
+        dur = 4
+        for spot in spots:
+            for idx_color,color in enumerate(colors):
+                im.get(spot+idx_color).set( color, dur )
+                
+    # other cycle
+    for i in range(4):
+        if time_cycle == 4 + i * 2:
+            print( "INF: time: %d, sending order for jour fossi spot %d: sinus" % (time_cycle,i) )
+            dur = 8
+            im.get(spots[i]+lustr_d).set( 165, dur, mode = mp, interpolation=is2 )
+            
+
 
 def a_fond_pour_les_artistes( im ):
     print("a_fond_pour_les_artistes")
     dur = 0
-    for n in range(14,33):
+    #~ for n in range(14,33):
+    for n in range(1,35):
         chan = n*offset_lustr
-        im.get(chan+lustr_d).set( 255, dur )
+        im.get(chan+lustr_d).set( 180, dur )
         im.get(chan+lustr_r).set( 255, dur )
         im.get(chan+lustr_l).set( 255, dur )
         im.get(chan+lustr_a).set( 255, dur )
@@ -1396,12 +1415,14 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
     
     global time_prev_sec, prev_cycle
     
-    is_demo_time_from_start = False
+    is_demo_time_from_start = True
     
     if is_demo_time_from_start:
         # temps depuis le lancement
 
         time_sec = int(time_demo)
+        
+        #~ time_sec += 300 # debug
         
         
         if time_sec == time_prev_sec:
@@ -1439,7 +1460,6 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
             return       
 
         time_prev_sec = time_sec
-        
     
     if prev_cycle != cycle:
         # premiere phase du cycle
@@ -1447,6 +1467,7 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
         print("\n*** Premiere phase de",  cycle_to_lib(cycle) )
             
     print( "time_cycle: %s" % time_cycle )
+    
         
     if 1:
         # autre phase du cycle
@@ -1458,6 +1479,7 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
             jour_41( im, time_cycle )
             jour_42( im, time_cycle)
             jour_44( im, time_cycle )
+            fossilation_jour( im, time_cycle )
             
             
         elif cycle == cycle_fadeout:
@@ -1546,7 +1568,7 @@ def prog_ccc( dm, nbr_chan ):
     # update and set values:
     #~ dmxal.set_verbose( True )
     
-    #~ a_fond_pour_les_ss(im)
+    #~ a_fond_pour_les_artistes(im)
     
     cpt = 0
     
@@ -1560,12 +1582,17 @@ def prog_ccc( dm, nbr_chan ):
         
         try:
             addr, msg = msgs.get_nowait()  # 👈 non-blocking
-            print(f"SOCKET: Received from {addr}: {msg}")
-            print(len(msg))
-            msg = ast.literal_eval(msg)
-            chan, value, dur = msg
-            print(f"SOCKET: Sending DMX command: chan: {chan}, value: {value}, dur: {dur}")
-            im.get(chan).set( value, dur )
+            #~ print(f"SOCKET: Received from {addr}: {msg}")
+            #~ print(len(msg))
+            orders = msg.split('|')
+            for order in orders:
+                if len(order) < 1:
+                    continue
+                #~ print("order: '%s'" % order )
+                msg = ast.literal_eval(order)
+                chan, value, dur = msg
+                #~ print(f"SOCKET: Sending DMX command: chan: {chan}, value: {value}, dur: {dur}")
+                im.get(chan).set( value, dur )
         except queue.Empty:
             # No messages yet, continue doing other stuff
             pass

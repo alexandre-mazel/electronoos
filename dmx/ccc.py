@@ -67,7 +67,7 @@ lustr_a = 2     # amber
 lustr_g = 3     # green
 lustr_c = 4     # cyan
 lustr_b = 5     # blue
-lustr_i = 6      #  indigo
+lustr_i = 6      # indigo
 lustr_d = 7     # dim
 
 # mode 16chan

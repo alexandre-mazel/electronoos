@@ -76,7 +76,7 @@ async def fade_all_wiz(col1, col2, duration, just_one_call = False, ips_bulb = N
         ips_bulb_rail2 = ["192.168.9.208","192.168.9.211","192.168.9.212","192.168.9.213","192.168.9.215","192.168.9.216"]
         ips_bulb_rail3 = ["192.168.9.218","192.168.9.219","192.168.9.220","192.168.9.221"]
         
-        if 0:
+        if 1:
             ips_bulb = []
             ips_bulb.extend( ips_bulb_rail2 )
             ips_bulb.extend( ips_bulb_rail3 )
@@ -248,6 +248,9 @@ def test_wiz():
         col_1 = (0,0,0,255,255,255)
         #~ col_1 = (0, 5, 60,0,0,40)
         col_2 = (0, 5, 20, 90,90,90)
+        
+        loop.run_until_complete(fade_all_wiz(col_1,col_1,1))
+        return
 
         #~ loop.run_until_complete(fade_all_wiz(col_1,col_2,duration))
         
@@ -268,6 +271,7 @@ def test_wiz():
         loop.run_until_complete(fade_all_wiz(col_4,col_4,5))  # pause sur la couleur
         
         if 1:
+            pass
             #~ loop.run_until_complete(fade_all_wiz(col_4,col_3,duration3/2))
             #~ loop.run_until_complete(fade_all_wiz(col_3,col_2,duration2/3))
             #~ loop.run_until_complete(fade_all_wiz(col_2,col_1,duration/3))

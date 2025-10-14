@@ -15,6 +15,7 @@ fossilation nuit: 0, 0, 169, 0, 0, 149, 33, 207, basse: d105, haute: 175
 new nuit:          0, 0, 83, 0, 0, 255, 35, 161, meme ecart
 
 lavande (mode nuit): 9, 47, 0, 0, 73, 171, 255, 105
+blanc jour: 255, 203, 255, 255, 255, 255, 255, 255
 
 """
 

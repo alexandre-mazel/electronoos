@@ -45,9 +45,18 @@ cycle_fadein = 3
 cycle_mute = 4 # la nuit on fait rien
 prev_cycle = -2
 
+time_demo = -2
+
 def cycle_to_lib( cycle ):
     return ["jour", "fadeout", "nuit", "fadein", "mute", "unknown"][cycle] # -1 => unknown
+    
+def cycle_to_lib_first_letter( cycle ):
+    return ["j", "o", "n", "i", "m", "u"][cycle] # -1 => u
 
+#~ def get_next_cycle( cycle ):
+    #~ if cycle < cycle_fadein:
+        #~ return cycle + 1
+    #~ return cycle_jour
 
         
         
@@ -59,7 +68,6 @@ duration_fadein = 23
 densite_fadeout_moitie = 50
 duration_densite_fadeout_moitie = 4
 
-
 if 0:
     # shorten
     duration_jour = 30+30+30+100
@@ -68,6 +76,37 @@ if 0:
     duration_fadein = 23
 
 duration_loop = duration_jour + duration_fadeout + duration_nuit + duration_fadein
+
+
+    
+def get_time_before_next_cycle( time_demo ):
+    time_demo = int(time_demo)
+    time_demo = time_demo % duration_loop
+    limite = duration_jour
+    if time_demo < limite:
+        return limite - time_demo
+        
+    limite = duration_jour + duration_fadeout
+    if time_demo < limite:
+        return limite - time_demo
+        
+    limite = duration_jour + duration_fadeout + duration_nuit
+    if time_demo < limite:
+        return limite - time_demo
+        
+    limite = duration_jour + duration_fadeout + duration_nuit + duration_fadein
+    if time_demo < limite:
+        return limite - time_demo
+       
+    print( "get_time_before_next_cycle: not handled !!!" )
+    assert(0) # not handled
+
+
+
+indigo_leger = (0,0,0,0,0,0,3,255)
+lustr_specific_indigo = ( 6, 7, 8, 9,33, 5, 3 )
+lustr_exclude = ( 14, 24, 28, 29)
+
 
 print("INF: duration_loop:", duration_loop )
 
@@ -755,7 +794,7 @@ sol cote porte: 170,182, f26, sol cote mur: 100, 144, f26 sol transition: 156,14
 def jour_41( im, time_cycle ):
     spot = king_41
     
-    duration_p1 = 49 # 60
+    duration_p1 = 48 # 60
     duration_p2 = 34 # 36
     duration_sol = 32
     
@@ -1379,16 +1418,42 @@ def fossilation_nuit( im, time_cycle ):
             im.get(spots[i]+lustr_d).set( 175, dur, mode = mp, interpolation=is2 )
             
 
+def lustr_fadein( im, time_cycle, duration = duration_fadein ):
+    
+    jour = (255, 203, 255, 255, 255, 255, 255, 255)
+    
+    if time_cycle == 1:
+        print( "INF: time: %d, sending order for fadein/jour lustr" % (time_cycle) )
+        dur = duration
+        for n in range( 1,35 ):
+            chan = n*offset_lustr
+            colors = jour
+            if n in lustr_exclude:
+                continue
+            if n in lustr_specific_indigo:
+                colors = indigo_leger
+            for idx_color, color in enumerate(colors):
+                im.get(chan+idx_color).set( color, dur )
+                
+    
+def lustr_jour( im, time_cycle ):
+    lustr_fadein( im, time_cycle, 3 )
+
+
 def lustr_fadeout( im, time_cycle, duration = duration_fadeout ):
     
     lavande = (9, 47, 0, 0, 73, 171, 255, 105)
     
     if time_cycle == 1:
-        print( "INF: time: %d, sending order for fadeout/nuit lustr_nuit" % (time_cycle) )
+        print( "INF: time: %d, sending order for fadeout/nuit lustr" % (time_cycle) )
         dur = duration
-        colors = lavande
         for n in range( 1,35 ):
             chan = n*offset_lustr
+            colors = lavande
+            if n in lustr_exclude:
+                continue
+            if n in lustr_specific_indigo:
+                colors = indigo_leger
             for idx_color, color in enumerate(colors):
                 im.get(chan+idx_color).set( color, dur )
                 
@@ -1417,6 +1482,8 @@ def a_fond_pour_les_artistes( im ):
     im.get(first_she_dmx+she_d).set( 255, dur )
     im.get(first_she_dmx+she_r).set( 255, dur )
     
+    
+is_demo_time_from_start = True
     
 def get_demo_times():
     """
@@ -1455,14 +1522,12 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
     
     global time_prev_sec, prev_cycle
     
-    is_demo_time_from_start = True
-    
     if is_demo_time_from_start:
         # temps depuis le lancement
 
         time_sec = int(time_demo)
         
-        time_sec += 350 # debug
+        #~ time_sec += 280 # debug
         
         
         if time_sec == time_prev_sec:
@@ -1501,16 +1566,26 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
 
         time_prev_sec = time_sec
     
+    cycle = cycle_mute # debug
+    
     if prev_cycle != cycle:
         # premiere phase du cycle
         prev_cycle = cycle
         print("\n*** Premiere phase de",  cycle_to_lib(cycle) )
+        
+        if cycle == cycle_mute:
+            for i in range( 1, nbr_chan ):
+                im.get(first_she_dmx+she_r).set( 0, 10 )
+            return
             
     print( "time_cycle: %s" % time_cycle )
     
         
     if 1:
         # autre phase du cycle
+        
+        if cycle == cycle_mute:
+            return
         if cycle == cycle_jour:
             pass
             jour_38( im, time_cycle )
@@ -1520,6 +1595,7 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
             jour_42( im, time_cycle)
             jour_44( im, time_cycle )
             fossilation_jour( im, time_cycle )
+            #~ lustr_jour( im, time_cycle )
             
             
         elif cycle == cycle_fadeout:
@@ -1532,7 +1608,6 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
             fadeout_44( im, time_cycle)
             lustr_fadeout( im, time_cycle )
             
-
             
         elif cycle == cycle_nuit:
             if is_demo_time_from_start: time_cycle -= duration_jour+duration_fadeout
@@ -1553,6 +1628,7 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
             fadein_41( im, time_cycle)
             fadein_42( im, time_cycle)
             fadein_44( im, time_cycle)
+            lustr_fadein( im, time_cycle )
             
                 
 def getTimeStamp():
@@ -1583,11 +1659,29 @@ def run_server_in_thread(host="0.0.0.0", port=9000):
     messages = queue.Queue()
 
     def handle_client(conn, addr):
+        global time_demo, prev_cycle
         with conn:
             while True:
                 data = conn.recv(1024)
                 if not data:
                     break
+                print("DBG: handle_client: received:", str(data) )
+                if b"getnextcycle" in data:
+                    # envoi j, n, o ou i (la lettre du cycle) suivi du nbr de seconde jusque la
+
+                    if is_demo_time_from_start:
+                        t = time_demo # juste pour cette ligne j'ai du mettre time_demo en globale!
+                        c = prev_cycle
+                    else:
+                        t, c, _ = get_demo_times()
+                        
+                    txt = cycle_to_lib_first_letter( c )
+                    txt += str(get_time_before_next_cycle(t))
+                    print("SOCKET: sending this next_cycle information: %s" % txt )
+                    txt = txt.encode()
+                    conn.send( txt )
+                    continue   
+                
                 messages.put((addr, data.decode().strip()))
 
     def server_thread():
@@ -1604,6 +1698,8 @@ def run_server_in_thread(host="0.0.0.0", port=9000):
     
 
 def prog_ccc( dm, nbr_chan ):
+    
+    global prev_cycle, time_demo
 
     im = interpolator.InterpolatorManager( nbr_chan )
 
@@ -1624,10 +1720,19 @@ def prog_ccc( dm, nbr_chan ):
     print("looping...")
     while 1:
         
+        #~ print("DBG: get_time_before_next_cycle:", get_time_before_next_cycle(time_demo) )
+        
+        time_demo = time.time() - time_begin
+        
+        #~ time_demo *= 10 # to debug quicker
+
+
         try:
-            addr, msg = msgs.get_nowait()  # 👈 non-blocking
-            #~ print(f"SOCKET: Received from {addr}: {msg}")
+            addr, msg = msgs.get_nowait()  # non-blocking
+            print(f"SOCKET: Received from {addr}: '{msg}'")
             #~ print(len(msg))
+
+            # dmx commands
             orders = msg.split('|')
             for order in orders:
                 if len(order) < 1:
@@ -1641,11 +1746,6 @@ def prog_ccc( dm, nbr_chan ):
             # No messages yet, continue doing other stuff
             pass
         
-        time_demo = time.time() - time_begin
-        
-        #~ time_demo *= 10 # to debug quicker
-
-        #~ print(".")
         
         #~ send_some_order_test(im, time_demo)
         send_order_oscillation(im, time_demo)

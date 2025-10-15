@@ -370,8 +370,11 @@ def jour_38( im, time_cycle ):
     time_2 = 11
     time_3 = 30
     
+    duree_totale = time_1 + time_2 + time_1 + time_2 + time_1 + time_2 + 10 + 14
+    #~ print( "duree_totale:", duree_totale ) # 144
+    
     # loop at 150s (2.5min)
-    time_cycle %= 150
+    time_cycle %= duree_totale
     
     if time_cycle == 1:
         print( "INF: time: %d, sending order for jour spot38 (P1)" % time_cycle )
@@ -439,15 +442,16 @@ def jour_38( im, time_cycle ):
         
     if time_cycle == time_1 + time_2 + time_1 + time_2 + time_1 + time_2:
         print( "INF: time: %d, sending order for jour spot38 (Mezza)" % time_cycle )
-        dur = 10
+        force_jour(im,spot)
+        dur = 7
         im.get(spot+king_h).set( 28, dur )
         im.get(spot+king_v).set( 36, dur )
         im.get(spot+king_focus).set( 68, dur )
         
-    if time_cycle == time_1 + time_2 + time_1 + time_2 + time_1 + time_2 + 6:
-        print( "INF: time: %d, sending order for jour spot38 (Mezza)" % time_cycle )
+    if time_cycle == time_1 + time_2 + time_1 + time_2 + time_1 + time_2 + 10:
+        print( "INF: time: %d, sending order for jour spot38 (Mezza(2))" % time_cycle )
         im.get(spot+king_h).set( 34, 8, mode = mp, interpolation=is2 )
-        #~ im.get(spot+king_v).set( 85, 14, mode = mp, interpolation=is2 )
+        im.get(spot+king_v).set( 38, 14, mode = mp, interpolation=is2 )
         
 """
 couleur nuit: drgbw: 18, 0, 82, 248, 118
@@ -1570,7 +1574,8 @@ def send_order_oscillation( im: interpolator.InterpolatorManager, time_demo: flo
 
         time_sec = int(time_demo)
         
-        time_sec += 280 # debug
+        #~ time_sec += 100 # debug
+        #~ time_sec += 280 # debug
         
         
         if time_sec == time_prev_sec:

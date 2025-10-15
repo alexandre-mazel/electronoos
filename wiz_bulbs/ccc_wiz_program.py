@@ -16,13 +16,32 @@ from ccc_dmx_prog import duration_jour, duration_fadeout, duration_nuit, duratio
 
 def get_all_ips():
     print( "get_all_ips..." )
-    ips_bulb = ["192.168.0.111","192.168.0.113","192.168.0.116"]
+    if 1:
+        # alex house
+        ips_bulb = ["192.168.0.111","192.168.0.113","192.168.0.116"]
+        
+    ips_bulb_rail1 = ["192.168.9.201","192.168.9.202","192.168.9.203","192.168.9.204","192.168.9.205","192.168.9.206","192.168.9.207"]
+    ips_bulb_rail2 = ["192.168.9.208","192.168.9.209","192.168.9.210","192.168.9.211","192.168.9.212","192.168.9.213","192.168.9.215","192.168.9.216","192.168.9.217"]
+    ips_bulb_rail3 = ["192.168.9.218","192.168.9.219","192.168.9.220","192.168.9.221"]
+    
+    ips_bulb_rail_sans_vert = ["192.168.9.208","192.168.9.211","192.168.9.212","192.168.9.213"]
+    
+    if 1:
+        ips_bulb = []
+        ips_bulb.extend( ips_bulb_rail1 )
+        ips_bulb.extend( ips_bulb_rail2 )
+        ips_bulb.extend( ips_bulb_rail3 )
+        
+        #~ ips_bulb = ips_bulb_rail_sans_vert
+
     return ips_bulb
     
     
     
 col_jour = (0,0,0,255,255,255)
 col_nuit = (0, 5, 30,0,0,40)
+col_nuit = (3, 47, 255,0,0,255)
+col_nuit_sans_vert = (3, 0, 255,0,0,255)
     
     
     
@@ -41,13 +60,18 @@ def run_demo():
     
     while 1:
 
-        # temps lié a l'heure
+        # temps lie a l'heure
         time_sec, cycle, time_cycle = get_demo_times()
         
-        if cycle == cycle_mute:
-            print("muted...")
-            time.sleep(1)
-            continue
+        # debug
+        #~ cycle = cycle_jour
+        #~ cycle = cycle_nuit
+        #~ cycle = cycle_mute
+        
+        #~ if cycle == cycle_mute:
+            #~ print("muted...")
+            #~ time.sleep(1)
+            #~ continue
         
         if time_sec == time_prev_sec:
             time.sleep( 0.1 )
@@ -67,7 +91,10 @@ def run_demo():
             # premiere phase du cycle
             prev_cycle = cycle
             print("\n*** Premiere phase de",  cycle_to_lib(cycle) )
-            
+
+            if cycle == cycle_mute:
+                loop.run_until_complete(fade_all_wiz(col_nuit,col_off,10,ips_bulb=ips_bulb))
+                
             if cycle == cycle_jour:
                 pass
             if cycle == cycle_fadeout or ( is_first_time and cycle == cycle_nuit ):

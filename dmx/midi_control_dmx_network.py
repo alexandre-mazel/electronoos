@@ -105,16 +105,30 @@ def send_values(host="127.0.0.1", port=9000, chan = 80, values=(421)):
             # un msg pour toutes les commandes:
             msg = ""
             for i,v in enumerate(values):
-                msg += str((chan+i,v,dur)) +'|'
+                if v != None:
+                    msg += str((chan+i,v,dur)) +'|'
             msg = msg.encode()
             s.sendall(msg + b"\n")
             if bVerbose: print(f"Sent: {msg}")
 
 host = "192.168.9.110"
+
+import ccc
+
+is_lustr = 1
+is_lustr = 0 # else it's king
+
+chan = 180 # king_42
+chan = ccc.king_41
+
 while 1:
     if modified:
         modified = 0
-        values = (r,l,a,g,c,b,i,d)
+        if is_lustr:
+            values = (r,l,a,g,c,b,i,d)
+        else:
+            r,g,b,w,d = r,l,a,g,c # conversion des sliders vers ce qu'on veut
+            values = (None, None, None, d, r, g, b, w )
         print("values:", values )
         if 0:
             # fossilation
@@ -123,7 +137,8 @@ while 1:
             send_values(host=host,values=values, chan=120)
             send_values(host=host,values=values, chan=130)
         else:
-            send_values(host=host,values=values, chan=180)
+            #~ send_values(host=host,values=values, chan=180)
+            send_values(host=host,values=values, chan=chan)
         
     time.sleep(0.4)
         

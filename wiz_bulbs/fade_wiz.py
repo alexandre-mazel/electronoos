@@ -60,6 +60,8 @@ async def fade_all_wiz(col1, col2, duration, just_one_call = False, ips_bulb = N
     """
     
     print( "INF: fade_all_wiz: starting...")
+    print( "INF: col1:", str(col1))
+    print( "INF: col2:", str(col2))
     
     if ips_bulb == None:
         
@@ -97,7 +99,7 @@ async def fade_all_wiz(col1, col2, duration, just_one_call = False, ips_bulb = N
     time_begin = time.time()
     mute = 0
     cpt = 0
-    while time.time() - time_begin <=  duration:
+    while time.time() - time_begin <=  duration or cpt == 1: # 1 seul appel (premier tres long => renvoie un coup pour etre sur d'avoir bien fini)
         t = time.time() - time_begin
         col = [0,0,0, 0,0, 0]
         coef0 = t / duration

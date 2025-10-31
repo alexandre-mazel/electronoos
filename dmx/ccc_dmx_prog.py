@@ -33,8 +33,8 @@ sudo date -s '@1759832799'
 
 """
 
-hour_demo_begin = 8 # premiere heure ou la demo commence => 8
-hour_demo_end = 15  # premiere heure ou la demo s'arrete => 22
+hour_demo_begin = 8 # premiere heure ou la demo commence => 8 > diusable: 0
+hour_demo_end = 22  # premiere heure ou la demo s'arrete => 22 disable: 25
 
 time_prev_sec = 0
 
@@ -879,7 +879,6 @@ def jour_41( im, time_cycle ):
     if time_cycle == duration_p1+29:
         print( "INF: time: %d, sending order for jour spot41 (P2-c6)" % time_cycle )
         dur = 5
-        im.get(spot+king_focus).set( 26, dur )
         im.get(spot+king_h).set( 160, dur )
         im.get(spot+king_v).set( 170, dur )
         
@@ -1100,6 +1099,7 @@ def jour_42( im, time_cycle ):
         dur = 8
         im.get(spot+king_h).set( 176+margin+7, dur, mode = mp, interpolation=is2 ) # on ajoute pour mieux activer la zone
         im.get(spot+king_v).set( 88, dur, mode = mp, interpolation=is2 )
+        im.get(spot+king_focus).set( 48, 4,  mode = mp, interpolation=is2 ) # vibrance de focus
         
     if time_cycle == duration_p1:
         print( "INF: time: %d, sending order for jour spot42 (pierre)" % time_cycle )
@@ -1130,7 +1130,6 @@ def jour_42( im, time_cycle ):
     if time_cycle == duration_p1+duration_transition+5:
         print( "INF: time: %d, sending order for jour spot42 (etagere-fin)" % time_cycle )
         dur = duration_etagere-3
-        im.get(spot+king_focus).set( 38, dur )
         im.get(spot+king_h).set( 130, dur )
         im.get(spot+king_v).set( 72, dur )
         
@@ -1423,7 +1422,7 @@ def fadein_44( im, time_cycle ):
 # fossilation: 89, 21, 157, 0, 0, 0,0,123 - basse: d77, haute: 165
 def fossilation_jour( im, time_cycle ):
     spots = [100,110,120,130]
-    colors = (89, 21, 157, 0, 0, 0, 0, 127)
+    colors = (89, 21, 157, 0, 0, 0, 0, 107)
     if time_cycle == 1:
         print( "INF: time: %d, sending order for jour fossi: set" % time_cycle )
         dur = 4
@@ -1835,8 +1834,9 @@ def prog_ccc( dm, nbr_chan ):
         
         cpt += 1
         
-        if time_demo > 600 and im.is_all_finished():
-            break
+        # la grosse betise:
+        #~ if time_demo > 600 and im.is_all_finished():
+            #~ break
 
 # prog_ccc - end
 

@@ -23,6 +23,7 @@ def get_all_ips():
     ips_bulb_rail1 = ["192.168.9.201","192.168.9.202","192.168.9.203","192.168.9.204","192.168.9.205","192.168.9.206","192.168.9.207"]
     ips_bulb_rail2 = ["192.168.9.208","192.168.9.209","192.168.9.210","192.168.9.211","192.168.9.212","192.168.9.213","192.168.9.215","192.168.9.216","192.168.9.217"]
     ips_bulb_rail3 = ["192.168.9.218","192.168.9.219","192.168.9.220","192.168.9.221"]
+    ips_bulb_ccc_spare = ["192.168.9.225","192.168.9.226","192.168.9.227"]
     
     ips_bulb_rail_sans_vert = ["192.168.9.208","192.168.9.211","192.168.9.212","192.168.9.213"]
     
@@ -33,6 +34,9 @@ def get_all_ips():
         ips_bulb.extend( ips_bulb_rail3 )
         
         #~ ips_bulb = ips_bulb_rail_sans_vert
+        
+        
+    #~ ips_bulb = ips_bulb_ccc_spare # debug et timing chez moi avec le tp_link wifi7: 0.11 par appel
 
     return ips_bulb
     
@@ -94,6 +98,7 @@ def run_demo():
 
             if cycle == cycle_mute:
                 loop.run_until_complete(fade_all_wiz(col_nuit,col_off,10,ips_bulb=ips_bulb))
+                loop.run_until_complete(fade_all_wiz(col_off,col_off,2,ips_bulb=ips_bulb))
                 
             if cycle == cycle_jour:
                 pass

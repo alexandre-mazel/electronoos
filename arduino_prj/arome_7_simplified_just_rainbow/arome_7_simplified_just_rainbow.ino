@@ -9,12 +9,17 @@
 
 #ifdef MEGA
 
+# pragma message "ATTENTION: On compile pour le MEGA !"
+
 #   define PIN_LEDS 50
 
 #endif // MEGA
 
 
 #ifdef PRO_MICRO
+
+# pragma message "ATTENTION: On compile pour le PRO_MICRO !"
+
 
 #   define PIN_LEDS 9    // la 9 c'est la A9
 
@@ -27,7 +32,7 @@
 CRGB leds[NUM_LEDS];
 
 
-int32 hueToRGB( int nHue )
+int32_t hueToRGB( int nHue )
 {
   //this is the algorithm to convert from RGB to HSV
   // nHue between 0 and 254
@@ -70,10 +75,10 @@ int32 hueToRGB( int nHue )
     break;
   }
   
-  int r = constrain((int)255*r,0,255);
-  int g = constrain((int)255*g,0,255);  
-  int b = constrain((int)255*b,0,255);
-  return (r << 16) | (g << 8) | b;
+  int32_t ir = constrain((int)255*r,0,255);
+  int32_t ig = constrain((int)255*g,0,255);  
+  int32_t ib = constrain((int)255*b,0,255);
+  return (ir << 16) | (ig << 8) | ib;
 }
   
   
@@ -82,9 +87,9 @@ void animate_rainbow_mode()
   static int static_nHueColor = 0;
   const int nCoefRalentisseur = 16;
    
-  int32  color = hueToRGB( static_nHueColor/nCoefRalentisseur
+  int32_t color = hueToRGB( static_nHueColor/nCoefRalentisseur );
 
-  for(int dot = 0;dot < NUM_LEDS; dot++)
+  for( int dot = 0; dot < NUM_LEDS; ++dot )
   { 
     leds[dot] = color;
   }
@@ -106,6 +111,8 @@ void animate_rainbow_mode()
 void setup()
 {
     Serial.begin(57600);
+
+    Serial.println( "\nArduino started: Table des Aromes - simplified rainbow v0.7\n" );
     
     pinMode( PIN_LEDS, OUTPUT );
     FastLED.addLeds<NEOPIXEL, PIN_LEDS>(leds, NUM_LEDS); 
@@ -114,6 +121,9 @@ void setup()
 
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
+
+int nFpsCpt = 0;
+unsigned long timeFpsBegin;
 
 void loop()
 {

@@ -4,7 +4,8 @@
 
 //#define MEGA
 #define PRO_MICRO
-//#define XIAO_C3
+//#define XIAO_C3 //NDEV
+
 
 
 #ifdef MEGA
@@ -14,6 +15,7 @@
 #   define PIN_LEDS 50
 
 #endif // MEGA
+
 
 
 #ifdef PRO_MICRO
@@ -26,8 +28,9 @@
 #endif // PRO_MICRO
 
 
-#define NUM_LEDS 4
 
+
+#define NUM_LEDS 4
 
 CRGB leds[NUM_LEDS];
 

@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import asyncio
+import datetime
+import os
 import time
 
 import fade_wiz
@@ -39,6 +41,25 @@ def get_all_ips():
     #~ ips_bulb = ips_bulb_ccc_spare # debug et timing chez moi avec le tp_link wifi7: 0.11 par appel
 
     return ips_bulb
+    
+    
+def getTimeStamp():
+    """
+    
+    # REM: linux command:
+    # timedatectl list-timezones: list all timezones
+    # sudo timedatectl set-timezone Europe/Paris => set paris
+    """
+    datetimeObject = datetime.datetime.now()
+    strTimeStamp = datetimeObject.strftime( "%Y/%m/%d: %Hh%Mm%Ss" )
+    return strTimeStamp
+    
+def log( msg ):
+    if os.name == "nt": return
+    fn = "/home/pi/logs/ccc_wiz_program.log"
+    fn = open(fn,"at")
+    fn.write( getTimeStamp() + ": " + msg + "\n" )
+    fn.close()
     
     
     
@@ -83,9 +104,12 @@ def run_demo():
             
         time_retry_ip = 20*60
         #~ time_retry_ip = 20 # to check quickly in test mode
-        if time.time() - time_last_check_ip > time_retry_ip:
+        time_retry_ip = 2 * 60
+        
+        if 0 or ( cycle != cycle_mute and time.time() - time_last_check_ip > time_retry_ip and len(ips_bulb) < 17):
             time_last_check_ip = time.time()
             print( "Recreating IPs" )
+            log("Recreating IP, len: %d, list: %s" % (len(ips_bulb),ips_bulb) )
             ips_bulb = get_all_ips() # reprend toutes les ips et essaye de se reconnecter a des nouvelles lampes qui serait arriver entre temps
 
         time_prev_sec = time_sec
@@ -118,7 +142,15 @@ def run_demo():
         
         
 if __name__ == "__main__":
-    run_demo()
-    
+    # on la relance si elle plante sur une erreur inconnue
+    log("started...")
+    while 1:
+        try:
+                run_demo()
+        except BaseException as err:
+            s = "ERR: unknown exception 421: ", str(err)
+            print( s )
+            log(s)
+            time.sleep( 30 )
     
 

@@ -180,7 +180,7 @@ async def fade_all_wiz(col1, col2, duration, just_one_call = False, ips_bulb = N
                     del ips_bulb[i]
                     continue
                 i += 1
-            print( "ips_bulb after results:", ips_bulb )
+            print( "ips_bulb after results (len:%d): %s" % (len(ips_bulb), ips_bulb ) )
                 
                     
         cpt += 1

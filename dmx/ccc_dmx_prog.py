@@ -28,12 +28,15 @@ pip3 install serial pyserial numpy
 # copy to Oscillation RPI:
 scp ccc_dmx_prog.py na@192.168.9.102:/home/na/dev/git/electronoos/dmx/
 
+# voir l'heure:
+python3 -c "import time;print(time.time())"
+
 # mettre l'heure:
 sudo date -s '@1759832799'
 
 """
 
-hour_demo_begin = 8 # premiere heure ou la demo commence => 8 > diusable: 0
+hour_demo_begin = 8 # premiere heure ou la demo commence => 8 > disable: 0
 hour_demo_end = 22  # premiere heure ou la demo s'arrete => 22 disable: 25
 
 time_prev_sec = 0

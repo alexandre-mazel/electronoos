@@ -24,6 +24,7 @@ dmxal.set_verbose( False )
 
 # Mes projos:
 # 60 lumières Par LED DMX, lumière de scène RGB de 90W
+# celui de l'anniv de Gaia
 # 32€TTC/Amazon
 # 750g
 # Conso: Eteint: 2.8w(elec+fan), full RGB: 52w

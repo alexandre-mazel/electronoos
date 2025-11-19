@@ -10,6 +10,7 @@ data = "https://obo-world.com/presence.htm?c=kendo&b=champs_elysee" # moved to o
 data = "mailto:photobooth.cdl%2B7@gmail.com?subject=Ma photo aux Caves du Louvre&body=Attachez%20votre%20photo%20%C3%A0%20cet%20email.%0D%0A%0D%0AConseil: s%C3%A9lectionner une image de grande taille, mais pas%20%22taille%20r%C3%A9elle%22."
 #~ data = "mailto:photobooth.cdl%2B7@gmail.com?subject=My picture at the Caves du Louvre&body=Please%20attach%20your%20photo%20to%20this%20email.%0D%0A%0D%0ATips%3A%20Select%20%22large%20image%22%20size%20but%20not%20%22real%20size%22."
 data = "https://docs.google.com/spreadsheets/d/1qnfdF1RQdCKBCx2Y6ZmaJbvtatqz5kJGXiOTRkEiPbM"
+data = "https://www.instagram.com/officielzoedor?igsh=dGt3d2ZzNHU3b2xx"
 if 0:
     data = "http://obo-world.com/vitrine/index_en.html?src=ces"
     data = "http://obo-world.com/index.html?src=tf"

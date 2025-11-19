@@ -1,12 +1,36 @@
 #include <FastLED.h> // FastLed Neopixel by David Madison and FastLed 3.9.8
 
 //#define NUM_LEDS (16*16) // number of led present in your strip
-#define NUM_LEDS 30
+#define NUM_LEDS (16)
 
 //#define DATA_PIN 45 // digital pin of the connected led
-#define DATA_PIN 50
+//#define DATA_PIN A10
+#define DATA_PIN 45
 
 CRGB leds[NUM_LEDS];
+
+void printHexa2( unsigned char u )
+{
+  // print u with a leading 0 if needed
+  if( u < 16 )
+  {
+    Serial.print("0");
+  }
+  Serial.print(u,HEX);
+}
+
+void printCRGB( CRGB c )
+{
+  Serial.print("0x");
+  printHexa2( c.raw[2] );
+  printHexa2( c.raw[1] );
+  printHexa2( c.raw[0] );
+}
+void printCRGBln( CRGB c )
+{
+  printCRGB( c );
+  Serial.println("");
+}
 
 
 uint32_t hueToHexa( int nHue )
@@ -91,6 +115,8 @@ void chaser(int nDelay=500)
 
 void serialGlow(int nDelay=500)
 {
+  Serial.println( "leds: serialGlow");
+
   // une led qui se balade d'un coté a l'autre
   for(int dot=(NUM_LEDS-1) ; dot >=0 ; dot--)
   {
@@ -126,6 +152,7 @@ void strobo(int nDelay=100)
 
 void medusa(int nDelay=100)
 {
+  Serial.println("Medusa");
   for( int hue = 0; hue < 255; ++hue )
   {
     uint32_t color = hueToHexa( hue);
@@ -170,7 +197,11 @@ void full_on()
 
 void full_one_color( struct CRGB one_color)
 {
-  Serial.println( "leds: full_one_color");
+  //one_color.raw[0] = 0;
+  //one_color.raw[1] = 0;
+  //one_color.raw[2] = 0xFF;
+  Serial.print( "leds: full_one_color: ");
+  printCRGBln( one_color );
   for( int dot = 0; dot < NUM_LEDS; ++dot )
   { 
     leds[dot] = one_color;
@@ -339,6 +370,14 @@ void loop()
   if( 1 )
   {
     erase_all();
+    full_one_color(CRGB::White);
+    delay(3000);
+    //return;
+  }
+
+  if( 1 )
+  {
+    erase_all();
     full_one_color(CRGB::Blue);
     delay(3000);
     //return;
@@ -349,7 +388,15 @@ void loop()
     erase_all();
     full_one_color(CRGB::Red);
     delay(3000);
-    return;
+    //return;
+  }
+
+  if( 1 )
+  {
+    erase_all();
+    full_one_color(CRGB::Green);
+    delay(3000);
+    //return;
   }
 
   if( 0 )
@@ -385,29 +432,44 @@ void loop()
     return;
   }
 
-  for(int i = 0; i < 10; ++i )
+  if( 0 )
   {
-    chaser(10);
+    for(int i = 0; i < 10; ++i )
+    {
+      chaser(10);
+    }
   }
 
-  for(int i = 0; i < 3; ++i )
+  if( 1 )
   {
-    medusa(100);
+    for(int i = 0; i < 3; ++i )
+    {
+      medusa(100);
+    }
   }
 
-  for(int i = 0; i < 5; ++i )
+  if( 1 )
   {
-    serialGlow(100);
+    for(int i = 0; i < 5; ++i )
+    {
+      serialGlow(100);
+    }
   }
 
-  for(int i = 0; i < 2000; ++i )
+  if( 0 )
   {
-    strobo(20);
+    for(int i = 0; i < 2000; ++i )
+    {
+      strobo(20);
+    }
   }
 
-  for(int i = 0; i < 32; ++i )
+  if( 0 )
   {
-    beat(120);
+    for(int i = 0; i < 32; ++i )
+    {
+      beat(120);
+    }
   }
 
   static int32_t last = 0;

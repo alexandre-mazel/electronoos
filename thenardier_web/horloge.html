@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Horloge plein écran — Temps réel</title>
+  <title>Horloge plein &eacute;cran — Temps r&eacute;el pour les petits &eacute;coliers</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
   <style>
     :root{
@@ -159,5 +159,32 @@
     });
 
   </script>
+  
+<script>
+  let wakeLock = null;
+
+  async function requestWakeLock() {
+    try {
+      wakeLock = await navigator.wakeLock.request("screen");
+      console.log("Wake Lock activé ✅");
+
+      // Si l’onglet perd le focus, on redemande
+      wakeLock.addEventListener("release", () => {
+        console.log("Wake Lock relâché ❌");
+      });
+    } catch (err) {
+      console.error(`${err.name}, ${err.message}`);
+    }
+  }
+
+  // Demande le verrouillage quand la page est chargée
+  document.addEventListener("DOMContentLoaded", () => {
+    if ("wakeLock" in navigator) {
+      requestWakeLock();
+    } else {
+      console.warn("L’API Wake Lock n’est pas supportée sur ce navigateur.");
+    }
+  });
+</script>
 </body>
 </html>

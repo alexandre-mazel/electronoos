@@ -100,6 +100,8 @@ def playSongInterruptible(strFilename):
         print("DBG: playSongInterruptible: ret: %s" % ret )
         if ret == False:
             return -1
+        #~ print("INF: playSongInterruptible: len: %s" % pg.mixer.Sounds().get_length() )
+        
     except BaseException as err:
         print("ERR: playSongInterruptible: song not playable: %s (err: %s)" % (strFilename,err))
         return -1
@@ -134,6 +136,14 @@ def playSongInterruptible(strFilename):
                     # decode key as char
                     key = pressedKey.decode()
                     print("key: %s" % key )
+                    if key == 's':
+                        print("stopping current song...")
+                        print("fading...")
+                        timeLastNext = time.time()
+                        pg.mixer.music.fadeout(1500)
+                        time.sleep(1.5) #fadout is not blocking
+                        pg.mixer.music.stop()
+                        return 10
                     if key == 'n':
                         print("skipping current song...")
                         if time.time()-timeLastNext > 3: # we dont want to fade if in a rapid series of next

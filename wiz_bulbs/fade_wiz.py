@@ -1,5 +1,8 @@
 import asyncio
 
+# to get raw information of the bulb:
+# echo '{"method":"getSystemConfig","env":"dev","params":{}}' | nc -u -w 1 <theIPofYourBulb> 38899
+# au ccc, j'ai deja perdu une ampoule dans appel a l'autre en 3.5s (timeout qqpart?)
 import pywizlight
 from pywizlight import wizlight, PilotBuilder, discovery # pip install pywizlight # NB: Requires Python version >=3.7.
 

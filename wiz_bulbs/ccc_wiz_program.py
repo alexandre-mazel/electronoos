@@ -5,6 +5,23 @@ import asyncio
 import datetime
 import os
 import time
+"""
+pb actuel: au bout de plusieurs jours, too many open files.
+Et effectivement ca grandit par paquet de 17, or on a pile 17 ampoules...
+pi@raspberrypi:~/dev/git/electronoos/wiz_bulbs $ lsof -p 26299 | wc
+    101     911   11800
+pi@raspberrypi:~/dev/git/electronoos/wiz_bulbs $ lsof -p 26299 | wc
+    118    1064   13623
+pi@raspberrypi:~/dev/git/electronoos/wiz_bulbs $ lsof -p 26299 | wc
+    118    1064   13623
+pi@raspberrypi:~/dev/git/electronoos/wiz_bulbs $
+
+cf bug_ccc_openfile.txt
+
+
+        bulbs.append(wizlight(ip)) ? les fermer a la fin ?
+
+"""
 
 import fade_wiz
 from fade_wiz import col_blue, col_green, col_red, col_off, col_full, fade_all_wiz
@@ -58,7 +75,7 @@ def log( msg ):
     if os.name == "nt": return
     fn = "/home/pi/logs/ccc_wiz_program.log"
     fn = open(fn,"at")
-    fn.write( getTimeStamp() + ": " + msg + "\n" )
+    fn.write( getTimeStamp() + ": " + str(msg) + "\n" )
     fn.close()
     
     
@@ -148,7 +165,7 @@ if __name__ == "__main__":
         try:
                 run_demo()
         except BaseException as err:
-            s = "ERR: unknown exception 421: ", str(err)
+            s = "ERR: unknown exception 421: " + str(err)
             print( s )
             log(s)
             time.sleep( 30 )

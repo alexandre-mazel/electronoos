@@ -1,7 +1,8 @@
-<!doctype html>
+<!DOCTYPE HTML>
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
+  <link rel='shortcut icon' type='image/png' href='/img/ico_thenardier.png'>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Horloge plein &eacute;cran — Temps r&eacute;el pour les petits &eacute;coliers</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -166,11 +167,11 @@
   async function requestWakeLock() {
     try {
       wakeLock = await navigator.wakeLock.request("screen");
-      console.log("Wake Lock activé ✅");
+      console.log("Wake Lock activé");
 
       // Si l’onglet perd le focus, on redemande
       wakeLock.addEventListener("release", () => {
-        console.log("Wake Lock relâché ❌");
+        console.log("Wake Lock relâché");
       });
     } catch (err) {
       console.error(`${err.name}, ${err.message}`);

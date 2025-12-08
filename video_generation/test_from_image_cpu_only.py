@@ -7,7 +7,7 @@ pipe = StableVideoDiffusionPipeline.from_pretrained(
 )
 pipe = pipe.to("cpu")
 
-img_filename = "Rose high res.png"
+img_filename = "Rose high res.jpg"
 from PIL import Image
 img_prompt = Image.open(img_filename)
 width = height = 512

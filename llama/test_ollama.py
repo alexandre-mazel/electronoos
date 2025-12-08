@@ -29,9 +29,10 @@ strModel = "llama3.3:70B" # size: GB, running:   # no size
 
 
 """
-Sur linux (eg: azure):
-# methode rapide:
+Install sur linux (eg: azure):
+# methode rapide (et aussi pour updater)
 curl -fsSL https://ollama.com/install.sh | sh
+
 
 ou sinon, cf https://www.linuxtricks.fr/wiki/ia-installer-un-modele-de-langage-llm-avec-ollama
 

@@ -11,6 +11,8 @@ data = "mailto:photobooth.cdl%2B7@gmail.com?subject=Ma photo aux Caves du Louvre
 #~ data = "mailto:photobooth.cdl%2B7@gmail.com?subject=My picture at the Caves du Louvre&body=Please%20attach%20your%20photo%20to%20this%20email.%0D%0A%0D%0ATips%3A%20Select%20%22large%20image%22%20size%20but%20not%20%22real%20size%22."
 data = "https://docs.google.com/spreadsheets/d/1qnfdF1RQdCKBCx2Y6ZmaJbvtatqz5kJGXiOTRkEiPbM"
 data = "https://www.instagram.com/officielzoedor?igsh=dGt3d2ZzNHU3b2xx"
+data = "https://engrenage.studio/almatools/"
+data = "http://linkedin.com/in/alexandremazel/"
 if 0:
     data = "http://obo-world.com/vitrine/index_en.html?src=ces"
     data = "http://obo-world.com/index.html?src=tf"
@@ -19,6 +21,7 @@ if 0:
     #~ data = "https://www.linkedin.com/in/alexandremazel/"
     data = "http://linkedin.com/in/alexandremazel/"
     data = "http://obo-world.com/vitrine/form_candi.htm"
+    
     data = """BEGIN:VCARD
 VERSION:3.0
 N:Mazel;Alexandre
@@ -34,9 +37,29 @@ EMAIL:alexandre.mazel@obo-world.com
 TEL;TYPE=voice,work,pref:+33 610601979
 END:VCARD
 """
+
+if 1:
+    # vcard almatools
+    data = """BEGIN:VCARD
+VERSION:3.0
+N:Mazel;Alexandre
+FN:Alexandre Mazel
+ORG:Obo-World;Engrenage.studio;AlmaTools;Freelance
+ROLE:CTO;CEO;CCO
+TITLE:CTO;CEO;CCO
+"""
+    #~ data += "URL:http://obo-world.com\n"
+    data += "URL:https://engrenage.studio/almatools/\n"
+    data += """PHOTO;TYPE=PNG:http://engrenage.studio/img/alexandre_mazel.jpg
+EMAIL:alexandre.zelma@gmail.com
+TEL;TYPE=voice,work,pref:+33 610601979
+END:VCARD
+"""
+    
 # output file name
 filename = "oia_cycle_x.png"
 # generate qr code
+print("data: ", str(data) )
 img = qrcode.make(data)
 # save img to a file
 img.save(filename)

@@ -14,4 +14,6 @@ pipe = StableVideoDiffusionPipeline.from_pretrained(
 )
 pipe = pipe.to("cpu")
 
-frames = pipe("a scenic mountain landscape")["frames"]
+prompt = "a scenic mountain landscape"
+print( "starting to generate: ", prompt )
+frames = pipe(prompt)["frames"]

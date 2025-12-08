@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 tester sur azure:
 ~/dev$ python3 -m venv video_generation

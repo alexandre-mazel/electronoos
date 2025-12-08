@@ -36,7 +36,7 @@ pipe.to("cpu")  # CPU mode (lent mais fonctionne)
 # ----- 2. Generate frames -----
 prompt = "a scenic mountain landscape"
 result = pipe(prompt)
-frames = result["frames"][0]  # liste de frames PIL (en général ~25 images)
+frames = result["frames"][0]  # liste de frames PIL (en general ~25 images)
 
 # ----- 3. Save frames as images -----
 os.makedirs("frames", exist_ok=True)
@@ -59,4 +59,4 @@ subprocess.run([
     output_file
 ])
 
-print("Vidéo générée :", output_file)
+print("Video generated :", output_file)

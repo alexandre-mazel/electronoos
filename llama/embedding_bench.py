@@ -82,7 +82,7 @@ def run_bench():
     ]
     
     # test juste une seule
-    strModelToCompare = ["paraphrase-multilingual:278m"]
+    #~ strModelToCompare = ["paraphrase-multilingual:278m"]
 
 
     conclusion = []
@@ -136,6 +136,9 @@ openthinker:32b: -6.32, 71.69s, 5120
 deepseek-r1:70b: -14.00, 16.15s, 2
 
 # ajout de j'ai soif
+
+#result: perf, duration, size of vector
+
 paraphrase-multilingual:278m: 7.16, 2.17s, 768
 mxbai-embed-large:335m: 6.06, 2.51s, 1024
 granite-embedding:278m: 2.43, 0.34s, 768

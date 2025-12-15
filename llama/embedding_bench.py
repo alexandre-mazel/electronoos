@@ -91,13 +91,14 @@ def run_bench():
     # "deepseek-r1:671b", # model requires more system memory (444.5 GiB)
     "deepseek-r1:70b","deepseek-r1:8b", "deepseek-r1:1.5b",
     "qwen2.5-coder:32b", "qwen2.5-coder:0.5b",
-    "olmo2:13b", "olmo2:7b","command-r7b:7b",
+    "command-r7b:7b",
     # new dec2025
     "nomic-embed-text-v2-moe", "deepseek-v3.2","qwen3-embedding","embeddinggemma",
     ]
     
     # test juste une seule
     #~ strModelToCompare = ["paraphrase-multilingual:278m"]
+    strModelToCompare = ["qwen3-embedding"]
 
 
     conclusion = []
@@ -181,7 +182,42 @@ qwen2.5-coder:0.5b: -12.35, 2.55s, 896
 qwen2.5-coder:32b: -13.58, 74.47s, 5120
 deepseek-r1:70b: -18.00, 19.44s, 2
 
-Meme sur paraphrase-multilingual:278m s'en sort pas trop sur j'ai soif:
+# 2025 dec 15: redone on azure-server1, with some new models:
+
+qwen3-embedding: 8.89, 24.30s, 4096
+paraphrase-multilingual:278m: 7.16, 11.19s, 768
+mxbai-embed-large:335m: 6.07, 3.77s, 1024
+embeddinggemma: 4.09, 6.24s, 768
+nomic-embed-text-v2-moe: 2.91, 7.88s, 768
+granite-embedding:278m: 2.43, 10.33s, 768
+nomic-embed-text: 1.79, 2.58s, 768
+bge-large:335m: 1.65, 3.46s, 1024
+granite-embedding:30m: 1.59, 3.09s, 384
+bge-m3:567m: 0.61, 12.08s, 1024
+all-minilm:33m: 0.53, 1.61s, 384
+snowflake-arctic-embed:335m: 0.18, 3.96s, 1024
+snowflake-arctic-embed2:568m: -0.73, 14.24s, 1024
+all-minilm:22m: -1.30, 1.62s, 384
+olmo2:7b: -4.02, 28.61s, 4096
+olmo2:7b: -4.02, 21.57s, 4096
+snowflake-arctic-embed:22m: -5.28, 1.37s, 384
+command-r7b:7b: -5.35, 28.13s, 4096
+olmo2:13b: -6.00, 52.62s, 5120
+olmo2:13b: -6.00, 36.44s, 5120
+deepseek-r1:1.5b: -7.36, 8.78s, 1536
+snowflake-arctic-embed:110m: -7.39, 1.99s, 768
+mistral-small:24b: -7.93, 90.39s, 5120
+qwen2.5-coder:0.5b: -10.14, 5.39s, 896
+openthinker:32b: -18.00, 27.60s, 2
+llama3.3:70B: -18.00, 66.82s, 2
+deepseek-r1:70b: -18.00, 16.96s, 2
+deepseek-r1:8b: -18.00, 9.72s, 2
+qwen2.5-coder:32b: -18.00, 16.46s, 2
+deepseek-v3.2: -18.00, 16.51s, 2
+
+
+
+Meme sur paraphrase-multilingual:278m s'en sort pas trop sur "j'ai soif":
 
 'J'ai froid'  and  'je me caille'  => 2.8595345530512675
 'I'm hungry'  and  'I'm starving'  => 8.466821471644218

@@ -1,5 +1,18 @@
 # -*- coding: utf-8 -*- 
 
+"""
+
+A lancer tel quel depuis na@azure1: python3 embedding_bench.py
+
+lister les modeles installe:
+ollama list
+
+voir les modeles existants:
+https://ollama.com/library
+
+"""
+
+
 import time
 
 from embedtools import *
@@ -79,6 +92,8 @@ def run_bench():
     "deepseek-r1:70b","deepseek-r1:8b", "deepseek-r1:1.5b",
     "qwen2.5-coder:32b", "qwen2.5-coder:0.5b",
     "olmo2:13b", "olmo2:7b","command-r7b:7b",
+    # new dec2025
+    "nomic-embed-text-v2-moe", "deepseek-v3.2","qwen3-embedding","embeddinggemma",
     ]
     
     # test juste une seule

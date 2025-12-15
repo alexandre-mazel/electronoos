@@ -81,6 +81,10 @@ def llama3_embedding(text, strModel ):
             except Exception as err:
                 print( "WRN: llama3_embedding '%s': error occurs (2): %s" % (strModel, err)  )
                 return [1.,0.] # histoire d'avoir un truc qui ressemble a un vecteur un peu pourri
+        else:
+            print( "WRN: llama3_embedding '%s': error unknown, returning rotten vector" % (strModel)  )
+            return [1.,0.] # histoire d'avoir un truc qui ressemble a un vecteur un peu pourri
+            
     #~ print(out)
     return out['embedding']
     

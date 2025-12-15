@@ -98,7 +98,7 @@ def run_bench():
     
     # test juste une seule
     #~ strModelToCompare = ["paraphrase-multilingual:278m"]
-    strModelToCompare = ["qwen3-embedding"]
+    #~ strModelToCompare = ["qwen3-embedding"]
 
 
     conclusion = []

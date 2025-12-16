@@ -7,12 +7,12 @@ description: Turtle2 - Utilisation de boucles et fonctions
 
     L'usage de **ChatGPT** va vous rendre **idiot**.
     
-    - Ce TP est adapté à votre niveau.
-    - Sa progression est réfléchie.
-    - Si au lieu de réfléchir, vous allez pomper une solution de ChatGPT ou équivalent, vous n'apprendrez rien, vous vous ennuierez dans les prochains TPs et vous risquez d'avoir du mal lors de l'interrogation, et vous aurez donc une mauvaise image de vous, ce qui est fort dommage.
-    - Il est donc fortement recommandé de [réfléchir]("La reflexion vous aidera à avoir le contrôle de votre vie.")  par vous-même.
-    - Si vous êtes coincé, demandez de l'aide à votre professeur, il est la pour ça.
-    - Ne regardez pas les solutions sans réfléchir.
+    - Ce TP est adaptÃ© Ã  votre niveau.
+    - Sa progression est rÃ©flÃ©chie.
+    - Si au lieu de rÃ©flÃ©chir, vous allez pomper une solution de ChatGPT ou Ã©quivalent, vous n'apprendrez rien, vous vous ennuierez dans les prochains TPs et vous risquez d'avoir du mal lors de l'interrogation, et vous aurez donc une mauvaise image de vous, ce qui est fort dommage.
+    - Il est donc fortement recommandÃ© de [rÃ©flÃ©chir]("La reflexion vous aidera Ã  avoir le contrÃ´le de votre vie.")  par vous-mÃªme.
+    - Si vous Ãªtes coincÃ©, demandez de l'aide Ã  votre professeur, il est la pour Ã§a.
+    - Ne regardez pas les solutions sans rÃ©flÃ©chir.
 
 # Turtle en Python: Utilisation de boucles et fonctions
 

@@ -1,0 +1,115 @@
+DBeaver et BeaverCloud
+
+1) install Docker:
+(on RPI5)
+sudo apt update
+sudo apt install docker.io
+
+2) install docker image:
+cf https://github.com/dbeaver/cloudbeaver/wiki/CloudBeaver-Community-deployment-from-docker-image
+
+docker pull dbeaver/cloudbeaver:latest
+
+sudo docker run --name cloudbeaver --rm -ti -p 8978:8978 -v /var/cloudbeaver/workspace:/opt/cloudbeaver/workspace -v /home/na/dbs:/dbs dbeaver/cloudbeaver:latest
+
+http://192.168.0.50:8978
+http://thenardier.fr:50978
+(redir sur la freebox de 50978 sur rpi5:8978)
+
+Config: Thenardier Beaver Server
+cbadmin
+cbArn....??7!
+
+user: guest/guestNSI1
+
+--------
+Installer sqlite3 pour cree une db:
+sudo apt-get install sqlite3
+
+sqlite3 school.db
+
+CREATE TABLE students (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  first_name TEXT,
+  bday DATE
+);
+
+CREATE TABLE matieres (
+  id INTEGER PRIMARY KEY,
+  name TEXT
+);
+
+CREATE TABLE grades (
+  id INTEGER PRIMARY KEY,
+  id_matiere INT,
+  id_student INT,
+  note INT,
+  CONSTRAINT fk_grades_students
+    FOREIGN KEY (id_student)
+    REFERENCES students(id),
+  CONSTRAINT fk_grades_matieres
+    FOREIGN KEY (id_matiere)
+    REFERENCES matieres(id)
+);
+
+INSERT INTO students (id, name, first_name,bday) VALUES
+(1,'Ethienbled', 'Alice','22/05/1974'),
+(2,'Tarvalho', 'Elsa','18/06/1973'),
+(3,'Tamel', 'Torto','06/05/2008'),
+(4,'Tamel', 'Taia','27/03/2013'),
+(5,'Tamel', 'Alexandre','19/08/1974');
+
+INSERT INTO matieres VALUES
+    (1,'Mathematique')
+    ,(2,'Physique')
+    ,(3,'NSI')
+;
+
+INSERT INTO grades(id_matiere,id_student,note) VALUES
+     (1,1,18)
+    ,(1,2,12)
+    ,(1,3,14)
+    ,(1,4,11)
+    ,(1,5,7)
+    
+    ,(2,1,14)
+    ,(2,2,15)
+    ,(2,3,12)
+    ,(2,4,13)
+    ,(2,5,8)
+    
+;
+
+# for help: .help
+# to quit (everything is saved by default):
+
+.exit
+
+--------------------
+Connect in Beaver Cloud:
+
+1) ajouter driver JDBC SQLite dans les drivers:
+CloudBeaver/settings/new driver
+SQLite
+Driver class: org.sqlite.JDBC
+JDBC URL template: jdbc:sqlite:{file}
+
+Libraries/Add
+Type: Maven
+Group Id: org.xerial
+Artifact Id: sqlite-jdbc
+Version: 3.45.1.0
+
+Redémarrer CloudBeaver (important)
+
+OU dans server/config, j'ai desactivé le disable de sqllite
+
+2) Ajouter la db
+
+Open CloudBeaver
+New Connection: SQLite
+Database file path:
+/dbs/school.db
+
+(on a lancé cloudbeaver en montant /home/na/dbs to /dbs dans le docker de beaver)

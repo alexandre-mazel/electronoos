@@ -142,6 +142,18 @@ pygame.quit()
 
 ![image](img/pygame_02.png){width=300}
 
+
+!!! abstract "La structure d'un jeu"
+
+    Dans un jeu, il y a plusieurs phases, la plus importante est la phase de jeu, dans celle-ci le but est d'afficher le plus d'images par secondes pour que le joueur en 'prenne plein la vue'.
+    On parlera de fps "Frame par secondes", le nombre d'images qu'on peut afficher.
+    On différencie donc plusieurs phases pour arriver à ce résultat: 
+
+    - La **phase d'initialisation** ou chargement: le but de cette phase est de charger en mémoire (dans des variables donc) toutes les informations dont on aura besoin pendant la phase de jeu afin de ne pas avoir de ralentissements (lag)s pendant la phase de jeu.
+    - La **phase de jeu**: C'est une boucle avec plusieurs parties: lecture des actions de l'utilisateurs (clavier, souris, joypad), mis à jour du jeu en conséquence, prise en compte des autres actions des autres joueurs, puis calcul d'une nouvelle image, puis affichage de cette image à l'écran, et on recommence.
+    - La **phase de fin de jeu**: Après la phase de jeu, on va afficher des scores, sauvegarder des progressions sur le disque, les changements dans le monde... et proposer une nouvelle partie.
+
+
 ## 3. Gestion des évènements
 Lorsqu'un programme ```pygame``` est lancé, la variable interne ```pygame.event.get()``` reçoit en continu les évènements des périphériques gérés par le système d'exploitation.  
 Nous allons nous intéresser aux évènements de type ```KEYDOWN``` (touche de clavier appuyée) ou de type ```MOUSEBUTTONDOWN``` (boutons de souris appuyé).

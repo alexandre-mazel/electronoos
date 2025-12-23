@@ -135,6 +135,24 @@ SOFTWARE.
 
 resizeCanvas();
 
+/*
+Explication:
+generateColor va generer du orange (NB: je l'ai changé ici pour qu'il balance du blanc qui tire sur le rose)
+- Pas de couleurs froides
+- Bloom activé
+- Curl élevé => flammes instables
+
+mouseenter
+mousemove
+
+Chaque mouvement :
+    - injecte de la vitesse
+    - injecte de la “matière chaude”
+    
+Si on ne veut pas d'interaction on peut multipleSplats(1);
+    
+*/
+
 var config = {
     SIM_RESOLUTION: 256,
     DYE_RESOLUTION: 256,
@@ -1140,7 +1158,8 @@ function correctDeltaY (delta) {
 }
 
 function generateColor() {
-    return { r: 1.0, g: 0.4, b: 0.0 };
+   // return { r: 1.0, g: 0.4, b: 0.0 }; // joli orange
+   return { r: 1.0, g: 0.4, b: 1.0 }; // joli blanc qui part dans le rose
 }
 
 function HSVtoRGB (h, s, v) {

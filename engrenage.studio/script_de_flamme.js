@@ -1079,6 +1079,20 @@ window.FluidSimulation.addTrackedEventListener(canvas, 'mousemove', function (e)
     updatePointerMoveData(pointer, posX, posY);  
 });
 
+function goFullscreen() {
+  const el = document.documentElement;
+
+  if (el.requestFullscreen) {
+    el.requestFullscreen();
+  } else if (el.webkitRequestFullscreen) {
+    el.webkitRequestFullscreen(); // Safari iOS
+  }
+}
+
+window.FluidSimulation.addTrackedEventListener(canvas, 'mousedown', function (e) {
+    goFullscreen();
+});
+
 window.FluidSimulation.addTrackedEventListener(canvas, 'touchstart', function (e) {
     if (!isValid()) return;
     e.preventDefault();

@@ -1083,9 +1083,11 @@ function goFullscreen() {
   const el = document.documentElement;
 
   if (el.requestFullscreen) {
-    el.requestFullscreen();
+        ret = el.requestFullscreen();
+        console.log( "ret1: ", ret );
   } else if (el.webkitRequestFullscreen) {
-    el.webkitRequestFullscreen(); // Safari iOS
+        ret = el.webkitRequestFullscreen(); // Safari iOS
+        console.log( "ret2: ", ret );
   }
 }
 

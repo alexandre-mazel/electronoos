@@ -1089,8 +1089,15 @@ function goFullscreen() {
   }
 }
 
+var b_only_once_full_screen = true;
+
+
 window.FluidSimulation.addTrackedEventListener(canvas, 'mousedown', function (e) {
-    goFullscreen();
+    if( b_only_once_full_screen )
+    {
+        b_only_once_full_screen = false;
+        goFullscreen();
+    }
 });
 
 window.FluidSimulation.addTrackedEventListener(canvas, 'touchstart', function (e) {
@@ -1104,7 +1111,11 @@ window.FluidSimulation.addTrackedEventListener(canvas, 'touchstart', function (e
         var posY = scaleByPixelRatio(touches[i].pageY);
         updatePointerDownData(pointers[i + 1], touches[i].identifier, posX, posY);
     }
-    goFullscreen();
+    if( b_only_once_full_screen )
+    {
+        b_only_once_full_screen = false;
+        goFullscreen();
+    }
 });
 
 window.FluidSimulation.addTrackedEventListener(canvas, 'touchmove', function (e) {

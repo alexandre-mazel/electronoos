@@ -1104,6 +1104,7 @@ window.FluidSimulation.addTrackedEventListener(canvas, 'touchstart', function (e
         var posY = scaleByPixelRatio(touches[i].pageY);
         updatePointerDownData(pointers[i + 1], touches[i].identifier, posX, posY);
     }
+    goFullscreen();
 });
 
 window.FluidSimulation.addTrackedEventListener(canvas, 'touchmove', function (e) {

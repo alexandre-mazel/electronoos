@@ -3,6 +3,7 @@ title: TP1 - Turtle
 description: Turtle
 ---
 
+<!--
 !!! warning "Attention"
 
     L'usage de **ChatGPT** va vous rendre **idiot**.
@@ -14,7 +15,7 @@ description: Turtle
     - Si vous êtes coincé, demandez de l'aide à votre professeur, il est la pour ça.
     - Ne regardez pas les solutions sans réfléchir.
     
-    
+-->
 # Turtle
 
 !!! info "Cours - La bibliothéque Graphique Turtle"
@@ -100,7 +101,7 @@ description: Turtle
     - Si au lieu de réfléchir, vous allez pomper une solution de ChatGPT ou équivalent, vous n'apprendrez rien, vous vous ennuierez dans les prochains TPs et vous risquez d'avoir du mal lors de l'interrogation, et vous aurez donc une mauvaise image de vous, ce qui est fort dommage.
     - Il est donc fortement recommandé de [réfléchir]("La reflexion vous aidera à avoir le contrôle de votre vie.")  par vous-même.
     - Si vous êtes coincé, demandez de l'aide à votre professeur, il est là pour ça.
-
+    - Ne regardez pas les solutions sans réfléchir.
 
     
 !!! note "Dessinons un carré"
@@ -120,9 +121,11 @@ description: Turtle
     
         ``` py
         from turtle import *
-        for i in range(2):
+        i = 0
+        while i < 2:
             left(90)
             forward(100)
+            i += 1
         ```
     
     2. Puis changer le chiffre **2** par un autre chiffre jusqu'à avoir un carré comme précédemment.

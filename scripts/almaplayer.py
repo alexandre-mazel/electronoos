@@ -20,6 +20,7 @@ sys.stdout.flush()
 sys.path.append("../alex_pytools/")
 sys.path.append("C:/Users/alexa/dev/git/electronoos/alex_pytools/")
 import sound_player
+import misctools
 
 timeLastNext = time.time()-100
 
@@ -86,6 +87,7 @@ def playWebm(strFilename):
 def playSongInterruptible(strFilename):
     """
     return -1 on error, 0 if finished, 1 if skipped, 2 for prev, 10 if want to exit
+    20 => shuffle the list
     """
     print("INF: playing '%s'" % strFilename )
     if ".m4a" in strFilename:
@@ -144,6 +146,14 @@ def playSongInterruptible(strFilename):
                         time.sleep(1.5) #fadout is not blocking
                         pg.mixer.music.stop()
                         return 10
+                    if key == 'r':
+                        print("stopping current song and randomizing the list...")
+                        print("fading...")
+                        timeLastNext = time.time()
+                        pg.mixer.music.fadeout(1500)
+                        time.sleep(1.5) #fadout is not blocking
+                        pg.mixer.music.stop()
+                        return 20
                     if key == 'n':
                         print("skipping current song...")
                         if time.time()-timeLastNext > 3: # we dont want to fade if in a rapid series of next
@@ -205,6 +215,7 @@ def playAllFileFromFolder( strPath, listToExclude=[], strStartFrom = "" ):
         if bSearchStart:
             if f != strStartFrom:
                 continue
+                
             # else, it's the one to start!
             bSearchStart = False
         
@@ -223,7 +234,13 @@ def playAllFileFromFolder( strPath, listToExclude=[], strStartFrom = "" ):
         print( "DBG: playAllFileFromFolder: ret: %d" % ret )
         if ret == 10:
             return
-        if ret == 2:
+        if ret == 20:
+            print("Shuffling the list. List[5] was: %s" % str(listMusics[:5]) )
+            print("WRN: Was shuffled only from the one started first")
+            listMusics = misctools.shuffle(listMusics,len(listMusics))
+            print("Now List[5] is: %s" % str(listMusics[:5]) )
+            n = 0
+        elif ret == 2:
             n -= 1
             if n < 0:
                 n = len(listMusics)-1
@@ -245,12 +262,20 @@ if __name__ == "__main__":
         #print(sys.argv)
         if len(sys.argv)>1:
             mp3file = sys.argv[1]
-            if playSongInterruptible(mp3file) != 10:
-                # trouve les autre chansons du dossier et les joue (mais que les suivantes)
+            if 0:
+                # ancienne facon (probleme c'est que la premiere fois, les touches comme r ne sont pas geres)
+                if playSongInterruptible(mp3file) != 10:
+                    # trouve les autre chansons du dossier et les joue (mais que les suivantes)
+                    strPath, strFilename = os.path.split(mp3file)
+                    if os.sep not in mp3file:
+                        strPath = "."+os.sep
+                    playAllFileFromFolder( strPath+os.sep, [strFilename],strStartFrom=strFilename )
+            else:
                 strPath, strFilename = os.path.split(mp3file)
                 if os.sep not in mp3file:
                     strPath = "."+os.sep
-                playAllFileFromFolder(strPath+os.sep, [strFilename],strStartFrom=strFilename)
+                playAllFileFromFolder( strPath+os.sep, [],strStartFrom=strFilename )
+                
              
     except BaseException as err:
         print("ERR: Almaplayer, catched error: %s" % str(err))

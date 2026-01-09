@@ -62,7 +62,7 @@ description: Turtle
     
 !!! note "Création d'un nouveau script dans Thonny"
 
-    1. Depuis le bureau, lancez l'application **Thonny**
+    1. Depuis le bureau, lancez l'application **Thonny** (ou si elle n'y est pas, lancez EduPython)
     <figure markdown>
       ![thonny_window](images/thonny.png)
       L'application Thonny
@@ -85,6 +85,7 @@ description: Turtle
         ```
     
     2. Puis appuyer sur la touche F5 pour que l'ordinateur exécute votre script.
+       (Dans EduPython c'est le triangle vert au milieu de la barre d'outil du haut.)
     
     3. Vous devriez voir une figure comme celle ci:
     <figure markdown>
@@ -125,7 +126,7 @@ description: Turtle
         while i < 2:
             left(90)
             forward(100)
-            i += 1
+            i = i + 1
         ```
     
     2. Puis changer le chiffre **2** par un autre chiffre jusqu'à avoir un carré comme précédemment.

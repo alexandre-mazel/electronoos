@@ -24,31 +24,39 @@ description: Turtle2 - Utilisation de boucles et fonctions
     
     ``` py
     from turtle import *
-    for i in range(4):
+    i = 0
+    while i < 4:
         left(90)
         forward(100)
+        i = i + 1
     ```
-    Voici un autre exemple de boucle avec l'utilisation d'une variable:
+    Voici un autre exemple de boucle avec l'utilisation d'une variable pour la taille:
     ``` py
     from turtle import *
     
     taille = 100
-    for i in range(4):
+    i = 0
+    while i < 4:
         left(90)
         forward(taille)
-        taille = taille + 100
+        i = i + 1
     ```
     Voici une boucle dans une boucle:
     ``` py
     from turtle import *
     
-    taille = 20
-    for j in range(3):
-        for i in range(4):
+    taille = 30
+    j = 0
+    while j < 3:
+        i = 0
+        while i < 4:
             left(90)
             forward(taille)
+            i = i + 1
         taille = taille + 20
+        j = j + 1
     ```
+    N'hésitez pas à tester ces boucles lors du TP.
      
 !!! info "Cours - Utilisation de fonctions"
 
@@ -59,11 +67,13 @@ description: Turtle2 - Utilisation de boucles et fonctions
     ``` py
     from turtle import *
     
-    # Voici la définition d'une fonction:
+    # Voici la definition d'une fonction:
     def carre(longueur):
-        for i in range(4):
+        i = 0
+        while i < 4:
             left(90)
             forward(longueur)
+            i = i + 1
         
     # Maintenant que l'ordinateur connait cette nouvelle fonction;
     # on peut l'utiliser:

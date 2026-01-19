@@ -91,6 +91,10 @@ she_d = 2
 she_r = 3      # r (then g then b)
 she_g = 4
 she_b = 5
+she_w = 6
+she_a = 7
+she_vio = 8
+she_max = 10
 
 first_lustr = 1
 nbr_lustr = 33

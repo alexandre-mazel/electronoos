@@ -247,7 +247,7 @@ def test_wiz():
 
         loop.run_until_complete(fade_all_wiz(col_1,col_2,duration))
         
-    if 1:
+    if 0:
         # reglage pour eclairage oeuvre #2: avec brightness bien gere.
         duration = 20.6 # in sec
         col_1 = (0,0,0,255,255,255)
@@ -331,6 +331,13 @@ def test_wiz():
         # essaye de forcer la lampe a s'eteindre
         loop.run_until_complete(fade_all_wiz(col_4,col_off,2)) # force to call it
         loop.run_until_complete(fade_all_wiz(col_off,col_off,1,just_one_call=True))
+        
+    if 1:
+        # test 1 lampe
+        ip = "192.168.9.219"
+        col_violet = (255,0,255,0,0,230)
+        loop.run_until_complete(fade_all_wiz(col_violet,col_violet,1,ips_bulb=[ip]))
+        
 
 if __name__ == "__main__":
     test_wiz()

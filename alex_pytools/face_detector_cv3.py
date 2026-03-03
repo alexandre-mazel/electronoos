@@ -351,4 +351,6 @@ facedetector = FaceDetector()
         
 if __name__ == "__main__":
     im = cv2.imread("../data/girl_face.jpg")
-    facedetector.detect(im)
+    ret = facedetector.detect(im)
+    print("ref: [(1341, 857, 3772, 3271, 0.9979175), (437, 33, 2746, 2396, 0.6864305)]")
+    print("ret: %s" % str(ret) )

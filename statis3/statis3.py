@@ -53,6 +53,7 @@ def replaceNameReplaceByNonAccentuatedChars(s):
                     ( "\\N{FIREWORKS}", "-" ),
                     ( "\\N{BIG SOLIDUS}", "-" ),
                     ( "\\N{BIG REVERSE SOLIDUS}", "-" ), # c'est cense etre l'anti slash, mais on met juste un -
+                    ( "\\N{DRUM WITH DRUMSTICKS}", "_" ),
                     
                     ( "\\N{HANGUL SYLLABLE HAE}", "X" ), # caractere coréen qui veut dire spring
                     ( "\\N{HANGUL SYLLABLE SEOG}", "X" ), # qui veut dire night (ou l'inverse) #faire un code qui change tout les HANGUL_SYLLABLE_* par rien ou X

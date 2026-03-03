@@ -44,12 +44,25 @@ function downloadFile(data, name = 'file', type = 'text/plain') {
 
 function jumpToSite(strName)
 {
+    // Pas la peine de relancer le serveur obor, car c'est :8001, liens sous la forme:  http://thenardier.fr:8001/j.htm?t_sql
     dictConv = {
         "qcm1": "https://pasallard.gitlab.io/qcm_nsi_premiere/QCM_Python_Bases_partie1.html",
         "qcm23": "https://pasallard.gitlab.io/qcm_nsi_premiere/NSI1_Linux_QCM_Training.html",
         "qcm81": "https://pasallard.gitlab.io/qcm_nsi_premiere/NSI1_ArchitectureMaterielle.html",
         "tox": "https://compute-it.toxicode.fr/?progression=python",
         "nbpyt1": "https://pasallard.gitlab.io/premiere_nsi_voltaire/Programmation/1_BasesPython/BasesPython_Exos_Synthese.ipynb",
+        "t_sql": " https://glassus.github.io/terminale_nsi/T4_Bases_de_donnees/4.2_Langage_SQL/cours",
+        "t_seco": "https://cours-beucher.forge.apps.education.fr/terminale-nsi/12-Securisation_des_communications/Securisation_des_communications/",
+        "t_api": "https://nsi.erwandemerville.fr/terminale/modularite/api/#activite-recuperer-la-meteo-dans-un-programme-python",
+        "t_progd": "https://sommerfeldludovic.forge.apps.education.fr/ns-info-lycee-faustin-fleret/03_terminale_nsi/04_lp/01_cours/",
+        "t_progdvid": "https://www.arte.tv/fr/videos/107398-010-A/voyages-au-pays-des-maths/",
+        "sort_sel": "https://tube-sciences-technologies.apps.education.fr/w/g57kTAw5R1PYxZ9SfR4ZQ4",
+        "sort_sel2": "https://tube-sciences-technologies.apps.education.fr/w/oV738XhMgEXcMbF6G3NVky",
+        "sort_ins": "https://tube-sciences-technologies.apps.education.fr/w/5Ku5v65iAcD1wDyWULJXXz",
+        "sort_ins2": "https://tube-sciences-technologies.apps.education.fr/w/typukTUwfCg6gXfpvBeS51",
+        "sort_merge": "https://tube-sciences-technologies.apps.education.fr/w/iMT4VKF1gcv4imzDbRPcUr",
+        "sort_quick": "https://tube-sciences-technologies.apps.education.fr/w/agdsBW5PaCz1HVzmxf6gtk",
+        "sort_count": "https://tube-sciences-technologies.apps.education.fr/w/tyzLFNVoiGMaVNjrLUfUrR",
     };
     
     console.log( "jumpToSite: '" + strName + "'" )

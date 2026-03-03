@@ -1348,6 +1348,14 @@ def shuffle( aList, n = 1 ):
         del aList[idx]
     return out
     
+if 0:
+    li = [1,2,3,4,5]
+    print(shuffle(li,3))
+    li = ["Alex","Elsa","Corto","Gaia"]
+    print(shuffle(li,4))
+    exit(1)
+    
+    
 
 global_dict_shuffle_int_mem = {}
 def shuffle_int_mem(nMax):

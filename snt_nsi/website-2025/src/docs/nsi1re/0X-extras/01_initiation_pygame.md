@@ -142,6 +142,18 @@ pygame.quit()
 
 ![image](img/pygame_02.png){width=300}
 
+
+!!! abstract "La structure d'un jeu"
+
+    Dans un jeu, il y a plusieurs phases, la plus importante est la phase de jeu, dans celle-ci le but est d'afficher le plus d'images par secondes pour que le joueur en 'prenne plein la vue'.
+    On parlera de fps "Frame par secondes", le nombre d'images qu'on peut afficher.
+    On différencie donc plusieurs phases pour arriver à ce résultat: 
+
+    - La **phase d'initialisation** ou chargement: le but de cette phase est de charger en mémoire (dans des variables donc) toutes les informations dont on aura besoin pendant la phase de jeu afin de ne pas avoir de ralentissements (lags) pendant la phase de jeu. Dans notre exemple, on a chargé le sprite sur le disque avant la boucle du jeu.
+    - La **phase de jeu**: C'est une boucle avec plusieurs parties: lecture des actions de l'utilisateurs (clavier, souris, joypad), mis à jour du jeu en conséquence, prise en compte des autres actions des autres joueurs, puis calcul d'une nouvelle image, puis affichage de cette image à l'écran, et on recommence. Dans notre exemple c'est la boucle while principale.
+    - La **phase de fin de jeu**: Après la phase de jeu, on va afficher des scores, sauvegarder des progressions sur le disque, les changements dans le monde... et proposer une nouvelle partie. Toujours dans notre exemple, c'est ce qui pourrait se trouver après notre boucle while.
+
+
 ## 3. Gestion des évènements
 Lorsqu'un programme ```pygame``` est lancé, la variable interne ```pygame.event.get()``` reçoit en continu les évènements des périphériques gérés par le système d'exploitation.  
 Nous allons nous intéresser aux évènements de type ```KEYDOWN``` (touche de clavier appuyée) ou de type ```MOUSEBUTTONDOWN``` (boutons de souris appuyé).
@@ -164,7 +176,8 @@ for event in pygame.event.get():
         ```python linenums='1'
         import pygame
         from pygame.locals import *
-
+        
+        # 1: Initialisation et chargement
         pygame.init()
 
         fenetre = pygame.display.set_mode((640, 480))
@@ -172,8 +185,9 @@ for event in pygame.event.get():
         perso = pygame.image.load('perso.png').convert_alpha()
         position_perso = perso.get_rect()
 
+        # 2: Boucle principale de notre jeu
         running = True
-        while running: 
+        while running:
             fenetre.fill((10, 186, 181))
             position_perso.topleft = (100, 200)
             fenetre.blit(perso, position_perso)
@@ -182,7 +196,8 @@ for event in pygame.event.get():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-                    
+        
+        # 3: Gestion de la fin de jeu et nettoyage
         pygame.quit()
         ```
 
@@ -284,10 +299,10 @@ Le clic-gauche est associé à la valeur 1, le clic-droit à la valeur 3 (le cli
                 if event.type == pygame.QUIT:
                     running = False
 
-            if event.type == MOUSEBUTTONDOWN and event.button == 1 :
-                print('clic gauche détecté')
-            if event.type == MOUSEBUTTONDOWN and event.button == 3 :
-                print('clic droit détecté')
+                if event.type == MOUSEBUTTONDOWN and event.button == 1 :
+                    print('clic gauche détecté')
+                if event.type == MOUSEBUTTONDOWN and event.button == 3 :
+                    print('clic droit détecté')
         
         pygame.quit()
         
@@ -337,10 +352,10 @@ Cette fonction n'a pas besoin d'être dans notre boucle d'écoute des évènemen
                 if event.type == pygame.QUIT:
                     running = False
 
-            if event.type == MOUSEBUTTONDOWN and event.button == 1 :
-                print('clic gauche détecté')
-            if event.type == MOUSEBUTTONDOWN and event.button == 3 :
-                print('clic droit détecté')
+                if event.type == MOUSEBUTTONDOWN and event.button == 1 :
+                    print('clic gauche détecté')
+                if event.type == MOUSEBUTTONDOWN and event.button == 3 :
+                    print('clic droit détecté')
         
         pygame.quit()
         

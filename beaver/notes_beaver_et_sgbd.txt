@@ -1,0 +1,226 @@
+DBeaver et BeaverCloud
+
+1) install Docker:
+(on RPI5)
+sudo apt update
+sudo apt install docker.io
+
+2) install docker image:
+cf https://github.com/dbeaver/cloudbeaver/wiki/CloudBeaver-Community-deployment-from-docker-image
+
+docker pull dbeaver/cloudbeaver:latest
+
+sudo docker run --name cloudbeaver --rm -ti -p 8978:8978 -v /var/cloudbeaver/workspace:/opt/cloudbeaver/workspace -v /home/na/dbs:/dbs dbeaver/cloudbeaver:latest
+
+http://192.168.0.50:8978
+http://thenardier.fr:50978
+(redir sur la freebox de 50978 sur rpi5:8978)
+
+Config: Thenardier Beaver Server
+cbadmin
+cbArn....??7!
+
+user: guest/guestNSI1
+
+--------
+Installer sqlite3 pour cree une db:
+sudo apt-get install sqlite3
+
+sqlite3 school.db
+
+CREATE TABLE students (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  first_name TEXT,
+  bday DATE
+);
+
+CREATE TABLE matieres (
+  id INTEGER PRIMARY KEY,
+  name TEXT
+);
+
+CREATE TABLE grades (
+  id INTEGER PRIMARY KEY,
+  id_matiere INT,
+  id_student INT,
+  note INT,
+  CONSTRAINT fk_grades_students
+    FOREIGN KEY (id_student)
+    REFERENCES students(id),
+  CONSTRAINT fk_grades_matieres
+    FOREIGN KEY (id_matiere)
+    REFERENCES matieres(id)
+);
+
+INSERT INTO students (id, name, first_name,bday) VALUES
+(1,'Ethienbled', 'Alice','22/05/1974'),
+(2,'Tarvalho', 'Elsa','18/06/1973'),
+(3,'Tamel', 'Torto','06/05/2008'),
+(4,'Tamel', 'Taia','27/03/2013'),
+(5,'Tamel', 'Alexandre','19/08/1974');
+
+INSERT INTO matieres VALUES
+    (1,'Mathematique')
+    ,(2,'Physique')
+    ,(3,'NSI')
+;
+
+INSERT INTO grades(id_matiere,id_student,note) VALUES
+     (1,1,18)
+    ,(1,2,12)
+    ,(1,3,14)
+    ,(1,4,11)
+    ,(1,5,7)
+    
+    ,(2,1,14)
+    ,(2,2,15)
+    ,(2,3,12)
+    ,(2,4,13)
+    ,(2,5,8)
+    
+;
+
+# for help: .help
+# to quit (everything is saved by default):
+
+.exit
+
+--------------------
+Connect in Beaver Cloud:
+
+1) ajouter driver JDBC SQLite dans les drivers:
+CloudBeaver/settings/new driver
+SQLite
+Driver class: org.sqlite.JDBC
+JDBC URL template: jdbc:sqlite:{file}
+
+Libraries/Add
+Type: Maven
+Group Id: org.xerial
+Artifact Id: sqlite-jdbc
+Version: 3.45.1.0
+
+Redémarrer CloudBeaver (important)
+
+OU dans server/config, j'ai desactivé le disable de sqllite
+
+2) Ajouter la db
+
+Open CloudBeaver
+New Connection: SQLite
+Database file path:
+/dbs/school.db
+
+(on a lancé cloudbeaver en montant /home/na/dbs to /dbs dans le docker de beaver)
+
+--------
+Installé MariaDB meilleur pour acces concurrentiel
+
+sudo apt update
+sudo apt install mariadb-server
+sudo mysql_secure_installation
+
+
+
+--- Creation d'une DB:
+sudo mariadb
+
+
+CREATE DATABASE school_maria_db;
+USE school_maria_db;
+
+CREATE TABLE students (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255),
+    first_name VARCHAR(255),
+    bday DATE
+);
+
+CREATE TABLE matieres (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255)
+);
+
+CREATE TABLE grades (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_matiere INT,
+    id_student INT,
+    note INT,
+    CONSTRAINT fk_grades_students
+        FOREIGN KEY (id_student)
+        REFERENCES students(id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_grades_matieres
+        FOREIGN KEY (id_matiere)
+        REFERENCES matieres(id)
+        ON DELETE CASCADE
+);
+
+// les dates sont différentes, le reste est pareil:
+
+INSERT INTO students (id, name, first_name,bday) VALUES
+(1,'Ethienbled', 'Alice','1974-05-22'),
+(2,'Tarvalho', 'Elsa','1973-06-18'),
+(3,'Tamel', 'Torto','2008-05-06'),
+(4,'Tamel', 'Taia','2013-03-27'),
+(5,'Tamel', 'Alexandre','1974-08-19');
+
+// Pas un seul fichier:
+
+Stockage interne
+Quand tu crées une base et des tables, MariaDB stocke tout dans son répertoire de données, généralement quelque chose comme :
+/var/lib/mysql/nom_de_la_base/
+
+
+Chaque table est stockée dans plusieurs fichiers internes (un fichier .frm pour la structure, .ibd pour les données si InnoDB, etc.).
+Tu n’as pas un fichier unique .db que tu peux déplacer comme SQLite.
+
+=> Sauvegarde/export
+
+Si tu veux un fichier unique pour sauvegarder ou transférer la base, tu dois faire un dump avec mysqldump :
+mysqldump -u ton_utilisateur -p school > school_backup.sql
+
+
+school_backup.sql contient toutes les commandes SQL pour recréer la base et les tables.
+Tu peux ensuite restaurer sur un autre serveur :
+mariadb -u ton_utilisateur -p school < school_backup.sql
+
+// avoir de l'aide:
+HELP;
+ou HELP CREATE;
+
+// quitter:
+QUIT;
+ou
+EXIT;
+
+
+
+# cree l'utilisateur dbeaver dans mariadb
+CREATE USER 'dbeaver_user'@'%' IDENTIFIED BY 'mariakwdbeaver**';
+USE school_maria_db;
+GRANT ALL PRIVILEGES ON school_maria_db.* TO 'dbeaver_user'@'%';
+FLUSH PRIVILEGES;
+
+# confiurer une nouvelle connection
+Host / Server	192.168.1.xx (IP de ton Pi) => thenardier.fr
+Port	50306 # redir freebox 50306 => 3306
+Database / Schema	school
+Username	dbeaver_user
+Password	le mot de passe
+cocher "save credentials for all user with access"
+
+# verifier que ca ecoute depuis l'exterieur:
+na@pidev:~ $ sudo netstat -tulnp | grep 3306
+tcp        0      0 127.0.0.1:3306          0.0.0.0:*               LISTEN  
+=> n'ecoute qu'en local
+
+sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf
+bind-address = 127.0.0.1 # a changer en 0.0.0.0
+
+#redemarrer:
+sudo systemctl restart mariadb
+
+
+

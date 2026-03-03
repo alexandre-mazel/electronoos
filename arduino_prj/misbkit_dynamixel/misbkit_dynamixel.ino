@@ -203,7 +203,7 @@ void setup() {
   }
   
   DEBUG_SERIAL.print( "Total " );
-  DEBUG_SERIAL.print( found_dynamixel );
+  DEBUG_SERIAL.print( nNbrFoundMotor );
   DEBUG_SERIAL.println( " DYNAMIXEL(s) found!" );
 
   lcd_print_message( "Nbr Motor found: ", nNbrFoundMotor );
@@ -238,17 +238,27 @@ void setup() {
     }
   }
 
-  if( 0 )
+  if( 1 )
   {
     // Tested and working code to rename a servo id
     if( nNbrFoundMotor > 0 )
     {
-      int nID = 46;
+      int nID = 17;
       int nNewBaudrate = 57600;
+
       lcd_print_message( "WARNING: in 5 sec" );
       lcd_print_message( "Change motor ID: ", nID );
       lcd_print_message( "To BR: ", nNewBaudrate );
-      delay( 6000 );
+
+      for(int i = 0; i < 12; ++i)
+      {
+        dxl.ledOn(nID);
+        delay(250);
+        dxl.ledOff(nID);
+        delay(250);
+      }
+      
+      //delay( 3000 );
       dxl.setBaudrate( nID, nNewBaudrate );
       
       

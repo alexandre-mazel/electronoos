@@ -299,7 +299,7 @@ if 0:
             time.sleep(time_wait)
             
             
-if 1:
+if 0:
     # allumé/eteint tres lent
     print("slow on and off")
     time_wait = 4
@@ -311,6 +311,47 @@ if 1:
         time.sleep(time_wait)
         dmx.set_data( dev_id+0, 0 )
         time.sleep(time_wait)
+        
+        
+if 1:
+    print("she full UV")
+    from ccc import * # for she_xxx
+    time_wait = 6
+    # regler la teinte a blanc:
+    dmx.set_clear_channel_at_exit( False )
+    for i in range(she_max):
+        dmx.set_data( dev_id+i, 0 )
+
+    dmx.set_data( dev_id+she_v, 40 )
+    dmx.set_data( dev_id+she_d, 255 )
+    dmx.set_data( dev_id+she_vio, 255 )
+    
+    offset = 20
+    if 0:
+            while 1:
+                # rotate with this light
+                dmx.set_data( dev_id+she_h, 170+offset )
+                time.sleep(time_wait)
+                dmx.set_data( dev_id+she_h, 170-offset )
+                time.sleep(time_wait), 
+    if 1:
+        # sinus
+        import sys
+        sys.path.append("../alex_pytools/")
+        import interpolator
+        im = interpolator.InterpolatorManager( 2 ) # we don't use the 0
+        
+        duration = 6
+        #~ im.get(she_h).set( 170-offset, 0 )
+        im.get(she_h).set( 170+offset, duration, start_val = 170-offset, mode = interpolator.mode_pingpong, interpolation=interpolator.interpolation_sinus )
+        while 1:
+            im.update()
+            v = im.get(she_h).get_val()
+            dmx.set_data( dev_id+she_h, v )
+            time.sleep(0.1)
+            
+
+        
     
     
     

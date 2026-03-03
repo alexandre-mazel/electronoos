@@ -67,7 +67,7 @@ lustr_a = 2     # amber
 lustr_g = 3     # green
 lustr_c = 4     # cyan
 lustr_b = 5     # blue
-lustr_i = 6      #  indigo
+lustr_i = 6      # indigo
 lustr_d = 7     # dim
 
 # mode 16chan
@@ -91,6 +91,10 @@ she_d = 2
 she_r = 3      # r (then g then b)
 she_g = 4
 she_b = 5
+she_w = 6
+she_a = 7
+she_vio = 8
+she_max = 10
 
 first_lustr = 1
 nbr_lustr = 33

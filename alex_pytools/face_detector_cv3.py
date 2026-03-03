@@ -8,7 +8,7 @@ strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
 print("strLocalPath: " + strLocalPath)
 
 
-from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neighbors import KNeighborsClassifier # pip install scikit-learn   or   debian: sudo apt-get install python3-sklearn python3-sklearn-lib python-sklearn-doc
 
 def isSameArray(a,b):
     if len(a) != len(b):

@@ -351,12 +351,16 @@ facedetector = FaceDetector()
         
 if __name__ == "__main__":
     im = cv2.imread("../data/girl_face.jpg")
+    print("im size: %dx%d" % (im.shape[1],im.shape[0]) ) # a big one...
+    
     ret = facedetector.detect(im[:])
+    
     print("ref: [(1341, 857, 3772, 3271, 0.9979175), (437, 33, 2746, 2396, 0.6864305)]")
     print("ret: %s" % str(ret) )
+    
     if 1:
         # compute time
         time_begin = time.time()
         ret = facedetector.detect(im)
         duration = time.time() - time_begin
-        print("duration: %.3fs (%.1fps)" % (duration,1/duration) ) # mstab7:  0.030s (33.4ps)
+        print("duration: %.3fs (%.1fps)" % (duration,1/duration) ) # mstab7:  0.030s (33.4ps), RPi5: 0.094s (10.6ps)

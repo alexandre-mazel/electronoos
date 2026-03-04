@@ -12,6 +12,15 @@ import cities_data
 from cities_data import assert_equal, assert_not_equal
 
 
+    
+kCityName = 0
+kStateID = 2
+kStateName = 3
+kCountyName = 5
+kLong = 6
+kLat = 7
+kZips = 15
+
 class CitiesUs:
     """
     Uses:
@@ -25,18 +34,10 @@ class CitiesUs:
         distTwoZip( zip1, zip2 )
     """
     
-    kCity = 0
-    kStateID = 2
-    kStateName = 3
-    kCountyName = 5
-    kLong = 6
-    kLat = 7
-    kZips = 15
-    
-    
     def __init__(self):
         self.dictCities = {} # id => (city, city_ascii?, state_id, state_name,county_fips, county_name,float(strLong),float(strLat),population, density, ranking?,list_of_zips)
-        self.dictIdPerZips = {} # zip as a string => id
+        self.dictIdsPerZip = {} # zip as a string => (id1, id2, ...)
+        self.dictIdsPerCityName = {} # zip as a string => (id1, id2, ...)
         #~ self.dupCityPerZip = {} # some cities have same zip, so we store for each overwritten city slug their zip
         #~ self.dupZipPerZip = {} # some zip are for the same cities, we store them here alternateZip => Zip
         #~ self.cacheLastFindByRealName = (None,None,None) # city, partof, result of last research
@@ -58,6 +59,7 @@ class CitiesUs:
         line = file.readline() # skip first line
         self.dictCities = {}
         nDuplicateZip = 0
+        nDuplicateCityName = 0
         while 1:
             line = file.readline()
             if len(line)<1:
@@ -81,25 +83,38 @@ class CitiesUs:
                         
             
             for z in listZips:
-                if z in self.dictIdPerZips:
-                    print( "WRN: %s have same zip than %s: %s" % (strCity,self.dictCities[self.dictIdPerZips[z]][0],z) )
+                if not z in self.dictIdsPerZip:
+                    self.dictIdsPerZip[z] = []
+                else:
+                    first_id = self.dictIdsPerZip[z][0]
+                    if bVerbose: print( "WRN: %s have same zip than %s: %s" % (strCity,self.dictCities[first_id][kCityName],z) )
                     nDuplicateZip += 1
-                self.dictIdPerZips[z] = strId
+
+                self.dictIdsPerZip[z].append( strId )
+                
+            if not strCity in self.dictIdsPerCityName:
+                    self.dictIdsPerCityName[strCity] = []
+            else:
+                first_id = self.dictIdsPerCityName[strCity][0]
+                if bVerbose: print( "WRN: %s/%s have same cityname than %s/%s" % (strCity,strCountyName,self.dictCities[first_id][kCityName],self.dictCities[first_id][kCountyName]) )
+                nDuplicateCityName += 1
+
+            self.dictIdsPerCityName[strCity].append( strId )
+            
                 
             #~ break
             
             
         # while each line
         
-        print( "INF: %d loaded cities" % len(self.dictCities) ) # should be 31257
+        print( "INF: %d loaded cities" % len(self.dictCities)  ) # should be 31257
+        assert( len(self.dictCities) == 31257 )
         print( "WRN: %d duplicated zip found" % nDuplicateZip )
+        print( "WRN: %d duplicated cityname found" % nDuplicateCityName )
         
         # manual addings:
                 
         print("INF: Cities: loading city data - end duration: %.2fs" % (time.time()-timeBegin) )
-        # mstab7: 0.27s
-        # rpi4 2.7: 11.8s
-        # rpi4 3.7: 1.18s
     # load - end
     
     def warn(self,msg):
@@ -122,7 +137,7 @@ class CitiesUs:
 
             
         try:
-            id = self.dictIdPerZips[zip]
+            id = self.dictIdsPerZip[zip][0]
         except KeyError:
             return None
             
@@ -161,34 +176,33 @@ class CitiesUs:
 
     def findByRealName( self, strCityName, bPartOf=False ):
         """
-        return the zip related to a city real name or -1 if not found
-        bPartOf, ne fonctionne pas si dans dupCityPerZip
+        return id related to a cityname
         """
         bVerbose = 0
         
         if strCityName == "":
             return -1
             
-        if self.cacheLastFindByRealName[0] == strCityName and self.cacheLastFindByRealName[1] == bPartOf:
-            return self.cacheLastFindByRealName[2]
+        #~ if self.cacheLastFindByRealName[0] == strCityName and self.cacheLastFindByRealName[1] == bPartOf:
+            #~ return self.cacheLastFindByRealName[2]
             
-        if self.bEnableHash:
-            # use hashed dict
+        
+            
+        try:
+            listSlug = self.realNameToSlug[strCityName]
+        except KeyError:
+            strSimpleName = simpleString(strCityName)
             try:
-                listSlug = self.realNameToSlug[strCityName]
+                listSlug = self.simpleNameToSlug[strSimpleName]
             except KeyError:
-                strSimpleName = simpleString(strCityName)
-                try:
-                    listSlug = self.simpleNameToSlug[strSimpleName]
-                except KeyError:
-                    if not bPartOf:
-                        return -1
-                    for k,v in self.simpleNameToSlug.items():
-                        if strSimpleName in k:
-                            listSlug = v
-                            break
-                    else:
-                        return -1
+                if not bPartOf:
+                    return -1
+                for k,v in self.simpleNameToSlug.items():
+                    if strSimpleName in k:
+                        listSlug = v
+                        break
+                else:
+                    return -1
 
             
             if len(listSlug)>1:
@@ -678,34 +692,13 @@ def getTop50():
         ]
 
 # getTop50 - end
-    
-if 0:
-    cities = Cities()
-    cities.load()
-    rdist=cities.distTwoZip("75001",bigCityToZip("Paris"))
-    print(rdist)
-    rdist=cities.distTwoZip("75001",bigCityToZip("Marseille"))
-    print(rdist)    
-    rdist=cities.distTwoZip("75001",bigCityToZip("Nice"))
-    print(rdist)    
-    
-def statByRegion(bOutputHtml=False):
-    import xeniadb
-    #~ listPeoples(cnx)
-    cnx = xeniadb.connect()
-    generateStatHousing(cnx,bOutputHtml=bOutputHtml)
-    cnx.close()
-    
-    
-
-
 
 
 def autotest_cities():
     cities = CitiesUs()
     cities.load()
     #  mstab7_2.7 : 
-    #  mstab7_3.9 : 
+    #  mstab7_3.9 : 0.18
     # RPI4_2.7      : 
     # RPI4_3.7      : 
     

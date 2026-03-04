@@ -98,7 +98,7 @@ class CitiesUs:
                     self.dictIdsPerCityName[strCity] = []
             else:
                 first_id = self.dictIdsPerCityName[strCity][0]
-                if bVerbose: print( "WRN: %s/%s have same cityname than %s/%s" % (strCity,strCountyName,self.dictCities[first_id][kCityName],self.dictCities[first_id][kCountyName]) )
+                if bVerbose: print( "WRN: %s/%s have same cityname than %s/%s" % (strCity,strStateName,self.dictCities[first_id][kCityName],self.dictCities[first_id][kCountyName]) )
                 nDuplicateCityName += 1
 
             self.dictIdsPerCityName[strCity].append( strId )
@@ -133,11 +133,19 @@ class CitiesUs:
             pass
         return None
         
+    def getCityAndStateNameById( self, id ):
+        try:
+            return self.dictCities[id][kCityName] + "/" + self.dictCities[id][kStateName]
+        except KeyError:
+            print("WRN: CitiesUs.getCityAndStateNameById: city with id: '%s' not found..." % id )
+            pass
+        return "/"
+        
     def getCityAndCountyNameById( self, id ):
         try:
             return self.dictCities[id][kCityName] + "/" + self.dictCities[id][kCountyName]
         except KeyError:
-            print("WRN: CitiesUs.getCityById: city with id: '%s' not found..." % id )
+            print("WRN: CitiesUs.getCityAndCountyNameById: city with id: '%s' not found..." % id )
             pass
         return "/"
     
@@ -160,13 +168,12 @@ class CitiesUs:
             return None
             
         return self.dictCities[id]
-
             
 
-    def findByName( self, strCityName, strCountyName = None, bPartOf=False ):
+    def findByName( self, strCityName, strStateName = None, bPartOf=False ):
         """
         return id related to a cityname.
-        WRN: If countyname is bad and bPartOf is False, it will return -1 even if city exists
+        WRN: If strStateName is bad and bPartOf is False, it will return -1 even if city exists
         """
         bVerbose = 0
         
@@ -183,20 +190,20 @@ class CitiesUs:
 
             
         if len(listIds) > 1:
-            if strCountyName == None:
+            if strStateName == None:
                 self.warn("WRN: CitiesUs.findByName: this city name has different cities: %s" % (listIds) )
                 id = listIds[0]
             else:
                 for id in listIds:
-                    print( "DBG: CitiesUs.findByName try to match '%s' and '%s'" % (strCountyName,dictCities[id][kCountyName]) ) 
-                    if self.dictCities[id][kCountyName]== strCountyName:
+                    print( "DBG: CitiesUs.findByName try to match '%s' and '%s'" % (strStateName,dictCities[id][kStateName]) ) 
+                    if self.dictCities[id][kStateName]== strStateName:
                         return id
-                self.warn("WRN: CitiesUs.findByName: this city name '%s', exist but not with this countyname: '%s' (1)" % (strCityName,strCountyName) )
+                self.warn("WRN: CitiesUs.findByName: this city name '%s', exist but not with this statename: '%s' (1)" % (strCityName,strStateName) )
                 return -1
         else:
             id = listIds[0]
-            if strCountyName != None and self.dictCities[id][kCountyName] != strCountyName:
-                self.warn("WRN: CitiesUs.findByName: this city name '%s' exist but not with this countyname: '%s' (2)" % (strCityName,strCountyName) )
+            if strStateName != None and self.dictCities[id][kStateName] != strStateName:
+                self.warn("WRN: CitiesUs.findByName: this city name '%s' exist but not with this statename: '%s' (2)" % (strCityName,strStateName) )
                 return -1
         return id
 
@@ -219,40 +226,35 @@ class CitiesUs:
         
         city = self.dictCities[strMinId]
         dist = distLongLat(rLong, rLat,city[kLong],city[kLat])
-        print("DBG: findByLongLat: exiting with: %s/%s diff: %.3fkm, id: %s (dist: %.3f)" % (city[kCityName],city[kCountyName], rMinDist,strMinId,dist))
+        print("DBG: findByLongLat: exiting with: %s/%s diff: %.3fkm, id: %s (dist: %.3f)" % (city[kCityName],city[kStateName], rMinDist,strMinId,dist))
         return strMinId,dist
             
         
         
         
-    def isValidAdress( self, zip, strCityName ):
+    def isValidAdress( self, zip, strCityName, strStateName = None ):
         """
         is this zip correpond roughly to this city.
-        return zip, real name, confidence [0..1]
-        or None,None,0
+        return zip, real name, state name, confidence [0..1]
+        or None,None, None, 0
         """
-        retVal = None,None,0.
+        retVal = None,None,None, 0.
         
         if isinstance(zip, int):
             zip = "%05d" % zip
             
-        try:
-            listSlug = self.zipToSlug[zip]
-        except KeyError:
-            return retVal
-            
-        strCityName = simpleString( strCityName )
-        for k in listSlug:
-            city = self.cityPerSlug[k]
-            if strCityName in city[2]: # look in simplename
-                sumLen = len(city[2]) + len(strCityName) # or max des 2, ca se discute
-                rDiff = abs(len(city[2])-len(strCityName)) / float(sumLen) # on aurait pu faire une distance de Levenstein
-                # rDiff can be from 0 to nearly 1
-                rConfidence = 1. - rDiff
+        ids = self.dictIdsPerZip[zip]
+        
+        for id in ids:
+            city = self.dictCities[id]
+            if strCityName == city[kCityName] and ( strStateName == None or strStateName == city[kStateName] ):
+                return zip, city[kCityName], city[kStateName], 1
                 
-                print("DBG: isValidAdress: %s and %s => %s: %s, rConfidence: %.2f" % (zip, strCityName, zip, city[2], rConfidence) )
-                return zip, city[2], rConfidence
+        # else recherche approximative, au plus proche
+        
+        
         return retVal
+        
         
     def distTwoCity( self, city1, county1, city2, county2, bApproxSearch=True, bVerbose=False ):
         id1 = self.findByName( city1, county1 )
@@ -287,10 +289,12 @@ def autotest_cities():
     assert_equal( cities.getCityById( cities.findByName("New York") )[0], "New York" )
     
     print("Test: findByName adding CountyName")
-    assert_equal( cities.findByName("New York","bad countyname"), -1 )
+    assert_equal( cities.findByName("New York","bad statename"), -1 )
     assert_equal( cities.findByName("New York","San Francisco"), -1 ) # another bad county name
-    assert_equal( cities.getCityAndCountyNameById( cities.findByName("New York","Queens") ), "New York/Queens" )
-    assert_equal( cities.getCityAndCountyNameById( cities.findByName("San Francisco","San Francisco") ), "San Francisco/San Francisco" )
+    assert_equal( cities.getCityAndStateNameById( cities.findByName("New York","New York") ), "New York/New York" )
+    assert_equal( cities.getCityAndCountyNameById( cities.findByName("New York","New York") ), "New York/Queens" )
+    assert_equal( cities.getCityAndStateNameById( cities.findByName("San Francisco","California") ), "San Francisco/California" )
+    assert_equal( cities.getCityAndCountyNameById( cities.findByName("San Francisco","California") ), "San Francisco/San Francisco" )
     assert_equal( cities.findByName("San Francisco","Caca"), -1 )
     
     #~ assert_equal( cities.getCityById(cities.findByLongLat(-74.01380,40.70879)[0])[0], "New York" )
@@ -298,7 +302,20 @@ def autotest_cities():
     assert_equal( cities.getCityAndCountyNameById(cities.findByLongLat(-74.01380,40.70879)[0]), "Hoboken/Hudson" ) # Paris
     assert_equal( cities.getCityAndCountyNameById(cities.findByLongLat(-122.41903,37.77500)[0]), "San Francisco/San Francisco" ) # Paris
     
-    assert_diff( cities.distTwoCity( "New York","Queens", "San Francisco","San Francisco" ), 4189.4 ) #~ 4768km a pied
+    assert_diff( cities.distTwoCity( "New York","New York", "San Francisco","California" ), 4189.4 ) #~ 4768km a pied
+    
+    assert_equal( cities.isValidAdress( "10168", "New York" )[3], 1 )
+    assert_equal( cities.isValidAdress( 10168, "New York" )[3], 1 )
+    
+    assert_equal( cities.isValidAdress( "75006", "New York" )[3], 0 )
+    assert_equal( cities.isValidAdress( 75006, "New York" )[3], 0 )
+    
+    assert_equal( cities.isValidAdress( 90210, "Beverly Hills" )[3], 1 )
+    assert_equal( cities.isValidAdress( 90210, "Beverly Hills", "Caca" )[3], 0 )
+    
+    assert_equal( cities.isValidAdress( 10168, "New York", "Queens" )[3], 0 )
+    assert_equal( cities.isValidAdress( 10168, "New York", "Caca" )[3], 0 )
+
     
 
 # autotest_cities - end

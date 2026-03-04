@@ -344,6 +344,8 @@ def autotest_cities():
     assert_equal( cities.findByZip("666"), None )
     assert_not_equal( cities.findByZip("11220"), None )
     assert_equal( cities.findByZip("11220")[0], "New York" )
+    assert_equal( cities.findByZip("35816")[0], "Huntsville" )
+    assert_equal( cities.findByZip("90210")[0], "Los Angeles" )
     
     assert_equal( cities.findByName(""), -1 )
     assert_not_equal( cities.findByName("New York"), -1 )
@@ -368,6 +370,7 @@ def autotest_cities():
     assert_equal( cities.getCityAndCountyNameById( cities.findByName("San Francisco","California") ), "San Francisco/San Francisco" )
     assert_equal( cities.getCityAndStatePairById( cities.findByName("San Francisco","California") ), ("San Francisco","California") )
     assert_equal( cities.findByName("San Francisco","Caca"), -1 )
+    assert_equal( cities.getCityAndStateNameById(cities.findByName("Huntsville")), "Huntsville/Alabama" )
     
     assert_equal( cities.getCityAndStatePairById(cities.findByName("Springfield")), ("Springfield","Massachusetts") ) # 439199 habitants (le plus grand)
     assert_equal( cities.getCityAndStatePairById(cities.findByName("Springfield", "Ohio")), ("Springfield","Ohio") ) # un plus petit
@@ -394,6 +397,7 @@ def autotest_cities():
     
     assert_equal( cities.isValidAdress( 90210, "Beverly Hills" )[3], 1 )
     assert_equal( cities.isValidAdress( 90210, "Beverly Hills", "Caca" )[3], 0 )
+    assert_equal( cities.isValidAdress( 90210, "Beverly Hills", "California" )[3], 1 )
     
     assert_equal( cities.isValidAdress( 10168, "New York", "Queens" )[3], 0 )
     assert_equal( cities.isValidAdress( 10168, "New York", "Caca" )[3], 0 )

@@ -26,7 +26,25 @@ def assert_equal(a,b):
             
     print("(%s==%s) => NOT ok (type:%s and %s)" % (a,b,type(a),type(b)))
     assert(0)
+    
+def assert_not_equal(a,b):
+    if a != b:
+        print("(%s!=%s) => ok" % (a,b))
+        return
+    if sys.version_info[0]<3:
+        if isinstance(a,unicode):
+            a = a.encode("utf-8", 'replace')
 
+        if isinstance(b,unicode):
+            b = b.encode("utf-8", 'replace')
+        
+        if a != b:
+            print("(%s!=%s) => ok (but unicode_encoded)" % (a,b))
+            return
+            
+    print("(%s!=%s) => NOT ok (type:%s and %s)" % (a,b,type(a),type(b)))
+    assert(0)
+    
 def assert_diff(a,b,diff=0.1):
     if abs(a-b)<diff:
         print("(%s diff %s < %s) => ok" % (a,b,diff))

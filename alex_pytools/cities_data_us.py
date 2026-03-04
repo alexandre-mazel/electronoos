@@ -9,6 +9,7 @@ import time
 
 import stringtools
 import cities_data
+from cities_data import assert_equal, assert_not_equal
 
 
 class CitiesUs:
@@ -23,9 +24,19 @@ class CitiesUs:
     3: Distance between two city: give two zip, it returns the distance
         distTwoZip( zip1, zip2 )
     """
+    
+    kCity = 0
+    kStateID = 2
+    kStateName = 3
+    kCountyName = 5
+    kLong = 6
+    kLat = 7
+    kZips = 15
+    
+    
     def __init__(self):
         self.dictCities = {} # id => (city, city_ascii?, state_id, state_name,county_fips, county_name,float(strLong),float(strLat),population, density, ranking?,list_of_zips)
-        self.dictCitiesPerZips = {} # zip as a string => id
+        self.dictIdPerZips = {} # zip as a string => id
         #~ self.dupCityPerZip = {} # some cities have same zip, so we store for each overwritten city slug their zip
         #~ self.dupZipPerZip = {} # some zip are for the same cities, we store them here alternateZip => Zip
         #~ self.cacheLastFindByRealName = (None,None,None) # city, partof, result of last research
@@ -34,7 +45,7 @@ class CitiesUs:
 
     def load(self):
         bVerbose = 1
-        #~ bVerbose = 0
+        bVerbose = 0
         
         print("INF: CitiesUS: loading city data...")
         timeBegin = time.time()
@@ -46,6 +57,7 @@ class CitiesUs:
         file = cities_data.openWithEncoding(strFilename, "rt", encoding = enc)
         line = file.readline() # skip first line
         self.dictCities = {}
+        nDuplicateZip = 0
         while 1:
             line = file.readline()
             if len(line)<1:
@@ -66,10 +78,21 @@ class CitiesUs:
             if bVerbose: print("listZips (%d): %s" % (len(listZips), str(listZips)) )
             self.dictCities[strId] = (strCity, strCityAscii, strStateId, strStateName, strCountyFips, strCountyName, float(strLong), float(strLat), strPopulation, \
                         strDensity, strSource, strMilitary, strIncorporated, strTimeZone, strRanking,listZips)
+                        
+            
+            for z in listZips:
+                if z in self.dictIdPerZips:
+                    print( "WRN: %s have same zip than %s: %s" % (strCity,self.dictCities[self.dictIdPerZips[z]][0],z) )
+                    nDuplicateZip += 1
+                self.dictIdPerZips[z] = strId
+                
             #~ break
             
             
         # while each line
+        
+        print( "INF: %d loaded cities" % len(self.dictCities) ) # should be 31257
+        print( "WRN: %d duplicated zip found" % nDuplicateZip )
         
         # manual addings:
                 
@@ -85,63 +108,26 @@ class CitiesUs:
         self.warnMessages.append(msg)
         print(msg)
     
-    @staticmethod
-    def getCityRealName( c ):
-        """
-        take a city description and return the real name
-        """
-        return c[3]
         
     def findByZip( self, zip, bQuiet = True ):
         """
         return info on a city or None if not nound
         """
         if zip == None:
-            print("WRN: findByZip: called with None => returning None" )
+            print("WRN: CitiesUs.findByZip: called with None => returning None" )
             return None
+            
         if isinstance(zip, int):
             zip = "%05d" % zip
-            
-        if zip == "75000":
-            zip = "75001"
-        elif zip == "69000":
-            zip = "69001"
-        elif zip == "31000":
-            zip = "31100"
-        elif zip == "13000":
-            zip = "13001"            
-        # ne fonctione pas pour toutes les bigs cities
-        #~ elif isBigCityZip(zip):
-            #~ newzip = "%05d" % (int(zip)+1)
-            #~ print("DBG: findByZip: changing zip %s to %s" % (zip,newzip) )
-            #~ zip = newzip
-            
-        if self.bEnableHash:
-            # use hashed dict
-            try:
-                listSlug = self.zipToSlug[zip]
-            except KeyError:
-                try:
-                    listSlug = self.zipToSlug[zip[:-1]+"0"]
-                except KeyError:
-                    return None
-                
-            if not bQuiet and len(listSlug)>1:
-                self.warn("WRN: findByZip: this zip '%s' belongs to different cities: %s" % (zip,listSlug) )
-            k = listSlug[0]
-            return self.cityPerSlug[k]
+
             
         try:
-            return self.dictCities[zip]
+            id = self.dictIdPerZips[zip]
         except KeyError:
-            try:
-                return self.dictCities[zip[:-2]+"01"]
-            except KeyError:
-                try:
-                    return self.dictCities[self.dupZipPerZip[zip]]
-                except KeyError as err:
-                    if not bQuiet: print("WRN: findByZip: zip %s not found (err:%s)" % (zip,str(err) ) )
-        return None
+            return None
+            
+        return self.dictCities[id]
+
             
     def findBySlugName( self, strCityName, bPartOf=False ):
         """
@@ -723,7 +709,14 @@ def autotest_cities():
     # RPI4_2.7      : 
     # RPI4_3.7      : 
     
-    assert_equal( cities.findByRealName("Besançon"), "25000" )
+    assert_equal( cities.findByZip("666"), None )
+    assert_not_equal( cities.findByZip("11220"), None )
+    assert_equal( cities.findByZip("11220")[0], "New York" )
+    
+    
+    
+    
+    
     assert_equal( cities.findByRealName("Besancon"), "25000" )
     assert_equal( cities.findByRealName("Saint-etienne"), "42001" )
     assert_equal( cities.findByRealName("Orléans"), "45001" )

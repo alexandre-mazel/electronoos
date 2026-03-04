@@ -119,7 +119,7 @@ class CitiesUs:
             # un peu de debug/exploration
             if 0:
                 if strCity != strCityAscii:
-                    print( "INF: ascii: %s != %s" % (strCity, strCityAscii) ) # eg Bayamon avec un accent aigu sur le 0 ou San German avec un accent aigu sur le a
+                    print( "INF: ascii: %s != %s" % (strCityAscii, strCity) ) # eg Bayamon avec un accent aigu sur le 0 ou San German avec un accent aigu sur le a
                 
             #~ break
             

@@ -235,14 +235,14 @@ class CitiesUs:
             else:
                 for id in listIds:
                     print( "DBG: CitiesUs.findByName try to match '%s' and '%s'" % (strStateName,self.dictCities[id][kStateName]) ) 
-                    if self.dictCities[id][kStateName]== strStateName:
+                    if self.dictCities[id][kStateName]== strStateName or self.dictCities[id][kStateID]== strStateName:
                         return id
-                self.warn("WRN: CitiesUs.findByName: this city name '%s', exist but not with this statename: '%s' (1)" % (strCityName,strStateName) )
+                self.warn("WRN: CitiesUs.findByName: this city name '%s', exist but not with this statename/stateid: '%s' (1)" % (strCityName,strStateName) )
                 return -1
         else:
             id = listIds[0]
-            if not bPartOf and strStateName != None and self.dictCities[id][kStateName] != strStateName:
-                self.warn("WRN: CitiesUs.findByName: this city name '%s' exist but not with this statename: '%s' (2)" % (strCityName,strStateName) )
+            if not bPartOf and strStateName != None and self.dictCities[id][kStateName] != strStateName and self.dictCities[id][kStateID] != strStateName:
+                self.warn("WRN: CitiesUs.findByName: this city name '%s' exist but not with this statename/stateid: '%s' (2)" % (strCityName,strStateName) )
                 return -1
         return id
 
@@ -286,7 +286,7 @@ class CitiesUs:
         
         for id in ids:
             city = self.dictCities[id]
-            if strCityName == city[kCityName] and ( strStateName == None or strStateName == city[kStateName] ):
+            if strCityName == city[kCityName] and ( strStateName == None or strStateName == city[kStateName] or strStateName == city[kStateID] ):
                 return zip, city[kCityName], city[kStateName], 1
                 
         # else recherche approximative, au plus proche
@@ -328,6 +328,25 @@ class CitiesUs:
         
         return distLongLat( lo1, la1, lo2, la2 )
         
+        
+    def extractAddress( self, txt ):
+        print( "DBG: extractAddress: extracting from text: " + txt )
+        for li in txt.split("\n"):
+            splitted = li.split(",")
+            city =splitted[0].strip()
+            state = None
+            if len(splitted) > 1:
+                splitted = splitted[1].split( " " )
+                idx = 0
+                if len(splitted[0]) < 2 and len(splitted) > 1:
+                    idx = 1
+                state = splitted[idx].strip()
+            id = self.findByName( city, state )
+            if id != -1:
+                return id
+        return -1
+            
+        
 #class CitiesUS - end
 
 
@@ -351,6 +370,8 @@ def autotest_cities():
     assert_not_equal( cities.findByName("New York"), -1 )
     assert_equal( cities.getCityById( cities.findByName("New York") )[0], "New York" )
     assert_equal( cities.getCityById( cities.findByName("New York") )[0], "New York" )
+    
+    assert_equal( cities.getCityAndStateNameById( cities.findByName("New York", "NY") ), "New York/New York" )
     
     print( "DBG: findByName ret:", cities.findByName("New Yor", bPartOf = 1) )
     
@@ -398,6 +419,7 @@ def autotest_cities():
     assert_equal( cities.isValidAdress( 90210, "Beverly Hills" )[3], 1 )
     assert_equal( cities.isValidAdress( 90210, "Beverly Hills", "Caca" )[3], 0 )
     assert_equal( cities.isValidAdress( 90210, "Beverly Hills", "California" )[3], 1 )
+    assert_equal( cities.isValidAdress( 90210, "Beverly Hills", "CA" )[3], 1 )
     
     assert_equal( cities.isValidAdress( 10168, "New York", "Queens" )[3], 0 )
     assert_equal( cities.isValidAdress( 10168, "New York", "Caca" )[3], 0 )
@@ -413,6 +435,36 @@ def autotest_cities():
     assert_diff( cities.isValidAdress( "10168", "Meu York", "Meu Yor" )[3], 0.666 )
     assert_diff( cities.isValidAdress( "10168", "New York", "Meu Y" )[3], 0.615 )
     assert_diff( cities.isValidAdress( "75006", "New York" )[3], 0 )
+    
+    random_adress1 = """Street:  501 Crim Lane
+City:  Botkins
+State/province/area:   Ohio
+Phone number:  937-693-8441
+Zip code:  45306
+Country calling code:  +1
+Country:  United States
+"""
+    random_adress2 = """
+Street:  2183 Beechwood Avenue
+City:  Somerville
+State/province/area:   Tennessee
+Phone number:  908-867-1457
+Zip code:  38068
+Country calling code:  +1
+Country:  United States
+"""
+
+    random_adress3 = "Rancho Cucamonga, California"
+    random_adress4 = "Decatur, GA 30030"
+    random_adress5 = "254 Hilton Road, California,\nLos Angeles, 13200"
+    random_adress6 = "New York City, NY 10001"
+    random_adress7 = "Chicago, Illinois"
+    
+    for num,txt in enumerate( [random_adress1,random_adress2,random_adress3,random_adress4,random_adress5,random_adress6,random_adress7] ):
+        id = cities.extractAddress( txt )
+        print( "DBG: autotest_cities.extractAddress: id:", id )
+        if id != -1:
+            print( "DBG: autotest_cities.extractAddress: %s" % (cities.getCityAndStateNameById( id ) ) )
 
 # autotest_cities - end
     

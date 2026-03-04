@@ -33,6 +33,8 @@ class CitiesUs:
          
     3: Distance between two city: give two zip, it returns the distance
         distTwoZip( zip1, zip2 )
+        
+    NB: Cities are sorted by population, so all research with many answers will return the biggest city
     """
     
     def __init__(self):
@@ -61,6 +63,9 @@ class CitiesUs:
         self.dictCities = {}
         nDuplicateZip = 0
         nDuplicateCityName = 0
+        nTotalPopulation = 0
+        nNbrCityMore100k = 0
+        nNbrCityMore100kCalifornia = 0
         while 1:
             line = file.readline()
             if len(line)<1:
@@ -104,20 +109,38 @@ class CitiesUs:
 
             self.dictIdsPerCityName[strCity].append( strId )
             
+            nPop = int( strPopulation )
+            nTotalPopulation += nPop
+            if nPop >= 100000:
+                nNbrCityMore100k += 1
+                if strStateName == "California":
+                    nNbrCityMore100kCalifornia += 1
+            
                 
             #~ break
             
-            
-        # while each line
+        # while each line - end
+        
+        # official stats: Over 109,000 cities and towns from all 50 states
+        # 346 over 100k as of July 1, 2024, as estimated by the U.S. Census Bureau
+        # 76 in california
+        # 348,503,802 inhabitants as of March 2 2026, ref worldometer
         
         print( "INF: %d loaded cities" % len(self.dictCities)  ) # should be 31257
+        print( "INF: %d inhabitants" % nTotalPopulation  ) # should be 406,992,621 (too much)
+        print( "INF: nNbrCityMore100k: %d" % nNbrCityMore100k  ) # Currently 472 instead of 346
+        print( "INF: nNbrCityMore100kCalifornia: %d" % nNbrCityMore100kCalifornia ) # Currently 86 instead of 76
         assert( len(self.dictCities) == 31257 )
+        assert( nTotalPopulation == 406992621 )
+        assert( nNbrCityMore100k == 472 )
+        assert( nNbrCityMore100kCalifornia == 86 )
+        
         print( "WRN: %d duplicated zip found" % nDuplicateZip )
         print( "WRN: %d duplicated cityname found" % nDuplicateCityName )
         
         # manual addings:
                 
-        print("INF: Cities: loading city data - end duration: %.2fs" % (time.time()-timeBegin) )
+        print("INF: CitiesUs: loading city data - end duration: %.2fs" % (time.time()-timeBegin) )
     # load - end
     
     def warn(self,msg):
@@ -141,6 +164,14 @@ class CitiesUs:
             print("WRN: CitiesUs.getCityAndStateNameById: city with id: '%s' not found..." % id )
             pass
         return "/"
+
+    def getCityAndStatePairById( self, id ):
+        try:
+            return self.dictCities[id][kCityName], self.dictCities[id][kStateName]
+        except KeyError:
+            print("WRN: CitiesUs.getCityAndStatePairById: city with id: '%s' not found..." % id )
+            pass
+        return ("","")
         
     def getCityAndCountyNameById( self, id ):
         try:
@@ -149,7 +180,6 @@ class CitiesUs:
             print("WRN: CitiesUs.getCityAndCountyNameById: city with id: '%s' not found..." % id )
             pass
         return "/"
-    
         
     def findByZip( self, zip, bQuiet = True ):
         """
@@ -196,7 +226,7 @@ class CitiesUs:
                 id = listIds[0]
             else:
                 for id in listIds:
-                    print( "DBG: CitiesUs.findByName try to match '%s' and '%s'" % (strStateName,dictCities[id][kStateName]) ) 
+                    print( "DBG: CitiesUs.findByName try to match '%s' and '%s'" % (strStateName,self.dictCities[id][kStateName]) ) 
                     if self.dictCities[id][kStateName]== strStateName:
                         return id
                 self.warn("WRN: CitiesUs.findByName: this city name '%s', exist but not with this statename: '%s' (1)" % (strCityName,strStateName) )
@@ -273,18 +303,24 @@ class CitiesUs:
         return retValNone
         
         
-    def distTwoCity( self, city1, county1, city2, county2, bApproxSearch=True, bVerbose=False ):
+    def distTwoCity( self, city1, county1, city2, county2 = None, bApproxSearch=True, bVerbose=False ):
         id1 = self.findByName( city1, county1 )
         id2 = self.findByName( city2, county2 )
         return self.distTwoIds( id1, id2 )
 
     def distTwoIds( self, id1, id2 ):
+        if id1 == -1:
+            print( "WRN: distTwoIds: id1 is -1, returning 999999")
+            return 999999
+        if id2 == -1:
+            print( "WRN: distTwoIds: id2 is -1, returning 999999")
+            return 999999
         lo1, la1 = self.dictCities[id1][kLong:kLat+1]
         lo2, la2 = self.dictCities[id2][kLong:kLat+1]
         
         return distLongLat( lo1, la1, lo2, la2 )
         
-#class Cities - end
+#class CitiesUS - end
 
 
 
@@ -293,7 +329,7 @@ def autotest_cities():
     cities = CitiesUs()
     cities.load()
     #  mstab7_2.7 : 
-    #  mstab7_3.9 : 0.18
+    #  mstab7_3.9 : 0.19
     # RPI4_2.7      : 
     # RPI4_3.7      : 
     
@@ -312,14 +348,21 @@ def autotest_cities():
     assert_equal( cities.getCityAndCountyNameById( cities.findByName("New York","New York") ), "New York/Queens" )
     assert_equal( cities.getCityAndStateNameById( cities.findByName("San Francisco","California") ), "San Francisco/California" )
     assert_equal( cities.getCityAndCountyNameById( cities.findByName("San Francisco","California") ), "San Francisco/San Francisco" )
+    assert_equal( cities.getCityAndStatePairById( cities.findByName("San Francisco","California") ), ("San Francisco","California") )
     assert_equal( cities.findByName("San Francisco","Caca"), -1 )
     
     #~ assert_equal( cities.getCityById(cities.findByLongLat(-74.01380,40.70879)[0])[0], "New York" )
     assert_equal( cities.getCityById(cities.findByLongLat(-74.01380,40.70879)[0])[0], "Hoboken" ) # Un quartier précis de New York
+    assert_equal( cities.getCityAndStateNameById(cities.findByLongLat(-74.01380,40.70879)[0]), "Hoboken/New Jersey" ) # Paris
     assert_equal( cities.getCityAndCountyNameById(cities.findByLongLat(-74.01380,40.70879)[0]), "Hoboken/Hudson" ) # Paris
+    assert_equal( cities.getCityAndCountyNameById(cities.findByLongLat(-73.9,40.6943)[0]), "New York/Queens" ) # Paris
     assert_equal( cities.getCityAndCountyNameById(cities.findByLongLat(-122.41903,37.77500)[0]), "San Francisco/San Francisco" ) # Paris
     
     assert_diff( cities.distTwoCity( "New York","New York", "San Francisco","California" ), 4189.4 ) #~ 4768km a pied
+    assert_diff( cities.distTwoCity( "New York","New York", "Hoboken","Caca" ), 999999 )
+    assert_diff( cities.distTwoCity( "New York","New York", "Pipi" ), 999999 )
+    assert_diff( cities.distTwoCity( "New York","New York", "Hoboken" ), 10.36 )
+    assert_diff( cities.distTwoCity( "New York","New York", "Hoboken", "New Jersey" ), 10.36 )
     
     assert_equal( cities.isValidAdress( "10168", "New York" )[3], 1 )
     assert_equal( cities.isValidAdress( 10168, "New York" )[3], 1 )
@@ -343,8 +386,7 @@ def autotest_cities():
     assert_diff( cities.isValidAdress( "10168", "Meu York", "Meu York" )[3], 0.75 )
     assert_diff( cities.isValidAdress( "10168", "Meu York", "Meu Yor" )[3], 0.666 )
     assert_diff( cities.isValidAdress( "10168", "New York", "Meu Y" )[3], 0.615 )
-
-    
+    assert_diff( cities.isValidAdress( "75006", "New York" )[3], 0 )
 
 # autotest_cities - end
     

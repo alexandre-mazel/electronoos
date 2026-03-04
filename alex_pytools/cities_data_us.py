@@ -221,6 +221,10 @@ class CitiesUs:
         try:
             listIds = self.dictIdsPerCityName[strCityName]
         except KeyError:
+            if bPartOf: 
+                for id,c in self.dictCities.items():
+                    if strCityName in c[kCityName]:
+                        return id
             return -1
 
             
@@ -237,7 +241,7 @@ class CitiesUs:
                 return -1
         else:
             id = listIds[0]
-            if strStateName != None and self.dictCities[id][kStateName] != strStateName:
+            if not bPartOf and strStateName != None and self.dictCities[id][kStateName] != strStateName:
                 self.warn("WRN: CitiesUs.findByName: this city name '%s' exist but not with this statename: '%s' (2)" % (strCityName,strStateName) )
                 return -1
         return id
@@ -341,9 +345,19 @@ def autotest_cities():
     assert_not_equal( cities.findByZip("11220"), None )
     assert_equal( cities.findByZip("11220")[0], "New York" )
     
+    assert_equal( cities.findByName(""), -1 )
     assert_not_equal( cities.findByName("New York"), -1 )
     assert_equal( cities.getCityById( cities.findByName("New York") )[0], "New York" )
     assert_equal( cities.getCityById( cities.findByName("New York") )[0], "New York" )
+    
+    print( "DBG: findByName ret:", cities.findByName("New Yor", bPartOf = 1) )
+    
+    # find by name bPartOf return city sorted by habitants (pratique)
+    assert_equal( cities.getCityAndStateNameById(cities.findByName("New Yor", bPartOf = 1)), "New York/New York" )
+    assert_equal( cities.getCityAndStateNameById(cities.findByName("New", bPartOf = 1)), "New York/New York" )
+    assert_equal( cities.getCityAndStateNameById(cities.findByName("N", bPartOf = 1)), "New York/New York" )
+    assert_equal( cities.getCityAndStateNameById(cities.findByName("Qu", bPartOf = 1)), "Queens/New York" )
+    assert_equal( cities.getCityAndStateNameById(cities.findByName("", bPartOf = 1)), "/" )
     
     print("Test: findByName adding CountyName")
     assert_equal( cities.findByName("New York","bad statename"), -1 )
@@ -354,6 +368,10 @@ def autotest_cities():
     assert_equal( cities.getCityAndCountyNameById( cities.findByName("San Francisco","California") ), "San Francisco/San Francisco" )
     assert_equal( cities.getCityAndStatePairById( cities.findByName("San Francisco","California") ), ("San Francisco","California") )
     assert_equal( cities.findByName("San Francisco","Caca"), -1 )
+    
+    assert_equal( cities.getCityAndStatePairById(cities.findByName("Springfield")), ("Springfield","Massachusetts") ) # 439199 habitants (le plus grand)
+    assert_equal( cities.getCityAndStatePairById(cities.findByName("Springfield", "Ohio")), ("Springfield","Ohio") ) # un plus petit
+    assert_equal( cities.getCityAndStatePairById(cities.findByName("Springfield", "Wisconsin")), ("Springfield","Wisconsin") ) # le plus petit: 100h
     
     #~ assert_equal( cities.getCityById(cities.findByLongLat(-74.01380,40.70879)[0])[0], "New York" )
     assert_equal( cities.getCityById(cities.findByLongLat(-74.01380,40.70879)[0])[0], "Hoboken" ) # Un quartier précis de New York

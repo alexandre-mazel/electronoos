@@ -14,7 +14,7 @@ from cities_data import assert_equal, assert_not_equal, assert_diff, distLongLat
 
 import misctools # for levenshtein
     
-kCityName = 0
+kCityName = 0 # version sans accent
 kStateID = 2
 kStateName = 3
 kCountyName = 5
@@ -38,7 +38,7 @@ class CitiesUs:
     """
     
     def __init__(self):
-        self.dictCities = {} # id => (city, city_ascii?, state_id, state_name,county_fips, county_name,float(strLong),float(strLat),population, density, ranking?,list_of_zips)
+        self.dictCities = {} # id => (city_ascii (sans accent), city avec accent, state_id, state_name,county_fips, county_name,float(strLong),float(strLat),population, density, ranking?,list_of_zips)
         self.dictIdsPerZip = {} # zip as a string => (id1, id2, ...)
         self.dictIdsPerCityName = {} # zip as a string => (id1, id2, ...)
         #~ self.dupCityPerZip = {} # some cities have same zip, so we store for each overwritten city slug their zip
@@ -86,7 +86,7 @@ class CitiesUs:
                 
             listZips = strZips.split(" ")
             if bVerbose: print("listZips (%d): %s" % (len(listZips), str(listZips)) )
-            self.dictCities[strId] = (strCity, strCityAscii, strStateId, strStateName, strCountyFips, strCountyName, float(strLong), float(strLat), strPopulation, \
+            self.dictCities[strId] = (strCityAscii, strCity, strStateId, strStateName, strCountyFips, strCountyName, float(strLong), float(strLat), strPopulation, \
                         strDensity, strSource, strMilitary, strIncorporated, strTimeZone, strRanking,listZips)
                         
             
@@ -116,6 +116,10 @@ class CitiesUs:
                 if strStateName == "California":
                     nNbrCityMore100kCalifornia += 1
             
+            # un peu de debug/exploration
+            if 0:
+                if strCity != strCityAscii:
+                    print( "INF: ascii: %s != %s" % (strCity, strCityAscii) ) # eg Bayamon avec un accent aigu sur le 0 ou San German avec un accent aigu sur le a
                 
             #~ break
             

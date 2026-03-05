@@ -65,23 +65,63 @@ Pas de prefixe particulier pour les mobiles. (donc spécifier en mode texte), eg
 
 
 import misctools # for levenshtein
+
+
+
+
+# Le Mexique est divisé en estados [États], chaque État est ensuite divisé en municipios [similaires aux comtés aux États-Unis], 
+# puis les municipios sont divisés en colonias [similaires aux quartiers aux États-Unis ou aux arrondissements au Royaume-Uni].
+# Certains municipios ruraux ou historiquement ruraux peuvent être divisés en villes ou villages, puis chaque village divisé en barrios au lieu de colonias.
+
+
     
 kCityName = 0 # version sans accent
-kZip = 1
-kStateID = 2
+kCityNameAscii = 1
+kZip = 2
 kStateName = 3
-kCountyName = 5
-kLong = 8
-kLat = 9
+kStateID = 4
+kCountyName = 5 # municipios
+kCommunityName = 7 # colonia, petit quartier
+kLong = 9
+kLat = 10
 
-class CitiesUs:
+
+def removeAccentSpecificLang( s, strSpecificLang = "ES" ):
+    dic_conv = { 
+            "Á": "A",
+            "á": "a",
+            "É": "E",
+            "é": "e",
+            "Í": "I",
+            "í": "i",
+            "Ñ": "N",
+            "ñ": "n",
+            "Ó": "O",
+            "ó": "o",
+            "Ú": "U",
+            "ú": "u",
+            "Ü": "U",
+            "ü": "u",
+    }
+    out = []
+    for c in s:
+        try:
+            newc = dic_conv[c]
+        except KeyError:
+            newc = c
+        out += newc
+    out = "".join(out)
+    #~ print( "DBG: removeAccentSpecificLang: '%s' => '%s'" % (s,out) )
+    return out
+
+class CitiesMex:
     """
     Uses:
     1: Autocomplete, eg on a website: enter start of city, it completes with "full name (zip)"
         findByRealName( city, bPartOf = True )
          
     2: Adress detection: give a zip and a city, it will validate it's really an adress, and can correct it.
-        isValidAdress( zip, city ), return (zip,city,confidence) confidence of the right correction.
+        isValidAddress( zip, city ), return (zip,city,confidence) confidence of the right correction.
          
     3: Distance between two city: give two zip, it returns the distance
         distTwoZip( zip1, zip2 )
@@ -92,7 +132,7 @@ class CitiesUs:
     def __init__(self):
         self.dictCities = {} # id => (city_ascii (sans accent), city avec accent, state_id, state_name,county_fips, county_name,float(strLong),float(strLat),population, density, ranking?,list_of_zips)
         self.dictIdsPerZip = {} # zip as a string => (id1, id2, ...)
-        self.dictIdsPerCityName = {} # zip as a string => (id1, id2, ...)
+        self.dictIdsPerCityName = {} # cityname without accent as a string => (id1, id2, ...)
         #~ self.dupCityPerZip = {} # some cities have same zip, so we store for each overwritten city slug their zip
         #~ self.dupZipPerZip = {} # some zip are for the same cities, we store them here alternateZip => Zip
         #~ self.cacheLastFindByRealName = (None,None,None) # city, partof, result of last research
@@ -101,7 +141,7 @@ class CitiesUs:
 
     def load(self):
         bVerbose = 1
-        #~ bVerbose = 0
+        bVerbose = 0
         
         print("INF: CitiesUS: loading city data...")
         timeBegin = time.time()
@@ -117,9 +157,9 @@ class CitiesUs:
         self.dictCities = {}
         nDuplicateZip = 0
         nDuplicateCityName = 0
-        nTotalPopulation = 0
-        nNbrCityMore100k = 0
-        nNbrCityMore100kCalifornia = 0
+        #~ nTotalPopulation = 0
+        #~ nNbrCityMore100k = 0
+        #~ nNbrCityMore100kCalifornia = 0
         id = 1
         while 1:
             line = file.readline()
@@ -129,70 +169,69 @@ class CitiesUs:
             line = line.replace('"','')
             fields = line.split('\t')
             if bVerbose: print("fields (%d): %s" % (len(fields), str(fields)) )
-            strCountryCode, strZip, strCity, strStateName, strStateId, strCountyName, strCountyID, strCommunity, strCommunityID, strLat, strLong, strAccuracy = fields
+            strCountryCode, strZip, strCity, strCommunity, strCommunityID, strCountyName, strCountyID, strStateName, strStateId,  strLat, strLong, strAccuracy = fields
             
+            if bVerbose  or "Cavario" in strCity or "52213" in strZip: print("%d: strCity: %s, strStateId: %s, strStateName: %s, strCountyName: %s, strCommunity: %s" % (id, strCity,strStateId,strStateName,strCountyName, strCommunity) ) 
+                
             strAccuracy = strAccuracy.strip() # remove EOL
             
-            if bVerbose: print("strCity: %s,strStateId: %s,strStateName: %s,strCountyName: %s" % (strCity,strStateId,strStateName,strCountyName) ) 
-                
-            if strZip in self.dictCities:
-                print( "WRN: duplicate zip: '%s'" % strZip )
-                #~ assert(0)
-                
-            self.dictCities[id] = ( strCity, strZip, strStateName, strStateId, strCountyName, strCountyID, strCommunity, strCommunityID, float(strLong), float(strLat) )
+            if strStateName == "" and strStateId == "":
+                # qd pas de community (ou de county) ca décale tout.
+                    strStateName = strCommunity
+                    strStateId = strCommunityID
+                    
+                    # 2 choix a décider selon les locaux!
+                    if 0:
+                        strCountyName = strCommunity
+                        strCountyID = strCommunityID
+                        strCommunity = ""
+                        strCommunityID = -1
+                    elif 0:
+                        strCommunity = strCountyName
+                        strCommunityID = strCountyID    
+                        strCountyName = ""
+                        strCountyID = -1
+                    else:
+                        strCommunity = ""
+                        strCommunityID = -1
                         
-            
-            for z in listZips:
-                if not z in self.dictIdsPerZip:
-                    self.dictIdsPerZip[z] = []
-                else:
-                    first_id = self.dictIdsPerZip[z][0]
-                    if bVerbose: print( "WRN: %s have same zip than %s: %s" % (strCity,self.dictCities[first_id][kCityName],z) )
-                    nDuplicateZip += 1
+                        
+                        
+            strCityAscii = removeAccentSpecificLang( strCity )
+            self.dictCities[id] = ( strCity, strCityAscii, strZip, strStateName, strStateId, strCountyName, strCountyID, strCommunity, strCommunityID, float(strLong), float(strLat) )
 
-                self.dictIdsPerZip[z].append( strId )
-                
-            if not strCity in self.dictIdsPerCityName:
-                    self.dictIdsPerCityName[strCity] = []
+            if not strZip in self.dictIdsPerZip:
+                self.dictIdsPerZip[strZip] = []
             else:
-                first_id = self.dictIdsPerCityName[strCity][0]
+                if bVerbose: print( "WRN: Duplicate id for the same zips: id %s and %s" % (id, self.dictIdsPerZip[strZip][0]) )
+                nDuplicateZip += 1
+            self.dictIdsPerZip[strZip].append( id )
+                
+            if not strCityAscii in self.dictIdsPerCityName:
+                    self.dictIdsPerCityName[strCityAscii] = []
+            else:
+                first_id = self.dictIdsPerCityName[strCityAscii][0]
                 if bVerbose: print( "WRN: %s/%s have same cityname than %s/%s" % (strCity,strStateName,self.dictCities[first_id][kCityName],self.dictCities[first_id][kCountyName]) )
                 nDuplicateCityName += 1
 
-            self.dictIdsPerCityName[strCity].append( strId )
+            self.dictIdsPerCityName[strCityAscii].append( id )
             
-            nPop = int( strPopulation )
-            nTotalPopulation += nPop
-            if nPop >= 100000:
-                nNbrCityMore100k += 1
-                if strStateName == "California":
-                    nNbrCityMore100kCalifornia += 1
-            
-            # un peu de debug/exploration
-            if 0:
-                if strCity != strCityAscii:
-                    print( "INF: ascii: %s != %s" % (strCityAscii, strCity) ) # eg Bayamon avec un accent aigu sur le 0 ou San German avec un accent aigu sur le a
-                
-            #~ break
+            id += 1
+
+            if id > 10 and 0:
+                break
             
         # while each line - end
         
-        # official stats: Over 109,000 cities and towns from all 50 states
-        # 346 over 100k as of July 1, 2024, as estimated by the U.S. Census Bureau
-        # 76 in california
-        # 348,503,802 inhabitants as of March 2 2026, ref worldometer
+        # official stats: Over xx cities and towns from all xx states
         
-        print( "INF: %d loaded cities" % len(self.dictCities)  ) # should be 31257
-        print( "INF: %d inhabitants" % nTotalPopulation  ) # should be 406,992,621 (too much)
-        print( "INF: nNbrCityMore100k: %d" % nNbrCityMore100k  ) # Currently 472 instead of 346
-        print( "INF: nNbrCityMore100kCalifornia: %d" % nNbrCityMore100kCalifornia ) # Currently 86 instead of 76
-        assert( len(self.dictCities) == 31257 )
-        assert( nTotalPopulation == 406992621 )
-        assert( nNbrCityMore100k == 472 )
-        assert( nNbrCityMore100kCalifornia == 86 )
+        print( "" )
+        print( "INF: %d loaded cities" % len(self.dictCities)  ) # should be 144654
+        print( "WRN: %d duplicated zip found" % nDuplicateZip ) # 112207 !
+        print( "WRN: %d duplicated cityname found" % nDuplicateCityName ) # 64914! (la moitié !?!)
         
-        print( "WRN: %d duplicated zip found" % nDuplicateZip )
-        print( "WRN: %d duplicated cityname found" % nDuplicateCityName )
+        assert( len(self.dictCities) == 144654 )
+
         
         # manual addings:
                 
@@ -259,7 +298,7 @@ class CitiesUs:
 
     def findByName( self, strCityName, strStateName = None, bPartOf=False ):
         """
-        return id related to a cityname.
+        return id related to a cityname. (cityname with or without accent)
         WRN: If strStateName is bad and bPartOf is False, it will return -1 even if city exists
         """
         bVerbose = 0
@@ -269,6 +308,11 @@ class CitiesUs:
             
         #~ if self.cacheLastFindByRealName[0] == strCityName and self.cacheLastFindByRealName[1] == bPartOf:
             #~ return self.cacheLastFindByRealName[2]
+            
+            
+        strCityName = removeAccentSpecificLang( strCityName )
+        if strStateName != None:
+            strStateName = removeAccentSpecificLang( strStateName )
             
         try:
             listIds = self.dictIdsPerCityName[strCityName]
@@ -287,13 +331,13 @@ class CitiesUs:
             else:
                 for id in listIds:
                     print( "DBG: CitiesUs.findByName try to match '%s' and '%s'" % (strStateName,self.dictCities[id][kStateName]) ) 
-                    if self.dictCities[id][kStateName]== strStateName or self.dictCities[id][kStateID]== strStateName:
+                    if removeAccentSpecificLang(self.dictCities[id][kStateName]) == strStateName or self.dictCities[id][kStateID]== strStateName:
                         return id
                 self.warn("WRN: CitiesUs.findByName: this city name '%s', exist but not with this statename/stateid: '%s' (1)" % (strCityName,strStateName) )
                 return -1
         else:
             id = listIds[0]
-            if not bPartOf and strStateName != None and self.dictCities[id][kStateName] != strStateName and self.dictCities[id][kStateID] != strStateName:
+            if not bPartOf and strStateName != None and removeAccentSpecificLang(self.dictCities[id][kStateName]) != strStateName and self.dictCities[id][kStateID] != strStateName:
                 self.warn("WRN: CitiesUs.findByName: this city name '%s' exist but not with this statename/stateid: '%s' (2)" % (strCityName,strStateName) )
                 return -1
         return id
@@ -323,22 +367,31 @@ class CitiesUs:
         
         
         
-    def isValidAdress( self, zip, strCityName, strStateName = None ):
+    def isValidAddress( self, zip, strCityName, strStateName = None ):
         """
-        is this zip correpond roughly to this city.
+        is this zip correspond roughly to this city.
         return zip, real name, state name, confidence [0..1]
         or None,None, None, 0
+        
+        Work on unaccentuated string
         """
         retValNone = None,None,None, 0.
         
         if isinstance(zip, int):
             zip = "%05d" % zip
             
-        ids = self.dictIdsPerZip[zip]
+        try:
+            ids = self.dictIdsPerZip[zip]
+        except KeyError:
+            return retValNone
+            
+        strCityName = removeAccentSpecificLang( strCityName )
+        if strStateName != None:
+            strStateName = removeAccentSpecificLang( strStateName )
         
         for id in ids:
             city = self.dictCities[id]
-            if strCityName == city[kCityName] and ( strStateName == None or strStateName == city[kStateName] or strStateName == city[kStateID] ):
+            if strCityName == city[kCityNameAscii] and ( strStateName == None or strStateName == removeAccentSpecificLang(city[kStateName]) or strStateName == city[kStateID] ):
                 return zip, city[kCityName], city[kStateName], 1
                 
         # else recherche approximative, au plus proche
@@ -346,9 +399,10 @@ class CitiesUs:
         id_min = -1
         for id in ids:
             city = self.dictCities[id]
-            dist = misctools.levenshtein( strCityName, city[kCityName] )
+            print( "DBG: isValidAddress: comparing '%s' and '%s'" % (strCityName,city[kCityNameAscii]) )
+            dist = misctools.levenshtein( strCityName, city[kCityNameAscii] )
             if strStateName != None:
-                dist += misctools.levenshtein( strStateName, city[kStateName] )
+                dist += misctools.levenshtein( strStateName, removeAccentSpecificLang(city[kStateName]) )
             if dist < dist_min:
                 dist_min = dist
                 id_min = id
@@ -399,124 +453,75 @@ class CitiesUs:
         return -1
             
         
-#class CitiesUS - end
+#class CitiesMex - end
 
 
 
 
 def autotest_cities():
-    cities = CitiesUs()
+    cities = CitiesMex()
     cities.load()
     #  mstab7_2.7 : 
-    #  mstab7_3.9 : 0.19
+    #  mstab7_3.9 : 1.22
     # RPI4_2.7      : 
     # RPI4_3.7      : 
     
     assert_equal( cities.findByZip("666"), None )
     assert_not_equal( cities.findByZip("11220"), None )
-    assert_equal( cities.findByZip("11220")[0], "New York" )
-    assert_equal( cities.findByZip("35816")[0], "Huntsville" )
-    assert_equal( cities.findByZip("90210")[0], "Los Angeles" )
+    assert_not_equal( cities.findByZip("06700"), None )
+    
+    assert_equal( cities.findByZip("06700")[kCityName], "Roma Norte" )
+    assert_equal( cities.findByZip("06700")[kStateName], "Ciudad de México" )
+    assert_equal( cities.findByZip("06700")[kCountyName], "Cuauhtémoc" )
+    assert_equal( cities.findByZip("06700")[kCommunityName], "Distrito Federal" )
+    
+    # San Diego la Huerta es una localidad del Estado de México, México. Es parte del municipio de Calimaya. # https://es.wikipedia.org/wiki/San_Diego_la_Huerta
+    assert_equal( cities.findByZip("52213")[kCityName], "El Calvario" )  # or San Diego la Huerta
+    assert_equal( cities.findByZip("52213")[kStateName], "México" )
+    assert_equal( cities.findByZip("52213")[kCountyName], "Calimaya" )
+    assert_equal( cities.findByZip("52213")[kCommunityName], "" )
+    
+    assert_equal( cities.findByZip("35816")[kCityName], "Providencia" )
+    assert_equal( cities.findByZip("35816")[kStateName], "Durango" )
+    assert_equal( cities.findByZip("35816")[kCountyName], "Cuencamé" )
+    assert_equal( cities.findByZip("35816")[kCommunityName], "" )
+
     
     assert_equal( cities.findByName(""), -1 )
-    assert_not_equal( cities.findByName("New York"), -1 )
-    assert_equal( cities.getCityById( cities.findByName("New York") )[0], "New York" )
-    assert_equal( cities.getCityById( cities.findByName("New York") )[0], "New York" )
+    assert_equal( cities.findByName("New York"), -1 )
+    assert_equal( cities.getCityById( cities.findByName("Delegación Política Cuauhtémoc"))[kCityName], "Delegación Política Cuauhtémoc"  )
+    assert_equal( cities.getCityById( cities.findByName("Delegacion Politica Cuauhtemoc"))[kCityName], "Delegación Política Cuauhtémoc"  )
     
-    assert_equal( cities.getCityAndStateNameById( cities.findByName("New York", "NY") ), "New York/New York" )
+    assert_equal( cities.getCityById( cities.findByName("El Calvario") )[kCityName], "El Calvario" )
+    
+    assert_equal( cities.getCityAndStateNameById( cities.findByName("El Calvario", "Durango") ), "El Calvario/Durango" )
     
     print( "DBG: findByName ret:", cities.findByName("New Yor", bPartOf = 1) )
     
     # find by name bPartOf return city sorted by habitants (pratique)
-    assert_equal( cities.getCityAndStateNameById(cities.findByName("New Yor", bPartOf = 1)), "New York/New York" )
-    assert_equal( cities.getCityAndStateNameById(cities.findByName("New", bPartOf = 1)), "New York/New York" )
-    assert_equal( cities.getCityAndStateNameById(cities.findByName("N", bPartOf = 1)), "New York/New York" )
-    assert_equal( cities.getCityAndStateNameById(cities.findByName("Qu", bPartOf = 1)), "Queens/New York" )
-    assert_equal( cities.getCityAndStateNameById(cities.findByName("", bPartOf = 1)), "/" )
+    assert_equal( cities.getCityAndStateNameById(cities.findByName("El Calvari", bPartOf = 1)), "El Calvario/Jesús María" )
     
     print("Test: findByName adding CountyName")
-    assert_equal( cities.findByName("New York","bad statename"), -1 )
-    assert_equal( cities.findByName("New York","San Francisco"), -1 ) # another bad county name
-    assert_equal( cities.getCityAndStateNameById( cities.findByName("New York","New York") ), "New York/New York" )
-    assert_equal( cities.getCityAndCountyNameById( cities.findByName("New York","New York") ), "New York/Queens" )
-    assert_equal( cities.getCityAndStateNameById( cities.findByName("San Francisco","California") ), "San Francisco/California" )
-    assert_equal( cities.getCityAndCountyNameById( cities.findByName("San Francisco","California") ), "San Francisco/San Francisco" )
-    assert_equal( cities.getCityAndStatePairById( cities.findByName("San Francisco","California") ), ("San Francisco","California") )
-    assert_equal( cities.findByName("San Francisco","Caca"), -1 )
-    assert_equal( cities.getCityAndStateNameById(cities.findByName("Huntsville")), "Huntsville/Alabama" )
-    
-    assert_equal( cities.getCityAndStatePairById(cities.findByName("Springfield")), ("Springfield","Massachusetts") ) # 439199 habitants (le plus grand)
-    assert_equal( cities.getCityAndStatePairById(cities.findByName("Springfield", "Ohio")), ("Springfield","Ohio") ) # un plus petit
-    assert_equal( cities.getCityAndStatePairById(cities.findByName("Springfield", "Wisconsin")), ("Springfield","Wisconsin") ) # le plus petit: 100h
-    
-    #~ assert_equal( cities.getCityById(cities.findByLongLat(-74.01380,40.70879)[0])[0], "New York" )
-    assert_equal( cities.getCityById(cities.findByLongLat(-74.01380,40.70879)[0])[0], "Hoboken" ) # Un quartier précis de New York
-    assert_equal( cities.getCityAndStateNameById(cities.findByLongLat(-74.01380,40.70879)[0]), "Hoboken/New Jersey" ) # Paris
-    assert_equal( cities.getCityAndCountyNameById(cities.findByLongLat(-74.01380,40.70879)[0]), "Hoboken/Hudson" ) # Paris
-    assert_equal( cities.getCityAndCountyNameById(cities.findByLongLat(-73.9,40.6943)[0]), "New York/Queens" ) # Paris
-    assert_equal( cities.getCityAndCountyNameById(cities.findByLongLat(-122.41903,37.77500)[0]), "San Francisco/San Francisco" ) # Paris
-    
-    assert_diff( cities.distTwoCity( "New York","New York", "San Francisco","California" ), 4189.4 ) #~ 4768km a pied
-    assert_diff( cities.distTwoCity( "New York","New York", "Hoboken","Caca" ), 999999 )
-    assert_diff( cities.distTwoCity( "New York","New York", "Pipi" ), 999999 )
-    assert_diff( cities.distTwoCity( "New York","New York", "Hoboken" ), 10.36 )
-    assert_diff( cities.distTwoCity( "New York","New York", "Hoboken", "New Jersey" ), 10.36 )
-    
-    assert_equal( cities.isValidAdress( "10168", "New York" )[3], 1 )
-    assert_equal( cities.isValidAdress( 10168, "New York" )[3], 1 )
-    
-    assert_equal( cities.isValidAdress( "75006", "New York" )[3], 0 )
-    assert_equal( cities.isValidAdress( 75006, "New York" )[3], 0 )
-    
-    assert_equal( cities.isValidAdress( 90210, "Beverly Hills" )[3], 1 )
-    assert_equal( cities.isValidAdress( 90210, "Beverly Hills", "Caca" )[3], 0 )
-    assert_equal( cities.isValidAdress( 90210, "Beverly Hills", "California" )[3], 1 )
-    assert_equal( cities.isValidAdress( 90210, "Beverly Hills", "CA" )[3], 1 )
-    
-    assert_equal( cities.isValidAdress( 10168, "New York", "Queens" )[3], 0 )
-    assert_equal( cities.isValidAdress( 10168, "New York", "Caca" )[3], 0 )
-    
-    print("Test: isValidAdress adding approximation")
-    assert_diff( cities.isValidAdress( "10168", "Mew York" )[3], 0.875 )
-    assert_diff( cities.isValidAdress( "10168", "Meu York" )[3], 0.75 )
-    assert_diff( cities.isValidAdress( "10168", "Meu Yor" )[3], 0.571 )
-    
-    assert_diff( cities.isValidAdress( "10168", "Mew York", "New York" )[3], 0.9375 )
-    assert_diff( cities.isValidAdress( "10168", "New York", "Mew York" )[3], 0.9375 )
-    assert_diff( cities.isValidAdress( "10168", "Meu York", "Meu York" )[3], 0.75 )
-    assert_diff( cities.isValidAdress( "10168", "Meu York", "Meu Yor" )[3], 0.666 )
-    assert_diff( cities.isValidAdress( "10168", "New York", "Meu Y" )[3], 0.615 )
-    assert_diff( cities.isValidAdress( "75006", "New York" )[3], 0 )
-    
-    random_adress1 = """Street:  501 Crim Lane
-City:  Botkins
-State/province/area:   Ohio
-Phone number:  937-693-8441
-Zip code:  45306
-Country calling code:  +1
-Country:  United States
-"""
-    random_adress2 = """
-Street:  2183 Beechwood Avenue
-City:  Somerville
-State/province/area:   Tennessee
-Phone number:  908-867-1457
-Zip code:  38068
-Country calling code:  +1
-Country:  United States
-"""
+    assert_equal( cities.findByName("El Calvari","bad statename"), -1 )
 
-    random_adress3 = "Rancho Cucamonga, California"
-    random_adress4 = "Decatur, GA 30030"
-    random_adress5 = "254 Hilton Road, California,\nLos Angeles, 13200"
-    random_adress6 = "New York City, NY 10001"
-    random_adress7 = "Chicago, Illinois"
+    #~ assert_equal( cities.getCityById(cities.findByLongLat(-74.01380,40.70879)[0])[0], "New York" )
+    assert_equal( cities.getCityAndStateNameById(cities.findByLongLat(-108.0114,25.5775)[0]), "Alhueycito/Sinaloa" )
+    assert_diff( cities.distTwoCity( "Alhueycito","Sinaloa", "Roma Norte", "Ciudad de México" ), 1137.35 )#~ 1572km a pied
+    assert_diff( cities.distTwoCity( "Alhueycito","Sinaloa", "Roma Norte" ), 1137.35 )#~ 1572km a pied
     
-    for num,txt in enumerate( [random_adress1,random_adress2,random_adress3,random_adress4,random_adress5,random_adress6,random_adress7] ):
-        id = cities.extractAddress( txt )
-        print( "DBG: autotest_cities.extractAddress: id:", id )
-        if id != -1:
-            print( "DBG: autotest_cities.extractAddress: %s" % (cities.getCityAndStateNameById( id ) ) )
+    assert_diff( cities.distTwoCity( "New York","New York", "Hoboken","Caca" ), 999999 )
+    
+    
+    print("Test: isValidAddress block")
+    assert_equal( cities.isValidAddress( "06700", "Roma Norte" )[3], 1 )
+    assert_equal( cities.isValidAddress( "06700", "Mora Norte" )[3], 0.8 )
+    assert_equal( cities.isValidAddress( "06701", "Roma Norte" )[3], 0 )
+    
+    assert_equal( cities.isValidAddress( "06357", "Delegación Política Cuauhtémoc" )[3], 1 )
+    assert_diff( cities.isValidAddress( "06357", "Delegacion Politica Cuauhtemoc" )[3], 1 )
+    assert_diff( cities.isValidAddress( "06357", "Delegación Política Cuauhtémo" )[3], 0.965 )
+    assert_diff( cities.isValidAddress( "06357", "Delegación Política Cuauht" )[3], 0.846 )
+
 
 # autotest_cities - end
     
@@ -524,7 +529,7 @@ if __name__ == "__main__":
     if 1:
         autotest_cities()
         #~ autotest_region()
-        print("INF: CitiesUs.autotest passed [GOOD]")
+        print("INF: CitiesMex.autotest passed [GOOD]")
     if 0:        
         """
         Syntaxe:

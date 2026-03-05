@@ -29,7 +29,7 @@ class CitiesUs:
         findByRealName( city, bPartOf = True )
          
     2: Adress detection: give a zip and a city, it will validate it's really an adress, and can correct it.
-        isValidAdress( zip, city ), return (zip,city,confidence) confidence of the right correction.
+        isValidAddress( zip, city ), return (zip,city,confidence) confidence of the right correction.
          
     3: Distance between two city: give two zip, it returns the distance
         distTwoZip( zip1, zip2 )
@@ -271,7 +271,7 @@ class CitiesUs:
         
         
         
-    def isValidAdress( self, zip, strCityName, strStateName = None ):
+    def isValidAddress( self, zip, strCityName, strStateName = None ):
         """
         is this zip correpond roughly to this city.
         return zip, real name, state name, confidence [0..1]
@@ -282,7 +282,10 @@ class CitiesUs:
         if isinstance(zip, int):
             zip = "%05d" % zip
             
-        ids = self.dictIdsPerZip[zip]
+        try:
+            ids = self.dictIdsPerZip[zip]
+        except KeyError:
+            return retValNone
         
         for id in ids:
             city = self.dictCities[id]
@@ -410,31 +413,32 @@ def autotest_cities():
     assert_diff( cities.distTwoCity( "New York","New York", "Hoboken" ), 10.36 )
     assert_diff( cities.distTwoCity( "New York","New York", "Hoboken", "New Jersey" ), 10.36 )
     
-    assert_equal( cities.isValidAdress( "10168", "New York" )[3], 1 )
-    assert_equal( cities.isValidAdress( 10168, "New York" )[3], 1 )
+    assert_equal( cities.isValidAddress( "10168", "New York" )[3], 1 )
+    assert_equal( cities.isValidAddress( 10168, "New York" )[3], 1 )
     
-    assert_equal( cities.isValidAdress( "75006", "New York" )[3], 0 )
-    assert_equal( cities.isValidAdress( 75006, "New York" )[3], 0 )
+    assert_equal( cities.isValidAddress( "75006", "New York" )[3], 0 )
+    assert_equal( cities.isValidAddress( 75006, "New York" )[3], 0 )
+    assert_equal( cities.isValidAddress( 66666, "New York" )[3], 0 )
     
-    assert_equal( cities.isValidAdress( 90210, "Beverly Hills" )[3], 1 )
-    assert_equal( cities.isValidAdress( 90210, "Beverly Hills", "Caca" )[3], 0 )
-    assert_equal( cities.isValidAdress( 90210, "Beverly Hills", "California" )[3], 1 )
-    assert_equal( cities.isValidAdress( 90210, "Beverly Hills", "CA" )[3], 1 )
+    assert_equal( cities.isValidAddress( 90210, "Beverly Hills" )[3], 1 )
+    assert_equal( cities.isValidAddress( 90210, "Beverly Hills", "Caca" )[3], 0 )
+    assert_equal( cities.isValidAddress( 90210, "Beverly Hills", "California" )[3], 1 )
+    assert_equal( cities.isValidAddress( 90210, "Beverly Hills", "CA" )[3], 1 )
     
-    assert_equal( cities.isValidAdress( 10168, "New York", "Queens" )[3], 0 )
-    assert_equal( cities.isValidAdress( 10168, "New York", "Caca" )[3], 0 )
+    assert_equal( cities.isValidAddress( 10168, "New York", "Queens" )[3], 0 )
+    assert_equal( cities.isValidAddress( 10168, "New York", "Caca" )[3], 0 )
     
-    print("Test: isValidAdress adding approximation")
-    assert_diff( cities.isValidAdress( "10168", "Mew York" )[3], 0.875 )
-    assert_diff( cities.isValidAdress( "10168", "Meu York" )[3], 0.75 )
-    assert_diff( cities.isValidAdress( "10168", "Meu Yor" )[3], 0.571 )
+    print("Test: isValidAddress adding approximation")
+    assert_diff( cities.isValidAddress( "10168", "Mew York" )[3], 0.875 )
+    assert_diff( cities.isValidAddress( "10168", "Meu York" )[3], 0.75 )
+    assert_diff( cities.isValidAddress( "10168", "Meu Yor" )[3], 0.571 )
     
-    assert_diff( cities.isValidAdress( "10168", "Mew York", "New York" )[3], 0.9375 )
-    assert_diff( cities.isValidAdress( "10168", "New York", "Mew York" )[3], 0.9375 )
-    assert_diff( cities.isValidAdress( "10168", "Meu York", "Meu York" )[3], 0.75 )
-    assert_diff( cities.isValidAdress( "10168", "Meu York", "Meu Yor" )[3], 0.666 )
-    assert_diff( cities.isValidAdress( "10168", "New York", "Meu Y" )[3], 0.615 )
-    assert_diff( cities.isValidAdress( "75006", "New York" )[3], 0 )
+    assert_diff( cities.isValidAddress( "10168", "Mew York", "New York" )[3], 0.9375 )
+    assert_diff( cities.isValidAddress( "10168", "New York", "Mew York" )[3], 0.9375 )
+    assert_diff( cities.isValidAddress( "10168", "Meu York", "Meu York" )[3], 0.75 )
+    assert_diff( cities.isValidAddress( "10168", "Meu York", "Meu Yor" )[3], 0.666 )
+    assert_diff( cities.isValidAddress( "10168", "New York", "Meu Y" )[3], 0.615 )
+    assert_diff( cities.isValidAddress( "75006", "New York" )[3], 0 )
     
     random_adress1 = """Street:  501 Crim Lane
 City:  Botkins

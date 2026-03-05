@@ -465,7 +465,7 @@ class Cities:
         findByRealName( city, bPartOf = True )
          
     2: Adress detection: give a zip and a city, it will validate it's really an adress, and can correct it.
-        isValidAdress( zip, city ), return (zip,city,confidence) confidence of the right correction.
+        isValidAddress( zip, city ), return (zip,city,confidence) confidence of the right correction.
          
     3: Distance between two city: give two zip, it returns the distance
         distTwoZip( zip1, zip2 )
@@ -750,7 +750,7 @@ class Cities:
         
         
         
-    def isValidAdress( self, zip, strCityName ):
+    def isValidAddress( self, zip, strCityName ):
         """
         is this zip correpond roughly to this city.
         return zip, real name, confidence [0..1]
@@ -775,7 +775,7 @@ class Cities:
                 # rDiff can be from 0 to nearly 1
                 rConfidence = 1. - rDiff
                 
-                print("DBG: isValidAdress: %s and %s => %s: %s, rConfidence: %.2f" % (zip, strCityName, zip, city[2], rConfidence) )
+                print("DBG: isValidAddress: %s and %s => %s: %s, rConfidence: %.2f" % (zip, strCityName, zip, city[2], rConfidence) )
                 return zip, city[2], rConfidence
         return retVal
         
@@ -1319,11 +1319,11 @@ def autotest_cities():
     dist = cities.distTwoZip("69001","75004",bVerbose=True)
     assert_diff(dist,400,20)
     
-    assert_diff(cities.isValidAdress( "34440","colombier")[2],0.95)
-    assert_diff(cities.isValidAdress( "34440","colom")[2],0.67)
-    assert_diff(cities.isValidAdress( "34440","nissa")[2],0.42)
-    assert_diff(cities.isValidAdress( "34440","a")[2],0.1)
-    assert_diff(cities.isValidAdress( "34440","y")[2],0.)    
+    assert_diff(cities.isValidAddress( "34440","colombier")[2],0.95)
+    assert_diff(cities.isValidAddress( "34440","colom")[2],0.67)
+    assert_diff(cities.isValidAddress( "34440","nissa")[2],0.42)
+    assert_diff(cities.isValidAddress( "34440","a")[2],0.1)
+    assert_diff(cities.isValidAddress( "34440","y")[2],0.)    
     
     timeBegin = time.time()
     for i in range(100):

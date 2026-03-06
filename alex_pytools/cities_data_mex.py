@@ -113,6 +113,66 @@ def removeAccentSpecificLang( s, strSpecificLang = "ES" ):
     out = "".join(out)
     #~ print( "DBG: removeAccentSpecificLang: '%s' => '%s'" % (s,out) )
     return out
+    
+# indicatifs_mexique_complet.py
+
+phone_indicatif_mexique = {
+    "55": ["Ciudad de México", "Ciudad de México"],       # capitale 🇲🇽 :contentReference[oaicite:1]{index=1}
+    "56": ["Ciudad de México", "Ciudad de México"],       # overlay pour Mexico City :contentReference[oaicite:2]{index=2}
+    "33": ["Guadalajara", "Jalisco"],                     # :contentReference[oaicite:3]{index=3}
+    "81": ["Monterrey", "Nuevo León"],                    # :contentReference[oaicite:4]{index=4}
+    "222": ["Puebla", "Puebla"],                          # :contentReference[oaicite:5]{index=5}
+    "664": ["Tijuana", "Baja California"],                # :contentReference[oaicite:6]{index=6}
+    "998": ["Cancún", "Quintana Roo"],                    # :contentReference[oaicite:7]{index=7}
+    "999": ["Mérida", "Yucatán"],                         # :contentReference[oaicite:8]{index=8}
+    "449": ["Aguascalientes", "Aguascalientes"],           # :contentReference[oaicite:9]{index=9}
+    "477": ["León", "Guanajuato"],                        # :contentReference[oaicite:10]{index=10}
+    "442": ["Querétaro", "Querétaro"],                    # :contentReference[oaicite:11]{index=11}
+    "744": ["Acapulco", "Guerrero"],                      # :contentReference[oaicite:12]{index=12}
+    "614": ["Chihuahua", "Chihuahua"],                    # :contentReference[oaicite:13]{index=13}
+    "656": ["Ciudad Juárez", "Chihuahua"],                # :contentReference[oaicite:14]{index=14}
+    "662": ["Hermosillo", "Sonora"],                      # :contentReference[oaicite:15]{index=15}
+    "686": ["Mexicali", "Baja California"],               # :contentReference[oaicite:16]{index=16}
+    "229": ["Veracruz", "Veracruz"],                      # :contentReference[oaicite:17]{index=17}
+    "322": ["Puerto Vallarta", "Jalisco"],                # :contentReference[oaicite:18]{index=18}
+    "444": ["San Luis Potosí", "San Luis Potosí"],        # :contentReference[oaicite:19]{index=19}
+    "844": ["Saltillo", "Coahuila"],                      # :contentReference[oaicite:20]{index=20}
+    "899": ["Reynosa", "Tamaulipas"],                     # :contentReference[oaicite:21]{index=21}
+    "433": ["Morelia", "Michoacán"],                      # :contentReference[oaicite:22]{index=22}
+    "624": ["Cabo San Lucas", "Baja California Sur"],     # :contentReference[oaicite:23]{index=23}
+    "951": ["Oaxaca de Juárez", "Oaxaca"],                # :contentReference[oaicite:24]{index=24}
+    "961": ["Tuxtla Gutiérrez", "Chiapas"],               # :contentReference[oaicite:25]{index=25}
+    "871": ["Torreón", "Coahuila"],                       # :contentReference[oaicite:26]{index=26}
+    "861": ["Progreso", "Yucatán"],
+    "646": ["Ensenada","Baja California"],
+    "667": ["Culiacán","Sinaloa"],
+    "462": ["Irapuato","Guanajuato"],
+    "443": ["Morelia","Michoacán"],
+    "833": ["Tampico","Tamaulipas"],
+    "993": ["Villahermosa","Tabasco"],
+    "984": ["Playa del Carmen","Quintana Roo"],
+    "815": ["Toluca","Estado de México"],
+    "932": ["Jalapa","Veracruz"],
+    "777": ["Cuernavaca","Morelos"],
+    "938": ["Ciudad del Carmen","Campeche"],
+}
+
+if 0:
+    # fusion de 2 dicos
+    for k,v in indicatifs_mexique.items():
+        if not k in phone_indicatif_mexique:
+            print('"%s":["%s","%s"]' % (k,v[0],v[1]) )
+        else:
+            assert(v == phone_indicatif_mexique[k] )
+    exit(1)
+    
+def getCityAndStateFromPhoneIndicatif( indi ):
+    indi = str(indi)
+    try:
+        return phone_indicatif_mexique[indi]
+    except KeyError as err:
+        pass
+    return None
 
 class CitiesMex:
     """
@@ -143,7 +203,7 @@ class CitiesMex:
         bVerbose = 1
         bVerbose = 0
         
-        print("INF: CitiesUS: loading city data...")
+        print("INF: CitiesMex: loading city data...")
         timeBegin = time.time()
         strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
         #~ print("strLocalPath: " + strLocalPath)
@@ -236,7 +296,31 @@ class CitiesMex:
         # manual addings:
                 
         print("INF: CitiesUs: loading city data - end duration: %.2fs" % (time.time()-timeBegin) )
+        
+        #~ self.computeStats()
     # load - end
+    
+    def computeStats( self ):
+        lenCity = 0
+        nbrCity = 0
+        lenState = 0
+        nbrState = 0
+        for k,v in self.dictCities.items():
+            c = v[kCityName]
+            if c != "":
+                lenCity += len(c.split( " " ))
+                nbrCity += 1
+            c = v[kStateName]
+            if c != "":
+                lenState += len(c.split( " " ))
+                nbrState += 1      
+
+        print( "nbr city: %d" % len( self.dictCities ) )
+        print( "nbr city not empty: %d" % nbrCity )
+        print( "avg city not empty: %.2f" % (lenCity/nbrCity) ) # 2.41
+        print( "nbr state not empty: %d" % nbrState )
+        print( "avg state not empty: %.2f" % (lenState/nbrState) ) # 1.81
+        
     
     def warn(self,msg):
         if msg in self.warnMessages:
@@ -298,7 +382,7 @@ class CitiesMex:
 
     def findByName( self, strCityName, strStateName = None, bPartOf=False ):
         """
-        return id related to a cityname. (cityname with or without accent)
+        return id related to a cityname. (cityname with or without accent) or -1 if not found
         WRN: If strStateName is bad and bPartOf is False, it will return -1 even if city exists
         """
         bVerbose = 0
@@ -365,6 +449,20 @@ class CitiesMex:
         return strMinId,dist
             
         
+    def findByCityStateOrCommunity( self, name ):
+        """
+        return city id and number of field matching the name
+        or if not found -1, -1
+        """
+        if name == "":
+            return -1,-1
+            
+        name = removeAccentSpecificLang(name).lower()
+        for id,data in self.dictCities.items():
+            for num_field in [kCityName, kStateName, kCountyName, kCommunityName]:
+                if name == removeAccentSpecificLang(data[num_field]).lower():
+                    return id, num_field
+        return -1, -1
         
         
     def isValidAddress( self, zip, strCityName, strStateName = None ):
@@ -465,6 +563,7 @@ def autotest_cities():
     #  mstab7_3.9 : 1.22
     # RPI4_2.7      : 
     # RPI4_3.7      : 
+    # Azure             : 1.21
     
     assert_equal( cities.findByZip("666"), None )
     assert_not_equal( cities.findByZip("11220"), None )
@@ -521,8 +620,21 @@ def autotest_cities():
     assert_diff( cities.isValidAddress( "06357", "Delegacion Politica Cuauhtemoc" )[3], 1 )
     assert_diff( cities.isValidAddress( "06357", "Delegación Política Cuauhtémo" )[3], 0.965 )
     assert_diff( cities.isValidAddress( "06357", "Delegación Política Cuauht" )[3], 0.846 )
-
-
+    
+    assert_equal( getCityAndStateFromPhoneIndicatif( "421" ), None )
+    assert_equal( getCityAndStateFromPhoneIndicatif( "646" ), ['Ensenada', 'Baja California'] )
+    assert_equal( getCityAndStateFromPhoneIndicatif( 646 ), ['Ensenada', 'Baja California'] )
+    
+    assert_equal( cities.findByCityStateOrCommunity( "Baja California" )[1], kStateName )
+    assert_equal( cities.findByCityStateOrCommunity( "Ensenada" )[1], kCountyName ) # c'est aussi une county
+    assert_equal( cities.findByCityStateOrCommunity( "Roma Norte" )[1], kCityName )
+    assert_equal( cities.findByCityStateOrCommunity( "Baja California Sur" )[1], kCommunityName )
+    # cherche d'une communauté qui fonctionne:
+    #~ for k,v in cities.dictCities.items():
+        #~ if cities.findByCityStateOrCommunity( v[kCommunityName] )[1] == kCommunityName:
+            #~ print("kCommunityName: '%s'" % v[kCommunityName] )
+            #~ exit(1)
+    
 # autotest_cities - end
     
 if __name__ == "__main__":

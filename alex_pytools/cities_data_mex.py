@@ -332,7 +332,7 @@ class CitiesMex:
         try:
             return self.dictCities[id]
         except KeyError:
-            print("WRN: CitiesUs.getCityById: city with id: '%s' not found..." % id )
+            print("WRN: CitiesMex.getCityById: city with id: '%s' not found..." % id )
             pass
         return None
         
@@ -340,7 +340,7 @@ class CitiesMex:
         try:
             return self.dictCities[id][kCityName] + "/" + self.dictCities[id][kStateName]
         except KeyError:
-            print("WRN: CitiesUs.getCityAndStateNameById: city with id: '%s' not found..." % id )
+            print("WRN: CitiesMex.getCityAndStateNameById: city with id: '%s' not found..." % id )
             pass
         return "/"
 
@@ -348,7 +348,7 @@ class CitiesMex:
         try:
             return self.dictCities[id][kCityName], self.dictCities[id][kStateName]
         except KeyError:
-            print("WRN: CitiesUs.getCityAndStatePairById: city with id: '%s' not found..." % id )
+            print("WRN: CitiesMex.getCityAndStatePairById: city with id: '%s' not found..." % id )
             pass
         return ("","")
         
@@ -356,7 +356,7 @@ class CitiesMex:
         try:
             return self.dictCities[id][kCityName] + "/" + self.dictCities[id][kCountyName]
         except KeyError:
-            print("WRN: CitiesUs.getCityAndCountyNameById: city with id: '%s' not found..." % id )
+            print("WRN: CitiesMex.getCityAndCountyNameById: city with id: '%s' not found..." % id )
             pass
         return "/"
         
@@ -365,7 +365,7 @@ class CitiesMex:
         return info on a city or None if not nound
         """
         if zip == None:
-            print("WRN: CitiesUs.findByZip: called with None => returning None" )
+            print("WRN: CitiesMex.findByZip: called with None => returning None" )
             return None
             
         if isinstance(zip, int):
@@ -410,19 +410,19 @@ class CitiesMex:
             
         if len(listIds) > 1:
             if strStateName == None:
-                self.warn("WRN: CitiesUs.findByName: this city name has different cities: %s" % (listIds) )
+                self.warn("WRN: CitiesMex.findByName: this city name has different ids: %s" % (listIds) )
                 id = listIds[0]
             else:
                 for id in listIds:
-                    print( "DBG: CitiesUs.findByName try to match '%s' and '%s'" % (strStateName,self.dictCities[id][kStateName]) ) 
+                    print( "DBG: CitiesMex.findByName try to match state '%s' and '%s'" % (strStateName,self.dictCities[id][kStateName]) ) 
                     if removeAccentSpecificLang(self.dictCities[id][kStateName]) == strStateName or self.dictCities[id][kStateID]== strStateName:
                         return id
-                self.warn("WRN: CitiesUs.findByName: this city name '%s', exist but not with this statename/stateid: '%s' (1)" % (strCityName,strStateName) )
+                self.warn("WRN: CitiesMex.findByName: this city name '%s', exist but not with this statename/stateid: '%s' (1)" % (strCityName,strStateName) )
                 return -1
         else:
             id = listIds[0]
             if not bPartOf and strStateName != None and removeAccentSpecificLang(self.dictCities[id][kStateName]) != strStateName and self.dictCities[id][kStateID] != strStateName:
-                self.warn("WRN: CitiesUs.findByName: this city name '%s' exist but not with this statename/stateid: '%s' (2)" % (strCityName,strStateName) )
+                self.warn("WRN: CitiesMex.findByName: this city name '%s' exist but not with this statename/stateid: '%s' (2)" % (strCityName,strStateName) )
                 return -1
         return id
 
@@ -549,7 +549,14 @@ class CitiesMex:
             if id != -1:
                 return id
         return -1
-            
+        
+        
+    def getFormatedCity( self, city, bLeaveAccent = True ):
+        if bLeaveAccent: 
+            txt = city[kZip] + " " + city[kCityName] + ", " + city[kStateName]
+            return txt
+        txt = city[kZip] + " " + city[kCityNameAscii] + ", " + removeAccentSpecificLang( city[kStateName] )
+        return txt       
         
 #class CitiesMex - end
 
@@ -568,6 +575,9 @@ def autotest_cities():
     assert_equal( cities.findByZip("666"), None )
     assert_not_equal( cities.findByZip("11220"), None )
     assert_not_equal( cities.findByZip("06700"), None )
+    
+    assert_equal( cities.getFormatedCity( cities.findByZip("06700") ), "06700 Roma Norte, Ciudad de México" )
+    assert_equal( cities.getFormatedCity( cities.findByZip("06700"), False ), "06700 Roma Norte, Ciudad de Mexico" )
     
     assert_equal( cities.findByZip("06700")[kCityName], "Roma Norte" )
     assert_equal( cities.findByZip("06700")[kStateName], "Ciudad de México" )

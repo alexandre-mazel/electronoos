@@ -90,8 +90,10 @@ def removeAccentSpecificLang( s, strSpecificLang = "ES" ):
     dic_conv = { 
             "Á": "A",
             "á": "a",
+            "à": "a",
             "É": "E",
             "é": "e",
+            "è": "e",
             "Í": "I",
             "í": "i",
             "Ñ": "N",
@@ -99,6 +101,7 @@ def removeAccentSpecificLang( s, strSpecificLang = "ES" ):
             "Ó": "O",
             "ó": "o",
             "Ú": "U",
+            "ù": "u",
             "ú": "u",
             "Ü": "U",
             "ü": "u",
@@ -380,12 +383,11 @@ class CitiesMex:
         return self.dictCities[id]
             
 
-    def findByName( self, strCityName, strStateName = None, bPartOf=False ):
+    def findByName( self, strCityName, strStateName = None, bPartOf=False, bVerbose = 0 ):
         """
         return id related to a cityname. (cityname with or without accent) or -1 if not found
         WRN: If strStateName is bad and bPartOf is False, it will return -1 even if city exists
         """
-        bVerbose = 0
         
         if strCityName == "":
             return -1
@@ -414,7 +416,7 @@ class CitiesMex:
                 id = listIds[0]
             else:
                 for id in listIds:
-                    print( "DBG: CitiesMex.findByName try to match state '%s' and '%s'" % (strStateName,self.dictCities[id][kStateName]) ) 
+                    if bVerbose: print( "DBG: CitiesMex.findByName try to match state '%s' and '%s'" % (strStateName,self.dictCities[id][kStateName]) ) 
                     if removeAccentSpecificLang(self.dictCities[id][kStateName]) == strStateName or self.dictCities[id][kStateID]== strStateName:
                         return id
                 self.warn("WRN: CitiesMex.findByName: this city name '%s', exist but not with this statename/stateid: '%s' (1)" % (strCityName,strStateName) )

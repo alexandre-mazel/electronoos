@@ -414,8 +414,16 @@ if __name__ == "__main__":
         print(get_available_cameras())
     except BaseException as err:
         print( "ERR: while running get_available_cameras, err: %s" % str(err) )
-    #~ get_available_cameras_alt()
-    print(get_available_microphones())
+        
+    try:
+        get_available_cameras_alt()
+    except BaseException as err:
+        print( "ERR: while running get_available_cameras_alt, err: %s" % str(err) )
+        
+    try:
+        print(get_available_microphones())
+    except BaseException as err:
+        print( "ERR: while running get_available_cameras, err: %s" % str(err) )
     get_capacity()
         
     

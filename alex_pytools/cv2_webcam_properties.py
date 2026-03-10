@@ -252,7 +252,7 @@ def get_capacity():
         while 1:
             numcam = id_base + id
             
-            if nbr_error > 2:
+            if nbr_error > 3:
                 break # no more camera
             
             last_err = ""

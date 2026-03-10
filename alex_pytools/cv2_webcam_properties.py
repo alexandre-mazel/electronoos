@@ -225,7 +225,7 @@ def get_capacity():
     print( "INF: get_capacity: starting..." )
     
     bVerbose = 1
-    #~ bVerbose = 0
+    bVerbose = 0
     
     bRenderOneImageEachResolution = 1
     bRenderOneImageEachResolution = 0

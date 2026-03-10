@@ -410,7 +410,10 @@ name: 'DSHOW'
 
 if __name__ == "__main__":
     print("hostname: %s" % get_hostname() )
-    print(get_available_cameras())
+    try:
+        print(get_available_cameras())
+    except BaseException as err:
+        print( "ERR: while running get_available_cameras, err: %s" % str(err) )
     #~ get_available_cameras_alt()
     print(get_available_microphones())
     get_capacity()

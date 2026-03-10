@@ -210,7 +210,7 @@ def get_available_microphones() :
 
     return available_microphones
 
-def get_capacity():
+def get_capacity( bTestRealFps=True, bVerbose=True ):
     """
     mstab7:
     {0: 'Surface Camera Front', 1: 'Surface Camera Rear', 2: 'EOS Webcam Utility', 3: 'HD Pro Webcam C920', 4: 'GoPro Webcam'}
@@ -285,7 +285,7 @@ def get_capacity():
                 if 0 and (h != 720 or h != 896):
                     continue
                     
-                if h < 720:
+                if h < 480:
                     continue
                             
                 cam.set( cv2.CAP_PROP_FRAME_WIDTH, w )
@@ -297,8 +297,6 @@ def get_capacity():
                 getfps = cam.get( cv2.CAP_PROP_FPS )
                 
                 if getw == w and geth == h:
-                    
-                    bTestRealFps = True
                     
                     end = "\n" # default
                     if bTestRealFps:

@@ -245,7 +245,7 @@ def get_capacity():
         
         id = 0
         
-        id = 3 # start from specific idx
+        #~ id = 3 # start from specific idx
         
         nbr_error = 0
         

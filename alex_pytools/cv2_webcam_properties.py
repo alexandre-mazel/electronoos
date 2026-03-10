@@ -253,6 +253,7 @@ def get_capacity():
             numcam = id_base + id
             
             if nbr_error > 3:
+                if bVerbose: print( "nbr_error: %s exiting..." % nbr_error )
                 break # no more camera
             
             last_err = ""

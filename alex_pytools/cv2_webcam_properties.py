@@ -265,6 +265,7 @@ def get_capacity():
             cam = cv2.VideoCapture( numcam, cap_mode )
             if not cam.isOpened():
                 nbr_error += 1
+                id += 1
                 continue
             
             print( "camera id %d" % (numcam) )

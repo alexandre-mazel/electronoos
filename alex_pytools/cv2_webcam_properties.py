@@ -238,9 +238,14 @@ def get_capacity():
     
     hostname = get_hostname()
     
-    cap_mode = cv2.CAP_ANY
-    list_base = [0,cv2.CAP_DSHOW] # CAP_DSHOW has a value of 700
-    list_base = [cv2.CAP_DSHOW]
+    if os.name == "nt":
+        cap_mode = cv2.CAP_ANY
+        list_base = [0,cv2.CAP_DSHOW] # CAP_DSHOW has a value of 700
+        list_base = [cv2.CAP_DSHOW]
+    else
+        cap_mode = cv2.CAP_V4L
+        list_base = [0]
+        
     for id_base in list_base:
         
         id = 0

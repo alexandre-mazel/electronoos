@@ -370,8 +370,12 @@ def generate_js_cities_list(destination_filename):
     
     out += "citiesAndDatas_USA=["
     for k,data in cities.dictCities.items():
-        out += "['%s','%s',%.4f,%.4f]," % (data[kCityName],data[kZips][0],data[kLong],data[kLat],)
-    out += "]"
+        cityname = data[kCityName]
+        #~ if "\"" in cityname:
+            #~ print("outch")
+        out += '["%s","%s",%.4f,%.4f],' % (cityname,data[kZips][0],data[kLong],data[kLat])
+    out = out[:-1] # remove last comma
+    out += "];"
     
     f = open(destination_filename,"wt")
     f.write(out)

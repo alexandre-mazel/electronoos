@@ -166,14 +166,14 @@ def testLoopBugMyScanner():
 def runManyTimes( nNbrTimes = 50 ):
     for i in range(nNbrTimes):
         try:
-            acquire_image_wia("c:/tmp/wia-test2.png",nResolution=300)
+            acquire_image_wia("c:/tmp/wia-test2.png",nResolution=600)
             print("INF: Success!")
             break
         except BaseException as err:
             print("ERR: try %d: %s" % (i,err))
             
-#~ runManyTimes()   
+runManyTimes()   
 #~ preprocessExportedFile("c:/tmp/wia-test2a.png")
-preprocessExportedFile("../data/wia-test2a.png")
-preprocessExportedFile("../data/wia-test2b.png")
+#~ preprocessExportedFile("../data/wia-test2a.png")
+#~ preprocessExportedFile("../data/wia-test2b.png")
 

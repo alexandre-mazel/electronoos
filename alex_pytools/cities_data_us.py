@@ -353,6 +353,35 @@ class CitiesUs:
 #class CitiesUS - end
 
 
+def generate_js_cities_list(destination_filename):
+    """
+    will generate a big js list, like that with each city, zip, long, lat
+    to the given filename
+    citiesAndDatas=[['Ozan', '01190', 4.91667, 46.3833],['Cormoranche-sur-Sa&ocirc;ne', '01290', 4.83333, 46.2333]
+    """
+    print( "INF: generate_js_cities_list to filename '%s'" % destination_filename )
+    out = ""
+    out += "// automatically generated using script '%s'\n" % ( sys.modules[__name__].__file__ )
+    
+    cities = CitiesUs()
+    cities.load()
+    
+    out += "// it contains %d cities\n" % len(cities.dictCities)
+    
+    out += "citiesAndDatas_USA=["
+    for k,data in cities.dictCities.items():
+        out += "['%s','%s',%.4f,%.4f]," % (data[kCityName],data[kZips][0],data[kLong],data[kLat],)
+    out += "]"
+    
+    f = open(destination_filename,"wt")
+    f.write(out)
+    f.close()
+    
+    print( "INF: generate_js_cities_list to filename '%s' - done" % destination_filename )
+# generate_js_cities_list - end
+    
+
+
 
 
 def autotest_cities():
@@ -486,3 +515,6 @@ if __name__ == "__main__":
         if len(sys.argv)>1:
             bOutputHtml = True
         statByRegion( bOutputHtml = bOutputHtml )
+        
+    if 1:
+        generate_js_cities_list( "datas/eng_city_usa_datas.js")

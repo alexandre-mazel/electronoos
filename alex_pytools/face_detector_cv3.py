@@ -257,6 +257,11 @@ def selectFace( faces_list, img_shape ):
     print(faces_list)
     for i in range(len( faces_list ) ):
         xt, yt, xb, yb,rConf = faces_list[i]
+        # sometimes a face is detected in the bottom corner and is incomplete but it approximate position, so it gives too much point from size
+        if xb > w:
+            xb = w-1
+        if yb > h:
+            yb = h-1
         facew = xb-xt;
         faceh = yb-yt;        
         nScore = 0; # all distances are compared in square

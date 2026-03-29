@@ -7,6 +7,7 @@ syntax: scriptname imagename [analyse]
 """
 
 import cv2
+import os
 import sys
 import numpy as np
 import time
@@ -32,10 +33,34 @@ def mse(imageA, imageB):
     
 def getScreenWidth():
     import ctypes
-    user32 = ctypes.windll.user32
-    screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
-    print("screensize: %s" % str(screensize))
-    return screensize[0]
+    if os.name == "nt":
+        # ce code me semble qu'il fonctionnait a une epoque sous linux...
+        user32 = ctypes.windll.user32
+        screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
+        print("screensize: %s" % str(screensize))
+        return screensize[0]
+    
+    if 0:
+        # pb: screeninfo.common.ScreenInfoError: No enumerators available
+        from screeninfo import get_monitors # pip install screeninfo
+
+        for m in get_monitors():
+            print(m.width, m.height)
+            return m.width
+    if 1:
+        # mess another thinter ?
+        # The X11 connection broke (error 1). Did the X11 server die? (ou c'est plus tard le probleme?)
+        import tkinter as tk
+
+        root = tk.Tk()
+        width = root.winfo_screenwidth()
+        height = root.winfo_screenheight()
+        root.destroy()
+
+        print(width, height)
+        return width
+        
+    return 2560
 
 def viewImg( strFilename, bAnalyse = False, bAnalyseAlt = False ):
     """

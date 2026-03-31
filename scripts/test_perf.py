@@ -690,18 +690,7 @@ pi@rasp3thermal:~ $ python test_perf.py
 python version   : 2.7.16 (32bits) (4 core(s))
 test_cpu_int2    : ####################   5.60s
 test_cpu_float2  : ####################   0.94s
-scipy.fftpack    : not found
-^C^C^Copencv  : not found
-test_orbcv imgs  : test_perf_vga_*.png: not found
-^Ctest_orbcv bis   : Traceback (most recent call last):
-  File "test_perf.py", line 379, in <module>
-    test_perf(nDiskTestSizeMB=nDiskTestSizeMB);
-  File "test_perf.py", line 356, in test_perf
-    rTotalTime += test_opencv_orb_realcase(); # because on some computer the previous one takes time initialise stuffs
-  File "test_perf.py", line 224, in test_opencv_orb_realcase
-    img[j,i,0] = math.sin(w*h)*1000
-KeyboardInterrupt
-^C
+
 pi@rasp3thermal:~ $ python3 test_perf.py
 python version   : 3.7.3 (32bits) (4 core(s))
 test_cpu_int2    : ####################   5.59s

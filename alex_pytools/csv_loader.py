@@ -276,6 +276,9 @@ def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
             fIndex = io.open( filename_with_index_out, "wt", encoding="cp1252" )
             for k,content in dOut.items():
                 fn = filename+"__"+k+".csv"
+                if "jobs_desc_TH" in fn:
+                    print( "WRN: skipping Thailandais as on sait pas encoder les accents en utf-8 thai!!!" )
+                    continue
                 print("INF: writing to independant csv: %s" % fn )
                 f = io.open(fn,"wt", encoding=encoding)
                 for line in content:

@@ -348,7 +348,15 @@ class CitiesUs:
             if id != -1:
                 return id
         return -1
-            
+        
+        
+    def getFormatedCity( self, city, bLeaveAccent = True ):
+        """
+        bLeaveAccent: unused (but remains for compatibility)
+        """
+        txt = city[kZips][0] + " " + city[kCityName] + ", " + city[kStateName]
+        return txt
+        
         
 #class CitiesUS - end
 

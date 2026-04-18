@@ -362,22 +362,32 @@ class CitiesMex:
             print("WRN: CitiesMex.getCityAndCountyNameById: city with id: '%s' not found..." % id )
             pass
         return "/"
+
+    def getIdByZip( self, zip ):
+        """
+        return if of a city or -1 if not nound
+        """
+        if zip == None:
+            print("WRN: CitiesMex.getIdByZip: called with None => returning -1" )
+            return -1
+            
+        if isinstance(zip, int):
+            zip = "%05d" % zip
+            
+        try:
+            id = self.dictIdsPerZip[zip][0]
+        except KeyError:
+            return -1
+            
+        return id
         
     def findByZip( self, zip, bQuiet = True ):
         """
         return info on a city or None if not nound
         """
-        if zip == None:
-            print("WRN: CitiesMex.findByZip: called with None => returning None" )
-            return None
-            
-        if isinstance(zip, int):
-            zip = "%05d" % zip
-
-            
-        try:
-            id = self.dictIdsPerZip[zip][0]
-        except KeyError:
+        id = self.getIdByZip( zip )
+        if id == -1:
+            print("WRN: CitiesMex.findByZip: zip '%s' not found" % zip )
             return None
             
         return self.dictCities[id]
@@ -517,9 +527,16 @@ class CitiesMex:
         return retValNone
         
         
-    def distTwoCity( self, city1, county1, city2, county2 = None, bApproxSearch=True, bVerbose=False ):
+    def distTwoCities( self, city1, county1, city2, county2 = None, bApproxSearch=True, bVerbose=False ):
         id1 = self.findByName( city1, county1 )
         id2 = self.findByName( city2, county2 )
+        return self.distTwoIds( id1, id2 )
+        
+    def distTwoZips( self, zip1, zip2 ):
+        id1 = self.getIdByZip( zip1 )
+        id2 = self.getIdByZip( zip2 )
+        #~ print("id1: '%s'" % id1 )
+        #~ print("id2: '%s'" % id2 )
         return self.distTwoIds( id1, id2 )
 
     def distTwoIds( self, id1, id2 ):
@@ -666,11 +683,12 @@ def autotest_cities():
 
     #~ assert_equal( cities.getCityById(cities.findByLongLat(-74.01380,40.70879)[0])[0], "New York" )
     assert_equal( cities.getCityAndStateNameById(cities.findByLongLat(-108.0114,25.5775)[0]), "Alhueycito/Sinaloa" )
-    assert_diff( cities.distTwoCity( "Alhueycito","Sinaloa", "Roma Norte", "Ciudad de México" ), 1137.35 )#~ 1572km a pied
-    assert_diff( cities.distTwoCity( "Alhueycito","Sinaloa", "Roma Norte" ), 1137.35 )#~ 1572km a pied
+    assert_diff( cities.distTwoCities( "Alhueycito","Sinaloa", "Roma Norte", "Ciudad de México" ), 1137.35 )#~ 1572km a pied
+    assert_diff( cities.distTwoCities( "Alhueycito","Sinaloa", "Roma Norte" ), 1137.35 )#~ 1572km a pied
     
-    assert_diff( cities.distTwoCity( "New York","New York", "Hoboken","Caca" ), 999999 )
+    assert_diff( cities.distTwoCities( "New York","New York", "Hoboken","Caca" ), 999999 )
     
+    assert_diff( cities.distTwoZips( "06700", "06357" ), 3.33 ) # Roma Norte & Delegación Política Cuauhtémoc, theoric: 3.44km (distance calculator)
     
     print("Test: isValidAddress block")
     assert_equal( cities.isValidAddress( "06700", "Roma Norte" )[3], 1 )

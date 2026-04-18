@@ -185,21 +185,31 @@ class CitiesUs:
             pass
         return "/"
         
-    def findByZip( self, zip, bQuiet = True ):
+    def getIdByZip( self, zip ):
         """
-        return info on a city or None if not nound
+        return if of a city or -1 if not nound
         """
         if zip == None:
-            print("WRN: CitiesUs.findByZip: called with None => returning None" )
-            return None
+            print("WRN: CitiesUs.getIdByZip: called with None => returning -1" )
+            return -1
             
         if isinstance(zip, int):
             zip = "%05d" % zip
-
             
         try:
             id = self.dictIdsPerZip[zip][0]
         except KeyError:
+            return -1
+            
+        return id
+        
+    def findByZip( self, zip, bQuiet = True ):
+        """
+        return info on a city or None if not nound
+        """
+        id = self.getIdByZip( zip )
+        if id == -1:
+            print("WRN: CitiesUs.findByZip: zip '%s' not found" % zip )
             return None
             
         return self.dictCities[id]
@@ -314,9 +324,16 @@ class CitiesUs:
         return retValNone
         
         
-    def distTwoCity( self, city1, county1, city2, county2 = None, bApproxSearch=True, bVerbose=False ):
+    def distTwoCities( self, city1, county1, city2, county2 = None, bApproxSearch=True, bVerbose=False ):
         id1 = self.findByName( city1, county1 )
         id2 = self.findByName( city2, county2 )
+        return self.distTwoIds( id1, id2 )
+        
+    def distTwoZips( self, zip1, zip2 ):
+        id1 = self.getIdByZip( zip1 )
+        id2 = self.getIdByZip( zip2 )
+        #~ print("id1: '%s'" % id1 )
+        #~ print("id2: '%s'" % id2 )
         return self.distTwoIds( id1, id2 )
 
     def distTwoIds( self, id1, id2 ):
@@ -466,11 +483,13 @@ def autotest_cities():
     assert_equal( cities.getCityAndCountyNameById(cities.findByLongLat(-73.9,40.6943)[0]), "New York/Queens" ) # Paris
     assert_equal( cities.getCityAndCountyNameById(cities.findByLongLat(-122.41903,37.77500)[0]), "San Francisco/San Francisco" ) # Paris
     
-    assert_diff( cities.distTwoCity( "New York","New York", "San Francisco","California" ), 4189.4 ) #~ 4768km a pied
-    assert_diff( cities.distTwoCity( "New York","New York", "Hoboken","Caca" ), 999999 )
-    assert_diff( cities.distTwoCity( "New York","New York", "Pipi" ), 999999 )
-    assert_diff( cities.distTwoCity( "New York","New York", "Hoboken" ), 10.36 )
-    assert_diff( cities.distTwoCity( "New York","New York", "Hoboken", "New Jersey" ), 10.36 )
+    assert_diff( cities.distTwoCities( "New York","New York", "San Francisco","California" ), 4189.4 ) #~ 4768km a pied
+    assert_diff( cities.distTwoCities( "New York","New York", "Hoboken","Caca" ), 999999 )
+    assert_diff( cities.distTwoCities( "New York","New York", "Pipi" ), 999999 )
+    assert_diff( cities.distTwoCities( "New York","New York", "Hoboken" ), 10.36 )
+    assert_diff( cities.distTwoCities( "New York","New York", "Hoboken", "New Jersey" ), 10.36 )
+    
+    assert_diff( cities.distTwoZips( 90210,10168 ), 3993.93 ) # Beverly hills & New York, distance calculator: 3947.95
     
     assert_equal( cities.isValidAddress( "10168", "New York" )[3], 1 )
     assert_equal( cities.isValidAddress( 10168, "New York" )[3], 1 )

@@ -560,6 +560,23 @@ class CitiesMex:
         txt = city[kZip] + " " + city[kCityNameAscii] + ", " + removeAccentSpecificLang( city[kStateName] )
         return txt       
         
+        
+    def zipToHumanised( self, zip ):
+        city = self.findByZip( zip )
+        if city == None:
+            print("WRN: zipToHumanised city is None for zip '%s'" % zip )
+            return ""
+        strCity = city[3]
+        
+        strOut = "en " + city[kCityName]
+        return strOut
+        
+    def idToZip( self, id ):
+        """
+        take the id of a city and return the first zip
+        """
+        return self.getCityById( id )[kZip]
+        
 #class CitiesMex - end
 
 def generate_js_cities_list(destination_filename):

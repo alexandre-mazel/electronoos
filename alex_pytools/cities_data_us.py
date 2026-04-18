@@ -357,6 +357,22 @@ class CitiesUs:
         txt = city[kZips][0] + " " + city[kCityName] + ", " + city[kStateName]
         return txt
         
+    def zipToHumanised( self, zip ):
+        city = self.findByZip( zip )
+        if city == None:
+            print("WRN: zipToHumanised city is None for zip '%s'" % zip )
+            return ""
+        strCity = city[3]
+        
+        strOut = "in " + city[kCityName]
+        return strOut
+        
+    def idToZip( self, id ):
+        """
+        take the id of a city and return the first zip
+        """
+        return self.getCityById( id )[kZips][0]
+        
         
 #class CitiesUS - end
 
@@ -414,6 +430,8 @@ def autotest_cities():
     assert_not_equal( cities.findByName("New York"), -1 )
     assert_equal( cities.getCityById( cities.findByName("New York") )[0], "New York" )
     assert_equal( cities.getCityById( cities.findByName("New York") )[0], "New York" )
+    
+    assert_equal( cities.getCityById(cities.findByName("Los Angeles"))[kCityName], 'Los Angeles' )
     
     assert_equal( cities.getCityAndStateNameById( cities.findByName("New York", "NY") ), "New York/New York" )
     
@@ -480,6 +498,18 @@ def autotest_cities():
     assert_diff( cities.isValidAddress( "10168", "Meu York", "Meu Yor" )[3], 0.666 )
     assert_diff( cities.isValidAddress( "10168", "New York", "Meu Y" )[3], 0.615 )
     assert_diff( cities.isValidAddress( "75006", "New York" )[3], 0 )
+    
+    
+    assert_equal( cities.idToZip( "1840020491" ), "91367" ) # could change if we change datas
+    assert_equal( cities.idToZip( "1840042609" ), "78580" )
+    
+    assert_equal( cities.findByName( "Los Angeles" ), "1840020491" )
+    
+    # two cities with same name:
+    assert_equal( cities.getCityById( "1840042609" )[kCityName], "Los Angeles" )
+    assert_equal( cities.getCityById( "1840020491" )[kCityName], "Los Angeles" )
+    
+    
     
     random_adress1 = """Street:  501 Crim Lane
 City:  Botkins

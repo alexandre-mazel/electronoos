@@ -165,7 +165,7 @@ def load_datas_from_xlsx_exploded_for_python27( filename, encoding = 'utf-8', bV
         tabname = fi.readline().replace("\n","")
         if len(tabname)<2:
             break
-        print( "INF: load_datas_from_xlsx_exploded_for_python27: tabname: '%s'" % tabname )
+        #~ print( "INF: load_datas_from_xlsx_exploded_for_python27: tabname: '%s'" % tabname )
         fntab = filename+"__"+tabname+".csv"
         if 1:
             #~ data = load_csv( fntab, encoding=encoding )

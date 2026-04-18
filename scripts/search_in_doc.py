@@ -138,6 +138,60 @@ def searchInPdf(filename, s):
             cpt += 1
     return len(allparas),cpt
     
+    
+import openpyxl
+
+def searchInXlsx(filename, search_string):
+    # return nbr total cell, nbr match
+    
+    #~ results = []
+    nbr_title = 0
+    nbr_cell = 0
+    nbr_match = 0
+    
+    search_string = search_string.lower()
+
+    wb = openpyxl.load_workbook(filename, data_only=True)
+
+    bFirstTime = 1
+    for sheet in wb.worksheets:
+        bInTitle = 0
+        nbr_title += 1
+        if search_string in sheet.title.lower():
+            bInTitle = 1
+            nbr_match += 1
+        for row in sheet.iter_rows():
+            for cell in row:
+                nbr_cell += 1
+                bInCell = cell.value and search_string in str(cell.value).lower()
+                if bInCell or bInTitle:
+                    #~ results.append({
+                        #~ "sheet": sheet.title,
+                        #~ "row": cell.row,
+                        #~ "column": cell.column,
+                        #~ "value": cell.value
+                    #~ })
+                    if bFirstTime:
+                        bFirstTime = 0
+                        strDate = getModifiedTimeAsHumanTime(filename)
+                        print("***** %s (date: %s):" % (filename,strDate))
+                    if bInTitle:
+                        print("  %-36s (in the cell name)" % (sheet.title) )
+                        bInTitle = 0
+                    if bInCell:
+                        print("  %-36s %s%d (%d-%d): %s" % (sheet.title, chr(cell.column-1+ord('A')),cell.row, cell.column,cell.row,cell.value))
+                        nbr_match += 1
+                        
+                    
+
+    #~ return results
+    return nbr_cell+nbr_title, nbr_match
+    
+if 0:
+    searchInXlsx("test/classeur_test.xlsx", "Pierre")
+    #~ searchInXlsx("test/classeur_test.ods", "Pierre")
+    exit(0)
+    
 def searchInDocs(path,s,bRecurse=1,nVerbose=0):
     """
         - nVerbose: 0: rien, 1: juste quelques infos, 2: all filename treated
@@ -162,6 +216,8 @@ def searchInDocs(path,s,bRecurse=1,nVerbose=0):
                     nbrpara,match = searchInOdt( cfn,s )
                 elif ext == ".pdf":
                     nbrpara,match = searchInPdf( cfn,s )
+                elif ext == ".xlsx":
+                    nbrpara,match = searchInXlsx( cfn,s )
                 else:
                     if nVerbose>1: print("DBG: => skipping '%s'" % cfn)
                     continue
@@ -194,8 +250,9 @@ def searchInDocs(path,s,bRecurse=1,nVerbose=0):
 #~ searchInDocx("test/1988.docx", "autoroute")
 #~ searchInDocs("test", "autoroute")
 
+
 if __name__ == "__main__":
-    print( "\n  Search in docx/odt v1.03 by Alma\n  Searching into .pdf, doc, docx and odt and odp (not working totally)")
+    print( "\n  Search in docx/odt v1.03 by Alma\n  Searching into .pdf, doc, docx and odt, xlsx and odp (not working totally)")
     if len(sys.argv) < 2:
         print( "  syntax: %s <string_to_match> [1 ou 2 (for verbose/extra verbose)]\n\n  eg: %s autoroute \n" % ((sys.argv[0],)*2))
         sys.exit(-1)

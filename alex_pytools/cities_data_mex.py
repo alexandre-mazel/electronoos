@@ -187,7 +187,7 @@ class CitiesMex:
         isValidAddress( zip, city ), return (zip,city,confidence) confidence of the right correction.
          
     3: Distance between two city: give two zip, it returns the distance
-        distTwoZip( zip1, zip2 )
+        distTwoZips( zip1, zip2 )
         
     NB: Cities are sorted by population, so all research with many answers will return the biggest city
     """

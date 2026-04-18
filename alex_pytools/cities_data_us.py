@@ -329,7 +329,7 @@ class CitiesUs:
         id2 = self.findByName( city2, county2 )
         return self.distTwoIds( id1, id2 )
         
-    def distTwoZips( self, zip1, zip2 ):
+    def distTwoZips( self, zip1, zip2, bApproxSearch=True, bVerbose=False ):
         id1 = self.getIdByZip( zip1 )
         id2 = self.getIdByZip( zip2 )
         #~ print("id1: '%s'" % id1 )

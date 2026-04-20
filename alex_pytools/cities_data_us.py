@@ -418,7 +418,7 @@ def generate_js_cities_list(destination_filename):
     out = out[:-1] # remove last comma
     out += "];"
     
-    f = open(destination_filename,"wt")
+    f = open(destination_filename,"wt", encoding="utf-8")
     f.write(out)
     f.close()
     

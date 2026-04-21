@@ -72,7 +72,7 @@ import misctools # for levenshtein
 # Le Mexique est divisé en estados [États], chaque État est ensuite divisé en municipios [similaires aux comtés aux États-Unis], 
 # puis les municipios sont divisés en colonias [similaires aux quartiers aux États-Unis ou aux arrondissements au Royaume-Uni].
 # Certains municipios ruraux ou historiquement ruraux peuvent être divisés en villes ou villages, puis chaque village divisé en barrios au lieu de colonias.
-
+# State > County > Community
 
     
 kCityName = 0 # version sans accent
@@ -297,11 +297,47 @@ class CitiesMex:
 
         
         # manual addings:
+        print( "INF: Manual Addings..." )
+        
+        listCitiesToAdd = [
+            # zip, cityname, State,  County,  Community, strLong, strLat
+            # officiellement c'est 01000, mais d'apres wikipedia, c'est 00–16 !!!
+            ["01000", self.getCapitalName(), "Ciudad de México", "Ciudad de México", "Ciudad de México","-99.133208","19.432608"]
+        ]
+        
+        for c in listCitiesToAdd:
+            strZip, strCity,  strStateName, strCountyName, strCommunityName, strLong, strLat = c
+            strCityAscii = removeAccentSpecificLang(strCity)
+            strStateId = -1
+            strCountyID = -1
+            strCommunityId = -1
+            self.dictCities[id] = ( strCity, strCityAscii, strZip, strStateName, strStateId, strCountyName, strCountyID, strCommunity, strCommunityID, float(strLong), float(strLat) )
+
+            if not strZip in self.dictIdsPerZip:
+                self.dictIdsPerZip[strZip] = []
+            else:
+                print( "WRN: Duplicate id for the same zips: id %s and %s" % (id, self.dictIdsPerZip[strZip][0]) )
+                nDuplicateZip += 1
+            self.dictIdsPerZip[strZip].insert( 0, id ) # CDMX a la prio
+                
+            if not strCityAscii in self.dictIdsPerCityName:
+                    self.dictIdsPerCityName[strCityAscii] = []
+            else:
+                first_id = self.dictIdsPerCityName[strCityAscii][0]
+                if bVerbose: print( "WRN: %s/%s have same cityname than %s/%s" % (strCity,strStateName,self.dictCities[first_id][kCityName],self.dictCities[first_id][kCountyName]) )
+                nDuplicateCityName += 1
+
+            self.dictIdsPerCityName[strCityAscii].append( id )
+            id += 1
+          
                 
         print("INF: CitiesUs: loading city data - end duration: %.2fs" % (time.time()-timeBegin) )
         
         #~ self.computeStats()
     # load - end
+    
+    def getCapitalName( self ):
+        return "Mexico City (CDMX)"
     
     def computeStats( self ):
         lenCity = 0
@@ -401,6 +437,12 @@ class CitiesMex:
         
         if strCityName == "":
             return -1
+           
+    
+        strCityNameCapital = "Mexico City (CDMX)"
+        if strCityName in ["Mexico City", "CDMX", "Mexico"]:
+            strCityName = strCityNameCapital
+            
             
         #~ if self.cacheLastFindByRealName[0] == strCityName and self.cacheLastFindByRealName[1] == bPartOf:
             #~ return self.cacheLastFindByRealName[2]
@@ -495,6 +537,11 @@ class CitiesMex:
         except KeyError:
             return retValNone
             
+        # patch cdmx
+        if zip == "01000":
+            if( strCityName == "CDMX" or strCityName == "Mexico City" ):
+                strCityName = self.getCapitalName()
+            
         strCityName = removeAccentSpecificLang( strCityName )
         if strStateName != None:
             strStateName = removeAccentSpecificLang( strStateName )
@@ -516,6 +563,7 @@ class CitiesMex:
             if dist < dist_min:
                 dist_min = dist
                 id_min = id
+                
         if dist_min < 6:
             length = len(strCityName)
             if strStateName != None:
@@ -652,6 +700,8 @@ def autotest_cities():
     assert_equal( cities.findByZip("06700")[kCountyName], "Cuauhtémoc" )
     assert_equal( cities.findByZip("06700")[kCommunityName], "Distrito Federal" )
     
+    assert_equal( cities.findByZip("01000")[kCityName], "Mexico City (CDMX)" )
+    
     # San Diego la Huerta es una localidad del Estado de México, México. Es parte del municipio de Calimaya. # https://es.wikipedia.org/wiki/San_Diego_la_Huerta
     assert_equal( cities.findByZip("52213")[kCityName], "El Calvario" )  # or San Diego la Huerta
     assert_equal( cities.findByZip("52213")[kStateName], "México" )
@@ -666,8 +716,13 @@ def autotest_cities():
     
     assert_equal( cities.findByName(""), -1 )
     assert_equal( cities.findByName("New York"), -1 )
-    assert_equal( cities.getCityById( cities.findByName("Delegación Política Cuauhtémoc"))[kCityName], "Delegación Política Cuauhtémoc"  )
-    assert_equal( cities.getCityById( cities.findByName("Delegacion Politica Cuauhtemoc"))[kCityName], "Delegación Política Cuauhtémoc"  )
+    assert_equal( cities.getCityById( cities.findByName("Delegación Política Cuauhtémoc"))[kCityName], "Delegación Política Cuauhtémoc" )
+    assert_equal( cities.getCityById( cities.findByName("Delegacion Politica Cuauhtemoc"))[kCityName], "Delegación Política Cuauhtémoc" )
+    assert_equal( cities.getCityById( cities.findByName("Mexico City"))[kCityName], "Mexico City (CDMX)" )
+    assert_equal( cities.getCityById( cities.findByName("CDMX"))[kCityName], "Mexico City (CDMX)" )
+    assert_equal( cities.getCityById( cities.findByName("Mexico City (CDMX)"))[kCityName], "Mexico City (CDMX)" )
+    assert_equal( cities.getCityById( cities.findByName("Mexico City", "Ciudad de México"))[kCityName], "Mexico City (CDMX)" )
+    assert_equal( cities.getCityById( cities.findByName("Mexico City (CDMX)", "Ciudad de México"))[kCityName], "Mexico City (CDMX)" )
     
     assert_equal( cities.getCityById( cities.findByName("El Calvario") )[kCityName], "El Calvario" )
     
@@ -685,6 +740,7 @@ def autotest_cities():
     assert_equal( cities.getCityAndStateNameById(cities.findByLongLat(-108.0114,25.5775)[0]), "Alhueycito/Sinaloa" )
     assert_diff( cities.distTwoCities( "Alhueycito","Sinaloa", "Roma Norte", "Ciudad de México" ), 1137.35 )#~ 1572km a pied
     assert_diff( cities.distTwoCities( "Alhueycito","Sinaloa", "Roma Norte" ), 1137.35 )#~ 1572km a pied
+    assert_diff( cities.distTwoCities( "CDMX", "Ciudad de México", "Roma Norte" ), 3.55 ) # c'est a coté
     
     assert_diff( cities.distTwoCities( "New York","New York", "Hoboken","Caca" ), 999999 )
     
@@ -694,6 +750,9 @@ def autotest_cities():
     assert_equal( cities.isValidAddress( "06700", "Roma Norte" )[3], 1 )
     assert_equal( cities.isValidAddress( "06700", "Mora Norte" )[3], 0.8 )
     assert_equal( cities.isValidAddress( "06701", "Roma Norte" )[3], 0 )
+    assert_equal( cities.isValidAddress( "01000", "CDMX" )[3], 1 )
+    assert_equal( cities.isValidAddress( "01000", "Mexico City" )[3], 1 )
+    assert_equal( cities.isValidAddress( "01000", "Mexico City (CDMX)" )[3], 1 )
     
     assert_equal( cities.isValidAddress( "06357", "Delegación Política Cuauhtémoc" )[3], 1 )
     assert_diff( cities.isValidAddress( "06357", "Delegacion Politica Cuauhtemoc" )[3], 1 )

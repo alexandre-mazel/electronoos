@@ -3,7 +3,7 @@
 import socket
 import json
 
-def ask_ollama_http( model, prompt )
+def ask_ollama_http( model, prompt ):
     strHost = "localhost"
     port = "11434"
     

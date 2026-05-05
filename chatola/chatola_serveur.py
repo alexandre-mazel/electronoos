@@ -10,6 +10,6 @@ def receive():
 
 app.run(
     host="0.0.0.0",
-    port=5000,
+    port=10000,
     ssl_context=("/chemin/vers/fullchain.pem", "/chemin/vers/privkey.pem")
 )

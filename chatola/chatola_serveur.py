@@ -1,4 +1,5 @@
 from flask import Flask, request # sudo apt install python3-flask
+import time
 
 app = Flask(__name__)
 
@@ -12,7 +13,10 @@ def receive():
 def receivetchat():
     data = request.json
     print("INF: Tchat: Recu :", data)
-    return {"status": "ok"}
+    timeBegin = time.time()
+    ret = handle_user_tchat( data["user_id"], data["msg"] )
+    duration = time.time() - timeBegin
+    return {"status": "ok", "ans": ret, "debug": "", "duration": duration}
 
 certname = "azure."
 keyfn = "/etc/letsencrypt/live/%sobo-world.com/privkey.pem" % certname

@@ -94,6 +94,18 @@ class TchatUser:
         #~ response = ollama.chat( model=strModel, messages=[  {"role": "user", "content": msg} ], options= {"temperature": 0.0, "thinking":1,"seed": 1234}  )
         #~ print(response)
         #~ res = response["message"]["content"]
+        
+        historic.append({"role":"user","content":msg})
+        historic.append({"role":"assistant", "content": answer})
+        todo ajouter ca et pusher dans le prompt
+        """
+        et ensuite ce message doit fonctionner:
+        hello 2 fois doit pas donner la meme reponse
+        actuellement:
+        Hello! How can I assist you today?
+        my name is alexandre, memorize it! now what's my name ?
+        """
+        
         res = ask_ollama_http( strModel, msg )
         return res
 

@@ -25,7 +25,7 @@ def ask_ollama_http( model, prompt ):
     # ---- Manually build HTTP request ----
     request = (
         "POST /api/generate HTTP/1.1\r\n"
-        f"Host: {HOST}:{PORT}\r\n"
+        f"Host: {strHost}:{port}\r\n"
         "Content-Type: application/json\r\n"
         f"Content-Length: {len(body)}\r\n"
         "Connection: close\r\n"

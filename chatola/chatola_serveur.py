@@ -17,9 +17,10 @@ def receivetchat():
 certname = "azure."
 keyfn = "/etc/letsencrypt/live/%sobo-world.com/privkey.pem" % certname
 certfn = "/etc/letsencrypt/live/%sobo-world.com/cert.pem" % certname
+fullfn = "/etc/letsencrypt/live/%sobo-world.com/fullchain.pem" % certname
 
 app.run(
     host="0.0.0.0",
     port=10000,
-    ssl_context=(certfn,keyfn)
+    ssl_context=(fullfn,keyfn)
 )

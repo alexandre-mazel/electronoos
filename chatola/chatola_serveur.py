@@ -11,7 +11,7 @@ def receive():
 @app.route("/tchat", methods=["POST"])
 def receivetchat():
     data = request.json
-    print("Recu :", data)
+    print("INF: Tchat: Recu :", data)
     return {"status": "ok"}
 
 certname = "azure."

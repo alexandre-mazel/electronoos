@@ -11,3 +11,7 @@ def ask_tchat():
     service = url + "/tchat"
     response = requests.post(service, json={"msg": "hello"}, verify=False)
     print(response.json())
+    
+    
+test_data()
+ask_tchat()

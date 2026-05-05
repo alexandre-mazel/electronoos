@@ -9,7 +9,7 @@ def receive():
     return {"status": "ok"}
     
 @app.route("/tchat", methods=["POST"])
-def receive():
+def receivetchat():
     data = request.json
     print("Recu :", data)
     return {"status": "ok"}

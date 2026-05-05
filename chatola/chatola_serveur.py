@@ -13,10 +13,15 @@ def receive():
 def receivetchat():
     data = request.json
     print("INF: Tchat: Recu :", data)
+    debug_msg = ""
     timeBegin = time.time()
-    ret = handle_user_tchat( data["user_id"], data["msg"] )
+    try:
+        ret = handle_user_tchat( data["user_id"], data["msg"] )
+    except BaseException as err:
+        ret = "?"
+        debug_msg += "ERR: " + str(err)
     duration = time.time() - timeBegin
-    return {"status": "ok", "ans": ret, "debug": "", "duration": duration}
+    return {"status": "ok", "ans": ret, "debug": debug_msg, "duration": duration}
 
 certname = "azure."
 keyfn = "/etc/letsencrypt/live/%sobo-world.com/privkey.pem" % certname

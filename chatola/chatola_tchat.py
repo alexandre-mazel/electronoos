@@ -78,7 +78,7 @@ def ask_ollama_http( model, prompt ):
 
 
 strModel = "gemma3:270m" # un rapide pour tester
-#~ strModel = "llama3.2"
+strModel = "llama3.2"
 
 class TchatUser:    
     def __init__( self, firstname = "", name = "" ):

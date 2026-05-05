@@ -1,8 +1,14 @@
-from flask import Flask, request
+from flask import Flask, request # sudo apt install python3-flask
 
 app = Flask(__name__)
 
 @app.route("/data", methods=["POST"])
+def receive():
+    data = request.json
+    print("Recu :", data)
+    return {"status": "ok"}
+    
+@app.route("/tchat", methods=["POST"])
 def receive():
     data = request.json
     print("Recu :", data)

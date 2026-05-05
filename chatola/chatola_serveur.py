@@ -1,6 +1,8 @@
 from flask import Flask, request # sudo apt install python3-flask
 import time
 
+import chatola_tchat
+
 app = Flask(__name__)
 
 @app.route("/data", methods=["POST"])
@@ -16,7 +18,7 @@ def receivetchat():
     debug_msg = ""
     timeBegin = time.time()
     try:
-        ret = handle_user_tchat( data["user_id"], data["msg"] )
+        ret = chatola_tchat.handle_user_tchat( data["user_id"], data["msg"] )
     except BaseException as err:
         ret = "?"
         debug_msg += "ERR: " + str(err)

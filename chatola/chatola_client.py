@@ -25,7 +25,7 @@ def ask_tchat(user_id, msg):
 def loop_dialog( user_id ):
     while 1:
         msg = input( "You: " )
-        if msg.lower() in ["bye", "a+", "quit"]:
+        if msg.lower() in ["bye", "a+", "quit", "quit()"]:
             print( "Quitting...")
             break
         ans = ask_tchat( user_id, msg )

@@ -5,7 +5,7 @@ import json
 
 def ask_ollama_http( model, prompt ):
     strHost = "localhost"
-    port = "11434"
+    port = 11434
     
     # ---- Build JSON payload ----
     payload = {

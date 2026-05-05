@@ -34,8 +34,8 @@ def ask_ollama_http( model, prompt ):
 
     # ---- Open raw TCP socket ----
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        print(f"Connecting to {HOST}:{PORT}...")
-        s.connect((HOST, PORT))
+        print(f"Connecting to {strHost}:{port}...")
+        s.connect((strHost, port))
 
         print("Sending HTTP request...")
         s.sendall(request)

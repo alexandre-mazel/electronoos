@@ -2,6 +2,7 @@ from flask import Flask, request # sudo apt install python3-flask
 import time
 
 import chatola_tchat
+import traceback
 
 app = Flask(__name__)
 
@@ -21,7 +22,7 @@ def receivetchat():
         ret = chatola_tchat.handle_user_tchat( data["user_id"], data["msg"] )
     except BaseException as err:
         ret = "?"
-        debug_msg += "ERR: " + str(err)
+        debug_msg += "ERR: " + str(err) + "\nstack: " + traceback.format_exc()
     duration = time.time() - timeBegin
     return {"status": "ok", "ans": ret, "debug": debug_msg, "duration": duration}
 

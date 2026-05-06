@@ -86,7 +86,9 @@ def ask_ollama_http( model, prompt ):
     try:
         ret = data["response"]
     except BaseException as err:
-        s = "ERR: ask_ollama_http: %s (ollama error: %s)" % ( str(err), str(data["error"]) )
+        s = "ERR: ask_ollama_http: %s" % str(err)
+        if "error" in data:
+            s += " (ollama error: %s)" % ( str(data["error"]) )
         print( s )
         ret = s
     return ret

@@ -113,6 +113,7 @@ class TchatUser:
         self.firstname = firstname
         self.name = name
         self.context = [] # a list of sentence sent to tchatter
+        self.context = [{"role":"system","content":"Tu es un chatbot sympa."}]
         
     def getAns( self, msg ):
         

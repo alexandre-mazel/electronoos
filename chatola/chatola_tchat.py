@@ -86,7 +86,7 @@ def ask_ollama_http( model, prompt ):
     
     print("\n---- MODEL RESPONSE ----")
     try:
-        if ! bChat:
+        if not bChat:
             ret = data["response"]
         else:
             ret = data["message"]

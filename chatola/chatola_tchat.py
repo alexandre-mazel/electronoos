@@ -23,10 +23,10 @@ def ask_ollama_http( model, prompt ):
     body = json.dumps(payload).encode("utf-8")
     
 
-"""
-/generate ? expects string prompt
-/chat ? accepts structured messages (role/content)
-"""
+    """
+    /generate ? expects string prompt
+    /chat ? accepts structured messages (role/content)
+    """
 
     # ---- Manually build HTTP request ----
     request = (

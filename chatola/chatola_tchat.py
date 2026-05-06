@@ -145,6 +145,7 @@ class TchatUser:
         
         
         if 1:
+            kdb = []
             #~ kdb = knowledge.get_knowledge_related_to( msg )
             if "manger" in msg:
                 kdb = [

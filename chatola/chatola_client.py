@@ -17,7 +17,8 @@ def ask_tchat(user_id, msg):
         return ret
         
     dicres = response.json()
-    print( "DBG: ", dicres )
+    if "debug" in dicres and dicres["debug"] != "":
+        print( "DBG: ", dicres )
     ret = "???"
     try: 
         ret = dicres["ans"]

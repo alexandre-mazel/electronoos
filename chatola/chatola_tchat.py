@@ -89,7 +89,7 @@ def ask_ollama_http( model, messages ):
         if not bChat:
             ret = data["response"]
         else:
-            ret = data["message"]
+            ret = data["message"]["content"]
     except BaseException as err:
         s = "ERR: ask_ollama_http: %s" % str(err)
         if "error" in data:

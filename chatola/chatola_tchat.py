@@ -84,6 +84,10 @@ def ask_ollama_http( model, messages ):
     
     data = json.loads(body)
     
+    # prompt_eval_count: taille du contexte envoyé (historique + prompt)
+    # eval_count: nombre de tokens générés
+    print( "DBG: prompt_eval_count (input token): %s" % str( data["prompt_eval_count"] ) )
+    
     print("\n---- MODEL RESPONSE ----")
     try:
         if not bChat:
@@ -113,7 +117,7 @@ class TchatUser:
         self.firstname = firstname
         self.name = name
         self.context = [] # a list of sentence sent to tchatter
-        self.context = [{"role":"system","content":"Tu es un chatbot sympa."}]
+        self.context = [{"role":"system","content":"Tu es un chatbot sympa. Répond toujours avec des phrases pas trop longues et limitées a 2 ou phrases max en texte pur, sans émoticone ou truc fancy du genre."}]
         
     def getAns( self, msg ):
         

@@ -29,6 +29,8 @@ def ask_ollama_http( model, prompt ):
     /generate ? expects string prompt
     /chat ? accepts structured messages (role/content)
     """
+    
+    bChat = 1
 
     # ---- Manually build HTTP request ----
     request = (
@@ -70,7 +72,7 @@ def ask_ollama_http( model, prompt ):
 
     # keep only between {} # why garbage around ?
     # a faire que si en mode generate
-    if( 0 ):
+    if( not bChat ):
         idx = body.index("{")
         idx2 = body.index("}")
         body = body[idx:idx2+1]
@@ -84,7 +86,10 @@ def ask_ollama_http( model, prompt ):
     
     print("\n---- MODEL RESPONSE ----")
     try:
-        ret = data["response"]
+        if ! bChat:
+            ret = data["response"]
+        else:
+            ret = data["message"]
     except BaseException as err:
         s = "ERR: ask_ollama_http: %s" % str(err)
         if "error" in data:

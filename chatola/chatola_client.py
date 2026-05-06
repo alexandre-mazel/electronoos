@@ -16,7 +16,7 @@ def ask_tchat(user_id, msg):
         return ret
         
     dicres = response.json()
-    print( "DBG: ", dicres )
+    #~ print( "DBG: ", dicres )
     ret = "???"
     try: 
         ret = dicres["ans"]

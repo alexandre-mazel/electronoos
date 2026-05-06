@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+
 # import ollama
-# or pure http below
+# or pure http below:
 import socket
 import json
 
@@ -117,7 +119,7 @@ class TchatUser:
         self.firstname = firstname
         self.name = name
         self.context = [] # a list of sentence sent to tchatter
-        self.context = [{"role":"system","content":"Tu es un chatbot sympa. Répond toujours avec des phrases pas trop longues et limitées a 2 ou phrases max en texte pur, sans émoticone ou truc fancy du genre."}]
+        self.context = [{"role":"system","content":"Tu es un chatbot sympa. RÃ©pond toujours avec des phrases pas trop longues et limitÃ©es a 2 ou phrases max en texte pur, sans Ã©moticone ou truc fancy du genre."}]
         
     def getAns( self, msg ):
         

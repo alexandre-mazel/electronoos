@@ -3,8 +3,8 @@
 import socket
 import json
 
-def ask_ollama_http( model, message ):
-    print( "DBG: ask_ollama_http: model: %s, prompt:\n%s" % (model, message) )
+def ask_ollama_http( model, messages ):
+    print( "DBG: ask_ollama_http: model: %s, prompt:\n%s" % (model, messages) )
     
     strHost = "localhost"
     port = 11434
@@ -18,7 +18,7 @@ def ask_ollama_http( model, message ):
     payload = {
         "model": model,
         #~ "prompt": prompt, # quand on est en mode generate
-        "message": message,
+        "messages": messages,
         "stream": False,        # easier to parse than streaming mode
           "options": 
             {

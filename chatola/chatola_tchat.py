@@ -122,7 +122,7 @@ class TchatUser:
         self.context = [{"role":"system","content":"Tu es un chatbot sympa. Répond toujours avec des phrases pas trop longues et limitées a 2 ou phrases max en texte pur, sans émoticone ou truc fancy du genre."}]
         if 1:
             self.context.append( {"role":"system","content":"Si on te demande un restaurant dans le coin (on est dans le 16ieme arrt de paris), tu peux parler de Ragazzi 2.0 au 83 rue de Longchamp ou La matta au 23 rue de l'annonciation"} )
-            
+        
     def getAns( self, msg ):
         
         #~ response = ollama.chat( model=strModel, messages=[  {"role": "user", "content": msg} ], options= {"temperature": 0.0, "thinking":1,"seed": 1234}  )
@@ -142,6 +142,20 @@ class TchatUser:
         """
         
         prompt = self.context[:]
+        
+        
+        if 1:
+            #~ kdb = knowledge.get_knowledge_related_to( msg )
+            if "manger" in msg:
+                kdb = [
+                    "restaurant italien La Petite Tour au 11 rue de la Tour 75116 Paris",
+                    "restaurant Le Paris Seize au 18 rue des Belles Feuilles 75116 Paris",
+                    "pizzeria Pop's Pizza proche de l’avenue Victor Hugo 75116 Paris",
+                    "restaurant japonais Planet Sushi avenue Victor Hugo 75116 Paris",
+                ]
+            for k in kdb:
+                print( "Adding k: '%s'" % k )
+                prompt.insert(0, {"role": "system","content": k} )
         
         res = ask_ollama_http( strModel, prompt )
         

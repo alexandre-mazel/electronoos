@@ -38,7 +38,7 @@ def loop_dialog( user_id ):
         ans = ask_tchat( user_id, msg )
         print( "IA: %s" % ans )
         duration = time.time() - time_begin
-        print( "(generated in %.2fs)" % duration )
+        print( "    (generated in %.2fs)" % duration )
                 
     
 loop_dialog( "Tester")

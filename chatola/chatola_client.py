@@ -33,8 +33,12 @@ def loop_dialog( user_id ):
         if msg.lower() in ["bye", "a+", "quit", "quit()"]:
             print( "Quitting...")
             break
+        time_begin = time.time()
         ans = ask_tchat( user_id, msg )
         print( "IA: %s" % ans )
+        duration = time.time() - time_begin
+        print( "(generated in %.2fs)" % duration )
+                
     
 loop_dialog( "Tester")
     

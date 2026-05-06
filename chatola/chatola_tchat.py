@@ -71,7 +71,12 @@ def ask_ollama_http( model, prompt ):
     # ---- Parse JSON result ----
     data = json.loads(body)
     print("\n---- MODEL RESPONSE ----")
-    ret = data["response"]
+    try:
+        ret = data["response"]
+    except BaseException as err:
+        s = "ERR: ask_ollama_http: %s" % str(err)
+        print( s )
+        ret = s
     return ret
     
 # ask_ollama_http - end

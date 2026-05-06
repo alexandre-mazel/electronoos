@@ -4,6 +4,8 @@ import socket
 import json
 
 def ask_ollama_http( model, prompt ):
+    print( "DBG: ask_ollama_http: model: %s, prompt:\n%s" % (model, prompt) )
+    
     strHost = "localhost"
     port = 11434
     

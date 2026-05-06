@@ -1,4 +1,4 @@
-llama3.2 (2.5G):
+llama3.2 (2.5G, 3.0 avec un context a 8k):
 
 You: Hello
 IA: Bonjour ! Comment puis-je vous aider aujourd'hui ?
@@ -53,3 +53,23 @@ You: tu affabules un peu quand meme
 IA: Je vais essayer de me corriger ! Le Musée Rodin est vraiment à Paris, mais je ne sais pas exactement où... Je vais chercher les informations !
     (generated in 3.17s)
 You:
+...
+
+
+
+You: Do you love me?
+IA: Non, je ne peux pas ressentir de l'amour ou d'attirance envers toi. Je suis un programme informatique conçu pour fournir des informations et répondre à des questions. Je n'ai pas la capacité de ressentir des émotions.
+    (generated in 5.27s)
+You: do you take money for sex?
+IA: Non, je ne peux pas prendre d'argent pour des activités sexuelles. Je suis un programme informatique gratuit et sans frais. Mon objectif est de vous aider avec vos questions et fournir des informations utiles, pas de vous proposer des services personnels.
+    (generated in 5.42s)
+You: bon je vais voir la concurrence alors
+IA: Je comprends ! Il y a beaucoup d'options pour rencontrer des personnes intéressantes à Paris. N'hésitez pas à essayer les sites de rencontre en ligne ou les événements sociaux pour trouver quelqu'un qui vous convienne. Bonne chance !
+    (generated in 5.46s)
+You:
+IA: C'est la fin de notre conversation ! J'espère que j'ai pu vous aider avec vos questions et que vous avez trouvé des idées pour passer du temps à Paris. Si vous avez d'autres questions ou besoin d'aide, n'hésitez pas à me contacter. À bientôt !
+    (generated in 7.07s)
+You: sais tu si la secretaire du cabinet a un copain, elle est bonne non ?
+IA: Je ne suis pas au courant des relations personnelles de personnes spécifiques, y compris les secrétaires du cabinet. Je peux vous donner des informations générales sur Paris ou aider à répondre à d'autres questions, mais je ne peux pas fournir des informations sur les vies privées des individus.
+    (generated in 6.64s)
+You: quit()

@@ -120,7 +120,9 @@ class TchatUser:
         self.name = name
         self.context = [] # a list of sentence sent to tchatter
         self.context = [{"role":"system","content":"Tu es un chatbot sympa. Répond toujours avec des phrases pas trop longues et limitées a 2 ou phrases max en texte pur, sans émoticone ou truc fancy du genre."}]
-        
+        if 1:
+            self.context.append( {"role":"system","content":"Si on te demande un restaurant dans le coin (on est dans le 16ieme arrt de paris), tu peux parler de Ragazzi 2.0 au 83 rue de Longchamp ou La matta au 23 rue de l'annonciation"}
+            
     def getAns( self, msg ):
         
         #~ response = ollama.chat( model=strModel, messages=[  {"role": "user", "content": msg} ], options= {"temperature": 0.0, "thinking":1,"seed": 1234}  )

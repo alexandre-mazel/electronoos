@@ -9,7 +9,12 @@ def test_data():
     
 def ask_tchat(user_id, msg):
     service = url + "/tchat"
-    response = requests.post(service, json={"user_id": user_id, "msg": msg}, verify=True)
+    try:
+        response = requests.post(service, json={"user_id": user_id, "msg": msg}, verify=True)
+    except requests.exceptions.ConnectionError as err:
+        ret = "ERR: Impossible to connect to Chatola Serveur"
+        return ret
+        
     dicres = response.json()
     print( "DBG: ", dicres )
     ret = "???"

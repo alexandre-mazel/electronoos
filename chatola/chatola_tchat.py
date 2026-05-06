@@ -81,10 +81,11 @@ strModel = "gemma3:270m" # un rapide pour tester
 strModel = "llama3.2"
 
 class TchatUser:    
-    def __init__( self, firstname = "", name = "" ):
+    def __init__( self, user_id, firstname = "", name = "" ):
         """
         Name is a nicely name
         """
+        self.user_id = user_id
         self.firstname = firstname
         self.name = name
         self.context = [] # a list of sentence sent to tchatter
@@ -95,9 +96,10 @@ class TchatUser:
         #~ print(response)
         #~ res = response["message"]["content"]
         
-        historic.append({"role":"user","content":msg})
-        historic.append({"role":"assistant", "content": answer})
-        todo ajouter ca et pusher dans le prompt
+        print( "DBG: TchatUser.getAns: name: %s, context:\n%s" % (self.user_id,self.context) )
+        
+        self.context.append({"role":"user","content":msg})
+        self.context.append({"role":"assistant", "content": answer})
         """
         et ensuite ce message doit fonctionner:
         hello 2 fois doit pas donner la meme reponse
@@ -106,7 +108,9 @@ class TchatUser:
         my name is alexandre, memorize it! now what's my name ?
         """
         
-        res = ask_ollama_http( strModel, msg )
+        prompt = self.context[:]
+        
+        res = ask_ollama_http( strModel, prompt )
         return res
 
 class TchatUserManager:
@@ -115,7 +119,7 @@ class TchatUserManager:
         self.users = {} # user_id => TchatUser
         
     def createUser( self, user_id ):
-        u = TchatUser()
+        u = TchatUser( user_id )
         self.users[user_id] = u
         
     def getUser( self, user_id ):

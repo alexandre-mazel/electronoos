@@ -21,10 +21,16 @@ def ask_ollama_http( model, prompt ):
     }
 
     body = json.dumps(payload).encode("utf-8")
+    
+
+"""
+/generate ? expects string prompt
+/chat ? accepts structured messages (role/content)
+"""
 
     # ---- Manually build HTTP request ----
     request = (
-        "POST /api/generate HTTP/1.1\r\n"
+        "POST /api/chat HTTP/1.1\r\n"
         f"Host: {strHost}:{port}\r\n"
         "Content-Type: application/json\r\n"
         f"Content-Length: {len(body)}\r\n"

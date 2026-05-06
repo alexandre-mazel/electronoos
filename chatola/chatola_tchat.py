@@ -147,12 +147,15 @@ class TchatUser:
         if 1:
             kdb = []
             #~ kdb = knowledge.get_knowledge_related_to( msg )
+            # je pense qu'il faut garder les resultats de connaissances sur au moins 3-5 echanges
+            # sinon si il file une adresse de resto, et que je dit c'est ou? il a oublié entre temps
             if "manger" in msg:
                 kdb = [
                     "restaurant italien La Petite Tour au 11 rue de la Tour 75116 Paris",
                     "restaurant Le Paris Seize au 18 rue des Belles Feuilles 75116 Paris",
                     "pizzeria Pop's Pizza proche de l’avenue Victor Hugo 75116 Paris",
                     "restaurant japonais Planet Sushi avenue Victor Hugo 75116 Paris",
+                    "place du Trocadéro idéale pour voir la tour Eiffel"
                 ]
             for k in kdb:
                 print( "Adding k: '%s'" % k )

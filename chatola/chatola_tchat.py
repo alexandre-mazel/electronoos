@@ -3,16 +3,22 @@
 import socket
 import json
 
-def ask_ollama_http( model, prompt ):
-    print( "DBG: ask_ollama_http: model: %s, prompt:\n%s" % (model, prompt) )
+def ask_ollama_http( model, message ):
+    print( "DBG: ask_ollama_http: model: %s, prompt:\n%s" % (model, message) )
     
     strHost = "localhost"
     port = 11434
     
+    """
+    /generate ? expects string prompt
+    /chat ? accepts structured messages (role/content)
+    """
+    
     # ---- Build JSON payload ----
     payload = {
         "model": model,
-        "prompt": prompt,
+        #~ "prompt": prompt, # quand on est en mode generate
+        "message": message,
         "stream": False,        # easier to parse than streaming mode
           "options": 
             {
@@ -23,12 +29,6 @@ def ask_ollama_http( model, prompt ):
     }
 
     body = json.dumps(payload).encode("utf-8")
-    
-
-    """
-    /generate ? expects string prompt
-    /chat ? accepts structured messages (role/content)
-    """
     
     bChat = 1
 

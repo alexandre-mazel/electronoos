@@ -69,15 +69,19 @@ def ask_ollama_http( model, prompt ):
     print(body)
 
     # keep only between {} # why garbage around ?
-    idx = body.index("{")
-    idx2 = body.index("}")
-    body = body[idx:idx2+1]
+    # a faire que si en mode generate
+    if( 0 ):
+        idx = body.index("{")
+        idx2 = body.index("}")
+        body = body[idx:idx2+1]
 
-    print("\n---- BODY cleaned ----")
-    print(body)
+        print("\n---- BODY cleaned ----")
+        print(body)
 
     # ---- Parse JSON result ----
+    
     data = json.loads(body)
+    
     print("\n---- MODEL RESPONSE ----")
     try:
         ret = data["response"]

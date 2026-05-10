@@ -151,7 +151,7 @@ class TchatUser:
             # sinon si il file une adresse de resto, et que je dit c'est ou? il a oublié entre temps
             # j'ai monté les token a 8k dans le systeme du daemon (a reloader)
             
-            # mettre aussi des infos sur paris un peu plus globales et le tourisme en francs
+            # mettre aussi des infos sur paris un peu plus globale et le tourisme en france
             if "manger" in msg:
                 kdb = [
                     "restaurant italien La Petite Tour au 11 rue de la Tour 75116 Paris",

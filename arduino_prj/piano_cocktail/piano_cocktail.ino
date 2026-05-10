@@ -120,8 +120,8 @@ long int nTimeStartFill = 0;
 int bIsFilling = 0;
 
 // mettre une plus grande valeur pour qu'il coupe plus tot.
-unsigned char nMilliBeforeCut = 90; // 10 en version normal (maintenant 13), en oversize: 45 si slow, 70 si rapide, mettre 100, et mettre hache.
-// new middle size: 30 c'est trop, 80 encore un peu trop, 100 pas assez, test 90.
+unsigned char nMilliBeforeCut = 83; // 10 en version normal (maintenant 13), en oversize: 45 si slow, 70 si rapide, mettre 100, et mettre hache.
+// new middle size: 30 c'est trop, 80 encore un peu trop, 100 pas assez, test 90. plus assez
 
 bool bWriteToEeprom = 0; // apres les reglages, mettre une fois a 1 pour ecrire puis a 0 pour la prod.
 

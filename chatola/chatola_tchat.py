@@ -146,13 +146,10 @@ class TchatUser:
         
         if 1:
             kdb = []
-            #~ kdb = knowledge.get_knowledge_related_to( msg )
-            # je pense qu'il faut garder les resultats de connaissances sur au moins 3-5 echanges
-            # sinon si il file une adresse de resto, et que je dit c'est ou? il a oublié entre temps
-            # j'ai monté les token a 8k dans le systeme du daemon (a reloader)
+            kdb = knowledge.get_knowledge_related_to( msg )
             
-            # mettre aussi des infos sur paris un peu plus globale et le tourisme en france
-            if "manger" in msg:
+                # mettre aussi des infos sur paris un peu plus globale et le tourisme en france
+            if "manger" in msg and 0:
                 kdb = [
                     "restaurant italien La Petite Tour au 11 rue de la Tour 75116 Paris",
                     "restaurant Le Paris Seize au 18 rue des Belles Feuilles 75116 Paris",
@@ -160,6 +157,11 @@ class TchatUser:
                     "restaurant japonais Planet Sushi avenue Victor Hugo 75116 Paris",
                     "place du Trocadéro idéale pour voir la tour Eiffel"
                 ]
+            
+            # je pense qu'il faut garder les resultats de connaissances sur au moins 3-5 echanges
+            # sinon si il file une adresse de resto, et que je dit c'est ou? il a oublié entre temps
+            # j'ai monté les token a 8k dans le systeme du daemon (a reloader)
+            
             for k in kdb:
                 print( "Adding k: '%s'" % k )
                 prompt.insert(0, {"role": "system","content": k} )

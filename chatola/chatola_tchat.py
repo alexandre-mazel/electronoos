@@ -186,11 +186,14 @@ class TchatUser:
 
         prompt.extend(self.context[:])
         
+        print( "avant doublons: prompt: %d" % len(prompt) )
         # vire les doublons
         prompt = list({
             tuple(sorted(d.items())): d 
             for d in prompt
         }.values())
+        
+        print( "apres doublons: prompt: %d" % len(prompt) )
         
         res = ask_ollama_http( strModel, prompt )
         

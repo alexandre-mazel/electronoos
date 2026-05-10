@@ -29,6 +29,7 @@ def ask_tchat(user_id, msg):
 #~ test_data()
 #~ ask_tchat( "test", "hello" )
 
+
 def loop_dialog( user_id ):
     while 1:
         msg = input( "You: " )

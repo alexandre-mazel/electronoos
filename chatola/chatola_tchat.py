@@ -165,7 +165,7 @@ class TchatUser:
             # j'ai monté les token a 8k dans le systeme du daemon (a reloader)
             
             for k in kdb:
-                print( "Adding k: '%s'" % k )
+                print( "Adding k: '%s'" % str(k) )
                 prompt.insert(0, {"role": "system","content": k} )
         
         res = ask_ollama_http( strModel, prompt )

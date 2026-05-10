@@ -116,7 +116,7 @@ class Knowledge:
             res.append( ( simi, self.infos[i] ) )
             
         mosted = sorted( res, reverse=True )
-        if 1:
+        if 0:
             print( "\nDBG: getKnowledgeForQuestion: res for question '%s'" % (question) )
             for v in mosted:
                 print( v )

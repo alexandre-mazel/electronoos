@@ -178,6 +178,7 @@ class TchatUser:
                 if len( self.prev_kdb ) > 4:
                     del self.prev_kdb[0]
                 for kdb in self.prev_kdb:
+                    print( "\nOther kdb: ")
                     for k in kdb:
                         print( "Adding k: '%s'" % str(k) )
                         prompt.append( {"role": "system","content": k} )

@@ -135,6 +135,8 @@ class TchatUser:
         
         print( "DBG: TchatUser.getAns: name: %s, context:\n%s" % (self.user_id,self.context) )
         
+        self.context.append({"role":"user","content":msg})
+        
         """
         et ensuite ce message doit fonctionner:
         hello 2 fois doit pas donner la meme reponse
@@ -143,7 +145,7 @@ class TchatUser:
         my name is alexandre, memorize it! now what's my name ?
         """
         
-        prompt = self.context[:]
+        prompt = {}
         
         
         if 1:
@@ -181,7 +183,7 @@ class TchatUser:
                         prompt.append( {"role": "system","content": k} )
 
 
-        self.context.append({"role":"user","content":msg})
+        prompt.extend(self.context[:])
         
         res = ask_ollama_http( strModel, prompt )
         

@@ -145,7 +145,7 @@ class TchatUser:
         my name is alexandre, memorize it! now what's my name ?
         """
         
-        prompt = {}
+        prompt = []
         
         
         if 1:

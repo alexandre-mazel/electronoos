@@ -104,7 +104,7 @@ class Knowledge:
         print( "INF: computeEmbedding: %d sentence(s), duration: %.1fs" % (len(self.infos), (time.time() - timeBegin) ) )
         self._savePrecalc()
         
-    def getKnowledgeForQuestion( self, question, max=24 ):
+    def getKnowledgeForQuestion( self, question, max=24, verbose = False ):
         """
         return the max best sentence related to a current question
         """
@@ -116,15 +116,17 @@ class Knowledge:
             res.append( ( simi, self.infos[i] ) )
             
         mosted = sorted( res, reverse=True )
-        if 0:
+        if verbose:
             print( "\nDBG: getKnowledgeForQuestion: res for question '%s'" % (question) )
             for v in mosted:
                 print( v )
         
         out = []
         for v in mosted[:max]:
-            if "qwen3" in self.model and v[0] < 0.5: # sinon on pourrait mettre 0.42 si on en veut plus...
+            if "qwen3" in self.model and v[0] < 0.55: # sinon on pourrait mettre 0.42 si on en veut plus...
                 break
+            if verbose:
+                print( "DBG: getKnowledgeForQuestion: ending with: %s (%.2f) " % (v[1],v[0]) )
             out.append(v[1])
         return out
    
@@ -141,11 +143,14 @@ def get_knowledge_related_to( question ):
 def autotest():
     global knowledge
     classic_init()
-    knowledge.getKnowledgeForQuestion( "ou manger une pizza ?" )
-    knowledge.getKnowledgeForQuestion( "j'ai faim, ou aller ?" )
-    knowledge.getKnowledgeForQuestion( "je veux voir des sculptures de Rodin" )
-    knowledge.getKnowledgeForQuestion( "je veux manger libanais" )
-    knowledge.getKnowledgeForQuestion( "quel est la station de metro la plus proche?" )
+    verbose = 1
+    knowledge.getKnowledgeForQuestion( "ou manger une pizza ?", verbose=verbose ) # pas de chance rien au dessus de 0.50!
+    knowledge.getKnowledgeForQuestion( "ou manger une pizza italienne?", verbose=verbose )
+    knowledge.getKnowledgeForQuestion( "j'ai faim, ou aller ?", verbose=verbose )
+    knowledge.getKnowledgeForQuestion( "je veux voir des sculptures de Rodin", verbose=verbose )
+    knowledge.getKnowledgeForQuestion( "je veux manger libanais", verbose=verbose )
+    knowledge.getKnowledgeForQuestion( "quel est la station de metro la plus proche?", verbose=verbose )
+    knowledge.getKnowledgeForQuestion( "Hello", verbose=verbose )
     
 if __name__ == "__main__":
     autotest()

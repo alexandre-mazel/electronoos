@@ -12,7 +12,7 @@ class Knowledge:
         self.model = "nomic-embed-text" # bof (565MB) (rapide: 13s for 106 sentence)
         self.model = "qwen3-embedding" # (7GB for 8K context) (plus long: 144s for 106 sentence)
         self.host = "localhost"
-        self.port = 11435
+        self.port = 11434
         
         if os.name == "nt":
             self.host = "obo-world.com"

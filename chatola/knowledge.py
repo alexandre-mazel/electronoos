@@ -125,7 +125,7 @@ class Knowledge:
         for v in mosted[:max]:
             if "qwen3" in self.model and v[0] < 0.5: # sinon on pourrait mettre 0.42 si on en veut plus...
                 break
-            out.append(v)
+            out.append(v[1])
         return out
    
 knowledge = Knowledge()      

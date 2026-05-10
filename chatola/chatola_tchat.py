@@ -183,9 +183,6 @@ class TchatUser:
                         print( "Adding k: '%s'" % str(k) )
                         prompt.append( {"role": "system","content": k} )
 
-
-        prompt.extend(self.context[:])
-        
         print( "avant doublons: prompt: %d" % len(prompt) )
         # vire les doublons
         prompt = list({
@@ -194,7 +191,9 @@ class TchatUser:
         }.values())
         
         print( "apres doublons: prompt: %d" % len(prompt) )
-        
+
+        prompt.extend(self.context[:])
+
         res = ask_ollama_http( strModel, prompt )
         
         if "ERR: " not in res:

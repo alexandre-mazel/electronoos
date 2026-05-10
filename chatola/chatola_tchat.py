@@ -125,6 +125,8 @@ class TchatUser:
         if 0:
             self.context.append( {"role":"system","content":"Si on te demande un restaurant dans le coin (on est dans le 16ieme arrt de paris), tu peux parler de Ragazzi 2.0 au 83 rue de Longchamp ou La matta au 23 rue de l'annonciation"} )
         
+        self.prev_kdb = []
+        
     def getAns( self, msg ):
         
         #~ response = ollama.chat( model=strModel, messages=[  {"role": "user", "content": msg} ], options= {"temperature": 0.0, "thinking":1,"seed": 1234}  )
@@ -164,9 +166,24 @@ class TchatUser:
             # sinon si il file une adresse de resto, et que je dit c'est ou? il a oublié entre temps
             # j'ai monté les token a 8k dans le systeme du daemon (a reloader)
             
-            for k in kdb:
-                print( "Adding k: '%s'" % str(k) )
-                prompt.insert(0, {"role": "system","content": k} )
+            if 0:
+                # just this one
+                for k in kdb:
+                    print( "Adding k: '%s'" % str(k) )
+                    prompt.insert(0, {"role": "system","content": k} )
+                    
+            if 1:
+                # memorize prev
+                self.prev_kdb.append( kdb )
+                if len( self.prev_kdb > 4 ):
+                    del self.prev_kdb[0]
+                for kdb in self.prev_kdb:
+                    for k in kdb:
+                        print( "Adding k: '%s'" % str(k) )
+                        prompt.append( {"role": "system","content": k} )
+                    
+            self.prev_kdb.pop(0)
+            self.prev_kdb.
         
         res = ask_ollama_http( strModel, prompt )
         

@@ -185,6 +185,12 @@ class TchatUser:
 
         prompt.extend(self.context[:])
         
+        # vire les doublons
+        prompt = list({
+            tuple(sorted(d.items())): d 
+            for d in prompt
+        }.values())
+        
         res = ask_ollama_http( strModel, prompt )
         
         if "ERR: " not in res:

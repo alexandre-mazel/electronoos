@@ -73,3 +73,19 @@ You: sais tu si la secretaire du cabinet a un copain, elle est bonne non ?
 IA: Je ne suis pas au courant des relations personnelles de personnes spécifiques, y compris les secrétaires du cabinet. Je peux vous donner des informations générales sur Paris ou aider à répondre à d'autres questions, mais je ne peux pas fournir des informations sur les vies privées des individus.
     (generated in 6.64s)
 You: quit()
+...
+
+
+Avec l'historique:
+IA: Bienvenue ! Comment puis-je vous aider aujourd'hui ?
+    (generated in 8.32s)
+You: how a re you ?
+IA: Je vais bien, merci. Je suis un chatbot pour vous aider avec vos questions et vos besoins.
+    (generated in 2.57s)
+You: y a des taxis dans le coin ?
+IA: Oui, il y a une station de taxis près du place Victor Hugo.
+    (generated in 4.84s)
+You: du place de victor hugo ? c'est pas tres francais !
+IA: Je m'excuse pour l'erreur. La place est bien située près de la ligne 2 du métro et des commerces, mais je devrais dire "place Victor Hugo" au lieu de "coinc".
+    (generated in 13.85s)
+You:

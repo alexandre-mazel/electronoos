@@ -5,6 +5,8 @@
 import socket
 import json
 
+import knowledge
+
 def ask_ollama_http( model, messages ):
     print( "DBG: ask_ollama_http: model: %s, prompt:\n%s" % (model, messages) )
     

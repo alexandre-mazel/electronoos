@@ -175,7 +175,7 @@ class TchatUser:
             if 1:
                 # memorize prev
                 self.prev_kdb.append( kdb )
-                if len( self.prev_kdb > 4 ):
+                if len( self.prev_kdb ) > 4:
                     del self.prev_kdb[0]
                 for kdb in self.prev_kdb:
                     for k in kdb:

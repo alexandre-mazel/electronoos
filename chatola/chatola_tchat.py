@@ -181,9 +181,7 @@ class TchatUser:
                     for k in kdb:
                         print( "Adding k: '%s'" % str(k) )
                         prompt.append( {"role": "system","content": k} )
-                    
-            self.prev_kdb.pop(0)
-            self.prev_kdb.
+
         
         res = ask_ollama_http( strModel, prompt )
         

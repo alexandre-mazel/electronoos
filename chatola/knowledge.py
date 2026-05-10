@@ -9,7 +9,7 @@ class Knowledge:
     def __init__( self ):
         self.infos = [] # a list of informations
         self.vects = [] # embedding related to each informations
-        self.model = "nomic-embed-text" # bof (565MB) (rapide: 13s for 106 sentence)
+        self.model = "nomic-embed-text" # resultat bof, mais rapide (565MB) (rapide: 13s for 106 sentence)
         self.model = "qwen3-embedding" # (7GB for 8K context) (plus long: 144s for 106 sentence)
         self.host = "localhost"
         self.port = 11434
@@ -104,7 +104,7 @@ class Knowledge:
         print( "INF: computeEmbedding: %d sentence(s), duration: %.1fs" % (len(self.infos), (time.time() - timeBegin) ) )
         self._savePrecalc()
         
-    def get_knowledge_related_to( self, question, max=24 ):
+    def getKnowledgeForQuestion( self, question, max=24 ):
         """
         return the max best sentence related to a current question
         """
@@ -117,7 +117,7 @@ class Knowledge:
             
         mosted = sorted( res, reverse=True )
         if 1:
-            print( "\nDBG: get_knowledge_related_to: res for question '%s'" % (question) )
+            print( "\nDBG: getKnowledgeForQuestion: res for question '%s'" % (question) )
             for v in mosted:
                 print( v )
         
@@ -134,14 +134,18 @@ def classic_init():
     knowledge.addKnowlegdeFromTxtOneLiner( "datas/dataset_paris_16_rue_jean_richepin.txt" )
     knowledge.computeEmbedding()
     
+def get_knowledge_related_to( question ):
+    global knowledge
+    return knowledge.getKnowledgeForQuestion( question )
+    
 def autotest():
     global knowledge
     classic_init()
-    knowledge.get_knowledge_related_to( "ou manger une pizza ?" )
-    knowledge.get_knowledge_related_to( "j'ai faim, ou aller ?" )
-    knowledge.get_knowledge_related_to( "je veux voir des sculptures de Rodin" )
-    knowledge.get_knowledge_related_to( "je veux manger libanais" )
-    knowledge.get_knowledge_related_to( "quel est la station de metro la plus proche?" )
+    knowledge.getKnowledgeForQuestion( "ou manger une pizza ?" )
+    knowledge.getKnowledgeForQuestion( "j'ai faim, ou aller ?" )
+    knowledge.getKnowledgeForQuestion( "je veux voir des sculptures de Rodin" )
+    knowledge.getKnowledgeForQuestion( "je veux manger libanais" )
+    knowledge.getKnowledgeForQuestion( "quel est la station de metro la plus proche?" )
     
 if __name__ == "__main__":
     autotest()

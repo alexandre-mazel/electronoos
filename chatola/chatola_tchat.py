@@ -192,6 +192,8 @@ class TchatUserManager:
 
 tum = TchatUserManager()
 
+knowledge.classic_init()
+
 def handle_user_tchat(user_id, msg):
     u = tum.getUser( user_id )
     ans = u.getAns( msg )

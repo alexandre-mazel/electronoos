@@ -128,11 +128,15 @@ class Knowledge:
             out.append(v)
         return out
    
-knowledge = Knowledge()           
-def autotest():
+knowledge = Knowledge()      
+def classic_init():
     global knowledge
     knowledge.addKnowlegdeFromTxtOneLiner( "datas/dataset_paris_16_rue_jean_richepin.txt" )
     knowledge.computeEmbedding()
+    
+def autotest():
+    global knowledge
+    classic_init()
     knowledge.get_knowledge_related_to( "ou manger une pizza ?" )
     knowledge.get_knowledge_related_to( "j'ai faim, ou aller ?" )
     knowledge.get_knowledge_related_to( "je veux voir des sculptures de Rodin" )

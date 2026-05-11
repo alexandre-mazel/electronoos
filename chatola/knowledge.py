@@ -113,6 +113,7 @@ class Knowledge:
             #~ self.infos.append( title + ";" + contents )
             self.infos.append( title )
             self.details[title] = contents
+            # TODO: comparer le vecteur d'un titre et du contenu ? (c'est tellement long le calcul du contenu que ca fait hésiter)
         #~ exit(1)
         
         
@@ -129,7 +130,7 @@ class Knowledge:
         print( "INF: computeEmbedding: %d sentence(s), duration: %.1fs" % (len(self.infos), (time.time() - timeBegin) ) )
         self._savePrecalc()
         
-    def getKnowledgeForQuestion( self, question, max=24, verbose = False ):
+    def getKnowledgeForQuestion( self, question, max=12, verbose = False ):
         """
         return the max best sentence related to a current question
         """
@@ -155,7 +156,7 @@ class Knowledge:
             out.append(v[1])
             if v[1] in self.details:
                 # on a un gros texte par rapport a cette infos
-                out.append(self.detail[v[1]])
+                out.append(self.details[v[1]])
         return out
    
 knowledge = Knowledge()      
@@ -180,6 +181,7 @@ def autotest():
     knowledge.getKnowledgeForQuestion( "je veux manger libanais", verbose=verbose )
     knowledge.getKnowledgeForQuestion( "quel est la station de metro la plus proche?", verbose=verbose )
     knowledge.getKnowledgeForQuestion( "Hello", verbose=verbose )
+    knowledge.getKnowledgeForQuestion( "Parle moi des exosomes", verbose=verbose )
     
 if __name__ == "__main__":
     autotest()

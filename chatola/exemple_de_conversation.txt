@@ -89,3 +89,9 @@ You: du place de victor hugo ? c'est pas tres francais !
 IA: Je m'excuse pour l'erreur. La place est bien située près de la ligne 2 du métro et des commerces, mais je devrais dire "place Victor Hugo" au lieu de "coinc".
     (generated in 13.85s)
 You:
+...
+
+Avec info de la clinique
+You: Hello ?
+You: C'est quoi un exosome ?
+You: C'est quoi la différence entre un FUE et une FUT?

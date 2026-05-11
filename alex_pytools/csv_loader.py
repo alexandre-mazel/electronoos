@@ -195,10 +195,14 @@ def load_datas_from_xlsx_exploded_for_python27( filename, encoding = 'utf-8', bV
     #~ print("DBG: load_datas_from_xlsx_exploded_for_python27: dOut: %s" % str(dOut) )
     return dOut
     
-def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
+def load_datas_from_xlsx( filename, encoding = 'utf-8', replace_eol = None, bVerbose = 0 ):
     """
     return a dict indexed by tab name then lines (without handling headers)
+    - replace_eol: if None: do nothing, else, replace all EOL in a field by this string, eg ". "
     """
+    sepa = ";"
+    newchar = "," # which char to put when a sepa is found into a cell ?
+    
     # ce qui fonctionne pas, c'est qu'en fait il faut chercher des ; avant les "\n"
     
     #~ import xlrd # pip install xlrd 
@@ -253,6 +257,9 @@ def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
                 if bVerbose: print("col: %s" % col)
                 if col == 'nan':
                     break
+                if replace_eol != None:
+                    col = col.replace( "\n", replace_eol )
+                col = col.replace( sepa, newchar )
                 oneLine.append(col)
 
             if oneLine != []: # skip empty line
@@ -287,7 +294,7 @@ def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
                         f.write( str(field))
                         # change: we always want to finish a line with a ; so a ;\n is a real end of record
                         if nfield+1 < len(line) or 1:
-                            f.write(";")
+                            f.write( sepa )
                     f.write("\n")
                 f.close()
                 fIndex.write(k+"\n")

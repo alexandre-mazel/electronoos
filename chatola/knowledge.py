@@ -9,6 +9,7 @@ class Knowledge:
     
     def __init__( self ):
         self.infos = [] # a list of informations
+        self.details = {} # an info => txt: a long texte about the infos. (info is seen as a summary of infos)
         self.vects = [] # embedding related to each informations
         self.model = "nomic-embed-text" # resultat bof, mais rapide (565MB) (rapide: 13s for 106 sentence)
         self.model = "qwen3-embedding" # (7GB for 8K context) (plus long: 144s for 106 sentence)
@@ -102,13 +103,17 @@ class Knowledge:
         print( "INF: addKnowlegdeFromXlsX: Loading '%s'" % filename )
         sys.path.append( "../alex_pytools/" )
         import csv_loader
-        dic = csv_loader.load_datas_from_xlsx( filename, bVerbose = 1 )
+        dic = csv_loader.load_datas_from_xlsx( filename, replace_eol = ". ", bVerbose = 0 )
         datas = dic[list(dic.keys())[0]]
-        for data in datas:
-            print(data)
+        for data in datas[1:]: # skip headers
+            #~ print(data)
+            #~ print(len(data))
             url, title, contents = data
             print( title )
-        exit(1)
+            #~ self.infos.append( title + ";" + contents )
+            self.infos.append( title )
+            self.details[title] = contents
+        #~ exit(1)
         
         
             

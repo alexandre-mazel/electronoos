@@ -45,9 +45,12 @@ def ask_ollama_http( model, messages ):
         "Connection: close\r\n"
         "\r\n"
     ).encode("utf-8") + body
+    
+    timeout = 10*60 # 10 min
 
     # ---- Open raw TCP socket ----
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.settimeout(TIMEOUT)
         print(f"Connecting to {strHost}:{port}...")
         s.connect((strHost, port))
 
@@ -56,11 +59,14 @@ def ask_ollama_http( model, messages ):
 
         # ---- Receive full response ----
         response = b""
-        while True:
-            chunk = s.recv(4096)
-            if not chunk:
-                break
-            response += chunk
+        try:
+            while True:
+                chunk = s.recv(4096)
+                if not chunk:
+                    break
+                response += chunk
+        except socket.timeout:
+            print("ERR: Socket timeout reached")
 
     # ---- Separate headers and body ----
     header_bytes, _, body_bytes = response.partition(b"\r\n\r\n")

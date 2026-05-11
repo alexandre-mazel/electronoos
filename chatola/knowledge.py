@@ -185,6 +185,7 @@ def autotest():
     
     # timing pour 12 questions avec details de la clinique (long) (J'ai dépasse les 8k token):  
     # "total_duration":456310328028,"load_duration":3331023098,"prompt_eval_count":8192,"prompt_eval_duration":450818778459,"eval_count":12,"eval_duration":1603491810
+    # => 456 sec soit 7.6min
     
 if __name__ == "__main__":
     autotest()

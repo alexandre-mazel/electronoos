@@ -50,7 +50,7 @@ def ask_ollama_http( model, messages ):
 
     # ---- Open raw TCP socket ----
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.settimeout(TIMEOUT)
+        s.settimeout(timeout)
         print(f"Connecting to {strHost}:{port}...")
         s.connect((strHost, port))
 

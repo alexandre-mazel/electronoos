@@ -151,8 +151,8 @@ class Knowledge:
         for idx, v in enumerate( mosted[:max] ):
             if "qwen3" in self.model and v[0] < 0.55: # sinon on pourrait mettre 0.42 si on en veut plus...
                 break
-            if verbose:
-                print( "DBG: getKnowledgeForQuestion: ending with: %s (%.2f) " % (v[1],v[0]) )
+            if verbose or 1:
+                print( "DBG: getKnowledgeForQuestion: ending with: %d: %s (%.2f) " % (idx, v[1],v[0]) )
             out.append(v[1])
             if v[1] in self.details and v[0] > 0.65 and idx < 6: # ne pas mettre des tonnes d'infos si on n'est pas sur (sinon Hello prend 3 plombes: 150sec)
                 # on a un gros texte par rapport a cette infos

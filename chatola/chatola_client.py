@@ -11,7 +11,7 @@ def test_data():
 def ask_tchat(user_id, msg):
     service = url + "/tchat"
     try:
-        response = requests.post(service, json={"user_id": user_id, "msg": msg}, verify=True,timeout=(10, 480)) # 10sec de timeout sur la co et 480 sur la reponse
+        response = requests.post(service, json={"user_id": user_id, "msg": msg}, verify=True,timeout=(10, 600)) # 10sec de timeout sur la co et 480 ou 600 sur la reponse
     except requests.exceptions.ConnectionError as err:
         ret = "ERR: ask_tchat: Impossible to connect to Chatola Server"
         return ret

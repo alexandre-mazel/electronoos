@@ -15,7 +15,7 @@ def ask_tchat(user_id, msg):
     except requests.exceptions.ConnectionError as err:
         ret = "ERR: ask_tchat: Impossible to connect to Chatola Server"
         return ret
-    except urllib3.exceptions.ReadTimeoutError as err:
+    except requests.exceptions.ReadTimeout as err:
         ret = "ERR: ask_tchat: time out in Server: " + str( err )
         return ret
         

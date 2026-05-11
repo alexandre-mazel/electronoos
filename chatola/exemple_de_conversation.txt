@@ -102,3 +102,4 @@ IA: Un exosome est une petite vésicule naturelle qui contient des molécules bioa
 You: C'est quoi la différence entre un FUE et une FUT?
 IA: FUE (Follicular Unit Extraction) et FUT (Follicular Unit Transplantation) sont deux techniques de greffe de cheveux qui diffèrent par leur méthode d'extraction des unités folliculaires. \n\nLe FUE consiste à extraire les unités folliculaires individuellement, généralement 1-3 cheveux chacune, à l'aide d'un punch spécifique. Cela permet de préserver la qualité et la santé des greffons.\n\nLa FUT, en revanche, implique l'extraction de bandes de peau contenant plusieurs unités folliculaires (généralement 3-4 cheveux chacune) à l'aide d'une lame spéciale."
 (generated in 472.50s) (mais j'ai pas eu la réponse en vrai, il doit y avoir un pb de timeout!)
+(7528 token pour la question en direct apres hello)

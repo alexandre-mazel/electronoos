@@ -13,7 +13,10 @@ def ask_tchat(user_id, msg):
     try:
         response = requests.post(service, json={"user_id": user_id, "msg": msg}, verify=True,timeout=(10, 480)) # 10sec de timeout sur la co et 480 sur la reponse
     except requests.exceptions.ConnectionError as err:
-        ret = "ERR: Impossible to connect to Chatola Serveur"
+        ret = "ERR: ask_tchat: Impossible to connect to Chatola Server"
+        return ret
+    except urllib3.exceptions.ReadTimeoutError as err:
+        ret = "ERR: ask_tchat: time out in Server: " + str( err )
         return ret
         
     dicres = response.json()

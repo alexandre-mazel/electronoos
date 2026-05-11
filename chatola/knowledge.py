@@ -2,6 +2,7 @@ import json
 import numpy
 import os
 import pure_http_embedding_httpclient
+import sys
 import time
 
 class Knowledge:
@@ -92,6 +93,25 @@ class Knowledge:
             print( "DBG: addKnowlegdeFromTxtOneLiner: '%s'" % line )
             self.infos.append( line )
             
+    def addKnowlegdeFromXlsX( self, filename ):
+        """
+        Format: URL, Titre, Contenus
+        eg: Actus WKDO - The Clinic.xlsx
+        pb: la zone contenus peut contenir des retours chariots !!!
+        """
+        print( "INF: addKnowlegdeFromXlsX: Loading '%s'" % filename )
+        sys.path.append( "../alex_pytools/" )
+        import csv_loader
+        dic = csv_loader.load_datas_from_xlsx( filename, bVerbose = 1 )
+        datas = dic[list(dic.keys())[0]]
+        for data in datas:
+            print(data)
+            url, title, contents = data
+            print( title )
+        exit(1)
+        
+        
+            
     def computeEmbedding( self ):
         """
         (re)compute the embedding of each info
@@ -134,6 +154,7 @@ knowledge = Knowledge()
 def classic_init():
     global knowledge
     knowledge.addKnowlegdeFromTxtOneLiner( "datas/dataset_paris_16_rue_jean_richepin.txt" )
+    knowledge.addKnowlegdeFromXlsX( "datas/Actus WKDO - The Clinic.xlsx" )
     knowledge.computeEmbedding()
     
 def get_knowledge_related_to( question ):

@@ -153,6 +153,9 @@ class Knowledge:
             if verbose:
                 print( "DBG: getKnowledgeForQuestion: ending with: %s (%.2f) " % (v[1],v[0]) )
             out.append(v[1])
+            if v[1] in self.details:
+                # on a un gros texte par rapport a cette infos
+                out.append(self.detail[v[1]])
         return out
    
 knowledge = Knowledge()      

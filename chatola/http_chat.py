@@ -195,14 +195,14 @@ def testperf():
         long2              : 257.479s
         
 
-        Champion1 en 100%  Gpu (3080 10GB) (le modele fait 3GB, ca prend 3GB!)
+        Champion1 en 100%  Gpu (3080 10GB) (le modele fait 3.4GB dans ollama ps, ca prend 3.4GB dans nvidia-smi!)
         NVIDIA-SMI 570.133.07             Driver Version: 570.133.07     CUDA Version: 12.8
         (ca fonctionnait pas car mes drivers était en 11.4)
             
 
         Load+Hello      : 1.811s        
-        Hello               : 0.135s         (token: 555/35)
-        avg                 : 0.109s         (token: 555/35)
+        Hello               : 0.135s         (token: 26/8)
+        avg                 : 0.109s         (token: 46/2)
         long1              : 3.334s         (token: 32/599)
         long2              : 1.405s         (token: 5782/85)
         (les timings sont bien régulier)
@@ -210,10 +210,10 @@ def testperf():
         
         avec deepseek-r1:8b (6.6GB VRAM)
         Load+Hello      : 5.109s
-        Hello           : 2.117s            (token: 3/224)
-        avg             : 1.904s            (token: 555/35)
-        long1           : 16.052s           (token: 9/1707)
-        long2           : 4.821s            (token: 5752/315)
+        Hello               : 2.117s            (token: 3/224)
+        avg                 : 1.904s            (token: 555/35)
+        long1               : 16.052s         (token: 9/1707)
+        long2               : 4.821s           (token: 5752/315)
 
 
 

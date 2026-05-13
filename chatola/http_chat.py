@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # import ollama
 # or pure http below:
 import socket

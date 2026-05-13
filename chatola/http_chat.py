@@ -125,6 +125,7 @@ def testperf():
                     #~ [{"user":"hello"}] # amusant ca sort un truc incomprehensible un code python qui fait du sklearn !?!
                     
                     # token: (input/output): 26/8 (pourquoi 26?)
+                    [ "Hello", [{"role":"user","content":"Hello"}] ],  # premier pour charger le modele, second pour test speed
                     [ "Hello", [{"role":"user","content":"Hello"}] ], 
                     
                     # token: 46/2

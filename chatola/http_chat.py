@@ -162,7 +162,7 @@ def testperf():
         Azure: 
         cpu: Intel(R) Xeon(R) Platinum 8272CL CPU @ 2.60GHz
         
-        Hello: 0.669s # 4.6 si model pas encore chargé
+        Hello: 0.669s # 4.6 si model pas encore charge
           avg: 0.818s
         long1: 43.806s
         long2: 190.068s / 246.041s avec get_knowledge_related_to a max=4

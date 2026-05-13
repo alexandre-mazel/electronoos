@@ -104,6 +104,7 @@ class Knowledge:
         sys.path.append( "../alex_pytools/" )
         import csv_loader
         dic = csv_loader.load_datas_from_xlsx( filename, replace_eol = ". ", bVerbose = 0 )
+        print("DBG: addKnowlegdeFromXlsX: keys: %s" % str(dic.keys() ) )
         datas = dic[list(dic.keys())[0]]
         for data in datas[1:]: # skip headers
             #~ print(data)

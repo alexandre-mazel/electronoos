@@ -152,7 +152,12 @@ def testperf():
             msgss[4][1].insert( 0, {"role": "system","content": k} )
         print("")
     
-    model = "llama3.2"
+    # 2 models running in 10GB VRAM
+    model = "ministral-3:14b"
+    model = "deepseek-r1:8b"
+
+    #  a nice recent one
+    #~ model = "llama3.2"
     res = []
     i = 0
     for title_test, messages in msgss:
@@ -192,15 +197,15 @@ def testperf():
 
         Champion1 en 100%  Gpu (3080 10GB) (le modele fait 3GB, ca prend 3GB!)
         NVIDIA-SMI 570.133.07             Driver Version: 570.133.07     CUDA Version: 12.8
+        (ca fonctionnait pas car mes drivers était en 11.4)
+            
         cpu: Intel(R) Core(TM) i7-9700K CPU @ 3.60GHz
         Load+Hello      : 1.811s
         Hello               : 0.135s
         avg                 : 0.109s
         long1              : 3.334s
         long2              : 1.405s
-
-
-
+        (les timings sont bien régulier)
 
 
         """

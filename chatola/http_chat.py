@@ -77,9 +77,14 @@ def ask_ollama_http( model, messages, strHost = "localhost", port = 11434 ):
 
     # keep only between {} # why garbage around ?
     # a faire que si en mode generate
-    if( not bChat ):
+    # non a faire que si en chunked
+    isChunked = "Transfer-Encoding: chunked" in headers
+    print( "INF: isChunked: ", isChunked )
+    if( isChunked ):
         idx = body.index("{")
-        idx2 = body.index("}")
+        idx2 = len(body) - 1
+        while  body[idx2] != "}" and idx2 > 0:
+            idx2 -= 1
         body = body[idx:idx2+1]
 
         print("\n---- BODY cleaned ----")
@@ -118,13 +123,14 @@ def testperf():
     msgss =   [
                     #~ [{"user":"hello"}] # amusant ca sort un truc incomprehensible un code python qui fait du sklearn !?!
                     [ "Hello", [{"role":"user","content":"Hello"}] ],
-                    [ "avg", [{"role":"user","content":"Hello, give me pricesely the results of 16*16."}] ],
-                    [ "long", [{"role":"user","content":"Hello, give me pricesely the results of 16*16."}] ],
+                    [ "avg", [{"role":"user","content":"Hello, give me precisely the results of 16*16, print only the result and nothing else."}] ],
+                    [ "long1", [{"role":"user","content":"Parle moi de calvitie"}] ], # question courte, reponse longue
+                    [ "long2", [{"role":"user","content":"Parle moi de calvitie"}] ], # question longue avec context, reponse longue
                 ]
     if 1:
         # long message
-        import knowledge        
-        kbd = knowledge.get_knowledge_related_to( "calvitie" )
+        import knowledge
+        kdb = knowledge.get_knowledge_related_to( "calvitie" )
         for k in kdb:
             print( "Adding k: '%s'" % str(k) )
             msgss[2][1].insert( 0, {"role": "system","content": k} )
@@ -135,7 +141,7 @@ def testperf():
         time_begin = time.time()
         print( ask_ollama_http( model, messages ) )
         duration = time.time() - time_begin
-        print( "%s: duration: %.3fs" % (title_test, duration) )
+        print( "%s: duration: %.3fs\n" % (title_test, duration) )
         res.append( duration )
         
     for i in range( len(msgss) ):

@@ -153,8 +153,8 @@ def testperf():
         print("")
     
     # 2 models running in 10GB VRAM
-    model = "ministral-3:14b"
-    #~ model = "deepseek-r1:8b"
+    #~ model = "ministral-3:14b"
+    model = "deepseek-r1:8b"
 
     #  a nice recent one
     #~ model = "llama3.2"
@@ -199,28 +199,32 @@ def testperf():
         NVIDIA-SMI 570.133.07             Driver Version: 570.133.07     CUDA Version: 12.8
         (ca fonctionnait pas car mes drivers était en 11.4)
             
-        cpu: Intel(R) Core(TM) i7-9700K CPU @ 3.60GHz
-        Load+Hello      : 1.811s
+
+        Load+Hello      : 1.811s        (token: 555/35)
         Hello               : 0.135s
-        avg                 : 0.109s
-        long1              : 3.334s
-        long2              : 1.405s
+        avg                 : 0.109s        (token: 555/35)
+        long1              : 3.334s         (token: 32/599)
+        long2              : 1.405s         (token: 5782/85)
         (les timings sont bien régulier)
         
         
-        avec deepseek-r1:8b (6GB VRAM)
-        Load+Hello      : 3.855s
-        Hello               : 2.116s
-        avg                 : 1.900s
+        avec deepseek-r1:8b (6GB VRAM) - context 4096
+        Load+Hello      : 3.855s        (token: 555/35)
+        Hello               : 2.116s        
+        avg                 : 1.900s        (token: 577/4)
         long1              : 16.060s
         long2              : 3.819s
         
+        avec deepseek-r1:8b (6GB VRAM)
+
+
+        
         avec ministral-3:14b (11GB 16%/84% CPU/GPU )
-        Load+Hello      : 6.068s
-        Hello               : 1.191s
-        avg                 : 0.254s
-        long1               : 61.679s
-        long2               : 4.925s
+        Load+Hello      : 6.576s            (token: 555/35)
+        Hello           : 1.781s
+        avg             : 0.411s            (token: 577/4)
+        long1           : 83.570s                          (token: 561/1709) 
+        long2           : 8.515s                    (token: 4910/111)
 
 
 

@@ -41,7 +41,7 @@ ps eax | grep sound_analyser | wc
 # mise a jour du robot chez brice:
 pscp -pw naonao C:/Users/alexa/dev/git/electronoos/cherie/*.py nao@87.90.82.139:/home/nao/.local/lib/python2.7/site-packages/electronoos/cherie & pscp -pw naonao C:/Users/alexa/dev/git/abcdk/sdk/abcdk/sound_a*.py nao@87.90.82.139:/home/nao/.local/lib/python2.7/site-packages/abcdk/ & pscp -pw naonao C:/Users/alexa/dev/git/electronoos/alex_pytools/misc*.py nao@87.90.82.139:/home/nao/.local/lib/python2.7/site-packages/electronoos/alex_pytools/ &
 
-# tout abcdk:
+# tout 
 pscp -r -pw naonao C:/Users/alexa/dev/git/electronoos/* nao@87.90.82.139:/home/nao/.local/lib/python2.7/site-packages/electronoos/
 # que alextools
 pscp -r -pw naonao C:/Users/alexa/dev/git/electronoos/alex_pytools/* nao@87.90.82.139:/home/nao/.local/lib/python2.7/site-packages/electronoos/alex_pytools/
@@ -76,6 +76,13 @@ pscp -pw naonao nao@87.90.82.139:/home/nao/recorded/rawWavs/* d:\cherie_sound_re
 # rsync -rv --size-only nao@87.90.82.139:/home/nao/recorded/rawWavs/ /mnt/d/cherie_sound_record/ # d n'est pas monté!
 
 
+# installation chez Brice (2nd version: mars 2023)
+192.168.1.254
+mdp: bribri345!
+(on passe les mots de passe du courrier)
+puis carré bleu bbox, services de la box.
+On met jarc en .15
+puis on redirige le port 22
 
 """
 

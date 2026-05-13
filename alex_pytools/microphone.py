@@ -8,6 +8,12 @@ import time
 
 import sound_processing
 
+global_bMustStop = False
+
+def stop_loop():
+    global global_bMustStop
+    global_bMustStop = True
+
 def loop_getsound(callback=None):
     """
     start a loop, calling callback
@@ -20,6 +26,9 @@ def loop_getsound(callback=None):
     RATE = 44100
     
     p = pyaudio.PyAudio()
+    
+    global global_bMustStop
+    global_bMustStop = False
     
     bTestInOut = True # test monitor
     bTestInOut = False
@@ -53,6 +62,8 @@ def loop_getsound(callback=None):
     cpt = 0
     while 1:
         data = stream.read(CHUNK)  # read audio stream (chunk = nbr sample)
+        if global_bMustStop:
+            break
         if callback != None: callback(data,RATE,WIDTH,CHANNELS,time.time())
         cpt += 1
         if (cpt%(5*RATE//CHUNK))==0:

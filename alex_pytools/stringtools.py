@@ -51,6 +51,20 @@ def findSubString( buf, strBefore, strAfter= "", nOccurence = 1, bQuiet=False ):
     if not bQuiet: print("DBG: findSubString: looking for '%s' in '%s...' return nothing (idx:%s) (before:'%s'), (after:'%s')" % (strBefore,buf[:40],idx,strBefore,strAfter) )
     return ""
     
+def findSubStringToList( buf, strBefore, strAfter ):
+    """
+    return all strings contain between two sepas strBefore and strAfter
+    """
+    o = []
+    occ = 1
+    while 1:
+        s = findSubString(buf,strBefore,strAfter,occ)
+        if s == "":
+            break
+        o.append(s)
+        occ += 1
+    return o
+    
 def timeCompareSubString(nTimes):
     import time
     import re

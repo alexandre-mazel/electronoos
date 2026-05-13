@@ -1,8 +1,11 @@
 #!/usr/bin/python
 
+# to be run as:
+# sudo nohup /home/na/dev/git/electronoos/scripts/stat_connected.py &
+
 def logDebug(txt):
     pass
-    #file = open("/home/pi/pi_error.log", "at" )
+    #file = open("/home/na/pi_error.log", "at" )
     #file.write(txt + "\n")
     #file.close()
     
@@ -177,6 +180,7 @@ class Stater:
             "BC:83:85:00:24:35": "TabPro4",
             "E0:2B:E9:D7:DE:8A": "TabPro7",
             "B8:8A:EC:C7:73:14": "SwitchCorto",
+            "1C:45:86:94:FB:6F": "SwitchGaia",
             "48:4B:AA:68:E4:41": "IphoneAlex",
             "B8:FF:61:54:81:FA": "IpadAlex",
             "90:21:81:27:D5:58": "TabletGaia",
@@ -196,10 +200,13 @@ class Stater:
             "2C:F0:5D:9F:BF:DE": "XeniaDev",
             "A0:32:99:D1:52:CA": "LenovoYoga",
             "8A:E2:56:9A:7D:6A": "IphoneXAlex",
+            "3A:E6:D8:43:04:B5": "Iphone14",
             "72:1C:0D:52:39:39": "A52_Alex",
             "20:C1:9B:F3:F2:0A": "Kakashi",
             
             "84:CF:BF:95:4A:88": "FairCorto",
+            "9E:DF:71:E1:AE:0E": "FairCorto2",
+
             "74:DA:38:F6:D8:DB": "Edimax_meteo",
             
             
@@ -303,7 +310,7 @@ sys.path.append(strLocalPath+"/../crypto_prono/")
 import scrap
 def updateScrap():
     strPath = os.path.expanduser("~/")+"/records/"
-    strPath = "/home/pi/records/"
+    strPath = "/home/na/records/"
     scrap.scrapAndSaveCryptoCurrency(strPath)
     
 def getTemperatureFrom1wire(strDeviceID):
@@ -317,14 +324,23 @@ def getTemperatureFrom1wire(strDeviceID):
     if len(lines)>0:
         t = lines[-1].split("t=")[-1]
         t = int(t)/1000.
+        #~ t -= 1.5 # overheat
     else:
         t = -127
     return t
     
 def updateTemperature():
-    t = getTemperatureFrom1wire( "28-3cb1f649c835")
+    strDeviceID = "28-3cb1f649c835"
+    t = getTemperatureFrom1wire(strDeviceID)
     if t <= -127:
         return
+        
+    if 1:
+         # on va moyenner 2 lectures a 15s d'intervalles
+        time.sleep(15)
+        t2 = getTemperatureFrom1wire(strDeviceID)
+        if t2 > -127:
+            t = (t + t2) / 2
     
     #~ print("INF: updateTemperature: %.1f" % t )
     
@@ -333,7 +349,7 @@ def updateTemperature():
         dest = "c:/save/office_temperature.txt"
     else:
         #~ dest = os.path.expanduser("~/save/office_temperature.txt")
-        dest = "/home/pi/save/office_temperature.txt" # here we want to save there, even if running as root
+        dest = "/home/na/save/office_temperature.txt" # here we want to save there, even if running as root
     
     f = open(dest,"a+")
     f.write("%s: %s: %.1f\n" % (timestamp,"armoire",t) )

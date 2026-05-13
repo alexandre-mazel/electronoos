@@ -7,6 +7,7 @@ import sys
 strElectroPath = "C:/Users/alexa/dev/git/electronoos/"
 sys.path.append(strElectroPath+"/alex_pytools/")
 #~ print sys.path
+import misctools
 import stringmatch
 
 def findInFile( filename, strToMatch, bVerbose = True ):
@@ -23,7 +24,7 @@ def findInFile( filename, strToMatch, bVerbose = True ):
     nCptLineAnalysed = 0
     while 1:
         try:
-            line = file.readline()
+            line = file.readline() # ATTENTION READLINE A UNE LIMITE SUR LES GROS FICHIERS: il ne retourne pas toutes les lignes.
             #~ print("DBG: nCptLine: %d, offset: %s" % (nCptLine,file.tell() ) )
             if line == None or len(line) == 0:
                 break
@@ -46,7 +47,8 @@ def findInFile( filename, strToMatch, bVerbose = True ):
         if strToMatchLower in line.lower() or stringmatch.isMatch(line.lower(),strToMatchLower):
             if bFirstTime:
                 bFirstTime = False
-                print( "\n***** %s:" % filename )
+                stamp = misctools.getFileStamp(filename)
+                print( "\n***** %s (date: %s):" % (filename,stamp) )
                 line=line.replace(chr(13),"")
             lenLineMax = 200
             if len(line)>lenLineMax:
@@ -75,11 +77,15 @@ def findInFile( filename, strToMatch, bVerbose = True ):
     return nCptLineAnalysed,nNbrMatch
 
 
-def findInFiles( strPath, strToMatch, strFileMask = '*', bVerbose = True ):
+def findInFiles( strPath, strToMatch, strFileMask = '*', bVerbose = True, bShowResultInTextEditor = False, bInternalCall = False ):
     """
     return nbr files analysed, nbr file where match is found and nbr total lines
     """
-    aFiles = sorted(os.listdir(strPath))
+    try:
+        aFiles = sorted(os.listdir(strPath))
+    except PermissionError as err:
+        print("WRN: findInFiles: permission error for '%s'" % strPath)
+        return 0,0,0,0
     #~ print(aFiles)
 
     nbrFilesAnalysed = 0
@@ -87,11 +93,14 @@ def findInFiles( strPath, strToMatch, strFileMask = '*', bVerbose = True ):
     nbrLinesAnalysed = 0
     nbrLinesWithMatch = 0
     
+    listFilesToView = []
+    
     for strFile in aFiles:
         strFullPath = strPath + os.sep + strFile
         if os.path.isdir(strFullPath):
             #recursively check the folders
-            na,nf,nla,nlm = findInFiles( strFullPath,strToMatch, strFileMask,bVerbose=bVerbose)
+            na,nf,nla,nlm, listFiles = findInFiles( strFullPath,strToMatch, strFileMask,bVerbose=bVerbose,bShowResultInTextEditor=bShowResultInTextEditor,bInternalCall=True)
+            if bShowResultInTextEditor: listFilesToView.extend(listFiles)
             nbrFilesAnalysed += na
             nbrFilesWithMatch += nf
             nbrLinesAnalysed += nla
@@ -107,22 +116,50 @@ def findInFiles( strPath, strToMatch, strFileMask = '*', bVerbose = True ):
             nla,nlm = findInFile(strFullPath,strToMatch,bVerbose=bVerbose)
             if nlm > 0:
                 nbrFilesWithMatch += 1
+                if bShowResultInTextEditor: listFilesToView.append(strFullPath)
             nbrLinesAnalysed += nla
             nbrLinesWithMatch += nlm
             nbrFilesAnalysed += 1
-    return nbrFilesAnalysed,nbrFilesWithMatch,nbrLinesAnalysed,nbrLinesWithMatch
+            
+    if not bInternalCall  and bShowResultInTextEditor and len(listFilesToView)>0:
+        print("INF: opening %s file(s) in text editor..." % len(listFilesToView) )
+        strCommandLine = "scite "
+        for f in listFilesToView:
+            strCommandLine += '"%s" ' % f
+        #~ print("command: '%s'" % strCommandLine)
+        os.system(strCommandLine)
+        
+    return nbrFilesAnalysed,nbrFilesWithMatch,nbrLinesAnalysed,nbrLinesWithMatch,listFilesToView
         
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        print( "\n  My Grep-clone v1.0\n\n  syntax: %s <string_to_match> <files_mask> [1]\n\n  eg: %s a_word_in_a_line *.py\n  eg: %s *word1*word2* face*\n  eg: %s any_string_with_some* * 1 => will print binary file kipped file(s)" % ((sys.argv[0],)*4))
+    if len(sys.argv) < 2:
+        print( "\n  My Grep-clone v1.0\n\n  syntax: %s <string_to_match> <files_mask> [1] [show]\n\n  eg: %s a_word_in_a_line *.py\n  eg: %s *word1*word2* face*\n  eg: %s any_string_with_some* * 1 => will print binary file skipped file(s)\n      if option show: open all hitting file(s) in scite" % ((sys.argv[0],)*4))
         exit(-1)
     print("\n")
+    
+    bShowResultInTextEditor = False
     
     bVerbose = 0
     if len(sys.argv)>3 and sys.argv[3]=='1':
         bVerbose = 1
-    strToMatch,mask = sys.argv[1:3]
+    #strToMatch,mask = sys.argv[1:3]
+    if len(sys.argv)>1:
+        strToMatch = sys.argv[1]
+    if len(sys.argv)>2:
+        mask = sys.argv[2]
+    else:
+        mask = "*.*"
+        
+    if len(sys.argv)>3:
+        if sys.argv[3]:
+            bShowResultInTextEditor = 1
+            
+    if "gui" == strToMatch[:3] and "gui" == strToMatch[-3:]:
+        # special case when comming from command line guialtgui => "alt"
+        strToMatch = '"' + strToMatch[3:-3] + '"' # car on ne peut pas appeller just grep "alt", par contre on peut dans le shell windows taper grep \"alt\" et ca fonctionne !
+        print( "WRN: changing research to '%s' (but you could also type in shell: prep \\\"alt\\\"" % strToMatch )
+        
     print("INF: bVerbose: %s" % bVerbose ) 
-    na,nf,nla,nlm = findInFiles(".",strToMatch,mask.lower(),bVerbose=bVerbose)
+    na,nf,nla,nlm,listfiles = findInFiles(".",strToMatch,mask.lower(),bVerbose=bVerbose,bShowResultInTextEditor=bShowResultInTextEditor)
     print("\nNbr Analysed Files: %d\nNbr Matching Files: %d\nNbr Total Line Analysed: %d\nNbr Total Line With Match: %d" % (na,nf,nla,nlm) )
             

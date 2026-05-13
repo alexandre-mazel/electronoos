@@ -31,7 +31,7 @@ def print_grey(s):
         from colorama import Fore, Back, Style, init
         init()
         print( Fore.BLACK + Style.BRIGHT + s ) # bright blacks looks like grey
-    except BaseException, err:
+    except BaseException as err:
         # print( "DBG: err: %s" % err) # to debug this method
         print( s ) # no colorama => no color, it's ok...
         
@@ -64,11 +64,12 @@ def isSamePoint(v1, v2, rEqualThreshold ):
 
 class StlTriangle:
     """
-    a list of triangles
-    """
-    def __init__( self ):
-        self.nv = (0., 0., 0. )
-        self.v = [ (0., 0., 0. ), (0., 0., 0. ), (0., 0., 0. ) ]
+    a simple triangle
+,     """
+    def __init__( self, p1 = (0.,0.,0.), p2 = (0.,0.,0.), p3 = (0.,0.,0.) ):
+        self.nv = (0., 0., 0. ) # the normal ?
+        #~ self.v = [ (0., 0., 0. ), (0., 0., 0. ), (0., 0., 0. ) ]
+        self.v = [ p1,p2,p3 ]
         self.attr = 0
         
     def __str__( self ):
@@ -95,6 +96,34 @@ class StlTriangle:
                 
         return False
         
+    def isEqual( self, rhs, epsilon = 0.000001 ):
+        print("isEqual?")
+        if not isinstance(rhs, self.__class__):
+            return False
+        if not isSamePoint( self.nv, rhs.nv, rEqualThreshold = epsilon ):
+            print( "INF: StlTriangle.isEqual: nv are different:")
+            print( "self.nv: %s" % str(self.nv))
+            print( "rhs.nv: %s" % str(rhs.nv))
+            return False
+            
+        for i in range(3):
+            if not isSamePoint( self.v[i], rhs.v[i], rEqualThreshold = epsilon ):
+                print( "INF: StlTriangle.isEqual: v%d are different:" % i)
+                print( "self.v%d: %s" % (i,str(self.v[i])))
+                print( "rhs.v%d: %s" % (i,str(rhs.v[i])))
+                return False
+            
+        return True
+        
+    def __eq__( self, rhs ):
+        return self.isEqual(rhs)
+
+            
+    def __ne__( self, rhs ):
+        return not self == rhs
+            
+# class StlTriangle - end
+    
 class StlObject:
     """
     a list of triangles
@@ -166,7 +195,11 @@ class StlObject:
         
     def saveToStl( self, strFilename ):
         file = open( strFilename, "wb")
-        buf = ""
+        if sys.version_info[0] >= 3:
+            buf = b""
+        else:
+            buf = ""
+            
         buf += struct.pack( "80B", *((0,)*80) )
         buf += struct.pack( "I", len(self.aTriangles) )
         
@@ -178,6 +211,21 @@ class StlObject:
             
         file.write(buf)
         file.close()
+        
+    def addTriangle( self, p1,p2,p3):
+        self.aTriangles.append(StlTriangle(p1,p2,p3))
+        
+    def addQuad( self, p1,p2,p3,p4):
+        self.aTriangles.append(StlTriangle(p1,p2,p3))
+        self.aTriangles.append(StlTriangle(p3,p1,p4))
+        
+    def move( self, offset ):
+        for k in range(len(self.aTriangles)):
+            for j in range(3):
+                #~ for i in range(3):
+                    #~ self.aTriangles[k].v[j][i] += offset[i]
+                    self.aTriangles[k].v[j] = self.aTriangles[k].v[j][0] + offset[0],self.aTriangles[k].v[j][1] + offset[1], self.aTriangles[k].v[j][2] + offset[2]
+        
 # class StlObject - end
                         
 
@@ -191,7 +239,7 @@ class Stl:
     def reset( self ):
         self.aObjects = [] # a list of StlObject
         
-    def load( self, strFilename ):
+    def load( self, strFilename, bSplit = True ):
         """
         return True if ok
         """
@@ -254,11 +302,15 @@ class Stl:
         # triangles - end
         #~ prind( "DBG: self (1): %s" % str(self) )
         
-        prind( "DBG: Stl.load: nbr object before split: %d" % len(self.aObjects) )
+        if bSplit:
+            prind( "DBG: Stl.load: nbr object before split: %d" % len(self.aObjects) )
         
-        self.aObjects = self.aObjects[0].split()
+            self.aObjects = self.aObjects[0].split()
         
-        prind( "DBG: Stl.load: nbr object after split: %d" % len(self.aObjects) )
+            prind( "DBG: Stl.load: nbr object after split: %d" % len(self.aObjects) )
+            
+        else:
+            prind( "DBG: Stl.load: nbr object: %d" % len(self.aObjects) )
         
         #~ prind( "DBG: self (2): %s" % str(self) )
         
@@ -294,15 +346,15 @@ class Stl:
                             colors.append(['y','y','y'])
                         #~ if nNumTriangle > 2:
                             #~ break
-                print x
-                print y
-                print z
-                print colors
+                print(x)
+                print(y)
+                print(z)
+                print(colors)
                 x = np.array(x)
                 y = np.array(y)
                 z = np.array(z)
                 colors = np.array(colors)
-                print colors.shape
+                print(colors.shape)
                 #~ ax.plot_surface(x, y, z, cmap=cm.coolwarm, linewidth=0, antialiased=False)
                 ax.plot_trisurf(x, y, z, linewidth=0.2, antialiased=True) # , color=colors
             else:
@@ -332,6 +384,13 @@ class Stl:
     def getNbrObjects( self ):
         return len(self.aObjects)
         
+    def getNbrTriangles( self ):
+        sum = 0
+        for i in range(len(self.aObjects)):
+            nNbrTriangles = len(self.aObjects[i].aTriangles)
+            sum += nNbrTriangles
+        return sum
+        
     def saveByObject( self, strFilenameStart, bRenderThem ):
         """
         save each object in separate file named <strFilenameStart>__object_index__triangles_number.stl
@@ -343,6 +402,28 @@ class Stl:
             self.aObjects[i].saveToStl(strFilename)
             if bRenderThem:
                 viewStl( strFilename )
+                
+        
+    def compare( self, rhs ):
+        if self.getNbrObjects() != rhs.getNbrObjects():
+            print("INF: Stl.compare: different nbr object: %d and %d" % (stl1.getNbrObjects(),stl2.getNbrObjects()) )
+            return False
+            
+        for k in range(self.getNbrObjects()):
+            print("INF: Stl.compare: comparing object %d:" % k )
+            if len(self.aObjects[k].aTriangles) != len(rhs.aObjects[k].aTriangles):
+                print("INF: compareStl: different nbr triangles: %d and %d" % (len(self.aObjects[k].aTriangles),len(rhs.aObjects[k].aTriangles)) )
+                return False
+            for j in range(len(self.aObjects[k].aTriangles)):
+                tri1 = self.aObjects[k].aTriangles[j]
+                tri2 = rhs.aObjects[k].aTriangles[j]
+                #~ print(tri1)
+                #~ print(tri2)
+                if tri1 != tri2 and 0:
+                    print("INF: compareStl: different triangle num %d" % j )
+                    break
+                
+        return True
         
 # class Stl - end
 
@@ -355,6 +436,43 @@ def splitStl( strFilename, strDstFilenameStart, bRenderEachSavedObject = False )
     stl = Stl()
     stl.load(strFilename)
     stl.saveByObject( strDstFilenameStart, bRenderThem = bRenderEachSavedObject ) 
+    
+def compareStl( strFilename1,strFilename2 ):
+    stl1 = Stl()
+    stl1.load(strFilename1,bSplit = False)
+    stl2 = Stl()
+    stl2.load(strFilename2,bSplit = False)
+    
+    return stl1.compare(stl2)
+        
+    print( "INF: compareStl: end" )
+    
+if 1:
+    if 1:
+        fn1 = r"C:\Users\alexa\perso\docs\2023-10_cdl_piano_cocktail\print_support\CDL Melangeur_piece_dessus_v3b.stl"
+        fn2 = r"C:\Users\alexa\perso\docs\2023-10_cdl_piano_cocktail\print_support\CDL Melangeur_piece_dessus_v3.stl" # different
+        fn2 = r"C:\Users\alexa\perso\docs\2023-10_cdl_piano_cocktail\print_support\dessus_v3b_garder_pour_test_doublons.stl" # pareil?
+        # le dernier n'est pas pareil car peut etre que les triangles ne sont pas toujours rangé dans le meme ordre
+        # TODO: tri des triangles avec un hash malin
+        # TODO: faire 2 exports ou on est sur que c'est les memes pour refs.
+        
+    if 1:
+        fn1 = r"C:\Users\alexa\perso\docs\2023-10_cdl_piano_cocktail\print_support\dessus_v3b_garder_pour_test_doublons.stl"
+        fn2 = r"C:\Users\alexa\perso\docs\2023-10_cdl_piano_cocktail\print_support\dessus_v3b_garder_pour_test_doublons2.stl" # pareil?
+        # 2 exports a plusieurs mois de suite ne font pas le meme exports
+        
+    if 1:
+        fn1 = r"C:\Users\alexa\perso\docs\2023-10_cdl_piano_cocktail\print_support\dessus_v3b_garder_pour_test_doublons2.stl" # pareil?
+        fn2 = r"C:\Users\alexa\perso\docs\2023-10_cdl_piano_cocktail\print_support\dessus_v3b_garder_pour_test_doublons3.stl" # pareil?
+        # 2 exports a la suite font pas le meme resultat !!!
+        
+    if 0:
+        fn1 = r"C:\Users\alexa\perso\docs\2023-10_cdl_piano_cocktail\print_support\CDL Melangeur_piece_dessous_v3.stl"
+        fn2 = r"C:\Users\alexa\perso\docs\2023-10_cdl_piano_cocktail\print_support\CDL Melangeur_piece_dessus_v3.stl" # tres different
+        fn2 = r"C:\Users\alexa\perso\docs\2023-10_cdl_piano_cocktail\print_support\dessous_v3_doublons_peut_etre_je_garde_pour_tester_mon_compariseur.stl" # pareil?
+        
+    compareStl(fn1,fn2)
+    exit(1)
     
 def autoTest():
     stl = Stl()
@@ -380,4 +498,5 @@ if( __name__ == "__main__" ):
         splitStl( sys.argv[1], sys.argv[2] )
         
     #splitStl( "C:/Users/amazel/Downloads/PepperBackSmall(5).stl", "/tmp/t" )
-splitStl( "C:/Users/amazel/Downloads/Meuble SDB.stl", "/tmp/sdb" )    
+#~ splitStl( "C:/Users/amazel/Downloads/Meuble SDB.stl", "/tmp/sdb" )    
+#~ splitStl( "Meuble SDB.stl", "/tmp/sdb" )    

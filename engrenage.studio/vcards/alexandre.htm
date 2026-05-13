@@ -1,0 +1,133 @@
+<html>
+<header>
+<style>
+.sub_addr {
+display: table-cell;padding:10,0,10,0;width: 100px;
+vertical-align: middle; 
+//float:center;
+text-align: center;
+//justify-content: center;
+//align-items: center;
+//margin: auto;
+display: flex run-in;
+}
+
+.href_normal
+{
+text-decoration: none;
+color:black;
+}
+
+.bloc:after, .bloc:before {
+	content: " ";
+	position: absolute;
+	width: 46px;
+	height: 210px;
+	z-index: -10;
+}
+
+.bloc:before { background: transparent;}
+.bloc:after { background: transparent; }
+
+.shadowcard:before {
+	top: 30px;
+	left: 46px;
+	width: 46;
+	height: 180px;
+	
+	box-shadow: -7px 0 10px #555;
+	transform: rotate(-5deg);
+}
+.shadowcard:after { display: none; }
+
+</style>
+</header>
+<body>
+
+<!-- box-shadow: 0 9px 0px 0px white, 0 -9px 0px 0px white, 12px 0 15px -4px rgba(31, 73, 125, 0.8), -12px 0 15px -4px rgba(31, 73, 125, 0.8);-->
+<!-- box-shadow: 1px 2px 3px 4px rgba(20,20,20,0.4);-->
+<!-- box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.5); -->
+<!-- box-shadow: -10px -10px 15px rgba(255,255,255,0.5),10px 10px 15px rgba(70,70,70,0.12); -->
+
+<div class="bloc shadowcard" style="border: 2px solid black;width: 460px;height: 210px; 
+border-radius: 8px;background-color: #fdf2e4; 
+box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.5);
+margin:30; padding:10;
+font-family: monospace;
+">
+    <div style="display: table;
+    ">
+
+        <div style="display: table-row;width:100%;border: 0px;">
+          <div style="padding:12;border: 0px;width: 140px;display: table-cell;vertical-align: top;"	>
+            <center>
+            <img src = "../img/logo_engrenage.png" width=60/><br>
+            <br>
+            Engrenage Innovation<br>
+          </div>
+          
+          <div style="border: 1px;word-wrap: break-word;width: 200px;padding:20;
+          vertical-align: bottom;display: table-cell;">
+            <left>
+            <b>Alexandre Mazel</b><br>
+            CEO - CCO<br>
+            <br>
+            +33 610 601 979<br>
+            <a href="mailto:alexandre@engrenage.studio?subject=Let's do business together!" class="href_normal"><font size=-1>alexandre@engrenage.studio</a>
+          </div>
+          
+          <div style="width: 100px; float:center; display: table-cell;padding:10;">
+            <img src = "../img/alexandre_mazel.jpg" width=100px style="border-radius: 10%;" />
+          </div>
+        </div>
+        
+        <!--
+        <div style="display: table-row;border: 0px solid black;width:100%;background-color: #808080;vertical-align: middle;
+        ">
+          <div class="sub_addr" style="width:100px"  >
+            <font size=-2> <a href="http://engrenage.studio">http://engrenage.studio</a>
+          </div>
+          <div class="sub_addr" >
+             <a href="https://www.linkedin.com/in/alexandremazel/"><img src="../img/linkedin_logo.png" style="height:20px"></a>
+           </div>
+          <div class="sub_addr" style="width:200px">
+             <a href="https://scholar.google.com/citations?user=quing7wAAAAJ&hl=fr"><img src="../img/google_scholar_logo.png" style="height:20px"></a>
+          </div>
+          <div class="sub_addr" style="right:0px;width:30px">
+             <a href="https://www.youtube.com/theamazel"><img src="../img/youtube_logo.png" style="height:20px"></a>
+          </div>
+      </div>
+      -->
+      </div>
+      
+      <br> <!-- beurk -->
+      <br>
+      
+      <div style="width=300px;">
+          <table style="width:100%" border=0>
+          <tr>
+          <td style="width:25%">
+          <center>
+            <a href="http://engrenage.studio" class="href_normal"><font size=-8> http://<font size=-1>engrenage.studio</a>
+          </td>
+          <td style="width:25%">
+          <center>
+            <a href="https://www.linkedin.com/in/alexandremazel/"><img src="../img/linkedin_logo.png" style="height:16px"></a>
+          </td>
+          <td style="width:25%">
+          <center>
+            <a href="https://scholar.google.com/citations?user=quing7wAAAAJ&hl=fr"><img src="../img/google_scholar_logo.png" style="height:16px"></a>
+          </td>
+          <td style="width:25%">
+          <center>
+            <a href="https://www.youtube.com/theamazel"><img src="../img/youtube_logo.png" style="height:16px"></a>
+          </td>
+          </tr>
+          </table>
+      </div>
+      
+        
+    </div>
+</div>
+</body>
+</html>

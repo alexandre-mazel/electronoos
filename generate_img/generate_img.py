@@ -54,6 +54,8 @@ def generateImg( aListImg, w=14, h=8, nNbrBits=24 ):
         if w == -1: w = img.shape[1]
         if h == -1: h = img.shape[0]
         
+        print("INF: img is %dx%d" % (w,h))
+        
         if nNbrBits == 4 and (w%2) == 1:
             print("ERR: generateImg can't generate image with odd width (w:%d)" % w )
             return False

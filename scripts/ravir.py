@@ -88,6 +88,21 @@ mkdir -p /home/nao/recorded_images/
 # derniere tete du sav amené: 192.168.1.174 (en filaire) 169 en wifi
 # reflash a la main: nao-autoflash pepper-x86-2.5.5.5_2016-11-28_with-root.opn
 
+# tweaker les fans:
+mount / -o remount,rw
+nano /opt/aldebaran/etc/alfand.conf
+TEMPTRIPPOINT=65;75;90;93
+FANSPEEDPOINT=20;30;50;90;100
+
+# ne pas oublier de desactiver les modules non necessaire dans naoqi car l'un de cela allume la camera xtion
+et donc ca fait un point rouge
+
+Le test etait a 79.
+Ici on change:
+Le respireur a 76 et l'autre a 92
+
+C'est un test de robotique sociale, on veut voir les differences de perception et de projection.
+
 """
 
 import os
@@ -671,7 +686,7 @@ class Perliner:
             
         if self.motion != None:
             
-            rPosInc = noise.getSimplexNoise(t)*rAmp
+            rPosInc = noise.getSimplexNoise(t)*rAmp*1.2
 
             #~ print("updateBodyPosture: bForceMove: %s, rPosInc: %.3f, self.timeLastUpdateBody: %.3fs" % (bForceMove,rPosInc,self.timeLastUpdateBody ) )
             if (abs(rPosInc) > 0.03 or bForceMove ) and self.timeLastUpdateBody + 0.5 < time.time():

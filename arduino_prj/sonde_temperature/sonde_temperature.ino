@@ -1,9 +1,11 @@
 #define DS18B20MODEL 0x28
 #include "OneWire.h"
 #include "DallasTemperature.h"
+
+//#include "../mydallas.cpp" // move all dallas custom to this file to clean this one!
  
  /* Broche du bus 1-Wire */
-const byte BROCHE_ONEWIRE = 2;
+const byte BROCHE_ONEWIRE = 7; // was 2
 
 /* Code de retour de la fonction getTemperature() */
 enum DS18B20_RCODES {
@@ -102,7 +104,7 @@ void lookUpSensors(){
 }
 
 void setup() {
-  Serial.begin(9600);  // definition de l'ouverture du port serie
+  Serial.begin(57600);  // definition de l'ouverture du port serie
   pinMode(BROCHE_ONEWIRE,INPUT);
 
 #ifdef USE_DALLAS

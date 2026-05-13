@@ -109,7 +109,7 @@ class Bumper:
 # Load the cascade
 face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
-cap = cv2.VideoCapture(1) #ouvre la webcam
+cap = cv2.VideoCapture(3) #ouvre la webcam # 3: camera en usb
 
 bumper = Bumper(radius=9)
 
@@ -120,6 +120,8 @@ while 1:
     #~ img = cv2.resize(img, None, fx=2,fy=2)
     
     #~ img = cv2.flip(img,0) # flip vertic
+    
+    print(img.shape)
 
     # Convert into grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)

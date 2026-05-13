@@ -63,6 +63,11 @@ class SoundPlayer:
         
     def playFileMp3(self, strFilename, bWaitEnd = True, rSoundVolume = 1. ):
         pg.mixer.music.load(strFilename)
+        if 0:
+            # print("length: %s" % pg.mixer.music.get_length()) # only for wav
+            import mutagen.mp3
+            song_only_for_duration = mutagen.mp3.MP3(strFilename)
+            print("length: %s" % song_only_for_duration.info.length)
         pg.mixer.music.play()
         if bWaitEnd:
             clock = pg.time.Clock()

@@ -243,6 +243,6 @@ if __name__ == "__main__":
         #~ filename = "C:/cvs/cvs_manual_png/b5148fdf19cc63dc7873f3d667088c8a5628aa56_0000.png"
         if len(sys.argv)>1:
             filename = sys.argv[1]
-        extract_txt(filename) 
+        extract_txt(filename)
     print("Duration: %.2fs" % (time.time()-timeBegin) )
     

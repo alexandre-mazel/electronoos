@@ -1,0 +1,51 @@
+--------
+[0, 1, 2, 3] , well placed:  1 , misplaced:  0
+[4, 5, 6, 7] , well placed:  1 , misplaced:  0
+[0, 1, 6, 7] , well placed:  2 , misplaced:  0
+[0, 0, 6, 6] , well placed:  3 , misplaced:  0
+[0, 6, 6, 6] , well placed:  4 , misplaced:  0
+--------
+Game finished in 5 turn(s)
+
+--------
+[0, 1, 2, 3] , well placed:  0 , misplaced:  2
+[4, 5, 6, 7] , well placed:  1 , misplaced:  1
+[4, 6, 7, 0] , well placed:  1 , misplaced:  0
+[4, 1, 5, 3] , well placed:  2 , misplaced:  2
+[4, 3, 5, 1] , well placed:  4 , misplaced:  0
+--------
+Game finished in 5 turn(s)
+
+--------
+[0, 1, 2, 3] , well placed:  0 , misplaced:  1
+[4, 5, 6, 7] , well placed:  0 , misplaced:  2
+[4, 5, 2, 3] , well placed:  0 , misplaced:  0
+[6, 7, 0, 1] , well placed:  3 , misplaced:  0
+[6, 7, 0, 0] , well placed:  4 , misplaced:  0
+--------
+Game finished in 5 turn(s)
+
+--------
+[0, 1, 2, 3] , well placed:  0 , misplaced:  1
+[4, 5, 6, 7] , well placed:  1 , misplaced:  1
+[4, 5, 2, 3] , well placed:  1 , misplaced:  1
+[4, 2, 5, 1] , well placed:  0 , misplaced:  3
+[2, 5, 1, 4] , well placed:  2 , misplaced:  1
+[2, 5, 1, 1] , well placed:  1 , misplaced:  2
+[2, 5, 2, 4] , well placed:  2 , misplaced:  0
+[1, 5, 1, 4] , well placed:  3 , misplaced:  0
+[1, 5, 5, 4] , well placed:  3 , misplaced:  0
+[1, 5, 4, 4] , well placed:  4 , misplaced:  0
+--------
+Game finished in 10 turn(s)
+
+--------
+[0, 1, 2, 3] , well placed:  0 , misplaced:  1
+[4, 5, 6, 7] , well placed:  1 , misplaced:  1
+[5, 4, 3, 2] , well placed:  1 , misplaced:  1
+[5, 2, 3, 4] , well placed:  1 , misplaced:  1
+[5, 3, 1, 7] , well placed:  0 , misplaced:  0
+[4, 6, 0, 2] , well placed:  0 , misplaced:  3
+[2, 4, 6, 4] , well placed:  4 , misplaced:  0
+--------
+Game finished in 7 turn(s)

@@ -130,13 +130,10 @@ def testperf():
                     [ "Load+Hello", [{"role":"user","content":"Hello"}] ],  # premier pour charger le modele, second pour test speed
                     [ "Hello", [{"role":"user","content":"Hello"}] ], 
                     
-                    # token: 46/2
-                    [ "avg", [{"role":"user","content":"Hello, give me precisely the results of 16*16, print only the result and nothing else."}] ],
+                    [ "comput", [{"role":"user","content":"Hello, give me precisely the results of 16*16, print only the result and nothing else."}] ],
                     
-                    # token: 32/662 ou 32/599 (avec GPU)?
                     [ "long1", [{"role":"user","content":"Parle moi de calvitie"}] ], # question courte, reponse longue
                     
-                    # token: ?/79  - sur GPU: 5782/85
                     [ "long2", [{"role":"user","content":"Parle moi de calvitie, mais avec une reponse courte de 2 phrases max."}] ], # question longue avec context, reponse longue
                 ]
                 
@@ -182,7 +179,7 @@ def testperf():
         cpu: Intel(R) Xeon(R) Platinum 8272CL CPU @ 2.60GHz
         
         Hello               : 0.669s # 4.6 si model pas encore charge
-          avg               : 0.818s
+        comput           : 0.818s
         long1              : 43.806s
         long2              : 190.068s / 246.041s avec get_knowledge_related_to a max=4
         
@@ -190,7 +187,7 @@ def testperf():
         cpu: Intel(R) Core(TM) i7-9700K CPU @ 3.60GHz
         Load+Hello      : 2.690s
         Hello               : 0.751s
-          avg               : 0.491s
+        comput           : 0.491s
         long1              : 69.791s
         long2              : 257.479s
         
@@ -202,7 +199,7 @@ def testperf():
 
         Load+Hello      : 1.811s        
         Hello               : 0.135s         (token: 26/8)
-        avg                 : 0.109s         (token: 46/2)
+        comput            : 0.109s        (token: 46/2)
         long1              : 3.334s         (token: 32/599)
         long2              : 1.405s         (token: 5782/85)
         (les timings sont bien régulier)
@@ -211,7 +208,7 @@ def testperf():
         avec deepseek-r1:8b (6.6GB VRAM)
         Load+Hello      : 5.109s
         Hello               : 2.117s            (token: 3/224)
-        avg                 : 1.904s            (token: 555/35)
+        comput            : 1.904s            (token: 555/35)
         long1               : 16.052s         (token: 9/1707)
         long2               : 4.821s           (token: 5752/315)
 
@@ -221,7 +218,7 @@ def testperf():
         avec ministral-3:14b (11GB 16%/84% CPU/GPU )
         Load+Hello      : 6.576s            
         Hello               : 1.781s            (token: 555/35)
-        avg                 : 0.411s            (token: 577/4)
+        comput            : 0.411s            (token: 577/4)
         long1               : 83.570s         (token: 561/1709) 
         long2               : 8.515s           (token: 4910/111)
 

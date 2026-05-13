@@ -125,7 +125,7 @@ def testperf():
                     #~ [{"user":"hello"}] # amusant ca sort un truc incomprehensible un code python qui fait du sklearn !?!
                     
                     # token: (input/output): 26/8 (pourquoi 26?)
-                    [ "Hello", [{"role":"user","content":"Hello"}] ],  # premier pour charger le modele, second pour test speed
+                    [ "Load+Hello", [{"role":"user","content":"Hello"}] ],  # premier pour charger le modele, second pour test speed
                     [ "Hello", [{"role":"user","content":"Hello"}] ], 
                     
                     # token: 46/2
@@ -137,6 +137,9 @@ def testperf():
                     # token: 4609/79
                     [ "long2", [{"role":"user","content":"Parle moi de calvitie, mais avec une reponse courte de 2 phrases max."}] ], # question longue avec context, reponse longue
                 ]
+                
+    normal_answer = ["","256"]
+    
     if 1:
         # long message
         import knowledge
@@ -156,17 +159,28 @@ def testperf():
         print( "%s: duration: %.3fs\n" % (title_test, duration) )
         res.append( duration )
         
+        
+    print( "cpu: %s" % strCpu )
     for i in range( len(msgss) ):
-        print( "%5s: %.3fs" % ( msgss[i][0], res[i] ) )
+        print( "%10s: %.3fs" % ( msgss[i][0], res[i] ) )
         
         """
         Azure: 
         cpu: Intel(R) Xeon(R) Platinum 8272CL CPU @ 2.60GHz
         
-        Hello: 0.669s # 4.6 si model pas encore charge
-          avg: 0.818s
-        long1: 43.806s
-        long2: 190.068s / 246.041s avec get_knowledge_related_to a max=4
+        Hello               : 0.669s # 4.6 si model pas encore charge
+          avg               : 0.818s
+        long1              : 43.806s
+        long2              : 190.068s / 246.041s avec get_knowledge_related_to a max=4
+        
+        Champion1 en 100%  cpu:
+        cpu: Intel(R) Core(TM) i7-9700K CPU @ 3.60GHz
+        Load+Hello      : 2.690s
+        Hello               : 0.751s
+          avg               : 0.491s
+        long1               : 69.791s
+        long2               : 257.479s
+
 
 
         """

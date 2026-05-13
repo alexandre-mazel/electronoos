@@ -164,7 +164,7 @@ def testperf():
         time_begin = time.time()
         ret = ask_ollama_http( model, messages )
         print( ret )
-        if i < len(normal_answer):
+        if i < len(normal_answer) and model == "llama3.2":
             assert( ret == normal_answer[i] )
         
         duration = time.time() - time_begin

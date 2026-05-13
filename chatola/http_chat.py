@@ -144,7 +144,7 @@ def testperf():
         kdb = knowledge.get_knowledge_related_to( "calvitie", max=4,verbose = False )
         for k in kdb:
             print( "Adding k: '%s'" % str(k) )
-            msgss[3][1].insert( 0, {"role": "system","content": k} )
+            msgss[4][1].insert( 0, {"role": "system","content": k} )
         print("")
     
     model = "llama3.2"

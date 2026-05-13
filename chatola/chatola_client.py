@@ -1,14 +1,13 @@
 import requests
+import sys
 import time
 
-url = "https://obo-world.com:10000"
-
-def test_data():
+def test_data(url):
     service = url + "/data"
     response = requests.post(service, json={"msg": "hello"})
     print(response.json())
     
-def ask_tchat(user_id, msg):
+def ask_tchat(url, user_id, msg):
     service = url + "/tchat"
     try:
         response = requests.post(service, json={"user_id": user_id, "msg": msg}, verify=True,timeout=(10, 600)) # 10sec de timeout sur la co et 480 ou 600 sur la reponse
@@ -32,7 +31,7 @@ def ask_tchat(user_id, msg):
 #~ test_data()
 #~ ask_tchat( "test", "hello" )
 
-def loop_dialog( user_id ):
+def loop_dialog( chatola_url, user_id ):
     while 1:
         msg = input( "You: " )
         if msg == "":
@@ -41,12 +40,17 @@ def loop_dialog( user_id ):
             print( "Quitting...")
             break
         time_begin = time.time()
-        ans = ask_tchat( user_id, msg )
+        ans = ask_tchat( chatola_url, user_id, msg )
         print( "IA: %s" % ans )
         duration = time.time() - time_begin
         print( "    (generated in %.2fs)" % duration )
                 
     
-loop_dialog( "Tester")
+if __name__ == "__main__":
+    chatola_url = "https://obo-world.com:10000"
+    if len(sys.argv[1]) > 1:
+        chatola_url = sys.argv[1]
+    print( "INF: chatola_url: '%s'" % chatola_url )
+    loop_dialog( chatola_url, "Tester")
     
     

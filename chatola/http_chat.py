@@ -164,7 +164,7 @@ def testperf():
         
     print( "cpu: %s" % strCpu )
     for i in range( len(msgss) ):
-        print( "%10s: %.3fs" % ( msgss[i][0], res[i] ) )
+        print( "%-10s: %.3fs" % ( msgss[i][0], res[i] ) )
         
         """
         Azure: 
@@ -182,6 +182,15 @@ def testperf():
           avg               : 0.491s
         long1               : 69.791s
         long2               : 257.479s
+        
+
+        cpu: Intel(R) Core(TM) i7-9700K CPU @ 3.60GHz
+        Load+Hello: 3.026s
+             Hello: 0.135s
+               avg: 0.106s
+             long1: 3.351s
+             long2: 1.406s
+
 
 
 

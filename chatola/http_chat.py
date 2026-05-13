@@ -110,15 +110,41 @@ def ask_ollama_http( model, messages, strHost = "localhost", port = 11434 ):
 # ask_ollama_http - end
 
 def testperf():
+    import sys
+    sys.path.append( "../alex_pytools/")
+    import misctools
+    strCpu = misctools.getCpuModel(bShort=True)
+    print( "cpu: %s" % strCpu )
     msgss =   [
-                    [{"user":"hello"}]
+                    #~ [{"user":"hello"}] # amusant ca sort un truc incomprehensible un code python qui fait du sklearn !?!
+                    [ "Hello", [{"role":"user","content":"Hello"}] ],
+                    [ "avg", [{"role":"user","content":"Hello, give me pricesely the results of 16*16."}] ],
+                    [ "long", [{"role":"user","content":"Hello, give me pricesely the results of 16*16."}] ],
                 ]
-    model = "llama2.3"
-    for messages in msgss:
+    if 1:
+        # long message
+        import knowledge        
+        kbd = knowledge.get_knowledge_related_to( "calvitie" )
+        for k in kdb:
+            print( "Adding k: '%s'" % str(k) )
+            msgss[2][1].insert( 0, {"role": "system","content": k} )
+    
+    model = "llama3.2"
+    res = []
+    for title_test, messages in msgss:
         time_begin = time.time()
         print( ask_ollama_http( model, messages ) )
         duration = time.time() - time_begin
-        print( "duration: 0.3f" % duration )
+        print( "%s: duration: %.3fs" % (title_test, duration) )
+        res.append( duration )
+        
+    for i in range( len(msgss) ):
+        print( "%5s: %.3fs" % ( msgss[i][0], res[i] ) )
+        
+        """
+        Azure: 
+        cpu: Intel(R) Xeon(R) Platinum 8272CL CPU @ 2.60GHz
+        """
     
     
     

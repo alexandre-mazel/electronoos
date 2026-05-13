@@ -126,7 +126,7 @@ def testperf():
     msgss =   [
                     #~ [{"user":"hello"}] # amusant ca sort un truc incomprehensible un code python qui fait du sklearn !?!
                     
-                    # token: (input/output): 26/8 (pourquoi 26?)
+                    # token: (input/output): 26/8 (pourquoi 26 juste pour hello?)
                     [ "Load+Hello", [{"role":"user","content":"Hello"}] ],  # premier pour charger le modele, second pour test speed
                     [ "Hello", [{"role":"user","content":"Hello"}] ], 
                     
@@ -136,7 +136,7 @@ def testperf():
                     # token: 32/662 ou 32/599 (avec GPU)?
                     [ "long1", [{"role":"user","content":"Parle moi de calvitie"}] ], # question courte, reponse longue
                     
-                    # token: 4609/79  - sur GPU: 3468/69 et 4096/106 avec un knowledge de max=4
+                    # token: ?/79  - sur GPU: 5782/85
                     [ "long2", [{"role":"user","content":"Parle moi de calvitie, mais avec une reponse courte de 2 phrases max."}] ], # question longue avec context, reponse longue
                 ]
                 

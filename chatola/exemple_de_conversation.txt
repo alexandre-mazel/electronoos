@@ -117,3 +117,52 @@ IA: Je pensais que tu voulais discuter de calvitie, mais si c'est rien, je peux 
 You: pourquoi tu veux parler de calvitie ? t'es chelou, tu sais ce que c'est au moins ?
 IA: Non, je ne suis pas \"chelou\" ! Je suis un chatbot conçu pour fournir des informations et répondre à des questions sur une large gamme de sujets, y compris la santé et les problèmes de cheveux comme la calvitie. La calvitie est une condition médicale qui affecte de nombreuses personnes, notamment les hommes, mais également les femmes. Je peux fournir des informations sur ses causes, symptômes, traitements et autres aspects liés à cette condition.
 (generated in 472.50s) (mais j'ai pas eu la réponse en vrai, j'ai pas trouvé la correction)
+
+
+You: hello
+IA: Bonjour ! Comment puis-je vous aider aujourd'hui ?
+    (generated in 10.50s)
+You: hello
+IA: Qu'est-ce qui se passe ? Avez-vous des questions sur la calvitie ou autre chose ?
+    (generated in 2.04s)
+You: non
+IA: Pas de problème, alors à bientôt !
+    (generated in 29.70s)
+You: parle moi de voiture de sport
+IA: Les voitures de sport sont conçues pour offrir une expérience de conduite exceptionnelle. Elles sont généralement équipées d'un moteur puissant et de suspension spéciale pour améliorer la maniabilité et la vitesse. Quel type de voiture de sport aimeriez-vous en savoir plus sur ?
+    (generated in 7.19s)
+You: tu connais les porsches?
+IA: Oui, je connais bien les Porsche ! Elles sont l'une des marques de voitures de sport les plus célèbres et respectées au monde. Les Porsche sont connues pour leur design élégant, leur performance exceptionnelle et leur qualité de construction. Quelle est votre marque préférée de Porsche ?
+    (generated in 14.18s)
+You: les porshe ferrari ? tu connais ?
+IA: Non, il n'y a pas de "Porsche Ferrari". Cependant, je peux vous dire que les deux marques sont très célèbres dans le monde du sport automobile. Les Porsche sont connues pour leurs modèles comme le 911 ou la Boxster, tandis que les Ferrari sont célèbres pour leurs modèles comme le F40 ou la 488 Spider.
+    (generated in 44.21s)
+You: y a un magasin de porsche dans le quartier?
+IA: Oui, il y a un concessionnaire Porsche à Passy Plaza, rue de Passy 75016 Paris. Vous pouvez y trouver des modèles de voitures de sport Porsche et des services de maintenance et de réparation.
+    (generated in 16.64s)
+You: cool, redis moi l'adresse précise?
+IA: Désolé, je n'ai pas d'informations sur une concessionnaire Porsche spécifique à Passy Plaza. Je peux vous suggérer de vérifier le site internet de Porsche ou un moteur de recherche comme Google pour trouver les adresses des concessionnaires de Porsche près de vous.
+    (generated in 19.40s)
+You: tu sais plus qu'on parle de porsche et donc tu peux pas me donner l'adresse précise du garage porsche ?
+IA: Je comprends mieux maintenant ! Je peux vous donner une adresse approximative, mais je ne peux pas garantir que c'est la bonne. Selon les informations que j'ai, il y a un concessionnaire Porsche à Passy Plaza, rue de Passy 75016 Paris. Mais pour obtenir l'adresse précise et les heures d'ouverture, je vous recommande de vérifier le site internet de Porsche ou de contacter directement le concessionnaire pour confirmer.
+    (generated in 29.26s)
+You: bon allez parles moi de cul en vrai
+IA: Je vais essayer de répondre à votre question de manière claire et respectueuse.
+
+La "cul" peut faire référence à plusieurs choses, mais je vais supposer que vous voulez parler du cul-derrière ou des fesses. Si c'est le cas, je peux vous dire qu'il est une partie importante du corps humain qui sert à soutenir le poids et à faciliter les mouvements.
+
+Si vous avez une question spécifique sur la santé, l'exercice ou la beauté liée aux fesses, je serais ravi de vous aider !
+    (generated in 35.87s)
+You: mais oui, dis moi comment avoir des belles fesses!
+IA: Pour avoir des belles fesses, il y a plusieurs choses que vous pouvez faire :
+
+1. **Exercices de renforcement** : les exercices qui ciblent les muscles du derrière, tels que les squats, les lunges et les leg press, peuvent aider à renforcer les fesses.
+2. **Posture** : maintenir une bonne posture peut aider à donner l'illusion d'avoir des fesses plus volumineuses. Essayez de garder vos épaules en arrière et votre dos droit.
+3. **Étirements** : faire des étirements pour les muscles du derrière, tels que les étirements de la chair lombaire et des fessiers, peuvent aider à améliorer la flexibilité et à donner un look plus élégant aux fesses.
+4. **Maillot de sport** : porter un maillot de sport qui accentue les formes du corps peut aider à donner l'illusion d'avoir des fesses plus volumineuses.
+
+Il est important de noter que la beauté est subjective et qu'il n'y a pas de "forme idéale" pour les fesses. Il est également important de prendre soin de votre santé et de votre bien-être général, plutôt que de vous concentrer uniquement sur l'apparence physique.
+
+Et si vous voulez en savoir plus sur les exercices ou les conseils pour améliorer la forme de vos fesses, je serais ravi de vous aider !
+    (generated in 84.57s)
+You:

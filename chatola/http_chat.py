@@ -97,6 +97,7 @@ def ask_ollama_http( model, messages, strHost = "localhost", port = 11434 ):
     # prompt_eval_count: taille du contexte envoy?historique + prompt)
     # eval_count: nombre de tokens g?r?
     print( "DBG: prompt_eval_count (input token): %s" % str( data["prompt_eval_count"] ) )
+    print( "DBG: eval_count (answer token): %s" % str( data["eval_count"] ) )
     
     print("\n---- MODEL RESPONSE ----")
     try:
@@ -115,17 +116,6 @@ def ask_ollama_http( model, messages, strHost = "localhost", port = 11434 ):
 # ask_ollama_http - end
 
 def testperf():
-<<<<<<< HEAD
-    msgss =   [
-                    [{"user":"hello"}]
-                ]
-    model = "llama2.3"
-    for messages in msgss:
-        time_begin = time.time()
-        print( ask_ollama_http( model, messages ) )
-        duration = time.time() - time_begin
-        print( "duration: 0.3f" % duration )
-=======
     import sys
     sys.path.append( "../alex_pytools/")
     import misctools
@@ -133,18 +123,28 @@ def testperf():
     print( "cpu: %s" % strCpu )
     msgss =   [
                     #~ [{"user":"hello"}] # amusant ca sort un truc incomprehensible un code python qui fait du sklearn !?!
-                    [ "Hello", [{"role":"user","content":"Hello"}] ],
+                    
+                    # token: (input/output): 26/8 (pourquoi 26?)
+                    [ "Hello", [{"role":"user","content":"Hello"}] ], 
+                    
+                    # token: 46/2
                     [ "avg", [{"role":"user","content":"Hello, give me precisely the results of 16*16, print only the result and nothing else."}] ],
+                    
+                    # token: 32/662
                     [ "long1", [{"role":"user","content":"Parle moi de calvitie"}] ], # question courte, reponse longue
-                    [ "long2", [{"role":"user","content":"Parle moi de calvitie"}] ], # question longue avec context, reponse longue
+                    
+                    # token: 4609/79
+                    [ "long2", [{"role":"user","content":"Parle moi de calvitie, mais avec une reponse courte de 2 phrases max."}] ], # question longue avec context, reponse longue
                 ]
     if 1:
         # long message
         import knowledge
-        kdb = knowledge.get_knowledge_related_to( "calvitie" )
+        knowledge.classic_init()
+        kdb = knowledge.get_knowledge_related_to( "calvitie", max=4,verbose = False )
         for k in kdb:
             print( "Adding k: '%s'" % str(k) )
-            msgss[2][1].insert( 0, {"role": "system","content": k} )
+            msgss[3][1].insert( 0, {"role": "system","content": k} )
+        print("")
     
     model = "llama3.2"
     res = []
@@ -161,8 +161,14 @@ def testperf():
         """
         Azure: 
         cpu: Intel(R) Xeon(R) Platinum 8272CL CPU @ 2.60GHz
+        
+        Hello: 0.669s # 4.6 si model pas encore chargé
+          avg: 0.818s
+        long1: 43.806s
+        long2: 190.068s / 246.041s avec get_knowledge_related_to a max=4
+
+
         """
->>>>>>> 1f87d1684121a4cef1d794b02bb8f89be969448d
     
     
     

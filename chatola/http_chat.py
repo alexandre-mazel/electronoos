@@ -140,7 +140,7 @@ def testperf():
                     [ "long2", [{"role":"user","content":"Parle moi de calvitie, mais avec une reponse courte de 2 phrases max."}] ], # question longue avec context, reponse longue
                 ]
                 
-    normal_answer = ["","256"]
+    normal_answer = ["How can I assist you today?","How can I assist you today?","256"]
     
     if 1:
         # long message
@@ -154,12 +154,18 @@ def testperf():
     
     model = "llama3.2"
     res = []
+    i = 0
     for title_test, messages in msgss:
         time_begin = time.time()
-        print( ask_ollama_http( model, messages ) )
+        ret = ask_ollama_http( model, messages )
+        print( ret )
+        if i < len(normal_answer):
+            assert( ret == normal_answer[i] )
+        
         duration = time.time() - time_begin
         print( "%s: duration: %.3fs\n" % (title_test, duration) )
         res.append( duration )
+        i += 1
         
         
     print( "cpu: %s" % strCpu )
@@ -180,16 +186,19 @@ def testperf():
         Load+Hello      : 2.690s
         Hello               : 0.751s
           avg               : 0.491s
-        long1               : 69.791s
-        long2               : 257.479s
+        long1              : 69.791s
+        long2              : 257.479s
         
 
+        Champion1 en 100%  Gpu (3080 10GB) (le modele fait 3GB, ca prend 3GB!)
+        NVIDIA-SMI 570.133.07             Driver Version: 570.133.07     CUDA Version: 12.8
         cpu: Intel(R) Core(TM) i7-9700K CPU @ 3.60GHz
-        Load+Hello: 3.026s
-             Hello: 0.135s
-               avg: 0.106s
-             long1: 3.351s
-             long2: 1.406s
+        Load+Hello      : 1.811s
+        Hello               : 0.135s
+        avg                 : 0.109s
+        long1              : 3.334s
+        long2              : 1.405s
+
 
 
 

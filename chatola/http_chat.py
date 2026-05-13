@@ -153,11 +153,11 @@ def testperf():
         print("")
     
     # 2 models running in 10GB VRAM
-    model = "ministral-3:14b"
+    #~ model = "ministral-3:14b"
     #~ model = "deepseek-r1:8b"
 
     #  a nice recent one
-    #~ model = "llama3.2"
+    model = "llama3.2"
     res = []
     i = 0
     for title_test, messages in msgss:
@@ -208,12 +208,20 @@ def testperf():
         (les timings sont bien régulier)
         
         
-        avec deepseek-r1:8b
-        Load+Hello: 3.855s
-        Hello     : 2.116s
-        avg       : 1.900s
-        long1     : 16.060s
-        long2     : 3.819s
+        avec deepseek-r1:8b (6GB VRAM)
+        Load+Hello      : 3.855s
+        Hello               : 2.116s
+        avg                 : 1.900s
+        long1              : 16.060s
+        long2              : 3.819s
+        
+        avec ministral-3:14b (11GB 16%/84% CPU/GPU )
+        Load+Hello      : 6.068s
+        Hello               : 1.191s
+        avg                 : 0.254s
+        long1               : 61.679s
+        long2               : 4.925s
+
 
 
 

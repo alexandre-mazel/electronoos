@@ -133,10 +133,10 @@ def testperf():
                     # token: 46/2
                     [ "avg", [{"role":"user","content":"Hello, give me precisely the results of 16*16, print only the result and nothing else."}] ],
                     
-                    # token: 32/662
+                    # token: 32/662 ou 32/599 (avec GPU)?
                     [ "long1", [{"role":"user","content":"Parle moi de calvitie"}] ], # question courte, reponse longue
                     
-                    # token: 4609/79
+                    # token: 4609/79  - 4096/106 avec un knowledge de max=4
                     [ "long2", [{"role":"user","content":"Parle moi de calvitie, mais avec une reponse courte de 2 phrases max."}] ], # question longue avec context, reponse longue
                 ]
                 
@@ -146,7 +146,7 @@ def testperf():
         # long message
         import knowledge
         knowledge.classic_init()
-        kdb = knowledge.get_knowledge_related_to( "calvitie", max=4,verbose = False )
+        kdb = knowledge.get_knowledge_related_to( "calvitie", max=3,verbose = False )
         for k in kdb:
             print( "Adding k: '%s'" % str(k) )
             msgss[4][1].insert( 0, {"role": "system","content": k} )

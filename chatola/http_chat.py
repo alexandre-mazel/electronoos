@@ -154,7 +154,7 @@ def testperf():
     
     # 2 models running in 10GB VRAM
     model = "ministral-3:14b"
-    model = "deepseek-r1:8b"
+    #~ model = "deepseek-r1:8b"
 
     #  a nice recent one
     #~ model = "llama3.2"
@@ -175,7 +175,7 @@ def testperf():
         
     print( "cpu: %s" % strCpu )
     for i in range( len(msgss) ):
-        print( "%-10s: %.3fs" % ( msgss[i][0], res[i] ) )
+        print( "%-10s\t: %.3fs" % ( msgss[i][0], res[i] ) )
         
         """
         Azure: 
@@ -206,6 +206,15 @@ def testperf():
         long1              : 3.334s
         long2              : 1.405s
         (les timings sont bien régulier)
+        
+        
+        avec deepseek-r1:8b
+        Load+Hello: 3.855s
+        Hello     : 2.116s
+        avg       : 1.900s
+        long1     : 16.060s
+        long2     : 3.819s
+
 
 
         """

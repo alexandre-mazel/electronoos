@@ -153,11 +153,11 @@ def testperf():
         print("")
     
     # 2 models running in 10GB VRAM
-    #~ model = "ministral-3:14b"
+    model = "ministral-3:14b"
     #~ model = "deepseek-r1:8b"
 
     #  a nice recent one
-    model = "llama3.2"
+    #~ model = "llama3.2"
     res = []
     i = 0
     for title_test, messages in msgss:

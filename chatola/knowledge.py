@@ -166,9 +166,9 @@ def classic_init():
     knowledge.addKnowlegdeFromXlsX( "datas/Actus WKDO - The Clinic.xlsx" )
     knowledge.computeEmbedding()
     
-def get_knowledge_related_to( question ):
+def get_knowledge_related_to( question, max=12, verbose = False ):
     global knowledge
-    return knowledge.getKnowledgeForQuestion( question )
+    return knowledge.getKnowledgeForQuestion( question, max=max, verbose = verbose )
     
 def autotest():
     global knowledge

@@ -115,6 +115,17 @@ def ask_ollama_http( model, messages, strHost = "localhost", port = 11434 ):
 # ask_ollama_http - end
 
 def testperf():
+<<<<<<< HEAD
+    msgss =   [
+                    [{"user":"hello"}]
+                ]
+    model = "llama2.3"
+    for messages in msgss:
+        time_begin = time.time()
+        print( ask_ollama_http( model, messages ) )
+        duration = time.time() - time_begin
+        print( "duration: 0.3f" % duration )
+=======
     import sys
     sys.path.append( "../alex_pytools/")
     import misctools
@@ -151,6 +162,7 @@ def testperf():
         Azure: 
         cpu: Intel(R) Xeon(R) Platinum 8272CL CPU @ 2.60GHz
         """
+>>>>>>> 1f87d1684121a4cef1d794b02bb8f89be969448d
     
     
     

@@ -199,13 +199,16 @@ def pdfMultiCell( pdf, x, y, txt, hInterlign, bCentered = False ):
         pdf.text(xp,y,line )
         y += hInterlign
 
-def generatePdfFromImages( listImgs, strOutPdfFilename, strVersoText = None, nNbrImagePerPage = 1, aListArea = None, bAddPageNum = True ):
+def generatePdfFromImages( listImgs, strOutPdfFilename, strVersoText = None, nNbrImagePerPage = 1, aListArea = None, bAddPageNum = True, bLandscape = False ):
     """
     Generate a pdf files from a list of images
     - nNbrImagePerPage: currently tested: 1 and 4
     - aListArea: for each area one image will be generated and copied as a new image (one area per page if nbr_image_per_page = 1)
     """
-    pdf = FPDF('P', 'mm', 'A4') # Portrait, measures in mm, format is A4
+    if bLandscape:
+        pdf = FPDF('L', 'mm', 'A4') # Portrait, measures in mm, format is A4
+    else:
+        pdf = FPDF('P', 'mm', 'A4') # Portrait, measures in mm, format is A4
     #~ pdf.SetAuthor("amazel")
     #~ pdf.add_page()
     #~ pdf.set_font('Arial', 'B', 16)
@@ -213,6 +216,11 @@ def generatePdfFromImages( listImgs, strOutPdfFilename, strVersoText = None, nNb
     #~ pdf.output(strOutPdfFilename, 'F')
     wA4 = 210
     hA4 = 297
+    
+    if bLandscape:
+        wA4 = hA4
+        hA4 = 210
+        
     if nNbrImagePerPage > 1:
         nImageW = wA4/(nNbrImagePerPage//2)
     else:
@@ -238,6 +246,12 @@ def generatePdfFromImages( listImgs, strOutPdfFilename, strVersoText = None, nNb
             import cv2
             import numpy as np
             im = cv2.imread(strFilename,cv2.IMREAD_ANYDEPTH)
+            if im is None:
+                print( "ERR: generatePdfFromImages: image can't be loaded: %s" % strFilename ) 
+                nNumImage += 1
+                if nNumImage >= len(listImgs):
+                    break
+                continue
             print("DBG: pdfMultiCell: im.dtype: %s" % str(im.dtype))
             print("DBG: pdfMultiCell: im.shape: %s" % str(im.shape))
             if im.dtype == np.uint16:
@@ -364,7 +378,16 @@ def pdf_full_page_to_img(src,dst):
         #~ zoom = 2    # zoom factor
         #~ mat = fitz.Matrix(zoom, zoom)
         #~ pix = page.get_pixmap(matrix=map)
-        for dpi in [300,150,75]:
+        dpiList = [300,150,75]
+        pageBound = page.bound()
+        print("DBG: pdf_full_page_to_img: page.bound: %s" % str(pageBound))
+        if pageBound[2]-pageBound[0]>7500 or pageBound[3]-pageBound[1]>7500:
+            print("DBG: pdf_full_page_to_img: reducing dpi...(1)")
+            dpiList = [50,25]
+        elif pageBound[2]-pageBound[0]>4000 or pageBound[3]-pageBound[1]>4000:
+            print("DBG: pdf_full_page_to_img: reducing dpi... (2)")
+            dpiList = [150,75]
+        for dpi in dpiList:
             try:
                 if bFitz16: 
                     pix = page.get_pixmap()
@@ -374,10 +397,19 @@ def pdf_full_page_to_img(src,dst):
                     pix = page.get_pixmap(dpi=dpi)
                 output = dst.replace(".png","_%04d.png"%i)
                 pix.save(output)
+                print("DBG: pix.size: %sx%s" % (str(pix.width),str(pix.height)))
                 listImg.append(output)
                 break; # exit of the for dpi
             except BaseException as err:
-                print("WRN: pdf_full_page_to_img: err occurs, trying with smaller def (dpi:%d), err:%s" % (dpi, err))
+                print("WRN: pdf_full_page_to_img: err occurs, trying with smaller def (dpi:%d), err: %s" % (dpi, err))
+                if "such file or directory" in str(err):
+                    print("\n"*5)
+                    print("ERR: Tu dois enlever et remettre la carte sur d:")
+                    print("waiting...")
+                    import misctools
+                    import time
+                    misctools.beepError(4)
+                    time.sleep(10)
     return listImg
 
 if __name__ == "__main__":

@@ -3,7 +3,8 @@
 import re
 import sys
 
-from misctools import assert_equal
+try: from misctools import assert_equal
+except: pass
 
 """
 some classic handy classes to work on string
@@ -49,6 +50,20 @@ def findSubString( buf, strBefore, strAfter= "", nOccurence = 1, bQuiet=False ):
             
     if not bQuiet: print("DBG: findSubString: looking for '%s' in '%s...' return nothing (idx:%s) (before:'%s'), (after:'%s')" % (strBefore,buf[:40],idx,strBefore,strAfter) )
     return ""
+    
+def findSubStringToList( buf, strBefore, strAfter ):
+    """
+    return all strings contain between two sepas strBefore and strAfter
+    """
+    o = []
+    occ = 1
+    while 1:
+        s = findSubString(buf,strBefore,strAfter,occ)
+        if s == "":
+            break
+        o.append(s)
+        occ += 1
+    return o
     
 def timeCompareSubString(nTimes):
     import time
@@ -484,7 +499,7 @@ def removeAccentString( s ):
     for c in s:
         if ord(c)>127:
             c = removeAccent(c) # WARNING: in python2.7 this method will cut extra char in two char, and so they won't be detected correctly
-            print("DBG: removeAccentString: received '%s'" % c )
+            #~ print("DBG: removeAccentString: received '%s'" % c )
         out += c
     return out
     
@@ -534,7 +549,7 @@ def cutSentenceToWords( s ):
     return a list of words in sentence, removing all punctuation
     c'est bien => ["c", "est", "bien"]
     """
-    if 1:
+    if 0:
         return re.split('\W+',s) # to add other char: \W+|_ ( a tester)
         
     words = []

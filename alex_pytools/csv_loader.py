@@ -65,6 +65,7 @@ def load_csv_multiline(filename, sepa = ';', bSkipFirstLine = 0, encoding =  'ut
     
 def load_csv(filename, sepa = ';', bSkipFirstLine = 0, encoding =  'utf-8', bVerbose=0 ):
 
+    timeBegin = time.time()
     data = []
     try:
         file = openWithEncoding(filename, "rt", encoding = encoding)
@@ -93,10 +94,16 @@ def load_csv(filename, sepa = ';', bSkipFirstLine = 0, encoding =  'utf-8', bVer
             #~ elif not isinstance(fields[i], str):
             elif looksLikeNumber(fields[i]):
                 # TODO: handle array
+                bConverted = False
                 if '.' in fields[i]:
-                    fields[i] = float(fields[i])
-                else:
-                    fields[i] = int(fields[i])
+                    try:
+                        fields[i] = float(fields[i])
+                        bConverted = True
+                    except ValueError: pass
+                if not bConverted:
+                    try:
+                        fields[i] = int(fields[i])
+                    except ValueError: pass
         data.append(fields)
         
     # concatenate line with some " and unclosing " (eg a \n is in the text)
@@ -147,9 +154,10 @@ def load_csv(filename, sepa = ';', bSkipFirstLine = 0, encoding =  'utf-8', bVer
         else:
             nNumLine += 1
             
-        
+    print("INF: load_csv: file '%s' loaded in %5.2fs" % (filename,time.time()-timeBegin))
     return data
-    
+# load_csv - end
+
 def load_datas_from_xlsx_exploded_for_python27( filename, encoding = 'utf-8', bVerbose = 0 ):
     dOut = dict()
     fi = io.open(filename + "__index.csv","rt", encoding=encoding)
@@ -157,7 +165,7 @@ def load_datas_from_xlsx_exploded_for_python27( filename, encoding = 'utf-8', bV
         tabname = fi.readline().replace("\n","")
         if len(tabname)<2:
             break
-        print( "INF: load_datas_from_xlsx_exploded_for_python27: tabname: '%s'" % tabname )
+        #~ print( "INF: load_datas_from_xlsx_exploded_for_python27: tabname: '%s'" % tabname )
         fntab = filename+"__"+tabname+".csv"
         if 1:
             #~ data = load_csv( fntab, encoding=encoding )
@@ -187,10 +195,14 @@ def load_datas_from_xlsx_exploded_for_python27( filename, encoding = 'utf-8', bV
     #~ print("DBG: load_datas_from_xlsx_exploded_for_python27: dOut: %s" % str(dOut) )
     return dOut
     
-def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
+def load_datas_from_xlsx( filename, encoding = 'utf-8', replace_eol = None, bVerbose = 0 ):
     """
     return a dict indexed by tab name then lines (without handling headers)
+    - replace_eol: if None: do nothing, else, replace all EOL in a field by this string, eg ". "
     """
+    sepa = ";"
+    newchar = "," # which char to put when a sepa is found into a cell ?
+    
     # ce qui fonctionne pas, c'est qu'en fait il faut chercher des ; avant les "\n"
     
     #~ import xlrd # pip install xlrd 
@@ -225,7 +237,7 @@ def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
             return load_datas_from_xlsx_exploded_for_python27(filename, encoding=encoding)
 
         try: import pandas as pd # pip install pandas
-        except: print("WRN: no pandas found...") # on python2.7, it will be ok
+        except BaseException as err: print("WRN: no pandas found... (err: %s)" % err) # on python2.7, it will be ok
         
         df = pd.read_excel( filename, sheet_name=None, header=None )
     
@@ -245,8 +257,13 @@ def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
                 if bVerbose: print("col: %s" % col)
                 if col == 'nan':
                     break
+                if replace_eol != None:
+                    col = col.replace( "\n", replace_eol )
+                col = col.replace( sepa, newchar )
                 oneLine.append(col)
-            listLine.append(oneLine)
+
+            if oneLine != []: # skip empty line
+                listLine.append(oneLine)
 
         dOut[sheet_name] = listLine
     if bVerbose:
@@ -266,6 +283,9 @@ def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
             fIndex = io.open( filename_with_index_out, "wt", encoding="cp1252" )
             for k,content in dOut.items():
                 fn = filename+"__"+k+".csv"
+                if "jobs_desc_TH" in fn:
+                    print( "WRN: skipping Thailandais as on sait pas encoder les accents en utf-8 thai!!!" )
+                    continue
                 print("INF: writing to independant csv: %s" % fn )
                 f = io.open(fn,"wt", encoding=encoding)
                 for line in content:
@@ -274,13 +294,15 @@ def load_datas_from_xlsx( filename, encoding = 'utf-8', bVerbose = 0 ):
                         f.write( str(field))
                         # change: we always want to finish a line with a ; so a ;\n is a real end of record
                         if nfield+1 < len(line) or 1:
-                            f.write(";")
+                            f.write( sepa )
                     f.write("\n")
                 f.close()
                 fIndex.write(k+"\n")
             fIndex.close()
     
     return dOut
+    
+# load_datas_from_xlsx - end
     
 #~ load_datas_from_xlsx( r"C:\Users\alexa\dev\git\obo\www\chatbot\OBO_Recruitement_dialog.xlsx")
     
@@ -299,6 +321,55 @@ def save_csv(filename, data, bForceEndingBySeparator=True):
                 s += sepa
         file.write(s+"\n")
     file.close()
+# save_csv - end
+
+    
+def pasteOnChar( datas, begin = '(',end = ')', sepa = ',', bVerbose=0 ):
+    """
+    receive an array of array. (eg result from load_csv)
+    paste field in second array if contain begin until field containing end.
+    eg [ "bobo","les animaux (chat", "rat", "poule) sont heureux." ,"youpi" ] => [ "bobo", "les animaux (chat,rat,poule) sont heureux." ,"youpi" ]
+    """
+    #~ bVerbose = 1
+    assert(begin != end)
+    for j in range(len(datas)):
+        d = datas[j]
+        if bVerbose: print("DBG: pasteOnChar: d1:" + str(d))
+        i = 0
+        nIdxStart = -1 # -1 if not between begin and end
+        while i < len(d):
+            if nIdxStart == -1:
+                if isinstance((d[i]), int) or isinstance((d[i]), float) : # une fois il y avait le nombre 1000 comme nom d'agent !
+                    i += 1
+                    continue
+                idx1 = d[i].rfind(begin) # cherche le dernier
+                if idx1 > -1:
+                    #~ print("idx1: %s" % idx1)
+                     # handling a ) in the same field than ( but no multiple () # todo
+                    idx2 = d[i][idx1:].find(end)
+                    if idx2 == -1 :
+                        #~ print("idx2: %s" % idx2)
+                        nIdxStart = i
+            else:
+                if end in d[i]: # todo: multi ()
+                    j = nIdxStart +1
+                    for k in range(i-nIdxStart):
+                        d[nIdxStart] += ',' + d[nIdxStart+1]
+                        del d[nIdxStart+1]
+                    i = nIdxStart # fait reculer le pointeur pour que le +1 l'envoie sur le prochain
+                    if i > 0: i -=1 # repasse celui ci car il peut aussi contenir un ( apres le ) qui a fermer
+                    nIdxStart = -1
+            i += 1
+        # while - end
+        if bVerbose: print("DBG: pasteOnChar: d2:" + str(d))
+        if 0:
+            # debug specific
+            if len(d) == 12:
+                print("DBG: pasteOnChar: breaking on 12")
+                break
+    return datas
+# pasteOnChar - end
+    
     
 def autotestXlsx():
     timeBeginXls = time.time()
@@ -312,6 +383,18 @@ def autotestXlsx():
 
     
 def autotest():
+    a = [[ "bobo","les animaux (chat", "rat", "poule) sont heureux." ,"youpi" ]]
+    out = [[ "bobo", "les animaux (chat,rat,poule) sont heureux." ,"youpi" ]]
+    out2 = pasteOnChar(a)
+    print(out2)
+    assert( out2 == out )
+    
+    a = [['2022/05/24: 05h27m36s', 'obo-world', 'www.obo-world.com', '', 'Mozilla/5.0 (Linux', ' Android 6.0.1', ' Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.64 Mobile Safari/537.36 (compatible', ' Googlebot/2.1', ' +http://www.google.com/bot.html)', '192.168.0.11']]
+    out = [['2022/05/24: 05h27m36s', 'obo-world', 'www.obo-world.com', '', 'Mozilla/5.0 (Linux, Android 6.0.1, Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.64 Mobile Safari/537.36 (compatible, Googlebot/2.1, +http://www.google.com/bot.html)', '192.168.0.11']]
+    out2 = pasteOnChar(a)
+    print(out2)
+    assert( out2 == out )
+    
     loadmethods = [load_csv,load_csv_multiline]
     loadmethods = [load_csv_multiline]
     for loadmethod in loadmethods:

@@ -67,7 +67,7 @@ def printGuitarTunerStyle(max_freq,closest_note,closest_pitch):
     print infos like a guitar tuner
     """
     ref = guitar_notes_freqs
-    ref = cello_notes_freqs
+    #~ ref = cello_notes_freqs
     rDiff = max_freq-closest_pitch
     strSymbol = '?'
     strStringNum = '? '
@@ -90,9 +90,26 @@ def printGuitarTunerStyle(max_freq,closest_note,closest_pitch):
         strStringNum = str(ref[closest_note][0])
     else:
         pass
-    print("%s: str%s %s (%.1fHz / %.1fHz)" % (closest_note, strStringNum, strSymbol,max_freq,closest_pitch))
+    print("%s: str%s %s (%.1fHz / %.1fHz) " % (closest_note, strStringNum, strSymbol,max_freq,closest_pitch,),end="")
 
+    if 1:
+        # test half:
+        half = max_freq/2.
+        print("[half: %.1fHz" % half, end="")
+        closest_note_half, closest_pitch_half = find_closest_note(half)
+        if closest_note_half in ref:
+            strStringNumHalf = str(ref[closest_note_half][0])
+            print(" / %.1fHz, %s: str%s" % (closest_pitch_half, closest_note_half, strStringNumHalf), end="" )
+        print("]",end="")
         
+            
+
+    if strStringNum == '? ':
+        print("\t\t\tref: ", end="")
+        for r in ref:
+            print("%d: %.1fHz, " % ref[r],end="")
+            
+    print("")
     
     
 
@@ -159,6 +176,7 @@ def callback(indata, frames, time, status):
     max_freq = max_ind * (SAMPLE_FREQ/WINDOW_SIZE) / NUM_HPS
 
     closest_note, closest_pitch = find_closest_note(max_freq)
+
     max_freq = round(max_freq, 1)
     closest_pitch = round(closest_pitch, 1)
 

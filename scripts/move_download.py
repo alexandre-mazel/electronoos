@@ -8,38 +8,48 @@ import misctools
 global_strPassword = misctools.getEnv("PUBLAC_PWD")
 #~ print("DBG: using passwd: '%s'" % global_strPassword )
 
-def transfer( path, filename ):
+def transfer( path, filename, extra_remove_folder = "" ):
+    """
+    extra_remove_folder: specify another path on the remote computer
+    """
     global global_strPassword
     if not os.path.isfile("c:\exe\pscp.exe"):
         print("ERR: pscp not present")
         return False
     src = path + filename
     # echo y |  scp ... will say yes in a new computer asking for a key update
-    ret = os.system("echo y | c:\exe\pscp -pw %s \"%s\" publac@robot-enhanced-education.org:/home/publac/received/" % (global_strPassword,src))
+    ret = os.system("echo y | c:\exe\pscp -pw %s \"%s\" publac@robot-enhanced-education.org:/home/publac/received/%s" % (global_strPassword,src,extra_remove_folder))
     return ret==0
 
-def move_download(strPath = ""):
+def move_download(strDownloadPath = "", strSpecificFolder = ""):
     """
     move all files from download folder to another computer.
+    - strSpecificFolder: copy file from and into a specific folder, eg: "lki/"
     """
     bVerbose = 1
     bVerbose = 0
     
-    if strPath == "":
-        #~ strPath = os.getlogin()
-        strPath = os.environ['USERPROFILE']
-        strPath += os.sep + "Downloads" + os.sep
+    if strDownloadPath == "":
+        #~ strDownloadPath = os.getlogin()
+        strDownloadPath = os.environ['USERPROFILE']
+        strDownloadPath += os.sep + "Downloads" + os.sep
         
-    print("INF: move_download: strPath: '%s'" % strPath )
+    print("INF: move_download: strDownloadPath: '%s'" % strDownloadPath )
+    print("INF: move_download: strSpecificFolder: '%s'" % strSpecificFolder )
     
-    listFiles = os.listdir(strPath)    
-    listFiles = sorted(listFiles, key=lambda x: os.path.getmtime(strPath+x),reverse=True)
+    strDownloadPath += strSpecificFolder
+    
+    listFiles = os.listdir(strDownloadPath)    
+    listFiles = sorted(listFiles, key=lambda x: os.path.getmtime(strDownloadPath+x),reverse=True)
     
     for f in listFiles:
         body,ext = os.path.splitext(f)
-        if ext not in [".pdf", ".doc", ".docx", ".jpg"]:
+        extWanted = [".pdf", ".doc", ".docx", ".jpg"]
+        if "lki" in strSpecificFolder:
+            extWanted.extend([".txt"])
+        if ext not in extWanted:
             continue
-        absf = strPath + f
+        absf = strDownloadPath + f
         modtime = os.path.getmtime(absf)
         age = time.time() - modtime
         if age < 60:
@@ -58,10 +68,10 @@ def move_download(strPath = ""):
             continue
             
         print("INF: move_download: moving age %.1fs: '%s'" % (age,ascii(f)))
-        bSuccess = transfer(strPath,f)
+        bSuccess = transfer(strDownloadPath,f,strSpecificFolder)
         print("INF: success: %s" % bSuccess )
         if bSuccess:
-            dst = strPath + os.sep + "moved_files" + os.sep
+            dst = strDownloadPath + os.sep + "moved_files" + os.sep
             try: os.makedirs(dst)
             except FileExistsError as err: pass
             try: 
@@ -78,11 +88,12 @@ def move_download(strPath = ""):
 
 def loop_move_download():
     while 1:
-        move_download()        
+        move_download()
+        move_download("","lki/")
         time.sleep(60*1)
     
 
-#~ ret = os.system("c:\exe\pscp -pw puba32puc c:/tmp/a.txt publac@robot-enhanced-education.org:/home/publac/")
+#~ ret = os.system("c:\exe\pscp -pw ??? c:/tmp/a.txt publac@robot-enhanced-education.org:/home/publac/")
 #~ print("ret: %s" % ret )
 #~ if ret == 0:
     #~ print("Success !!!" )

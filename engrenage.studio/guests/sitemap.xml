@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+   <url>
+      <loc>http://engrenage.studio/guests/index.html</loc>
+      <lastmod>2021-01-26</lastmod>
+      <changefreq>yearly</changefreq>
+   </url>
+
+   <url>
+      <loc>http://engrenage.studio/guests/cv_fadila.pdf</loc>
+      <lastmod>2021-01-26</lastmod>
+      <changefreq>yearly</changefreq>
+   </url>
+
+   <url>
+      <loc>http://engrenage.studio/guests/cv_alexandre.pdf</loc>
+      <lastmod>2021-01-26</lastmod>
+      <changefreq>yearly</changefreq>
+   </url>
+
+</urlset>

@@ -7,7 +7,5 @@
     <Dialogs />
     <Resources />
     <Topics />
-    <IgnoredPaths>
-        <Path src=".metadata" />
-    </IgnoredPaths>
+    <IgnoredPaths />
 </Package>

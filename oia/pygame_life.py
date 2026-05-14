@@ -1,3 +1,5 @@
+# jeu de la vie en pygame
+# 2021 A.Mazel
 import copy
 import pygame
 

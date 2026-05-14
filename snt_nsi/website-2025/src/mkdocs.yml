@@ -1,0 +1,174 @@
+# Informations générales
+site_name: Lycée Claude BERNARD - TP de NSI-SNT 2025 - A.Mazel
+site_url: https://www.mulot-nsi.fr
+site_author: Yannick Mulot & Alexandre Mazel
+
+# Arborescence de navigation
+nav:
+  - Accueil: index.md
+  - SNT:
+      - snt/index.md
+      - Tutoriels:
+          - L'ordinateur de la région: snt/tutoriels/ordinateur.md
+          - Windows: snt/tutoriels/windows.md
+          - Saisie de texte: snt/tutoriels/saisie-de-texte.md
+          - ENT: snt/tutoriels/ent.md
+          - Faire des diapositives pour un exposé: snt/tutoriels/diapos.md
+          #~ - Python: snt/tutoriels/python.md
+          - FAQ (windows): snt/tutoriels/faq.md
+      - Chapitre 1 - Internet:
+          - snt/01-internet/index.md
+          - TP1 - Naissance d'Internet: snt/01-internet/tp1-naissance-internet.md
+          - TP2 - Simulation d'un réseau: snt/01-internet/tp2-simulation-reseau.md
+          - TP3 - Moteurs de recherche sur internet (pas fini): snt/01-internet/tp3-moteurs_de_recherche.md
+      - Chapitre 2 - Le Web:
+          - TP1 - Langage HTML: snt/02-web/tp1-langage-html.md
+          - TP2 - Langage CSS: snt/02-web/tp2-langage-css.md
+          - TP3 - Confidentialité: snt/02-web/tp3-confidentialite.md
+          #~ - Projet - Minisite web: snt/02-web/prj-minisite.md
+      - Chapitre 3 - Les réseaux sociaux:
+          - TP1 - Modélisation: snt/03-reseaux-sociaux/tp1-modelisation.md
+          - TP2 - Identité numérique et cyber-violence: snt/03-reseaux-sociaux/tp2_identite_numerique_et_cyberviolence.md
+      - Chapitre 4 - Donn&eacute;es et traitements:
+          - TP1 - Turtle en Python: snt/04-processing/tp1_python_turtle.md
+          - TP2 - Turtle en Python - Utilisation de boucles et fonctions: snt/04-processing/tp2_python_turtle2.md
+          - TP3 - Compute IT! - Python c'est vous: snt/04-processing/tp3_python_compute_it.md
+  
+      #~ - Chapitre 4 - Les données structurées:
+          #~ - TP1 - Données ouvertes: snt/04-donnees-structurees/tp1-donnees-ouvertes.md
+          #~ - TP2 - Les métadonnées:  snt/04-donnees-structurees/tp2-metadonnees.md
+          #~ - TP3 - Stockage sur le Cloud: snt/04-donnees-structurees/tp-stockage-cloud.md
+      - Chapitre 5 - Photographie numérique:
+          - TP1 - Manipulation d'une image: snt/05-photographie-numerique/tp1-manipulation-image_capytale.md
+          #~ - TP1 - Manipulation d'une image: snt/05-photographie-numerique/tp1-manipulation-image.md
+          #~ - TP2 - Retouche d'une image: snt/05-photographie-numerique/tp-retouche-image.md
+      #~ - Chapitre 6 - Cartographie:
+          #~ - TP1 - Cartes numériques: snt/06-cartographie/tp1-cartes-numeriques.md
+  - NSI 1RE:
+      - nsi1re/index.md
+      - Chapitre 5 - Architecture:
+          - TP1 - Architecture d'un ordinateur : nsi1re/05-archi/tp1-compos_ordi.md
+      #~ - Chapitre 1 - Langages du Web:
+          #~ - TP1 - Création d'une page web: nsi1re/01-langages-web/tp1-creation-page-web.md
+      #~ - Chapitre 2 - Architecture des ordinateurs:
+          #~ - TP1 - Interpréteur de commandes: nsi1re/02-ordinateurs/tp1-cli.md
+      #~ - Chapitre 3 - Bases de la programmation:
+          #~ - TP1 - Mode interactif: nsi1re/03-bases-programmation/tp1-python-mode-interactif.md
+          #~ - TP2 - Mode script: nsi1re/03-bases-programmation/tp2-python-mode-script.md
+          #~ - TP3 - Module Turtle: nsi1re/03-bases-programmation/tp3-turtle.md
+      #~ - Chapitre 4 - Les fonctions:
+          #~ - TP1 - Décomposition : nsi1re/04-fonctions/tp1-decompostion-en-sous-problemes.md
+          #~ - TP2 - Programmation défensive : nsi1re/04-fonctions/tp2-programmation-defensive.md
+          #~ - Remédiation : nsi1re/04-fonctions/remediation.md
+      #~ - Chapitre 6 - Les tableaux:
+          #~ - TP1 - Tableaux : nsi1re/06-tableaux/tp1-tableaux.md
+          #~ - TP2 - Tableaux 2D : nsi1re/06-tableaux/tp2-tableaux-2d.md
+      #~ - Chapitre 7 - Logique booléenne:
+          #~ - TP1 - Circuits combinatoires: nsi1re/07-logique-boolenne/tp1-circuits-combinatoires.md
+      #~ - Chapitre 11 - Les dictionnaires:
+          #~ - TP1 - Les données EXIF: nsi1re/11-dictionnaires/tp1-donnees-exif.md
+          #~ - TP2 - Compteur de mots: nsi1re/11-dictionnaires/tp2-compteur-mots.md
+          #~ - TP3 - Format JSON: nsi1re/11-dictionnaires/tp3-format-json.md
+      - Chapitre 8 - Languages:
+          - TP1 - Assembleur: nsi1re/08-languages/tp1-assembleur1.md
+      - Chapitre 12 - Données en table:
+          #~ - Cours: nsi1re/12-tables/cours.md
+          - Fichiers CSV: nsi1re/12-tables/csv.md
+      #~ - Chapitre 14 - Le Web:
+          #~ - Installation de PHP: nsi1re/14-web/langage-php.md
+          #~ - TP1 - Formulaire HTML: nsi1re/14-web/tp1-formulaire-html.md
+          #~ - TP2 - Tkinter: nsi1re/14-web/tp2-tkinter.md
+      #~ - Projets:
+          #~ - Projet 1 - Présentez-vous: nsi1re/projets/prj-presentez-vous.md
+          #~ - Projet 2 - Paysage aléatoire: nsi1re/projets/prj-paysage.md
+          #~ - Projet 3 - Tableau 2D: nsi1re/projets/prj-tableau-2d.md
+          
+      - Extras:
+          - Initiation à pygame: nsi1re/0X-extras/01_initiation_pygame.md
+#~ not_in_nav: |
+  #~ snt/02-web/prj-minisite-faq.md
+  
+
+
+# Configuration du thème
+theme:
+  name: material
+  favicon: images/favicon.png
+  logo: assets/book2.png
+  language: fr
+  features:
+    - content.code.annotate
+    - content.code.copy
+    - navigation.footer
+    - navigation.indexes
+    # - navigation.sections
+    - navigation.tabs
+    - navigation.top
+    # - navigation.instant
+  font:
+    text: Roboto
+  palette:
+    - scheme: default
+      primary: indigo # change default color # as seen on https://squidfunk.github.io/mkdocs-material/setup/changing-the-colors/
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - scheme: slate
+      primary: indigo # change default color
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+      
+# Plugins
+plugins:
+  - minify:
+      minify_html: true
+  - search
+
+# Extensions Markdown
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - md_in_html
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys:
+      key_map:
+        shift: Maj
+        control: Ctrl
+        option: Opti
+        up: Haut
+        space: Espace
+        enter: Entrée
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      toc_depth: 3
+      
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+
+extra_javascript:
+  - assets/js/katex.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js
+
+extra_css:
+  - assets/css/style.css
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css

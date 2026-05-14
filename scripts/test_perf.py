@@ -30,9 +30,12 @@ def getFreeDiskSpace():
         s = os.statvfs('/')
         nSize = (s.f_bavail * s.f_frsize)
         return nSize
-    import psutil # pip install psutil
-    usa = psutil.disk_usage('/')
-    return usa.free
+    try:
+        import psutil # pip install psutil
+        usa = psutil.disk_usage('/')
+        return usa.free
+    except ImportError as err: pass
+    return -1
 
 
 class FlushableFile:
@@ -162,6 +165,27 @@ def test_cpu_float( bPrint = True ):
     return rDuration;
 #test_cpu_float - end
 
+def test_crypt( bPrint = True ):
+    try:
+        import bcrypt
+    except:
+        if bPrint: print( "bcrypt        : not found")
+        return 0
+        
+    if bPrint: sys.stdout.write( "test_crypt       : " )
+    timeBegin = time.time();
+    x = 18.2
+    for i in range( 20 ):
+        password = "cazaekncecd".encode()
+        salt ="$2b$12$DTK1eFh7Xf5IJcHwDjy7x.".encode()
+        bcrypt.hashpw(password,salt)
+        if bPrint: sys.stdout.write( "#" );
+        if bPrint: sys.stdout.flush();
+    rDuration = time.time() - timeBegin;
+    if bPrint: print("%7.2fs" % rDuration);
+    return rDuration;
+#test_crypt - end
+
 def test_ram( sizeGB = 1, bPrint = True ):
     try:
         import numpy
@@ -246,7 +270,7 @@ def test_opencv_orb( bPrint = True ):
     try:
         import cv2
     except:
-        if bPrint: print( "opencv (orb)      : not found")
+        if bPrint: print( "opencv (for orb)      : not found")
         return 0
         
     import math
@@ -258,7 +282,7 @@ def test_opencv_orb( bPrint = True ):
     img = numpy.zeros((h,w,1), numpy.uint8)
     for j in range(h):
         for i in range(w):
-            img[j,i,0] = math.sin(w*h)*1000
+            img[j,i,0] = (math.sin(w*h)*1000) % 256
     
     timeBegin = time.time();
     for i in range(20):
@@ -307,7 +331,7 @@ def test_opencv_orb_realcase( bPrint = True ):
     img = numpy.zeros((h,w,1), numpy.uint8)
     for j in range(h):
         for i in range(w):
-            img[j,i,0] = math.sin(w*h)*1000
+            img[j,i,0] = (math.sin(w*h)*1000)% 256
     
     try:
         img1 = cv2.imread( "test_perf_vga_01.png" )
@@ -412,7 +436,7 @@ def test_multithreading():
         sys.stdout.write( "multiprocess x%-2d:" % nNbrProcessInParalell  )    
         bFirstInLine = True
         all_process = []
-        for func_to_test in (test_cpu_int,test_cpu_float,test_ram,test_numpy,test_opencv_orb,test_opencv_orb_realcase,test_opencv_orb_realcase):
+        for func_to_test in (test_cpu_int,test_cpu_float,test_crypt, test_numpy,test_opencv_orb,test_opencv_orb_realcase,test_opencv_orb_realcase):
             if not bFirstInLine: sys.stdout.write(" /" )
             bFirstInLine = False
             timeBegin = time.time()        
@@ -436,8 +460,9 @@ def test_perf(nDiskTestSizeMB=200,bTestMultiThreading=True):
     print_cpu()
     print_ram()
     rTotalTime = 0;
-    #~ rTotalTime += test_cpu_int();
-    #~ rTotalTime += test_cpu_float();
+    rTotalTime += test_cpu_int();
+    rTotalTime += test_cpu_float();
+    rTotalTime += test_crypt();
     rTotalTime += test_ram(2);
     rTotalTime += test_ram(4);
     rTotalTime += test_ram(6);
@@ -579,7 +604,7 @@ test_disk_write: #################### 562.11s ( 6.79 Mo/s)
 test_disk_read : #################### 123.60s (30.86 Mo/s)
 
 
-D:\>python c:test_perf.py
+D:/>python c:test_perf.py
 INF: Due to low empty disk space, reducing disk test size to 439 MB
 python version : 3.8.2 (32bits) (4 core(s))
 test_cpu_int2    : ####################   1.06s
@@ -665,18 +690,7 @@ pi@rasp3thermal:~ $ python test_perf.py
 python version   : 2.7.16 (32bits) (4 core(s))
 test_cpu_int2    : ####################   5.60s
 test_cpu_float2  : ####################   0.94s
-scipy.fftpack    : not found
-^C^C^Copencv  : not found
-test_orbcv imgs  : test_perf_vga_*.png: not found
-^Ctest_orbcv bis   : Traceback (most recent call last):
-  File "test_perf.py", line 379, in <module>
-    test_perf(nDiskTestSizeMB=nDiskTestSizeMB);
-  File "test_perf.py", line 356, in test_perf
-    rTotalTime += test_opencv_orb_realcase(); # because on some computer the previous one takes time initialise stuffs
-  File "test_perf.py", line 224, in test_opencv_orb_realcase
-    img[j,i,0] = math.sin(w*h)*1000
-KeyboardInterrupt
-^C
+
 pi@rasp3thermal:~ $ python3 test_perf.py
 python version   : 3.7.3 (32bits) (4 core(s))
 test_cpu_int2    : ####################   5.59s
@@ -902,6 +916,7 @@ python version   : 3.7.3 (32bits) (4 core(s))
 cpu              : ARMv7 Processor rev 3 (v7l)
 test_cpu_int2    : ####################   1.73s
 test_cpu_float2  : ####################   0.26s
+test_crypt       : ####################  11.91s
 test_scipy_xxt   : ####################   7.41s (53.96x)
 test_orb4.6.0    : ####################   1.60s (62.38fps)
 test_orbcv imgs  : ####################   6.03s (16.57fps)
@@ -968,6 +983,41 @@ disk_read     1KB: ####################  28.29s (35.35 Mo/s)
 disk_write 1024KB: #################### 305.95s ( 3.27 Mo/s)
 disk_read  1024KB: ####################  22.97s (43.54 Mo/s)
 pi@thenardier:~/dev/git/electronoos/scripts $
+
+*** RPI4 ***
+(recomputed)
+
+
+*** RPI5 ***
+
+python version   : 3.11.2 (64bits) (4 core(s))
+cpu              : Raspberry Pi 5 Model B Rev 1.0
+ram              : 7.36 / 7.86 GB
+test_cpu_int2    : ####################   0.40s
+test_cpu_float2  : ####################   0.08s
+test_crypt       : ####################   6.65s
+test_cpu_ram 2G  : ####################   0.68s
+test_cpu_ram 4G  : ####################   1.37s
+test_cpu_ram 6G  : ####################   2.04s
+test_cpu_ram 8G  : ####################   2.74s
+test_cpu_ram10G  : ####################   3.43s
+test_cpu_ram12G  : ####################   4.11s
+test_cpu_ram14G  : ####################   5.86s
+test_cpu_ram16G  :  Memory Error...
+test_scipy_xxt   : ####################   3.20s (124.89x)
+test_orb4.6.0    : ####################   0.27s (365.58fps)
+test_orbcv imgs  : ####################   1.28s (78.07fps)
+test_orbcv bis   : ####################   1.28s (78.15xfps)
+multiprocess x1 :  0.42s /  0.09s /  3.21s /  0.47s /  1.59s /  1.59s =>    7.36s (per thread:7.36s)
+multiprocess x4 :  0.43s /  0.11s / 13.81s /  0.72s /  2.09s /  2.09s =>   26.60s (per thread:6.65s)
+multiprocess x8 :  0.85s /  0.20s / 27.95s /  1.44s /  4.26s /  4.55s =>   65.84s (per thread:8.23s)
+multiprocess x32:  3.97s /  0.89s /111.97s /  6.66s / 20.86s / 21.01s =>  231.21s (per thread:7.23s)
+disk_write    1KB: ####################  16.24s (61.59 Mo/s)
+disk_read     1KB: ####################  12.49s (80.09 Mo/s)
+disk_write 1024KB: ####################  15.98s (62.58 Mo/s)
+disk_read  1024KB: ####################  10.63s (94.11 Mo/s)
+
+
 
 
 
@@ -1152,6 +1202,7 @@ python version   : 3.9.5 (64bits) (8 core(s))
 cpu              : Intel(R) Core(TM) i7-1065G7 CPU @ 1.30GHz
 test_cpu_int2    : ####################   0.62s
 test_cpu_float2  : ####################   0.09s
+test_crypt       : ####################   7.89s
 test_scipy_xxt   : ####################   1.06s (377.83x)
 test_orb4.5.2    : ####################   0.27s (373.96fps)
 test_orbcv imgs  : ####################   1.25s (80.10fps)
@@ -1168,6 +1219,9 @@ python version   : 3.9.5 (64bits) (8 core(s))
 cpu              : Intel(R) Core(TM) i7-1065G7 CPU @ 1.30GHz
 ram              : 11.02 / 15.60 GB
 ram              : 10.73 / 15.60 GB
+test_cpu_int2    : ####################   0.46s
+test_cpu_float2  : ####################   0.07s
+test_crypt       : ####################   5.68s
 test_cpu_ram 2G  : ####################   0.37s
 test_cpu_ram 4G  : ####################   0.65s
 test_cpu_ram 6G  : ####################   0.94s
@@ -1176,8 +1230,6 @@ test_cpu_ram10G  : ####################   2.29s
 test_cpu_ram12G  : ####################   3.77s
 test_cpu_ram14G  : ####################   5.76s
 test_cpu_ram16G  : ####################   7.93s  # require some of empty spaces (for swap)
-test_cpu_int2    : ####################   0.46s
-test_cpu_float2  : ####################   0.07s
 test_scipy_xxt   : ####################   0.89s (449.65x)
 test_orb4.5.2    : ####################   0.20s (490.18fps)
 test_orbcv imgs  : ####################   1.10s (91.16fps)
@@ -1188,31 +1240,56 @@ disk_write 1024KB: ####################   4.75s (210.67 Mo/s)
 disk_read  1024KB: ####################   0.27s (3640.21 Mo/s)
 
 
+# same 23/10/2023 after fresh reboot
+
+python version   : 3.9.5 (64bits) (8 core(s))
+cpu              : Intel(R) Core(TM) i7-1065G7 CPU @ 1.30GHz
+ram              : 11.96 / 15.60 GB
+test_cpu_int2    : ####################   0.42s
+test_cpu_float2  : ####################   0.06s
+test_cpu_ram 2G  : ####################   0.36s
+test_cpu_ram 4G  : ####################   0.68s
+test_cpu_ram 6G  : ####################   0.95s
+test_cpu_ram 8G  : ####################   1.23s
+test_cpu_ram10G  : ####################   1.77s
+test_cpu_ram12G  : ####################   1.91s
+test_cpu_ram14G  : ####################   4.43s
+test_cpu_ram16G  : ####################   6.93s
+test_scipy_xxt   : ####################   0.85s (468.08x)
+test_orb4.5.5    : ####################   0.27s (376.54fps)
+test_orbcv imgs  : ####################   0.90s (110.98fps)
+test_orbcv bis   : ####################   0.64s (157.29fps)
+disk_write    1KB: ####################   9.46s (105.73 Mo/s)
+disk_read     1KB: ####################   5.77s (173.38 Mo/s)
+disk_write 1024KB: ####################   4.76s (210.16 Mo/s)
+disk_read  1024KB: ####################   0.33s (3047.28 Mo/s)
+
+
 comparison test writing on ms tab 4:
 
 new sandisk fit mini usb 128Go sur port usb
-E:\>python c:test_perf.py 1000
+E:/>python c:test_perf.py 1000
 disk_write    1KB: ####################  19.55s (51.16 Mo/s)
 disk_read     1KB: ####################   3.59s (278.21 Mo/s)
 disk_write 1024KB: ####################  20.55s (48.66 Mo/s)
 disk_read  1024KB: ####################   0.67s (1488.13 Mo/s)
 
 microsd nintendo switch 128 avec adapteur usb de Sophie
-E:\>python c:test_perf.py 1000
+E:/>python c:test_perf.py 1000
 disk_write    1KB: ####################  72.02s (13.89 Mo/s)
 disk_read     1KB: ####################   3.81s (262.24 Mo/s)
 disk_write 1024KB: ####################  72.97s (13.70 Mo/s)
 disk_read  1024KB: ####################   0.47s (2133.94 Mo/s)
 
 microsd nintendo switch 128 dans slot microsd
-D:\>python c:test_perf.py 1000
+D:/>python c:test_perf.py 1000
 disk_write    1KB: ####################  16.71s (59.85 Mo/s)
 disk_read     1KB: ####################   3.34s (298.99 Mo/s)
 disk_write 1024KB: ####################  16.58s (60.31 Mo/s)
 disk_read  1024KB: ####################   0.44s (2283.54 Mo/s)
 
 microsd sandisk extreme 256 (celle de ms tab) dans slot microsd
-D:\>python c:test_perf.py 1000
+D:/>python c:test_perf.py 1000
 disk_write    1KB: ####################  17.18s (58.22 Mo/s)
 disk_read     1KB: ####################   3.38s (296.26 Mo/s)
 disk_write 1024KB: ####################  16.47s (60.70 Mo/s)
@@ -1248,6 +1325,23 @@ disk_write    1KB: ####################  58.17s (68.76 Mo/s)
 disk_read     1KB: ####################  12.23s (327.03 Mo/s)
 disk_write 1024KB: ####################  60.98s (65.59 Mo/s)
 disk_read  1024KB: ####################   1.47s (2718.76 Mo/s)
+
+microsd Sandisk Extreme Pro 256 dans slot microsd:
+disk_write    1KB: ####################  17.76s (56.32 Mo/s)
+disk_read     1KB: ####################   3.38s (295.91 Mo/s)
+disk_write 1024KB: ####################  15.08s (66.32 Mo/s)
+disk_read  1024KB: ####################   0.38s (2660.04 Mo/s)
+sur 4000MB:
+disk_write    1KB: ####################  59.47s (67.26 Mo/s)
+disk_read     1KB: ####################  12.91s (309.82 Mo/s)
+disk_write 1024KB: ####################  61.63s (64.90 Mo/s)
+disk_read  1024KB: ####################   1.35s (2973.70 Mo/s)
+
+new sandisk fit mini usb 256Go sur port usb (depuis anyplus c'est kifkif):
+disk_write    1KB: ####################  16.45s (60.78 Mo/s)
+disk_read     1KB: ####################   3.20s (312.69 Mo/s)
+disk_write 1024KB: ####################   9.80s (102.09 Mo/s)
+disk_read  1024KB: ####################   0.35s (2830.65 Mo/s)
 
 
 Sandisk Ultra 1To sur lecteur USB
@@ -1307,6 +1401,7 @@ disk_read  1024KB: ####################   1.36s (2951.93 Mo/s)
 
 
 
+
 *** Dell kakashi Corto/Elsa (si sur batterie, mettre sur mode perf elevée):
 windows disk size 5000
 python version   : 3.10.4 (64bits) (16 core(s))
@@ -1321,6 +1416,7 @@ disk_write    1KB: ####################   19.43s (235 Mo/s)
 disk_read     1KB: ####################   17.74s (281 Mo/s)
 disk_write 1024KB: ####################   3.31s (1375 Mo/s)
 disk_read  1024KB: ####################   1.23s (4078 Mo/s)
+
 
 *** don de concept: gros
 C:\dev\git\electronoos\scripts>python test_perf.py
@@ -1350,4 +1446,141 @@ disk_write    1KB: ####################  24.98s (40.03 Mo/s)
 disk_read     1KB: ####################   8.25s (121.24 Mo/s)
 disk_write 1024KB: ####################  17.95s (55.71 Mo/s)
 disk_read  1024KB: ####################   0.33s (3049.87 Mo/s)
+
+*** don de la region petit ordi de Corto
+python version   : 3.12.0 (64bits) (2 core(s))
+cpu              : Intel(R) Celeron(R) N5100 @ 1.10GHz
+test_cpu_int2    : ####################   0.71s
+test_cpu_float2  : ####################   0.13s
+test_cpu_ram 2G  : ####################   0.47s
+test_cpu_ram 4G  : ####################   0.98s
+test_cpu_ram 6G  : ####################   2.57s
+test_cpu_ram 8G  : ####################   3.79s
+test_cpu_ram10G  : ####################   5.35s
+test_cpu_ram12G  : ####################   7.00s
+test_cpu_ram14G  : ####################   10.51s
+test_cpu_ram16G  : ####################   12.65s
+disk_read     1KB: ####################   7.00s (142.92 Mo/s)
+disk_read  1024KB: ####################   1.38s (726.17 Mo/s)
+
+
+
+
+*** ExoScale instance Standard - Large
+
+ubuntu@VM-ef8b3a4e-a4fe-4560-9021-74a52faa6357:~/dev/git/electronoos/scripts$ python3 test_perf.py
+python version   : 3.10.12 (64bits) (4 core(s))
+cpu              : Intel Xeon Processor (Skylake)
+ram              : 7.24 / 7.75 GB
+test_cpu_int2    : ####################   0.35s
+test_cpu_float2  : ####################   0.08s
+test_crypt       : ####################   5.26s
+test_cpu_ram 2G  : ####################   1.20s
+test_cpu_ram 4G  : ####################   2.21s
+test_cpu_ram 6G  : ####################   3.65s
+test_cpu_ram 8G  : ####################   4.88s
+test_cpu_ram10G  : ####################   6.13s
+test_cpu_ram12G  : ####################   7.44s
+test_cpu_ram14G  : ####################   8.59s
+test_cpu_ram16G  :  Memory Error...
+test_scipy_xxt   : ####################   1.02s (393.63x)
+test_orb4.6.0    : ####################   0.18s (566.20fps)
+test_orbcv imgs  : ####################   0.66s (151.02fps)
+test_orbcv bis   : ####################   0.61s (164.29fps)
+multiprocess x1 :  0.39s /  0.12s /  5.26s /  1.13s /  0.01s /  0.01s /  0.01s =>    6.93s (per thread:6.93s)
+multiprocess x4 :  0.40s /  0.12s /  5.30s /  1.34s /  0.02s /  0.02s /  0.01s =>   14.13s (per thread:3.53s)
+multiprocess x8 :  0.76s /  0.29s / 10.56s /  2.59s /  0.02s /  0.02s /  0.02s =>   28.40s (per thread:3.55s)
+multiprocess x32:  2.97s /  0.84s / 42.23s / 10.87s /  0.08s /  0.08s /  0.08s =>   85.55s (per thread:2.67s)
+disk_write    1KB: ####################   5.11s (195.62 Mo/s)
+disk_read     1KB: ####################   1.71s (585.41 Mo/s)
+disk_write 1024KB: ####################   2.85s (350.36 Mo/s)
+disk_read  1024KB: ####################   0.74s (1359.73 Mo/s)
+
+
+*** Azure Server1 - "8 cores" 16 GB
+na@Server1:~/dev/git/electronoos/scripts$ python3 test_perf.py
+python version   : 3.12.3 (64bits) (4 core(s))
+cpu              : Intel(R) Xeon(R) Platinum 8272CL CPU @ 2.60GHz
+ram              : 12.34 / 15.57 GB
+test_cpu_int2    : ####################   0.63s
+test_cpu_float2  : ####################   0.08s
+test_crypt       : ####################   5.36s
+test_cpu_ram 2G  : ####################   0.32s
+test_cpu_ram 4G  : ####################   0.64s
+test_cpu_ram 6G  : ####################   0.96s
+test_cpu_ram 8G  : ####################   1.28s
+test_cpu_ram10G  : ####################   1.59s
+test_cpu_ram12G  : ####################   1.91s
+test_cpu_ram14G  : ####################   2.23s
+test_cpu_ram16G  : ####################   2.55s
+test_scipy_xxt   : ####################   1.00s (401.42x)
+test_orb4.6.0    : ####################   0.17s (596.29fps)
+test_orbcv imgs  : ####################   0.66s (152.03fps)
+test_orbcv bis   : ####################   0.65s (152.85fps)
+multiprocess x1 :  0.63s /  0.09s /  5.37s /  1.00s /  0.28s /  0.78s /  0.78s =>    8.92s (per thread:8.92s)
+multiprocess x4 :  1.33s /  0.18s /  5.87s /  1.97s /  0.55s /  1.40s /  1.40s =>   21.61s (per thread:5.40s)
+multiprocess x8 :  2.65s /  0.36s / 11.75s /  4.25s /  1.12s /  2.86s /  2.86s =>   47.46s (per thread:5.93s)
+multiprocess x32: 10.62s /  1.42s / 47.16s / 16.83s /  4.44s / 11.59s / 11.56s =>  151.08s (per thread:4.72s)
+disk_write    1KB: ####################   8.33s (120.02 Mo/s)
+disk_read     1KB: ####################   4.66s (214.56 Mo/s)
+disk_write 1024KB: ####################   7.39s (135.39 Mo/s)
+disk_read  1024KB: ####################   3.79s (263.53 Mo/s)
+
+*** Azure Server2cpu - Standard F4as v6 (4 vcpus, 16 GiB memory) - "8 cores" 16 GB
+INF: Changing disk test size to 5000 MB
+python version   : 3.12.3 (64bits) (4 core(s))
+cpu              : AMD EPYC 9V74 80-Core Processor
+ram              : 15.00 / 15.61 GB
+test_cpu_int2    : ####################   0.30s
+test_cpu_float2  : ####################   0.05s
+test_crypt       : ####################   4.10s
+test_cpu_ram 2G  : ####################   0.08s
+test_cpu_ram 4G  : ####################   0.16s
+test_cpu_ram 6G  : ####################   0.25s
+test_cpu_ram 8G  : ####################   0.33s
+test_cpu_ram10G  : ####################   0.41s
+test_cpu_ram12G  : ####################   0.49s
+test_cpu_ram14G  : ####################   0.56s
+test_cpu_ram16G  : ####################   0.65s
+test_scipy_xxt   : ####################   0.48s (825.25x)
+test_orb4.6.0    : ####################   0.08s (1249.10fps)
+test_orbcv imgs  : ####################   0.32s (313.66fps)
+test_orbcv bis   : ####################   0.32s (315.63fps)
+multiprocess x1 :  0.31s /  0.05s /  4.10s /  0.46s /  0.16s /  0.43s /  0.42s =>    5.93s (per thread:5.93s)
+multiprocess x4 :  0.32s /  0.06s /  4.11s /  0.82s /  0.16s /  0.44s /  0.43s =>   12.27s (per thread:3.07s)
+multiprocess x8 :  0.63s /  0.11s /  8.22s /  1.90s /  0.32s /  0.88s /  0.88s =>   25.21s (per thread:3.15s)
+multiprocess x32:  2.52s /  0.44s / 32.92s /  7.29s /  1.30s /  3.62s /  3.61s =>   76.92s (per thread:2.40s)
+disk_write    1KB: ####################  81.11s (61.65 Mo/s)
+disk_read     1KB: ####################  20.04s (249.44 Mo/s)
+disk_write 1024KB: ####################  49.19s (101.64 Mo/s)
+disk_read  1024KB: ####################   0.80s (6252.09 Mo/s)
+
+
+
+
+*** Ordi gabriel portable gamer
+python version   : 3.13.1 (64bits) (8 core(s))
+cpu              : AMD Ryzen 5 2500U with Radeon Vega Mobile Gfx
+ram             : 11.94 / 14.90 GB
+test_cpu_int2    : ####################   1.03s
+test_cpu_float2  : ####################   0.16s
+test_crypt            : ####################   11.56s
+test_cpu_ram 2G  : ####################   0.67s
+test_cpu_ram 4G  : ####################   1.33s
+test_cpu_ram 6G  : ####################   2.12s
+test_cpu_ram 8G  : ####################   3.13s
+test_cpu_ram10G  : ####################   4.05s
+test_cpu_ram12G  : ####################   6.97s
+test_cpu_ram14G  : ####################   15.05s
+test_cpu_ram16G  : ####################   19.40s
+test_scipy_xxt   : ####################   2.23s (179.55x)
+test_orb4.10.0    : ####################   0.57s (175.56fps)
+test_orbcv imgs  : ####################   3.84s (26.06fps)
+test_orbcv bis   : ####################   1.62s (61.55fps)
+disk_write    1KB: ####################   22.69s (44 Mo/s)
+disk_read     1KB: ####################   19.55s (51 Mo/s)
+disk_write 1024KB: ####################   4.91s (203 Mo/s)
+disk_read  1024KB: ####################   0.67s (1492 Mo/s)
+
+
 """

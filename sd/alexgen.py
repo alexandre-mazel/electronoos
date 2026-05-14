@@ -1,6 +1,6 @@
 import torch # don't forget to use python3
 from torch import autocast
-from diffusers import StableDiffusionPipeline
+from diffusers import StableDiffusionPipeline # pip install transformers==4.19.2 diffusers invisible-watermark
 
 import os
 import cv2

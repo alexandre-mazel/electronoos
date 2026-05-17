@@ -72,7 +72,7 @@ import misctools # for levenshtein
 # Le Mexique est divisé en estados [États], chaque État est ensuite divisé en municipios [similaires aux comtés aux États-Unis], 
 # puis les municipios sont divisés en colonias [similaires aux quartiers aux États-Unis ou aux arrondissements au Royaume-Uni].
 # Certains municipios ruraux ou historiquement ruraux peuvent être divisés en villes ou villages, puis chaque village divisé en barrios au lieu de colonias.
-
+# State > County > Community
 
     
 kCityName = 0 # version sans accent
@@ -187,7 +187,7 @@ class CitiesMex:
         isValidAddress( zip, city ), return (zip,city,confidence) confidence of the right correction.
          
     3: Distance between two city: give two zip, it returns the distance
-        distTwoZip( zip1, zip2 )
+        distTwoZips( zip1, zip2 )
         
     NB: Cities are sorted by population, so all research with many answers will return the biggest city
     """
@@ -297,11 +297,47 @@ class CitiesMex:
 
         
         # manual addings:
+        print( "INF: Manual Addings..." )
+        
+        listCitiesToAdd = [
+            # zip, cityname, State,  County,  Community, strLong, strLat
+            # officiellement c'est 01000, mais d'apres wikipedia, c'est 00–16 !!!
+            ["01000", self.getCapitalName(), "Ciudad de México", "Ciudad de México", "Ciudad de México","-99.133208","19.432608"]
+        ]
+        
+        for c in listCitiesToAdd:
+            strZip, strCity,  strStateName, strCountyName, strCommunityName, strLong, strLat = c
+            strCityAscii = removeAccentSpecificLang(strCity)
+            strStateId = -1
+            strCountyID = -1
+            strCommunityId = -1
+            self.dictCities[id] = ( strCity, strCityAscii, strZip, strStateName, strStateId, strCountyName, strCountyID, strCommunity, strCommunityID, float(strLong), float(strLat) )
+
+            if not strZip in self.dictIdsPerZip:
+                self.dictIdsPerZip[strZip] = []
+            else:
+                print( "WRN: Duplicate id for the same zips: id %s and %s" % (id, self.dictIdsPerZip[strZip][0]) )
+                nDuplicateZip += 1
+            self.dictIdsPerZip[strZip].insert( 0, id ) # CDMX a la prio
+                
+            if not strCityAscii in self.dictIdsPerCityName:
+                    self.dictIdsPerCityName[strCityAscii] = []
+            else:
+                first_id = self.dictIdsPerCityName[strCityAscii][0]
+                if bVerbose: print( "WRN: %s/%s have same cityname than %s/%s" % (strCity,strStateName,self.dictCities[first_id][kCityName],self.dictCities[first_id][kCountyName]) )
+                nDuplicateCityName += 1
+
+            self.dictIdsPerCityName[strCityAscii].append( id )
+            id += 1
+          
                 
         print("INF: CitiesUs: loading city data - end duration: %.2fs" % (time.time()-timeBegin) )
         
         #~ self.computeStats()
     # load - end
+    
+    def getCapitalName( self ):
+        return "Mexico City (CDMX)"
     
     def computeStats( self ):
         lenCity = 0
@@ -362,22 +398,32 @@ class CitiesMex:
             print("WRN: CitiesMex.getCityAndCountyNameById: city with id: '%s' not found..." % id )
             pass
         return "/"
+
+    def getIdByZip( self, zip ):
+        """
+        return if of a city or -1 if not nound
+        """
+        if zip == None:
+            print("WRN: CitiesMex.getIdByZip: called with None => returning -1" )
+            return -1
+            
+        if isinstance(zip, int):
+            zip = "%05d" % zip
+            
+        try:
+            id = self.dictIdsPerZip[zip][0]
+        except KeyError:
+            return -1
+            
+        return id
         
     def findByZip( self, zip, bQuiet = True ):
         """
         return info on a city or None if not nound
         """
-        if zip == None:
-            print("WRN: CitiesMex.findByZip: called with None => returning None" )
-            return None
-            
-        if isinstance(zip, int):
-            zip = "%05d" % zip
-
-            
-        try:
-            id = self.dictIdsPerZip[zip][0]
-        except KeyError:
+        id = self.getIdByZip( zip )
+        if id == -1:
+            print("WRN: CitiesMex.findByZip: zip '%s' not found" % zip )
             return None
             
         return self.dictCities[id]
@@ -391,6 +437,12 @@ class CitiesMex:
         
         if strCityName == "":
             return -1
+           
+    
+        strCityNameCapital = "Mexico City (CDMX)"
+        if strCityName in ["Mexico City", "CDMX", "Mexico"]:
+            strCityName = strCityNameCapital
+            
             
         #~ if self.cacheLastFindByRealName[0] == strCityName and self.cacheLastFindByRealName[1] == bPartOf:
             #~ return self.cacheLastFindByRealName[2]
@@ -485,6 +537,11 @@ class CitiesMex:
         except KeyError:
             return retValNone
             
+        # patch cdmx
+        if zip == "01000":
+            if( strCityName == "CDMX" or strCityName == "Mexico City" ):
+                strCityName = self.getCapitalName()
+            
         strCityName = removeAccentSpecificLang( strCityName )
         if strStateName != None:
             strStateName = removeAccentSpecificLang( strStateName )
@@ -506,6 +563,7 @@ class CitiesMex:
             if dist < dist_min:
                 dist_min = dist
                 id_min = id
+                
         if dist_min < 6:
             length = len(strCityName)
             if strStateName != None:
@@ -517,9 +575,16 @@ class CitiesMex:
         return retValNone
         
         
-    def distTwoCity( self, city1, county1, city2, county2 = None, bApproxSearch=True, bVerbose=False ):
+    def distTwoCities( self, city1, county1, city2, county2 = None, bApproxSearch=True, bVerbose=False ):
         id1 = self.findByName( city1, county1 )
         id2 = self.findByName( city2, county2 )
+        return self.distTwoIds( id1, id2 )
+        
+    def distTwoZips( self, zip1, zip2, bApproxSearch=True, bVerbose=False ):
+        id1 = self.getIdByZip( zip1 )
+        id2 = self.getIdByZip( zip2 )
+        #~ print("id1: '%s'" % id1 )
+        #~ print("id2: '%s'" % id2 )
         return self.distTwoIds( id1, id2 )
 
     def distTwoIds( self, id1, id2 ):
@@ -560,7 +625,56 @@ class CitiesMex:
         txt = city[kZip] + " " + city[kCityNameAscii] + ", " + removeAccentSpecificLang( city[kStateName] )
         return txt       
         
+        
+    def zipToHumanised( self, zip ):
+        city = self.findByZip( zip )
+        if city == None:
+            print("WRN: zipToHumanised city is None for zip '%s'" % zip )
+            return ""
+        strCity = city[3]
+        
+        strOut = "en " + city[kCityName]
+        return strOut
+        
+    def idToZip( self, id ):
+        """
+        take the id of a city and return the first zip
+        """
+        return self.getCityById( id )[kZip]
+        
 #class CitiesMex - end
+
+def generate_js_cities_list(destination_filename):
+    """
+    will generate a big js list, like that with each city, zip, long, lat
+    to the given filename
+    citiesAndDatas=[['Ozan', '01190', 4.91667, 46.3833],['Cormoranche-sur-Sa&ocirc;ne', '01290', 4.83333, 46.2333]
+    """
+    print( "INF: generate_js_cities_list to filename '%s'" % destination_filename )
+    out = ""
+    out += "// automatically generated using script '%s'\n" % ( sys.modules[__name__].__file__ )
+    
+    cities = CitiesMex()
+    cities.load()
+    
+    out += "// it contains %d cities\n" % len(cities.dictCities)
+    
+    out += "citiesAndDatas_MEX=["
+    for k,data in cities.dictCities.items():
+        cityname = data[kCityName]
+        #~ if "\"" in cityname:
+            #~ print("outch")
+        out += '["%s","%s",%.4f,%.4f],' % (cityname,data[kZip],data[kLong],data[kLat])
+    out = out[:-1] # remove last comma
+    out += "];"
+    
+    f = open(destination_filename,"wt", encoding = "utf-8")
+    f.write(out)
+    f.close()
+    
+    print( "INF: generate_js_cities_list to filename '%s' - done" % destination_filename )
+# generate_js_cities_list - end
+    
 
 
 
@@ -586,6 +700,8 @@ def autotest_cities():
     assert_equal( cities.findByZip("06700")[kCountyName], "Cuauhtémoc" )
     assert_equal( cities.findByZip("06700")[kCommunityName], "Distrito Federal" )
     
+    assert_equal( cities.findByZip("01000")[kCityName], "Mexico City (CDMX)" )
+    
     # San Diego la Huerta es una localidad del Estado de México, México. Es parte del municipio de Calimaya. # https://es.wikipedia.org/wiki/San_Diego_la_Huerta
     assert_equal( cities.findByZip("52213")[kCityName], "El Calvario" )  # or San Diego la Huerta
     assert_equal( cities.findByZip("52213")[kStateName], "México" )
@@ -600,8 +716,13 @@ def autotest_cities():
     
     assert_equal( cities.findByName(""), -1 )
     assert_equal( cities.findByName("New York"), -1 )
-    assert_equal( cities.getCityById( cities.findByName("Delegación Política Cuauhtémoc"))[kCityName], "Delegación Política Cuauhtémoc"  )
-    assert_equal( cities.getCityById( cities.findByName("Delegacion Politica Cuauhtemoc"))[kCityName], "Delegación Política Cuauhtémoc"  )
+    assert_equal( cities.getCityById( cities.findByName("Delegación Política Cuauhtémoc"))[kCityName], "Delegación Política Cuauhtémoc" )
+    assert_equal( cities.getCityById( cities.findByName("Delegacion Politica Cuauhtemoc"))[kCityName], "Delegación Política Cuauhtémoc" )
+    assert_equal( cities.getCityById( cities.findByName("Mexico City"))[kCityName], "Mexico City (CDMX)" )
+    assert_equal( cities.getCityById( cities.findByName("CDMX"))[kCityName], "Mexico City (CDMX)" )
+    assert_equal( cities.getCityById( cities.findByName("Mexico City (CDMX)"))[kCityName], "Mexico City (CDMX)" )
+    assert_equal( cities.getCityById( cities.findByName("Mexico City", "Ciudad de México"))[kCityName], "Mexico City (CDMX)" )
+    assert_equal( cities.getCityById( cities.findByName("Mexico City (CDMX)", "Ciudad de México"))[kCityName], "Mexico City (CDMX)" )
     
     assert_equal( cities.getCityById( cities.findByName("El Calvario") )[kCityName], "El Calvario" )
     
@@ -617,16 +738,21 @@ def autotest_cities():
 
     #~ assert_equal( cities.getCityById(cities.findByLongLat(-74.01380,40.70879)[0])[0], "New York" )
     assert_equal( cities.getCityAndStateNameById(cities.findByLongLat(-108.0114,25.5775)[0]), "Alhueycito/Sinaloa" )
-    assert_diff( cities.distTwoCity( "Alhueycito","Sinaloa", "Roma Norte", "Ciudad de México" ), 1137.35 )#~ 1572km a pied
-    assert_diff( cities.distTwoCity( "Alhueycito","Sinaloa", "Roma Norte" ), 1137.35 )#~ 1572km a pied
+    assert_diff( cities.distTwoCities( "Alhueycito","Sinaloa", "Roma Norte", "Ciudad de México" ), 1137.35 )#~ 1572km a pied
+    assert_diff( cities.distTwoCities( "Alhueycito","Sinaloa", "Roma Norte" ), 1137.35 )#~ 1572km a pied
+    assert_diff( cities.distTwoCities( "CDMX", "Ciudad de México", "Roma Norte" ), 3.55 ) # c'est a coté
     
-    assert_diff( cities.distTwoCity( "New York","New York", "Hoboken","Caca" ), 999999 )
+    assert_diff( cities.distTwoCities( "New York","New York", "Hoboken","Caca" ), 999999 )
     
+    assert_diff( cities.distTwoZips( "06700", "06357" ), 3.33 ) # Roma Norte & Delegación Política Cuauhtémoc, theoric: 3.44km (distance calculator)
     
     print("Test: isValidAddress block")
     assert_equal( cities.isValidAddress( "06700", "Roma Norte" )[3], 1 )
     assert_equal( cities.isValidAddress( "06700", "Mora Norte" )[3], 0.8 )
     assert_equal( cities.isValidAddress( "06701", "Roma Norte" )[3], 0 )
+    assert_equal( cities.isValidAddress( "01000", "CDMX" )[3], 1 )
+    assert_equal( cities.isValidAddress( "01000", "Mexico City" )[3], 1 )
+    assert_equal( cities.isValidAddress( "01000", "Mexico City (CDMX)" )[3], 1 )
     
     assert_equal( cities.isValidAddress( "06357", "Delegación Política Cuauhtémoc" )[3], 1 )
     assert_diff( cities.isValidAddress( "06357", "Delegacion Politica Cuauhtemoc" )[3], 1 )
@@ -663,3 +789,7 @@ if __name__ == "__main__":
         if len(sys.argv)>1:
             bOutputHtml = True
         statByRegion( bOutputHtml = bOutputHtml )
+
+        
+    if 1:
+        generate_js_cities_list( "datas/eng_city_mex_datas.js")

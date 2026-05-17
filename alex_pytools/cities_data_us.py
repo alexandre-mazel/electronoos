@@ -32,7 +32,7 @@ class CitiesUs:
         isValidAddress( zip, city ), return (zip,city,confidence) confidence of the right correction.
          
     3: Distance between two city: give two zip, it returns the distance
-        distTwoZip( zip1, zip2 )
+        distTwoZips( zip1, zip2 )
         
     NB: Cities are sorted by population, so all research with many answers will return the biggest city
     """
@@ -185,21 +185,31 @@ class CitiesUs:
             pass
         return "/"
         
-    def findByZip( self, zip, bQuiet = True ):
+    def getIdByZip( self, zip ):
         """
-        return info on a city or None if not nound
+        return if of a city or -1 if not nound
         """
         if zip == None:
-            print("WRN: CitiesUs.findByZip: called with None => returning None" )
-            return None
+            print("WRN: CitiesUs.getIdByZip: called with None => returning -1" )
+            return -1
             
         if isinstance(zip, int):
             zip = "%05d" % zip
-
             
         try:
             id = self.dictIdsPerZip[zip][0]
         except KeyError:
+            return -1
+            
+        return id
+        
+    def findByZip( self, zip, bQuiet = True ):
+        """
+        return info on a city or None if not nound
+        """
+        id = self.getIdByZip( zip )
+        if id == -1:
+            print("WRN: CitiesUs.findByZip: zip '%s' not found" % zip )
             return None
             
         return self.dictCities[id]
@@ -314,9 +324,16 @@ class CitiesUs:
         return retValNone
         
         
-    def distTwoCity( self, city1, county1, city2, county2 = None, bApproxSearch=True, bVerbose=False ):
+    def distTwoCities( self, city1, county1, city2, county2 = None, bApproxSearch=True, bVerbose=False ):
         id1 = self.findByName( city1, county1 )
         id2 = self.findByName( city2, county2 )
+        return self.distTwoIds( id1, id2 )
+        
+    def distTwoZips( self, zip1, zip2, bApproxSearch=True, bVerbose=False ):
+        id1 = self.getIdByZip( zip1 )
+        id2 = self.getIdByZip( zip2 )
+        #~ print("id1: '%s'" % id1 )
+        #~ print("id2: '%s'" % id2 )
         return self.distTwoIds( id1, id2 )
 
     def distTwoIds( self, id1, id2 ):
@@ -348,7 +365,31 @@ class CitiesUs:
             if id != -1:
                 return id
         return -1
-            
+        
+        
+    def getFormatedCity( self, city, bLeaveAccent = True ):
+        """
+        bLeaveAccent: unused (but remains for compatibility)
+        """
+        txt = city[kZips][0] + " " + city[kCityName] + ", " + city[kStateName]
+        return txt
+        
+    def zipToHumanised( self, zip ):
+        city = self.findByZip( zip )
+        if city == None:
+            print("WRN: zipToHumanised city is None for zip '%s'" % zip )
+            return ""
+        strCity = city[3]
+        
+        strOut = "in " + city[kCityName]
+        return strOut
+        
+    def idToZip( self, id ):
+        """
+        take the id of a city and return the first zip
+        """
+        return self.getCityById( id )[kZips][0]
+        
         
 #class CitiesUS - end
 
@@ -377,7 +418,7 @@ def generate_js_cities_list(destination_filename):
     out = out[:-1] # remove last comma
     out += "];"
     
-    f = open(destination_filename,"wt")
+    f = open(destination_filename,"wt", encoding="utf-8")
     f.write(out)
     f.close()
     
@@ -406,6 +447,8 @@ def autotest_cities():
     assert_not_equal( cities.findByName("New York"), -1 )
     assert_equal( cities.getCityById( cities.findByName("New York") )[0], "New York" )
     assert_equal( cities.getCityById( cities.findByName("New York") )[0], "New York" )
+    
+    assert_equal( cities.getCityById(cities.findByName("Los Angeles"))[kCityName], 'Los Angeles' )
     
     assert_equal( cities.getCityAndStateNameById( cities.findByName("New York", "NY") ), "New York/New York" )
     
@@ -440,11 +483,13 @@ def autotest_cities():
     assert_equal( cities.getCityAndCountyNameById(cities.findByLongLat(-73.9,40.6943)[0]), "New York/Queens" ) # Paris
     assert_equal( cities.getCityAndCountyNameById(cities.findByLongLat(-122.41903,37.77500)[0]), "San Francisco/San Francisco" ) # Paris
     
-    assert_diff( cities.distTwoCity( "New York","New York", "San Francisco","California" ), 4189.4 ) #~ 4768km a pied
-    assert_diff( cities.distTwoCity( "New York","New York", "Hoboken","Caca" ), 999999 )
-    assert_diff( cities.distTwoCity( "New York","New York", "Pipi" ), 999999 )
-    assert_diff( cities.distTwoCity( "New York","New York", "Hoboken" ), 10.36 )
-    assert_diff( cities.distTwoCity( "New York","New York", "Hoboken", "New Jersey" ), 10.36 )
+    assert_diff( cities.distTwoCities( "New York","New York", "San Francisco","California" ), 4189.4 ) #~ 4768km a pied
+    assert_diff( cities.distTwoCities( "New York","New York", "Hoboken","Caca" ), 999999 )
+    assert_diff( cities.distTwoCities( "New York","New York", "Pipi" ), 999999 )
+    assert_diff( cities.distTwoCities( "New York","New York", "Hoboken" ), 10.36 )
+    assert_diff( cities.distTwoCities( "New York","New York", "Hoboken", "New Jersey" ), 10.36 )
+    
+    assert_diff( cities.distTwoZips( 90210,10168 ), 3993.93 ) # Beverly hills & New York, distance calculator: 3947.95
     
     assert_equal( cities.isValidAddress( "10168", "New York" )[3], 1 )
     assert_equal( cities.isValidAddress( 10168, "New York" )[3], 1 )
@@ -472,6 +517,18 @@ def autotest_cities():
     assert_diff( cities.isValidAddress( "10168", "Meu York", "Meu Yor" )[3], 0.666 )
     assert_diff( cities.isValidAddress( "10168", "New York", "Meu Y" )[3], 0.615 )
     assert_diff( cities.isValidAddress( "75006", "New York" )[3], 0 )
+    
+    
+    assert_equal( cities.idToZip( "1840020491" ), "91367" ) # could change if we change datas
+    assert_equal( cities.idToZip( "1840042609" ), "78580" )
+    
+    assert_equal( cities.findByName( "Los Angeles" ), "1840020491" )
+    
+    # two cities with same name:
+    assert_equal( cities.getCityById( "1840042609" )[kCityName], "Los Angeles" )
+    assert_equal( cities.getCityById( "1840020491" )[kCityName], "Los Angeles" )
+    
+    
     
     random_adress1 = """Street:  501 Crim Lane
 City:  Botkins

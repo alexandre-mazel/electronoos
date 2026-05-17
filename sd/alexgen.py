@@ -1,6 +1,6 @@
 import torch # don't forget to use python3
 from torch import autocast
-from diffusers import StableDiffusionPipeline
+from diffusers import StableDiffusionPipeline # pip install transformers==4.19.2 diffusers invisible-watermark
 
 import os
 import cv2
@@ -9,6 +9,7 @@ import time
 
 def save_and_show_pil_image( image, prompt = "none", nNumImage=0, bShow = True):
     fn = prompt.replace(" ", "_")[:80] + '__' + str(time.time()) + ".png"
+    print( "INF: saving to %s" % fn )
     fn = os.path.expanduser("~/generated/" + fn)
     image.save(fn)
 
@@ -267,14 +268,22 @@ def generateFaces():
 
     prompt = ""
     #~ prompt += "portrait of a man,"
-    prompt += "portrait of a woman,"
+    #~ prompt += "portrait of a woman,"
     #~ prompt += "portrait of a boy,"
     #~ prompt += "portrait of a girl,"
     #~ prompt += "portrait of an old man,"
     #~ prompt += "portrait of an old woman,"
     
+    #~ prompt += "picture of a man,"
+    
+    prompt += "picture of a MODS"
+    
+    #~ prompt += "blond hair,"
+    #~ prompt += "ginger hair,"
+    
     prompt += " realistic,"
-    prompt += " sharp, very detailed, high resolution, dramatic lighting"
+    prompt += " sharp, very detailed, high resolution,"
+    #~ prompt += "  dramatic lighting,"
     
     #~ prompt += " a wholesome animation key shot, medium shot, waist up, studio Ghibli, Pixar and Disney animation, sharp, very detailed, high resolution, Rendered in Unreal Engine 5, anime key art by Greg Rutkowski, Bloom, dramatic lighting"
 
@@ -283,7 +292,29 @@ def generateFaces():
     nCptGen = 0
     timeBegin = time.time()
     with autocast("cuda"):
+        promptcopy = prompt
         while 1:
+            
+            nCptRotation = nCptGen
+            
+            hairs_colors = ["dark", "blond", "ginger", "no"]
+            skin_colors = ["caucasian", "indian", "black", "asian"]
+            genders = ["man", "woman","boy", "girl", "old man", "old woman"]
+            
+            color_hair = ""
+            color_hair = " " + hairs_colors[nCptRotation%len(hairs_colors)] + " hair, "; nCptRotation //= len(hairs_colors)
+            
+            color_skin = ""
+            color_skin = " " + skin_colors[nCptRotation%len(skin_colors)] + " skin, "; nCptRotation //= len(skin_colors)
+
+            gender = ""
+            gender = " " + genders[nCptRotation%len(genders)] + ", "
+            
+            mods = gender + color_skin + color_hair
+            
+            prompt = promptcopy.replace("MODS", mods)
+            
+            
             print("INF: generateFaces: Generating image %d" % nCptGen )
             if bLarge:
                 image = pipe(prompt)["sample"][0]  

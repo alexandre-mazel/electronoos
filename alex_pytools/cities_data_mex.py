@@ -437,11 +437,14 @@ class CitiesMex:
         
         if strCityName == "":
             return -1
+            
+        bIsCapital = False
            
     
         strCityNameCapital = "Mexico City (CDMX)"
-        if strCityName in ["Mexico City", "CDMX", "Mexico"]:
+        if strCityName in ["Mexico City", "CDMX", "Mexico",strCityNameCapital]:
             strCityName = strCityNameCapital
+            bIsCapital = True
             
             
         #~ if self.cacheLastFindByRealName[0] == strCityName and self.cacheLastFindByRealName[1] == bPartOf:
@@ -477,7 +480,8 @@ class CitiesMex:
             id = listIds[0]
             if not bPartOf and strStateName != None and removeAccentSpecificLang(self.dictCities[id][kStateName]) != strStateName and self.dictCities[id][kStateID] != strStateName:
                 self.warn("WRN: CitiesMex.findByName: this city name '%s' exist but not with this statename/stateid: '%s' (2)" % (strCityName,strStateName) )
-                return -1
+                if not bIsCapital: # If the city was the capital, it's quite sure, it's this city !
+                    return -1
         return id
 
         
@@ -723,6 +727,7 @@ def autotest_cities():
     assert_equal( cities.getCityById( cities.findByName("Mexico City (CDMX)"))[kCityName], "Mexico City (CDMX)" )
     assert_equal( cities.getCityById( cities.findByName("Mexico City", "Ciudad de México"))[kCityName], "Mexico City (CDMX)" )
     assert_equal( cities.getCityById( cities.findByName("Mexico City (CDMX)", "Ciudad de México"))[kCityName], "Mexico City (CDMX)" )
+    assert_equal( cities.getCityById( cities.findByName("Mexico City (CDMX)", "Caca boudin"))[kCityName], "Mexico City (CDMX)" ) # patch: quelque soit le nom de la ville, celle ci est magique
     
     assert_equal( cities.getCityById( cities.findByName("El Calvario") )[kCityName], "El Calvario" )
     

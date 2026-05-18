@@ -200,7 +200,7 @@ def testperf():
         Load+Hello      : 1.811s        
         Hello               : 0.135s         (token: 26/8)
         comput            : 0.109s        (token: 46/2)
-        long1              : 3.334s         (token: 32/599)
+        long1              : 3.334s         (token: 32/599) (a peu pres 180 token/sec)
         long2              : 1.405s         (token: 5782/85)
         (les timings sont bien régulier)
         
@@ -222,6 +222,15 @@ def testperf():
         long1               : 83.570s         (token: 561/1709) 
         long2               : 8.515s           (token: 4910/111)
 
+
+        # d'apres ChatGpt:
+
+        Comparaison rapide Jetson Xavier AGX
+        Setup	Tokens/sec
+        CPU only	2–4
+        CUDA partiel	5–10
+        CUDA optimisé	8–14
+        PC RTX 4090	70–150
 
 
 

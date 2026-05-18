@@ -170,6 +170,7 @@ def runManyTimes( nNbrTimes = 50 ):
             dst_fn = "c:/tmp/wia-test_%d.png" % int( time.time() )
             reso = 600
             reso = 300
+            print("INF: Writing to '%s'" % dst_fn )
             acquire_image_wia( dst_fn, nResolution=reso )
             print("INF: Success!")
             break

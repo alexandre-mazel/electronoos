@@ -728,6 +728,7 @@ def autotest_cities():
     assert_equal( cities.getCityById( cities.findByName("Mexico City", "Ciudad de México"))[kCityName], "Mexico City (CDMX)" )
     assert_equal( cities.getCityById( cities.findByName("Mexico City (CDMX)", "Ciudad de México"))[kCityName], "Mexico City (CDMX)" )
     assert_equal( cities.getCityById( cities.findByName("Mexico City (CDMX)", "Caca boudin"))[kCityName], "Mexico City (CDMX)" ) # patch: quelque soit le nom de la ville, celle ci est magique
+    assert_equal( cities.getCityById( cities.findByName("CDMX", "Pipi"))[kCityName], "Mexico City (CDMX)" ) # patch: quelque soit le nom de la ville, celle ci est magique
     
     assert_equal( cities.getCityById( cities.findByName("El Calvario") )[kCityName], "El Calvario" )
     

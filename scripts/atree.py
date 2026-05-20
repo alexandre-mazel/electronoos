@@ -19,6 +19,8 @@ def analyze_directory(path):
     total_size = 0
     total_files = 0
     children = []
+    
+    print( "%s%s\r" % (path[:60],path[-10:]), end="", file=sys.stderr )
 
     try:
         entries = sorted(os.scandir(path), key=lambda e: (not e.is_dir(), e.name.lower()))
@@ -83,6 +85,10 @@ def main():
     print( "Please wait..." )
 
     total_size, total_files, tree = analyze_directory(root_path)
+    
+    # nettoie l'ecran
+    print( "%s\r", " "*80, file=sys.stderr )
+    print("")
 
     print(
         f"{os.path.basename(os.path.abspath(root_path))} "

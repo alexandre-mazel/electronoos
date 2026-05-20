@@ -152,6 +152,7 @@ def testperf():
     # 2 models running in 10GB VRAM
     #~ model = "ministral-3:14b"
     #~ model = "deepseek-r1:8b"
+    #~ model = "gemma4:e4b " # todo: add this one
 
     #  a nice recent one
     model = "llama3.2"

@@ -24,7 +24,7 @@ def analyze_directory(path):
 
     try:
         entries = sorted(os.scandir(path), key=lambda e: (not e.is_dir(), e.name.lower()))
-    except PermissionError:
+    except (PermissionError,FileNotFoundError,OSError):
         return 0, 0, []
 
     for entry in entries:
@@ -72,6 +72,10 @@ def print_tree(nodes, prefix=""):
 
 
 def main():
+    
+    # idee: on affiche dans la sortie d'erreur les textes d'avancement
+    # ainsi la redirection dans un fichier est propre !
+    
     if len(sys.argv) != 2:
         print(f"Usage: python {os.path.basename(sys.argv[0])} <directory>")
         sys.exit(1)
@@ -82,7 +86,7 @@ def main():
         print("Invalid directory")
         sys.exit(1)
         
-    print( "Please wait..." )
+    print( "Please wait...", file=sys.stderr )
 
     total_size, total_files, tree = analyze_directory(root_path)
     

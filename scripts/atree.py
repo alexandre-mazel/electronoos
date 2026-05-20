@@ -20,6 +20,9 @@ def analyze_directory(path):
     total_files = 0
     children = []
     
+    if path[:5] == "/proc":
+        return 0, 0, []
+    
     print( "%s%s\r" % (path[:60],path[-10:]), end="", file=sys.stderr )
 
     try:

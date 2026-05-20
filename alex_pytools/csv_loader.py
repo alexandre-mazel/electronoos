@@ -257,9 +257,11 @@ def load_datas_from_xlsx( filename, encoding = 'utf-8', replace_eol = None, bVer
                 if bVerbose: print("col: %s" % col)
                 if col == 'nan':
                     break
-                if replace_eol != None:
-                    col = col.replace( "\n", replace_eol )
-                col = col.replace( sepa, newchar )
+                if isinstance( col, str ):
+                    if replace_eol != None:
+                        col = col.replace( "\n", replace_eol )
+                    col = col.replace( sepa, newchar )
+                    
                 oneLine.append(col)
 
             if oneLine != []: # skip empty line

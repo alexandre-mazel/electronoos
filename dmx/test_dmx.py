@@ -166,7 +166,12 @@ print("INF: dmx.device.description: ", dmx.device.description ) # USB Serial Por
 print("INF: dmx.device.interface: ", dmx.device.interface ) # None
 print("INF: dmx.device.device: ", dmx.device.device ) # COMx
 print("INF: dmx.device.manufacturer: ", dmx.device.manufacturer ) # FTDI
-print("INF: dmx.device.serial_number: ", dmx.device.serial_number ) # mon truc chinois orange: BG00U0KFA; l'enttec de l'ensad: EN172589A, le noir qui clignote: BG0106SGA
+print("INF: dmx.device.serial_number: ", dmx.device.serial_number ) 
+
+# mon truc chinois orange: BG00U0KFA; 
+# l'enttec de l'ensad: EN172589A (clignote vert quand données sont envoyées)
+# le noir qui clignote: BG0106SGA
+# Enttec nouveau: EN495722A (detecté mais n'envoie rien, ne clignote pas qd fonctionne pas)
 
 print("INF: dmx: starting" )
 
@@ -241,6 +246,8 @@ if 0:
             dmx.set_data(4, i)
             time.sleep(time_wait)
             
+            
+# specify an id
 dev_id = 1
 print( "device %d" % dev_id )
 
@@ -299,7 +306,7 @@ if 0:
             time.sleep(time_wait)
             
             
-if 0:
+if 1:
     # allumé/eteint tres lent
     print("slow on and off")
     time_wait = 4
@@ -313,7 +320,7 @@ if 0:
         time.sleep(time_wait)
         
         
-if 1:
+if 0:
     print("she full UV")
     from ccc import * # for she_xxx
     time_wait = 6

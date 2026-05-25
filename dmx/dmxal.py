@@ -341,6 +341,58 @@ def sleep_us(sleep_in_us: int) -> None:
     while (time.perf_counter_ns()-start_time) < sleep_in_ns:
         continue
     return
+    
+    
+def init_dmx( nbr_channel_to_use = 512 ):
+    """
+    Find the usb dmx controller and return the dmx object
+    """
+    
+    print("INF: dmxal.init_dmx: initing..." )
+
+    set_verbose( False )
+
+
+
+    try:
+        dmx = DMX( num_of_channels = nbr_channel_to_use )
+        #~ print(dir(dmx))
+        print("INF: dmx.is_connected(): ", dmx.is_connected() )
+        print("INF: dmx.num_of_channels: ", dmx.num_of_channels )
+
+        #~ print(dir(dmx.device))
+        print("INF: dmx.device.name: ", dmx.device.name ) # COMx
+        print("INF: dmx.device.vid: ", dmx.device.vid ) # EUROLITE_USB_DMX512_PRO_CABLE_INTERFACE = Device(vid=1027, pid=24577)
+        print("INF: dmx.device.pid: ", dmx.device.pid ) # 24577
+        print("INF: dmx.device.product: ", dmx.device.product ) # None
+        print("INF: dmx.device.description: ", dmx.device.description ) # USB Serial Port (COMx)
+        print("INF: dmx.device.interface: ", dmx.device.interface ) # None
+        print("INF: dmx.device.device: ", dmx.device.device ) # COMx
+        print("INF: dmx.device.manufacturer: ", dmx.device.manufacturer ) # FTDI
+        print("INF: dmx.device.serial_number: ", dmx.device.serial_number ) 
+        """
+        - mon truc chinois orange: BG00U0KFA
+        - l'enttec de l'ensad: EN172589A
+        - le noir qui clignote: BG0106SGA
+        - l'enttec num4: EN495728A
+        """
+
+
+    except BaseException as err:
+        print("ERR: During Initing: exception: err: %s" % str(err) )
+        print("Press a key to continue...")
+        #~ dummy = input()
+        class FakeDmx:
+            def __init__(self): pass
+            def set_data( self, chan, val): pass
+            def send( self): pass; #print("FakeDmx.send...")
+            def set_clear_channel_at_exit(self,newval): pass
+            def set_optimised(self,newval): pass
+        dmx = FakeDmx()
+        
+        
+    print("INF: dmxal.init_dmx: started" )
+    return dmx
 
 
 if __name__ == "__main__":

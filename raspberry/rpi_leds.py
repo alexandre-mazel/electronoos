@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 # NeoPixel library strandtest example
 # Author: Tony DiCola (tony@tonydicola.com)
 #
@@ -13,6 +14,7 @@
 import time
 from rpi_ws281x import *
 import argparse
+import random
 
 # LED strip configuration:
 LED_COUNT      = 16     # Number of LED pixels.
@@ -25,7 +27,7 @@ LED_INVERT     = False   # True to invert the signal (when using NPN transistor 
 LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
 
-LED_COUNT      = 383 * 3# 383 par barres ?
+LED_COUNT      = 844 # 383 * 3# 383 par barres ? # Fossilation: 842 a droite et 844 a gauche!
 
 nbr_leds = LED_COUNT
 
@@ -136,6 +138,7 @@ if __name__ == '__main__':
 
         while True:
             
+
             #~ for i in range(4 ):
             while 1:
                 colorFull( strip, 0xFFFFFF )
@@ -152,7 +155,7 @@ if __name__ == '__main__':
                 time.sleep(1)
                 colorFull( strip, 0x0 )
                 time.sleep(1)
-                
+
             print ('Color wipe animations.')
             colorWipe(strip, Color(255, 0, 0))  # Red wipe
             colorWipe(strip, Color(0, 255, 0))  # Blue wipe

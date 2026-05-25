@@ -27,7 +27,7 @@ Pour commencer vous aller donc devoir choisir un sujet pour votre exposé imagin
 !!! note "Mise en pratique: Choisir son sujet"
 
     1. Choisissez le sujet de votre exposé, ca pourrait parler d'une de vos passions, 
-    d'un-e chanteu-r-se, d'un sport, d'un jeu vidéo ou de ce qu'il vous plaira.
+    d'un-e chanteu-r-se, d'un sport, d'un jeu vidéo, une ville, un pays ou de ce qu'il vous plaira.
     2. Une fois votre sujet choisi, notez le quelque part pour ne pas l'oublier !
 
 
@@ -59,21 +59,13 @@ travaux pratiques.
 
 !!! note "Mise en pratique: Lancer le logiciel"
 
-    === "Méthode 1"
+    1. Aller dans le menu démarrer et chercher l'application *« LibreOffice Impress »* ou *« Powerpoint »* 
 
-        1. Appuyer sur <span class=keys><kbd>:fontawesome-brands-windows:</kbd><span>+</span><kbd>R</kbd></span>
-        2. Écrire *« LibreOffice Impress »* dans le champ de saisie **Ouvrir**
-        3. Cliquer sur **OK**
+### Choisir un thème de mise en page (optionnel)
 
-    === "Méthode 2"
+!!! note "Mise en pratique: Choisir son thème (si l'option se présente)"
 
-        1. Aller dans le menu démarrer et chercher l'application *« LibreOffice Impress »* ou *« Microsoft Powerpoint »* 
-
-### Choisir un thème de mise en page
-
-!!! note "Mise en pratique: Choisir son thème"
-
-    1. Au lancement de l'application une fenêtre apparait vous demandant de choisir un thème pour votre présentation, cela donnera un style à vos diapositives.
+    1. Dans Impress au lancement de l'application une fenêtre apparait vous demandant de choisir un thème pour votre présentation, cela donnera un style à vos diapositives.
     <figure markdown>
     ![Pad](images/diapo_01_model.png)
     </figure>

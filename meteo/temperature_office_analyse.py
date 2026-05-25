@@ -377,7 +377,7 @@ if __name__ == "__main__":
     year,month,day = misctools.getDay()
 
     if 1:
-        # draw some datas:
+        # print some datas:
         #~ print(datas.keys())
         print("Last datas of each type:")
         for k, v in datas.items():
@@ -433,4 +433,5 @@ if __name__ == "__main__":
             day += 31
             month -= 1
         render_all_datas(datas,year,month,day, sameGraphList = datas_of_interest)
+        # todo: save with name date_start date_stop
             

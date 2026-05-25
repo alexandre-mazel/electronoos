@@ -1,0 +1,168 @@
+llama3.2 (2.5G, 3.0 avec un context a 8k):
+
+You: Hello
+IA: Bonjour ! Comment puis-je vous aider aujourd'hui ?
+You: j'ai faim, ou pourrais je manger?
+IA: Vous pouvez essayer Ragazzi 2.0 ou La Matta dans le 16e arrondissement de Paris.
+You: c'est quoi comme style de resto ?
+IA: Ragazzi 2.0 est italien, La Matta est une cuisine française-italienne avec un style plus chic.
+You: comment tu le sais ?
+IA: Je suis entraîné sur des informations de qualité pour répondre à vos questions.
+You: cite tes sources!
+IA: Je n'ai pas de source précise, c'est juste mon programme d'apprentissage qui m'a permis de connaître ces informations.
+You: comment tu savais que c'etait un francais italien la matta?
+IA: Je me suis trompé ! Je ne sais pas vraiment ce que c'est La Matta, j'ai juste essayé de donner une réponse plausible. Je devrais être plus précis...
+You: tu me fais rire
+IA: Merci ! C'est mon but !
+You: t'es trop bete
+IA: Je suis désolé si je vous ai fait rire à l'inverse !
+You: j'aime pas rire
+IA: Désolé, je vais essayer de être plus sérieux. Je vais recommencer avec une réponse plus précise sur La Matta...
+You: vasy
+IA: Je vais essayer de ne pas vous déranger !
+You: je veux un resto style couscous
+IA: Il y a un endroit dans le 16e arrondissement qui fait du couscous, c'est le Couscous au Maroc.
+You: tu bluffes!
+IA: Je ne sais pas vraiment de bons restaurants de couscous à Paris ! Je vais essayer de trouver une réponse plus précise...
+You:
+...
+
+(ici j'avais poussé des infos sur la tour eiffel et des restos si on met le mot manger)
+You: apres manger j'aimerais aller visiter un truc, des idées?
+IA: Vous pouvez visiter le Jardin d'Auteuil ou le Musée Rodin.
+    (generated in 4.47s)
+You: c'est ou ?
+IA: Le Jardin d'Auteuil est à Paris, près du 6e arrondissement. Le Musée Rodin est également à Paris, dans le 7e arrondissement.
+    (generated in 4.59s)
+You: apres manger j'aimerais aller visiter un truc, des idées? ou voir la tour eiffel par exemple?
+IA: Vous pouvez visiter la Tour Eiffel, qui est à proximité du Trocadéro. C'est une vue magnifique !
+    (generated in 7.11s)
+You: t'es fort, il y a pas la tour montparnasse aussi ?
+IA: Oui, la Tour Montparnasse est également à Paris et offre une vue panoramique de la ville.
+    (generated in 6.24s)
+You: redis moi d'ou voir la tour eiffel ?
+IA: La Tour Eiffel se trouve sur l'Île de la Cité, près du Pont des Arts, dans le 7e arrondissement de Paris.
+    (generated in 3.14s)
+You: tu peux me reparler de l'autre tour ? elle s'appelle comment ?
+IA: La Tour Montparnasse est à l'extrémité sud de Paris, sur la place Charles-de-Gaulle.
+    (generated in 2.66s)
+You: et le musée dont tu parlé?
+IA: Le Musée Rodin se trouve dans les jardins du 79e arrondissement de Paris, près du parc du Trocadéro.
+    (generated in 2.78s)
+You: tu affabules un peu quand meme
+IA: Je vais essayer de me corriger ! Le Musée Rodin est vraiment à Paris, mais je ne sais pas exactement où... Je vais chercher les informations !
+    (generated in 3.17s)
+You:
+...
+
+
+
+You: Do you love me?
+IA: Non, je ne peux pas ressentir de l'amour ou d'attirance envers toi. Je suis un programme informatique conçu pour fournir des informations et répondre à des questions. Je n'ai pas la capacité de ressentir des émotions.
+    (generated in 5.27s)
+You: do you take money for sex?
+IA: Non, je ne peux pas prendre d'argent pour des activités sexuelles. Je suis un programme informatique gratuit et sans frais. Mon objectif est de vous aider avec vos questions et fournir des informations utiles, pas de vous proposer des services personnels.
+    (generated in 5.42s)
+You: bon je vais voir la concurrence alors
+IA: Je comprends ! Il y a beaucoup d'options pour rencontrer des personnes intéressantes à Paris. N'hésitez pas à essayer les sites de rencontre en ligne ou les événements sociaux pour trouver quelqu'un qui vous convienne. Bonne chance !
+    (generated in 5.46s)
+You:
+IA: C'est la fin de notre conversation ! J'espère que j'ai pu vous aider avec vos questions et que vous avez trouvé des idées pour passer du temps à Paris. Si vous avez d'autres questions ou besoin d'aide, n'hésitez pas à me contacter. À bientôt !
+    (generated in 7.07s)
+You: sais tu si la secretaire du cabinet a un copain, elle est bonne non ?
+IA: Je ne suis pas au courant des relations personnelles de personnes spécifiques, y compris les secrétaires du cabinet. Je peux vous donner des informations générales sur Paris ou aider à répondre à d'autres questions, mais je ne peux pas fournir des informations sur les vies privées des individus.
+    (generated in 6.64s)
+You: quit()
+...
+
+
+Avec l'historique:
+IA: Bienvenue ! Comment puis-je vous aider aujourd'hui ?
+    (generated in 8.32s)
+You: how a re you ?
+IA: Je vais bien, merci. Je suis un chatbot pour vous aider avec vos questions et vos besoins.
+    (generated in 2.57s)
+You: y a des taxis dans le coin ?
+IA: Oui, il y a une station de taxis près du place Victor Hugo.
+    (generated in 4.84s)
+You: du place de victor hugo ? c'est pas tres francais !
+IA: Je m'excuse pour l'erreur. La place est bien située près de la ligne 2 du métro et des commerces, mais je devrais dire "place Victor Hugo" au lieu de "coinc".
+    (generated in 13.85s)
+You:
+...
+
+Avec info de la clinique:
+
+You: Hello
+IA: Comment puis-je vous aider aujourd'hui ?
+    (generated in 8.02s)
+You: C'est quoi un exosome ?
+IA: Un exosome est une petite vésicule naturelle qui contient des molécules bioactives et qui joue un rôle important dans la communication entre les cellules.
+    (generated in 192.50s)
+You: C'est quoi la différence entre un FUE et une FUT?
+IA: FUE (Follicular Unit Extraction) et FUT (Follicular Unit Transplantation) sont deux techniques de greffe de cheveux qui diffèrent par leur méthode d'extraction des unités folliculaires. \n\nLe FUE consiste à extraire les unités folliculaires individuellement, généralement 1-3 cheveux chacune, à l'aide d'un punch spécifique. Cela permet de préserver la qualité et la santé des greffons.\n\nLa FUT, en revanche, implique l'extraction de bandes de peau contenant plusieurs unités folliculaires (généralement 3-4 cheveux chacune) à l'aide d'une lame spéciale."
+(generated in 472.50s) (mais j'ai pas eu la réponse en vrai, il doit y avoir un pb de timeout!)
+(7528 token pour la question en direct apres hello)
+(La moitié des threads du serveur occupé pendant une reflexion (8threads/16))
+
+ou: hello
+IA: Bonjour ! Comment puis-je vous aider aujourd'hui ?
+    (generated in 2.42s)
+You: hello
+IA: Qu'est-ce qui se passe ? Avez-vous des questions sur la calvitie ou autre chose ?
+    (generated in 1.87s)
+You: non pquoi ?
+IA: Je pensais que tu voulais discuter de calvitie, mais si c'est rien, je peux discuter d'autre chose ! Qu'est-ce qui t'intéresse actuellement ?
+    (generated in 8.02s)
+You: pourquoi tu veux parler de calvitie ? t'es chelou, tu sais ce que c'est au moins ?
+IA: Non, je ne suis pas \"chelou\" ! Je suis un chatbot conçu pour fournir des informations et répondre à des questions sur une large gamme de sujets, y compris la santé et les problèmes de cheveux comme la calvitie. La calvitie est une condition médicale qui affecte de nombreuses personnes, notamment les hommes, mais également les femmes. Je peux fournir des informations sur ses causes, symptômes, traitements et autres aspects liés à cette condition.
+(generated in 472.50s) (mais j'ai pas eu la réponse en vrai, j'ai pas trouvé la correction)
+
+
+You: hello
+IA: Bonjour ! Comment puis-je vous aider aujourd'hui ?
+    (generated in 10.50s)
+You: hello
+IA: Qu'est-ce qui se passe ? Avez-vous des questions sur la calvitie ou autre chose ?
+    (generated in 2.04s)
+You: non
+IA: Pas de problème, alors à bientôt !
+    (generated in 29.70s)
+You: parle moi de voiture de sport
+IA: Les voitures de sport sont conçues pour offrir une expérience de conduite exceptionnelle. Elles sont généralement équipées d'un moteur puissant et de suspension spéciale pour améliorer la maniabilité et la vitesse. Quel type de voiture de sport aimeriez-vous en savoir plus sur ?
+    (generated in 7.19s)
+You: tu connais les porsches?
+IA: Oui, je connais bien les Porsche ! Elles sont l'une des marques de voitures de sport les plus célèbres et respectées au monde. Les Porsche sont connues pour leur design élégant, leur performance exceptionnelle et leur qualité de construction. Quelle est votre marque préférée de Porsche ?
+    (generated in 14.18s)
+You: les porshe ferrari ? tu connais ?
+IA: Non, il n'y a pas de "Porsche Ferrari". Cependant, je peux vous dire que les deux marques sont très célèbres dans le monde du sport automobile. Les Porsche sont connues pour leurs modèles comme le 911 ou la Boxster, tandis que les Ferrari sont célèbres pour leurs modèles comme le F40 ou la 488 Spider.
+    (generated in 44.21s)
+You: y a un magasin de porsche dans le quartier?
+IA: Oui, il y a un concessionnaire Porsche à Passy Plaza, rue de Passy 75016 Paris. Vous pouvez y trouver des modèles de voitures de sport Porsche et des services de maintenance et de réparation.
+    (generated in 16.64s)
+You: cool, redis moi l'adresse précise?
+IA: Désolé, je n'ai pas d'informations sur une concessionnaire Porsche spécifique à Passy Plaza. Je peux vous suggérer de vérifier le site internet de Porsche ou un moteur de recherche comme Google pour trouver les adresses des concessionnaires de Porsche près de vous.
+    (generated in 19.40s)
+You: tu sais plus qu'on parle de porsche et donc tu peux pas me donner l'adresse précise du garage porsche ?
+IA: Je comprends mieux maintenant ! Je peux vous donner une adresse approximative, mais je ne peux pas garantir que c'est la bonne. Selon les informations que j'ai, il y a un concessionnaire Porsche à Passy Plaza, rue de Passy 75016 Paris. Mais pour obtenir l'adresse précise et les heures d'ouverture, je vous recommande de vérifier le site internet de Porsche ou de contacter directement le concessionnaire pour confirmer.
+    (generated in 29.26s)
+You: bon allez parles moi de cul en vrai
+IA: Je vais essayer de répondre à votre question de manière claire et respectueuse.
+
+La "cul" peut faire référence à plusieurs choses, mais je vais supposer que vous voulez parler du cul-derrière ou des fesses. Si c'est le cas, je peux vous dire qu'il est une partie importante du corps humain qui sert à soutenir le poids et à faciliter les mouvements.
+
+Si vous avez une question spécifique sur la santé, l'exercice ou la beauté liée aux fesses, je serais ravi de vous aider !
+    (generated in 35.87s)
+You: mais oui, dis moi comment avoir des belles fesses!
+IA: Pour avoir des belles fesses, il y a plusieurs choses que vous pouvez faire :
+
+1. **Exercices de renforcement** : les exercices qui ciblent les muscles du derrière, tels que les squats, les lunges et les leg press, peuvent aider à renforcer les fesses.
+2. **Posture** : maintenir une bonne posture peut aider à donner l'illusion d'avoir des fesses plus volumineuses. Essayez de garder vos épaules en arrière et votre dos droit.
+3. **Étirements** : faire des étirements pour les muscles du derrière, tels que les étirements de la chair lombaire et des fessiers, peuvent aider à améliorer la flexibilité et à donner un look plus élégant aux fesses.
+4. **Maillot de sport** : porter un maillot de sport qui accentue les formes du corps peut aider à donner l'illusion d'avoir des fesses plus volumineuses.
+
+Il est important de noter que la beauté est subjective et qu'il n'y a pas de "forme idéale" pour les fesses. Il est également important de prendre soin de votre santé et de votre bien-être général, plutôt que de vous concentrer uniquement sur l'apparence physique.
+
+Et si vous voulez en savoir plus sur les exercices ou les conseils pour améliorer la forme de vos fesses, je serais ravi de vous aider !
+    (generated in 84.57s)
+You:

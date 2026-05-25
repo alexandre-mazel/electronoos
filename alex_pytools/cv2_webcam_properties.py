@@ -210,7 +210,7 @@ def get_available_microphones() :
 
     return available_microphones
 
-def get_capacity():
+def get_capacity( bTestRealFps=True, bVerbose=True ):
     """
     mstab7:
     {0: 'Surface Camera Front', 1: 'Surface Camera Rear', 2: 'EOS Webcam Utility', 3: 'HD Pro Webcam C920', 4: 'GoPro Webcam'}
@@ -221,6 +221,8 @@ def get_capacity():
     specif officielle:  Camera frontale 5.0MP avec video Full HD 1080p, Camera arriere 8 Mpx avec mise au point automatique et qualite video Full HD 1080p
 
     """
+    
+    print( "INF: get_capacity: starting..." )
     
     bVerbose = 1
     bVerbose = 0
@@ -236,21 +238,27 @@ def get_capacity():
     
     hostname = get_hostname()
     
-    cap_mode = cv2.CAP_ANY
-    list_base = [0,cv2.CAP_DSHOW] # CAP_DSHOW has a value of 700
-    list_base = [cv2.CAP_DSHOW]
+    if os.name == "nt":
+        cap_mode = cv2.CAP_ANY
+        list_base = [0,cv2.CAP_DSHOW] # CAP_DSHOW has a value of 700
+        list_base = [cv2.CAP_DSHOW]
+    else:
+        cap_mode = cv2.CAP_V4L
+        list_base = [0]
+        
     for id_base in list_base:
         
         id = 0
         
-        id = 3 # start from specific idx
+        #~ id = 3 # start from specific idx
         
         nbr_error = 0
         
         while 1:
             numcam = id_base + id
             
-            if nbr_error > 2:
+            if nbr_error > 3:
+                if bVerbose: print( "nbr_error: %s exiting..." % nbr_error )
                 break # no more camera
             
             last_err = ""
@@ -262,6 +270,7 @@ def get_capacity():
             cam = cv2.VideoCapture( numcam, cap_mode )
             if not cam.isOpened():
                 nbr_error += 1
+                id += 1
                 continue
             
             print( "camera id %d" % (numcam) )
@@ -276,7 +285,7 @@ def get_capacity():
                 if 0 and (h != 720 or h != 896):
                     continue
                     
-                if h < 720:
+                if h < 480:
                     continue
                             
                 cam.set( cv2.CAP_PROP_FRAME_WIDTH, w )
@@ -288,8 +297,6 @@ def get_capacity():
                 getfps = cam.get( cv2.CAP_PROP_FPS )
                 
                 if getw == w and geth == h:
-                    
-                    bTestRealFps = True
                     
                     end = "\n" # default
                     if bTestRealFps:
@@ -410,9 +417,21 @@ name: 'DSHOW'
 
 if __name__ == "__main__":
     print("hostname: %s" % get_hostname() )
-    print(get_available_cameras())
-    #~ get_available_cameras_alt()
-    print(get_available_microphones())
+    try:
+        print(get_available_cameras())
+    except BaseException as err:
+        print( "ERR: while running get_available_cameras, err: %s" % str(err) )
+        
+    try:
+        get_available_cameras_alt()
+    except BaseException as err:
+        print( "ERR: while running get_available_cameras_alt, err: %s" % str(err) )
+        
+    try:
+        print(get_available_microphones())
+    except BaseException as err:
+        print( "ERR: while running get_available_cameras, err: %s" % str(err) )
+        
     get_capacity()
         
     

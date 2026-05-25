@@ -26,7 +26,25 @@ def assert_equal(a,b):
             
     print("(%s==%s) => NOT ok (type:%s and %s)" % (a,b,type(a),type(b)))
     assert(0)
+    
+def assert_not_equal(a,b):
+    if a != b:
+        print("(%s!=%s) => ok" % (a,b))
+        return
+    if sys.version_info[0]<3:
+        if isinstance(a,unicode):
+            a = a.encode("utf-8", 'replace')
 
+        if isinstance(b,unicode):
+            b = b.encode("utf-8", 'replace')
+        
+        if a != b:
+            print("(%s!=%s) => ok (but unicode_encoded)" % (a,b))
+            return
+            
+    print("(%s!=%s) => NOT ok (type:%s and %s)" % (a,b,type(a),type(b)))
+    assert(0)
+    
 def assert_diff(a,b,diff=0.1):
     if abs(a-b)<diff:
         print("(%s diff %s < %s) => ok" % (a,b,diff))
@@ -447,10 +465,10 @@ class Cities:
         findByRealName( city, bPartOf = True )
          
     2: Adress detection: give a zip and a city, it will validate it's really an adress, and can correct it.
-        isValidAdress( zip, city ), return (zip,city,confidence) confidence of the right correction.
+        isValidAddress( zip, city ), return (zip,city,confidence) confidence of the right correction.
          
     3: Distance between two city: give two zip, it returns the distance
-        distTwoZip( zip1, zip2 )
+        distTwoZips( zip1, zip2 )
     """
     def __init__(self):
         self.dictCities = {} # city per zip (zip as a string, could start with unsignifiant 00 )=> (strDept,strZip,strCity Slug,strCity Real (including casse),float(strLong),float(strLat))
@@ -732,7 +750,7 @@ class Cities:
         
         
         
-    def isValidAdress( self, zip, strCityName ):
+    def isValidAddress( self, zip, strCityName ):
         """
         is this zip correpond roughly to this city.
         return zip, real name, confidence [0..1]
@@ -757,11 +775,11 @@ class Cities:
                 # rDiff can be from 0 to nearly 1
                 rConfidence = 1. - rDiff
                 
-                print("DBG: isValidAdress: %s and %s => %s: %s, rConfidence: %.2f" % (zip, strCityName, zip, city[2], rConfidence) )
+                print("DBG: isValidAddress: %s and %s => %s: %s, rConfidence: %.2f" % (zip, strCityName, zip, city[2], rConfidence) )
                 return zip, city[2], rConfidence
         return retVal
         
-    def distTwoZip( self, zip1, zip2, bApproxSearch=True, bVerbose=False ):
+    def distTwoZips( self, zip1, zip2, bApproxSearch=True, bVerbose=False ):
         """
         - bApproxSearch: set to one to accept city name as zipcode, eg Saint-Tropez instead of 83990
         """
@@ -947,8 +965,8 @@ def generateStatHousing( cnx, bOutputHtml ):
     cities = Cities()
     cities.load()
     if 0:
-        rDist = cities.distTwoZip("75000","33000")
-        rDist2 = cities.distTwoZip("59000","66000")
+        rDist = cities.distTwoZips("75000","33000")
+        rDist2 = cities.distTwoZips("59000","66000")
         print("Dist Paris-Bordeaux: %s" % rDist ) # devrait etre 499,20 km, courament: 544.98
         print("Dist Lille-Perpignan: %s" % rDist2 ) # devrait etre 882,49 km, courament: 883.59
         return
@@ -1168,11 +1186,11 @@ def getTop50():
 if 0:
     cities = Cities()
     cities.load()
-    rdist=cities.distTwoZip("75001",bigCityToZip("Paris"))
+    rdist=cities.distTwoZips("75001",bigCityToZip("Paris"))
     print(rdist)
-    rdist=cities.distTwoZip("75001",bigCityToZip("Marseille"))
+    rdist=cities.distTwoZips("75001",bigCityToZip("Marseille"))
     print(rdist)    
-    rdist=cities.distTwoZip("75001",bigCityToZip("Nice"))
+    rdist=cities.distTwoZips("75001",bigCityToZip("Nice"))
     print(rdist)    
     
 def statByRegion(bOutputHtml=False):
@@ -1255,16 +1273,16 @@ def autotest_cities():
     assert_equal(zip1,"93140")
     #~ zip2 = cities.findByRealName("Vélizy")
     zip2 = "78140"
-    dist = cities.distTwoZip(zip1,zip2,bVerbose=True)
+    dist = cities.distTwoZips(zip1,zip2,bVerbose=True)
     assert_diff(dist,22,5)
 
     # bug Saint-Tropez
     zipFoireux = "Saint-Tropez"
-    dist = cities.distTwoZip(zipFoireux,"34000",bVerbose=True)
+    dist = cities.distTwoZips(zipFoireux,"34000",bVerbose=True)
     assert_diff(dist,225,5)
-    dist = cities.distTwoZip("75006",zipFoireux,bVerbose=True)
+    dist = cities.distTwoZips("75006",zipFoireux,bVerbose=True)
     assert_diff(dist,703,5)
-    dist = cities.distTwoZip("75006","Saint+Tropez",bVerbose=True)
+    dist = cities.distTwoZips("75006","Saint+Tropez",bVerbose=True)
     assert_diff(dist,703,5)
     
     # bug Schiltigheim / parly
@@ -1274,38 +1292,38 @@ def autotest_cities():
     #~ zip2 = cities.findByRealName("Le Chesnay-Rocquencourt")
     #~ assert_equal(zip2,"78150")
     zip2 = "78150"
-    dist = cities.distTwoZip(zip1,zip2,bVerbose=True)
+    dist = cities.distTwoZips(zip1,zip2,bVerbose=True)
     assert_diff(dist,397,20)
     
 
-    dist = cities.distTwoZip("75000","75001",bVerbose=True)
+    dist = cities.distTwoZips("75000","75001",bVerbose=True)
     assert_diff(dist,1,5)  
     
-    dist = cities.distTwoZip("75006","34000",bVerbose=True)
+    dist = cities.distTwoZips("75006","34000",bVerbose=True)
     assert_diff(dist,596,20)        
 
-    dist = cities.distTwoZip("33000","67000",bVerbose=True)
+    dist = cities.distTwoZips("33000","67000",bVerbose=True)
     assert_diff(dist,760,20)
 
-    dist = cities.distTwoZip("75000","75001",bVerbose=True)
+    dist = cities.distTwoZips("75000","75001",bVerbose=True)
     
-    dist = cities.distTwoZip("75020","75016",bVerbose=True)
+    dist = cities.distTwoZips("75020","75016",bVerbose=True)
     assert_diff(dist,9,4)
     
-    dist = cities.distTwoZip("75008","75017",bVerbose=True)
+    dist = cities.distTwoZips("75008","75017",bVerbose=True)
     assert_diff(dist,0.82,0.3)
     
-    dist = cities.distTwoZip("69001","75001",bVerbose=True)
+    dist = cities.distTwoZips("69001","75001",bVerbose=True)
     assert_diff(dist,400,20)
 
-    dist = cities.distTwoZip("69001","75004",bVerbose=True)
+    dist = cities.distTwoZips("69001","75004",bVerbose=True)
     assert_diff(dist,400,20)
     
-    assert_diff(cities.isValidAdress( "34440","colombier")[2],0.95)
-    assert_diff(cities.isValidAdress( "34440","colom")[2],0.67)
-    assert_diff(cities.isValidAdress( "34440","nissa")[2],0.42)
-    assert_diff(cities.isValidAdress( "34440","a")[2],0.1)
-    assert_diff(cities.isValidAdress( "34440","y")[2],0.)    
+    assert_diff(cities.isValidAddress( "34440","colombier")[2],0.95)
+    assert_diff(cities.isValidAddress( "34440","colom")[2],0.67)
+    assert_diff(cities.isValidAddress( "34440","nissa")[2],0.42)
+    assert_diff(cities.isValidAddress( "34440","a")[2],0.1)
+    assert_diff(cities.isValidAddress( "34440","y")[2],0.)    
     
     timeBegin = time.time()
     for i in range(100):
@@ -1406,7 +1424,7 @@ def autotest_cities():
     print("DBG: autotest: get monaco: %s" % str(retVal) )
     assert_equal(retVal[1],"98000")
     
-    dist = cities.distTwoZip("98000","06500",bVerbose=True) # Menton et Monaco
+    dist = cities.distTwoZips("98000","06500",bVerbose=True) # Menton et Monaco
     assert_diff(dist,11,4)
     
     val,dist = cities.findByLongLat(2.345418299722222,48.80381479972222) # ma maison

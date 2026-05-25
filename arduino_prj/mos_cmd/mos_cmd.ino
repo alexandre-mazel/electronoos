@@ -25,6 +25,7 @@
 # define PWM_PIN_2      9
 # define PWM_PIN_3      10
 # define ANALOG_MAX     255
+# define PIR_PIN        18
 
 #endif // PRO_MICRO
 
@@ -58,7 +59,9 @@ void setup()
 {
     Serial.begin( 57600 );
 
-    Serial.println( "INF: MOS Cmd v0.4" );
+    Serial.println( "INF: MOS Cmd v0.5" );
+
+    pinMode( PIR_PIN , INPUT );
 
     pinMode( LED_BUILTIN, OUTPUT );
 
@@ -81,8 +84,28 @@ void setup()
     }
 }
 
+long int last_time_seen = 0;
+
 void loop()
 {
+  if( 0 )
+  {
+    if( millis() - last_time_seen > 30*1000 ) // 30sec without someone => need someone to activate
+    {
+      Serial.println( "Waiting for someone...");
+
+      // wait for people detected
+      while( digitalRead(PIR_PIN) == LOW )
+      {
+        delay(200);
+      }
+      Serial.println( "Seen someone or something !");
+      last_time_seen = millis();
+    }
+  }
+
+    //delay(200);
+    //return;
 
     if( 1 )
     {

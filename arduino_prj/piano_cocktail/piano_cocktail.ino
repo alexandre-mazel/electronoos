@@ -119,9 +119,14 @@ void animateLcd()
 long int nTimeStartFill = 0;
 int bIsFilling = 0;
 
-unsigned char nMilliBeforeCut = 70; // 10 en version normal (maintenant 13), en oversize: 45 si slow, si rapide, mettre 100, et mettre
+// mettre une plus grande valeur pour qu'il coupe plus tot.
+unsigned char nMilliBeforeCut = 83; // 10 en version normal (maintenant 13), en oversize: 45 si slow, 70 si rapide, mettre 100, et mettre hache.
+// new middle size: 30 c'est trop, 80 encore un peu trop, 100 pas assez, test 90. plus assez
 
-bool bIsOversize = 1;
+bool bWriteToEeprom = 0; // apres les reglages, mettre une fois a 1 pour ecrire puis a 0 pour la prod.
+
+//bool bIsOversize = 1;
+bool bIsOversize = 0;
 
 bool bActivateHache  = bIsOversize; // activate on oversized
 
@@ -169,7 +174,7 @@ void setOpen( int nNumVanne, int bOpen)
 
 void readCfgFromEeproom()
 {
-  if(1)
+  if(bWriteToEeprom)
   {
     //write values (for the first time)
     Serial.println("\nWRITING TO EEPROM !\n");
@@ -188,7 +193,7 @@ void setup() {
   Serial.begin(57600); // was 9600 // changing here need to change also in the android application.
   //pinMode(resetPin, INPUT);
 
-  Serial.println("\nPianoCocktail v0.91");
+  Serial.println("\nPianoCocktail v0.91b");
 
   for( int i = 0; i < NBR_VANNE; ++i )
   {

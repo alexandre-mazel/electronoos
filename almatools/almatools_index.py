@@ -12,6 +12,7 @@ def index(req):
     }
     .imgelem{
     width:320px;
+    border-radius: 8px;
     }
     .txtelem{
     padding:10px;

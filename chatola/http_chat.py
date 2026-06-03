@@ -135,6 +135,10 @@ def testperf():
                     [ "long1", [{"role":"user","content":"Parle moi de calvitie"}] ], # question courte, reponse longue
                     
                     [ "long2", [{"role":"user","content":"Parle moi de calvitie, mais avec une reponse courte de 2 phrases max."}] ], # question longue avec context, reponse longue
+                    
+                    [ "carwash", [{"role":"user","content":"je dois aller au carwash laver ma voiture, il fait beau c'est a 100m de chez moi, est ce qu'il vaut mieux y aller a pied ou en voiture ? repond en une phrase de moins de 15 mots!"}] ], # question longue avec context, reponse longue
+                
+                
                 ]
                 
     normal_answer = ["How can I assist you today?","How can I assist you today?","256"]
@@ -153,6 +157,12 @@ def testperf():
     #~ model = "ministral-3:14b"
     #~ model = "deepseek-r1:8b"
     #~ model = "gemma4:e4b " # todo: add this one
+    #~ model = "llama3:70b" # enorme modele!
+    
+    #~ model = "qwen3.6:35b"  # bonne qualité
+    #~ model = "qwen3.6-35b-a3b-q8" # optimisé ?
+
+
 
     #  a nice recent one
     model = "llama3.2"
@@ -184,7 +194,7 @@ def testperf():
         long1              : 43.806s
         long2              : 190.068s / 246.041s avec get_knowledge_related_to a max=4
         
-        Champion1 en 100%  cpu:
+        ### Champion1 en 100%  cpu:
         cpu: Intel(R) Core(TM) i7-9700K CPU @ 3.60GHz
         Load+Hello      : 2.690s
         Hello               : 0.751s
@@ -193,7 +203,7 @@ def testperf():
         long2              : 257.479s
         
 
-        Champion1 en 100%  Gpu (3080 10GB) (le modele fait 3.4GB dans ollama ps, ca prend 3.4GB dans nvidia-smi!)
+        ### Champion1 en 100%  Gpu (3080 10GB) (le modele fait 3.4GB dans ollama ps, ca prend 3.4GB dans nvidia-smi!)
         NVIDIA-SMI 570.133.07             Driver Version: 570.133.07     CUDA Version: 12.8
         (ca fonctionnait pas car mes drivers était en 11.4)
             
@@ -205,16 +215,12 @@ def testperf():
         long2              : 1.405s         (token: 5782/85)
         (les timings sont bien régulier)
         
-        
         avec deepseek-r1:8b (6.6GB VRAM)
         Load+Hello      : 5.109s
         Hello               : 2.117s            (token: 3/224)
         comput            : 1.904s            (token: 555/35)
         long1               : 16.052s         (token: 9/1707)
         long2               : 4.821s           (token: 5752/315)
-
-
-
         
         avec ministral-3:14b (11GB 16%/84% CPU/GPU )
         Load+Hello      : 6.576s            
@@ -222,9 +228,16 @@ def testperf():
         comput            : 0.411s            (token: 577/4)
         long1               : 83.570s         (token: 561/1709) 
         long2               : 8.515s           (token: 4910/111)
+        
+        ### Apple M2 Max (de Yann)
+        Load+Hello      : 2.5s
+        Hello               : 0.220s
+        comput            : 0.182s
+        long1               : 9.83s
+        long2               : 6.87s
 
 
-        # d'apres ChatGpt:
+        ### d'apres ChatGpt Xavier AGX:
 
         Comparaison rapide Jetson Xavier AGX
         Setup	Tokens/sec
@@ -234,9 +247,96 @@ def testperf():
         PC RTX 4090	70–150
 
 
+        ### DGX Spark (peak a 297w) (idle: 112w)
+        
+        Load+Hello      : 3.476s
+        Hello               : 0.297s
+        comput            : 0.204s
+        long1               : 8.028s
+        long2               : 2.219s
+        carwash           : 0.437s (a pied)
+        
+        avec ministral-3:14b (51GB en 100 % GPU (context 262144))
+        Load+Hello      : 12.270s
+        Hello               : 2.751s
+        comput            : 0.401s
+        long1              : 50.396s
+        long2              : 6.233s
+        
+        avec deepseek-r1:8b (25GB VRAM, 131k context))
+        Load+Hello      : 21.305s
+        Hello               : 4.713s
+        comput           : 1.960s
+        long1              : 53.264s
+        long2              : 11.136s
 
+        llama3:70b (42GB en 100% GPU context 8192)
+        Load+Hello      : 42.716s
+        Hello               : 4.725s
+        comput           : 0.632s
+        long1              : 123.608s
+        long2              : 27.755s
+        carwash:         : 1.41 (a pied)
+        
+        qwen3.6:35b (29 GB    100% GPU     262144)
+        Load+Hello   : 22.752s
+        Hello            : 2.534s
+        comput        : 5.881s
+        long1           : 22.364s
+        long2           : 8.408s
+        
+        qwen3.6-35b-a3b-q8 (43 GB    100% GPU     262144)
+        qwen optimised:  install avec: 
+        wget https://huggingface.co/unsloth/Qwen3.6-35B-A3B-GGUF/blob/main/Qwen3.6-35B-A3B-Q8_0.gguf
+        echo FROM ./Qwen3.6-35B-A3B-Q8_0.gguf > modelfile
+        ollama create qwen3.6-35b-a3b-q8 -f modelfile
+        
+        Load+Hello      : 29.711s
+        Hello           : 4.216s
+        comput          : 7.186s
+        long1           : 28.902s
+        long2           : 18.605s
+        carwash       : 12.314s
+        
+
+        
+        # 3080 cutpaste:
+        Load+Hello      : 1.811s        
+        Hello               : 0.135s         (token: 26/8)
+        comput            : 0.109s        (token: 46/2)
+        long1              : 3.334s         (token: 32/599) (a peu pres 180 token/sec)
+        long2              : 1.405s         (token: 5782/85)
+        
+        avec deepseek-r1:8b (6.6GB VRAM)
+        Load+Hello      : 5.109s
+        Hello               : 2.117s            (token: 3/224)
+        comput            : 1.904s            (token: 555/35)
+        long1               : 16.052s         (token: 9/1707)
+        long2               : 4.821s           (token: 5752/315)
+        
+        avec ministral-3:14b (11GB 16%/84% CPU/GPU )
+        Load+Hello      : 6.576s            
+        Hello               : 1.781s            (token: 555/35)
+        comput            : 0.411s            (token: 577/4)
+        long1               : 83.570s         (token: 561/1709) 
+        long2               : 8.515s           (token: 4910/111)
+        
+        
+        
+
+        
+
+# a checker cette reponse sur dgx: 
+---- MODEL RESPONSE ----
+La calvitie est un phénomène naturel où les cheveux commencent à tomber, souvent en raison d'une production excessive d'hormones mâles ou d'un dérèglement hormonal. Elle peut être héréditaire et touche principalement les hommes, mais également les femmes, avec des causes variées telles que le stress, une mauvaise alimentation ou la chimiothérapie.
+
+A ajouter dans le test: 
+"je dois aller au carwash laver ma voiture, il fait beau c'est a 100m de chez moi, est ce qu'il vaut mieux y aller a pied ou en voiture ? repond en une phrase de moins de 15 mots!"
+"Le fromage sur la pizza n'arrete pas de couler sur la table, car la table est inclinée"
         """
     
+#todo
+# faire le bench avec differentes seed pour la phrase du carwash, car certaines fonctionnent seed fonctionnenet mieux que d'autrss
     
     
 if __name__ == "__main__":

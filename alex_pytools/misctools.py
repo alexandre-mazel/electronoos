@@ -593,6 +593,7 @@ def getCpuModel(bShort=False):
     elif platform.system() == "Linux":
         command = "cat /proc/cpuinfo"
         all_info = subprocess.check_output(command, shell=True).decode().strip()
+        name1 = "Unknown linux"
         for line in all_info.split("\n"):
             #~ print("DBG: line: '%s'" % line )
             strLineToSearch = "model name"
@@ -606,6 +607,14 @@ def getCpuModel(bShort=False):
                     name1 = name1[1:]
                     name1 = name1.strip()
                 break
+        try:
+            f = open( "/sys/class/dmi/id/product_family", "rt" )
+            data = f.read()
+            name1 = data
+            f.close()
+        except FileNotFoundError as err:
+            print( "DBG: getCpuModel: " , err )
+            pass
         name2 = name1
     else:
         name1, name2 =  "TODO:getCpuModel", "todo"

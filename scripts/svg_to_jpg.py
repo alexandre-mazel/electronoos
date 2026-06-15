@@ -39,7 +39,8 @@ def svg_to_png_folder( path ):
 
 
 if __name__ == "__main__":
-    svg_to_png_folder( "C:\\Users\\alexa\\dev\\git\\ensadlab\\misbkit_v2\\dev_web\\icons\\" )
+    #~ svg_to_png_folder( "C:\\Users\\alexa\\dev\\git\\ensadlab\\misbkit_v2\\dev_web\\icons\\" )
+    svg_to_png_folder( "C:\\Users\\alexa\\dev\\git\\misbkit_2.0\\interfaces\\Web_interfaces_june\\icons\\" )
     
     
     

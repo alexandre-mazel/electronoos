@@ -1,3 +1,5 @@
+// version 0.91c: change the max per cuve a 90sec au lieu de 60sec
+
 #include "HX711.h" // install in the library manager the HX711 by Rob Tillart (for cell amplifier)
 #include <LiquidCrystal.h>
 #include <EEPROM.h>
@@ -55,7 +57,7 @@ HX711 scale;
 
 // reglage pour barre de 3kg:
 
-float calibration_factor = 742.80; // 30g => 22000: 733 [une bouteille vide (celle de blanc orschwiller) peserait 448g; le plateau en fer 352g]
+float calibration_factor = 732.0; // 30g => 22000: 733 [une bouteille vide (celle de blanc orschwiller) peserait 448g; le plateau en fer 352g]
 // will be overwritten by EEPROM reading (so I put 100 to remember and test), to write it goto readCfgFromEeproom
 
 // la balance dans le sous sol: 733
@@ -121,7 +123,7 @@ int bIsFilling = 0;
 
 // mettre une plus grande valeur pour qu'il coupe plus tot.
 unsigned char nMilliBeforeCut = 83; // 10 en version normal (maintenant 13), en oversize: 45 si slow, 70 si rapide, mettre 100, et mettre hache.
-// new middle size: 30 c'est trop, 80 encore un peu trop, 100 pas assez, test 90. plus assez
+// new middle size: 30 c'est trop, 80 encore un peu trop, 100 pas assez, test 90 plus assez
 
 bool bWriteToEeprom = 0; // apres les reglages, mettre une fois a 1 pour ecrire puis a 0 pour la prod.
 
@@ -193,7 +195,7 @@ void setup() {
   Serial.begin(57600); // was 9600 // changing here need to change also in the android application.
   //pinMode(resetPin, INPUT);
 
-  Serial.println("\nPianoCocktail v0.91b");
+  Serial.println("\nPianoCocktail v0.91c");
 
   for( int i = 0; i < NBR_VANNE; ++i )
   {
@@ -635,7 +637,7 @@ void loop()
 {
 
   // security
-  if(bIsFilling && millis()-nTimeStartFill>60*1000L) // 60*1000 => 1 min
+  if(bIsFilling && millis()-nTimeStartFill>90*1000L) // 60*1000 => 1 min
   {
     // 1 min => security close
     stop_all();

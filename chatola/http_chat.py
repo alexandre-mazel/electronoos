@@ -298,6 +298,14 @@ def testperf():
         long2           : 18.605s
         carwash       : 12.314s
         
+        vllm et qwen3.6-35B-A3B-NVFP4 (script generer par codex) (mieux)
+        Load+Hello      : 2.3s
+        Hello               : 2.3s
+        comput          : 1.7s
+        long1           : 17s
+        long2           : 7s
+        carwash       : 3.91
+        
 
         
         # 3080 cutpaste:

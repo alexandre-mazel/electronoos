@@ -84,6 +84,8 @@ const int NBR_VANNE = 5;
 
 const int VANNE_TEST_PIN = 44;
 
+int bThisIsLastOne = false;
+
 
 #include <LiquidCrystal_I2C.h>
 
@@ -122,10 +124,10 @@ long int nTimeStartFill = 0;
 int bIsFilling = 0;
 
 // mettre une plus grande valeur pour qu'il coupe plus tot.
-unsigned char nMilliBeforeCut = 83; // 10 en version normal (maintenant 13), en oversize: 45 si slow, 70 si rapide, mettre 100, et mettre hache.
+unsigned char nMilliBeforeCut = 52; // 10 en version normal (maintenant 13), en oversize: 45 si slow, 70 si rapide, mettre 100, et mettre hache.
 // new middle size: 30 c'est trop, 80 encore un peu trop, 100 pas assez, test 90 plus assez
 
-bool bWriteToEeprom = 0; // apres les reglages, mettre une fois a 1 pour ecrire puis a 0 pour la prod.
+bool bWriteToEeprom = 1; // apres les reglages, mettre une fois a 1 pour ecrire puis a 0 pour la prod.
 
 //bool bIsOversize = 1;
 bool bIsOversize = 0;
@@ -178,8 +180,9 @@ void readCfgFromEeproom()
 {
   if(bWriteToEeprom)
   {
-    //write values (for the first time)
+    // write values (normally just once, for the first time)
     Serial.println("\nWRITING TO EEPROM !\n");
+    pLcd->print("WRITING TO EEPROM !");
     EEPROM.put(0x00, calibration_factor);
     EEPROM.put(0x04, nMilliBeforeCut);
     
@@ -195,7 +198,7 @@ void setup() {
   Serial.begin(57600); // was 9600 // changing here need to change also in the android application.
   //pinMode(resetPin, INPUT);
 
-  Serial.println("\nPianoCocktail v0.91c");
+  Serial.println("\nPianoCocktail v0.92");
 
   for( int i = 0; i < NBR_VANNE; ++i )
   {
@@ -367,6 +370,11 @@ int check_if_must_stop_verse()
     nbBalanceIsStuck = 0;
   }
 
+  int milibefore = nMilliBeforeCut;
+  if( !bThisIsLastOne )
+  {
+    milibefore /= 6; // sinon ca limite trop les premiers je trouve
+  }
   
   
   if(diff<nMilliBeforeCut || nbBalanceIsStuck) // couramment on prend 8 apres coupure // On ajoute 1 de plus en condition réél des caves
@@ -637,7 +645,7 @@ void loop()
 {
 
   // security
-  if(bIsFilling && millis()-nTimeStartFill>90*1000L) // 60*1000 => 1 min
+  if(bIsFilling && millis()-nTimeStartFill>90*1000L) // 60*1000 => 1 min (en fin de cuve on dépasse 1 min sur la machine A)
   {
     // 1 min => security close
     stop_all();
@@ -798,10 +806,11 @@ void loop()
             Serial.println("DBG: Processing next order...");
             --nNbrQueueOrder;
             float rGramme = queueOrder[nNbrQueueOrder*2+1];
+            bThisIsLastOne = nNbrQueueOrder==0;
             if(nNbrQueueOrder==0 && rTotalTarget>0)
             {
               rGramme = rTotalTarget-last_measured-0.5; // remove 0.5g to add margin car bouteille trop pleine
-              rGramme -= 5; // 2024/08/27: enleve 5g sur le total car ca fait trop sur le petit assembleur (la balance perdrait des grammes genre 10g a la minute ce qui explique le débordement?)
+              //rGramme -= 5; // 2024/08/27: enleve 5g sur le total car ca fait trop sur le petit assembleur (la balance perdrait des grammes genre 10g a la minute ce qui explique le débordement?)
               rTotalTarget = -1;
             }
             if(rGramme>0)

@@ -85,6 +85,9 @@ const int NBR_VANNE = 5;
 const int VANNE_TEST_PIN = 44;
 
 int bThisIsLastOne = false;
+int nEnableEndPrecisionState = 0; // 0: non, 1: a activer, 2: last serie // a la fin apres 5 sec que la mousse descend on peut remettre un petit coup
+long int nTimeStartPrecision = 0;
+
 
 
 #include <LiquidCrystal_I2C.h>
@@ -124,21 +127,21 @@ long int nTimeStartFill = 0;
 int bIsFilling = 0;
 
 // mettre une plus grande valeur pour qu'il coupe plus tot.
-unsigned char nMilliBeforeCut = 52; // 10 en version normal (maintenant 13), en oversize: 45 si slow, 70 si rapide, mettre 100, et mettre hache.
-// new middle size: 30 c'est trop, 80 encore un peu trop, 100 pas assez, test 90 plus assez
+unsigned char nMilliBeforeCut = 39; // 10 en version normal (maintenant 13), en oversize: 45 si slow, 70 si rapide, mettre 100, et mettre hache.
+// new middle size: 30 c'est trop, 80 encore un peu trop, 100 pas assez, test 90 plus assez. 28 avec le hachage a la fin
 
 bool bWriteToEeprom = 1; // apres les reglages, mettre une fois a 1 pour ecrire puis a 0 pour la prod.
 
 //bool bIsOversize = 1;
 bool bIsOversize = 0;
 
-bool bActivateHache  = bIsOversize; // activate on oversized
+bool bActivateHache  = bIsOversize || 0; // activate on oversized
 
 int nWaitBetweenBottleMs = 1000; // was 5000, then 3000 (new: doubled when oversize)
 
 unsigned long hache_timeNextChange = 0;
 int hache_nNextIsOpen = 1;
-int hache_period_ms = 500;
+int hache_period_ms = 250;
 
 // internal opening, without high level handling
 void _setOpen( int nNumVanne, int bOpen)
@@ -268,7 +271,7 @@ void setup() {
 
 float last_measured = 0;
 float rTotalTarget = -1; // set when we receive an assemble command to fill the bottle to the brim - or not more
-
+float rTotalTargetPrev; // le dernier total target qu'on voulait
 
 
 // ask to verse x grammes
@@ -307,6 +310,10 @@ void hache()
         _setOpen(nCurrentVanne,hache_nNextIsOpen);
         hache_nNextIsOpen ^= 1; // pingpong between 0 and 1
         hache_timeNextChange = millis() + hache_period_ms;
+        if( hache_nNextIsOpen && 0 )
+        {
+          hache_timeNextChange += 500; // longer wait pour la mousse de disparaitre
+        }
     }
 }
 
@@ -377,7 +384,7 @@ int check_if_must_stop_verse()
   }
   
   
-  if(diff<nMilliBeforeCut || nbBalanceIsStuck) // couramment on prend 8 apres coupure // On ajoute 1 de plus en condition réél des caves
+  if( diff<nMilliBeforeCut || nbBalanceIsStuck ) // couramment on prend 8 apres coupure // On ajoute 1 de plus en condition réél des caves
   {
     setOpen(nCurrentVanne, 0);
     if(0)
@@ -397,9 +404,17 @@ int check_if_must_stop_verse()
   }
   
   // hachage en fin de versage
-  if(rTotalTarget < 0 && diff < 300 && bActivateHache ) // if it's the last cuve, and near the end, we must slow down
+  if(rTotalTarget < 0 && diff < 220 && bActivateHache ) // if it's the last cuve, and near the end, we must slow down
   {
-    hache();
+    if( diff > 80 )
+    {
+      hache();
+    }
+    else
+    {
+      // a la fin du hachage, arrete de hacher pour gagner en précision
+      _setOpen(nCurrentVanne,true);
+    }
   }
   return 1;
 }
@@ -530,6 +545,7 @@ int handleOrder( const char * command)
         queueOrder[nNbrQueueOrder*2+0] = i;
         queueOrder[nNbrQueueOrder*2+1] = args[i];
         rTotalTarget += args[i];
+        rTotalTargetPrev = rTotalTarget;
         ++nNbrQueueOrder;
       }
     }
@@ -624,7 +640,7 @@ void sendSerialCommand(const char * msg)
 
 char dummyChangeCompiledSizeToPreventUploadError[23] = {1,2};
 
-void simulateReceiveAssembleOrder( int qt1 = 50, int qt2 = 50, int qt3 = 50, int qt4 = 50, int qt5 = 50)
+void simulateReceiveAssembleOrder( int qt1 = 150, int qt2 = 150, int qt3 = 150, int qt4 = 150, int qt5 = 150)
 {
   Serial.println("simulateReceiveAssembleOrder");
   scale.tare();
@@ -798,6 +814,12 @@ void loop()
     {
       if( nNbrQueueOrder > 0 )
       {
+        if( nNbrQueueOrder > 1 )
+        {
+          // on est sur une bouteille pleine, on veut de la précision
+          nEnableEndPrecisionState = 1;
+          nTimeStartPrecision = 0;
+        }
         // handle queue
         if(!isTargetDefined())
         {
@@ -807,6 +829,10 @@ void loop()
             --nNbrQueueOrder;
             float rGramme = queueOrder[nNbrQueueOrder*2+1];
             bThisIsLastOne = nNbrQueueOrder==0;
+            if( bThisIsLastOne && nEnableEndPrecisionState == 1)
+            {
+              nEnableEndPrecisionState = 2;
+            }
             if(nNbrQueueOrder==0 && rTotalTarget>0)
             {
               rGramme = rTotalTarget-last_measured-0.5; // remove 0.5g to add margin car bouteille trop pleine
@@ -822,5 +848,30 @@ void loop()
       }
     }
   }
+
+  if( nEnableEndPrecisionState == 2 && target_verse == -1001 )
+  {
+    Serial.print( "bEnableEndPrecision: programming a rajout at: ");
+    nTimeStartPrecision = millis() + 5000;
+    Serial.println( nTimeStartPrecision );
+    nEnableEndPrecisionState = 0;
+  }
+  if( nTimeStartPrecision != 0 && millis() > nTimeStartPrecision )
+  {
+    nTimeStartPrecision = 0;
+    Serial.print( "rTotalTargetPrev: ");
+    Serial.println( rTotalTargetPrev );
+    float rGramme = rTotalTargetPrev-last_measured-0.5;
+    Serial.print( "nTimeStartPrecision: missing: ");
+    Serial.println( rGramme );
+    if( rGramme > 2 )
+    {
+      Serial.print( "nTimeStartPrecision: launching a quantity of gramme: ");
+      Serial.println( rGramme );
+      verse_quantite(rGramme,nCurrentVanne);
+    }
+  }
+
+
   delay(100); // en tout, ca loop actuel prend a peu pres 176ms (avec un getunits de 2)
 }

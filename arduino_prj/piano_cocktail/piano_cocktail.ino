@@ -127,10 +127,10 @@ long int nTimeStartFill = 0;
 int bIsFilling = 0;
 
 // mettre une plus grande valeur pour qu'il coupe plus tot.
-unsigned char nMilliBeforeCut = 39; // 10 en version normal (maintenant 13), en oversize: 45 si slow, 70 si rapide, mettre 100, et mettre hache.
+unsigned char nMilliBeforeCut = 46; // 10 en version normal (maintenant 13), en oversize: 45 si slow, 70 si rapide, mettre 100, et mettre hache.
 // new middle size: 30 c'est trop, 80 encore un peu trop, 100 pas assez, test 90 plus assez. 28 avec le hachage a la fin
 
-bool bWriteToEeprom = 1; // apres les reglages, mettre une fois a 1 pour ecrire puis a 0 pour la prod.
+bool bWriteToEeprom = 0; // apres les reglages, mettre une fois a 1 pour ecrire puis a 0 pour la prod.
 
 //bool bIsOversize = 1;
 bool bIsOversize = 0;
@@ -545,7 +545,6 @@ int handleOrder( const char * command)
         queueOrder[nNbrQueueOrder*2+0] = i;
         queueOrder[nNbrQueueOrder*2+1] = args[i];
         rTotalTarget += args[i];
-        rTotalTargetPrev = rTotalTarget;
         ++nNbrQueueOrder;
       }
     }
@@ -814,11 +813,15 @@ void loop()
     {
       if( nNbrQueueOrder > 0 )
       {
-        if( nNbrQueueOrder > 1 )
+        if( nNbrQueueOrder > 1 || 1 )
         {
           // on est sur une bouteille pleine, on veut de la précision
-          nEnableEndPrecisionState = 1;
-          nTimeStartPrecision = 0;
+          if( rTotalTarget > 700 )
+          {
+            rTotalTargetPrev = rTotalTarget;
+            nEnableEndPrecisionState = 1;
+            nTimeStartPrecision = 0;
+          }
         }
         // handle queue
         if(!isTargetDefined())
@@ -829,7 +832,7 @@ void loop()
             --nNbrQueueOrder;
             float rGramme = queueOrder[nNbrQueueOrder*2+1];
             bThisIsLastOne = nNbrQueueOrder==0;
-            if( bThisIsLastOne && nEnableEndPrecisionState == 1)
+            if( bThisIsLastOne && nEnableEndPrecisionState == 1 )
             {
               nEnableEndPrecisionState = 2;
             }
@@ -849,26 +852,44 @@ void loop()
     }
   }
 
-  if( nEnableEndPrecisionState == 2 && target_verse == -1001 )
+  //Serial.print( "INF: nEnableEndPrecisionState: ");
+  //Serial.println( nEnableEndPrecisionState );
+  
+  if( nEnableEndPrecisionState == 2 && !isTargetDefined() )
   {
-    Serial.print( "bEnableEndPrecision: programming a rajout at: ");
     nTimeStartPrecision = millis() + 5000;
+    Serial.print( "INF: bEnableEndPrecision: programming a rajout at: ");
     Serial.println( nTimeStartPrecision );
     nEnableEndPrecisionState = 0;
   }
   if( nTimeStartPrecision != 0 && millis() > nTimeStartPrecision )
   {
-    nTimeStartPrecision = 0;
-    Serial.print( "rTotalTargetPrev: ");
+    nTimeStartPrecision = millis() + 1000; // temps pour stabiliser
+    Serial.print( "INF: rTotalTargetPrev: ");
     Serial.println( rTotalTargetPrev );
-    float rGramme = rTotalTargetPrev-last_measured-0.5;
-    Serial.print( "nTimeStartPrecision: missing: ");
-    Serial.println( rGramme );
-    if( rGramme > 2 )
+    Serial.print( "INF: last_measured: ");
+    Serial.println( last_measured );
+    float diff = rTotalTargetPrev-last_measured;
+    Serial.print( "INF: diff missing: ");
+    Serial.println( diff );
+    if( diff > 11 )
     {
-      Serial.print( "nTimeStartPrecision: launching a quantity of gramme: ");
+      float rGramme = diff; // on doit ajouter nMilliBeforeCut sinon ca ne relance mais ca coupe de suite
+      // c'est bien de couper de suite, ca fait un pchitt de 9-12g
+      // le micropchitt est a 5g
+      Serial.print( "INF: nTimeStartPrecision: launching a quantity of gramme: ");
       Serial.println( rGramme );
-      verse_quantite(rGramme,nCurrentVanne);
+      verse_quantite( rGramme, nCurrentVanne );
+      if(1)
+      {
+        // fait un pschitt extremement court: un micro pschitt!
+        delay(70); // 100 => 5g, 70 => 2.5g ?
+        setOpen(nCurrentVanne,0);
+      }
+    }
+    else
+    {
+      nTimeStartPrecision = 0;
     }
   }
 

@@ -156,7 +156,7 @@ def auto_off():
     
     
 def main(bDontAutoOff):
-    log("background_task: starting, bDontAutoOff: %s" % bDontAutoOff)
+    log("background_task: starting, bDontAutoOff: %s" % bDontAutoOff )
     while 1:
         check_temp()
         ping_other()

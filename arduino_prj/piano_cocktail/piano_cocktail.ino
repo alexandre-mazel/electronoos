@@ -815,7 +815,7 @@ void loop()
       {
         if( nNbrQueueOrder > 1 || 1 )
         {
-          // on est sur une bouteille pleine, on veut de la précision
+          // on est sur une bouteille pleine ou presque, on veut de la précision
           if( rTotalTarget > 700 )
           {
             rTotalTargetPrev = rTotalTarget;
@@ -851,6 +851,9 @@ void loop()
       }
     }
   }
+
+
+  // gestion des pschits-pschitts de fin pour gagner en précision
 
   //Serial.print( "INF: nEnableEndPrecisionState: ");
   //Serial.println( nEnableEndPrecisionState );

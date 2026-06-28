@@ -428,7 +428,7 @@ if __name__ == "__main__":
             datas.update(added_datas)
             datas_of_interest.append(("armoire","temp"))
             
-        day -= 4 # how much day you want to see
+        day -= 14 # how much day you want to see
         if day < 0:
             day += 31
             month -= 1

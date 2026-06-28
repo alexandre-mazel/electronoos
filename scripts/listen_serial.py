@@ -1,8 +1,27 @@
+import datetime
 import os
 import sys
 import time
 
 import serial # pip install pyserial
+
+last_time_stamp = datetime.datetime.now()
+def getTimeStamp():
+    """
+
+    # REM: linux command:
+    # timedatectl list-timezones: list all timezones
+    # sudo timedatectl set-timezone Europe/Paris => set paris
+    """
+    datetimeObject = datetime.datetime.now()
+    strTimeStamp = datetimeObject.strftime( "%Y/%m/%d: %Hh%Mm%Ss" )
+    if 1:
+        global last_time_stamp
+        decay = datetimeObject - last_time_stamp
+        decay = decay.total_seconds()
+        last_time_stamp = datetimeObject
+        strTimeStamp += " (%3.2fs)" % decay
+    return strTimeStamp
 
 def listPorts():
     """
@@ -89,7 +108,8 @@ def monitorPort(strPortName, nBaudRate=9600, bImmediateClosing = False):
             #~ buf = buf.decode(encoding='utf-8', errors='strict')
             if buf != prevPrint:
                 prevPrint = buf
-                print("buf: " + buf)
+                #~ print("buf: " + buf)
+                print( getTimeStamp() + ": " + buf)
             ser.write("print 2".encode())
     except BaseException as err: # including KeyboardInterrupt
         print("ERR: monitorPort (2): %s" % str(err) )

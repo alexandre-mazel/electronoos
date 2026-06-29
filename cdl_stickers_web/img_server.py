@@ -31,8 +31,10 @@ class ImageServer(SimpleHTTPRequestHandler):
         return True
         
     def do_POST(self):
-        if self.path == "/upload":
-            query = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+        parsed = urllib.parse.urlparse(self.path)
+        
+        if parsed.path == "/upload":
+            query = urllib.parse.parse_qs(parsed.query)
             image_id = query.get("id", ["1"])[0]
             print("do_POST: 1:upload apres query")
 
@@ -103,6 +105,10 @@ class ImageServer(SimpleHTTPRequestHandler):
                             self.wfile.write(file.read())
                         print( "INF: get_image: image sent..."  )
                         return
+                    else:
+                        # on l'efface (on en efface un de temps en temps, ca libere le disque)
+                        print( "INF: erasing old file: '%s'" % latest_file )
+                        os.unlink( latest_file )
 
             print( "INF: get_image: no img"  )
             self.send_response(200)
@@ -156,9 +162,11 @@ class ImageServer(SimpleHTTPRequestHandler):
             
         if 1:
             # serve other files
-            filepath = self.path.lstrip("/")
+            filepath = parsed.path.lstrip("/")
+            query = urllib.parse.parse_qs(parsed.query)
             
             print( "DBG: file: '%s'" % filepath )
+            print( "DBG: query: %s" % query )
 
             if filepath and os.path.isfile(filepath):
                 self.send_response(200)

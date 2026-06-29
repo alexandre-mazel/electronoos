@@ -189,6 +189,9 @@ capture="environment">
 
 <script>
 
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+
 const language_code =
 navigator.language.toLowerCase().startsWith("fr")
 ? "fr"
@@ -264,6 +267,7 @@ document.getElementById("upload_button").style.display="block";
 
 document.getElementById("status_text").textContent="";
 
+console.log("scroll to bottom")
 setTimeout(() => {
   window.scrollTo({
     top: document.body.scrollHeight,
@@ -291,7 +295,7 @@ form_data.append("image",image_selected);
 
 const request = new XMLHttpRequest();
 
-request.open("POST","/upload",true);
+request.open("POST","/upload?id="+ encodeURIComponent(id),true);
 
 request.upload.onprogress = function(event){
 

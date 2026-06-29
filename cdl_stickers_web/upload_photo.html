@@ -202,7 +202,7 @@ description:"Choisissez une photo puis envoyez-la.",
 pick:"Choisir une photo",
 upload:"Envoyer la photo",
 uploading:"Envoi...",
-received:"Merci ! Votre photo a bien été reçue.",
+received:"Merci ! Votre photo a bien Ã©tÃ© reÃ§ue.",
 error:"Une erreur est survenue."
 },
 
@@ -263,6 +263,14 @@ image_preview.style.display="block";
 document.getElementById("upload_button").style.display="block";
 
 document.getElementById("status_text").textContent="";
+
+setTimeout(() => {
+  window.scrollTo({
+    top: document.body.scrollHeight,
+    behavior: "smooth"
+  });
+}, 500);
+
 });
 
 document

@@ -3,9 +3,33 @@ import time
 import urllib.parse
 from http.server import SimpleHTTPRequestHandler, HTTPServer
 from datetime import datetime
+import cgi
+import io
 
 
 class ImageServer(SimpleHTTPRequestHandler):
+    
+
+    def writeImageFromMultipartFormat( self, data, filename, length ):
+        form = cgi.FieldStorage(
+            fp=io.BytesIO(data),
+            headers=self.headers,
+            environ={
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": self.headers.get("Content-Type"),
+                "CONTENT_LENGTH": str(length),
+            }
+        )
+
+        image_field = form["image"]
+
+        image_bytes = image_field.file.read()
+
+        with open(filename, "wb") as f:
+            f.write(image_bytes)
+        print( "INF: writeImageFromMultipartFormat: write an image of size %d in file: '%s'" % (len(image_bytes),filename) )
+        return True
+        
     def do_POST(self):
         if self.path == "/upload":
             query = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
@@ -30,13 +54,13 @@ class ImageServer(SimpleHTTPRequestHandler):
 
             filename = datetime.now().strftime("%Y%m%d_%H%M%S_%f") + ".jpg"
             filepath = os.path.join(folder, filename)
+            
+            self.writeImageFromMultipartFormat( data, filepath, length )
 
-            with open(filepath, "wb") as file:
-                file.write(data)
-                
             print("do_POST: 4")
 
             self.send_response(200)
+            self.send_header("Content-Type", "text/plain")
             self.end_headers()
             self.wfile.write(b"ok")
             return
@@ -82,7 +106,7 @@ class ImageServer(SimpleHTTPRequestHandler):
 
             print( "INF: get_image: no img"  )
             self.send_response(200)
-            elf.send_header("Content-Type", "text/plain")
+            self.send_header("Content-Type", "text/plain")
             self.end_headers()
             self.wfile.write(b"noimg")
             return

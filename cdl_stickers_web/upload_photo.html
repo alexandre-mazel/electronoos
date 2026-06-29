@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Les Caves du Louvre</title>
+<link rel="icon" type="image/png" href="/logo_cdl_ico.png">
 
 <style>
 html,body{
@@ -156,10 +157,13 @@ html,body{
 <div id="page_container">
 
 <div id="card_container">
-
+<!--
 <div id="logo_placeholder">
 LOGO
 </div>
+-->
+<img src = "logo_cdl_small.png" />
+<br>
 
 <div id="title_text"></div>
 
@@ -223,8 +227,8 @@ error:"An error occurred."
 
 const text_current = text_dictionary[language_code];
 
-document.getElementById("title_text").textContent =
-text_current.title;
+//~ document.getElementById("title_text").textContent =
+//~ text_current.title;
 
 document.getElementById("description_text").textContent =
 text_current.description;

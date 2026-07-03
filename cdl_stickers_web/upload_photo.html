@@ -162,7 +162,7 @@ html,body{
 LOGO
 </div>
 -->
-<img src = "logo_cdl_small.png" />
+<img src = "logo_cdl_small.png" width=200px />
 <br>
 
 <div id="title_text"></div>
@@ -173,7 +173,7 @@ LOGO
 id="file_input"
 type="file"
 accept="image/*"
-capture="environment">
+> <!-- param: capture="environment" => open rear camera; "user": selfie cam; rien: gallery -->
 
 <button id="pick_button"></button>
 
@@ -321,6 +321,14 @@ if(request.status>=200 && request.status<300){
 
 document.getElementById("status_text").textContent =
 text_current.received;
+
+console.log("scroll to bottom(2)")
+setTimeout(() => {
+  window.scrollTo({
+    top: document.body.scrollHeight,
+    behavior: "smooth"
+  });
+}, 500);
 
 }
 else{

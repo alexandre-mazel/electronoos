@@ -2,8 +2,8 @@
 
 #include <FastLED.h> // FastLed Neopixel by David Madison and FastLed 3.9.8
 
-//#define MEGA
-#define PRO_MICRO
+#define MEGA
+//#define PRO_MICRO
 //#define XIAO_C3 //NDEV
 
 

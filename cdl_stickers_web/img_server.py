@@ -6,6 +6,11 @@ from datetime import datetime
 import cgi
 import io
 
+# upload page: http://ip:8000/upload_photo.html?id=x
+# eg: http://10.0.126.73:8000/upload_photo.html?id=1
+# upload file: /upload?id=1
+# to retrieve last img : /get_image?id=1
+# to retrieve just filename of last img: /get_image_filename?id=1
 
 class ImageServer(SimpleHTTPRequestHandler):
     

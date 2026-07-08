@@ -194,31 +194,27 @@ header h1{
         padding:15px;
     }
 
-    .preview{
-
-        position:fixed;
-        display:none;
-
-        background:white;
-        border-radius:12px;
-        box-shadow:0 18px 40px rgba(0,0,0,.35);
-        padding:12px;
-
-        z-index:9999;
-        pointer-events: none; /* evite que la preview pique l'event mouseenter meme caché */
+    .preview {
+        width:90vw;
         max-width:90vw;
-        max-height:90vh;
+        left:5vw !important;
+        top:5vh !important;
+        transform:none !important;
+        padding:10px;
         overflow-y:auto;
     }
 
-    .preview img{
-        width:85vw;
-        height:auto;
-        max-height:60vh;
-        object-fit:cover;
+    .preview-grid {
+        display:flex;
+        flex-direction:column;
+        width:100%;
     }
-    .preview-grid{
-        
+
+    .preview img {
+        width:100%;
+        height:auto;
+        max-width:100%;
+        object-fit:cover;
     }
     
 } /* mobile */

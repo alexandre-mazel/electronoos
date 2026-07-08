@@ -300,7 +300,6 @@ header h1{
 .play-icon {
 
     position:absolute;
-
     left:50%;
     top:50%;
 
@@ -312,19 +311,53 @@ header h1{
     border-radius:50%;
 
     background:rgba(0,0,0,.55);
-
     color:white;
 
     font-size:30px;
-
     display:flex;
 
     align-items:center;
     justify-content:center;
 
     padding-left:5px;
+}
+
+.play-icon {
+
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    width:60px;
+    height:60px;
+
+    border-radius:50%;
+
+    background:rgba(0,0,0,.55);
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
 
 }
+
+
+/* triangle CSS */
+.play-icon::after {
+
+    content:"";
+
+    margin-left:5px;
+
+    width:0;
+    height:0;
+
+    border-top:12px solid transparent;
+    border-bottom:12px solid transparent;
+    border-left:20px solid white;
+
+}
+
 </style>
 </head>
 
@@ -488,7 +521,7 @@ project.gallery.forEach(src=>{
 
         const play=document.createElement("div");
         play.className="play-icon";
-        play.innerHTML="▶";
+        play.innerHTML="";
 
         container.appendChild(play);
 

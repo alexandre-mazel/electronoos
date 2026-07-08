@@ -491,6 +491,8 @@ function createProjectCard(project){
 
     card.appendChild(info);
 
+if (window.innerWidth > 700) 
+        {
     card.addEventListener("mouseenter",()=>
     {
         const r = card.getBoundingClientRect();
@@ -536,6 +538,7 @@ function createProjectCard(project){
         
         
     } ); // mouseenter
+    }
 
     card.addEventListener("mouseleave",()=>{
     

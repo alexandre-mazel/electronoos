@@ -524,6 +524,28 @@ project.gallery.forEach(src=>{
         play.innerHTML="";
 
         container.appendChild(play);
+        
+        play.addEventListener("click",(e)=>{
+
+            e.stopPropagation();
+            video.controls = true;
+            video.play();
+            play.style.display="none";
+
+        });
+            
+        play.addEventListener("touchend",(e)=>{
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            video.controls = true;
+
+            video.play();
+
+            play.style.display="none";
+
+        },{passive:false});
 
     } 
     else {
@@ -599,8 +621,13 @@ project.gallery.forEach(src=>{
  */
  
      if (window.innerWidth > 700) {
+     
+        let overCard = false;
+        let overPreview = false;
 
         card.addEventListener("mouseenter", () => {
+        
+        overCard = true;
 
             const r = card.getBoundingClientRect();
             
@@ -632,8 +659,35 @@ project.gallery.forEach(src=>{
         });
 
 
-        card.addEventListener("mouseleave", () => {
-            preview.style.display = "none";
+
+        card.addEventListener("mouseleave",()=>{
+
+            // but: si qd on quitte on va sur la preview, peut etre qu'on va vouloir cliquer sur le play, alors on laisse un peu de temps pour aller sur la preview, et tant qu'on y est on la garde
+            overCard = false;
+
+            setTimeout(()=>{
+
+                if(!overCard && !overPreview){
+                    preview.style.display="none";
+                }
+
+            },100);
+
+        });
+        
+
+
+        preview.addEventListener("mouseenter",()=>{
+
+            overPreview=true;
+
+        });
+        
+        preview.addEventListener("mouseleave",()=>{
+
+            overPreview=false;
+            preview.style.display="none";
+
         });
 
         close.addEventListener("click", ()=>{

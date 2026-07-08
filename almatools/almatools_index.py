@@ -67,6 +67,12 @@ def index(req):
     <div style='vertical-align: middle;'>
     <img src='/almatools/adr_email_at.svg' height=15px>
     </div>
+    
+    <div style='vertical-align: middle;'>
+    <a href='/almatools/book.html'>Projects</a>
+    </div>
+    
+    
     </body>
     </html>
     """

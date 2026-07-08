@@ -167,7 +167,8 @@ header h1{
 
     z-index:100;
     
-    pointer-events: none; /* evite que la preview pique l'event mouseenter meme caché */
+    // pointer-events: none; /* evite que la preview pique l'event mouseenter meme caché */
+    pointer-events:auto;
     
         overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
@@ -240,6 +241,9 @@ header h1{
         max-height:90vh;
         touch-action: pan-y;
         overscroll-behavior: contain;
+        
+        pointer-events:auto;
+
     }
 
     .preview-grid {

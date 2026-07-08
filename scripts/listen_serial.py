@@ -138,6 +138,9 @@ if __name__ == "__main__":
     
     if len(sys.argv) > 1:
         strPortName = sys.argv[1]
+    else:
+        print("using autodetected port: %s" % strPortNameAutodetect )
+        strPortName = strPortNameAutodetect
         
     
     if len(sys.argv) > 2:
@@ -147,14 +150,10 @@ if __name__ == "__main__":
             bClean = True
         else:
             nBaudRate = int(sys.argv[2])
-
-            
-    if 0:
-        print("using autodetected port: %s" % strPortNameAutodetect )
-        strPortName = strPortNameAutodetect
         
     print("\nINF: Connecting to %s (baud: %s)" % (strPortName,nBaudRate) )
-    while 2 != monitorPort(strPortName,nBaudRate,bImmediateClosing=bClean):
+    while 1:
+        monitorPort(strPortName,nBaudRate,bImmediateClosing=bClean)
         time.sleep(1.)
         print("Reconnecting...")
     print("INF: script finished...")

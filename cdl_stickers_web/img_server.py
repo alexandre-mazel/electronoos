@@ -10,7 +10,10 @@ import io
 # eg: http://10.0.126.73:8000/upload_photo.html?id=1
 # upload file: /upload?id=1
 # to retrieve last img : /get_image?id=1
+# eg: http://10.0.126.73:8000/get_image?id=6
 # to retrieve just filename of last img: /get_image_filename?id=1
+
+# réseaux public: caves du louvre (wistro) bonjour
 
 class ImageServer(SimpleHTTPRequestHandler):
     
@@ -76,6 +79,7 @@ class ImageServer(SimpleHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
+        limit_time_photo_sec = 30
         print( "DBG: go_GET: '%s'" % self.path )
         parsed = urllib.parse.urlparse(self.path)
 
@@ -101,7 +105,7 @@ class ImageServer(SimpleHTTPRequestHandler):
                 if files:
                     latest_file = max(files, key=os.path.getmtime)
 
-                    if time.time() - os.path.getmtime(latest_file) < 60:
+                    if time.time() - os.path.getmtime(latest_file) < limit_time_photo_sec:
                         self.send_response(200)
                         self.send_header("Content-Type", "image/jpeg") # TODO: change selon extension du fichier!
                         self.end_headers()
@@ -150,7 +154,7 @@ class ImageServer(SimpleHTTPRequestHandler):
                         key=lambda file: os.path.getmtime(os.path.join(folder, file))
                     )
 
-                    if time.time() - os.path.getmtime(os.path.join(folder, latest_file)) >= 60:
+                    if time.time() - os.path.getmtime(os.path.join(folder, latest_file)) >= limit_time_photo_sec:
                         latest_file = None
 
             self.send_response(200)

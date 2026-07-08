@@ -168,6 +168,9 @@ header h1{
     z-index:100;
     
     pointer-events: none; /* evite que la preview pique l'event mouseenter meme caché */
+    
+        overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
 
 }
 
@@ -184,6 +187,37 @@ header h1{
     object-fit:cover;
     border-radius:8px;
 }
+
+.closePreview {
+
+    display:none;
+
+    position:absolute;
+
+    top:8px;
+    right:12px;
+
+    width:32px;
+    height:32px;
+
+    background:rgba(0,0,0,.6);
+
+    color:white;
+
+    border-radius:50%;
+
+    font-size:24px;
+
+    line-height:30px;
+
+    text-align:center;
+
+    cursor:pointer;
+
+    z-index:10;
+
+}
+
 
 /* Mobile */
 
@@ -202,6 +236,10 @@ header h1{
         transform:none !important;
         padding:10px;
         overflow-y:auto;
+        
+        max-height:90vh;
+        touch-action: pan-y;
+        overscroll-behavior: contain;
     }
 
     .preview-grid {
@@ -215,6 +253,10 @@ header h1{
         height:auto;
         max-width:100%;
         object-fit:cover;
+    }
+    
+    .closePreview {
+        display:block;
     }
     
 } /* mobile */
@@ -321,6 +363,12 @@ function createProjectCard(project){
 
     const preview=document.createElement("div");
     preview.className="preview";
+    
+    const close=document.createElement("div");
+    close.className="closePreview";
+    close.innerHTML="×";
+
+    preview.appendChild(close);
 
     const grid=document.createElement("div");
     grid.className="preview-grid";
@@ -448,6 +496,12 @@ document.addEventListener("click",()=>{
         p.style.display="none";
     });
 
+});
+
+close.addEventListener("click", (e)=>{
+    e.stopPropagation();
+    preview.style.display="none";
+    document.body.style.overflow="";
 });
 
 </script>

@@ -536,20 +536,34 @@ function createProjectCard(project){
     }); // mouseleave
 
     // Mobile tap
-    img.addEventListener("click",(e)=>{
+img.addEventListener("click", (e) => {
 
-        if(window.innerWidth<700){
+    if (window.innerWidth < 700) {
 
-            e.stopPropagation();
+        e.stopPropagation();
 
-            preview.style.display=
-                preview.style.display==="block"
-                ?"none"
-                :"block";
+        const isVisible = preview.style.display === "block";
 
+        if (isVisible) {
+
+            preview.style.display = "none";
+            document.body.style.overflow = "";
+
+        } else {
+
+            preview.style.display = "block";
+
+            // Position mobile
+            preview.style.left = "5vw";
+            preview.style.top = "5vh";
+            preview.style.transform = "none";
+
+            // Bloque le scroll derrière
+            document.body.style.overflow = "hidden";
         }
+    }
 
-    });
+});
 
     return card;
 
@@ -563,11 +577,17 @@ projects.forEach(p=>{
 });
 
 
-document.addEventListener("click",()=>{
+document.addEventListener("click",(e)=>{
 
-    document.querySelectorAll(".preview").forEach(p=>{
-        p.style.display="none";
-    });
+    if (!e.target.closest(".preview") &&
+        !e.target.classList.contains("main-image")) {
+
+        document.querySelectorAll(".preview").forEach(p=>{
+            p.style.display="none";
+        });
+
+        document.body.style.overflow="";
+    }
 
 });
 

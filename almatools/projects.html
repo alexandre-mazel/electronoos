@@ -108,7 +108,11 @@ header h1{
     display:block;
 
     cursor:pointer;
+    
 
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .info{
@@ -577,16 +581,30 @@ projects.forEach(p=>{
 });
 
 
-document.addEventListener("click",(e)=>{
+img.addEventListener("pointerup", (e) => {
 
-    if (!e.target.closest(".preview") &&
-        !e.target.classList.contains("main-image")) {
+    if (window.innerWidth < 700) {
 
-        document.querySelectorAll(".preview").forEach(p=>{
-            p.style.display="none";
-        });
+        e.preventDefault();
+        e.stopPropagation();
 
-        document.body.style.overflow="";
+        const isVisible = preview.style.display === "block";
+
+        if (isVisible) {
+
+            preview.style.display = "none";
+            document.body.style.overflow = "";
+
+        } else {
+
+            preview.style.display = "block";
+
+            preview.style.left = "5vw";
+            preview.style.top = "5vh";
+            preview.style.transform = "none";
+
+            document.body.style.overflow = "hidden";
+        }
     }
 
 });

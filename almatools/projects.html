@@ -190,35 +190,38 @@ header h1{
 @media(max-width:700px){
 
     #gallery{
-
         grid-template-columns:1fr;
-
         padding:15px;
-
     }
 
     .preview{
 
-    position:fixed;
-    display:none;
+        position:fixed;
+        display:none;
 
-    background:white;
-    border-radius:12px;
-    box-shadow:0 18px 40px rgba(0,0,0,.35);
-    padding:12px;
+        background:white;
+        border-radius:12px;
+        box-shadow:0 18px 40px rgba(0,0,0,.35);
+        padding:12px;
 
-    z-index:9999;
-    pointer-events: none; /* evite que la preview pique l'event mouseenter meme caché */
+        z-index:9999;
+        pointer-events: none; /* evite que la preview pique l'event mouseenter meme caché */
+        max-width:90vw;
+        max-height:90vh;
+        overflow-y:auto;
     }
 
     .preview img{
-
-        width:42vw;
-        height:31vw;
-
+        width:85vw;
+        height:auto;
+        max-height:60vh;
+        object-fit:cover;
     }
-
-}
+    .preview-grid{
+        
+    }
+    
+} /* mobile */
 </style>
 </head>
 
@@ -232,6 +235,8 @@ header h1{
 <div id="gallery"></div>
 
 <script>
+
+alert(window.innerWidth)
 
 const projects=[
 
@@ -376,6 +381,8 @@ function createProjectCard(project){
             preview.style.display = "block";
 
             if (window.innerWidth > 700) {
+            
+                console.log( "DBG: desktop: side" )
 
                 const popupWidth = 640;
 
@@ -396,9 +403,11 @@ function createProjectCard(project){
                 preview.style.top = r.top + "px";
                 preview.style.transform = "none";
 
-            } else {
+            } 
+            else 
+            {
 
-                // Mobile : centree
+                console.log( "DBG: Mobile : centree" )
                 preview.style.left = "50%";
                 preview.style.top = "50%";
                 preview.style.transform = "translate(-50%,-50%)";

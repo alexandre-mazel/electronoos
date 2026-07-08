@@ -578,45 +578,58 @@ function createProjectCard(project){
     else
     {
 
-        img.addEventListener("touchend", (e) => {
+            let startX = 0;
+            let startY = 0;
 
-            e.preventDefault();
-            e.stopPropagation();
+            img.addEventListener("touchstart", (e) => {
 
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
 
-            if (preview.style.display === "block") {
-
-                preview.style.display = "none";
-
-                document.body.style.overflow = "";
-
-            } 
-            
-            else {
-
-                preview.style.display = "block";
-
-                preview.style.left = "5vw";
-                preview.style.top = "5vh";
-                preview.style.transform = "none";
-
-                document.body.style.overflow = "hidden";
-
-            }
+            }, {passive:true});
 
 
-        }, {passive:false});
+            img.addEventListener("touchend", (e) => {
 
-        close.addEventListener("touchend", (e)=>{
+                const endX = e.changedTouches[0].clientX;
+                const endY = e.changedTouches[0].clientY;
 
-            e.preventDefault();
-            e.stopPropagation();
+                const distance = Math.sqrt(
+                    Math.pow(endX - startX, 2) +
+                    Math.pow(endY - startY, 2)
+                );
 
-            preview.style.display="none";
 
-            document.body.style.overflow="";
+                // Si le doigt a bougé, c'était un scroll
+                if (distance > 10) {
+                    return;
+                }
 
-        }, {passive:false});
+
+                // Sinon c'est un vrai tap
+                e.preventDefault();
+                e.stopPropagation();
+
+
+                if (preview.style.display === "block") {
+
+                    preview.style.display = "none";
+                    document.body.style.overflow = "";
+
+                } else {
+
+                    preview.style.display = "block";
+
+                    preview.style.left = "5vw";
+                    preview.style.top = "5vh";
+                    preview.style.transform = "none";
+
+                    document.body.style.overflow = "hidden";
+
+                }
+
+            }, {passive:false});
+
 
 
     } // mobile

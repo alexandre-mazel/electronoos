@@ -415,52 +415,54 @@ function createProjectCard(project){
 
     card.appendChild(info);
 
-    card.addEventListener("mouseenter",()=>{
-//~         preview.style.display="block";
-            const r = card.getBoundingClientRect();
-            
-            console.log( "DBG: preview: rect:", r )
-            console.log( "DBG: preview: window.innerWidth:", window.innerWidth )
+    card.addEventListener("mouseenter",()=>
+    {
+        const r = card.getBoundingClientRect();
 
-            preview.style.display = "block";
+        console.log( "DBG: preview: rect:", r )
+        console.log( "DBG: preview: window.innerWidth:", window.innerWidth )
 
-            if (window.innerWidth > 700) {
-            
-                console.log( "DBG: desktop: side" )
+        preview.style.display = "block";
 
-                const popupWidth = 640;
+        if (window.innerWidth > 700) 
+        {
+            console.log( "DBG: desktop: side" )
+            const popupWidth = 640;
 
-                if (r.right +  30 <= window.innerWidth *0.6) {
-
-                    // a droite
-                    preview.style.left = (r.right + 20) + "px";
-
-                } else {
-
-                    // a gauche
-                    preview.style.left = (r.left - popupWidth - 20) + "px";
-
-                }
-                
-                console.log( "DBG: preview: left:", preview.style.left )
-
-                preview.style.top = r.top + "px";
-                preview.style.transform = "none";
-
+            if (r.right +  30 <= window.innerWidth *0.6)
+            {
+                // a droite
+                preview.style.left = (r.right + 20) + "px";
             } 
             else 
             {
-
-                console.log( "DBG: Mobile : centree" )
-                preview.style.left = "50%";
-                preview.style.top = "50%";
-                preview.style.transform = "translate(-50%,-50%)";
+                // a gauche
+                preview.style.left = (r.left - popupWidth - 20) + "px";
             }
-    });
+
+            console.log( "DBG: preview: left:", preview.style.left )
+
+            preview.style.top = r.top + "px";
+            preview.style.transform = "none";
+            
+        } 
+        else 
+        {
+            console.log( "DBG: Mobile : centree" )
+            preview.style.left = "50%";
+            preview.style.top = "50%";
+            preview.style.transform = "translate(-50%,-50%)";
+            document.body.style.overflow = "hidden"; // ne scroll pas sous la preview
+        }
+        
+    } ); // mouseenter
 
     card.addEventListener("mouseleave",()=>{
+    
         preview.style.display="none";
-    });
+        document.body.style.overflow = "";
+        
+    }); // mouseleave
 
     // Mobile tap
     img.addEventListener("click",(e)=>{

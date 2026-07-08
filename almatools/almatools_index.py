@@ -69,7 +69,7 @@ def index(req):
     </div>
     
     <div style='vertical-align: middle;'>
-    <a href='/almatools/book.html'>Projects</a>
+    <a href='/almatools/projects.html'>Projects</a>
     </div>
     
     

@@ -166,29 +166,23 @@ header h1{
     padding:12px;
 
     z-index:100;
+    
+    pointer-events: none; /* evite que la preview pique l'event mouseenter meme caché */
 
 }
 
+
 .preview-grid{
-
     display:grid;
-
-    grid-template-columns:repeat(2,1fr);
-
-    gap:8px;
-
+    grid-template-columns:repeat(2,320px);
+    gap:10px;
 }
 
 .preview img{
-
-    width:220px;
-
-    height:165px;
-
+    width:300px;
+    height:220px;
     object-fit:cover;
-
     border-radius:8px;
-
 }
 
 /* Mobile */
@@ -205,16 +199,16 @@ header h1{
 
     .preview{
 
-        position:fixed;
+    position:fixed;
+    display:none;
 
-        left:50%;
+    background:white;
+    border-radius:12px;
+    box-shadow:0 18px 40px rgba(0,0,0,.35);
+    padding:12px;
 
-        top:50%;
-
-        transform:translate(-50%,-50%);
-
-        max-width:95vw;
-
+    z-index:9999;
+    pointer-events: none; /* evite que la preview pique l'event mouseenter meme caché */
     }
 
     .preview img{
@@ -243,13 +237,30 @@ const projects=[
 
 {
 title:"Salle des aromes (2017)",
-location:"Les Caves du Louvre/Paris",
+location:"CDL",
 partner:"",
 technic:"Conception & Arduino Development",
 cover:"aromes/00.jpg",
 gallery:[
 "aromes/01_zoom_girl.jpg",
 "aromes/02.jpg",
+]
+},
+
+
+{
+title:"Snakable (2024)",
+location:"Teatros Del Canal/Madrid",
+partner:"ENSAD",
+technic:"Arduino programming",
+cover:"snake2/00_s-bianchini_ensadlab_snakable_09-2020_9j1a3215.tif.jpg",
+gallery:[
+"snake2/visitor.jpg",
+"snake2/01.jpg",
+"snake2/02.jpg",
+"snake2/03.jpg",
+"snake2/04.jpg",
+"snake2/05_output.gif",
 ]
 },
 
@@ -324,24 +335,74 @@ function createProjectCard(project){
 
     preview.appendChild(grid);
 
-    card.appendChild(preview);
+//~     card.appendChild(preview);
+    document.body.appendChild(preview);
 
     card.appendChild(img);
 
     const info=document.createElement("div");
     info.className="info";
+    
+    let partner = project.partner
+    
+    if( partner == "ENSAD" )
+    {
+        partner = "Ecole Nationale des Arts D&eacute;coratifs (ENSAD)"
+    }
+    
+    let location = project.location
+    
+    if( location == "CDL" )
+    {
+        location = "Les Caves du Louvre/Paris"
+    }
 
     info.innerHTML=`
         <div><span class="label">Project</span><br><span class="value">${project.title}</span></div>
-        <div><span class="label">Location</span><br><span class="value">${project.location}</span></div>
-        <div><span class="label">Partner</span><br><span class="value">${project.partner}</span></div>
+        <div><span class="label">Location</span><br><span class="value">${location}</span></div>
+        <div><span class="label">Partner</span><br><span class="value">${partner}</span></div>
         <div><span class="label">Technics</span><br><span class="value">${project.technic}</span></div>
     `;
 
     card.appendChild(info);
 
     card.addEventListener("mouseenter",()=>{
-        preview.style.display="block";
+//~         preview.style.display="block";
+            const r = card.getBoundingClientRect();
+            
+            console.log( "DBG: preview: rect:", r )
+            console.log( "DBG: preview: window.innerWidth:", window.innerWidth )
+
+            preview.style.display = "block";
+
+            if (window.innerWidth > 700) {
+
+                const popupWidth = 640;
+
+                if (r.right +  30 <= window.innerWidth *0.6) {
+
+                    // a droite
+                    preview.style.left = (r.right + 20) + "px";
+
+                } else {
+
+                    // a gauche
+                    preview.style.left = (r.left - popupWidth - 20) + "px";
+
+                }
+                
+                console.log( "DBG: preview: left:", preview.style.left )
+
+                preview.style.top = r.top + "px";
+                preview.style.transform = "none";
+
+            } else {
+
+                // Mobile : centree
+                preview.style.left = "50%";
+                preview.style.top = "50%";
+                preview.style.transform = "translate(-50%,-50%)";
+            }
     });
 
     card.addEventListener("mouseleave",()=>{

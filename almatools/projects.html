@@ -267,6 +267,64 @@ header h1{
     }
     
 } /* mobile */
+
+.media-preview {
+
+    position:relative;
+
+    width:100%;
+
+}
+
+
+.media-preview img,
+.preview-video {
+
+    display:block;
+
+    width:100%;
+
+    height:auto;
+
+    aspect-ratio:4/3;
+
+    object-fit:cover;
+
+    border-radius:10px;
+
+}
+
+
+/* triangle lecture */
+
+.play-icon {
+
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    transform:translate(-50%,-50%);
+
+    width:60px;
+    height:60px;
+
+    border-radius:50%;
+
+    background:rgba(0,0,0,.55);
+
+    color:white;
+
+    font-size:30px;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    padding-left:5px;
+
+}
 </style>
 </head>
 
@@ -328,6 +386,19 @@ gallery:[
 ]
 },
 
+{
+title:"Fossilation (2025)",
+location:"Centre Culturel du Canada/Paris",
+partner:"ENSAD",
+technic:"Redesign electronics, Raspberry programming, Network setup, behavior development",
+cover:"fossilation/00_20251015_171937.jpg",
+gallery:[
+"fossilation/01_20251015_172226.jpg",
+"fossilation/01_20251015_172226.jpg",
+
+]
+},
+
 
 
 {
@@ -342,6 +413,20 @@ gallery:[
 "smilebox/IMG_8412_ret_sm.jpg",
 "smilebox/IMG_8434_ret_sm.jpg",
 "smilebox/IMG_8439_ret_sm.jpg",
+]
+},
+
+
+{
+title:"Fossilation (2026)",
+location:"Soci&eacute;t&eacute; des Arts Technologiques/Canada",
+partner:"ENSAD",
+technic:"Installation, Behavior & Light programming",
+cover:"fossilation_sat/00.jpg",
+gallery:[
+"fossilation_sat/02.jpg",
+"fossilation_sat/20260529_105600_test_music_bien_mais_long_crop_div2.mp4",
+
 ]
 }
 
@@ -381,13 +466,47 @@ function createProjectCard(project){
     grid.className="preview-grid";
 
 
-    project.gallery.forEach(src=>{
+project.gallery.forEach(src=>{
 
-        const i=document.createElement("img");
-        i.src=src;
-        grid.appendChild(i);
+    const container=document.createElement("div");
+    container.className="media-preview";
 
-    });
+
+    if(src.toLowerCase().endsWith(".mp4")) {
+
+        const video=document.createElement("video");
+
+        video.src=src;
+        video.muted=true;
+        video.preload="metadata";
+
+        // affiche la première image de la vidéo
+        video.className="preview-video";
+
+        container.appendChild(video);
+
+
+        const play=document.createElement("div");
+        play.className="play-icon";
+        play.innerHTML="▶";
+
+        container.appendChild(play);
+
+    } 
+    else {
+
+        const img=document.createElement("img");
+
+        img.src=src;
+
+        container.appendChild(img);
+
+    }
+
+
+    grid.appendChild(container);
+
+});
 
     preview.appendChild(grid);
 
@@ -416,8 +535,15 @@ function createProjectCard(project){
     info.innerHTML=`
         <div><span class="label">Project</span><br><span class="value">${project.title}</span></div>
         <div><span class="label">Location</span><br><span class="value">${location}</span></div>
-        <div><span class="label">Partner</span><br><span class="value">${partner}</span></div>
-        <div><span class="label">Technics</span><br><span class="value">${project.technic}</span></div>
+            `;
+    if( partner.length > 0 )
+    {
+        info.innerHTML += `    
+            <div><span class="label">Partner</span><br><span class="value">${partner}</span></div>
+                `;
+    }
+    info.innerHTML += `    
+    <div><span class="label">Technics</span><br><span class="value">${project.technic}</span></div>
     `;
 
     card.appendChild(info);

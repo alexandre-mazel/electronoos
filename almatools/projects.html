@@ -490,20 +490,56 @@ function createProjectCard(project){
     `;
 
     card.appendChild(info);
+    
+    /*
+            DESKTOP
+            --------
+            mouseenter card
+                    |
+                    v
+               affiche preview
 
-if (window.innerWidth > 700) 
-        {
-    card.addEventListener("mouseenter",()=>
-    {
-        const r = card.getBoundingClientRect();
 
-        console.log( "DBG: preview: rect:", r )
-        console.log( "DBG: preview: window.innerWidth:", window.innerWidth )
+            mouseleave card
+                    |
+                    v
+               cache preview
 
-        preview.style.display = "block";
 
-        if (window.innerWidth > 700) 
-        {
+
+            MOBILE
+            ------
+            touch image
+                    |
+                    v
+               affiche preview
+                    |
+                    v
+             body overflow hidden
+
+
+            touch ×
+                    |
+                    v
+               cache preview
+                    |
+                    v
+             body overflow normal
+             
+ */
+ 
+     if (window.innerWidth > 700) {
+
+        card.addEventListener("mouseenter", () => {
+
+            const r = card.getBoundingClientRect();
+            
+            console.log( "DBG: preview: rect:", r )
+            console.log( "DBG: preview: window.innerWidth:", window.innerWidth )
+
+            preview.style.display = "block";
+            preview.style.transform = "none";
+
             console.log( "DBG: desktop: side" )
             const popupWidth = 640;
 
@@ -522,30 +558,70 @@ if (window.innerWidth > 700)
 
             preview.style.top = r.top + "px";
             preview.style.transform = "none";
-            
-        } 
-        else 
-        {
-            console.log( "DBG: Mobile : centree" )
-//~             preview.style.left = "50%";
-//~             preview.style.top = "50%";
-//~             preview.style.transform = "translate(-50%,-50%)";
-            preview.style.display = "block";
-            document.body.style.overflow = "hidden"; // ne scroll pas sous la preview
-            
-                
-        }
-        
-        
-    } ); // mouseenter
-    }
 
-    card.addEventListener("mouseleave",()=>{
+        });
+
+
+        card.addEventListener("mouseleave", () => {
+
+            preview.style.display = "none";
+
+        });
+
+        close.addEventListener("click", ()=>{
+
+            preview.style.display="none";
+
+        });
+
+    } // desktop
+    else
+    {
+
+        img.addEventListener("touchend", (e) => {
+
+            e.preventDefault();
+            e.stopPropagation();
+
+
+            if (preview.style.display === "block") {
+
+                preview.style.display = "none";
+
+                document.body.style.overflow = "";
+
+            } 
+            
+            else {
+
+                preview.style.display = "block";
+
+                preview.style.left = "5vw";
+                preview.style.top = "5vh";
+                preview.style.transform = "none";
+
+                document.body.style.overflow = "hidden";
+
+            }
+
+
+        }, {passive:false});
+
+        close.addEventListener("touchend", (e)=>{
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            preview.style.display="none";
+
+            document.body.style.overflow="";
+
+        }, {passive:false});
+
+
+    } // mobile
     
-        preview.style.display="none";
-        document.body.style.overflow = "";
-        
-    }); // mouseleave
+
 
 
     return card;
@@ -559,40 +635,23 @@ projects.forEach(p=>{
     gallery.appendChild(createProjectCard(p));
 });
 
+document.addEventListener("touchend", (e)=>{
 
-img.addEventListener("pointerup", (e) => {
+    if (
+        !e.target.closest(".preview") &&
+        !e.target.classList.contains("main-image")
+    ){
 
-    if (window.innerWidth < 700) {
+        document.querySelectorAll(".preview").forEach(p=>{
+            p.style.display="none";
+        });
 
-        e.preventDefault();
-        e.stopPropagation();
+        document.body.style.overflow="";
 
-        const isVisible = preview.style.display === "block";
-
-        if (isVisible) {
-
-            preview.style.display = "none";
-            document.body.style.overflow = "";
-
-        } else {
-
-            preview.style.display = "block";
-
-            preview.style.left = "5vw";
-            preview.style.top = "5vh";
-            preview.style.transform = "none";
-
-            document.body.style.overflow = "hidden";
-        }
     }
 
 });
 
-close.addEventListener("click", (e)=>{
-    e.stopPropagation();
-    preview.style.display="none";
-    document.body.style.overflow="";
-});
 
 </script>
 

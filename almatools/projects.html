@@ -669,6 +669,7 @@ project.gallery.forEach(src=>{
 
                 if(!overCard && !overPreview){
                     preview.style.display="none";
+                    stopAllVideos()
                 }
 
             },100);
@@ -687,6 +688,7 @@ project.gallery.forEach(src=>{
 
             overPreview=false;
             preview.style.display="none";
+            stopAllVideos()
 
         });
 
@@ -758,6 +760,7 @@ project.gallery.forEach(src=>{
             e.stopPropagation();
 
             preview.style.display="none";
+            stopAllVideos()
 
             document.body.style.overflow="";
 
@@ -786,12 +789,22 @@ document.addEventListener("touchend", (e)=>{
 
         document.querySelectorAll(".preview").forEach(p=>{
             p.style.display="none";
+            stopAllVideos()
         });
 
         document.body.style.overflow="";
     }
 
 });
+
+function stopAllVideos(){
+
+    document.querySelectorAll("video").forEach(video => {
+        video.pause();
+//~         video.currentTime = 0; // reset to start
+    });
+
+}
 
 
 </script>

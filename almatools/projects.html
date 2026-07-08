@@ -631,6 +631,16 @@ function createProjectCard(project){
             }, {passive:false});
 
 
+        close.addEventListener("touchend", (e)=>{
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            preview.style.display="none";
+
+            document.body.style.overflow="";
+
+        }, {passive:false});
 
     } // mobile
     

@@ -64,34 +64,22 @@ header h1{
 #gallery{
 
     display:grid;
-
-    grid-template-columns:
-        repeat(auto-fit,minmax(320px,1fr));
+    grid-template-columns: repeat(auto-fit,minmax(320px,1fr));
 
     gap:28px;
-
     padding:30px;
-
     max-width:1700px;
-
     margin:auto;
-
 }
 
 .card{
 
     background:white;
-
     border-radius:var(--radius);
-
     overflow:hidden;
-
     box-shadow:var(--shadow);
-
     transition:.25s;
-
     position:relative;
-
 }
 
 .card:hover{
@@ -104,52 +92,39 @@ header h1{
     height:240px;
 
     object-fit:cover;
-
     display:block;
-
     cursor:pointer;
     
-
     touch-action: manipulation;
     user-select: none;
     -webkit-user-select: none;
     
-        user-select: none;
+    user-select: none;
     -webkit-user-select: none;
     -webkit-touch-callout: none;
     touch-action: manipulation;
 }
 
 .info{
-
     padding:18px;
-
 }
 
 .info div{
 
     margin:5px 0;
-
     line-height:1.3em;
-
 }
 
 .label{
 
     color:var(--muted);
-
     font-size:.82rem;
-
     text-transform:uppercase;
-
     letter-spacing:.08em;
-
 }
 
 .value{
-
     font-size:1rem;
-
 }
 
 /* popup */
@@ -159,31 +134,20 @@ header h1{
     position:absolute;
 
     left:50%;
-
     top:15px;
-
     transform:translateX(-50%);
-
     display:none;
-
     background:white;
-
     border-radius:12px;
-
     box-shadow:0 18px 40px rgba(0,0,0,.35);
-
     padding:12px;
-
     z-index:100;
-    
     /* pointer-events: none; */ /* evite que la preview pique l'event mouseenter meme caché */
     pointer-events:auto;
     
-        overscroll-behavior: contain;
+    overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
-
 }
-
 
 .preview-grid{
     display:grid;
@@ -211,21 +175,13 @@ header h1{
     height:32px;
 
     background:rgba(0,0,0,.6);
-
     color:white;
-
     border-radius:50%;
-
     font-size:24px;
-
     line-height:30px;
-
     text-align:center;
-
     cursor:pointer;
-
     z-index:10;
-
 }
 
 
@@ -249,21 +205,13 @@ header h1{
 
         width: 90vw;
         max-width: 90vw;
-
         max-height: 90vh;
-
         padding: 12px;
-
         background: white;
-
         border-radius: 14px;
-
         box-shadow: 0 15px 40px rgba(0,0,0,.35);
-
         overflow-y: auto;
-
         z-index: 9999;
-
         transform: none !important;
 
         /* permet le scroll uniquement dans la preview */
@@ -279,11 +227,8 @@ header h1{
     .preview-grid {
 
         display: flex;
-
         flex-direction: column;
-
         gap: 12px;
-
         width: 100%;
     }
 
@@ -292,14 +237,10 @@ header h1{
     .preview img {
 
         display: block;
-
         width: 100%;
         max-width: 100%;
-
         height: auto;
-
         object-fit: cover;
-
         border-radius: 10px;
     }
 
@@ -308,30 +249,20 @@ header h1{
     .closePreview {
 
         display: block;
-
         position: sticky;
-
         top: 0;
-
         margin-left: auto;
-
         width: 34px;
         height: 34px;
 
         line-height: 32px;
-
         text-align: center;
-
         font-size: 26px;
-
         color: white;
-
         background: rgba(0,0,0,.65);
 
         border-radius: 50%;
-
         cursor: pointer;
-
         z-index: 10;
     }
     
@@ -492,40 +423,20 @@ function createProjectCard(project){
     card.appendChild(info);
     
     /*
-            DESKTOP
-            --------
-            mouseenter card
-                    |
-                    v
-               affiche preview
+    Events:
+        DESKTOP
+        --------
+        mouseenter card:  affiche preview
+        mouseleave card: cache preview
+
+        MOBILE
+        ------
+        touch image: affiche preview
+           body overflow hidden
 
 
-            mouseleave card
-                    |
-                    v
-               cache preview
-
-
-
-            MOBILE
-            ------
-            touch image
-                    |
-                    v
-               affiche preview
-                    |
-                    v
-             body overflow hidden
-
-
-            touch ×
-                    |
-                    v
-               cache preview
-                    |
-                    v
-             body overflow normal
-             
+        touch: cache preview
+           body overflow normal
  */
  
      if (window.innerWidth > 700) {
@@ -563,15 +474,11 @@ function createProjectCard(project){
 
 
         card.addEventListener("mouseleave", () => {
-
             preview.style.display = "none";
-
         });
 
         close.addEventListener("click", ()=>{
-
             preview.style.display="none";
-
         });
 
     } // desktop
@@ -631,6 +538,7 @@ function createProjectCard(project){
             }, {passive:false});
 
 
+
         close.addEventListener("touchend", (e)=>{
 
             e.preventDefault();
@@ -644,8 +552,6 @@ function createProjectCard(project){
 
     } // mobile
     
-
-
 
     return card;
 
@@ -670,7 +576,6 @@ document.addEventListener("touchend", (e)=>{
         });
 
         document.body.style.overflow="";
-
     }
 
 });

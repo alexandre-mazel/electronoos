@@ -25,6 +25,9 @@ def acquire_image_wia(strDstFilename,rectToScan=(0,0,210,297),nBitsPerPixel=24,n
     """
     wia = win32com.client.Dispatch(WIA_COM) # wia is a CommonDialog object
     dev = wia.ShowSelectDevice()
+    if len(dev.Items) < 1:
+        print( "ERR: acquire_image_wia: no scanner found." )
+        return False
     scanner = dev.Items[0]
     
     rMagicCoef =  1.17 # looks like a magic, tuned for my canon lide 70. perhaps some DotToInch explanations...
@@ -54,6 +57,8 @@ def acquire_image_wia(strDstFilename,rectToScan=(0,0,210,297),nBitsPerPixel=24,n
     if os.path.exists(strDstFilename):
         os.remove(strDstFilename)
     image.SaveFile(strDstFilename)
+    
+    return True
 
 
 def acquire_image_wia_test():
@@ -154,16 +159,20 @@ def preprocessExportedFile(filename):
     return filename_dst
 
 def testLoopBugMyScanner():
+    print( "INF: testLoopBugMyScanner: starting..." )
     os.chdir("c:/tmp")
     while 1:
         try:
-            acquire_image_wia_test()
-            break
+            bRet = acquire_image_wia_test()
+            if bRet:
+                print( "INF: testLoopBugMyScanner: success !" )
+                break
         except BaseException as err:
             print("err: %s" % err)
            
        
 def runManyTimes( nNbrTimes = 50 ):
+    print( "INF: runManyTimes: starting..." )
     for i in range(nNbrTimes):
         try:
             dst_fn = "c:/tmp/wia-test2.png"
@@ -171,13 +180,15 @@ def runManyTimes( nNbrTimes = 50 ):
             reso = 600
             reso = 300
             print("INF: Writing to '%s'" % dst_fn )
-            acquire_image_wia( dst_fn, nResolution=reso )
-            print("INF: Success!")
-            break
+            bRet = acquire_image_wia( dst_fn, nResolution=reso )
+            if bRet:
+                print("INF: Success!")
+                break
         except BaseException as err:
             print("ERR: try %d: %s" % (i,err))
             
-runManyTimes()   
+#~ testLoopBugMyScanner()   # ne fonctionne plus?: err: name 'WIA_COMMAND_TAKE_PICTURE' is not defined
+runManyTimes()   # Fonctionne ok !
 #~ preprocessExportedFile("c:/tmp/wia-test2a.png")
 #~ preprocessExportedFile("../data/wia-test2a.png")
 #~ preprocessExportedFile("../data/wia-test2b.png")

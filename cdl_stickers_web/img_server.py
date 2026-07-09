@@ -13,6 +13,8 @@ import io
 # eg: http://10.0.126.73:8000/get_image?id=6
 # to retrieve just filename of last img: /get_image_filename?id=1
 
+# served at thenardier.fr port 9000
+
 # réseaux public: caves du louvre (wistro) bonjour
 
 class ImageServer(SimpleHTTPRequestHandler):

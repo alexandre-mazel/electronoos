@@ -3,7 +3,7 @@ import time
 import urllib.parse
 from http.server import SimpleHTTPRequestHandler, HTTPServer
 from datetime import datetime
-import cgi
+import cgi # generate a warning deprecated in Python 3.13
 import io
 
 # upload page: http://ip:8000/upload_photo.html?id=x
@@ -13,9 +13,12 @@ import io
 # eg: http://10.0.126.73:8000/get_image?id=6
 # to retrieve just filename of last img: /get_image_filename?id=1
 
-# served at thenardier.fr port 9000
+# served at rpi5 through avec ce script qui tourne dans un screen. Acces par:
+# http://thenardier.fr:9500/upload_photo.html?id=6
+# http://thenardier.fr:9500/get_image?id=6
+# 
 
-# réseaux public: caves du louvre (wistro) bonjour
+# reseaux public: caves du louvre (wistro) bonjour ?
 
 class ImageServer(SimpleHTTPRequestHandler):
     
@@ -209,7 +212,7 @@ class ImageServer(SimpleHTTPRequestHandler):
 
 
 def main():
-    port = 8000
+    port = 9500
     server = HTTPServer(("0.0.0.0", port), ImageServer)
     print( "INF: img_server: serving on port %d" % port )
     server.serve_forever()

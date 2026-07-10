@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script>
+// rewrite adr if shortcuted
+if( window.location.pathname == "/art" )
+{
+    history.replaceState({}, "/art", "/art/projects.html");
+}
+
 function getCurrentFolderCapitalized() {
     const path = window.location.pathname;
     const parts = path.split('/').filter(Boolean);
@@ -17,6 +23,9 @@ function getCurrentFolderCapitalized() {
     } else {
         folder = parts[parts.length - 1];
     }
+    
+    if( folder == "art" )
+        folder = "Alma Real Time (A.R.T.)"
 
     return folder.charAt(0).toUpperCase() + folder.slice(1);
 }

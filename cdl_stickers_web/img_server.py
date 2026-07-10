@@ -1,7 +1,7 @@
 import os
 import time
 import urllib.parse
-from http.server import SimpleHTTPRequestHandler, HTTPServer
+from http.server import SimpleHTTPRequestHandler, HTTPServer,ThreadingHTTPServer
 from datetime import datetime
 import cgi # generate a warning deprecated in Python 3.13
 import io
@@ -78,6 +78,7 @@ class ImageServer(SimpleHTTPRequestHandler):
             self.send_header("Content-Type", "text/plain")
             self.end_headers()
             self.wfile.write(b"ok")
+            print("INF: Upload file: finished")
             return
 
         self.send_response(404)
@@ -89,10 +90,12 @@ class ImageServer(SimpleHTTPRequestHandler):
         parsed = urllib.parse.urlparse(self.path)
 
         if parsed.path == "/get_image":
+            print( "INF: request get_image starting..." )
             query = urllib.parse.parse_qs(parsed.query)
             image_id = query.get("id", [None])[0]
 
             if image_id is None or not image_id.isdigit() or not 1 <= int(image_id) <= 8:
+                print( "WRN: bad id..." )
                 self.send_response(400)
                 self.end_headers()
                 self.wfile.write(b"invalid id")
@@ -111,6 +114,7 @@ class ImageServer(SimpleHTTPRequestHandler):
                     latest_file = max(files, key=os.path.getmtime)
 
                     if time.time() - os.path.getmtime(latest_file) < limit_time_photo_sec:
+                        print( "INF: Find an image: '%s'" % latest_file )
                         self.send_response(200)
                         self.send_header("Content-Type", "image/jpeg") # TODO: change selon extension du fichier!
                         self.end_headers()
@@ -213,7 +217,8 @@ class ImageServer(SimpleHTTPRequestHandler):
 
 def main():
     port = 9500
-    server = HTTPServer(("0.0.0.0", port), ImageServer)
+    #~ server = HTTPServer(("0.0.0.0", port), ImageServer)
+    server = ThreadingHTTPServer(("0.0.0.0", port), ImageServer) # certains appelle depuis chrome bloquer le thread (car chrome ne ferme pas la connection), lancer comme ca, c'est cool, meme si un thread est bloqué, un autre prend la main !
     print( "INF: img_server: serving on port %d" % port )
     server.serve_forever()
 

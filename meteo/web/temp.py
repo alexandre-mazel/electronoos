@@ -87,7 +87,7 @@ def index():
         print("-->")
     
     s = format_record( r_last )
-    out =  "<html><head>" + getStyle() + "</head><body>" +  s + "</body></html>"
+    out =  "<html><head><meta charset='UTF-8'><title>Temperature chez nous</title>" + getStyle() + "</head><body>" +  s + "</body></html>"
     if verbose:
         print("<!--")
         print( "out: " + str(out) )

@@ -68,8 +68,9 @@ def compute_stat():
     
     vals =  datas[("armoire","temp")]
     
-    if os.name == "nt":
+    #~ if os.name == "nt":
         #~ generate_temperature_graph_plotly( vals[-10000:], "generated_gfx.html" )
+    if 1:
         import generate_graph_v3
         generate_graph_v3.generateTemperatureGraph( vals[-10000:], "generated_gfx3.html" )
     

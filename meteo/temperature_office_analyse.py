@@ -12,12 +12,32 @@
 # to retrieve data sent from logged data from various IOT device
 # scp -P 50022 na@thenardier.fr:/var/www/save/webdata.txt  C:/Users/alexa/dev/git/electronoos/meteo/data/
 
-
+import os
 import sys
 
-sys.path.append("../../obo/spider/")
+sys.path.append("../")
 
-import common
+def getlogin():
+    try:
+        return os.getlogin()
+    except AttributeError:
+        print( "WRN: NT: getlogin unknown, returning default: 'Alexa'" )
+    return "alexa"
+
+def getElectronoosPath():
+    if os.name == "nt":
+        strElectroPath = "C:/Users/"+getlogin()+"/dev/git/electronoos/"
+        if not os.path.isdir(strElectroPath):
+            strElectroPath = "c:/dev/git/electronoos/"
+    else:
+        if os.path.expanduser("~") == "/var/www": # from modpython
+            strElectroPath = os.path.expanduser("/home/na/dev/git/electronoos/")
+        else:
+            strElectroPath = os.path.expanduser("~/dev/git/electronoos/")
+            strElectroPath = os.path.expanduser("/home/na/dev/git/electronoos/") # when started in root
+    return strElectroPath
+    
+sys.path.append(getElectronoosPath()+"alex_pytools/")
 import misctools
 import datetime
 
@@ -77,7 +97,10 @@ def decode_file_sonde(strFilename):
         if bVerbose: print(line)
         if len(line)<2:
             break
-        datas = splitBytes(line,ord(":"))
+        if sys.version_info[0]>=3:
+            datas = splitBytes(line,ord(":"))
+        else:
+            datas = line.split( ":" )
         
         if bVerbose: print(datas)
         
@@ -89,7 +112,7 @@ def decode_file_sonde(strFilename):
         
         # duplicates in websave compared to office sonde: 1735662309.73: robot-enhanced-education.org: temp: 19.0
         
-        if b"/" in datas[0]:
+        if (sys.version_info[0]>=3 and b"/" in datas[0]) or sys.version_info[0]<3:
             # office sonde format
             if len(datas) < 4:
                 print( "WRN: decode_file_sonde: skipping record: %s" % str(datas))
@@ -125,7 +148,7 @@ def decode_file_sonde(strFilename):
             if strValue == None or strValue == "None" :
                 continue
             
-            strDateTime = common.epochToTimeStamp(float(strEpoch))
+            strDateTime = misctools.convertEpochToSpecificTimezone(float(strEpoch))
             if bVerbose: print("strDateTime: '%s'" % strDateTime)
             strDate,strTime = strDateTime.split(':')
             strTime = strTime.strip()

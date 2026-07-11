@@ -2,6 +2,7 @@
 
 """
 A lancer en local sur REE ainsi le fichier des temperature est toujours a jour...
+Sur REE c'est un apache2 qui tourne.
 """
 
 import os

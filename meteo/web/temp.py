@@ -211,8 +211,11 @@ def index():
     
     
 if __name__ == "__main__":
+    import time
     #~ stats = compute_stat()
+    t_begin = time.time()
     s=index()
     f = open("debug.html","wt")
     f.write(s)
     f.close()
+    print("duration: %.2fs" % (time.time()-t_begin) )

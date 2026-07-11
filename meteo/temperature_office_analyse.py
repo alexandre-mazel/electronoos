@@ -176,13 +176,13 @@ def decode_file_sonde(strFilename):
         #~ if nNumLine > 100:
             #~ break
             
-            
         # remove abberations (85 is for a temp sonde who send 85 when initing)
-        if ( rValue < -100 ) or ("temp" in strMesureName.lower() and abs(rValue-85)<0.01) or ( ( not "temp" in strMesureName.lower() ) and rValue < 1. ) or rValue > 50000: # max is VOC 1...50000
+        bTempInMesurename = "Temp" in strMesureName
+        if ( rValue < -100 ) or ( bTempInMesurename and abs(rValue-85)<0.01) or ( ( not bTempInMesurename ) and rValue < 1. ) or rValue > 50000: # max is VOC 1...50000
             continue
             
         # remove test
-        if "test" in strMesureName.lower() or "misbb" in strHost.lower():
+        if "Test" in strMesureName or "misbb" in strHost.lower():
             continue
             
         if 0:

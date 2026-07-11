@@ -36,7 +36,7 @@ def format_record( r ):
     
     return """
         <div class="temp-card">
-            <div class="temp-value">%.1f<span class="temp-unit">°C</span></div>
+            <div class="temp-value">%.1f<span class="temp-unit">°</span></div>
             <div class="temp-date">%s</div>
         </div>
         """ % (temp,dt)

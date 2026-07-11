@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
+import time
 
 def generateTemperatureGraph(records, filename="temperature.html"):
 
+    print( "INF: generateTemperatureGraph: generating filename '%s'" % filename )
+    
+    t_begin = time.time()
+    
     import json
 
     data = []
@@ -312,5 +317,8 @@ resize();
 """
 
     open(filename,"w").write(html)
+    
+    duration = time.time() - t_begin
+    print( "INF: generateTemperatureGraph: done in %.2fs" % duration )
 
     return filename

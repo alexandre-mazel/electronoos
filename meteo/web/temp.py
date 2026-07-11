@@ -77,6 +77,8 @@ def getStyle():
 """
 
 def index():
+    print("tutu")
+    return;
     verbose = 1
     #~ verbose = 0
     #~ r_last = compute_stat()

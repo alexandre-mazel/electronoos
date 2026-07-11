@@ -400,9 +400,13 @@ def getCurrentTimeZoneName():
         strName =  time.tzname[1]
     else:
         strName = time.tzname[0]
-    import pytz # pip install pytz or python2 -m pip install pytz
-    tz = pytz.timezone("Europe/Paris")
-    return tz
+    try:
+        import pytz # pip install pytz or python2 -m pip install pytz
+        tz = pytz.timezone("Europe/Paris")
+        return tz
+    except ImportError as err:
+        print( "WRN: getCurrentTimeZoneName: returning None as error is: %s" % str(err) )
+        return None
 
 def convertEpochToSpecificTimezone( timeEpoch, bRemoveNever=0 ):
     time.localtime()

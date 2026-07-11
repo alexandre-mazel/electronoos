@@ -183,7 +183,7 @@ def getStyle():
 
 def index():
     data = misctools.cacheOnDisk.getData( "web_temp_last_data", 60*3 )
-    if data != None and 0:
+    if data != None:
         return data
         
     verbose = 1

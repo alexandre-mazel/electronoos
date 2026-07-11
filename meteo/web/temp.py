@@ -53,7 +53,7 @@ def getStyle():
     font-family: "Segoe UI", Arial, sans-serif;
     text-align: center;
     box-shadow: 0 8px 20px rgba(0,0,0,.25);
-}}
+}
 
 .temp-value {
     font-size: 56px;

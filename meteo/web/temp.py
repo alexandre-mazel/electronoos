@@ -41,7 +41,7 @@ def getMinMax( v, duration_minute ):
         if start_minute - record_minute > duration_minute:
             print( "DBG: getMinMax: stopping at record: '%s'" % str(r) )
             break
-        if v[idx_min][-1] > temp:
+        if v[idx_min][-1] > temp and abs(temp) > 0.01 : # si 0.0 c'est un bug
             idx_min = idx
         if v[idx_max][-1] < temp:
             idx_max = idx
@@ -68,7 +68,8 @@ def compute_stat():
     rmin_h,rmax_h = getMinMax( vals, 60 )
     rmin_d,rmax_d = getMinMax( vals, 60*24 )
     rmin_7d,rmax_7d = getMinMax( vals, 60*24*7 )
-    return r_last, rmin_h,rmax_h,rmin_d,rmax_d,rmin_7d,rmax_7d
+    rmin_3m,rmax_3m = getMinMax( vals, 60*24*7*12 )
+    return r_last, rmin_h,rmax_h,rmin_d,rmax_d,rmin_7d,rmax_7d,rmin_3m,rmax_3m
     
 def format_record( r, title, style = 0 ):
     """
@@ -164,7 +165,7 @@ def index():
     verbose = 1
     #~ verbose = 0
     if 1:
-        r_last, r_min_h,r_max_h,r_min_d,r_max_d,r_min_7d,r_max_7d = compute_stat()
+        r_last, r_min_h,r_max_h,r_min_d,r_max_d,r_min_7d,r_max_7d,r_min_3m,r_max_3m = compute_stat()
     else:
         r_last = [2026, 7, 11, 11, 15, 28.6]
         r_min_h = [2026, 7, 11, 11, 15, 22.6]
@@ -173,6 +174,8 @@ def index():
         r_max_d = [2026, 7, 11, 11, 15, 28.6]
         r_min_7d = [2026, 7, 11, 11, 15, 12.6]
         r_max_7d = [2026, 7, 11, 11, 15, 38.6]
+        r_min_3m = [2026, 2, 11, 11, 15, 2.6]
+        r_max_3m = [2026, 1, 11, 11, 15, 38.6]
     if verbose:
         print("<!--")
         print( "r_last: " + str(r_last) )
@@ -195,6 +198,9 @@ def index():
 
     ss.append( format_record( r_min_7d, "minimum derni&egrave;re semaine", 1 ) )
     ss.append( format_record( r_max_7d, "maximum derni&egrave;re semaine", 2 ) )
+
+    ss.append( format_record( r_min_3m, "minimum 3 derniers mois", 1 ) )
+    ss.append( format_record( r_max_3m, "maximum 3 derniers mois", 2 ) )
     
     out =  "<html><head><meta charset='UTF-8'><title>Temperature chez nous</title>" + getStyle() + "</head><body>"
     out += "<div class='temp-container'>"

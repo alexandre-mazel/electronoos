@@ -69,8 +69,9 @@ def compute_stat():
     vals =  datas[("armoire","temp")]
     
     if os.name == "nt":
-        generate_temperature_graph_plotly( vals[-10000:], "generated_gfx.html" )
-    
+        #~ generate_temperature_graph_plotly( vals[-10000:], "generated_gfx.html" )
+        import generate_graph_v3
+        generate_graph_v3.generateTemperatureGraph( vals[-10000:], "generated_gfx3.html" )
     
     r_last = vals[-1]
     
@@ -325,6 +326,8 @@ def index():
         out += s
         if i == 0 or ( i-1 ) % 3 == 2:
             out += "</div><br><div class='temp-container'>"
+            
+    out += "<a href='generated_gfx3.html'>Voir la courbe</a>"
     out += "</body></html>"
     if verbose:
         print("<!--")

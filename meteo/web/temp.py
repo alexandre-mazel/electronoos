@@ -78,7 +78,7 @@ def getStyle():
 
 def index():
     verbose = 1
-    #~ verbose = 0
+    verbose = 0
     #~ r_last = compute_stat()
     r_last = [2026, 7, 11, 11, 15, 28.6]
     if verbose:

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 A lancer en local sur REE ainsi le fichier des temperature est toujours a jour...
 """

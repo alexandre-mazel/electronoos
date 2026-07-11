@@ -67,6 +67,11 @@ def compute_stat():
     datas = temperature_office_analyse.decode_file_sonde(strFilename)
     
     vals =  datas[("armoire","temp")]
+    
+    if os.name == "nt":
+        generate_temperature_graph_plotly( vals[-10000:], "generated_gfx.html" )
+    
+    
     r_last = vals[-1]
     
     rmin_h,rmax_h, avg_h = getMinMax( vals, 60 )
@@ -75,6 +80,90 @@ def compute_stat():
     rmin_3m,rmax_3m, avg_3m = getMinMax( vals, 60*24*7*12 )
     return r_last, rmin_h,rmax_h,rmin_d,rmax_d,rmin_7d,rmax_7d,rmin_3m,rmax_3m, avg_h, avg_d, avg_7d, avg_3m
     
+    
+def generate_temperature_graph_plotly(records, output_filename="temperature_graph.html"):
+    """
+    records: liste de tuples
+        [(y, mo, d, h, m, temp), ...]
+
+    Génère un fichier HTML interactif.
+    
+    Attention: ca rame si trop de valeur et pas lisible.
+    """
+    print( "INF: generate_temperature_graph_plotly: generating from %d records" % len( records ) )
+    
+    import plotly # pip install plotly # sudo python2 -m pip install plotly
+    import plotly.graph_objects as go
+    from plotly.colors import sample_colorscale
+    import datetime
+
+    # Trie par date
+    records = sorted(records)
+
+    dates = []
+    temps = []
+
+    for y, mo, d, h, mi, t in records:
+        dates.append(datetime.datetime(y, mo, d, h, mi))
+        temps.append(float(t))
+
+    tmin = min(temps)
+    tmax = max(temps)
+
+    # évite division par zéro
+    if tmax == tmin:
+        norm = [0.5] * len(temps)
+    else:
+        norm = [(t - tmin) / float(tmax - tmin) for t in temps]
+
+    # Bleu -> Rouge
+    colors = sample_colorscale(
+        "RdBu_r",    # bleu=froid, rouge=chaud
+        norm
+    )
+
+    fig = go.Figure()
+
+    fig.add_trace(
+        go.Scatter(
+            x=dates,
+            y=temps,
+            mode="lines+markers",
+            line=dict(
+                color="rgba(120,120,120,0.4)",
+                width=2
+            ),
+            marker=dict(
+                size=8,
+                color=temps,
+                colorscale="RdBu_r",
+                cmin=tmin,
+                cmax=tmax,
+                line=dict(width=1, color="black")
+            ),
+            hovertemplate=
+                "<b>%{y:.1f} °C</b><br>"
+                "%{x|%d/%m/%Y %H:%M}"
+                "<extra></extra>"
+        )
+    )
+
+    fig.update_layout(
+        title="Historique des températures",
+        xaxis_title="Date",
+        yaxis_title="Température (°C)",
+        template="plotly_white",
+        hovermode="closest",
+        height=500,
+    )
+
+    fig.write_html(
+        output_filename,
+        include_plotlyjs="cdn"
+    )
+
+    return output_filename
+
 def format_record( r, title, style = 0 ):
     """
     generate a nice html code to output a record: y,mo,d,h,m,temperature
@@ -183,7 +272,7 @@ def getStyle():
 
 def index():
     data = misctools.cacheOnDisk.getData( "web_temp_last_data", 60*3 )
-    if data != None:
+    if data != None and 1:
         return data
         
     verbose = 1

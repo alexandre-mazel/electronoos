@@ -72,7 +72,11 @@ def compute_stat():
         #~ generate_temperature_graph_plotly( vals[-10000:], "generated_gfx.html" )
     if 1:
         import generate_graph_v3
-        generate_graph_v3.generateTemperatureGraph( vals[-10000:], "generated_gfx3.html" )
+        if os.name == "nt":
+            filename_gfx = "generated_gfx3.html"
+        else:
+            filename_gfx = "/var/www/html/generated_gfx3.html"
+        generate_graph_v3.generateTemperatureGraph( vals[-10000:], filename_gfx )
     
     r_last = vals[-1]
     

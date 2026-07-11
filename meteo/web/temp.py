@@ -77,8 +77,6 @@ def getStyle():
 """
 
 def index():
-    print("tutu")
-    return;
     verbose = 1
     #~ verbose = 0
     #~ r_last = compute_stat()
@@ -89,7 +87,12 @@ def index():
         print("-->")
     
     s = format_record( r_last )
-    print( "<html><head>" + getStyle() + "</head><body>" +  s + "</body></html>" )
+    out =  "<html><head>" + getStyle() + "</head><body>" +  s + "</body></html>"
+    if verbose:
+        print("<!--")
+        print( "out: " + str(out) )
+        print("-->")
+    return out
     
     
 if __name__ == "__main__":

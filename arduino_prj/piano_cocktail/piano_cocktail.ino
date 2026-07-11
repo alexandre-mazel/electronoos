@@ -1,3 +1,5 @@
+// version 0.91c: change the max per cuve a 90sec au lieu de 60sec
+
 #include "HX711.h" // install in the library manager the HX711 by Rob Tillart (for cell amplifier)
 #include <LiquidCrystal.h>
 #include <EEPROM.h>
@@ -55,12 +57,15 @@ HX711 scale;
 
 // reglage pour barre de 3kg:
 
-float calibration_factor = 661; // 30g => 22000: 733 [une bouteille vide (celle de blanc orschwiller) peserait 448g; le plateau en fer 352g]
+float calibration_factor = 732.0; // 30g => 22000: 733 [une bouteille vide (celle de blanc orschwiller) peserait 448g; le plateau en fer 352g]
 // will be overwritten by EEPROM reading (so I put 100 to remember and test), to write it goto readCfgFromEeproom
 
 // la balance dans le sous sol: 733
 // balance a ochateau, section 1: 733 => 929 au lieu de 1030,cad la bonne valeur est entre 660 et 661 => 661
 // balance du oversized: 661 => 1140 au lieu de 1030/1036, mettre entre 727 et 732 => mettre 729
+
+// Balance numero 4 (futur nouvel assembleur B): 742.80
+// Balance numero 5 (futur nouvel assembleur A): 673.86
 
 float old_calibration_factor = calibration_factor;
 
@@ -78,6 +83,11 @@ const int VANNE_1_PIN = 32; // others need to be continuous
 const int NBR_VANNE = 5;
 
 const int VANNE_TEST_PIN = 44;
+
+int bThisIsLastOne = false;
+int nEnableEndPrecisionState = 0; // 0: non, 1: a activer, 2: last serie // a la fin apres 5 sec que la mousse descend on peut remettre un petit coup
+long int nTimeStartPrecision = 0;
+
 
 
 #include <LiquidCrystal_I2C.h>
@@ -116,13 +126,22 @@ void animateLcd()
 long int nTimeStartFill = 0;
 int bIsFilling = 0;
 
-unsigned char nMilliBeforeCut = 13; // 10 en version normal (maintenant 13), en oversize: 45 si slow, si rapide, mettre 100, et mettre
+// mettre une plus grande valeur pour qu'il coupe plus tot.
+unsigned char nMilliBeforeCut = 46; // 10 en version normal (maintenant 13), en oversize: 45 si slow, 70 si rapide, mettre 100, et mettre hache.
+// new middle size: 30 c'est trop, 80 encore un peu trop, 100 pas assez, test 90 plus assez. 28 avec le hachage a la fin
 
-bool bActivateHache  = 0; // activate on oversized
+bool bWriteToEeprom = 0; // apres les reglages, mettre une fois a 1 pour ecrire puis a 0 pour la prod.
+
+//bool bIsOversize = 1;
+bool bIsOversize = 0;
+
+bool bActivateHache  = bIsOversize || 0; // activate on oversized
+
+int nWaitBetweenBottleMs = 1000; // was 5000, then 3000 (new: doubled when oversize)
 
 unsigned long hache_timeNextChange = 0;
 int hache_nNextIsOpen = 1;
-int hache_period_ms = 500;
+int hache_period_ms = 250;
 
 // internal opening, without high level handling
 void _setOpen( int nNumVanne, int bOpen)
@@ -141,7 +160,12 @@ void setOpen( int nNumVanne, int bOpen)
     
     // we will hache only if versing is on, so next hache will be after an opening
     hache_nNextIsOpen = 0;
-    hache_timeNextChange = millis()+hache_period_ms;
+
+    int nHacheTime = hache_period_ms;
+    if( bOpen )
+      nHacheTime /= 2; // we hache half the wait time
+
+    hache_timeNextChange = millis()+nHacheTime;
 
 
     if(bOpen)
@@ -157,10 +181,11 @@ void setOpen( int nNumVanne, int bOpen)
 
 void readCfgFromEeproom()
 {
-  if(0)
+  if(bWriteToEeprom)
   {
-    //write values (for the first time)
+    // write values (normally just once, for the first time)
     Serial.println("\nWRITING TO EEPROM !\n");
+    pLcd->print("WRITING TO EEPROM !");
     EEPROM.put(0x00, calibration_factor);
     EEPROM.put(0x04, nMilliBeforeCut);
     
@@ -176,7 +201,7 @@ void setup() {
   Serial.begin(57600); // was 9600 // changing here need to change also in the android application.
   //pinMode(resetPin, INPUT);
 
-  Serial.println("\nPianoCocktail v0.91");
+  Serial.println("\nPianoCocktail v0.92");
 
   for( int i = 0; i < NBR_VANNE; ++i )
   {
@@ -237,11 +262,16 @@ void setup() {
 
   //handleOrder("#Assemble_10_20_30"); // to test when not connected to the tablet
 
+  if( bIsOversize )
+  {
+    nWaitBetweenBottleMs *= 2;
+  }
+
 } // setup
 
 float last_measured = 0;
 float rTotalTarget = -1; // set when we receive an assemble command to fill the bottle to the brim - or not more
-
+float rTotalTargetPrev; // le dernier total target qu'on voulait
 
 
 // ask to verse x grammes
@@ -280,6 +310,10 @@ void hache()
         _setOpen(nCurrentVanne,hache_nNextIsOpen);
         hache_nNextIsOpen ^= 1; // pingpong between 0 and 1
         hache_timeNextChange = millis() + hache_period_ms;
+        if( hache_nNextIsOpen && 0 )
+        {
+          hache_timeNextChange += 500; // longer wait pour la mousse de disparaitre
+        }
     }
 }
 
@@ -289,7 +323,6 @@ int isTargetDefined()
 }
 int check_if_must_stop_verse()
 {
-  const int nWaitBetweenBottleMs = 1000; // was 5000, then 3000
   // return 0 if not versing, 1 if versing, 2 if done
 
   if(!isTargetDefined())
@@ -344,9 +377,14 @@ int check_if_must_stop_verse()
     nbBalanceIsStuck = 0;
   }
 
+  int milibefore = nMilliBeforeCut;
+  if( !bThisIsLastOne )
+  {
+    milibefore /= 6; // sinon ca limite trop les premiers je trouve
+  }
   
   
-  if(diff<nMilliBeforeCut || nbBalanceIsStuck) // couramment on prend 8 apres coupure // On ajoute 1 de plus en condition réél des caves
+  if( diff<nMilliBeforeCut || nbBalanceIsStuck ) // couramment on prend 8 apres coupure // On ajoute 1 de plus en condition réél des caves
   {
     setOpen(nCurrentVanne, 0);
     if(0)
@@ -366,9 +404,17 @@ int check_if_must_stop_verse()
   }
   
   // hachage en fin de versage
-  if(rTotalTarget < 0 && diff < 300 && bActivateHache ) // if it's the last cuve, and near the end, we must slow down
+  if(rTotalTarget < 0 && diff < 220 && bActivateHache ) // if it's the last cuve, and near the end, we must slow down
   {
-    hache();
+    if( diff > 80 )
+    {
+      hache();
+    }
+    else
+    {
+      // a la fin du hachage, arrete de hacher pour gagner en précision
+      _setOpen(nCurrentVanne,true);
+    }
   }
   return 1;
 }
@@ -593,7 +639,7 @@ void sendSerialCommand(const char * msg)
 
 char dummyChangeCompiledSizeToPreventUploadError[23] = {1,2};
 
-void simulateReceiveAssembleOrder( int qt1 = 50, int qt2 = 50, int qt3 = 50, int qt4 = 50, int qt5 = 50)
+void simulateReceiveAssembleOrder( int qt1 = 150, int qt2 = 150, int qt3 = 150, int qt4 = 150, int qt5 = 150)
 {
   Serial.println("simulateReceiveAssembleOrder");
   scale.tare();
@@ -614,7 +660,7 @@ void loop()
 {
 
   // security
-  if(bIsFilling && millis()-nTimeStartFill>60*1000L) // 60*1000 => 1 min
+  if(bIsFilling && millis()-nTimeStartFill>90*1000L) // 60*1000 => 1 min (en fin de cuve on dépasse 1 min sur la machine A)
   {
     // 1 min => security close
     stop_all();
@@ -767,6 +813,16 @@ void loop()
     {
       if( nNbrQueueOrder > 0 )
       {
+        if( nNbrQueueOrder > 1 || 1 )
+        {
+          // on est sur une bouteille pleine ou presque, on veut de la précision
+          if( rTotalTarget > 700 )
+          {
+            rTotalTargetPrev = rTotalTarget;
+            nEnableEndPrecisionState = 1;
+            nTimeStartPrecision = 0;
+          }
+        }
         // handle queue
         if(!isTargetDefined())
         {
@@ -775,10 +831,15 @@ void loop()
             Serial.println("DBG: Processing next order...");
             --nNbrQueueOrder;
             float rGramme = queueOrder[nNbrQueueOrder*2+1];
+            bThisIsLastOne = nNbrQueueOrder==0;
+            if( bThisIsLastOne && nEnableEndPrecisionState == 1 )
+            {
+              nEnableEndPrecisionState = 2;
+            }
             if(nNbrQueueOrder==0 && rTotalTarget>0)
             {
               rGramme = rTotalTarget-last_measured-0.5; // remove 0.5g to add margin car bouteille trop pleine
-              rGramme -= 5; // 2024/08/27: enleve 5g sur le total car ca fait trop sur le petit assembleur (la balance perdrait des grammes genre 10g a la minute ce qui explique le débordement?)
+              //rGramme -= 5; // 2024/08/27: enleve 5g sur le total car ca fait trop sur le petit assembleur (la balance perdrait des grammes genre 10g a la minute ce qui explique le débordement?)
               rTotalTarget = -1;
             }
             if(rGramme>0)
@@ -790,5 +851,51 @@ void loop()
       }
     }
   }
+
+
+  // gestion des pschits-pschitts de fin pour gagner en précision
+
+  //Serial.print( "INF: nEnableEndPrecisionState: ");
+  //Serial.println( nEnableEndPrecisionState );
+  
+  if( nEnableEndPrecisionState == 2 && !isTargetDefined() )
+  {
+    nTimeStartPrecision = millis() + 5000;
+    Serial.print( "INF: bEnableEndPrecision: programming a rajout at: ");
+    Serial.println( nTimeStartPrecision );
+    nEnableEndPrecisionState = 0;
+  }
+  if( nTimeStartPrecision != 0 && millis() > nTimeStartPrecision )
+  {
+    nTimeStartPrecision = millis() + 1000; // temps pour stabiliser
+    Serial.print( "INF: rTotalTargetPrev: ");
+    Serial.println( rTotalTargetPrev );
+    Serial.print( "INF: last_measured: ");
+    Serial.println( last_measured );
+    float diff = rTotalTargetPrev-last_measured;
+    Serial.print( "INF: diff missing: ");
+    Serial.println( diff );
+    if( diff > 11 )
+    {
+      float rGramme = diff; // on doit ajouter nMilliBeforeCut sinon ca ne relance mais ca coupe de suite
+      // c'est bien de couper de suite, ca fait un pchitt de 9-12g
+      // le micropchitt est a 5g
+      Serial.print( "INF: nTimeStartPrecision: launching a quantity of gramme: ");
+      Serial.println( rGramme );
+      verse_quantite( rGramme, nCurrentVanne );
+      if(1)
+      {
+        // fait un pschitt extremement court: un micro pschitt!
+        delay(70); // 100 => 5g, 70 => 2.5g ?
+        setOpen(nCurrentVanne,0);
+      }
+    }
+    else
+    {
+      nTimeStartPrecision = 0;
+    }
+  }
+
+
   delay(100); // en tout, ca loop actuel prend a peu pres 176ms (avec un getunits de 2)
 }

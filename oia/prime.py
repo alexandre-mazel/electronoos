@@ -42,15 +42,26 @@ def countPrimeSmart(n):
     return len(listPrime)
 
 timeBegin = time.time()
+
 if 0:
     for i in [1,2,3,5,7,9,10,20]:
         print("isPrime(%d): %s" % (i,isPrime(i)))
 
     
+if 0:
+    for n in range(0,10000000):
+        if isPrime(n):
+            print( "isPrime(%d): %s" % (n,   True) )
+            
+if 1:
+    n = 9999991
+    print("isPrime(%d): %s" % (n,isPrime(n))) # mstab7: 0.366s, avec sqrt: 0.000
+    
+if 0:
+    for i in [1000000]:
+        #~ print("countPrime(%d):%d"%(i,countPrime(i)))
+        print("countPrimeSmart(%d):%d"%(i,countPrimeSmart(i)))
 
-for i in [1000000]:
-    #~ print("countPrime(%d):%d"%(i,countPrime(i)))
-    print("countPrimeSmart(%d):%d"%(i,countPrimeSmart(i)))
 
 print("duration: %.3f" % (time.time()-timeBegin))
 

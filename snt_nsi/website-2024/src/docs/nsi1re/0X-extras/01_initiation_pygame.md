@@ -654,12 +654,13 @@ font = pygame.font.Font(pygame.font.get_default_font(), 36)
 text = font.render("Game Over", True, (255, 0, 0))
 fenetre.blit(text, dest=(550,40))
 ```
+Cela écrit le texte "Game Overt" en rouge (couleur: r=255,g=0,b=0) en gros (36) , dont le coin en haut à gauche est à la position (550,40).
 
 - **dessiner un rectangle :**  
 ```python
 pygame.draw.rect(fenetre,(0,255,0),(500,20,100,10))
 ```
-dessine un rectangle vert de 100 pixels sur 10 pixels, dont le coin en haut à gauche est à la position (500,20).
+Cela dessine un rectangle vert (couleur: r=0,g=255,b=0) de 100 pixels de large sur 10 pixels de haut, dont le coin en haut à gauche est à la position (500,20).
 
 
 - **gérer le temps:**

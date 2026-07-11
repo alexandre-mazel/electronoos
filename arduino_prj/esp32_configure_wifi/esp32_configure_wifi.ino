@@ -1,7 +1,7 @@
 #include <WiFi.h>
 
 const char* ssid = "Liberte";
-const char* password = "lagrosseliberte666!"; // to do: write it in rom once then load it from rom
+const char* password = "la..."; // to do: write it in rom once then load it from rom
 
 String hostname = "ESP32_Alex";
 

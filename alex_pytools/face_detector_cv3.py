@@ -8,7 +8,7 @@ strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
 print("strLocalPath: " + strLocalPath)
 
 
-from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neighbors import KNeighborsClassifier # pip install scikit-learn   or   debian: sudo apt-get install python3-sklearn python3-sklearn-lib python-sklearn-doc
 
 def isSameArray(a,b):
     if len(a) != len(b):
@@ -257,6 +257,11 @@ def selectFace( faces_list, img_shape ):
     print(faces_list)
     for i in range(len( faces_list ) ):
         xt, yt, xb, yb,rConf = faces_list[i]
+        # sometimes a face is detected in the bottom corner and is incomplete but it approximate position, so it gives too much point from size
+        if xb > w:
+            xb = w-1
+        if yb > h:
+            yb = h-1
         facew = xb-xt;
         faceh = yb-yt;        
         nScore = 0; # all distances are compared in square
@@ -351,4 +356,16 @@ facedetector = FaceDetector()
         
 if __name__ == "__main__":
     im = cv2.imread("../data/girl_face.jpg")
-    facedetector.detect(im)
+    print("im size: %dx%d" % (im.shape[1],im.shape[0]) ) # a big one...
+    
+    ret = facedetector.detect(im[:])
+    
+    print("ref: [(1341, 857, 3772, 3271, 0.9979175), (437, 33, 2746, 2396, 0.6864305)]")
+    print("ret: %s" % str(ret) )
+    
+    if 1:
+        # compute time
+        time_begin = time.time()
+        ret = facedetector.detect(im)
+        duration = time.time() - time_begin
+        print("duration: %.3fs (%.1fps)" % (duration,1/duration) ) # mstab7:  0.030s (33.4ps), RPi5: 0.094s (10.6ps)

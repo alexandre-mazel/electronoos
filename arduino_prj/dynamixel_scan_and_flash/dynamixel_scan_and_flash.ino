@@ -42,6 +42,10 @@ void setup() {
   DEBUG_SERIAL.begin(115200);   //set debugging port baudrate to 115200bps
   while(!DEBUG_SERIAL);         //Wait until the serial port is opened
 
+  DEBUG_SERIAL.println("dynamixel_scan_and_flash.ino v0.6. Setup starting...");
+
+  DEBUG_SERIAL.println("INF: Scanning...");
+
     
   for(int8_t protocol = 1; protocol < 3; protocol++) {
     // Set Port Protocol Version. This has to match with DYNAMIXEL protocol version.

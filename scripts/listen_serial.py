@@ -1,8 +1,27 @@
+import datetime
 import os
 import sys
 import time
 
 import serial # pip install pyserial
+
+last_time_stamp = datetime.datetime.now()
+def getTimeStamp():
+    """
+
+    # REM: linux command:
+    # timedatectl list-timezones: list all timezones
+    # sudo timedatectl set-timezone Europe/Paris => set paris
+    """
+    datetimeObject = datetime.datetime.now()
+    strTimeStamp = datetimeObject.strftime( "%Y/%m/%d: %Hh%Mm%Ss" )
+    if 1:
+        global last_time_stamp
+        decay = datetimeObject - last_time_stamp
+        decay = decay.total_seconds()
+        last_time_stamp = datetimeObject
+        strTimeStamp += " (%3.2fs)" % decay
+    return strTimeStamp
 
 def listPorts():
     """
@@ -89,7 +108,8 @@ def monitorPort(strPortName, nBaudRate=9600, bImmediateClosing = False):
             #~ buf = buf.decode(encoding='utf-8', errors='strict')
             if buf != prevPrint:
                 prevPrint = buf
-                print("buf: " + buf)
+                #~ print("buf: " + buf)
+                print( getTimeStamp() + ": " + buf)
             ser.write("print 2".encode())
     except BaseException as err: # including KeyboardInterrupt
         print("ERR: monitorPort (2): %s" % str(err) )
@@ -102,7 +122,7 @@ def monitorPort(strPortName, nBaudRate=9600, bImmediateClosing = False):
     return retVal
 
 if __name__ == "__main__":
-    print("Command line syntaxe: scriptname [<PORT_NAME>] (baud, default is 57600) [clean or reset] clean will try to open then close it, then we're sure he's clean")
+    print("Command line syntaxe: scriptname [<PORT_NAME>] (baud, default is 115200) [clean or reset] clean will try to open then close it, then we're sure he's clean")
     print("")
     #~ listPorts()
     strPortName = '/dev/ttyUSB0'
@@ -111,13 +131,16 @@ if __name__ == "__main__":
     strPortName = 'COM8'
     nBaudRate = 9600
     nBaudRate = 57600
-    #~ nBaudRate = 115200
+    nBaudRate = 115200
     bClean = False
     
     strPortNameAutodetect = listPorts()
     
     if len(sys.argv) > 1:
         strPortName = sys.argv[1]
+    else:
+        print("using autodetected port: %s" % strPortNameAutodetect )
+        strPortName = strPortNameAutodetect
         
     
     if len(sys.argv) > 2:
@@ -127,14 +150,10 @@ if __name__ == "__main__":
             bClean = True
         else:
             nBaudRate = int(sys.argv[2])
-
-            
-    if 0:
-        print("using autodetected port: %s" % strPortNameAutodetect )
-        strPortName = strPortNameAutodetect
         
     print("\nINF: Connecting to %s (baud: %s)" % (strPortName,nBaudRate) )
-    while 2 != monitorPort(strPortName,nBaudRate,bImmediateClosing=bClean):
+    while 1:
+        monitorPort(strPortName,nBaudRate,bImmediateClosing=bClean)
         time.sleep(1.)
         print("Reconnecting...")
     print("INF: script finished...")

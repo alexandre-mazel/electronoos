@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+// rewrite adr if shortcuted
+if( window.location.pathname == "/art" )
+{
+    history.replaceState({}, "/art", "/art/projects.html");
+}
+
+function getCurrentFolderCapitalized() {
+    const path = window.location.pathname;
+    const parts = path.split('/').filter(Boolean);
+
+    let folder = "";
+
+    if (parts.length === 0) return folder;
+
+    if (parts[parts.length - 1].includes(".")) {
+        folder = parts[parts.length - 2] || "";
+    } else {
+        folder = parts[parts.length - 1];
+    }
+    
+    if( folder == "art" )
+        folder = "Alma Real Time (A.R.T.)"
+
+    return folder.charAt(0).toUpperCase() + folder.slice(1);
+}
+
+console.log(getCurrentFolderCapitalized());
+</script>
+
+<script>document.write( "<title>" + getCurrentFolderCapitalized()+ " Projects</title>")</script>
+
+
+<style>
+:root{
+    --card-width:320px;
+    --image-height:240px;
+    --radius:14px;
+    --shadow:0 10px 28px rgba(0,0,0,.12);
+    --text:#222;
+    --muted:#666;
+    --bg:#f5f6f8;
+}
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    background:var(--bg);
+    font-family:Inter,Segoe UI,Roboto,sans-serif;
+    color:var(--text);
+}
+
+header{
+    text-align:center;
+    padding:50px 20px 30px;
+}
+
+header h1{
+    margin:0;
+    font-weight:300;
+    letter-spacing:2px;
+    font-size:2.2rem;
+}
+
+#gallery{
+
+    display:grid;
+    grid-template-columns: repeat(auto-fit,minmax(320px,1fr));
+
+    gap:28px;
+    padding:30px;
+    max-width:1700px;
+    margin:auto;
+}
+
+.card{
+
+    background:white;
+    border-radius:var(--radius);
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    transition:.25s;
+    position:relative;
+}
+
+.card:hover{
+    transform:translateY(-4px);
+}
+
+.main-image{
+
+    width:100%;
+    height:240px;
+
+    object-fit:cover;
+    display:block;
+    cursor:pointer;
+    
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
+}
+
+.info{
+    padding:18px;
+}
+
+.info div{
+
+    margin:5px 0;
+    line-height:1.3em;
+}
+
+.label{
+
+    color:var(--muted);
+    font-size:.82rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+}
+
+.value{
+    font-size:1rem;
+}
+
+/* popup */
+
+.preview{
+
+    position:absolute;
+
+    left:50%;
+    top:15px;
+    transform:translateX(-50%);
+    display:none;
+    background:white;
+    border-radius:12px;
+    box-shadow:0 18px 40px rgba(0,0,0,.35);
+    padding:12px;
+    z-index:100;
+    /* pointer-events: none; */ /* evite que la preview pique l'event mouseenter meme caché */
+    pointer-events:auto;
+    
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+.preview-grid{
+    display:grid;
+    grid-template-columns:repeat(2,320px);
+    gap:10px;
+}
+
+.preview img{
+    width:300px;
+    height:220px;
+    object-fit:cover;
+    border-radius:8px;
+}
+
+.closePreview {
+
+    display:none;
+
+    position:absolute;
+
+    top:8px;
+    right:12px;
+
+    width:32px;
+    height:32px;
+
+    background:rgba(0,0,0,.6);
+    color:white;
+    border-radius:50%;
+    font-size:24px;
+    line-height:30px;
+    text-align:center;
+    cursor:pointer;
+    z-index:10;
+}
+
+
+/* Mobile */
+
+@media(max-width:700px){
+
+    #gallery{
+        grid-template-columns:1fr;
+        padding:15px;
+    }
+
+
+    /* Fenêtre preview type lightbox */
+    .preview {
+
+        position: fixed;
+
+        left: 5vw !important;
+        top: 5vh !important;
+
+        width: 90vw;
+        max-width: 90vw;
+        max-height: 90vh;
+        padding: 12px;
+        background: white;
+        border-radius: 14px;
+        box-shadow: 0 15px 40px rgba(0,0,0,.35);
+        overflow-y: auto;
+        z-index: 9999;
+        transform: none !important;
+
+        /* permet le scroll uniquement dans la preview */
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+
+        /* nécessaire si on veut interagir avec la popup */
+        pointer-events: auto;
+    }
+
+
+    /* Les images passent en colonne */
+    .preview-grid {
+
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+    }
+
+
+    /* Images adaptées au téléphone */
+    .preview img {
+
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+
+
+    /* Bouton fermeture */
+    .closePreview {
+
+        display: block;
+        position: sticky;
+        top: 0;
+        margin-left: auto;
+        width: 34px;
+        height: 34px;
+
+        line-height: 32px;
+        text-align: center;
+        font-size: 26px;
+        color: white;
+        background: rgba(0,0,0,.65);
+
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 10;
+    }
+    
+} /* mobile */
+
+.media-preview {
+
+    position:relative;
+
+    width:100%;
+
+}
+
+
+.media-preview img,
+.preview-video {
+
+    display:block;
+
+    width:100%;
+
+    height:auto;
+
+    aspect-ratio:4/3;
+
+    object-fit:cover;
+
+    border-radius:10px;
+
+}
+
+
+/* triangle lecture */
+
+.play-icon {
+
+    position:absolute;
+    left:50%;
+    top:50%;
+
+    transform:translate(-50%,-50%);
+
+    width:60px;
+    height:60px;
+
+    border-radius:50%;
+
+    background:rgba(0,0,0,.55);
+    color:white;
+
+    font-size:30px;
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    padding-left:5px;
+}
+
+.play-icon {
+
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    width:60px;
+    height:60px;
+
+    border-radius:50%;
+
+    background:rgba(0,0,0,.55);
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+}
+
+
+/* triangle CSS */
+.play-icon::after {
+
+    content:"";
+
+    margin-left:5px;
+
+    width:0;
+    height:0;
+
+    border-top:12px solid transparent;
+    border-bottom:12px solid transparent;
+    border-left:20px solid white;
+
+}
+
+</style>
+</head>
+
+<body>
+
+
+<header>
+    <h1><script>document.write(getCurrentFolderCapitalized())</script> Projects</h1>
+</header>
+
+<div id="gallery"></div>
+
+<script>
+
+//~ alert(window.innerWidth)
+
+const projects=[
+
+{
+title:"Salle des aromes (2017)",
+location:"CDL",
+partner:"",
+technic:"Conception & Arduino Development",
+cover:"aromes/00.jpg",
+gallery:[
+"aromes/01_zoom_girl.jpg",
+"aromes/02.jpg",
+]
+},
+
+
+{
+title:"Snakable (2024)",
+location:"Teatros Del Canal/Madrid",
+partner:"ENSAD",
+technic:"Arduino programming",
+cover:"snake2/00_s-bianchini_ensadlab_snakable_09-2020_9j1a3215.tif.jpg",
+gallery:[
+"snake2/visitor.jpg",
+"snake2/01.jpg",
+"snake2/02.jpg",
+"snake2/03.jpg",
+"snake2/04.jpg",
+"snake2/05_output.gif",
+]
+},
+
+{
+title:"TCA (2025)",
+location:"(confidential)",
+partner:"ENSAD",
+technic:"Conception, mechanic design, building, electronics, experimentation, arduino development, tuning",
+cover:"tca/00_20250520_135446_collage.jpg",
+gallery:[
+"tca/01_zoom.png",
+"tca/02_20250520_174303.jpg",
+"tca/03_gears.png",
+"tca/04_ratchet.png",
+]
+},
+
+{
+title:"Fossilation (2025)",
+location:"Centre Culturel du Canada/Paris",
+partner:"ENSAD",
+technic:"Redesign electronics, Raspberry programming, Network setup, behavior development",
+cover:"fossilation/00_20251015_171937.jpg",
+gallery:[
+"fossilation/01_20251015_172226.jpg",
+"fossilation/01_20251015_172226.jpg",
+
+]
+},
+
+{
+title:"Oscillation (2025)",
+location:"Centre Culturel du Canada/Paris",
+partner:"ENSAD",
+technic:"Light support, Light programming of the complete exhibition: DMX & Smart Bulb",
+cover:"oscillation/00.jpg",
+gallery:[
+"oscillation/01.jpg",
+"oscillation/02.jpg",
+"oscillation/04.png",
+"oscillation/20251103_165155_oscillation_div2.mp4",
+
+]
+},
+
+
+
+{
+title:"SmileBox (2026)",
+location:"Le Mus&eacute;e en Herbe/Paris",
+partner:"Djeff",
+technic:"Conception, building, Raspberry setup & programming",
+cover:"smilebox/01_IMG_8353_ret_sm.jpg",
+gallery:[
+"smilebox/20260404_142333_vue_ecran.jpg",
+"smilebox/20260404_144234_pm_crop.jpg",
+"smilebox/IMG_8412_ret_sm.jpg",
+"smilebox/IMG_8434_ret_sm.jpg",
+"smilebox/IMG_8439_ret_sm.jpg",
+]
+},
+
+
+{
+title:"Production de cru personnalis&eacute; automatique (2024-2026)",
+location:"CDL",
+partner:"",
+technic:"Conception, plumbing, electronics, programming, tuning & experimenting, maintenance",
+cover:"piano_cocktail/20250227_132850_assembleur_v1_peint_final.jpg",
+gallery:[
+"piano_cocktail/degust.png",
+"piano_cocktail/assembleur_et_cuves_v2_technical_drawing.png",
+"piano_cocktail/20240611_171836_assembleur_v2.jpg",
+]
+},
+
+
+{
+title:"Fossilation (2026)",
+location:"Soci&eacute;t&eacute; des Arts Technologiques/Canada",
+partner:"ENSAD",
+technic:"Installation, Behavior & Light programming",
+cover:"fossilation_sat/00.jpg",
+gallery:[
+"fossilation_sat/02.jpg",
+"fossilation_sat/20260529_105600_test_music_bien_mais_long_crop_div2.mp4",
+
+]
+}
+
+];
+
+
+function createProjectCard(project){
+
+    // add projects path to all images
+    project.cover = "./projects/" + project.cover
+    
+    for( let i in project.gallery )
+    {
+        project.gallery[i] = "./projects/" + project.gallery[i]
+    }
+    // insert cover in gallery
+    project.gallery.unshift(project.cover)
+
+
+    const card=document.createElement("div");
+    card.className="card";
+
+    const img=document.createElement("img");
+    img.src=project.cover;
+    img.className="main-image";
+
+    const preview=document.createElement("div");
+    preview.className="preview";
+    
+    const close=document.createElement("div");
+    close.className="closePreview";
+    close.innerHTML="x";
+
+    preview.appendChild(close);
+
+    const grid=document.createElement("div");
+    grid.className="preview-grid";
+
+
+project.gallery.forEach(src=>{
+
+    const container=document.createElement("div");
+    container.className="media-preview";
+
+
+    if(src.toLowerCase().endsWith(".mp4")) {
+
+        const video=document.createElement("video");
+
+        video.src=src;
+        video.muted=true;
+        video.preload="metadata";
+
+        // affiche la première image de la vidéo
+        video.className="preview-video";
+
+        container.appendChild(video);
+
+
+        const play=document.createElement("div");
+        play.className="play-icon";
+        play.innerHTML="";
+
+        container.appendChild(play);
+        
+        play.addEventListener("click",(e)=>{
+
+            e.stopPropagation();
+            video.controls = true;
+            video.play();
+            play.style.display="none";
+
+        });
+            
+        play.addEventListener("touchend",(e)=>{
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            video.controls = true;
+
+            video.play();
+
+            play.style.display="none";
+
+        },{passive:false});
+
+    } 
+    else {
+
+        const img=document.createElement("img");
+
+        img.src=src;
+
+        container.appendChild(img);
+
+    }
+
+
+    grid.appendChild(container);
+
+});
+
+    preview.appendChild(grid);
+
+//~     card.appendChild(preview);
+    document.body.appendChild(preview);
+
+    card.appendChild(img);
+
+    const info=document.createElement("div");
+    info.className="info";
+    
+    let partner = project.partner
+    
+    if( partner == "ENSAD" )
+    {
+        partner = "Ecole Nationale des Arts D&eacute;coratifs (ENSAD)"
+    }
+    
+    let location = project.location
+    
+    if( location == "CDL" )
+    {
+        location = "Les Caves du Louvre/Paris"
+    }
+
+    info.innerHTML=`
+        <div><span class="label">Project</span><br><span class="value">${project.title}</span></div>
+        <div><span class="label">Location</span><br><span class="value">${location}</span></div>
+            `;
+    if( partner.length > 0 )
+    {
+        info.innerHTML += `    
+            <div><span class="label">Partner</span><br><span class="value">${partner}</span></div>
+                `;
+    }
+    info.innerHTML += `    
+    <div><span class="label">Technics</span><br><span class="value">${project.technic}</span></div>
+    `;
+
+    card.appendChild(info);
+    
+    /*
+    Events:
+        DESKTOP
+        --------
+        mouseenter card:  affiche preview
+        mouseleave card: cache preview
+
+        MOBILE
+        ------
+        touch image: affiche preview
+           body overflow hidden
+
+
+        touch: cache preview
+           body overflow normal
+ */
+ 
+     if (window.innerWidth > 700) {
+     
+        let overCard = false;
+        let overPreview = false;
+
+        card.addEventListener("mouseenter", () => {
+        
+        overCard = true;
+
+            const r = card.getBoundingClientRect();
+            
+            console.log( "DBG: preview: rect:", r )
+            console.log( "DBG: preview: window.innerWidth:", window.innerWidth )
+
+            preview.style.display = "block";
+            preview.style.transform = "none";
+
+            console.log( "DBG: desktop: side" )
+            const popupWidth = 640;
+
+            if (r.right +  30 <= window.innerWidth *0.6)
+            {
+                // a droite
+                preview.style.left = (r.right + 20) + "px";
+            } 
+            else 
+            {
+                // a gauche
+                preview.style.left = (r.left - popupWidth - 20) + "px";
+            }
+
+            console.log( "DBG: preview: left:", preview.style.left )
+
+            preview.style.top = r.top + "px";
+            preview.style.transform = "none";
+
+        });
+
+
+
+        card.addEventListener("mouseleave",()=>{
+
+            // but: si qd on quitte on va sur la preview, peut etre qu'on va vouloir cliquer sur le play, alors on laisse un peu de temps pour aller sur la preview, et tant qu'on y est on la garde
+            overCard = false;
+
+            setTimeout(()=>{
+
+                if(!overCard && !overPreview){
+                    preview.style.display="none";
+                    stopAllVideos()
+                }
+
+            },100);
+
+        });
+        
+
+
+        preview.addEventListener("mouseenter",()=>{
+
+            overPreview=true;
+
+        });
+        
+        preview.addEventListener("mouseleave",()=>{
+
+            overPreview=false;
+            preview.style.display="none";
+            stopAllVideos()
+
+        });
+
+        close.addEventListener("click", ()=>{
+            preview.style.display="none";
+        });
+
+    } // desktop
+    else
+    {
+
+            let startX = 0;
+            let startY = 0;
+
+            img.addEventListener("touchstart", (e) => {
+
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+
+            }, {passive:true});
+
+
+            img.addEventListener("touchend", (e) => {
+
+                const endX = e.changedTouches[0].clientX;
+                const endY = e.changedTouches[0].clientY;
+
+                const distance = Math.sqrt(
+                    Math.pow(endX - startX, 2) +
+                    Math.pow(endY - startY, 2)
+                );
+
+
+                // Si le doigt a bougé, c'était un scroll
+                if (distance > 10) {
+                    return;
+                }
+
+
+                // Sinon c'est un vrai tap
+                e.preventDefault();
+                e.stopPropagation();
+
+
+                if (preview.style.display === "block") {
+
+                    preview.style.display = "none";
+                    document.body.style.overflow = "";
+
+                } else {
+
+                    preview.style.display = "block";
+
+                    preview.style.left = "5vw";
+                    preview.style.top = "5vh";
+                    preview.style.transform = "none";
+
+                    document.body.style.overflow = "hidden";
+
+                }
+
+            }, {passive:false});
+
+
+
+        close.addEventListener("touchend", (e)=>{
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            preview.style.display="none";
+            stopAllVideos()
+
+            document.body.style.overflow="";
+
+        }, {passive:false});
+
+    } // mobile
+    
+
+    return card;
+
+}
+
+
+const gallery=document.getElementById("gallery");
+
+projects.forEach(p=>{
+    gallery.appendChild(createProjectCard(p));
+});
+
+document.addEventListener("touchend", (e)=>{
+
+    if (
+        !e.target.closest(".preview") &&
+        !e.target.classList.contains("main-image")
+    ){
+
+        document.querySelectorAll(".preview").forEach(p=>{
+            p.style.display="none";
+            stopAllVideos()
+        });
+
+        document.body.style.overflow="";
+    }
+
+});
+
+function stopAllVideos(){
+
+    document.querySelectorAll("video").forEach(video => {
+        video.pause();
+//~         video.currentTime = 0; // reset to start
+    });
+
+}
+
+
+</script>
+
+</body>
+</html>

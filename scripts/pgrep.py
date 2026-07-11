@@ -153,6 +153,11 @@ if __name__ == "__main__":
     if len(sys.argv)>3:
         if sys.argv[3]:
             bShowResultInTextEditor = 1
+            
+    if "gui" == strToMatch[:3] and "gui" == strToMatch[-3:]:
+        # special case when comming from command line guialtgui => "alt"
+        strToMatch = '"' + strToMatch[3:-3] + '"' # car on ne peut pas appeller just grep "alt", par contre on peut dans le shell windows taper grep \"alt\" et ca fonctionne !
+        print( "WRN: changing research to '%s' (but you could also type in shell: prep \\\"alt\\\"" % strToMatch )
         
     print("INF: bVerbose: %s" % bVerbose ) 
     na,nf,nla,nlm,listfiles = findInFiles(".",strToMatch,mask.lower(),bVerbose=bVerbose,bShowResultInTextEditor=bShowResultInTextEditor)

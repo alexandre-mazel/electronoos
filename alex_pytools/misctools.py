@@ -410,7 +410,7 @@ def convertEpochToSpecificTimezone( timeEpoch, bRemoveNever=0 ):
     #~ if isRPI() and time.localtime().tm_isdst:
         #~ dtd += datetime.timedelta(hours=-2)
         
-    print("DBG: convertEpochToSpecificTimezone: avant: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
+    # print("DBG: convertEpochToSpecificTimezone: avant: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
     # on lui dit que c'est de l'utc
     #~ dtd = dtd.replace(tzinfo=datetime.timezone.utc)
     try:
@@ -441,6 +441,30 @@ def convertTimeStampToEpoch(strTimeStamp):
         strTimeStamp = strTimeStamp.replace("_","/")
     
     dtd = datetime.datetime.strptime(strTimeStamp, "%Y/%m/%d: %Hh%Mm%Ss" )
+    # denaive l'heure
+    #~ print("DBG: convertTimeStampToEpoch: before: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
+    dtd = dtd.replace(tzinfo=getCurrentTimeZoneName())
+    # la passe en utc heure d'hiver, bug ? non semble ok
+    #~ if isRPI() and time.localtime().tm_isdst:
+        #~ dtd += datetime.timedelta(hours=-1)
+    #~ print("DBG: convertTimeStampToEpoch: after: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
+    # le passe en utc:
+    
+    #~ import pytz
+    #~ utc = pytz.timezone('UTC')
+    #~ dtd = utc.localize(dtd)
+    #~ dtd = dtd.replace(tzinfo=None)
+    dtd = dtd.astimezone(datetime.timezone.utc) # convert to utc
+    #~ print("DBG: convertTimeStampToEpoch: after2: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
+    dtd = dtd.replace(tzinfo=None) # transforme en naif, on aurait pu aussi passer le 1 janvier de naif en utc
+    return (dtd-datetime.datetime(1970,1,1)).total_seconds()
+    
+def convertYmdHmsToEpoch(y,m,d,hour=0,min=0,sec=0):
+    """
+    assume: le timestamp est celui local, et on le stocke en epoch (qui est basé sur utc heure d'hiver)
+    """
+    
+    dtd = datetime.datetime(y, m, d, hour=hour, minute=min, second=sec)
     # denaive l'heure
     #~ print("DBG: convertTimeStampToEpoch: before: time: %s, dtd.tzinfo: %s" % (dtd,dtd.tzinfo) )
     dtd = dtd.replace(tzinfo=getCurrentTimeZoneName())
@@ -569,6 +593,7 @@ def getCpuModel(bShort=False):
     elif platform.system() == "Linux":
         command = "cat /proc/cpuinfo"
         all_info = subprocess.check_output(command, shell=True).decode().strip()
+        name1 = "Unknown linux"
         for line in all_info.split("\n"):
             #~ print("DBG: line: '%s'" % line )
             strLineToSearch = "model name"
@@ -582,6 +607,14 @@ def getCpuModel(bShort=False):
                     name1 = name1[1:]
                     name1 = name1.strip()
                 break
+        try:
+            f = open( "/sys/class/dmi/id/product_family", "rt" )
+            data = f.read()
+            name1 = data
+            f.close()
+        except FileNotFoundError as err:
+            print( "DBG: getCpuModel: " , err )
+            pass
         name2 = name1
     else:
         name1, name2 =  "TODO:getCpuModel", "todo"
@@ -602,7 +635,7 @@ def getCpuTemp():
     #~ print(prob)
     #~ print(prob[0].CurrentReading)
     import wmi
-    w = wmi.WMI(namespace="root\wmi")
+    w = wmi.WMI(namespace="root\\wmi")
     temperature_info = w.MSAcpi_ThermalZoneTemperature()[0]
     print(temperature_info.CurrentTemperature)
 
@@ -999,6 +1032,21 @@ def smoothererstep( x, edge0 = 0, edge1 = 1 ):
     return x * x * x * x * (  x * ( x * ( (x*-20) +70)-84) + 35 )
     
     
+def getAvailableRam():
+    GB=1024*1024*1024.
+    try:
+        import psutil
+        infomem = psutil.virtual_memory()
+        avail = infomem.available
+        tot = infomem.total
+        #~ avail = tot-avail # seems like it's reverted at least on raspberry [but not exactly !?!]
+    except BaseException as err:
+        #~ print("ERR: %s" % err)
+        import os
+        avail = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_AVPHYS_PAGES') 
+        tot = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') 
+    return avail,tot
+    
 def playWav( strFilename, bWaitEnd = True, rSoundVolume = 1. ):
     """
     play a wav, return False on error
@@ -1309,6 +1357,14 @@ def shuffle( aList, n = 1 ):
         del aList[idx]
     return out
     
+if 0:
+    li = [1,2,3,4,5]
+    print(shuffle(li,3))
+    li = ["Alex","Elsa","Corto","Gaia"]
+    print(shuffle(li,4))
+    exit(1)
+    
+    
 
 global_dict_shuffle_int_mem = {}
 def shuffle_int_mem(nMax):
@@ -1375,18 +1431,26 @@ def backupFile( filename, bQuiet = 0 ):
         if time.time() - modtime > onedayinsec:
             # fait un backup du backup
             try:
-                os.rename(filenamebak,filenamebak+".time_"+ str(int(modtime)))
+                strNewName = filenamebak+".time_"+ str(int(modtime))
+                if not bQuiet: print( "INF: backupFile: moving '%s' to stamped '%s'" % (filenamebak,strNewName)  )
+                os.rename(filenamebak,strNewName)
             except FileExistsError as err: 
                 print("WRN: backupFile: rename error (1): on a deja sauvé ce fichier, et pourtant il est encore la...\nerr:%s" % err)
         else:
             os.remove(filenamebak)
     try:
+        if not bQuiet: print( "INF: backupFile: moving '%s' to '%s'" % (filename,filenamebak)  )
         os.rename(filename,filenamebak)
     except FileExistsError as err: 
         print("WRN: backupFile: rename error (2): on a deja sauvé ce fichier, et pourtant il est encore la...\nerr:%s" % err)
+    if not bQuiet: print("INF: backupFile: ok" )
     
-#~ backupFile("/tmp/test.txt")
-#~ exit(1)
+if 0:
+    backupFile("/tmp/test.txt",bQuiet=0)
+    ftmptest=open("/tmp/test.txt","wt")
+    ftmptest.write(str(time.time()))
+    ftmptest.close()
+    exit(1)
 
 def eraseFiles( listFiles, strPath = "" ):
     """
@@ -1811,6 +1875,36 @@ def eraseFileLongerLine(filename,sizemax):
     
 #~ eraseFileLongerLine("/tmp/data_offers.py",10000)
 #~ exit(0)
+
+
+def is_zipped( filename ):
+    """
+    Is this file looks like a zipped file ?
+    """
+    f = open( filename, "rb" )
+    buf = f.read(4)
+    f.close()
+    if len(buf) < 4:
+        return False
+    #~ print( "DBG: is_zipped: buf: %s" % buf )
+    return buf[0] == 0x1F and buf[1] == 0x8B and buf[2] == 0x08 and buf[3] == 0x08
+    
+def smart_size_to_str( size ):
+    if size < 1000:
+        if isinstance(size,int):
+            return "%d" % size
+        if size < 10:
+            return "%.3f" % size
+            
+        return "%.1f" % size
+        
+    if size < 1000*1000:
+        return "%.1fk" % (size/1000)
+        
+    if size < 1000*1000*1000:
+        return "%.1fM" % (size/(1000*1000))
+        
+    return "%.1fG" % (size/(1000*1000*1000))
 
 
 def gaussian(x):

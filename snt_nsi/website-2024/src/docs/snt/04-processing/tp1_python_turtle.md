@@ -20,6 +20,8 @@ description: Turtle
 
     On dirige un [crayon]("plus précisément, on dirige une tortue qui porte un crayon") avec des ordres simple afin de faire un dessin.
     
+    La scéne est vue du dessus.
+    
 
     Ordre possible:
 
@@ -43,17 +45,7 @@ description: Turtle
     1. Depuis l'explorateur de fichier, double-cliquez sur l'icône intitulée **Documents**
     2. Une fois dans votre zone personnelle, créez un nouveau dossier nommé **SNT** *(s'il n'existe pas déjà)*
     3. Entrez dans le dossier **SNT** et créez-y un nouveau dossier nommé **scripts** *(s'il n'existe pas déjà)*
-    
-    
-!!! note "A vous de jouer !"
-
-    1. Depuis le bureau, lancer l'application **Thonny**
-    2. Cliquer dans le menu Fichier/Nouveau (ou File/New)
-    3. Puis dans le menu Fichier/Enregistrer sous (ou File/save as)
-    4. Dans la fenêtre qui apparait, enregistrer votre fichier dans Documents/SNT/scripts/turtle_square.py
-    
-    
-        
+            
     
 !!! note "Création d'un nouveau script dans Thonny"
 

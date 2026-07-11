@@ -72,4 +72,5 @@ def run_loop_send(strDeviceID):
 if __name__ == "__main__":
     #~ run_loop_send("28-3c09f64897a2")
     run_loop_send("28-3cb1f649c835")
+    # warning not the one used from REE (cut and paste in stat_connected, burk!)
     

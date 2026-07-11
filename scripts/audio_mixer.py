@@ -67,14 +67,14 @@ class Sound:
         
         self.freqHistory = [] # for each sec an average of the volume of each band
         
-    def load(self):
+    def load(self, f):
         print("load sound...")
-        f = "c:/tmp/poker-face-medieval-style.mp3"        
-        f = "c:/tmp/theme-from-the-shawshank-redemption (double bass).mp3"
-        f = "c:/tmp/Eminem - Mockingbird (Blasterjaxx Remix).mp3"
-        f = "D:/FreezerMusic/Carameii/Noot Noot Theme Mozart Lacrimosa (Epic Version)/01. Carameii - Noot Noot Theme Mozart Lacrimosa (Epic Version).mp3"
-        f = "D:/FreezerMusic/Metallica/Metallica (Remastered 2021)/08. Metallica - Nothing Else Matters (Remastered 2021).mp3"
-        f = "c:/tmp/8_bits.mp3"
+        #~ f = "c:/tmp/poker-face-medieval-style.mp3"        
+        #~ f = "c:/tmp/theme-from-the-shawshank-redemption (double bass).mp3"
+        #~ f = "c:/tmp/Eminem - Mockingbird (Blasterjaxx Remix).mp3"
+        #~ f = "D:/FreezerMusic/Carameii/Noot Noot Theme Mozart Lacrimosa (Epic Version)/01. Carameii - Noot Noot Theme Mozart Lacrimosa (Epic Version).mp3"
+        #~ f = "D:/FreezerMusic/Metallica/Metallica (Remastered 2021)/08. Metallica - Nothing Else Matters (Remastered 2021).mp3"
+        #~ f = "c:/tmp/8_bits.mp3"
         #~ f = "c:/tmp/summer3.mp3"
         #~ f = "../test/chirp.mp3"
         #~ f = "../test/440hz.mp3"
@@ -220,7 +220,7 @@ class Sound:
         
         
 class Game:
-    def __init__(self):
+    def __init__(self, filename):
         self.screen = pygame.display.set_mode((1280+80, 840+40))
         self.clock = pygame.time.Clock()
         self.fps = 24  # Frames per second.
@@ -236,7 +236,7 @@ class Game:
         
         self.sounds = []
         self.sounds.append(Sound())
-        self.sounds[-1].load()
+        self.sounds[-1].load(filename)
         
         
     def handleInput(self):
@@ -301,8 +301,8 @@ class Game:
 # class Game - end
 
 
-def runGame():
-    game = Game()
+def runGame(filename):
+    game = Game(filename)
     while 1:
         bQuit = game.handleInput()
         game.update()
@@ -314,5 +314,8 @@ def runGame():
 
 
 if __name__ == "__main__":
+    filename = ""
+    if len(sys.argv)>1:
+        filename = sys.argv[1]
     #~ test()
-    runGame()
+    runGame(filename)

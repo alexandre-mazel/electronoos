@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 # coding: utf-8
 import os
+import sys
 import time
 import datetime
 
@@ -154,14 +155,16 @@ def auto_off():
             os.system( "halt -p")
     
     
-def main():
-    log("background_task: starting")
+def main(bDontAutoOff):
+    log("background_task: starting, bDontAutoOff: %s" % bDontAutoOff )
     while 1:
         check_temp()
         ping_other()
-        try: auto_off()
-        except BaseException as err: log( "ERR: auto_off: %s" % str(err))
+        if not bDontAutoOff:
+            try: auto_off()
+            except BaseException as err: log( "ERR: auto_off: %s" % str(err))
         time.sleep(60)
 
-
-main()
+bDontAutoOff = len(sys.argv) > 1
+print( "INF: bDontAutoOff: %s" % bDontAutoOff )
+main(bDontAutoOff)

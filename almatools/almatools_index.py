@@ -12,6 +12,7 @@ def index(req):
     }
     .imgelem{
     width:320px;
+    border-radius: 8px;
     }
     .txtelem{
     padding:10px;
@@ -66,6 +67,13 @@ def index(req):
     <div style='vertical-align: middle;'>
     <img src='/almatools/adr_email_at.svg' height=15px>
     </div>
+    <br>
+    <br>    
+    <div style='vertical-align: middle;'>
+    <a href='/almatools/projects.html'>Previous Projects</a>
+    </div>
+    
+    
     </body>
     </html>
     """

@@ -63,6 +63,8 @@ void setup() {
   DEBUG_SERIAL.begin(115200);   //set debugging port baudrate to 115200bps
   //while(!DEBUG_SERIAL);         //Wait until the serial port is opened
 
+  DEBUG_SERIAL.print("dynamixel_prog.ino: v0.1: Starting");
+
 
   dxl.setPortProtocolVersion((float)nMotorProtocol);
   DEBUG_SERIAL.print("SCAN PROTOCOL ");

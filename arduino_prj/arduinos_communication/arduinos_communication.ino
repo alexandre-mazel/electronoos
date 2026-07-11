@@ -1,18 +1,25 @@
-#include "steppers_driver.hpp"
-
 /*
-Test me, by sending manual command to the serial:
+
+Objective:
+- Drive 3 stepper motors at the same time with various speed.
+- Receive command from Serial2
+
+If you want to test me, by sending manual command to the serial:
 1) define the GET_ORDER_FROM_SERIAL1 to read orders from serial1 instead of serial2 (normal use)
 
-2) send command from the serial monitor input field:
-// launch the motor at 10 rpm
+2) send command from the serial monitor input field (at 57600):
+// launch the first motor at 10 rpm
 ##MOTOR_0_1_10
+// launch the first motor in reverse mode at 50 rpm
+##MOTOR_0_-1_50
 // stop it
 ##MOTOR_0_0_0
-
 */
 
-// #define GET_ORDER_FROM_SERIAL1 // to debug
+#include "steppers_driver.hpp"
+
+
+// #define GET_ORDER_FROM_SERIAL1 // to debug with command from default serial
 
  #ifdef GET_ORDER_FROM_SERIAL1
   #define SERIAL_ORDER Serial

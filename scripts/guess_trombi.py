@@ -52,7 +52,8 @@ def guess_trombi(filename):
 
         
     timeGuess = 10
-    timeGuess = 1000
+    timeGuess = 2000 # 1000 en mode dur
+    timeReveal = 2000
     
     cpt = 0
     while 1:
@@ -78,7 +79,7 @@ def guess_trombi(filename):
         imface = im[t:b+160,l:r+20]        
         imface = cv2.resize(imface,(0,0),fx=3,fy=3)
         cv2.imshow("guess who?", imface)
-        key = cv2.waitKey(timeGuess*2)
+        key = cv2.waitKey(timeReveal)
         if key == 27: break
         
         cpt += 1
@@ -86,7 +87,7 @@ def guess_trombi(filename):
 strPath = r"C:\Users\alexa\perso\docs\2024_09_Enseignement_Voltaire/"
 strPath = r"C:\Users\alexa\perso\docs_nextcloud_edu\2024_09_Enseignement_Voltaire/"
 fname = strPath + r"2024_09_NSI\1NSINF1_trombi_01.png"
-#~ fname = strPath + r"2024_09_SNT\210_trombi_all.png"
-#~ fname = strPath + r"2024_09_SNT\213_trombi_all.png"
+fname = strPath + r"2024_09_SNT\210_trombi_all.png"
+fname = strPath + r"2024_09_SNT\213_trombi_all.png"
 
 guess_trombi(fname)

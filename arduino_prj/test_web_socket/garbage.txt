@@ -1,0 +1,42 @@
+function pseudoColorFrom12Bit(value) {
+  // Clamp the input value to the 0–4095 range
+  value = Math.max(0, Math.min(4095, value));
+
+  // Normalize to 0–1
+  const normalized = value / 4095;
+
+  // Map the normalized value to a pseudo-color using a simple colormap
+  // Example: blue (low) -> cyan -> green -> yellow -> red (high)
+
+  let r = 0, g = 0, b = 0;
+
+  if (normalized < 0.25) {
+    // Blue to Cyan
+    r = 0;
+    g = normalized * 4 * 255;
+    b = 255;
+  } else if (normalized < 0.5) {
+    // Cyan to Green
+    r = 0;
+    g = 255;
+    b = (1 - (normalized - 0.25) * 4) * 255;
+  } else if (normalized < 0.75) {
+    // Green to Yellow
+    r = (normalized - 0.5) * 4 * 255;
+    g = 255;
+    b = 0;
+  } else {
+    // Yellow to Red
+    r = 255;
+    g = (1 - (normalized - 0.75) * 4) * 255;
+    b = 0;
+  }
+/*
+  return {
+    r: Math.round(r),
+    g: Math.round(g),
+    b: Math.round(b)
+  };
+  */
+  return "rgb("+r+","+g+","+b+")"
+}

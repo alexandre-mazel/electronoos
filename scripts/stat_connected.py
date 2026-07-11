@@ -1,5 +1,8 @@
 #!/usr/bin/python
 
+# to be run as:
+# sudo nohup /home/na/dev/git/electronoos/scripts/stat_connected.py &
+
 def logDebug(txt):
     pass
     #file = open("/home/na/pi_error.log", "at" )
@@ -327,9 +330,17 @@ def getTemperatureFrom1wire(strDeviceID):
     return t
     
 def updateTemperature():
-    t = getTemperatureFrom1wire( "28-3cb1f649c835")
+    strDeviceID = "28-3cb1f649c835"
+    t = getTemperatureFrom1wire(strDeviceID)
     if t <= -127:
         return
+        
+    if 1:
+         # on va moyenner 2 lectures a 15s d'intervalles
+        time.sleep(15)
+        t2 = getTemperatureFrom1wire(strDeviceID)
+        if t2 > -127:
+            t = (t + t2) / 2
     
     #~ print("INF: updateTemperature: %.1f" % t )
     

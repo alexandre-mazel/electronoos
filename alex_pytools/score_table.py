@@ -6,16 +6,16 @@ class ScoreTable:
     a score table.
     Saved ordered from best to less best
     """
-    def __init__( self, strGameName, bMinimumIsBest = False ):
+    def __init__( self, strGameName, bMinimumIsBest = False, encoding="utf-8" ):
         self.strGameName = strGameName
         self.bMinimumIsBest = bMinimumIsBest
-        self.load()
+        self.load( encoding = encoding )
         
     def reset(self):
         self.listScore = [] # list of pair (score,name,date and time)
         
-    def load( self ):
-        self.listScore = csv_loader.load_csv( "/tmp/score_%s.dat" % self.strGameName)
+    def load( self, encoding="utf-8"):
+        self.listScore = csv_loader.load_csv( "/tmp/score_%s.dat" % self.strGameName,encoding=encoding)
         
     def save( self ):
         csv_loader.save_csv( "/tmp/score_%s.dat" % self.strGameName, self.listScore )

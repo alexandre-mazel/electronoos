@@ -140,6 +140,9 @@ def runServer( nPort, bIsOnNao = 0, bVerbose=0 ):
                 if mem != None:
                     print("INF: GOOD: ALMemory is connected")
                     break
+            except ModuleNotFoundError as err:
+                print("INF: WRN: Naoqi not found")
+                break
             except RuntimeError as err:
                 print("INF: BAD: ALMemory not found, waiting...")
                 time.sleep(5)
@@ -294,5 +297,5 @@ dumpHexa data len: 4
         
 # pour tester, lancer : send_one_value_using_osclib.py en paralelle
 
-runServer(8002,bIsOnNao=1,bVerbose=0)
+runServer(8888,bIsOnNao=1,bVerbose=0)
    

@@ -61,3 +61,5 @@ if __name__ == "__main__":
     #~ findNonAscii(fn, bOnlyNotFrench = True)
     findNonAscii(fn, nSpecificValue = nSpecificValue)
     #~ testFileEncoding(fn)
+    
+print("\nFinished...")

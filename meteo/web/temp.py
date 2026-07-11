@@ -34,12 +34,12 @@ def format_record( r ):
     y,mo,d,h,m,temp = r
     dt = "%2d/%02d/%d - %d:%02d" % (mo,d,y,h,m)
     
-    return f"""
+    return """
         <div class="temp-card">
-            <div class="temp-value">{temp:.1f}<span class="temp-unit">°C</span></div>
-            <div class="temp-date">{dt}</div>
+            <div class="temp-value">%.1f<span class="temp-unit">°C</span></div>
+            <div class="temp-date">%s</div>
         </div>
-        """
+        """ % (temp,dt)
     
 def getStyle():
     return """

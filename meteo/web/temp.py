@@ -11,15 +11,14 @@ import sys
 sys.path.append("..")
 sys.path.append("/home/na/dev/git/electronoos/meteo/")
 
-sys.path.append("../../../obo/spider/") # pour common
-sys.path.append("/home/na/dev/git/obo/spider/")
 import temperature_office_analyse
+
+import misctools
 
 def record_to_min( r ):
     """
     convertit un y,mo,d,h,m,temp en sec since 1970 (roughly)
     """
-    import misctools
     y,mo,d,h,m,temp = r
     sec = misctools.convertYmdHmsToEpoch( y,mo,d,h,m )
     return sec//60
@@ -162,6 +161,10 @@ def getStyle():
 """
 
 def index():
+    data = misctools.cacheOnDisk.getData( "web_temp_last_data", 60*3 )
+    if data != None:
+        return data
+        
     verbose = 1
     #~ verbose = 0
     if 1:
@@ -213,6 +216,8 @@ def index():
         print("<!--")
         print( "out: " + str(out) )
         print("-->")
+        
+    misctools.cacheOnDisk.saveData( "web_temp_last_data", out )
     return out
     
     

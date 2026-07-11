@@ -1319,6 +1319,63 @@ class Cache:
 # class Cache - end
 cache = Cache()
 
+class CacheOnDisk:
+    """
+    Cache some information and store them on disk.
+    The goal is to prevent recomputing stuff already computed on disk and if last data where computed recently, just return cached result
+    """
+    def __init__( self ):
+        pass
+        
+    def _getFilenameFromDataName( self, strDataName ):
+        strDataName = strDataName.replace("*","_").replace("?","_").replace("/","_").replace("\\","_").replace(":","_")
+        return "/tmp/" + strDataName + ".cache"
+        
+    def saveData( self, strDataName, data ):
+        fn = self._getFilenameFromDataName(strDataName)
+        print( "DBG: CacheOnDisk: Writing data to '%s'" % fn )
+        f = open(fn,"wt")
+        f.write(repr(data))
+        f.close()
+        
+    def readData( self, strDataName ):
+        import ast
+        fn = self._getFilenameFromDataName(strDataName)
+        print( "DBG: CacheOnDisk: Reading data from '%s'" % fn )
+        f = open(fn,"rt")
+        data = f.read()
+        f.close()
+        return ast.literal_eval( data )
+        
+    def getData( self, strDataName, rCacheLifeTimeSec = 60*3 ):
+        fn = self._getFilenameFromDataName(strDataName)
+        try:
+            mtime = os.path.getmtime( fn )
+        except BaseException:
+            mtime = 0
+        print( "DBG: CacheOnDisk: mtime: %s" % str(mtime) )
+        if time.time() - mtime > rCacheLifeTimeSec:
+            # not cached!
+            return None
+        return self.readData( strDataName )
+            
+cacheOnDisk = CacheOnDisk()
+
+if 0:
+    # test CacheOnDisk
+    res = cacheOnDisk.getData( "test_3*5", 10 )
+    if res == None:
+        print("INF: cacheOnDisk: No cached")
+        cacheOnDisk.saveData( "test_3*5", 3*5 )
+    else:
+        print("INF: cacheOnDisk: cached: %s" % str( res ) )
+    res = cacheOnDisk.getData( "test_3*5", 10 )
+    print( "INF: cacheOnDisk: 2nd try: res: %s (should be 15)" % str( res ) )
+    time.sleep(2)
+    res = cacheOnDisk.getData( "test_3*5", 1 )
+    print( "INF: cacheOnDisk: 3nd try: res: %s (should be None)" % str( res ) )
+    exit(0)
+
 
 def getWebPage( strAddr ):
     #~ import urllib.request

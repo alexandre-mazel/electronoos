@@ -29,6 +29,8 @@ def getMinMax( v, duration_minute ):
     """
     idx_min = -1
     idx_max = -1
+    avg = v[idx_min][-1]
+    cpt_avg = 1
     start_minute = record_to_min(v[idx_min])
     print( "DBG: getMinMax: start_minute: %s => s%s" % (v[idx_min],start_minute))
     idx = -2
@@ -44,9 +46,12 @@ def getMinMax( v, duration_minute ):
             idx_min = idx
         if v[idx_max][-1] < temp:
             idx_max = idx
+        avg += temp
+        cpt_avg += 1
         idx -= 1
         
-    return v[idx_min], v[idx_max]
+    avg /= cpt_avg
+    return v[idx_min], v[idx_max], avg
         
 
 
@@ -64,11 +69,11 @@ def compute_stat():
     vals =  datas[("armoire","temp")]
     r_last = vals[-1]
     
-    rmin_h,rmax_h = getMinMax( vals, 60 )
-    rmin_d,rmax_d = getMinMax( vals, 60*24 )
-    rmin_7d,rmax_7d = getMinMax( vals, 60*24*7 )
-    rmin_3m,rmax_3m = getMinMax( vals, 60*24*7*12 )
-    return r_last, rmin_h,rmax_h,rmin_d,rmax_d,rmin_7d,rmax_7d,rmin_3m,rmax_3m
+    rmin_h,rmax_h, avg_h = getMinMax( vals, 60 )
+    rmin_d,rmax_d, avg_d = getMinMax( vals, 60*24 )
+    rmin_7d,rmax_7d, avg_7d = getMinMax( vals, 60*24*7 )
+    rmin_3m,rmax_3m, avg_3m = getMinMax( vals, 60*24*7*12 )
+    return r_last, rmin_h,rmax_h,rmin_d,rmax_d,rmin_7d,rmax_7d,rmin_3m,rmax_3m, avg_h, avg_d, avg_7d, avg_3m
     
 def format_record( r, title, style = 0 ):
     """
@@ -76,15 +81,21 @@ def format_record( r, title, style = 0 ):
     
     style: 0: default, 1: cold, 2: hot
     """
-    y,mo,d,h,m,temp = r
-    dt = "%2d/%02d/%d - %d:%02d" % (d,mo,y,h,m)
+    if isinstance(r,list):
+        y,mo,d,h,m,temp = r
+        dt = "%2d/%02d/%d - %d:%02d" % (d,mo,y,h,m)
+    else:
+        temp = r
+        dt = "&nbsp;"
     
     style_temp = "temp-value"
     if style == 1:
         style_temp = "temp-value-cold"
     elif style == 2:
         style_temp = "temp-value-hot"
-    
+    elif style == 3:
+        style_temp = "temp-value-avg"
+        
     return """
         <div class="temp-card">
             <div class="temp-title">%s</div>
@@ -116,8 +127,9 @@ def getStyle():
 
 .temp-title {
     margin-top: 1px;
-    margin-bottom: 14px;
-    font-size: 14px;
+    margin-bottom: 8px;
+    font-size: 15px;
+    font-weight: 600;
     opacity: .85;
     letter-spacing: .5px;
     color: darkblue;
@@ -146,14 +158,23 @@ def getStyle():
     color: blue;
 }
 
+.temp-value-avg {
+    font-size: 56px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -2px;
+    color: orange;
+}
+
 .temp-unit {
     font-size: 28px;
     vertical-align: top;
 }
 
 .temp-date {
-    margin-top: 14px;
-    font-size: 14px;
+    margin-top: 10px;
+    font-size: 15px;
+    font-weight: 700;
     opacity: .85;
     letter-spacing: .5px;
 }
@@ -162,13 +183,13 @@ def getStyle():
 
 def index():
     data = misctools.cacheOnDisk.getData( "web_temp_last_data", 60*3 )
-    if data != None:
+    if data != None and 0:
         return data
         
     verbose = 1
     #~ verbose = 0
     if 1:
-        r_last, r_min_h,r_max_h,r_min_d,r_max_d,r_min_7d,r_max_7d,r_min_3m,r_max_3m = compute_stat()
+        r_last, r_min_h,r_max_h,r_min_d,r_max_d,r_min_7d,r_max_7d,r_min_3m,r_max_3m, avg_h, avg_d, avg_7d, avg_3m = compute_stat()
     else:
         r_last = [2026, 7, 11, 11, 15, 28.6]
         r_min_h = [2026, 7, 11, 11, 15, 22.6]
@@ -194,22 +215,26 @@ def index():
     ss.append( format_record( r_last, "derni&egrave;re mesure" ) )
     
     ss.append( format_record( r_min_h, "minimum derni&egrave;re heure", 1 ) )
+    ss.append( format_record( avg_h, "moyenne derni&egrave;re heure", 3 ) )
     ss.append( format_record( r_max_h, "maximum derni&egrave;re heure", 2 ) )
     
     ss.append( format_record( r_min_d, "minimum derni&egrave;r jour", 1 ) )
+    ss.append( format_record( avg_d, "moyenne derni&egrave;r jour", 3 ) )
     ss.append( format_record( r_max_d, "maximum derni&egrave;r jour", 2 ) )
 
     ss.append( format_record( r_min_7d, "minimum derni&egrave;re semaine", 1 ) )
+    ss.append( format_record( avg_7d, "moyenne derni&egrave;re semaine", 3 ) )
     ss.append( format_record( r_max_7d, "maximum derni&egrave;re semaine", 2 ) )
 
     ss.append( format_record( r_min_3m, "minimum 3 derniers mois", 1 ) )
+    ss.append( format_record( avg_3m, "moyenne 3 derniers mois", 3 ) )
     ss.append( format_record( r_max_3m, "maximum 3 derniers mois", 2 ) )
     
     out =  "<html><head><meta charset='UTF-8'><title>Temperature chez nous</title>" + getStyle() + "</head><body>"
     out += "<div class='temp-container'>"
     for i,s in enumerate(ss):
         out += s
-        if i == 0 or ( i-1 ) % 2 == 1:
+        if i == 0 or ( i-1 ) % 3 == 2:
             out += "</div><br><div class='temp-container'>"
     out += "</body></html>"
     if verbose:

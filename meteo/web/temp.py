@@ -8,8 +8,10 @@ import os
 import sys
 
 sys.path.append("..")
+sys.path.append("/home/na/dev/git/electronoos/meteo/")
 
 sys.path.append("../../../obo/spider/") # pour common
+sys.path.append("/home/na/dev/git/obo/spider/")
 import temperature_office_analyse
 
 def record_to_min( r ):

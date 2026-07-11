@@ -160,7 +160,7 @@ def getStyle():
 def index():
     verbose = 1
     #~ verbose = 0
-    if 0:
+    if 1:
         r_last, r_min_h,r_max_h,r_min_d,r_max_d,r_min_7d,r_max_7d = compute_stat()
     else:
         r_last = [2026, 7, 11, 11, 15, 28.6]

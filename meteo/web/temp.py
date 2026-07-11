@@ -32,7 +32,7 @@ def format_record( r ):
     generate a nice html code to output a record: y,mo,d,h,m,temperature
     """
     y,mo,d,h,m,temp = r
-    dt = f"{d:02d}/{mo:02d}/{y} • {h:02d}:{m:02d}"
+    dt = f"{d:02d}/{mo:02d}/{y} - {h:02d}:{m:02d}"
     
     return f"""
         <div class="temp-card">

@@ -91,6 +91,10 @@ def decode_file_sonde(strFilename):
         
         if b"/" in datas[0]:
             # office sonde format
+            if len(datas) < 4:
+                print( "WRN: decode_file_sonde: skipping record: %s" % str(datas))
+                continue
+                
             strDate, strTime, strLocation, strValue = datas[:4]
             
             if bVerbose: print("strDate: '%s'" % strDate)

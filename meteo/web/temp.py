@@ -76,7 +76,7 @@ def format_record( r, title, style = 0 ):
     style: 0: default, 1: cold, 2: hot
     """
     y,mo,d,h,m,temp = r
-    dt = "%2d/%02d/%d - %d:%02d" % (mo,d,y,h,m)
+    dt = "%2d/%02d/%d - %d:%02d" % (d,mo,y,h,m)
     
     style_temp = "temp-value"
     if style == 1:

@@ -19,9 +19,34 @@ sys.path.append("../../obo/spider/")
 
 import common
 import misctools
-import retrieve_pop3
 import datetime
 
+    
+def splitBytes(bin,sepa,bLeaveEmpty = 0,bLeaveSepaAtEnd=0):
+    """
+    - bLeaveEmpty: 
+    - bLeaveSepaAtEnd: leave sepa at the end of each new element.
+                                if last element doesn't have sepa, it wont have it
+    """
+    listBin = []
+    start = 0
+    i = 0
+    lenbin = len(bin)
+    while i < lenbin:
+        #~ print(bin[i])
+        if bin[i] == sepa:
+            end = i
+            if bLeaveSepaAtEnd: end += 1
+            if bLeaveEmpty or end-1>start: listBin.append(bin[start:end])
+            start = i + 1
+        i += 1
+    if bLeaveEmpty or i-1>start: listBin.append(bin[start:i])
+    if 1:
+        # remove \r (0x0D at the end)
+        for i in range(len(listBin)):
+            if len(listBin[i])>0 and listBin[i][-1] == 0x0D:
+                listBin[i] = listBin[i][:-1]
+    return listBin
         
 def isListIn(word,list):
     """
@@ -52,7 +77,7 @@ def decode_file_sonde(strFilename):
         if bVerbose: print(line)
         if len(line)<2:
             break
-        datas = retrieve_pop3.splitBytes(line,ord(":"))
+        datas = splitBytes(line,ord(":"))
         
         if bVerbose: print(datas)
         

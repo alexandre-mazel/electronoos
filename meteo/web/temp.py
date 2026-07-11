@@ -10,7 +10,42 @@ import sys
 sys.path.append("..")
 
 sys.path.append("../../../obo/spider/") # pour common
-#~ import temperature_office_analyse
+import temperature_office_analyse
+
+def record_to_min( r ):
+    """
+    convertit un y,mo,d,h,m,temp en sec since 1970 (roughly)
+    """
+    import misctools
+    y,mo,d,h,m,temp = r
+    sec = misctools.convertYmdHmsToEpoch( y,mo,d,h,m )
+    return sec//60
+    
+def getMinMax( v, duration_minute ):
+    """
+    return le record min temp et max temp dans les duration_min derniere minute
+    """
+    idx_min = -1
+    idx_max = -1
+    start_minute = record_to_min(v[idx_min])
+    print( "DBG: getMinMax: start_minute: %s => s%s" % (v[idx_min],start_minute))
+    idx = -2
+    while 1:
+        r = v[idx]
+        temp = r[-1]
+        record_minute = record_to_min( r )
+        #~ print( "DBG: getMinMax: record_minute: %s => %s" % (r,record_minute) )
+        if start_minute - record_minute > duration_minute:
+            print( "DBG: getMinMax: stopping at record: '%s'" % str(r) )
+            break
+        if v[idx_min][-1] > temp:
+            idx_min = idx
+        if v[idx_max][-1] < temp:
+            idx_max = idx
+        idx -= 1
+        
+    return v[idx_min], v[idx_max]
+        
 
 
 def compute_stat():
@@ -25,25 +60,46 @@ def compute_stat():
     datas = temperature_office_analyse.decode_file_sonde(strFilename)
     
     vals =  datas[("armoire","temp")]
-    return vals[-1]
+    r_last = vals[-1]
     
-def format_record( r ):
+    rmin_h,rmax_h = getMinMax( vals, 60 )
+    rmin_d,rmax_d = getMinMax( vals, 60*24 )
+    rmin_7d,rmax_7d = getMinMax( vals, 60*24*7 )
+    return r_last, rmin_h,rmax_h,rmin_d,rmax_d,rmin_7d,rmax_7d
+    
+def format_record( r, title, style = 0 ):
     """
     generate a nice html code to output a record: y,mo,d,h,m,temperature
+    
+    style: 0: default, 1: cold, 2: hot
     """
     y,mo,d,h,m,temp = r
     dt = "%2d/%02d/%d - %d:%02d" % (mo,d,y,h,m)
     
+    style_temp = "temp-value"
+    if style == 1:
+        style_temp = "temp-value-cold"
+    elif style == 2:
+        style_temp = "temp-value-hot"
+    
     return """
         <div class="temp-card">
-            <div class="temp-value">%.1f<span class="temp-unit">°</span></div>
+            <div class="temp-title">%s</div>
+            <div class="%s">%.1f<span class="temp-unit">°</span></div>
             <div class="temp-date">%s</div>
         </div>
-        """ % (temp,dt)
+        """ % (title,style_temp,temp,dt)
     
 def getStyle():
     return """
 <style>
+.temp-container {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
 .temp-card {
     width: 220px;
     padding: 18px 20px;
@@ -55,11 +111,36 @@ def getStyle():
     box-shadow: 0 8px 20px rgba(0,0,0,.25);
 }
 
+.temp-title {
+    margin-top: 1px;
+    margin-bottom: 14px;
+    font-size: 14px;
+    opacity: .85;
+    letter-spacing: .5px;
+    color: darkblue;
+}
+
 .temp-value {
     font-size: 56px;
     font-weight: 700;
     line-height: 1;
     letter-spacing: -2px;
+}
+
+.temp-value-hot {
+    font-size: 56px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -2px;
+    color: red;
+}
+
+.temp-value-cold {
+    font-size: 56px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -2px;
+    color: blue;
 }
 
 .temp-unit {
@@ -79,15 +160,46 @@ def getStyle():
 def index():
     verbose = 1
     #~ verbose = 0
-    #~ r_last = compute_stat()
-    r_last = [2026, 7, 11, 11, 15, 28.6]
+    if 0:
+        r_last, r_min_h,r_max_h,r_min_d,r_max_d,r_min_7d,r_max_7d = compute_stat()
+    else:
+        r_last = [2026, 7, 11, 11, 15, 28.6]
+        r_min_h = [2026, 7, 11, 11, 15, 22.6]
+        r_max_h = [2026, 7, 11, 11, 15, 28.6]
+        r_min_d = [2026, 7, 11, 11, 15, 14.6]
+        r_max_d = [2026, 7, 11, 11, 15, 28.6]
+        r_min_7d = [2026, 7, 11, 11, 15, 12.6]
+        r_max_7d = [2026, 7, 11, 11, 15, 38.6]
     if verbose:
         print("<!--")
         print( "r_last: " + str(r_last) )
+        print( "r_min_h: " + str(r_min_h) )
+        print( "r_max_h: " + str(r_max_h) )
+        print( "r_min_d: " + str(r_min_d) )
+        print( "r_max_d: " + str(r_max_d) )
+        print( "r_min_7d: " + str(r_min_7d) )
+        print( "r_max_7d: " + str(r_max_7d) )
         print("-->")
     
-    s = format_record( r_last )
-    out =  "<html><head><meta charset='UTF-8'><title>Temperature chez nous</title>" + getStyle() + "</head><body>" +  s + "</body></html>"
+    ss = []
+    ss.append( format_record( r_last, "derni&egrave;re mesure" ) )
+    
+    ss.append( format_record( r_min_h, "minimum derni&egrave;re heure", 1 ) )
+    ss.append( format_record( r_max_h, "maximum derni&egrave;re heure", 2 ) )
+    
+    ss.append( format_record( r_min_d, "minimum derni&egrave;r jour", 1 ) )
+    ss.append( format_record( r_max_d, "maximum derni&egrave;r jour", 2 ) )
+
+    ss.append( format_record( r_min_7d, "minimum derni&egrave;re semaine", 1 ) )
+    ss.append( format_record( r_max_7d, "maximum derni&egrave;re semaine", 2 ) )
+    
+    out =  "<html><head><meta charset='UTF-8'><title>Temperature chez nous</title>" + getStyle() + "</head><body>"
+    out += "<div class='temp-container'>"
+    for i,s in enumerate(ss):
+        out += s
+        if i == 0 or ( i-1 ) % 2 == 1:
+            out += "</div><br><div class='temp-container'>"
+    out += "</body></html>"
     if verbose:
         print("<!--")
         print( "out: " + str(out) )
@@ -97,4 +209,7 @@ def index():
     
 if __name__ == "__main__":
     #~ stats = compute_stat()
-    index()
+    s=index()
+    f = open("debug.html","wt")
+    f.write(s)
+    f.close()

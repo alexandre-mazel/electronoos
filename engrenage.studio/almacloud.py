@@ -22,6 +22,19 @@ http://engrenage.studio:9520/info?filename=test&path=testdir&size=5&modified=33 
 curl -X POST http://engrenage.studio:9520/info -H "Content-Type: application/json" -d "{\"filename\":\"test_file_not_to_be_gitted.txt\",\"path\":\"testdir\",\"size\":30,\"modified\":1785596672}"
 curl -X POST http://engrenage.studio:9520/upload -F "filename=test_file_not_to_be_gitted.txt" -F "path=testdir" -F "size=30" -F "modified_time=1785596672" -F "file=@files\test_file_not_to_be_gitted.txt"
 # une fois l'upload appellé, le info doit retourner success
+# pour info: 1785596672: (2026-08-01 15:04:32 UTC) 
+
+(in screen pour almacloud) na@pidev:~/dev/git/electronoos/engrenage.studio$ stat files/testdir/test_file_not_to_be_gitted.txt
+  File: files/testdir/test_file_not_to_be_gitted.txt
+  Size: 30              Blocks: 8          IO Block: 4096   regular file
+Device: 179,2   Inode: 956296      Links: 1
+Access: (0644/-rw-r--r--)  Uid: ( 1000/      na)   Gid: ( 1000/      na)
+Access: 2026-08-01 17:15:24.461723804 +0200
+Modify: 2026-08-01 17:04:32.000000000 +0200 <<<<<<<<<<<<<<<< ici le mtime mis articiellement par le serveur
+Change: 2026-08-01 17:19:35.227206694 +0200
+ Birth: 2026-08-01 17:15:24.461723707 +0200
+
+
 """
 
 from datetime import datetime, UTC

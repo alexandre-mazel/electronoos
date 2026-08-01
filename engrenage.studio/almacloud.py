@@ -7,6 +7,7 @@ from http.server import SimpleHTTPRequestHandler, HTTPServer,ThreadingHTTPServer
 from datetime import datetime
 import cgi # generate a warning deprecated in Python 3.13
 import io
+import json
 
 """
 # Server running on 9520.
@@ -14,7 +15,10 @@ import io
 # /info post, avec nom du fichier, path, size et date, et il repond present ou pas
 # /upload post, avec nom de fichier, et path, il sauve le fichier et il repond ok ou pas
 # eg:
-http://engrenage.studio:9520/info?filename=test&path=testdir&size=5&modified=33
+http://engrenage.studio:9520/info?filename=test&path=testdir&size=5&modified=33 <= non car c'est un get
+
+# pour un post:
+curl -X POST http://engrenage.studio:9520/info  -H "Content-Type: application/json"  -d "{"filename":"test.txt",    "path":"test_dir",    "size":1234,     "modified":1722506400   }"
 """
 
 class ImageServer(SimpleHTTPRequestHandler):

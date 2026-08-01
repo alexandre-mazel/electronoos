@@ -86,13 +86,15 @@ class ImageServer(SimpleHTTPRequestHandler):
 
                     actual_size = stat.st_size
                     actual_mtime = int(stat.st_mtime)
-
-                    present = (
-                        actual_size == expected_size and
-                        actual_mtime == expected_mtime
-                    )
+                    
+                    if actual_size == expected_size and actual_mtime != expected_mtime:
+                        print( "DBG: mtime mismatched" )
+, 
+                    present = ( actual_size == expected_size and actual_mtime == expected_mtime )
 
                 response = {"present": present}
+                
+                print( "DBG: do_POST: /info: file '%s', '%s', exp_size: '%s', actual_size: %s, exp_mtime: %s, actual_mtime: %s, success: '%s'" % ( rel_path, filename, expected_size, actual_size, expected_mtime, actual_mtime, success ) )
 
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json")

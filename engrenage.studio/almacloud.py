@@ -24,6 +24,11 @@ curl -X POST http://engrenage.studio:9520/upload -F "filename=test_file_not_to_b
 # une fois l'upload appellé, le info doit retourner success
 """
 
+from datetime import datetime, UTC
+
+def format_mtime_utc(mtime):
+    return datetime.fromtimestamp(mtime, UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
+
 class ImageServer(SimpleHTTPRequestHandler):
     
 
@@ -93,7 +98,7 @@ class ImageServer(SimpleHTTPRequestHandler):
                     actual_mtime = int(stat.st_mtime)
                     
                     if actual_size == expected_size and actual_mtime != expected_mtime:
-                        print( "DBG: mtime mismatched" )
+                        print( "DBG: mtime mismatched: %s and %s" % (format_mtime_utc(expected_mtime), format_mtime_utc(actual_mtime)) )
 
                     present = ( actual_size == expected_size and actual_mtime == expected_mtime )
 
@@ -144,7 +149,7 @@ class ImageServer(SimpleHTTPRequestHandler):
                 
                 # mtime reçu du client (timestamp Unix)
                 if modified_time != None:
-                    print( "INF: changing the modified time to '%s'" % modified_time )
+                    print( "INF: changing the modified time to '%s' (%s)" % (modified_time,format_mtime_utc(modified_time) ) )
                     mtime = int(modified_time)
                     st = os.stat(dest_file)
                     os.utime(dest_file, (st.st_atime, mtime))

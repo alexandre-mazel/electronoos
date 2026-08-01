@@ -41,6 +41,7 @@ class ImageServer(SimpleHTTPRequestHandler):
             form["filename"].value,
             form.getvalue("path", ""),
             int(form["size"].value),
+            int(form["modified_time"].value),
             form[field_name].file.read()
         )
 
@@ -121,7 +122,7 @@ class ImageServer(SimpleHTTPRequestHandler):
                 length = int(self.headers["Content-Length"])
                 body = self.rfile.read(length)
 
-                filename, rel_path, expected_size, file_bytes, modified_time = self.readMultipartFile(body, length)
+                filename, rel_path, expected_size, modified_time, file_bytes = self.readMultipartFile(body, length)
 
                 # save file_bytes...
                 # Build destination safely

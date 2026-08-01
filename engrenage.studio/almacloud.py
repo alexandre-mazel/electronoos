@@ -80,6 +80,9 @@ class ImageServer(SimpleHTTPRequestHandler):
                     raise ValueError("Invalid path")
 
                 present = False
+                
+                actual_size = -1
+                actual_mtime = -1
 
                 if os.path.isfile(file_path):
                     stat = os.stat(file_path)

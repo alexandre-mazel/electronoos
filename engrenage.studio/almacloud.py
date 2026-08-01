@@ -21,7 +21,7 @@ http://engrenage.studio:9520/info?filename=test&path=testdir&size=5&modified=33 
 # windows:
 curl -X POST http://engrenage.studio:9520/info -H "Content-Type: application/json" -d "{\"filename\":\"test_file_not_to_be_gitted.txt\",\"path\":\"testdir\",\"size\":30,\"modified\":1785596672}"
 curl -X POST http://engrenage.studio:9520/upload -F "filename=test_file_not_to_be_gitted.txt" -F "path=testdir" -F "size=30" -F "modified_time=1785596672" -F "file=@files\test_file_not_to_be_gitted.txt"
-# une fois l'upload appellé, le info doit retourner success
+# une fois l'upload appellÃ©, le info doit retourner success
 """
 
 from datetime import datetime, UTC

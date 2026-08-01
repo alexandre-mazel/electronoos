@@ -8,10 +8,14 @@ from datetime import datetime
 import cgi # generate a warning deprecated in Python 3.13
 import io
 
+"""
 # Server running on 9520.
 # two call:
 # /info post, avec nom du fichier, path, size et date, et il repond present ou pas
 # /upload post, avec nom de fichier, et path, il sauve le fichier et il repond ok ou pas
+# eg:
+http://engrenage.studio:9520/info?filename=test&path=testdir&size=5&modified=33
+"""
 
 class ImageServer(SimpleHTTPRequestHandler):
     
@@ -151,77 +155,10 @@ class ImageServer(SimpleHTTPRequestHandler):
         print( "DBG: go_GET: '%s'" % self.path )
         parsed = urllib.parse.urlparse(self.path)
 
-        
-                
-        if parsed.path == "/info":
-            query = urllib.parse.parse_qs(parsed.query)
-            image_id = query.get("file", [None])
-            image_id = query.get("path", [None])
-            image_id = query.get("", [None])
-
-            folder = f"upload_{image_id}"
-
-            latest_file = None
-
-            if os.path.exists(folder):
-                files = [
-                    file for file in os.listdir(folder)
-                    if os.path.isfile(os.path.join(folder, file))
-                    and file.lower().endswith((".jpg", ".jpeg", ".png", ".gif", ".webp"))
-                ]
-
-                if files:
-                    latest_file = max(
-                        files,
-                        key=lambda file: os.path.getmtime(os.path.join(folder, file))
-                    )
-
-                    if time.time() - os.path.getmtime(os.path.join(folder, latest_file)) >= limit_time_photo_sec:
-                        latest_file = None
-
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json")
-            self.end_headers()
-
-            if latest_file:
-                response = f'{{"image":"{latest_file}"}}'
-            else:
-                response = '{"image":null}'
-
-            self.wfile.write(response.encode())
-            return
             
-        if 1:
-            # serve other files
-            filepath = parsed.path.lstrip("/")
-            query = urllib.parse.parse_qs(parsed.query)
-            
-            print( "DBG: file: '%s'" % filepath )
-            print( "DBG: query: %s" % query )
+        if 0:
+            pass
 
-            if filepath and os.path.isfile(filepath):
-                self.send_response(200)
-
-                if filepath.endswith(".jpg") or filepath.endswith(".jpeg"):
-                    self.send_header("Content-Type", "image/jpeg")
-                elif filepath.endswith(".png"):
-                    self.send_header("Content-Type", "image/png")
-                elif filepath.endswith(".txt"):
-                    self.send_header("Content-Type", "text/plain")
-                elif filepath.endswith(".html"):
-                    self.send_header("Content-Type", "text/html")
-                else:
-                    self.send_header("Content-Type", "application/octet-stream")
-
-                self.end_headers()
-
-                with open(filepath, "rb") as file:
-                    self.wfile.write(file.read())
-                    
-                print("INF: Replyed file...")
-                return
-            
-            print( "WRN: not found file: '%s'" % filepath )
 
         self.send_response(404)
         self.end_headers()

@@ -18,7 +18,9 @@ import json
 http://engrenage.studio:9520/info?filename=test&path=testdir&size=5&modified=33 <= non car c'est un get
 
 # pour un post:
-curl -X POST http://engrenage.studio:9520/info  -H "Content-Type: application/json"  -d "{"filename":"test.txt",    "path":"test_dir",    "size":1234,     "modified":1722506400   }"
+# windows:
+curl -X POST http://engrenage.studio:9520/info -H "Content-Type: application/json" -d "{\"filename\":\"test_file_not_to_be_gitted.txt\",\"path\":\"testdir\",\"size\":30,\"modified\":1722506400}"
+curl -X POST http://engrenage.studio:9520/upload -F "filename=test.txt" -F "path=testdir" -F "size=30" -F "file=@files\test_file_not_to_be_gitted.txt"
 """
 
 class ImageServer(SimpleHTTPRequestHandler):
@@ -130,10 +132,12 @@ class ImageServer(SimpleHTTPRequestHandler):
 
                 with open(dest_file, "wb") as f:
                     f.write(file_bytes)
+                    
+                writed_size = os.path.getsize(dest_file)
 
-                success = (
-                    os.path.getsize(dest_file) == expected_size
-                )
+                success = ( writed_size  == expected_size )
+                
+                print( "DBG: do_POST: /upload: received file '%s', '%s', exp_size: '%s', wr_size: %s, success: '%s'" % (rel_path, filename, expected_size,writed_size, success ) )
 
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json")

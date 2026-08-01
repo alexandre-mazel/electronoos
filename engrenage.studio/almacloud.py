@@ -19,8 +19,8 @@ http://engrenage.studio:9520/info?filename=test&path=testdir&size=5&modified=33 
 
 # pour un post:
 # windows:
-curl -X POST http://engrenage.studio:9520/info -H "Content-Type: application/json" -d "{\"filename\":\"test_file_not_to_be_gitted.txt\",\"path\":\"testdir\",\"size\":30,\"modified\":1722506400}"
-curl -X POST http://engrenage.studio:9520/upload -F "filename=test.txt" -F "path=testdir" -F "size=30" -F "file=@files\test_file_not_to_be_gitted.txt"
+curl -X POST http://engrenage.studio:9520/info -H "Content-Type: application/json" -d "{\"filename\":\"test_file_not_to_be_gitted.txt\",\"path\":\"testdir\",\"size\":30,\"modified\":1785596672}"
+curl -X POST http://engrenage.studio:9520/upload -F "filename=test_file_not_to_be_gitted.txt" -F "path=testdir" -F "size=30" -F "modified_time=1785596672" -F "file=@files\test_file_not_to_be_gitted.txt"
 """
 
 class ImageServer(SimpleHTTPRequestHandler):
@@ -121,7 +121,7 @@ class ImageServer(SimpleHTTPRequestHandler):
                 length = int(self.headers["Content-Length"])
                 body = self.rfile.read(length)
 
-                filename, rel_path, expected_size, file_bytes = self.readMultipartFile(body, length)
+                filename, rel_path, expected_size, file_bytes, modified_time = self.readMultipartFile(body, length)
 
                 # save file_bytes...
                 # Build destination safely
@@ -139,6 +139,13 @@ class ImageServer(SimpleHTTPRequestHandler):
                     f.write(file_bytes)
                     
                 writed_size = os.path.getsize(dest_file)
+                
+                # mtime reçu du client (timestamp Unix)
+                if modified_time != None:
+                    print( "INF: changing the modified time to '%s'" % modified_time )
+                    mtime = int(modified_time)
+                    st = os.stat(dest_file)
+                    os.utime(dest_file, (st.st_atime, mtime))
 
                 success = ( writed_size  == expected_size )
                 

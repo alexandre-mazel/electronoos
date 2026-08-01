@@ -56,6 +56,8 @@ class ImageServer(SimpleHTTPRequestHandler):
 
         if parsed.path == "/info":
             try:
+                print( "DBG: do_POST: /info: received..." )
+                
                 # Read request body
                 content_length = int(self.headers.get("Content-Length", 0))
                 body = self.rfile.read(content_length)
@@ -68,9 +70,7 @@ class ImageServer(SimpleHTTPRequestHandler):
 
                 # Prevent path traversal
                 base_dir = os.path.abspath("files")
-                file_path = os.path.abspath(
-                    os.path.join(base_dir, rel_path, filename)
-                )
+                file_path = os.path.abspath( os.path.join(base_dir, rel_path, filename)  )
                 
                 print( "DBG: do_POST: /info: received file_path: '%s'" % file_path )
 

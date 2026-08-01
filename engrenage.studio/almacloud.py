@@ -97,7 +97,7 @@ class ImageServer(SimpleHTTPRequestHandler):
 
                 response = {"present": present}
                 
-                print( "DBG: do_POST: /info: file '%s', '%s', exp_size: '%s', actual_size: %s, exp_mtime: %s, actual_mtime: %s, success: '%s'" % ( rel_path, filename, expected_size, actual_size, expected_mtime, actual_mtime, success ) )
+                print( "DBG: do_POST: /info: file '%s', '%s', exp_size: '%s', actual_size: %s, exp_mtime: %s, actual_mtime: %s, present: '%s'" % ( rel_path, filename, expected_size, actual_size, expected_mtime, actual_mtime, present ) )
 
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json")

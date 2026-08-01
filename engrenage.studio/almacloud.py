@@ -89,7 +89,7 @@ class ImageServer(SimpleHTTPRequestHandler):
                     
                     if actual_size == expected_size and actual_mtime != expected_mtime:
                         print( "DBG: mtime mismatched" )
-, 
+
                     present = ( actual_size == expected_size and actual_mtime == expected_mtime )
 
                 response = {"present": present}

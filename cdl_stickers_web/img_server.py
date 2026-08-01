@@ -218,7 +218,7 @@ class ImageServer(SimpleHTTPRequestHandler):
 def main():
     port = 9500
     #~ server = HTTPServer(("0.0.0.0", port), ImageServer)
-    server = ThreadingHTTPServer(("0.0.0.0", port), ImageServer) # certains appelle depuis chrome bloquer le thread (car chrome ne ferme pas la connection), lancer comme ca, c'est cool, meme si un thread est bloqué, un autre prend la main !
+    server = ThreadingHTTPServer(("0.0.0.0", port), ImageServer) # certains appels depuis chrome bloquait le thread (car chrome ne ferme pas la connection), lancer comme ca, c'est cool, meme si un thread est bloqué, un autre prend la main !
     print( "INF: img_server: serving on port %d" % port )
     server.serve_forever()
 

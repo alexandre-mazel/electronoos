@@ -53,6 +53,8 @@ def getTimeStamp():
     datetimeObject = datetime.now()
     strTimeStamp = datetimeObject.strftime( "%Y/%m/%d: %Hh%Mm%Ss" )
     return strTimeStamp
+    
+global_strUserHome = "/home/na/" # can't do os.path.expanduser('~'), as we're root
 
 class ImageServer(SimpleHTTPRequestHandler):
     

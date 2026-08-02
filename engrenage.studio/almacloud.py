@@ -41,8 +41,53 @@ from datetime import datetime, UTC
 
 def format_mtime_utc(mtime):
     return datetime.fromtimestamp(mtime, UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
+    
+def getTimeStamp():
+    """
+
+    # REM: linux command:
+    # timedatectl list-timezones: list all timezones
+    # sudo timedatectl set-timezone Europe/Paris => set paris
+    """
+    datetimeObject = datetime.datetime.now()
+    strTimeStamp = datetimeObject.strftime( "%Y/%m/%d: %Hh%Mm%Ss" )
+    return strTimeStamp
 
 class ImageServer(SimpleHTTPRequestHandler):
+    
+    def log( self, s ):
+        """
+        return name of log file or None on error
+        """
+        sourcename = "AlmaCloud"
+        import threading
+        strMessage = "%s: %s: %s: %s" % (getTimeStamp(), threading.currentThread().ident, sourcename, s)
+        
+        # output to /var/log/apache2/error.log when called from mod_python
+        sys.stderr.write(strMessage + "\n")
+        sys.stderr.flush()
+        
+        if os.name != "nt": 
+            fn = global_strUserHome + ("/logs/%s.log" % sourcename) # TODO: common.getLogPath()  + " ?
+        else:
+            fn = "c:/logs/%s.log" % sourcename
+        try:
+            f = open(fn,"at")
+        except BaseException as err:
+            f = None
+        
+        try:
+            if f == None: f = open(fn,"wt")
+            f.write(strMessage+"\n")
+            f.close()
+        except  (FileNotFoundError,PermissionError) as err:
+            if sourcename not in self.dictAlreadyOutputCantLog:
+                self.dictAlreadyOutputCantLog[sourcename] = True
+                print("CANT LOG: %s (err:%s)" % (strMessage,err) )
+            return None
+        print("LOG: %s" % (strMessage))
+        return fn
+        
     
 
     def readMultipartFile(self, body, length, field_name="file"):
@@ -169,7 +214,8 @@ class ImageServer(SimpleHTTPRequestHandler):
 
                 success = ( writed_size  == expected_size )
                 
-                print( "DBG: do_POST: /upload: received file '%s', '%s', exp_size: '%s', wr_size: %s, success: '%s'" % (rel_path, filename, expected_size,writed_size, success ) )
+                s = "INF: do_POST: /upload: received file '%s', '%s', exp_size: '%s', wr_size: %s, success: '%s'" % (rel_path, filename, expected_size,writed_size, success )
+                self.log( s )
 
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json")

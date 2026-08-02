@@ -49,7 +49,7 @@ def getTimeStamp():
     # timedatectl list-timezones: list all timezones
     # sudo timedatectl set-timezone Europe/Paris => set paris
     """
-    datetimeObject = datetime.datetime.now()
+    datetimeObject = datetime.now()
     strTimeStamp = datetimeObject.strftime( "%Y/%m/%d: %Hh%Mm%Ss" )
     return strTimeStamp
 

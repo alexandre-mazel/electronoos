@@ -227,7 +227,7 @@ class ImageServer(SimpleHTTPRequestHandler):
 
                 success = ( writed_size  == expected_size )
                 
-                s = "INF: do_POST: /upload: received for '%s', '%s', '%s', exp_size: '%s', wr_size: %s, success: '%s'" % (user, rel_path, filename, expected_size,writed_size, success )
+                s = "INF: do_POST: /upload: received for '%s@%s', '%s', '%s', '%s', exp_size: '%s', wr_size: %s, success: '%s'" % (user, device, storage, rel_path, filename, expected_size,writed_size, success )
                 self.log( s )
 
                 self.send_response(200)

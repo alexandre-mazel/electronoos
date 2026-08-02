@@ -20,9 +20,13 @@ http://engrenage.studio:9520/info?filename=test&path=testdir&size=5&modified=33 
 
 # pour un post:
 # windows:
-curl -X POST http://engrenage.studio:9520/info -H "Content-Type: application/json" -d "{\"filename\":\"test_file_not_to_be_gitted.txt\",\"path\":\"testdir\",\"size\":30,\"modified\":1785596672}"
-curl -X POST http://engrenage.studio:9520/upload -F "filename=test_file_not_to_be_gitted.txt" -F "path=testdir" -F "size=30" -F "modified_time=1785596672" -F "file=@files\test_file_not_to_be_gitted.txt"
+curl -X POST http://engrenage.studio:9520/info -H "Content-Type: application/json" -d "{\"user\":\"alexmobile\",\"filename\":\"test_file_not_to_be_gitted.txt\",\"path\":\"testdir\",\"size\":30,\"modified\":1785596672}"
+{"present": false}
+curl -X POST http://engrenage.studio:9520/upload -F "user=alexmobile" -F "filename=test_file_not_to_be_gitted.txt" -F "path=testdir" -F "size=30" -F "modified_time=1785596672" -F "file=@files\test_file_not_to_be_gitted.txt"
+{"success": 1}
+
 # une fois l'upload appellé, le info doit retourner success
+
 # pour info: 1785596672: (2026-08-01 15:04:32 UTC) 
 
 (in screen pour almacloud) na@pidev:~/dev/git/electronoos/engrenage.studio$ stat files/testdir/test_file_not_to_be_gitted.txt
@@ -105,6 +109,7 @@ class ImageServer(SimpleHTTPRequestHandler):
         )
 
         return (
+            form["user"].value,
             form["filename"].value,
             form.getvalue("path", ""),
             int(form["size"].value),
@@ -133,6 +138,7 @@ class ImageServer(SimpleHTTPRequestHandler):
                 body = self.rfile.read(content_length)
                 data = json.loads(body)
 
+                user = data["user"]
                 filename = data["filename"]
                 rel_path = data.get("path", "")
                 expected_size = int(data["size"])
@@ -140,7 +146,7 @@ class ImageServer(SimpleHTTPRequestHandler):
 
                 # Prevent path traversal
                 base_dir = os.path.abspath("files")
-                file_path = os.path.abspath( os.path.join(base_dir, rel_path, filename)  )
+                file_path = os.path.abspath( os.path.join(base_dir, user, rel_path, filename)  )
                 
                 print( "DBG: do_POST: /info: received file_path: '%s'" % file_path )
 
@@ -189,12 +195,12 @@ class ImageServer(SimpleHTTPRequestHandler):
                 length = int(self.headers["Content-Length"])
                 body = self.rfile.read(length)
 
-                filename, rel_path, expected_size, modified_time, file_bytes = self.readMultipartFile(body, length)
+                user, filename, rel_path, expected_size, modified_time, file_bytes = self.readMultipartFile(body, length)
 
                 # save file_bytes...
                 # Build destination safely
                 base_dir = os.path.abspath("files")
-                dest_dir = os.path.abspath(os.path.join(base_dir, rel_path))
+                dest_dir = os.path.abspath(os.path.join(base_dir, user, rel_path))
 
                 if not (dest_dir == base_dir or dest_dir.startswith(base_dir + os.sep)):
                     raise ValueError("Invalid path")
@@ -217,7 +223,7 @@ class ImageServer(SimpleHTTPRequestHandler):
 
                 success = ( writed_size  == expected_size )
                 
-                s = "INF: do_POST: /upload: received file '%s', '%s', exp_size: '%s', wr_size: %s, success: '%s'" % (rel_path, filename, expected_size,writed_size, success )
+                s = "INF: do_POST: /upload: received for '%s', '%s', '%s', exp_size: '%s', wr_size: %s, success: '%s'" % (user, rel_path, filename, expected_size,writed_size, success )
                 self.log( s )
 
                 self.send_response(200)

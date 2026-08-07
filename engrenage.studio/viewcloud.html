@@ -128,28 +128,82 @@
             color:var(--sub);
         }
         
-        #preview_overlay{
-            position:fixed;
-            inset:0;
-            background:rgba(0,0,0,.92);
-            display:none;
-            justify-content:center;
-            align-items:center;
-            z-index:10000;
-            cursor:pointer;
-        }
+#viewer_overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.94);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:20000;
+}
 
-        #preview_image,
-        #preview_video{
-            max-width:95vw;
-            max-height:95vh;
-            border-radius:12px;
-            box-shadow:0 20px 60px rgba(0,0,0,.5);
-        }
+#viewer_content{
+    max-width:95vw;
+    max-height:95vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
 
-        #preview_video{
-            display:none;
-        }
+#viewer_image,
+#viewer_video{
+    max-width:90vw;
+    max-height:85vh;
+    border-radius:15px;
+}
+
+#viewer_video{
+    display:none;
+}
+
+#viewer_close,
+#viewer_prev,
+#viewer_next{
+
+    position:absolute;
+    background:rgba(255,255,255,.15);
+    border:none;
+    color:white;
+    font-size:60px;
+    width:70px;
+    height:70px;
+    border-radius:50%;
+    cursor:pointer;
+
+}
+
+#viewer_close{
+    top:25px;
+    right:30px;
+    font-size:45px;
+}
+
+#viewer_prev{
+    left:30px;
+}
+
+#viewer_next{
+    right:30px;
+}
+
+#viewer_counter{
+    color:white;
+    font-size:22px;
+    margin-top:15px;
+}
+
+
+@media(max-width:700px){
+
+    #viewer_prev,
+    #viewer_next{
+        width:55px;
+        height:55px;
+        font-size:40px;
+    }
+
+}
 
         @media(max-width:700px){
 
@@ -293,7 +347,7 @@ function appendCards(){
         img.className="media_thumbnail";
         img.src=item.thumbnail;
         
-        card.onclick = () => showPreview(item);
+        card.onclick = () => openViewer(i);
 
         if(item.type==="video"){
             img.muted=true;
@@ -324,6 +378,135 @@ function appendCards(){
 
     console.log( "appendCards: ending..." )
 }
+
+let viewerIndex = 0;
+
+
+function openViewer(index){
+
+    viewerIndex = index;
+
+    updateViewer();
+
+    document.getElementById("viewer_overlay").style.display="flex";
+
+}
+
+
+function updateViewer(){
+
+    const item = mediaFiles.files[viewerIndex];
+
+    const image = document.getElementById("viewer_image");
+    const video = document.getElementById("viewer_video");
+
+    if(item.type==="video"){
+
+        image.style.display="none";
+
+        video.style.display="block";
+        video.src=item.url;
+        video.play();
+
+    }
+    else{
+
+        video.pause();
+        video.src="";
+
+        video.style.display="none";
+
+        image.style.display="block";
+        image.src=item.url;
+
+    }
+
+
+    document.getElementById("viewer_counter").textContent =
+        (viewerIndex+1)+" / "+mediaFiles.count;
+
+}
+
+
+function closeViewer(){
+
+    const overlay=document.getElementById("viewer_overlay");
+
+    overlay.style.display="none";
+
+    const video=document.getElementById("viewer_video");
+
+    video.pause();
+    video.src="";
+
+}
+
+
+function nextViewer(){
+
+    if(viewerIndex < mediaFiles.count-1){
+
+        viewerIndex++;
+        updateViewer();
+
+    }
+
+}
+
+
+function previousViewer(){
+
+    if(viewerIndex > 0){
+
+        viewerIndex--;
+        updateViewer();
+
+    }
+
+}
+
+
+document.getElementById("viewer_close")
+.onclick=closeViewer;
+
+
+document.getElementById("viewer_next")
+.onclick=nextViewer;
+
+
+document.getElementById("viewer_prev")
+.onclick=previousViewer;
+
+
+document.getElementById("viewer_overlay")
+.onclick=function(e){
+
+    if(e.target===this){
+        closeViewer();
+    }
+
+};
+
+
+document.addEventListener("keydown",function(e){
+
+    const visible =
+        document.getElementById("viewer_overlay").style.display==="flex";
+
+    if(!visible)
+        return;
+
+
+    if(e.key==="Escape")
+        closeViewer();
+
+    if(e.key==="ArrowRight")
+        nextViewer();
+
+    if(e.key==="ArrowLeft")
+        previousViewer();
+
+});
 
 function formatSize(bytes){
 

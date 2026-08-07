@@ -186,7 +186,7 @@ def scan():
                 files.append(entry)
                 total_size += entry["size"]
             except Exception:
-                pass
+                print( "ERR: scan: err: %s" % str(err) )
                 
             if len(files) > 20:
                 print( "DBG: scan: exiting after 20 files...")

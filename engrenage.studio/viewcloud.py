@@ -9,6 +9,7 @@ import mimetypes
 from datetime import datetime
 
 ROOT_DIR = "/home/pi/media"
+ROOT_DIR = "/home/na/dev/git/electronoos/engrenage.studio/files/"
 URL_PREFIX = "/media/"
 
 

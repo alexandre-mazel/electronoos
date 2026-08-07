@@ -522,14 +522,14 @@ function formatSize(bytes){
 
 }
 
+
+// scroll en bas, charge plus d'images.
 window.addEventListener("scroll",()=>{
 
     if(window.innerHeight+window.scrollY>document.body.offsetHeight-800){
 
         if(currentIndex<mediaFiles.count){
-
             appendCards();
-
         }
 
     }

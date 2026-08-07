@@ -136,6 +136,7 @@ def generate_thumbnail(src_filename, thumb_root, src_root):
                 raise RuntimeError("ffmpeg failed")
 
         else:
+            print("ERR: generate_thumbnail: unknown type" )
             return "",False
 
     except Exception as err:
@@ -261,7 +262,7 @@ if __name__ == "__main__":
         print("Generating video file test...")
         thumbname, really_generated = generate_thumbnail("/home/na/dev/git/electronoos/engrenage.studio/files/alex/A52s/internal/DCIM/Camera/20260724_173801.mp4","/thumb/","/files/")
         import time
-        time.sleep(180) # time for subprocess to start
+        time.sleep(180) # time for subprocess to start and finished...
         exit(0)
         
     from types import SimpleNamespace

@@ -466,20 +466,16 @@ function previousViewer(){
 }
 
 
-document.getElementById("viewer_close")
-.onclick=closeViewer;
+document.getElementById("viewer_close").onclick=closeViewer;
 
 
-document.getElementById("viewer_next")
-.onclick=nextViewer;
+document.getElementById("viewer_next").onclick=nextViewer;
 
 
-document.getElementById("viewer_prev")
-.onclick=previousViewer;
+document.getElementById("viewer_prev").onclick=previousViewer;
 
 
-document.getElementById("viewer_overlay")
-.onclick=function(e){
+document.getElementById("viewer_overlay").onclick=function(e){
 
     if(e.target===this){
         closeViewer();
@@ -537,6 +533,7 @@ window.addEventListener("scroll",()=>{
 
 });
 
+/*
 function showPreview(item){
 
     const overlay = document.getElementById("preview_overlay");
@@ -585,6 +582,8 @@ document.addEventListener("keydown",function(e){
     }
 
 });
+
+*/
 
 loadMedia();
 

@@ -98,10 +98,12 @@ def send_json(obj):
 
     txt = json.dumps(obj, ensure_ascii=False)
 
-    sys.stdout.write("Content-Type: application/json\r\n")
-    sys.stdout.write("Cache-Control: no-cache\r\n")
-    sys.stdout.write("\r\n")
-    sys.stdout.write(txt)
+    #~ sys.stdout.write("Content-Type: application/json\r\n")
+    #~ sys.stdout.write("Cache-Control: no-cache\r\n")
+    #~ sys.stdout.write("\r\n")
+    #~ sys.stdout.write(txt)
+    
+    return txt
 
 
 def index(req):
@@ -113,12 +115,10 @@ def index(req):
     
     
 
-    if qs == "list" or 1:
+    if qs == "list" or 1:        
+        return send_json(scan())
 
-        send_json(scan())
-        return
-
-    send_json({
+    return send_json({
         "success": False,
         "error": "unknown command"
     })

@@ -115,7 +115,7 @@ def index(req):
     
     
 
-    if qs == "list" or 1:        
+    if req.args == "list":        
         return send_json(scan())
 
     return send_json({

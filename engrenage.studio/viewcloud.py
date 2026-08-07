@@ -152,7 +152,7 @@ def build_file_entry(fullname,thumbname):
         "size": st.st_size,
         "date": datetime.fromtimestamp(st.st_mtime).isoformat(),
         "type": media_type,
-        "thumbnail": URL_PREFIX + urllib.parse.quote(relthumb);
+        "thumbnail": URL_PREFIX + urllib.parse.quote(relthumb),
         "url": URL_PREFIX + urllib.parse.quote(fullname)
     }
 

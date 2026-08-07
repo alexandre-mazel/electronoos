@@ -193,6 +193,46 @@
     margin-top:15px;
 }
 
+#viewer_info{
+
+    margin-top:12px;
+
+    color:white;
+
+    text-align:center;
+
+    font-size:14px;
+
+    opacity:.85;
+
+    max-width:90vw;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+    white-space:nowrap;
+
+}
+
+
+#viewer_filename{
+
+    font-size:17px;
+
+    font-weight:600;
+
+}
+
+
+#viewer_details{
+
+    margin-top:4px;
+
+    color:rgba(255,255,255,.7);
+
+}
+
 
 #search_container{
     margin-top:25px;
@@ -301,6 +341,10 @@
         <div id="viewer_content">
             <img id="viewer_image">
             <video id="viewer_video" controls></video>
+            <div id="viewer_info">
+                <div id="viewer_filename"></div>
+                <div id="viewer_details"></div>
+            </div>
             <div id="viewer_counter"></div>
         </div>
         <button id="viewer_next">�</button>
@@ -473,6 +517,17 @@ function updateViewer(){
 
     document.getElementById("viewer_counter").textContent =
         (viewerIndex+1)+" / "+mediaFiles.count;
+        
+        document.getElementById("viewer_filename").textContent =
+    item.name;
+
+
+document.getElementById("viewer_details").textContent =
+    item.folder +
+    " • " +
+    formatSize(item.size) +
+    " • " +
+    new Date(item.date).toLocaleString();
 
 }
 

@@ -361,7 +361,7 @@ function appendCards(){
 
         overlay.innerHTML=
             "<b>"+ui.file+"</b><div>"+item.name+"</div>"+
-            "<b>"+ui.folder+"</b><div>"+item.folder+"</div>"+
+            "<b>"+ui.folder+"</b><div><font size=-3>"+item.folder+"</font></div>"+
             "<b>"+ui.bytes+"</b><div>"+formatSize(item.size)+"</div>"+
             "<b>"+ui.date+"</b><div>"+new Date(item.date).toLocaleString()+"</div>";
 

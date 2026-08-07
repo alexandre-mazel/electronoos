@@ -123,11 +123,11 @@ def generate_thumbnail(src_filename, thumb_root, src_root):
 
     return thumb_filename
 
-def build_file_entry(fullname):
+def build_file_entry(fullname,thumbname):
 
     st = os.stat(fullname)
 
-    rel = os.path.relpath(fullname, ROOT_DIR).replace("\\", "/")
+    relthumb = os.path.relpath(thumbname, ROOT_DIR).replace("\\", "/")
 
     ext = os.path.splitext(fullname)[1].lower()
 
@@ -142,7 +142,7 @@ def build_file_entry(fullname):
         "size": st.st_size,
         "date": datetime.fromtimestamp(st.st_mtime).isoformat(),
         "type": media_type,
-        "thumbnail": URL_PREFIX + urllib.parse.quote(rel)
+        "thumbnail": URL_PREFIX + urllib.parse.quote(relthumb)
     }
 
 
@@ -168,10 +168,12 @@ def scan():
                 
             if 1:
                 # generate thumbnail
-                generate_thumbnail(fullname,"./thumb/","./files/")
+                thumbname = generate_thumbnail(fullname,"./thumb/","./files/")
+            else:
+                thumbname = fullname
 
             try:
-                entry = build_file_entry(fullname)
+                entry = build_file_entry(fullname,thumbname)
                 files.append(entry)
                 total_size += entry["size"]
             except Exception:

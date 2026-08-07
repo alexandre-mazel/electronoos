@@ -97,6 +97,7 @@ def generate_thumbnail(src_filename, thumb_root, src_root):
 
             with Image.open(src_filename) as img:
 
+                img = PIL.ImageOps.exif_transpose(img) # rotate based on exif flags
                 img = img.convert("RGB")
                 img.thumbnail((320, 240), Image.LANCZOS)
                 img.save(thumb_filename, "JPEG", quality=88)

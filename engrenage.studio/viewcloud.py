@@ -243,7 +243,10 @@ def index(req):
 if __name__ == "__main__":
     
     if 1:
+        print("Generating video file test...")
         thumbname, really_generated = generate_thumbnail("/home/na/dev/git/electronoos/engrenage.studio/files/alex/A52s/internal/DCIM/Camera/20260724_173801.mp4","/thumb/","/files/")
+        import time
+        time.sleep(3) # time for subprocess to start
         exit(0)
         
     from types import SimpleNamespace

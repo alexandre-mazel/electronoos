@@ -114,7 +114,7 @@ def generate_thumbnail(src_filename, thumb_root, src_root):
                     "-i", src_filename,
                     "-ss", "1",
                     "-frames:v", "1",
-                    "-vf", '"scale=320:240:force_original_aspect_ratio=decrease,pad=320:240:(ow-iw)/2:(oh-ih)/2"',
+                    "-vf", 'scale=320:240:force_original_aspect_ratio=decrease,pad=320:240:(ow-iw)/2:(oh-ih)/2',
                     thumb_filename
                 ],
                 check=True

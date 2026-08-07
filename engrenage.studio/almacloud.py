@@ -276,12 +276,14 @@ def main():
     port = 9520
 
     server = ThreadingHTTPServer(("0.0.0.0", port), ImageServer)
+    
+    path_cert = "/home/na/dev/git/obo/wsgi/"
 
     # Activation HTTPS
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     context.load_cert_chain(
-        certfile="cert.pem",
-        keyfile="privkey.pem"
+        certfile=path_cert+"cert.pem",
+        keyfile=path_cert+"privkey.pem"
     )
 
     server.socket = context.wrap_socket(

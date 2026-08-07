@@ -187,7 +187,7 @@ def scan():
             if 1:
                 # generate thumbnail
                 thumbname = generate_thumbnail(fullname,"/thumb/","/files/")
-                c += 1
+                generated_thumbnail += 1
             else:
                 thumbname = fullname
 

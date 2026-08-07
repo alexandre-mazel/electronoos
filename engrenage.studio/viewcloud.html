@@ -242,13 +242,15 @@ async function loadMedia(){
 
 function appendCards(){
 
+    console.log( "appendCards: entering" )
+
     const grid = document.getElementById("gallery_grid");
 
-    const end = Math.min(currentIndex + pageSize, mediaFiles.length);
+    const end = Math.min(currentIndex + pageSize, mediaFiles.count);
 
     for(let i=currentIndex;i<end;i++){
 
-        const item = mediaFiles[i];
+        const item = mediaFiles.files[i];
 
         const card = document.createElement("div");
         card.className="media_card";
@@ -277,13 +279,14 @@ function appendCards(){
         card.appendChild(overlay);
 
         grid.appendChild(card);
-
     }
 
     currentIndex=end;
 
-    document.getElementById("loading_container").style.display=currentIndex>=mediaFiles.length?"none":"block";
+    document.getElementById("loading_container").style.display=currentIndex>=mediaFiles.count?"none":"block";
 
+
+    console.log( "appendCards: ending..." )
 }
 
 function formatSize(bytes){
@@ -293,10 +296,8 @@ function formatSize(bytes){
     let i=0;
 
     while(bytes>1024 && i<units.length-1){
-
         bytes/=1024;
         i++;
-
     }
 
     return bytes.toFixed(1)+" "+units[i];
@@ -307,7 +308,7 @@ window.addEventListener("scroll",()=>{
 
     if(window.innerHeight+window.scrollY>document.body.offsetHeight-800){
 
-        if(currentIndex<mediaFiles.length){
+        if(currentIndex<mediaFiles.count){
 
             appendCards();
 

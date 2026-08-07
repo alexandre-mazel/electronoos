@@ -103,7 +103,7 @@ def send_json(obj):
     sys.stdout.write(txt)
 
 
-def index():
+def index(req):
 
     qs = os.environ.get("QUERY_STRING", "")
 

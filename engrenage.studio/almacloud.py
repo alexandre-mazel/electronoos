@@ -178,10 +178,13 @@ class ImageServer(SimpleHTTPRequestHandler):
                 
                 print( "DBG: do_POST: /info: file '%s', '%s', exp_size: '%s', actual_size: %s, exp_mtime: %s, actual_mtime: %s, present: '%s'" % ( rel_path, filename, expected_size, actual_size, expected_mtime, actual_mtime, present ) )
 
+                data = json.dumps(response).encode("utf-8")
+                
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(data)))
                 self.end_headers()
-                self.wfile.write(json.dumps(response).encode("utf-8"))
+                self.wfile.write(data)
 
             except (KeyError, ValueError, json.JSONDecodeError) as e:
                 self.send_response(400)
@@ -231,18 +234,24 @@ class ImageServer(SimpleHTTPRequestHandler):
                 s = "INF: do_POST: /upload: received for '%s@%s', '%s', '%s', '%s', exp_size: '%s', wr_size: %s, success: '%s'" % (user, device, storage, rel_path, filename, expected_size,writed_size, success )
                 self.log( s )
 
+                data = json.dumps({"success": int(success)}).encode()
+                
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(data)))
                 self.end_headers()
-                self.wfile.write(json.dumps({"success": int(success)}).encode())
+                self.wfile.write(data)
 
             except Exception as e:
                 print("Upload error:", e)
+                
+                data = b'{"success":0}'
 
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(data)))
                 self.end_headers()
-                self.wfile.write(b'{"success":0}')
+                self.wfile.write(data)
 
             return 
         # /upload

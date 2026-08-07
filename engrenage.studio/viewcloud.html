@@ -221,8 +221,12 @@ const pageSize = 50;
 async function loadMedia(){
 
     const response = await fetch("viewcloud.py?list");
+    
+    console.log( "Response:", response )
 
     mediaFiles = await response.json();
+    
+    console.log( "mediaFiles:", mediaFiles )
 
     document.getElementById("stats_files_value").textContent = mediaFiles.length;
 

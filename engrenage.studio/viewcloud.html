@@ -194,6 +194,37 @@
 }
 
 
+#search_container{
+    margin-top:25px;
+}
+
+#search_input{
+
+    width:100%;
+    max-width:600px;
+
+    padding:16px 22px;
+
+    font-size:22px;
+
+    border-radius:30px;
+    border:none;
+
+    background:white;
+
+    box-shadow:0 8px 25px rgba(0,0,0,.08);
+
+    outline:none;
+}
+
+#search_input:focus{
+
+    box-shadow:
+        0 0 0 3px rgba(59,130,246,.25),
+        0 8px 25px rgba(0,0,0,.08);
+
+}
+
 @media(max-width:700px){
 
     #viewer_prev,
@@ -243,6 +274,16 @@
                     <div id="stats_size_value" class="stats_value">0 MB</div>
                     <div id="stats_size_label" class="stats_label"></div>
                 </div>
+
+            </div>
+            
+            <div id="search_container">
+
+                <input
+                    id="search_input"
+                    type="search"
+                    placeholder="Search..."
+                >
 
             </div>
 
@@ -303,6 +344,7 @@ document.getElementById("stats_size_label").textContent = ui.size;
 document.getElementById("loading_container").textContent = ui.loading;
 
 let mediaFiles = [];
+let filteredFiles = [];
 let currentIndex = 0;
 const pageSize = 20;
 
@@ -313,6 +355,8 @@ async function loadMedia(){
     console.log( "Response:", response )
 
     mediaFiles = await response.json();
+    
+    filteredFiles = mediaFiles.files;
     
     console.log( "mediaFiles:", mediaFiles )
 
@@ -334,11 +378,11 @@ function appendCards(){
 
     const grid = document.getElementById("gallery_grid");
 
-    const end = Math.min(currentIndex + pageSize, mediaFiles.count);
+    const end = Math.min(     currentIndex + pageSize,     filteredFiles.length );
 
     for(let i=currentIndex;i<end;i++){
 
-        const item = mediaFiles.files[i];
+        const item = filteredFiles[i];
 
         const card = document.createElement("div");
         card.className="media_card";
@@ -347,7 +391,7 @@ function appendCards(){
         img.className="media_thumbnail";
         img.src=item.thumbnail;
         
-        card.onclick = () => openViewer(i);
+        card.onclick = () => openViewer(filteredFiles.indexOf(item));
 
         if(item.type==="video"){
             img.muted=true;
@@ -587,6 +631,33 @@ document.addEventListener("keydown",function(e){
 });
 
 */
+
+document.getElementById("search_input")
+.addEventListener("input", function(){
+
+    const value = this.value.toLowerCase().trim();
+
+    if(value===""){
+
+        filteredFiles = mediaFiles.files;
+
+    }
+    else{
+
+        filteredFiles = mediaFiles.files.filter(item =>
+            item.name.toLowerCase().includes(value)
+        );
+
+    }
+
+
+    document.getElementById("gallery_grid").innerHTML="";
+
+    currentIndex=0;
+
+    appendCards();
+
+});
 
 loadMedia();
 

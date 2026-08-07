@@ -161,15 +161,15 @@
 #viewer_prev,
 #viewer_next{
 
-    position:absolute;
-    background:rgba(255,255,255,.15);
-    border:none;
-    color:white;
-    font-size:60px;
-    width:70px;
-    height:70px;
-    border-radius:50%;
-    cursor:pointer;
+    width:64px;
+    height:64px;
+    font-size:38px;
+    font-weight:300;
+    background:rgba(255,255,255,.18);
+    backdrop-filter:blur(8px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
 
 }
 
@@ -255,14 +255,14 @@
     </div>
     
     <div id="viewer_overlay">
-        <button id="viewer_close">◊</button>
-        <button id="viewer_prev">ã</button>
+        <button id="viewer_close">x</button>
+        <button id="viewer_prev">‚ùÆ</button>
         <div id="viewer_content">
             <img id="viewer_image">
             <video id="viewer_video" controls></video>
             <div id="viewer_counter"></div>
         </div>
-        <button id="viewer_next">õ</button>
+        <button id="viewer_next">‚ùØ</button>
     </div>
 
 <script>
@@ -272,7 +272,7 @@ const language = navigator.language.toLowerCase().startsWith("fr") ? "fr" : "en"
 const text = {
 
     fr:{
-        title:"Galerie mÈdia",
+        title:"Galerie m√©dia",
         files:"Fichiers",
         size:"Taille totale",
         loading:"Chargement...",

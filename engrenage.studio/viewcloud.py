@@ -188,10 +188,15 @@ def scan():
             except Exception:
                 pass
                 
+            if len(files) > 20:
+                print( "DBG: scan: exiting after 20 files...")
+                break
+                
                 
         if len(files) > 20:
-            print( "DBG: scan: exiting after 20 files...")
+            print( "DBG: scan: exiting after 20 files... (2)")
             break
+
 
     return {
         "count": len(files),

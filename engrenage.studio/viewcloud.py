@@ -106,19 +106,34 @@ def generate_thumbnail(src_filename, thumb_root, src_root):
             
             print( "INF: generate_thumbnail: generating from VIDEO for '%s'" % src_filename )
 
-            subprocess.run(
+            result = subprocess.run(
                 [
                     "ffmpeg",
-                    "-loglevel", "error",
+                    "-loglevel", "verbose",
                     "-y",
-                    "-i", src_filename,
                     "-ss", "1",
+                    "-i", src_filename,
                     "-frames:v", "1",
-                    "-vf", 'scale=320:240:force_original_aspect_ratio=decrease,pad=320:240:(ow-iw)/2:(oh-ih)/2',
+                    "-vf", "scale=320:240:force_original_aspect_ratio=decrease,pad=320:240:(ow-iw)/2:(oh-ih)/2",
                     thumb_filename
                 ],
-                check=True
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
             )
+
+            print("ffmpeg return:", result.returncode)
+
+            if result.stdout:
+                print("STDOUT:")
+                print(result.stdout)
+
+            if result.stderr:
+                print("STDERR:")
+                print(result.stderr)
+
+            if result.returncode != 0:
+                raise RuntimeError("ffmpeg failed")
 
         else:
             return "",False

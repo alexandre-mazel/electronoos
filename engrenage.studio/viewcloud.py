@@ -164,8 +164,11 @@ def scan():
 
     total_size = 0
     
-    break_after_20 = 1
-    break_after_20 = 0
+    break_after_some = 1
+    #~ break_after_some = 0 # en fait on le laisse sinon la page rame trop la premiere fois !
+    
+    generated_thumbnail = 0
+    
 
     for root, dirs, names in os.walk(ROOT_DIR):
 
@@ -184,6 +187,7 @@ def scan():
             if 1:
                 # generate thumbnail
                 thumbname = generate_thumbnail(fullname,"/thumb/","/files/")
+                c += 1
             else:
                 thumbname = fullname
 
@@ -194,12 +198,12 @@ def scan():
             except Exception as err:
                 print( "ERR: scan: err: %s" % str(err) )
                 
-            if len(files) > 20 and break_after_20:
+            if generated_thumbnail > 10 and break_after_some:
                 print( "DBG: scan: exiting after 20 files...")
                 break
                 
                 
-        if len(files) > 20 and break_after_20:
+        if generated_thumbnail > 10 and break_after_some:
             print( "DBG: scan: exiting after 20 files... (2)")
             break
 

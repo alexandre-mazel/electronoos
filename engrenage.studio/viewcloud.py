@@ -164,9 +164,6 @@ def scan():
 
     total_size = 0
     
-    break_after_some = 1
-    #~ break_after_some = 0 # en fait on le laisse sinon la page rame trop la premiere fois !
-    
     generated_thumbnail = 0
     
 
@@ -184,7 +181,7 @@ def scan():
             if ext not in IMAGE_EXT and ext not in VIDEO_EXT:
                 continue
                 
-            if 1:
+            if 1 and generated_thumbnail < 10: # on est obligé de limiter le nombre de generation pour ne pas faire ramer la page qui attend pendant ce temps...
                 # generate thumbnail
                 thumbname = generate_thumbnail(fullname,"/thumb/","/files/")
                 generated_thumbnail += 1
@@ -198,15 +195,6 @@ def scan():
             except Exception as err:
                 print( "ERR: scan: err: %s" % str(err) )
                 
-            if generated_thumbnail > 10 and break_after_some:
-                print( "DBG: scan: exiting after 20 files...")
-                break
-                
-                
-        if generated_thumbnail > 10 and break_after_some:
-            print( "DBG: scan: exiting after 20 files... (2)")
-            break
-
 
     return {
         "count": len(files),

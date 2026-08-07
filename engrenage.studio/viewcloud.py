@@ -138,6 +138,7 @@ def build_file_entry(fullname,thumbname):
     st = os.stat(fullname)
 
     relthumb = os.path.relpath(thumbname, ROOT_DIR).replace("\\", "/")
+    relreal = os.path.relpath(fullname, ROOT_DIR).replace("\\", "/")
 
     ext = os.path.splitext(fullname)[1].lower()
 
@@ -153,7 +154,7 @@ def build_file_entry(fullname,thumbname):
         "date": datetime.fromtimestamp(st.st_mtime).isoformat(),
         "type": media_type,
         "thumbnail": URL_PREFIX + urllib.parse.quote(relthumb),
-        "url": URL_PREFIX + urllib.parse.quote(fullname)
+        "url": URL_PREFIX + urllib.parse.quote(relreal)
     }
 
 

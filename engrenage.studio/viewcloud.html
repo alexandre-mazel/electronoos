@@ -436,14 +436,16 @@ function appendCards(){
 
         const card = document.createElement("div");
         card.className="media_card";
+        
+        let is_video = item.type==="video" && img.src.match(/\.(mp4|mov|mkv|webm|avi)$/i)
 
-        const img = document.createElement(item.type==="video"?"video":"img");
+        const img = document.createElement(is_video?"video":"img");
         img.className="media_thumbnail";
         img.src=item.thumbnail;
         
         card.onclick = () => openViewer(filteredFiles.indexOf(item));
 
-        if(item.type==="video" && img.src.match(/\.(mp4|mov|mkv|webm|avi)$/i) ){
+        if(is_video) ){
             img.muted=true;
             img.loop=true;
             img.autoplay=true;

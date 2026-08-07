@@ -444,11 +444,14 @@ function closeViewer(){
 
 function nextViewer(){
 
-    if(viewerIndex < mediaFiles.count-1){
+    if(viewerIndex>=currentIndex && currentIndex<mediaFiles.count)
+    {
+        appendCards();
+    }
 
+    if(viewerIndex < mediaFiles.count-1){
         viewerIndex++;
         updateViewer();
-
     }
 
 }

@@ -74,10 +74,13 @@ def generate_thumbnail(src_filename, thumb_root, src_root):
 
     rel = os.path.relpath(src_filename, src_root)
 
-    thumb_filename = os.path.join(
-        thumb_root,
-        os.path.splitext(rel)[0] + ".jpg"
-    )
+    #~ thumb_filename = os.path.join(
+        #~ thumb_root,
+        #~ os.path.splitext(rel)[0] + ".jpg"
+    #~ )
+    
+    thumb_filename = src_filename.replace("src_root","thumb_root")
+    thumb_filename = os.path.splitext(thumb_filename)[0] + ".jpg"
 
     if os.path.exists(thumb_filename):
         return thumb_filename
@@ -174,7 +177,7 @@ def scan():
                 
             if 1:
                 # generate thumbnail
-                thumbname = generate_thumbnail(fullname,"./thumb/","./files/")
+                thumbname = generate_thumbnail(fullname,"/thumb/","/files/")
             else:
                 thumbname = fullname
 

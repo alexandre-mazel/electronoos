@@ -220,7 +220,7 @@ const pageSize = 50;
 
 async function loadMedia(){
 
-    const response = await fetch("viewcloud.py/list");
+    const response = await fetch("viewcloud.py?list");
 
     mediaFiles = await response.json();
 

@@ -239,4 +239,8 @@ def index(req):
 
 
 if __name__ == "__main__":
-    index()
+    from types import SimpleNamespace
+
+    req = SimpleNamespace()
+    req.args = "list"
+    index(req)

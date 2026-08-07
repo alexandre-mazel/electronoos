@@ -83,7 +83,7 @@ def generate_thumbnail(src_filename, thumb_root, src_root):
     thumb_filename = os.path.splitext(thumb_filename)[0] + ".jpg"
 
     if os.path.exists(thumb_filename):
-        return thumb_filename
+        return thumb_filename, False
 
     os.makedirs(os.path.dirname(thumb_filename), exist_ok=True)
 
@@ -121,17 +121,17 @@ def generate_thumbnail(src_filename, thumb_root, src_root):
             )
 
         else:
-            return None
+            return None,False
 
     except Exception as err:
 
         print("ERR generate_thumbnail:", err)
 
-        return None
+        return None, False
 
     print( "INF: generate_thumbnail: generating OK to '%s'" % thumb_filename )
 
-    return thumb_filename
+    return thumb_filename, True
 
 def build_file_entry(fullname,thumbname):
 
@@ -187,8 +187,9 @@ def scan():
                 
             if 1 and generated_thumbnail < 10: # on est obligé de limiter le nombre de generation pour ne pas faire ramer la page qui attend pendant ce temps...
                 # generate thumbnail
-                thumbname = generate_thumbnail(fullname,"/thumb/","/files/")
-                generated_thumbnail += 1
+                thumbname, really_generated = generate_thumbnail(fullname,"/thumb/","/files/")
+                if really_generated:
+                    generated_thumbnail += 1
             else:
                 thumbname = fullname
 

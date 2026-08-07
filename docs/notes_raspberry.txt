@@ -1,0 +1,83 @@
+comment tu sais que c'est un bon boîtier UASP
+
+1) Vérifier que le contrôleur USB-SATA supporte UASP
+
+2) Vérifier dans Linux que UASP est réellement actif
+
+Sur ton Raspberry Pi, tu peux brancher le disque puis faire :
+
+lsusb
+
+Tu verras quelque chose comme :
+
+Bus 002 Device 002: ID 174c:1153 ASMedia Technology Inc. ASM1153 SATA 6Gb/s bridge
+
+Puis :
+
+dmesg | grep -i uas
+
+Un bon résultat ressemble à :
+
+uas 2-1:1.0: UAS driver
+
+Si tu vois :
+
+usb-storage
+
+le boîtier fonctionne, mais sans UASP.
+
+
+
+
+
+
+
+## Economie d'elec:
+sudo rfkill block wifi
+sudo rfkill block bluetooth
+
+Pour les désactiver définitivement, ajoute dans /boot/firmware/config.txt :
+dtoverlay=disable-wifi
+dtoverlay=disable-bt
+Gain typique : 0,2 à 0,5 W.
+
+2. Réduire la fréquence du processeur
+
+Dans /boot/firmware/config.txt :
+
+arm_freq=1500
+
+ou même :
+
+arm_freq=1000
+
+Si ton application fait surtout du réseau et peu de calcul, tu ne verras probablement pas de différence.
+
+
+3. Désactiver le port HDMI
+
+Si le Pi fonctionne sans écran :
+
+tvservice -o
+
+9. Arrêter les services inutiles
+
+Par exemple :
+
+systemctl list-unit-files --state=enabled
+
+Puis désactiver ceux dont tu n'as pas besoin :
+
+sudo systemctl disable nom_du_service
+
+Attention à ne pas désactiver des services essentiels.
+
+Ce qui fait réellement économiser
+
+Par ordre d'impact, je miserais plutôt sur :
+
+Désactiver le Wi-Fi/Bluetooth si inutiles.
+Utiliser Raspberry Pi OS Lite.
+Choisir un stockage peu gourmand.
+Éviter les périphériques USB inutiles.
+Si les performances le permettent, réduire la fréquence maximale (arm_freq).

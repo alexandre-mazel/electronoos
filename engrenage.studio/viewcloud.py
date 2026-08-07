@@ -121,13 +121,13 @@ def generate_thumbnail(src_filename, thumb_root, src_root):
             )
 
         else:
-            return None,False
+            return "",False
 
     except Exception as err:
 
-        print("ERR generate_thumbnail:", err)
+        print("ERR: generate_thumbnail:", err)
 
-        return None, False
+        return "", False
 
     print( "INF: generate_thumbnail: generating OK to '%s'" % thumb_filename )
 

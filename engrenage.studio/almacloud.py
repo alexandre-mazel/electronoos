@@ -9,6 +9,7 @@ from datetime import datetime
 import cgi # generate a warning deprecated in Python 3.13
 import io
 import json
+import ssl
 
 """
 # Server running on 9520.
@@ -20,7 +21,7 @@ http://engrenage.studio:9520/info?filename=test&path=testdir&size=5&modified=33 
 
 # pour un post:
 # windows:
-curl -X POST http://engrenage.studio:9520/info -H "Content-Type: application/json" -d "{\"user\":\"alex\",\"device\":\"a52\",\"storage\":\"sdcard\",\"filename\":\"test_file_not_to_be_gitted.txt\",\"path\":\"testdir\",\"size\":30,\"modified\":1785596672}"
+curl -X POST https://engrenage.studio:9520/info -H "Content-Type: application/json" -d "{\"user\":\"alex\",\"device\":\"a52\",\"storage\":\"sdcard\",\"filename\":\"test_file_not_to_be_gitted.txt\",\"path\":\"testdir\",\"size\":30,\"modified\":1785596672}"
 {"present": false}
 curl -X POST http://engrenage.studio:9520/upload -F "user=alex" -F "device=a52" -F "storage=sdcard" -F "filename=test_file_not_to_be_gitted.txt" -F "path=testdir" -F "size=30" -F "modified_time=1785596672" -F "file=@files\test_file_not_to_be_gitted.txt"
 {"success": 1}
@@ -264,12 +265,37 @@ class ImageServer(SimpleHTTPRequestHandler):
         self.wfile.write(b"not found")
 
 
-def main():
+def main_no_security():
     port = 9520
     #~ server = HTTPServer(("0.0.0.0", port), ImageServer)
     server = ThreadingHTTPServer(("0.0.0.0", port), ImageServer) # certains appels depuis chrome bloquait le thread (car chrome ne ferme pas la connection), lancer comme ca, c'est cool, meme si un thread est bloqué, un autre prend la main !
     print( "INF: almacloud: serving on port %d" % port )
     server.serve_forever()
+    
+def main():
+    port = 9520
+
+    server = ThreadingHTTPServer(("0.0.0.0", port), ImageServer)
+
+    # Activation HTTPS
+    context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    context.load_cert_chain(
+        certfile="cert.pem",
+        keyfile="privkey.pem"
+    )
+
+    server.socket = context.wrap_socket(
+        server.socket,
+        server_side=True
+    )
+
+    print("INF: almacloud: serving HTTPS on port %d" % port)
+
+    server.serve_forever()
+
+
+if __name__ == "__main__":
+    main()
 
 
 if __name__ == "__main__":

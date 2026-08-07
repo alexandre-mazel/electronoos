@@ -228,11 +228,11 @@ async function loadMedia(){
     
     console.log( "mediaFiles:", mediaFiles )
 
-    document.getElementById("stats_files_value").textContent = mediaFiles.length;
+    document.getElementById("stats_files_value").textContent = mediaFiles.count;
 
     let total = 0;
 
-    mediaFiles.forEach(f=>total += f.size);
+    mediaFiles.files.forEach(f=>total += f.size);
 
     document.getElementById("stats_size_value").textContent = formatSize(total);
 

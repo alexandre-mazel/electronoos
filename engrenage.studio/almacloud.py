@@ -291,7 +291,7 @@ def main():
     # Activation HTTPS
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     context.load_cert_chain(
-        certfile=path_cert+"cert.pem",
+        certfile=path_cert+"fullchain.pem", # pour android il ne faut pas cert mais fullchain.pem
         keyfile=path_cert+"privkey.pem"
     )
 

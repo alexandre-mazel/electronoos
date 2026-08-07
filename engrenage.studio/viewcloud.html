@@ -127,6 +127,29 @@
             font-size:28px;
             color:var(--sub);
         }
+        
+        #preview_overlay{
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,.92);
+            display:none;
+            justify-content:center;
+            align-items:center;
+            z-index:10000;
+            cursor:pointer;
+        }
+
+        #preview_image,
+        #preview_video{
+            max-width:95vw;
+            max-height:95vh;
+            border-radius:12px;
+            box-shadow:0 20px 60px rgba(0,0,0,.5);
+        }
+
+        #preview_video{
+            display:none;
+        }
 
         @media(max-width:700px){
 
@@ -258,6 +281,8 @@ function appendCards(){
         const img = document.createElement(item.type==="video"?"video":"img");
         img.className="media_thumbnail";
         img.src=item.thumbnail;
+        
+        card.onclick = () => showPreview(item);
 
         if(item.type==="video"){
             img.muted=true;
@@ -318,9 +343,63 @@ window.addEventListener("scroll",()=>{
 
 });
 
+function showPreview(item){
+
+    const overlay = document.getElementById("preview_overlay");
+    const image = document.getElementById("preview_image");
+    const video = document.getElementById("preview_video");
+
+    overlay.style.display = "flex";
+
+    if(item.type === "video"){
+
+        image.style.display = "none";
+
+        video.style.display = "block";
+        video.src = item.url;
+        video.play();
+
+    }
+    else{
+
+        video.pause();
+        video.style.display = "none";
+
+        image.style.display = "block";
+        image.src = item.url;
+    }
+
+}
+
+document.getElementById("preview_overlay").onclick = function(){
+
+    this.style.display = "none";
+
+    const video = document.getElementById("preview_video");
+
+    video.pause();
+    video.src = "";
+
+};
+
+document.addEventListener("keydown",function(e){
+
+    if(e.key==="Escape"){
+
+        document.getElementById("preview_overlay").click();
+
+    }
+
+});
+
 loadMedia();
 
 </script>
+
+<div id="preview_overlay">
+    <img id="preview_image">
+    <video id="preview_video" controls></video>
+</div>
 
 </body>
 </html>

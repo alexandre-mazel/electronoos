@@ -36,6 +36,92 @@ VIDEO_EXT = {
     ".3gp"
 }
 
+import os
+import subprocess
+from PIL import Image
+
+IMAGE_EXT = {
+    ".jpg", ".jpeg", ".png", ".bmp",
+    ".gif", ".webp", ".tif", ".tiff", ".heic"
+}
+
+VIDEO_EXT = {
+    ".mp4", ".avi", ".mov", ".mkv",
+    ".wmv", ".webm", ".m4v", ".3gp"
+}
+
+
+def generate_thumbnail(src_filename, thumb_root, src_root):
+    """
+    Generate a thumbnail for an image or a video.
+
+    Parameters
+    ----------
+    src_filename : str
+        Absolute filename of the source image/video.
+
+    thumb_root : str
+        Root directory where thumbnails are stored.
+
+    src_root : str
+        Root directory of the media library.
+
+    Returns
+    -------
+    str
+        Absolute thumbnail filename.
+    """
+
+    rel = os.path.relpath(src_filename, src_root)
+
+    thumb_filename = os.path.join(
+        thumb_root,
+        os.path.splitext(rel)[0] + ".jpg"
+    )
+
+    if os.path.exists(thumb_filename):
+        return thumb_filename
+
+    os.makedirs(os.path.dirname(thumb_filename), exist_ok=True)
+
+    ext = os.path.splitext(src_filename)[1].lower()
+
+    try:
+
+        if ext in IMAGE_EXT:
+
+            with Image.open(src_filename) as img:
+
+                img = img.convert("RGB")
+                img.thumbnail((320, 240), Image.LANCZOS)
+                img.save(thumb_filename, "JPEG", quality=88)
+
+        elif ext in VIDEO_EXT:
+
+            subprocess.run(
+                [
+                    "ffmpeg",
+                    "-loglevel", "error",
+                    "-y",
+                    "-i", src_filename,
+                    "-ss", "1",
+                    "-frames:v", "1",
+                    "-vf", "scale=320:240:force_original_aspect_ratio=decrease,pad=320:240:(ow-iw)/2:(oh-ih)/2",
+                    thumb_filename
+                ],
+                check=True
+            )
+
+        else:
+            return None
+
+    except Exception as err:
+
+        print("ERR generate_thumbnail:", err)
+
+        return None
+
+    return thumb_filename
 
 def build_file_entry(fullname):
 
@@ -79,6 +165,10 @@ def scan():
 
             if ext not in IMAGE_EXT and ext not in VIDEO_EXT:
                 continue
+                
+            if 1:
+                # generate thumbnail
+                generate_thumbnail(fullname,"./thumb/","./files/")
 
             try:
                 entry = build_file_entry(fullname)
@@ -86,6 +176,9 @@ def scan():
                 total_size += entry["size"]
             except Exception:
                 pass
+                
+            if len(files) > 20:
+                break
 
     return {
         "count": len(files),

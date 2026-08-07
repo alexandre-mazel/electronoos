@@ -68,8 +68,8 @@ def scan():
 
     for root, dirs, names in os.walk(ROOT_DIR):
 
-        dirs.sort()
-        names.sort()
+        dirs.sort(reverse=True)
+        names.sort(reverse=True)
 
         for name in names:
 

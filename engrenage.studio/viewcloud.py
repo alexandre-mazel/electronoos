@@ -89,6 +89,8 @@ def generate_thumbnail(src_filename, thumb_root, src_root):
     try:
 
         if ext in IMAGE_EXT:
+            
+            print( "INF: generate_thumbnail: generating from IMG for '%s'" % src_filename )
 
             with Image.open(src_filename) as img:
 
@@ -97,6 +99,8 @@ def generate_thumbnail(src_filename, thumb_root, src_root):
                 img.save(thumb_filename, "JPEG", quality=88)
 
         elif ext in VIDEO_EXT:
+            
+            print( "INF: generate_thumbnail: generating from VIDEO for '%s'" % src_filename )
 
             subprocess.run(
                 [
@@ -120,6 +124,8 @@ def generate_thumbnail(src_filename, thumb_root, src_root):
         print("ERR generate_thumbnail:", err)
 
         return None
+
+    print( "INF: generate_thumbnail: generating OK to '%s'" % thumb_filename )
 
     return thumb_filename
 

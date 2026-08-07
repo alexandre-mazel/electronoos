@@ -455,7 +455,7 @@ function appendCards(){
 
         overlay.innerHTML=
             "<b>"+ui.file+"</b><div>"+item.name+"</div>"+
-            "<b>"+ui.folder+"</b><div><font size=-3>"+item.folder.replace("/home/na/dev/git/electronoos/engrenage.studio", "");+"</font></div>"+
+            "<b>"+ui.folder+"</b><div><font size=-3>"+item.folder.replace("/home/na/dev/git/electronoos/engrenage.studio/", "")+"</font></div>"+
             "<b>"+ui.bytes+"</b><div>"+formatSize(item.size)+"</div>"+
             "<b>"+ui.date+"</b><div>"+new Date(item.date).toLocaleString()+"</div>";
 
@@ -532,7 +532,7 @@ function updateViewer(){
 
 
 document.getElementById("viewer_details").textContent =
-    item.folder.replace("/home/na/dev/git/electronoos/engrenage.studio", ""); +
+    item.folder.replace("/home/na/dev/git/electronoos/engrenage.studio/", "") +
     " - " +
     formatSize(item.size) +
     " - " +

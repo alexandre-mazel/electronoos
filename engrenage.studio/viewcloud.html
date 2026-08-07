@@ -151,6 +151,7 @@
     max-width:90vw;
     max-height:85vh;
     border-radius:15px;
+    transition: opacity .2s ease;
 }
 
 #viewer_video{
@@ -503,15 +504,23 @@ function updateViewer(){
 
     }
     else{
-
         video.pause();
         video.src="";
 
         video.style.display="none";
-
         image.style.display="block";
-        image.src=item.url;
+//~         image.src=item.url;
 
+        image.style.opacity = "0.3";
+
+        const newImage = new Image();
+
+        newImage.onload = function(){
+            image.src = item.url;
+            image.style.opacity = "1";
+        };
+
+        newImage.src = item.url;
     }
 
 

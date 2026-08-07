@@ -188,8 +188,8 @@ def scan():
             except Exception:
                 pass
                 
-            if len(files) > 20:
-                break
+        if len(files) > 20:
+            break
 
     return {
         "count": len(files),

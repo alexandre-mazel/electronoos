@@ -231,6 +231,8 @@ def index(req):
 
     if req.args == "list&pwd=alex":        
         return send_json(scan())
+        
+    print( "DBG: access denied!" )
 
     return send_json({
         "success": False,

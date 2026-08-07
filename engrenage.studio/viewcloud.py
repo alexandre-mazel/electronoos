@@ -79,7 +79,7 @@ def generate_thumbnail(src_filename, thumb_root, src_root):
         #~ os.path.splitext(rel)[0] + ".jpg"
     #~ )
     
-    thumb_filename = src_filename.replace("src_root","thumb_root")
+    thumb_filename = src_filename.replace(src_root,thumb_root)
     thumb_filename = os.path.splitext(thumb_filename)[0] + ".jpg"
 
     if os.path.exists(thumb_filename):

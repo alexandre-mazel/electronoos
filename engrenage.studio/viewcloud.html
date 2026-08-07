@@ -350,7 +350,12 @@ const pageSize = 20;
 
 async function loadMedia(){
 
-    const response = await fetch("viewcloud.py?list");
+
+    const params = new URLSearchParams(window.location.search);
+
+    const pwd = params.get("pwd") || "";
+
+    const response = await fetch( "/viewcloud.py?list&pwd=" + encodeURIComponent(pwd) );
     
     console.log( "Response:", response )
 

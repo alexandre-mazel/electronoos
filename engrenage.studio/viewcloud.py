@@ -229,7 +229,7 @@ def index(req):
     
     
 
-    if req.args == "list":        
+    if req.args == "list&pwd=alex":        
         return send_json(scan())
 
     return send_json({

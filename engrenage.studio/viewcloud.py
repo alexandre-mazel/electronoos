@@ -185,7 +185,7 @@ def scan():
                 entry = build_file_entry(fullname,thumbname)
                 files.append(entry)
                 total_size += entry["size"]
-            except Exception:
+            except Exception as err:
                 print( "ERR: scan: err: %s" % str(err) )
                 
             if len(files) > 20:

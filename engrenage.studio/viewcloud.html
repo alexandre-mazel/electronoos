@@ -437,7 +437,7 @@ function appendCards(){
         const card = document.createElement("div");
         card.className="media_card";
         
-        let is_video = item.type==="video" && img.src.match(/\.(mp4|mov|mkv|webm|avi)$/i)
+        let is_video = ( item.type==="video" && img.src.match(/\.(mp4|mov|mkv|webm|avi)$/i) )
 
         const img = document.createElement(is_video?"video":"img");
         img.className="media_thumbnail";

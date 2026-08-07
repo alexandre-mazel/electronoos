@@ -166,11 +166,15 @@ def scan():
     
     generated_thumbnail = 0
     
+    print("DBG: viewcloud.py.scan: generated_thumbnail: %d" % (generated_thumbnail) )
+    
 
     for root, dirs, names in os.walk(ROOT_DIR):
 
         dirs.sort(reverse=True)
         names.sort(reverse=True)
+        
+        print("DBG: viewcloud.py.scan: dirs: %s, names len: %d" % (str(dirs),len(names) ) )
 
         for name in names:
 

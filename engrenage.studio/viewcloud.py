@@ -107,8 +107,13 @@ def send_json(obj):
 def index(req):
 
     qs = os.environ.get("QUERY_STRING", "")
+    
+    print("DBG: viewcloud.py.index: qs: '%s'" % qs )
+    print("DBG: viewcloud.py.index: req.args: '%s'" % req.args )
+    
+    
 
-    if qs == "list":
+    if qs == "list" or 1:
 
         send_json(scan())
         return

@@ -72,7 +72,7 @@ def generate_thumbnail(src_filename, thumb_root, src_root):
         Absolute thumbnail filename.
     """
 
-    rel = os.path.relpath(src_filename, src_root)
+    #~ rel = os.path.relpath(src_filename, src_root)
 
     #~ thumb_filename = os.path.join(
         #~ thumb_root,
@@ -147,7 +147,7 @@ def build_file_entry(fullname,thumbname):
 
     return {
         "name": os.path.basename(fullname),
-        "folder": os.path.dirname(rel),
+        "folder": os.path.dirname(fullname),
         "size": st.st_size,
         "date": datetime.fromtimestamp(st.st_mtime).isoformat(),
         "type": media_type,

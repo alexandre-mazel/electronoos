@@ -202,7 +202,7 @@ def scan():
             if ext not in IMAGE_EXT and ext not in VIDEO_EXT:
                 continue
                 
-            if 1 and generated_thumbnail < 10: # on est obligé de limiter le nombre de generation pour ne pas faire ramer la page qui attend pendant ce temps...
+            if 1 and generated_thumbnail < 6: # on est obligé de limiter le nombre de generation pour ne pas faire ramer la page qui attend pendant ce temps...
                 # generate thumbnail
                 thumbname, really_generated = generate_thumbnail(fullname,"/thumb/","/files/")
                 if really_generated:

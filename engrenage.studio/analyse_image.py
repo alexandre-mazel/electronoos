@@ -31,3 +31,4 @@ def analyse_image( filename ):
     
     
 fn = "./files/alex/A52s/internal/Pictures/WhatsApp/IMG-20260804-WA0011.jpg"
+print(analyse_image(fn))

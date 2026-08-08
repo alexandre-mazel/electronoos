@@ -419,6 +419,7 @@ async function loadMedia(){
     mediaFiles = await response.json();
     
     filteredFiles = mediaFiles.files;
+    document.getElementById("stats_files_found_box").classList.add("hidden")
     
     console.log( "mediaFiles:", mediaFiles )
 

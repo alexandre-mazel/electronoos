@@ -116,6 +116,7 @@ def generate_thumbnail(src_filename, thumb_root, src_root):
                     "-i", src_filename,
                     "-frames:v", "1",
                     "-vf", "scale=320:240:force_original_aspect_ratio=decrease,pad=320:240:(ow-iw)/2:(oh-ih)/2",
+                    "-update", "1",
                     thumb_filename
                 ],
                 stdout=subprocess.PIPE,

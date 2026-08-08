@@ -2,8 +2,26 @@
 
 import ollama
 
+"""
+Modèle	Taille Ollama	Vision	Mon avis RPi 5
+Moondream 1.8B	~1.7 GB	✅	⭐⭐⭐⭐⭐ très léger
+Qwen2.5-VL 3B	~3.2 GB	✅	⭐⭐⭐⭐ meilleur compromis
+Qwen2.5-VL 7B	~6 GB	✅	⭐⭐ trop gros pour mon premier choix
+
+Pour un Raspberry Pi 5 CPU, je donnerais ces ordres de grandeur, avec une grosse marge d'incertitude :
+
+Modèle vision	Temps/image estimé	RAM	Avis
+Moondream 1.8B	~10–30 s	~2 Go	🟢 très intéressant
+Qwen2.5-VL 3B	~20–60 s	~3–4 Go	🟢 meilleur résultat
+Gemma 4 E2B	~20–60 s	~3–5 Go	🟢 à tester
+Qwen3.5 2B	~30–70 s	~3 Go	🟡
+modèles 7B+ vision	~1–3 min+	5–8+ Go	🔴 je déconseille
+"""
+
 
 def analyse_image( filename ):
+    
+    print( "INF: analyse_image: '%s'" % filename )
 
     response = ollama.chat(
         model="moondream",
@@ -31,4 +49,5 @@ def analyse_image( filename ):
     
     
 fn = "./files/alex/A52s/internal/Pictures/WhatsApp/IMG-20260804-WA0011.jpg"
+fn = fn.replace("/files/","/thumb/")
 print(analyse_image(fn))

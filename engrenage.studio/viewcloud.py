@@ -82,7 +82,7 @@ def generate_thumbnail(src_filename, thumb_root, src_root):
     thumb_filename = src_filename.replace(src_root,thumb_root)
     thumb_filename = os.path.splitext(thumb_filename)[0] + ".jpg"
 
-    if os.path.exists(thumb_filename):
+    if os.path.exists(thumb_filename) and os.path.getsize(thumb_filename) > 0:
         print( "DBG: generate_thumbnail: file exists: '%s'" % thumb_filename )
         return thumb_filename, False
 

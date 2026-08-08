@@ -325,6 +325,12 @@
                     type="search"
                     placeholder="Search..."
                 >
+                
+                <div id="stats_files_box" class="stats_box">
+                    <div id="stats_files_found_value" class="stats_value">0</div>
+                    <div id="stats_files_found_label" class="stats_label">(found)</div>
+                </div>
+
 
             </div>
 
@@ -360,6 +366,7 @@ const text = {
     fr:{
         title:"Galerie média",
         files:"Fichiers",
+        filesfound:"Fichier(s) trouvÃ©((s)",
         size:"Taille totale",
         loading:"Chargement...",
         folder:"Dossier",
@@ -371,6 +378,7 @@ const text = {
     en:{
         title:"Media Gallery",
         files:"Files",
+        filesfound:"Found File(s)",
         size:"Total size",
         loading:"Loading...",
         folder:"Folder",
@@ -708,10 +716,12 @@ document.getElementById("search_input")
 
     const value = this.value.toLowerCase().trim();
 
-    if(value===""){
-
+    if(value==="")
+    {
         filteredFiles = mediaFiles.files;
-
+        document.getElementById("stats_files_found_value").textContent = "";
+        document.getElementById("stats_files_found_label").textContent = "";
+        
     }
     else{
 
@@ -719,6 +729,8 @@ document.getElementById("search_input")
             item.name.toLowerCase().includes(value)
         );
 
+        document.getElementById("stats_files_found_value").textContent = filteredFiles.length;
+        document.getElementById("stats_files_found_label").textContent = ui.filesfound;
     }
 
 

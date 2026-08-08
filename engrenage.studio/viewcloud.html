@@ -292,6 +292,10 @@
             }
 
         }
+        
+    .hidden {
+  display: none !important;
+}
     </style>
 
 </head>
@@ -326,10 +330,10 @@
                     placeholder="Search..."
                 >
                 
-                
+                <div id="stats_files_found_box" class="stats_box hidden" style="width:100px">
                     <div id="stats_files_found_value" class="stats_value">0</div>
                     <div id="stats_files_found_label" class="stats_label">(found)</div>
-                
+                </div>
 
 
             </div>
@@ -719,8 +723,7 @@ document.getElementById("search_input")
     if(value==="")
     {
         filteredFiles = mediaFiles.files;
-        document.getElementById("stats_files_found_value").textContent = "";
-        document.getElementById("stats_files_found_label").textContent = "";
+        document.getElementById("stats_files_found_value").classList.add("hidden")
         
     }
     else{
@@ -731,6 +734,7 @@ document.getElementById("search_input")
 
         document.getElementById("stats_files_found_value").textContent = filteredFiles.length;
         document.getElementById("stats_files_found_label").textContent = ui.filesfound;
+        document.getElementById("stats_files_found_value").classList.remove("hidden")
     }
 
 

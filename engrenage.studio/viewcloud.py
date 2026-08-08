@@ -175,7 +175,9 @@ def build_file_entry(fullname,thumbname):
     }
 
 
-def scan():
+def scan(nNbrMaxThumbNailToGenerate=6):
+    
+    print( "INF: Scan: start, nNbrMaxThumbNailToGenerate: %d" % nNbrMaxThumbNailToGenerate )
 
     files = []
 
@@ -202,7 +204,7 @@ def scan():
             if ext not in IMAGE_EXT and ext not in VIDEO_EXT:
                 continue
                 
-            if 1 and generated_thumbnail < 6: # on est obligé de limiter le nombre de generation pour ne pas faire ramer la page qui attend pendant ce temps...
+            if 1 and generated_thumbnail < nNbrMaxThumbNailToGenerate: # on est obligé de limiter le nombre de generation pour ne pas faire ramer la page qui attend pendant ce temps...
                 # generate thumbnail
                 thumbname, really_generated = generate_thumbnail(fullname,"/thumb/","/files/")
                 if really_generated:
@@ -259,12 +261,16 @@ def index(req):
 
 if __name__ == "__main__":
     
-    if 1:
+    if 0:
         print("Generating video file test...")
         thumbname, really_generated = generate_thumbnail("/home/na/dev/git/electronoos/engrenage.studio/files/alex/A52s/internal/DCIM/Camera/20260724_173801.mp4","/thumb/","/files/")
         import time
         time.sleep(5) # time for subprocess to start and finished...
         exit(0)
+        
+    if 1:
+        # generating all thumbs !
+        scan( 1000000 )
         
     from types import SimpleNamespace
 

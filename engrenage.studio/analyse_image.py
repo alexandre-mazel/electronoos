@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import ollama
 
 
@@ -11,8 +13,8 @@ def analyse_image( filename ):
                 "content": """Analyse cette image.
 
     Donne exactement :
-    1. Une seule phrase courte décrivant l'image.
-    2. Une liste de 5 à 10 tags pertinents, séparés par des virgules.
+    1. Une seule phrase courte dÃ©crivant l'image.
+    2. Une liste de 5 Ã  10 tags pertinents, sÃ©parÃ©s par des virgules.
 
     Format obligatoire :
     Description: <une phrase>

@@ -21,7 +21,7 @@ def analyse_image( filename ):
     Tags: <tag1>, <tag2>, <tag3>, ...
 
     Ne donne rien d'autre.""",
-                "images": ["photo.jpg"]
+                "images": [filename]
             }
         ]
     )

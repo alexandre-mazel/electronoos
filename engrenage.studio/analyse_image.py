@@ -26,7 +26,7 @@ def analyse_image( filename ):
     time_begin = time.time()
 
     response = ollama.chat(
-        model="moondream",
+        model="moondream", # try also qwen2.5vl:3b
         messages=[
             {
                 "role": "user",
@@ -53,5 +53,5 @@ def analyse_image( filename ):
     
     
 fn = "./files/alex/A52s/internal/Pictures/WhatsApp/IMG-20260804-WA0011.jpg"
-fn = fn.replace("/files/","/thumb/")
+#~ fn = fn.replace("/files/","/thumb/")
 print(analyse_image(fn))

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import ollama
+import time
 
 """
 Modèle	Taille Ollama	Vision	Mon avis RPi 5
@@ -22,6 +23,7 @@ modèles 7B+ vision	~1–3 min+	5–8+ Go	🔴 je déconseille
 def analyse_image( filename ):
     
     print( "INF: analyse_image: '%s'" % filename )
+    time_begin = time.time()
 
     response = ollama.chat(
         model="moondream",
@@ -43,6 +45,8 @@ def analyse_image( filename ):
             }
         ]
     )
+    
+    print( "duration: %.3fs" % (time.time()-time_begin) )
 
     ret = response["message"]["content"]
     return ret

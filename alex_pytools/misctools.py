@@ -445,6 +445,24 @@ def convertEpochToSpecificTimezone( timeEpoch, bRemoveNever=0 ):
     strTimeStamp = dtd.strftime( "%Y/%m/%d: %Hh%Mm%Ss" )
     return strTimeStamp
     
+def convertEpochToSpecificTimezoneOptimised(timeEpoch, bRemoveNever=0):
+
+    if timeEpoch == "" or timeEpoch is None:
+        timeEpoch = 0
+
+    timeEpoch = float(timeEpoch)
+
+    if timeEpoch < 100 and not bRemoveNever:
+        return "jamais"
+
+    try:
+        return time.strftime(
+            "%Y/%m/%d: %Hh%Mm%Ss",
+            time.localtime(timeEpoch)
+        )
+    except (OverflowError, ValueError, OSError):
+        return "1970/01/01: 02h00m00s"
+    
 def convertTimeStampToEpoch(strTimeStamp):
     """
     assume: le timestamp est celui local, et on le stocke en epoch (qui est basé sur utc heure d'hiver)

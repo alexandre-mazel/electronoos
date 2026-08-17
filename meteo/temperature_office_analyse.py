@@ -92,20 +92,23 @@ def decode_file_sonde(strFilename):
     allDatas = {}
     
     prevTemp = 0
+    bPython3 = sys.version_info[0]>=3
     while 1:
         line = f.readline()
         if bVerbose: print(line)
         if len(line)<2:
             break
-        if sys.version_info[0]>=3:
+        if bPython3:
             datas = splitBytes(line,ord(":"))
         else:
             datas = line.split( ":" )
         
         if bVerbose: print(datas)
         
-        for i in range(len(datas)):
-            datas[i] = datas[i].strip()
+        #~ for i in range(len(datas)):
+            #~ datas[i] = datas[i].strip()
+            
+        datas = [x.strip() for x in datas]
             
         # office sonde line format: 2023/02/13: 15h54m10s: armoire: 22.375
         # websave line format: 1735662269.80: MisBKit3: humid: 78.73
@@ -148,7 +151,7 @@ def decode_file_sonde(strFilename):
             if strValue == None or strValue == "None" :
                 continue
             
-            strDateTime = misctools.convertEpochToSpecificTimezone(float(strEpoch))
+            strDateTime = misctools.convertEpochToSpecificTimezoneOptimised(float(strEpoch))
             if bVerbose: print("strDateTime: '%s'" % strDateTime)
             strDate,strTime = strDateTime.split(':')
             strTime = strTime.strip()
@@ -190,8 +193,16 @@ def decode_file_sonde(strFilename):
             rValue = (prevTemp + rValue)/2
             prevTemp = rValue
             
-        if datas_key not in allDatas: allDatas[datas_key] = []
-        allDatas[datas_key].append([nYear, nMonth, nDay, nHour,nMin,rValue])
+        #~ if datas_key not in allDatas: allDatas[datas_key] = []
+        #~ allDatas[datas_key].append([nYear, nMonth, nDay, nHour,nMin,rValue])
+        
+        values = allDatas.get(datas_key)
+
+        if values is None:
+            allDatas[datas_key] = []
+            values = allDatas.get(datas_key)
+        values.append([nYear, nMonth, nDay, nHour,nMin,rValue])
+        
     
     f.close()
     

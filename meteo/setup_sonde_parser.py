@@ -10,3 +10,4 @@ setup(
     version="1.0",
     ext_modules=[module]
 )
+# faire: python setup_sonde_parser.py build_ext --inplace

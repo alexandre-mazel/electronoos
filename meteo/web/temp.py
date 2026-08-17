@@ -305,7 +305,7 @@ def getStyle():
 """
 
 def index():
-    data = misctools.cacheOnDisk.getData( "web_temp_last_data", 60*3 )
+    data = misctools.cacheOnDisk.getData( "web_temp_last_data", 60*3 ) # cache stored to: 
     if data != None and 1:
         return data
         

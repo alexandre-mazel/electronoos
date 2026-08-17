@@ -1353,7 +1353,7 @@ class CacheOnDisk:
             mtime = os.path.getmtime( fn )
         except BaseException:
             mtime = 0
-        print( "DBG: CacheOnDisk: mtime: %s" % str(mtime) )
+        print( "DBG: CacheOnDisk %s: mtime: %s" % (fn, str(mtime) ) )
         if time.time() - mtime > rCacheLifeTimeSec:
             # not cached!
             return None

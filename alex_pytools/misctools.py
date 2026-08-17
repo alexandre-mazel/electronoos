@@ -462,6 +462,14 @@ def convertEpochToSpecificTimezoneOptimised(timeEpoch, bRemoveNever=0):
         )
     except (OverflowError, ValueError, OSError):
         return "1970/01/01: 02h00m00s"
+        
+if 0:
+    time_begin = time.time()
+    for i in range(100000):
+        convertEpochToSpecificTimezone( 122222222 )
+    duration = time.time() - time_begin
+    print( "duration convertEpoch: %.3fs" % duration )
+    exit(1)
     
 def convertTimeStampToEpoch(strTimeStamp):
     """

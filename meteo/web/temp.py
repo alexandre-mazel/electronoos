@@ -6,7 +6,7 @@ Sur REE c'est un apache2 qui tourne.
 
 faire:
 sudo cp temp.py /var/www/html/temp.py
- sudo /etc/init.d/apache2 restart # pas sur
+sudo /etc/init.d/apache2 restart # pas sur
 
 """
 

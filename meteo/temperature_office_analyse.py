@@ -115,7 +115,7 @@ def decode_file_sonde(strFilename):
         
         # duplicates in websave compared to office sonde: 1735662309.73: robot-enhanced-education.org: temp: 19.0
         
-        if (sys.version_info[0]>=3 and b"/" in datas[0]) or sys.version_info[0]<3:
+        if (bPython3 and b"/" in datas[0]) or not bPython3:
             # office sonde format
             if len(datas) < 4:
                 print( "WRN: decode_file_sonde: skipping record: %s" % str(datas))

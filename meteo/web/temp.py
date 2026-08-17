@@ -80,7 +80,7 @@ def compute_stat():
     
     r_last = vals[-1]
     print( "last: %s" % vals[-5:])
-    diff = vals[-1][5] - vals[-2][5]
+    diff = vals[-1][5] - vals[-11][5] # 10 mesures soit a peu pres 5 min
     print( "diff: %.3f" % diff )
     #~ if vals[-1] > vals[-3] + 0.2
     

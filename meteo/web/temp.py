@@ -3,6 +3,11 @@
 """
 A lancer en local sur REE ainsi le fichier des temperature est toujours a jour...
 Sur REE c'est un apache2 qui tourne.
+
+faire:
+sudo cp temp.py /var/www/html/temp.py
+ sudo /etc/init.d/apache2 restart # pas sur
+
 """
 
 import os
@@ -353,7 +358,7 @@ def index():
     ss.append( format_record( avg_3m, "moyenne 3 derniers mois", 3 ) )
     ss.append( format_record( r_max_3m, "maximum 3 derniers mois", 2 ) )
     
-    out =  "<html><head><meta charset='UTF-8'><title>Temperature chez nous</title>" + getStyle() + "</head><body>"
+    out =  "<!DOCTYPE html><head><meta charset='UTF-8'><link rel='icon' type='image/png' href='thermometre.png'><title>Temperature chez nous</title>" + getStyle() + "</head><body>"
     out += "<div class='temp-container'>"
     for i,s in enumerate(ss):
         out += s

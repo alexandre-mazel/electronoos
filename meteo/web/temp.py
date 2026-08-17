@@ -79,12 +79,16 @@ def compute_stat():
         generate_graph_v3.generateTemperatureGraph( vals[-10000:], filename_gfx )
     
     r_last = vals[-1]
+    print( "last: %s" % vals[-5:])
+    diff = vals[-1][5] - vals[-2][5]
+    print( "diff: %.3f" % diff )
+    #~ if vals[-1] > vals[-3] + 0.2
     
     rmin_h,rmax_h, avg_h = getMinMax( vals, 60 )
     rmin_d,rmax_d, avg_d = getMinMax( vals, 60*24 )
     rmin_7d,rmax_7d, avg_7d = getMinMax( vals, 60*24*7 )
     rmin_3m,rmax_3m, avg_3m = getMinMax( vals, 60*24*7*12 )
-    return r_last, rmin_h,rmax_h,rmin_d,rmax_d,rmin_7d,rmax_7d,rmin_3m,rmax_3m, avg_h, avg_d, avg_7d, avg_3m
+    return r_last, diff, rmin_h,rmax_h,rmin_d,rmax_d,rmin_7d,rmax_7d,rmin_3m,rmax_3m, avg_h, avg_d, avg_7d, avg_3m
     
     
 def generate_temperature_graph_plotly(records, output_filename="temperature_graph.html"):
@@ -170,7 +174,7 @@ def generate_temperature_graph_plotly(records, output_filename="temperature_grap
 
     return output_filename
 
-def format_record( r, title, style = 0 ):
+def format_record( r, title, style = 0, diff = 0 ):
     """
     generate a nice html code to output a record: y,mo,d,h,m,temperature
     
@@ -191,13 +195,24 @@ def format_record( r, title, style = 0 ):
     elif style == 3:
         style_temp = "temp-value-avg"
         
+    strdiff = ""
+
+    if( diff != 0 ):
+        if diff > 0:
+            dir = "up"
+            strarrow = "↑"
+        else:
+            dir = "down"
+            strarrow = "↓"
+        strdiff = "<span class='arrow %s'>%s</span><div class='temp-title %s' style='font-size:11px'>diff: %.1f</div>" % (dir, strarrow,dir,diff)
+        
     return """
         <div class="temp-card">
             <div class="temp-title">%s</div>
-            <div class="%s">%.1f<span class="temp-unit">°</span></div>
+            <div class="%s">%.1f<span class="temp-unit">°</span>%s</div>
             <div class="temp-date">%s</div>
         </div>
-        """ % (title,style_temp,temp,dt)
+        """ % (title,style_temp,temp,strdiff,dt)
     
 def getStyle():
     return """
@@ -273,6 +288,19 @@ def getStyle():
     opacity: .85;
     letter-spacing: .5px;
 }
+
+.arrow {
+    font-size: 30px;
+    line-height: 1;
+}
+
+.up {
+    color: #e53935;
+}
+
+.down {
+    color: #1e88e5;
+}
 </style>
 """
 
@@ -284,7 +312,7 @@ def index():
     verbose = 1
     #~ verbose = 0
     if 1:
-        r_last, r_min_h,r_max_h,r_min_d,r_max_d,r_min_7d,r_max_7d,r_min_3m,r_max_3m, avg_h, avg_d, avg_7d, avg_3m = compute_stat()
+        r_last, diff, r_min_h,r_max_h,r_min_d,r_max_d,r_min_7d,r_max_7d,r_min_3m,r_max_3m, avg_h, avg_d, avg_7d, avg_3m = compute_stat()
     else:
         r_last = [2026, 7, 11, 11, 15, 28.6]
         r_min_h = [2026, 7, 11, 11, 15, 22.6]
@@ -307,15 +335,15 @@ def index():
         print("-->")
     
     ss = []
-    ss.append( format_record( r_last, "derni&egrave;re mesure" ) )
+    ss.append( format_record( r_last, "derni&egrave;re mesure", 0, diff ) )
     
     ss.append( format_record( r_min_h, "minimum derni&egrave;re heure", 1 ) )
     ss.append( format_record( avg_h, "moyenne derni&egrave;re heure", 3 ) )
     ss.append( format_record( r_max_h, "maximum derni&egrave;re heure", 2 ) )
     
-    ss.append( format_record( r_min_d, "minimum derni&egrave;r jour", 1 ) )
-    ss.append( format_record( avg_d, "moyenne derni&egrave;r jour", 3 ) )
-    ss.append( format_record( r_max_d, "maximum derni&egrave;r jour", 2 ) )
+    ss.append( format_record( r_min_d, "minimum dernier jour", 1 ) )
+    ss.append( format_record( avg_d, "moyenne dernier jour", 3 ) )
+    ss.append( format_record( r_max_d, "maximum dernier jour", 2 ) )
 
     ss.append( format_record( r_min_7d, "minimum derni&egrave;re semaine", 1 ) )
     ss.append( format_record( avg_7d, "moyenne derni&egrave;re semaine", 3 ) )

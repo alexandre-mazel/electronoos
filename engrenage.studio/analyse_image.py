@@ -26,7 +26,7 @@ def analyse_image( filename ):
     time_begin = time.time()
 
     response = ollama.chat(
-        model="moondream", # try also qwen2.5vl:3b
+        model="moondream", # try also qwen2.5vl:3b # 3 charge, pas j'ai essayé un autre (moondream repond trop a coté)
         messages=[
             {
                 "role": "user",

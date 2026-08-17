@@ -25,8 +25,11 @@ def analyse_image( filename ):
     print( "INF: analyse_image: '%s'" % filename )
     time_begin = time.time()
 
+    model="moondream", # try also qwen2.5vl:3b
+    model="qwen2.5vl:latest",
+
     response = ollama.chat(
-        model="moondream", # try also qwen2.5vl:3b
+        model="model",
         messages=[
             {
                 "role": "user",

@@ -306,7 +306,7 @@ def getStyle():
 
 def index():
     data = misctools.cacheOnDisk.getData( "web_temp_last_data", 60*3 ) # cache stored to /tmp/systemd-private-c1b9e088d50945b5ac2c5e0d0e33e978-apache2.service-gDEJ30/tmp/web_temp_last_data.cache (in ree)
-    if data != None and 0:
+    if data != None and 1:
         return data
         
     verbose = 1

@@ -529,6 +529,14 @@ def convertYmdHmsToEpoch(y,m,d,hour=0,min=0,sec=0):
     #python2:
     return time.mktime((y, m, d, hour, min, sec, 0, 0, -1))
     
+def convertYmdHmsToEpochOptimised(y, m, d, hour=0, min=0, sec=0):
+    """
+    Local date/time -> Unix epoch.
+    Compatible Python 2.7 / Python 3.
+    """
+
+    return time.mktime((y, m, d, hour, min, sec, 0, 0, -1))
+    
 def getFilenameFromTime(timestamp=None):
   """
   get a string usable as a filename relative to the current datetime stamp.

@@ -25,7 +25,7 @@ def record_to_min( r ):
     convertit un y,mo,d,h,m,temp en sec since 1970 (roughly)
     """
     y,mo,d,h,m,temp = r
-    sec = misctools.convertYmdHmsToEpoch( y,mo,d,h,m )
+    sec = misctools.convertYmdHmsToEpochOptimised( y,mo,d,h,m )
     return sec//60
     
 def getMinMax( v, duration_minute ):

@@ -69,7 +69,10 @@ def compute_stat():
     if os.name == "nt":
         # pour debugger, je prend un fichier local
         strFilename = "C:/Users/alexa/dev/git/electronoos/meteo/data/office_temperature.txt"
-    datas = temperature_office_analyse.decode_file_sonde(strFilename)
+    #~ datas = temperature_office_analyse.decode_file_sonde(strFilename)
+    sys.path.append("..")
+    import sonde_parser
+    datas = sonde_parser.decode_file_sonde( strFilename )
     
     vals =  datas[("armoire","temp")]
     

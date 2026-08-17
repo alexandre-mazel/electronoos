@@ -25,7 +25,7 @@ def analyse_image( filename ):
     print( "INF: analyse_image: '%s'" % filename )
     time_begin = time.time()
 
-    model="moondream", # try also qwen2.5vl:3b
+    model="moondream", # try also qwen2.5vl:3b # 3 charge, pas j'ai essayé un autre (moondream repond trop a coté)
     model="qwen2.5vl:latest",
 
     response = ollama.chat(

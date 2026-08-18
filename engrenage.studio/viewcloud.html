@@ -302,6 +302,21 @@
     color:var(--text);
 }
 
+.folder-toggle {
+    padding: 5px 9px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: white;
+    color: #666;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.folder-toggle:hover {
+    background: #f7f7f7;
+    border-color: #bbb;
+}
+
 @media(max-width:700px){
 
     #viewer_prev,
@@ -366,9 +381,11 @@
                     placeholder="Search..."
                 >
                 
-                <div id="folder_filters">
+            <button type="button" class="folder-toggle" onclick="toggleFolderFilters()">
+                ⇅ Folders
+            </button>
 
-                <button onclick="toggleFolderFilters()">Toggle folders</button>
+                <div id="folder_filters">
 
                     <label class="folder_filter">
                         <input type="checkbox" value="photos" checked>

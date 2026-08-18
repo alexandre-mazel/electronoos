@@ -817,7 +817,7 @@ function populateFolderFilters(folders) {
         checkbox.checked = true;
 
         const span = document.createElement("span");
-        span.textContent = folder;
+        span.textContent = folder.replace("/home/na/dev/git/engrenage.studio/files/alex/A52s/", "");
 
         label.appendChild(checkbox);
         label.appendChild(span);
@@ -835,7 +835,7 @@ function initFolderFilter()
     console.log("folder:", filteredFiles[0]?.folder);
 
     const folders = [...new Set(
-        filteredFiles.map(file => file.folder.replace("/home/na/dev/git/engrenage.studio/files/alex/A52s/","") // todo: automatically detect
+        filteredFiles.map(file => file.folder
     )].sort();
 
     console.log( "INF: initFolderFilter: folders:" + folders.toString() )

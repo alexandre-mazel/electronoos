@@ -766,8 +766,9 @@ document.addEventListener("keydown",function(e){
 
 */
 
-document.getElementById("search_input")
-.addEventListener("input", function(){
+document.getElementById("search_input").addEventListener("input", updateGallery);
+
+function updateGallery(){
 
     const value = this.value.toLowerCase().trim();
 
@@ -795,7 +796,7 @@ document.getElementById("search_input")
 
     appendCards();
 
-});
+}
 
 function populateFolderFilters(folders) {
 

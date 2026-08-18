@@ -801,7 +801,9 @@ function updateGallery(event){
     
     // filter on folders:
     const checkedFolders = getCheckedFolders();
+    console.log( "DBG: Avant filter on folder: nbr: ", filteredFiles.length );
     filteredFiles = filterFilesOnFolder(filteredFiles, checkedFolders);
+    console.log( "DBG: Apres: filter on folder: nbr: ", filteredFiles.length );
 
     document.getElementById("gallery_grid").innerHTML="";
 

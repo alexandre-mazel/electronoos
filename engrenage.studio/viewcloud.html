@@ -302,6 +302,139 @@
     color:var(--text);
 }
 
+.folder-filters {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+
+/* Button */
+
+.folder-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 7px 12px;
+
+    border: 1px solid #d0d5dd;
+    border-radius: 8px;
+
+    background: #fff;
+    color: #344054;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease,
+        box-shadow 0.15s ease,
+        transform 0.1s ease;
+}
+
+.folder-toggle:hover {
+    background: #f8f9fb;
+    border-color: #98a2b3;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+.folder-toggle:active {
+    transform: translateY(1px);
+}
+
+.folder-toggle-icon {
+    font-size: 15px;
+}
+
+
+/* Folder filters */
+
+.folder_filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    padding: 7px 11px;
+
+    border: 1px solid #e4e7ec;
+    border-radius: 8px;
+
+    background: #f9fafb;
+
+    font-size: 13px;
+    color: #475467;
+
+    cursor: pointer;
+
+    transition: all 0.15s ease;
+}
+
+.folder_filter:hover {
+    background: #f2f4f7;
+}
+
+
+/* Hide native checkbox */
+
+.folder_filter input {
+    appearance: none;
+    -webkit-appearance: none;
+
+    width: 16px;
+    height: 16px;
+
+    margin: 0;
+
+    border: 1.5px solid #98a2b3;
+    border-radius: 4px;
+
+    background: white;
+
+    cursor: pointer;
+
+    position: relative;
+
+    transition: all 0.15s ease;
+}
+
+
+/* Checked */
+
+.folder_filter input:checked {
+    background: #4f46e5;
+    border-color: #4f46e5;
+}
+
+
+/* Check mark */
+
+.folder_filter input:checked::after {
+    content: "✓";
+
+    position: absolute;
+
+    left: 2px;
+    top: -1px;
+
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+
+/* Label when checked */
+
+.folder_filter:has(input:checked) {
+    background: #eef2ff;
+    border-color: #c7d2fe;
+    color: #3730a3;
+}
+
 @media(max-width:700px){
 
     #viewer_prev,
@@ -368,8 +501,11 @@
                 
                 <div id="folder_filters">
 
-                <button onclick="toggleFolderFilters()">Toggle folders</button>
-                
+                    <button type="button" class="folder-toggle" onclick="toggleFolderFilters()">
+                        <span class="folder-toggle-icon">☑</span>
+                        <span class="folder-toggle-text">Tout sélectionner</span>
+                    </button>
+    
                     <label class="folder_filter">
                         <input type="checkbox" value="photos" checked>
                         <span>Photos</span>

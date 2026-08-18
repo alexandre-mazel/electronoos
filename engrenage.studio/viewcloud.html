@@ -482,6 +482,8 @@ async function loadMedia(){
     document.getElementById("stats_size_value").textContent = formatSize(total);
 
     appendCards();
+    
+    initFolderFilter();
 
 }
 
@@ -842,7 +844,6 @@ function initFolderFilter()
 }
 
 loadMedia();
-initFolderFilter();
 
 </script>
 

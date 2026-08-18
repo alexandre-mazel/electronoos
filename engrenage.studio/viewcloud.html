@@ -784,7 +784,7 @@ function updateGallery(event){
 
     if(value==="")
     {
-        filteredFiles = mediaFiles.files;
+        filteredFiles = structuredClone(mediaFiles.files);
         document.getElementById("stats_files_found_box").classList.add("hidden")
         
     }

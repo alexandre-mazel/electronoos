@@ -835,7 +835,7 @@ function initFolderFilter()
     console.log("folder:", filteredFiles[0]?.folder);
 
     const folders = [...new Set(
-        filteredFiles.map(file => file.folder)
+        filteredFiles.map(file => file.folder.replace("/home/na/dev/git/engrenage.studio/files/alex/A52s/","") // todo: automatically detect
     )].sort();
 
     console.log( "INF: initFolderFilter: folders:" + folders.toString() )

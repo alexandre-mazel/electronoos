@@ -901,14 +901,18 @@ function initFolderFilter()
 }
 
 function toggleFolderFilters() {
+    // invert all
     document
         .querySelectorAll(".folder_filter input[type='checkbox']")
         .forEach(function(checkbox) {
             checkbox.checked = !checkbox.checked;
         });
+        
+    updateGallery();
 }
 
 function toggleFolderFiltersAlternate() {
+    // set all to set or unset
     const checkboxes = document.querySelectorAll(
         ".folder_filter input[type='checkbox']"
     );
@@ -920,6 +924,8 @@ function toggleFolderFiltersAlternate() {
     checkboxes.forEach(function(checkbox) {
         checkbox.checked = !allChecked;
     });
+    
+    updateGallery();
 }
 
 loadMedia();

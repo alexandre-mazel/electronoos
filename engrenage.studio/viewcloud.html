@@ -834,7 +834,9 @@ function initFolderFilter()
     
     const container = document.getElementById("folder_filters");
     container.addEventListener("change", updateGallery);
-    }
+    
+    console.log( "INF: initFolderFilter: ending" )
+}
 
 loadMedia();
 initFolderFilter();

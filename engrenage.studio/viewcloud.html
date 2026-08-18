@@ -770,6 +770,14 @@ document.addEventListener("keydown",function(e){
 
 document.getElementById("search_input").addEventListener("input", updateGallery);
 
+function filterFilesOnFolder(files, checkedFolders) {
+    return files.filter(function(file) {
+        return checkedFolders.some(function(folder) {
+            return file.folder.includes(folder);
+        });
+    });
+}
+
 function updateGallery(event){
 
     const value = event.target.value.toLowerCase().trim();
@@ -790,6 +798,11 @@ function updateGallery(event){
         document.getElementById("stats_files_found_label").textContent = ui.filesfound;
         document.getElementById("stats_files_found_box").classList.remove("hidden")
     }
+    
+    // filter on folders:
+    const checkedFolders = getCheckedFolders();
+    filteredFiles = filterFilesOnFolder(filteredFiles, checkedFolders);
+
 
 
     document.getElementById("gallery_grid").innerHTML="";
@@ -798,6 +811,17 @@ function updateGallery(event){
 
     appendCards();
 
+}
+
+function getCheckedFolders() {
+    const values = [];
+
+    document.querySelectorAll(".folder_filter input[type='checkbox']:checked")
+        .forEach(function(checkbox) {
+            values.push(checkbox.value);
+        });
+
+    return values;
 }
 
 function populateFolderFilters(folders) {

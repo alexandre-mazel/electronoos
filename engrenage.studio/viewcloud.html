@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Media Gallery</title>
+    <link rel='icon' type='image/png' href='almacloud_ico.png'>
+    <title>AlmaCloud Gallery</title>
 
     <style>
         :root{
@@ -35,15 +36,15 @@
         }
 
         #header_container{
-            position:sticky;
+            position:relative; /* was sticky */
             top:0;
             z-index:100;
             background:rgba(245,247,251,.92);
             backdrop-filter:blur(18px);
             border-radius:var(--radius);
             box-shadow:var(--shadow);
-            padding:30px;
-            margin-bottom:30px;
+            padding:20px;
+            margin-bottom:20px;
         }
 
         #title_text{
@@ -357,6 +358,7 @@
 
         <div id="header_container">
 
+            <img src="almacloud.png" width=96 />
             <div id="title_text"></div>
 
             <div id="stats_container">
@@ -407,7 +409,7 @@
 
             </div>
 
-        </div>
+        </div> <!-- header_container -->
 
         <div id="gallery_grid"></div>
 

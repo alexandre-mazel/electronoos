@@ -830,7 +830,7 @@ function initFolderFilter()
 {
     console.log( "INF: initFolderFilter: entering..." )
     const folders = [...new Set(
-        filteredFiles.map(file => file.path)
+        filteredFiles.map(file => file.folder)
     )].sort();
 
     console.log( "INF: initFolderFilter: folders:" + folders.toString() )

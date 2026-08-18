@@ -266,6 +266,42 @@
 
 }
 
+#folder_filters{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-top:16px;
+}
+
+.folder_filter{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    padding:10px 16px;
+    border-radius:25px;
+    background:white;
+    box-shadow:0 6px 18px rgba(0,0,0,.07);
+    cursor:pointer;
+    font-size:17px;
+    user-select:none;
+    transition:.2s;
+}
+
+.folder_filter:hover{
+    box-shadow:0 8px 22px rgba(0,0,0,.12);
+}
+
+.folder_filter input{
+    width:19px;
+    height:19px;
+    accent-color:var(--accent);
+    cursor:pointer;
+}
+
+.folder_filter span{
+    color:var(--text);
+}
+
 @media(max-width:700px){
 
     #viewer_prev,
@@ -329,6 +365,20 @@
                     type="search"
                     placeholder="Search..."
                 >
+                
+                <div id="folder_filters">
+
+                    <label class="folder_filter">
+                        <input type="checkbox" value="photos" checked>
+                        <span>Photos</span>
+                    </label>
+
+                    <label class="folder_filter">
+                        <input type="checkbox" value="whatsapp" checked>
+                        <span>WhatsApp</span>
+                    </label>
+
+                </div>
                 
                 <div id="stats_files_found_box" class="stats_box" style="width:200px;margin:8px 0px;padding:4px 20px">
                     <div id="stats_files_found_value" class="stats_value">0</div>
@@ -747,7 +797,46 @@ document.getElementById("search_input")
 
 });
 
+function populateFolderFilters(folders) {
+
+    const container = document.getElementById("folder_filters");
+
+    container.innerHTML = "";
+
+    folders.forEach(folder => {
+
+        const label = document.createElement("label");
+        label.className = "folder_filter";
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.value = folder;
+        checkbox.checked = true;
+
+        const span = document.createElement("span");
+        span.textContent = folder;
+
+        label.appendChild(checkbox);
+        label.appendChild(span);
+
+        container.appendChild(label);
+    });
+}
+
+function initFolderFilter() 
+{
+    const folders = [...new Set(
+        mediaFiles.map(file => file.path)
+    )].sort();
+
+    populateFolderFilters(folders);
+    
+    const container = document.getElementById("folder_filters");
+    container.addEventListener("change", updateGallery);
+    }
+
 loadMedia();
+initFolderFilter();
 
 </script>
 

@@ -825,6 +825,7 @@ function populateFolderFilters(folders) {
 
 function initFolderFilter() 
 {
+    console.log( "INF: initFolderFilter: entering..." )
     const folders = [...new Set(
         mediaFiles.map(file => file.path)
     )].sort();

@@ -820,6 +820,8 @@ function getCheckedFolders() {
         .forEach(function(checkbox) {
             values.push(checkbox.value);
         });
+        
+    console.log("DBG: checkedFolders: " + values.toString() )
 
     return values;
 }

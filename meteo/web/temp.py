@@ -22,7 +22,7 @@ import misctools
 
 def record_to_min( r ):
     """
-    convertit un y,mo,d,h,m,temp en sec since 1970 (roughly)
+    convertit un y,mo,d,h,m,temp en min since 1970 (roughly)
     """
     y,mo,d,h,m,temp = r
     sec = misctools.convertYmdHmsToEpochOptimised( y,mo,d,h,m )

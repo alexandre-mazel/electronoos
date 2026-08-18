@@ -7,6 +7,7 @@ import json
 import urllib.parse
 import mimetypes
 from datetime import datetime
+import time
 
 ROOT_DIR = "/home/pi/media"
 ROOT_DIR = "/home/na/dev/git/electronoos/engrenage.studio/files/"
@@ -270,8 +271,12 @@ if __name__ == "__main__":
         exit(0)
         
     if 1:
-        # generating all thumbs !
-        scan( 1000000 )
+        while 1:
+            print( "INF: Generating all thumbs ! ..." )
+            time.sleep(1)
+            scan( 1000000 )
+            print( "INF: Generating all thumbs done, sleeping 10 min..."
+            time.sleep(10*60)
         
     from types import SimpleNamespace
 

@@ -192,7 +192,7 @@ def scan(nNbrMaxThumbNailToGenerate=6):
 
     for root, dirs, names in os.walk(ROOT_DIR):
 
-        dirs.sort(reverse=False) # ordre alphab pour folder
+        dirs.sort(reverse=True) # ordre alphab pour folder (si True => Whatsapp first si False => external first) bof dans les 2 cas
         names.sort(reverse=True)
         
         print("DBG: viewcloud.py.scan: dirs: %s, names len: %d" % (str(dirs),len(names) ) )

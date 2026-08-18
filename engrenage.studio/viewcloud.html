@@ -789,18 +789,11 @@ function updateGallery(/*event*/){
     if(value==="")
     {
         filteredFiles = structuredClone(mediaFiles.files);
-        document.getElementById("stats_files_found_box").classList.add("hidden")
-        
     }
-    else{
+    else
+    {
 
-        filteredFiles = mediaFiles.files.filter(item =>
-            item.name.toLowerCase().includes(value)
-        );
-
-        document.getElementById("stats_files_found_value").textContent = filteredFiles.length;
-        document.getElementById("stats_files_found_label").textContent = ui.filesfound;
-        document.getElementById("stats_files_found_box").classList.remove("hidden")
+        filteredFiles = mediaFiles.files.filter(item => item.name.toLowerCase().includes(value)  );
     }
     
     // filter on folders:
@@ -808,6 +801,18 @@ function updateGallery(/*event*/){
     console.log( "DBG: Avant filter on folder: nbr: ", filteredFiles.length );
     filteredFiles = filterFilesOnFolder(filteredFiles, checkedFolders);
     console.log( "DBG: Apres: filter on folder: nbr: ", filteredFiles.length );
+    
+
+    if( mediaFiles.files.length == filteredFiles.length )
+    {
+            document.getElementById("stats_files_found_box").classList.add("hidden")
+    }
+    else
+    {
+        document.getElementById("stats_files_found_value").textContent = filteredFiles.length;
+        document.getElementById("stats_files_found_label").textContent = ui.filesfound;
+        document.getElementById("stats_files_found_box").classList.remove("hidden")
+    }
 
     document.getElementById("gallery_grid").innerHTML="";
 

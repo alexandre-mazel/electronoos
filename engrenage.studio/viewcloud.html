@@ -834,9 +834,7 @@ function initFolderFilter()
     console.log("first:", filteredFiles[0]);
     console.log("folder:", filteredFiles[0]?.folder);
 
-    const folders = [...new Set(
-        filteredFiles.map(file => file.folder
-    )].sort();
+    const folders = [...new Set( filteredFiles.map(file => file.folder) )].sort();
 
     console.log( "INF: initFolderFilter: folders:" + folders.toString() )
 

@@ -770,9 +770,9 @@ document.addEventListener("keydown",function(e){
 
 document.getElementById("search_input").addEventListener("input", updateGallery);
 
-function updateGallery(){
+function updateGallery(obj){
 
-    const value = this.value.toLowerCase().trim();
+    const value = obj.value.toLowerCase().trim();
 
     if(value==="")
     {

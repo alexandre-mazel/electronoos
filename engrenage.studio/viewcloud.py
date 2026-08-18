@@ -275,7 +275,7 @@ if __name__ == "__main__":
             print( "INF: Generating all thumbs ! ..." )
             time.sleep(1)
             scan( 1000000 )
-            print( "INF: Generating all thumbs done, sleeping 10 min..."
+            print( "INF: Generating all thumbs done, sleeping 10 min..." )
             time.sleep(10*60)
         
     from types import SimpleNamespace

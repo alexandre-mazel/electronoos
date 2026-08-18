@@ -366,6 +366,8 @@
                     placeholder="Search..."
                 >
                 
+                <button onclick="toggleFolderFilters()">Toggle folders</button>
+                
                 <div id="folder_filters">
 
                     <label class="folder_filter">
@@ -879,6 +881,28 @@ function initFolderFilter()
     container.addEventListener("change", updateGallery);
     
     console.log( "INF: initFolderFilter: ending" )
+}
+
+function toggleFolderFilters() {
+    document
+        .querySelectorAll(".folder_filter input[type='checkbox']")
+        .forEach(function(checkbox) {
+            checkbox.checked = !checkbox.checked;
+        });
+}
+
+function toggleFolderFiltersAlternate() {
+    const checkboxes = document.querySelectorAll(
+        ".folder_filter input[type='checkbox']"
+    );
+
+    const allChecked = [...checkboxes].every(function(checkbox) {
+        return checkbox.checked;
+    });
+
+    checkboxes.forEach(function(checkbox) {
+        checkbox.checked = !allChecked;
+    });
 }
 
 loadMedia();

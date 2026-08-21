@@ -27,7 +27,7 @@ function getCurrentFolderCapitalized() {
     }
     
     
-//~     global_is_ART = true // force for debug
+    global_is_ART = true // force for debug
     
     if( folder == "art" || global_is_ART )
     {
@@ -47,7 +47,7 @@ console.log(getCurrentFolderCapitalized());
 <script>
 if( global_is_ART )
 {
-    document.write( "<link rel='icon' type='image/png' href='logo_almart_cable_ico_2.png'>" )
+    document.write( "<link rel='icon' type='image/png' href='logo_almart_cable_ico_3.png'>" )
 }
 </script>
 
@@ -76,7 +76,7 @@ body{
 
 header{
     text-align:center;
-    padding:20px 0px 0px;
+    padding:10px 0px 0px;
 }
 
 header h1{
@@ -380,8 +380,23 @@ header h1{
     border-top:12px solid transparent;
     border-bottom:12px solid transparent;
     border-left:20px solid white;
-
 }
+
+    
+.logo {
+    filter: drop-shadow(4px 4px 2px rgba(0, 0, 0, 0.35));
+    
+/*
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35));
+                                   |   |     |       +-- couleur + transparence
+                                   |   |     +------- flou
+                                   |   +---------- deplacement vertical
+                                   +------------ deplacement horizontal
+*/
+                   
+    width: 384px;
+}
+
 
 </style>
 </head>
@@ -391,7 +406,7 @@ header h1{
 <script>
 if( global_is_ART )
 {
-    document.write( "<center><IMG src=logo_almart_cable_med.png width=256></img></center>" )
+    document.write( "<center><IMG src=logo_almart_tech1_ret.png class='logo'></img></center>" )
 }
 </script>
 
@@ -410,6 +425,7 @@ const projects=[
 
 {
 title:"Salle des aromes (2017)",
+desc: "Un jeu interactif autour des odeurs.",
 location:"CDL",
 partner:"",
 technic:"Conception & Arduino Development",
@@ -424,6 +440,7 @@ gallery:[
 {
 title:"Snakable (2024)",
 location:"Teatros Del Canal/Madrid",
+desc: "",
 partner:"ENSAD",
 technic:"Arduino programming",
 cover:"snake2/00_s-bianchini_ensadlab_snakable_09-2020_9j1a3215.tif.jpg",
@@ -647,20 +664,22 @@ project.gallery.forEach(src=>{
     {
         location = "Les Caves du Louvre/Paris"
     }
+    
+    let desc = project.desc
 
-    info.innerHTML=`
-        <div><span class="label">Project</span><br><span class="value">${project.title}</span></div>
-        <div><span class="label">Location</span><br><span class="value">${location}</span></div>
-            `;
+    info.innerHTML=`<div><span class="label">Project</span><br><span class="value">${project.title}</span></div>`;
+    if( desc.length > 0 )
+    {
+        info.innerHTML += `<div><span class="label">Detail</span><br><span class="value">${desc}</span></div>`;
+    }
+    
+    info.innerHTML += `<div><span class="label">Location</span><br><span class="value">${location}</span></div>`;
+        
     if( partner.length > 0 )
     {
-        info.innerHTML += `    
-            <div><span class="label">Partner</span><br><span class="value">${partner}</span></div>
-                `;
+        info.innerHTML += `<div><span class="label">Partner</span><br><span class="value">${partner}</span></div>`;
     }
-    info.innerHTML += `    
-    <div><span class="label">Technics</span><br><span class="value">${project.technic}</span></div>
-    `;
+    info.innerHTML += `<div><span class="label">Technics</span><br><span class="value">${project.technic}</span></div>`;
 
     card.appendChild(info);
     
@@ -783,7 +802,7 @@ project.gallery.forEach(src=>{
                 );
 
 
-                // Si le doigt a bougé, c'était un scroll
+                // Si le doigt a bouge', c'était un scroll
                 if (distance > 10) {
                     return;
                 }

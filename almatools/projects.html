@@ -131,7 +131,7 @@ header h1{
 }
 
 .info{
-    padding:18px;
+    padding:10px 18px 6px /* haut horiz bas */
 }
 
 .info div{
@@ -425,7 +425,7 @@ const projects=[
 
 {
 title:"Salle des aromes (2017)",
-desc: "Un jeu interactif autour des odeurs.",
+desc: "An interactive installation exploring scents.",
 location:"CDL",
 partner:"",
 technic:"Conception & Arduino Development",
@@ -483,6 +483,7 @@ gallery:[
 
 {
 title:"Oscillation (2025)",
+desc: "Programming the whole exposition's stage ligthing",
 location:"Centre Culturel du Canada/Paris",
 partner:"ENSAD",
 technic:"Light support, Light programming of the complete exhibition: DMX & Smart Bulb",
@@ -501,6 +502,7 @@ gallery:[
 {
 title:"SmileBox (2026)",
 location:"Le Mus&eacute;e en Herbe/Paris",
+desc: "50 Meters of Smiles for the Museum's 50th Anniversary",
 partner:"Djeff",
 technic:"Conception, building, Raspberry setup & programming",
 cover:"smilebox/01_IMG_8353_ret_sm.jpg",
@@ -665,7 +667,8 @@ project.gallery.forEach(src=>{
         location = "Les Caves du Louvre/Paris"
     }
     
-    let desc = project.desc
+    let desc = project.desc;
+    if (desc == undefined) desc = "";
 
     info.innerHTML=`<div><span class="label">Project</span><br><span class="value">${project.title}</span></div>`;
     if( desc.length > 0 )

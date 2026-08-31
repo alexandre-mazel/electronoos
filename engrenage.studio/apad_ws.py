@@ -9,6 +9,7 @@ pad_clients = {}
 async def handle_client(websocket):
     path = websocket.request.path
     query = path.split("?", 1)[1] if "?" in path else ""
+    print( "DBG: handle_client: path: '%s', query: '%s'" % (path, query) )
     parameters = dict(
         item.split("=", 1)
         for item in query.split("&")

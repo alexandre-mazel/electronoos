@@ -16,7 +16,10 @@ async def handle_client(websocket):
         if "=" in item
     )
 
-    pad_id = parameters.get("pad", "").upper()
+    #~ pad_id = parameters.get("pad", "").upper()
+    path = websocket.request.path
+    pad_id = path.split("/")[2].upper()
+
 
     if len(pad_id) != 4 or not pad_id.isalpha():
         await websocket.close(code=1008, reason="Invalid pad")

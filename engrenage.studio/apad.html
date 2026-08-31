@@ -222,11 +222,18 @@
             websocket.onmessage = function(event) {
                 let message;
 
-                try {
+                try 
+                {
                     message = JSON.parse(event.data);
                 } catch (error) {
                     return;
                 }
+                
+                if (message.type === "new_pad") {
+                    window.location.href = "apad.html?" + message.pad_id;
+                    return;
+                }
+
 
                 if (message.type === "content") {
                     suppress_change = true;
@@ -289,10 +296,15 @@
         
         document.getElementById("new_pad_button").addEventListener("click", async function() {
         console.log( "DBG: Asking for a new pad..." )
-//~         const response = await fetch("/api/new_pad");
-        const protocol = get_ws_protocol()
-        const websocket_url = protocol + "//" + window.location.host + "/ws/" + "new_pad";
-        console.log( "DBG: Will connect to", websocket_url )
+        
+        if (!websocket || websocket.readyState !== WebSocket.OPEN) {
+            console.warn( "ERR: Impossible: not connected !" )
+            return;
+        }
+
+        websocket.send(JSON.stringify({
+            type: "new_pad"
+        }));
 
         if (!response.ok) {
             console.warn("Unable to create a new pad");

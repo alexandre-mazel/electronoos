@@ -7,6 +7,8 @@
 #
 # Author: A. Mazel
 
+# windows: pip install  bcrypt numpy opencv-python scipy pywin32 psutil
+
 import sys
 import os
 import struct
@@ -18,7 +20,7 @@ strLocalPath = os.path.dirname(sys.modules[__name__].__file__)
 if strLocalPath == "": strLocalPath = './'
 strLocalPath += "/../alex_pytools/"
 #~ print("DBG: adding to path: '%s'" % strLocalPath )
-sys.path.append(strLocalPath )
+sys.path.append( strLocalPath )
 try: import misctools # just for cpumodel
 except Exception as err: print("WRN: importing misctools => err: %s" % str(err))
 
@@ -127,14 +129,17 @@ def print_ram():
         avail = infomem.available
         tot = infomem.total
         #~ avail = tot-avail # seems like it's reverted at least on raspberry [but not exactly !?!]
-        print("ram              : %.2f / %.2f GB" % (avail/GB,tot/GB))
+        print( "ram              : %.2f / %.2f GB" % (avail/GB,tot/GB))
         #~ raise("toto") # to test the exception code check
     except BaseException as err:
         #~ print("ERR: %s" % err)
         import os
-        avail = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_AVPHYS_PAGES') 
-        tot = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') 
-        print("ram              : %.2f / %.2f GB" % (avail/GB,tot/GB))
+        try:
+            avail = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_AVPHYS_PAGES') 
+            tot = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') 
+            print( "ram              : %.2f / %.2f GB" % (avail/GB,tot/GB))
+        except BaseException as err:
+            print( "ram              : unknown (2)" )
 
     
 def test_cpu_int( bPrint = True ):
@@ -263,6 +268,8 @@ def test_numpy( bPrint = True ):
         sys.stdout.flush();
     
     rDuration = time.time() - timeBegin;
+    if rDuration < 0.000001:
+        rDuration = 0.0001
     if bPrint: print("%7.2fs (%5.2fx)" % (rDuration,(20*10*2)/rDuration));
     return rDuration;
     
@@ -306,6 +313,8 @@ def test_opencv_orb( bPrint = True ):
         sys.stdout.flush();
     
     rDuration = time.time() - timeBegin;
+    if rDuration < 0.000001:
+        rDuration = 0.0001
     if bPrint: print("%7.2fs (%5.2ffps)" % (rDuration, (20*nFramePerRound)/rDuration));
     return rDuration;
     
@@ -372,6 +381,8 @@ def test_opencv_orb_realcase( bPrint = True ):
         sys.stdout.flush();
     
     rDuration = time.time() - timeBegin;
+    if rDuration < 0.000001:
+        rDuration = 0.0001
     if bPrint: print("%7.2fs (%5.2ffps)" % (rDuration, (20*nFramePerRound)/rDuration));
     return rDuration;    
 
@@ -390,6 +401,8 @@ def test_disk_write( nMB=200, nPacketSize = 1024 ):
     file.flush();
     file.close();
     rDuration = time.time() - timeBegin;
+    if rDuration < 0.000001:
+        rDuration = 0.0001
     print("%7.2fs (%5.2f Mo/s)" % (rDuration,20*nTimePerLoop*nPacketSize/(rDuration*1024*1024)));
     return rDuration;
 #test_disk_write - end
@@ -416,6 +429,8 @@ def test_disk_read( nMB=200, nPacketSize = 1024 ):
         #~ strMsg = "ERR: test_disk_read: while fsyncing: %s" % str(err);
     file.close();
     rDuration = time.time() - timeBegin;
+    if rDuration < 0.000001:
+        rDuration = 0.0001
     print("%7.2fs (%5.2f Mo/s)" % (rDuration,20*nTimePerLoop*nPacketSize/(rDuration*1024*1024)));
     if( strMsg != "" ):
         print( strMsg )
@@ -1636,7 +1651,20 @@ disk_write 1024KB: ####################   4.91s (203 Mo/s)
 disk_read  1024KB: ####################   0.67s (1492 Mo/s)
 
 
+*** NSI4: HP Pavillon H9-1131EF
+python version   : 3.7.9 (32bits) (4 core(s)) (windows7)
+cpu              : Intel(R) Core(TM) i5-2320 CPU @ 3.00GHz
+ram             : unknown (2)
+test_cpu_int2    : ####################   1.11s
+test_cpu_float2  : ####################   0.45s
+test_scipy_xxt   : ####################   1.98s (201.90x)
+test_orb5.0.0    : ####################   0.37s (267.09fps)
+test_orbcv imgs  : ####################   1.50s (66.77fps)
+test_orbcv bis   : ####################   1.31s (76.55fps)
+disk_write    1KB: ####################   erreur: immediat (windows7 caching?)
 
+
+###########################################
 ### compilation des meilleurs:
 
 *** Champion1

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared Pad</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            background: #181818;
+            color: #eeeeee;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        #page_header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 16px;
+            background: #222222;
+            border-bottom: 1px solid #333333;
+        }
+
+        #page_title {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        #pad_code {
+            padding: 6px 10px;
+            border-radius: 6px;
+            background: #333333;
+            color: #ffffff;
+            font-family: monospace;
+            font-size: 18px;
+            letter-spacing: 2px;
+        }
+
+        #page_main {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            padding: 12px;
+        }
+
+        #pad_text {
+            width: 100%;
+            height: 100%;
+            resize: none;
+            border: 0;
+            outline: none;
+            border-radius: 8px;
+            padding: 20px;
+            background: #101010;
+            color: #f5f5f5;
+            font-family: monospace;
+            font-size: 22px;
+            line-height: 1.45;
+            tab-size: 4;
+        }
+
+        #pad_text:focus {
+            box-shadow: 0 0 0 2px #555555;
+        }
+
+        #page_footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 42px;
+            padding: 8px 16px;
+            background: #222222;
+            border-top: 1px solid #333333;
+            font-size: 14px;
+        }
+
+        #connection_status {
+            color: #aaaaaa;
+        }
+
+        #connection_status.connected {
+            color: #65d66f;
+        }
+
+        #connection_status.disconnected {
+            color: #ff6666;
+        }
+
+        #pad_size {
+            color: #888888;
+            font-family: monospace;
+        }
+
+        @media (max-width: 600px) {
+            #page_header {
+                padding: 10px 12px;
+            }
+
+            #page_title {
+                font-size: 18px;
+            }
+
+            #pad_code {
+                font-size: 16px;
+            }
+
+            #page_main {
+                padding: 6px;
+            }
+
+            #pad_text {
+                padding: 14px;
+                font-size: 20px;
+                border-radius: 6px;
+            }
+
+            #page_footer {
+                padding: 7px 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header id="page_header">
+        <h1 id="page_title">Shared Pad</h1>
+        <div id="pad_code">----</div>
+    </header>
+
+    <main id="page_main">
+        <textarea id="pad_text" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+    </main>
+
+    <footer id="page_footer">
+        <div id="connection_status">Connecting...</div>
+        <div id="pad_size">0 chars</div>
+    </footer>
+
+    <script>
+        const pad_text = document.getElementById("pad_text");
+        const pad_code = document.getElementById("pad_code");
+        const connection_status = document.getElementById("connection_status");
+        const pad_size = document.getElementById("pad_size");
+
+        const path_parts = window.location.pathname.split("/").filter(Boolean);
+        const pad_id = path_parts[path_parts.length - 1].toUpperCase();
+
+        let websocket = null;
+        let reconnect_timer = null;
+        let suppress_change = false;
+
+        pad_code.textContent = pad_id || "----";
+
+        function update_size() {
+            const size = pad_text.value.length;
+            pad_size.textContent = size + (size === 1 ? " char" : " chars");
+        }
+
+        function set_status(text, state) {
+            connection_status.textContent = text;
+            connection_status.className = state || "";
+        }
+
+        function connect() {
+            if (!pad_id || !/^[A-Z]{4}$/.test(pad_id)) {
+                set_status("Invalid pad", "disconnected");
+                return;
+            }
+
+            if (websocket) {
+                websocket.close();
+            }
+
+            const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+            const websocket_url = protocol + "//" + window.location.host + "/ws/" + pad_id;
+
+            set_status("Connecting...", "");
+
+            websocket = new WebSocket(websocket_url);
+
+            websocket.onopen = function() {
+                set_status("Connected", "connected");
+            };
+
+            websocket.onmessage = function(event) {
+                let message;
+
+                try {
+                    message = JSON.parse(event.data);
+                } catch (error) {
+                    return;
+                }
+
+                if (message.type === "content") {
+                    suppress_change = true;
+                    pad_text.value = message.content || "";
+                    suppress_change = false;
+                    update_size();
+                }
+            };
+
+            websocket.onclose = function() {
+                set_status("Disconnected", "disconnected");
+
+                clearTimeout(reconnect_timer);
+
+                reconnect_timer = setTimeout(function() {
+                    connect();
+                }, 2000);
+            };
+
+            websocket.onerror = function() {
+                set_status("Connection error", "disconnected");
+            };
+        }
+
+        pad_text.addEventListener("input", function() {
+            update_size();
+
+            if (suppress_change) {
+                return;
+            }
+
+            if (!websocket || websocket.readyState !== WebSocket.OPEN) {
+                return;
+            }
+
+            websocket.send(JSON.stringify({
+                type: "content",
+                content: pad_text.value
+            }));
+        });
+
+        pad_text.addEventListener("keydown", function(event) {
+            if (event.key === "Tab") {
+                event.preventDefault();
+
+                const start = pad_text.selectionStart;
+                const end = pad_text.selectionEnd;
+
+                pad_text.value =
+                    pad_text.value.substring(0, start) +
+                    "    " +
+                    pad_text.value.substring(end);
+
+                pad_text.selectionStart = start + 4;
+                pad_text.selectionEnd = start + 4;
+
+                pad_text.dispatchEvent(new Event("input"));
+            }
+        });
+
+        update_size();
+        connect();
+        pad_text.focus();
+    </script>
+
+</body>
+</html>

@@ -155,12 +155,20 @@
     </footer>
 
     <script>
+    
+        console.log("DBG: script started");
+    
         const pad_text = document.getElementById("pad_text");
         const pad_code = document.getElementById("pad_code");
         const connection_status = document.getElementById("connection_status");
         const pad_size = document.getElementById("pad_size");
+        
+        console.log("DBG: DOM elements =", pad_text, pad_code, connection_status, pad_size);
+
 
         const pad_id = window.location.search.substring(1).toUpperCase();
+        
+        console.log("DBG: pad_id =", pad_id);
         
         console.log( "Loading pad: ", pad_id )
 
@@ -182,6 +190,8 @@
         }
 
         function connect() {
+            console.log("DBG: connect() called");
+        
             if (!pad_id || !/^[A-Z]{4}$/.test(pad_id)) {
                 set_status("Invalid pad", "disconnected");
                 return;

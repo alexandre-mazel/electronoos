@@ -6,7 +6,7 @@ import websockets #  sudo pip install websockets --break-system-packages
 pads = {}
 pad_clients = {}
 
-def create_new_pad_id()
+def create_new_pad_id():
     while 1:
         pad_id = ""
         for i in range(4):

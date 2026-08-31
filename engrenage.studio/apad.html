@@ -141,6 +141,7 @@
 
     <header id="page_header">
         <h1 id="page_title">Shared Pad</h1>
+        <button id="new_pad_button">New pad</button>
         <div id="pad_code">----</div>
     </header>
 
@@ -160,6 +161,8 @@
         const pad_size = document.getElementById("pad_size");
 
         const pad_id = window.location.search.substring(1).toUpperCase();
+        
+        console.log( "Loading pad: ", pad_id )
 
 
         let websocket = null;
@@ -266,10 +269,25 @@
                 pad_text.dispatchEvent(new Event("input"));
             }
         });
+        
+        document.getElementById("new_pad_button").addEventListener("click", async function() {
+        const response = await fetch("/api/new_pad");
+
+        if (!response.ok) {
+            console.warn("Unable to create a new pad");
+            return;
+        }
+
+        const data = await response.json();
+
+        window.location.href = "apad.html?" + data.pad_id;
+    });
+
 
         update_size();
         connect();
         pad_text.focus();
+        
     </script>
 
 </body>

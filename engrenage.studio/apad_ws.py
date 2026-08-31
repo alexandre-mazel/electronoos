@@ -33,14 +33,6 @@ async def handle_client(websocket):
     pad_id = path.split("/")[2].upper()
     
     print( "DBG: handle_client: pad_id: '%s'" % (pad_id) )
-    
-    if( pad_id == "new_pad" ):
-        pad_id = create_new_pad_id()
-        await websocket.send(json.dumps({
-                    "type": "new_pad",
-                    "pad_id": pad_id
-                }))
-        return
 
 
     if len(pad_id) != 4 or not pad_id.isascii() or not pad_id.isalpha():
@@ -69,6 +61,15 @@ async def handle_client(websocket):
             data = json.loads(message)
 
             if data.get("type") != "content":
+                print( "DBG: handle_client: receiving other thing than content: '%s'" % data.get("type") )
+                
+                #~ if( pad_id == "new_pad" ):
+                #~ print( "DBG: handle_client: new_pad !" )
+                #~ pad_id = create_new_pad_id()
+                #~ await websocket.send(json.dumps({
+                            #~ "type": "new_pad",
+                            #~ "pad_id": pad_id
+                        #~ }))
                 continue
 
             content = data.get("content", "")

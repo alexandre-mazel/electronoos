@@ -81,13 +81,36 @@ async def handle_client(websocket):
             })
 
             clients = list(pad_clients.get(pad_id, set()))
+            
+            print(
+                f"DBG: BROADCAST: {len(clients)} clients, "
+                f"sender={websocket.remote_address}, "
+                f"response={response!r}",
+                flush=True,
+        )
+
 
             for client in clients:
                 if client != websocket:
                     try:
+                        print(
+                            f"DBG: broadcasting to client={client.remote_address}, "
+                            f"response={response!r}",
+                            flush=True,
+                        )
+
                         await client.send(response)
-                    except websockets.exceptions.ConnectionClosed:
-                        pass
+                        
+                        print(
+                            f"DBG: broadcast send OK to client={client.remote_address}",
+                            flush=True,
+                        )
+                        
+                    except websockets.exceptions.ConnectionClosed as e:
+                        print(
+                            f"DBG: broadcast client closed: {client.remote_address} {e!r}",
+                            flush=True,
+                        )
 
     except websockets.exceptions.ConnectionClosed:
         pass

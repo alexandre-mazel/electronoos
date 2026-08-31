@@ -1,6 +1,6 @@
 import asyncio
 import json
-import websockets
+import websockets #  sudo pip install websockets --break-system-packages
 
 pads = {}
 pad_clients = {}
@@ -68,16 +68,18 @@ async def handle_client(websocket):
             del pad_clients[pad_id]
 
 
+port = 8765
 async def run_server():
     async with websockets.serve(
         handle_client,
         "127.0.0.1",
-        8765
+        port
     ):
         await asyncio.Future()
 
 
 def main():
+    print( "INF: Running WS Server on port", port )
     asyncio.run(run_server())
 
 

@@ -306,12 +306,12 @@
             type: "new_pad"
         }));
 
-        if (!response.ok) {
-            console.warn("Unable to create a new pad");
-            return;
-        }
+//~         if (!response.ok) {
+//~             console.warn("Unable to create a new pad");
+//~             return;
+//~         }
 
-        const data = await response.json();
+//~         const data = await response.json();
 
         window.location.href = "apad.html?" + data.pad_id;
     });

@@ -1,9 +1,21 @@
 import asyncio
 import json
+import random
 import websockets #  sudo pip install websockets --break-system-packages
 
 pads = {}
 pad_clients = {}
+
+def create_new_pad_id()
+    while 1:
+        pad_id = ""
+        for i in range(4):
+            pad_id += chr( ord("A") + random.randint(0,25) )
+        print( "DBG: create_new_pad_id: testing new pad_id: '%s'" % pad_id )
+        if pad_id not in pads:
+            return pad_id
+    print( "ERR: create_new_pad_id: impossible to read this message (no more combination?)" )
+    return "XXXX"
 
 
 async def handle_client(websocket):
@@ -21,6 +33,16 @@ async def handle_client(websocket):
     pad_id = path.split("/")[2].upper()
     
     print( "DBG: handle_client: pad_id: '%s'" % (pad_id) )
+    
+    if( pad_id == "new_pad" )
+    {
+        pad_id = create_new_pad_id()
+        await websocket.send(json.dumps({
+                    "type": "new_pad",
+                    "pad_id": pad_id
+                }))
+        return
+    }
 
 
     if len(pad_id) != 4 or not pad_id.isascii() or not pad_id.isalpha():

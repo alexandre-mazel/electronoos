@@ -178,6 +178,11 @@
         let suppress_change = false;
 
         pad_code.textContent = pad_id || "----";
+        
+        function get_ws_protocol()
+        {
+            return window.location.protocol === "https:" ? "wss:" : "ws:";
+        }
 
         function update_size() {
             const size = pad_text.value.length;
@@ -202,7 +207,7 @@
                 websocket.close();
             }
 
-            const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+            const protocol = get_ws_protocol()
             const websocket_url = protocol + "//" + window.location.host + "/ws/" + pad_id;
             console.log( "DBG: Will connect to", websocket_url )
 
@@ -284,7 +289,10 @@
         
         document.getElementById("new_pad_button").addEventListener("click", async function() {
         console.log( "DBG: Asking for a new pad..." )
-        const response = await fetch("/api/new_pad");
+//~         const response = await fetch("/api/new_pad");
+        const protocol = get_ws_protocol()
+        const websocket_url = protocol + "//" + window.location.host + "/ws/" + "new_pad";
+        console.log( "DBG: Will connect to", websocket_url )
 
         if (!response.ok) {
             console.warn("Unable to create a new pad");

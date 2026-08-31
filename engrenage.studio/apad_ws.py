@@ -19,9 +19,11 @@ async def handle_client(websocket):
     #~ pad_id = parameters.get("pad", "").upper()
     path = websocket.request.path
     pad_id = path.split("/")[2].upper()
+    
+    print( "DBG: handle_client: pad_id: '%s'" % (pad_id) )
 
 
-    if len(pad_id) != 4 or not pad_id.isalpha():
+    if len(pad_id) != 4 or not pad_id.isascii() or not pad_id.isalpha():
         await websocket.close(code=1008, reason="Invalid pad")
         return
 
@@ -37,9 +39,13 @@ async def handle_client(websocket):
         "type": "content",
         "content": pads[pad_id]
     }))
+    
+    print("DBG: initial content sent")
 
     try:
         async for message in websocket:
+            print("DBG: received:", message)
+            
             data = json.loads(message)
 
             if data.get("type") != "content":

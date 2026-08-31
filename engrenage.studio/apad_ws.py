@@ -35,14 +35,12 @@ async def handle_client(websocket):
     print( "DBG: handle_client: pad_id: '%s'" % (pad_id) )
     
     if( pad_id == "new_pad" ):
-    {
         pad_id = create_new_pad_id()
         await websocket.send(json.dumps({
                     "type": "new_pad",
                     "pad_id": pad_id
                 }))
         return
-    }
 
 
     if len(pad_id) != 4 or not pad_id.isascii() or not pad_id.isalpha():

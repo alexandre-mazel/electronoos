@@ -159,8 +159,8 @@
         const connection_status = document.getElementById("connection_status");
         const pad_size = document.getElementById("pad_size");
 
-        const path_parts = window.location.pathname.split("/").filter(Boolean);
-        const pad_id = path_parts[path_parts.length - 1].toUpperCase();
+        const pad_id = window.location.search.substring(1).toUpperCase();
+
 
         let websocket = null;
         let reconnect_timer = null;

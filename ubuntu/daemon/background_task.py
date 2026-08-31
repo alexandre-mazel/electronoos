@@ -145,7 +145,7 @@ time_lastUsefull = time.time()
 def auto_off():
     global time_lastUsefull
     nNbrConnected = int(runCommandGetResults("who | wc -l"))
-    rLoad = float(runCommandGetResults("LC_ALL=C uptime | cut -d ',' -f 4"))
+    rLoad = float(runCommandGetResults("LC_ALL=C uptime | cut -d ',' -f 4")) # on veut le format anglais et pas francais pourri ou les virgules me nique!
     print("INF: nNbrConnected: %d, load: %5.2f" % (nNbrConnected,rLoad) )
     if nNbrConnected > 0 or rLoad > 0.1:
         time_lastUsefull = time.time()

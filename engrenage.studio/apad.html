@@ -193,6 +193,7 @@
 
             const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
             const websocket_url = protocol + "//" + window.location.host + "/ws/" + pad_id;
+            console.log( "DBG: Will connect to", websocket_url )
 
             set_status("Connecting...", "");
 
@@ -271,6 +272,7 @@
         });
         
         document.getElementById("new_pad_button").addEventListener("click", async function() {
+        console.log( "DBG: Asking for a new pad..." )
         const response = await fetch("/api/new_pad");
 
         if (!response.ok) {

@@ -56,6 +56,10 @@ def index(req):
             <img class=imgelem src="/almatools/illus_web.png"><br>
             <div class=txtelem>Site web et serveur</div>
         </div>
+        <div class='divelem'>
+            <img class=imgelem src="/almatools/projects/fossilation/00_20251015_171937.jpg"><br>
+            <div class=txtelem>Interactive exhibit</div>
+        </div>
     </div>
     <br>
     <br>
@@ -70,7 +74,7 @@ def index(req):
     <br>
     <br>    
     <div style='vertical-align: middle;'>
-    <a href='/almatools/projects.html'>Previous Projects</a>
+    <a href='/almatools/projects.html'>Recent Projects</a>
     </div>
     
     

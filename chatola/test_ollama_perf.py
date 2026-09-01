@@ -34,12 +34,12 @@ def ollama_ps():
         print(result.stdout.strip())
 
     except Exception as e:
-        print(f"Impossible d'exécuter 'ollama ps' : {e}")	
+        print(f"Impossible d'executer 'ollama ps' : {e}")	
         
 def print_hardware():
     import subprocess
 
-    print("\n--- Matériel ---")
+    print("\n--- Materiel ---")
 
     try:
         cpu = subprocess.run(
@@ -78,7 +78,7 @@ def print_hardware():
             print(f"GPU : {gpu_name}")
 
     except Exception as e:
-        print(f"Erreur lors de la détection du matériel : {e}")
+        print(f"Erreur lors de la detection du materiel : {e}")
        
 
 def ollama_model_exists(model_name):
@@ -129,7 +129,7 @@ def bench_ollama( strModel, strPrompt, nbr_test = 5 ):
     response = requests.post( strUrl, json=dJson, timeout=600 )
     
     print("")
-    print(f"# Benchmark Ollama — {strModel}")
+    print(f"# Benchmark Ollama - {strModel}")
     print(f"# {nbr_test} appels, generate: '{prompt}'")
     
     if not ollama_model_exists(strModel):
@@ -183,7 +183,7 @@ def bench_ollama( strModel, strPrompt, nbr_test = 5 ):
             f"speed={tok_s:.2f} tok/s"
         )
 
-    print("\n--- Résultats ---")
+    print("\n--- Results ---")
             
     print(f"Total       | {stats(durations)} s")
     print(f"Prompt      | {stats(prompt_eval_durations)} s")
@@ -218,7 +218,7 @@ print_hardware()
 
 *** MS Tab7
 
-# Benchmark Ollama — moondream:latest
+# Benchmark Ollama - moondream:latest
 # 5 appels, generate: 'Hello world, comment ca va et toi je suis malade ?.'
 
 #1 | total=0.913s | prompt=0.068s/23 tok | eval=0.798s/18 tok | speed=22.57 tok/s
@@ -227,7 +227,7 @@ print_hardware()
 #4 | total=0.907s | prompt=0.056s/23 tok | eval=0.831s/18 tok | speed=21.65 tok/s
 #5 | total=0.951s | prompt=0.070s/23 tok | eval=0.859s/18 tok | speed=20.95 tok/s
 
---- Résultats ---
+--- Results ---
 Total       | min=0.907 | max=0.951 | avg=0.922 s
 Prompt      | min=0.052 | max=0.070 | avg=0.060 s
 Tokens eval | min=18.000 | max=18.000 | avg=18.000
@@ -235,7 +235,7 @@ Eval        | min=0.798 | max=0.859 | avg=0.832 s
 Vitesse     | min=20.95 | max=22.57 | avg=21.64 tok/s
 
 
-# Benchmark Ollama — llama3.2:1b
+# Benchmark Ollama - llama3.2:1b
 # 5 appels, generate: 'Hello world, comment ca va et toi je suis malade ?.'
 
 #1 | total=5.623s | prompt=0.090s/38 tok | eval=5.501s/75 tok | speed=13.63 tok/s
@@ -244,7 +244,7 @@ Vitesse     | min=20.95 | max=22.57 | avg=21.64 tok/s
 #4 | total=5.634s | prompt=0.072s/38 tok | eval=5.535s/75 tok | speed=13.55 tok/s
 #5 | total=5.942s | prompt=0.100s/38 tok | eval=5.811s/75 tok | speed=12.91 tok/s
 
---- Résultats ---
+--- Results ---
 Total       | min=5.623 | max=6.118 | avg=5.794 s
 Prompt      | min=0.072 | max=0.100 | avg=0.087 s
 Tokens eval | min=75.000 | max=75.000 | avg=75.000
@@ -252,7 +252,7 @@ Eval        | min=5.501 | max=6.004 | avg=5.677 s
 Vitesse     | min=12.49 | max=13.63 | avg=13.23 tok/s
 d
 
-# Benchmark Ollama — mistral-small:22b
+# Benchmark Ollama - mistral-small:22b
 # 5 appels, generate: 'Hello world, comment ca va et toi je suis malade ?.'
 
 DBG: ollama_model_exists: current existing model:
@@ -267,7 +267,7 @@ NAME                ID              SIZE      PROCESSOR    CONTEXT    UNTIL
 llama3.2:1b         baf6a787fdff    1.5 GB    100% CPU     4096       4 minutes from now    
 moondream:latest    55fc3abd3867    1.3 GB    100% CPU     2048       4 minutes from now
 
---- Matériel ---
+--- Materiel ---
 CPU : Intel(R) Core(TM) i7-1065G7 CPU @ 1.30GHz
 GPU : Intel(R) Iris(R) Plus Graphics
         
@@ -278,7 +278,7 @@ set CUDA_VISIBLE_DEVICES=-1 && set OLLAMA_VULKAN=1 && ollama serve
 
 corto@DESKTOP-MOTSL8C C:\Users\corto\dev\git\electronoos\chatola>python test_ollama_perf.py
 
-# Benchmark Ollama — moondream:latest
+# Benchmark Ollama - moondream:latest
 # 5 appels, generate: 'Hello world, comment ca va et toi je suis malade ?.'
 
 #1 | total=0.149s | prompt=0.007s/23 tok | eval=0.114s/18 tok | speed=157.86 tok/s
@@ -287,7 +287,7 @@ corto@DESKTOP-MOTSL8C C:\Users\corto\dev\git\electronoos\chatola>python test_oll
 #4 | total=0.150s | prompt=0.007s/23 tok | eval=0.109s/18 tok | speed=164.64 tok/s
 #5 | total=0.134s | prompt=0.007s/23 tok | eval=0.107s/18 tok | speed=168.88 tok/s
 
---- Résultats ---
+--- Resultats ---
 Total       | min=0.134 | max=0.156 | avg=0.148 s
 Prompt      | min=0.007 | max=0.009 | avg=0.007 s
 Tokens eval | min=18.000 | max=18.000 | avg=18.000
@@ -295,7 +295,7 @@ Eval        | min=0.107 | max=0.114 | avg=0.110 s
 Vitesse     | min=157.86 | max=168.88 | avg=163.69 tok/s
 
 
-# Benchmark Ollama — llama3.2:1B
+# Benchmark Ollama - llama3.2:1B
 # 5 appels, generate: 'Hello world, comment ca va et toi je suis malade ?.'
 
 #1 | total=0.964s | prompt=0.009s/38 tok | eval=0.924s/98 tok | speed=106.09 tok/s
@@ -304,7 +304,7 @@ Vitesse     | min=157.86 | max=168.88 | avg=163.69 tok/s
 #4 | total=0.978s | prompt=0.010s/38 tok | eval=0.934s/98 tok | speed=104.98 tok/s
 #5 | total=0.984s | prompt=0.010s/38 tok | eval=0.942s/98 tok | speed=104.09 tok/s
 
---- Résultats ---
+--- Resultats ---
 Total       | min=0.964 | max=0.984 | avg=0.975 s
 Prompt      | min=0.009 | max=0.010 | avg=0.010 s
 Tokens eval | min=98.000 | max=98.000 | avg=98.000
@@ -312,7 +312,7 @@ Eval        | min=0.923 | max=0.942 | avg=0.932 s
 Vitesse     | min=104.09 | max=106.14 | avg=105.11 tok/s
 
 
-# Benchmark Ollama — mistral-small:22B
+# Benchmark Ollama - mistral-small:22B
 # 5 appels, generate: 'Hello world, comment ca va et toi je suis malade ?.'
 
 #1 | total=8.124s | prompt=0.234s/21 tok | eval=7.859s/35 tok | speed=4.45 tok/s
@@ -321,7 +321,7 @@ Vitesse     | min=104.09 | max=106.14 | avg=105.11 tok/s
 #4 | total=7.984s | prompt=0.232s/21 tok | eval=7.746s/35 tok | speed=4.52 tok/s
 #5 | total=7.997s | prompt=0.233s/21 tok | eval=7.758s/35 tok | speed=4.51 tok/s
 
---- Résultats ---
+--- Resultats ---
 Total       | min=7.984 | max=8.124 | avg=8.029 s
 Prompt      | min=0.231 | max=0.234 | avg=0.232 s
 Tokens eval | min=35.000 | max=35.000 | avg=35.000
@@ -333,16 +333,8 @@ Vitesse     | min=4.45 | max=4.52 | avg=4.50 tok/s
 NAME                 ID              SIZE     PROCESSOR          CONTEXT    UNTIL
 mistral-small:22B    d095cd553b04    13 GB    51%/49% CPU/GPU    4096       4 minutes from now
 
---- Matériel ---
+--- Materiel ---
 CPU : Intel(R) Core(TM) Ultra 7 265KF
 GPU : NVIDIA GeForce GTX 1070
-
-corto@DESKTOP-MOTSL8C C:\Users\corto\dev\git\electronoos\chatola>
-
-
-
-
-
-
 
 """

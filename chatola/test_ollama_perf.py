@@ -270,6 +270,7 @@ def bench_ollama( strModel, strPrompt, nbr_test, addr, port ):
     return avg_total
           
 
+avg_summary = []
 ollama_port = find_ollama_port(OLLAMA_ADDR)
 
 prompt = "Hello world, comment ca va et toi je suis malade ?."

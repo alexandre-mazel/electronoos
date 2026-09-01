@@ -269,7 +269,8 @@
                 console.error("WS ERROR:", event);
                 set_status("Connection error", "disconnected");
             };
-        }
+            
+        } // connect
 
         pad_text.addEventListener("input", function() {
             update_size();
@@ -330,19 +331,20 @@
     //~         const data = await response.json();
 
     //~         window.location.href = "apad.html?" + data.pad_id;
-        }
+        } // onNewPad
     
         update_size();
         connect();
         
-        if(!bPadSpecified )
+        if( !pad_id )
         {
             console.log( "DBG: connect: just asking for a new pad..." )
             onNewPad() // un peu crado...
-            return
         }
-
-        pad_text.focus();
+        else
+        {
+            pad_text.focus();
+        }
         
     </script>
 

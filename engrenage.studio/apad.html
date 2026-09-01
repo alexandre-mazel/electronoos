@@ -180,6 +180,11 @@
 
         pad_code.textContent = pad_id || "----";
         
+        if(!pad_id)
+        {
+            pad_id = "6666"
+        }
+        
         function get_ws_protocol()
         {
             return window.location.protocol === "https:" ? "wss:" : "ws:";
@@ -204,7 +209,8 @@
             
             if( bPadSpecified )
             {
-                if (!pad_id || !/^[A-Z]{4}$/.test(pad_id)) {
+                //if (!pad_id || !/^[A-Z]{4}$/.test(pad_id)) {
+                if (!pad_id || !/^[A-Z0-9]{4}$/.test(pad_id)) {
                     console.log("DBG: invalid pad_id =", pad_id);
                     set_status("Invalid pad", "disconnected");
                     return;
@@ -336,7 +342,7 @@
         update_size();
         connect();
         
-        if( !pad_id )
+        if( !pad_id || pad_id = "6666" )
         {
             console.log( "DBG: connect: just asking for a new pad..." )
             setTimeout(onNewPad, 1200); // un peu crado...

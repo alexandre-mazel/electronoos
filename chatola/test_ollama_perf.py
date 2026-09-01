@@ -1,5 +1,3 @@
-
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import time
@@ -214,9 +212,7 @@ strModel = "mistral-small:22B"
 bench_ollama( strModel, prompt, nbr_test )
 ollama_ps()
 
-
 print_hardware()
-
 
 """
 

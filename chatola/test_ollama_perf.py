@@ -295,7 +295,10 @@ avg_summary.append( ret )
 if ret != -1:
     ollama_ps()
     
-print( "Summary: ", avg_summary )
+print( "Summary: ", end = "" )
+for a in avg_summary:
+    print( "%.4f" % a, end = "" )
+print( "" )
 
 print_hardware()
 

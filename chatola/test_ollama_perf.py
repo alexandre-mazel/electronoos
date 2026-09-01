@@ -204,15 +204,17 @@ nbr_test = 5
 
 strModel = "moondream:latest"
 bench_ollama( strModel, prompt, nbr_test )
+ollama_ps()
 
 strModel = "llama3.2:1B"
 bench_ollama( strModel, prompt, nbr_test )
+ollama_ps()
 
 strModel = "mistral-small:22B"
 bench_ollama( strModel, prompt, nbr_test )
-
-
 ollama_ps()
+
+
 print_hardware()
 
 
@@ -278,29 +280,68 @@ GPU : Intel(R) Iris(R) Plus Graphics
 Ollama a lancer ainsi depuis cmd:
 set CUDA_VISIBLE_DEVICES=-1 && set OLLAMA_VULKAN=1 && ollama serve
 
-Benchmark Ollama — mistral-small:22B
-5 appels, stream=false
+corto@DESKTOP-MOTSL8C C:\Users\corto\dev\git\electronoos\chatola>python test_ollama_perf.py
 
-#1 | total=12.513s | prompt=0.359s/21 tok | eval=12.138s/35 tok | speed=2.88 tok/s
-#2 | total=12.521s | prompt=0.360s/21 tok | eval=12.136s/35 tok | speed=2.88 tok/s
-#3 | total=12.528s | prompt=0.360s/21 tok | eval=12.139s/35 tok | speed=2.88 tok/s
-#4 | total=12.532s | prompt=0.360s/21 tok | eval=12.148s/35 tok | speed=2.88 tok/s
-#5 | total=12.514s | prompt=0.359s/21 tok | eval=12.130s/35 tok | speed=2.89 tok/s
+# Benchmark Ollama — moondream:latest
+# 5 appels, generate: 'Hello world, comment ca va et toi je suis malade ?.'
+
+#1 | total=0.149s | prompt=0.007s/23 tok | eval=0.114s/18 tok | speed=157.86 tok/s
+#2 | total=0.156s | prompt=0.009s/23 tok | eval=0.111s/18 tok | speed=161.80 tok/s
+#3 | total=0.152s | prompt=0.007s/23 tok | eval=0.109s/18 tok | speed=165.29 tok/s
+#4 | total=0.150s | prompt=0.007s/23 tok | eval=0.109s/18 tok | speed=164.64 tok/s
+#5 | total=0.134s | prompt=0.007s/23 tok | eval=0.107s/18 tok | speed=168.88 tok/s
 
 --- Résultats ---
-Total       | min=12.513 | max=12.532 | avg=12.522 s
-Prompt      | min=0.359 | max=0.360 | avg=0.360 s
+Total       | min=0.134 | max=0.156 | avg=0.148 s
+Prompt      | min=0.007 | max=0.009 | avg=0.007 s
+Tokens eval | min=18.000 | max=18.000 | avg=18.000
+Eval        | min=0.107 | max=0.114 | avg=0.110 s
+Vitesse     | min=157.86 | max=168.88 | avg=163.69 tok/s
+
+
+# Benchmark Ollama — llama3.2:1B
+# 5 appels, generate: 'Hello world, comment ca va et toi je suis malade ?.'
+
+#1 | total=0.964s | prompt=0.009s/38 tok | eval=0.924s/98 tok | speed=106.09 tok/s
+#2 | total=0.979s | prompt=0.009s/38 tok | eval=0.940s/98 tok | speed=104.27 tok/s
+#3 | total=0.969s | prompt=0.010s/38 tok | eval=0.923s/98 tok | speed=106.14 tok/s
+#4 | total=0.978s | prompt=0.010s/38 tok | eval=0.934s/98 tok | speed=104.98 tok/s
+#5 | total=0.984s | prompt=0.010s/38 tok | eval=0.942s/98 tok | speed=104.09 tok/s
+
+--- Résultats ---
+Total       | min=0.964 | max=0.984 | avg=0.975 s
+Prompt      | min=0.009 | max=0.010 | avg=0.010 s
+Tokens eval | min=98.000 | max=98.000 | avg=98.000
+Eval        | min=0.923 | max=0.942 | avg=0.932 s
+Vitesse     | min=104.09 | max=106.14 | avg=105.11 tok/s
+
+
+# Benchmark Ollama — mistral-small:22B
+# 5 appels, generate: 'Hello world, comment ca va et toi je suis malade ?.'
+
+#1 | total=8.124s | prompt=0.234s/21 tok | eval=7.859s/35 tok | speed=4.45 tok/s
+#2 | total=8.034s | prompt=0.232s/21 tok | eval=7.769s/35 tok | speed=4.50 tok/s
+#3 | total=8.005s | prompt=0.231s/21 tok | eval=7.746s/35 tok | speed=4.52 tok/s
+#4 | total=7.984s | prompt=0.232s/21 tok | eval=7.746s/35 tok | speed=4.52 tok/s
+#5 | total=7.997s | prompt=0.233s/21 tok | eval=7.758s/35 tok | speed=4.51 tok/s
+
+--- Résultats ---
+Total       | min=7.984 | max=8.124 | avg=8.029 s
+Prompt      | min=0.231 | max=0.234 | avg=0.232 s
 Tokens eval | min=35.000 | max=35.000 | avg=35.000
-Eval        | min=12.130 | max=12.148 | avg=12.138 s
-Vitesse     | min=2.88 | max=2.89 | avg=2.88 tok/s
+Eval        | min=7.746 | max=7.859 | avg=7.776 s
+Vitesse     | min=4.45 | max=4.52 | avg=4.50 tok/s
+
 
 --- Ollama PS ---
-NAME                 ID              SIZE     PROCESSOR          CONTEXT    UNTIL              
+NAME                 ID              SIZE     PROCESSOR          CONTEXT    UNTIL
 mistral-small:22B    d095cd553b04    13 GB    51%/49% CPU/GPU    4096       4 minutes from now
 
 --- Matériel ---
 CPU : Intel(R) Core(TM) Ultra 7 265KF
 GPU : NVIDIA GeForce GTX 1070
+
+corto@DESKTOP-MOTSL8C C:\Users\corto\dev\git\electronoos\chatola>
 
 
 

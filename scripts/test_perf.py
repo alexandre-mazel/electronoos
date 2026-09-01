@@ -1664,8 +1664,36 @@ test_orbcv bis   : ####################   1.31s (76.55fps)
 disk_write    1KB: ####################   erreur: immediat (windows7 caching?)
 
 
+corto
+  C:\dev\git\electronoos\scripts>python test_perf.py
+python version   : 3.13.15 (64bits) (20 core(s))
+cpu              : Intel(R) Core(TM) Ultra 7 265KF
+ram              : 10.57 / 15.63 GB
+test_cpu_int2    : ####################   0.26s
+test_cpu_float2  : ####################   0.03s
+test_crypt       : ####################   3.21s
+test_cpu_ram 2G  : ####################   0.32s
+test_cpu_ram 4G  : ####################   0.59s
+test_cpu_ram 6G  : ####################   0.81s
+test_cpu_ram 8G  : ####################   1.18s
+test_cpu_ram10G  : ####################   1.56s
+test_cpu_ram12G  : ####################   2.87s
+test_cpu_ram14G  : ####################   4.79s
+test_cpu_ram16G  : ####################   4.28s
+test_scipy_xxt   : ####################   0.56s (718.73x)
+test_orb5.0.0    : ####################   0.13s (755.06fps)
+test_orbcv imgs  : ####################   0.58s (172.16fps)
+test_orbcv bis   : ####################   0.30s (331.75fps)
+disk_write    1KB: ####################   4.94s (202.59 Mo/s)
+disk_read     1KB: ####################   2.22s (450.12 Mo/s)
+disk_write 1024KB: ####################   3.40s (294.55 Mo/s)
+disk_read  1024KB: ####################   0.26s (3852.48 Mo/s)
+
+
+
 ###########################################
 ### compilation des meilleurs:
+###########################################
 
 *** Champion1
 python version   : 3.8.10 (64bits) (8 core(s))

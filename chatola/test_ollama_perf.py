@@ -4,8 +4,29 @@ import time
 import requests
 import statistics
 
-OLLAMA_URL = "http://127.0.0.1:11434/"
+OLLAMA_ADDR = "http://127.0.0.1"
 
+def test_ollama_port( addr, port ):
+    import urllib3
+    url = "%s:%s/api/tags" % (addr, port)
+    print( "DBG: test_ollama_port: testing url: '%s'" % url )
+    try:
+        r = requests.get( url )
+        #~ print(r.status_code)
+        data = r.json()
+        #~ print( data )
+        if "models" in data:
+            return True
+    except (ConnectionRefusedError, urllib3.exceptions.NewConnectionError,requests.exceptions.ConnectionError):
+        pass
+    return False
+
+def find_ollama_port(addr):
+    for port in [11434, 11435]:
+        if test_ollama_port( addr,port ):
+            print( "INF: find_ollama_port: find ollama on %s:%s" % (addr,port) )
+            return port
+    return -1
 
 def stats(values):
     return (
@@ -81,10 +102,13 @@ def print_hardware():
         print(f"Erreur lors de la detection du materiel : {e}")
        
 
-def ollama_model_exists(model_name):
+def ollama_model_exists(model_name,addr,port):
+    
+    strOllamaUrl = addr + ":" + str(port) + "/"
+    
     try:
         response = requests.get(
-            f"{OLLAMA_URL}api/tags",
+            f"{strOllamaUrl}api/tags",
             timeout=5
         )
 
@@ -112,7 +136,9 @@ def ollama_model_exists(model_name):
         return False
 
 
-def bench_ollama( strModel, strPrompt, nbr_test = 5 ):
+def bench_ollama( strModel, strPrompt, nbr_test, addr, port ):
+    
+    strOllamaUrl = addr + ":" + str(port) + "/"
 
     durations = []
     eval_durations = []
@@ -123,7 +149,7 @@ def bench_ollama( strModel, strPrompt, nbr_test = 5 ):
 
 
     #~ print( "(preloading...)" )
-    strUrl = f"{OLLAMA_URL}api/generate"
+    strUrl = f"{strOllamaUrl}api/generate"
     dOptions = { "temperature": 0, "seed": 42 }
     dJson = { "model": strModel, "prompt": strPrompt, "stream": False, "options": dOptions}
     response = requests.post( strUrl, json=dJson, timeout=600 )
@@ -132,7 +158,7 @@ def bench_ollama( strModel, strPrompt, nbr_test = 5 ):
     print(f"# Benchmark Ollama - {strModel}")
     print(f"# {nbr_test} appels, generate: '{prompt}'")
     
-    if not ollama_model_exists(strModel):
+    if not ollama_model_exists(strModel,addr, port):
         print( "WRN: This model isn't present:", strModel )
         print("")
         return
@@ -194,22 +220,23 @@ def bench_ollama( strModel, strPrompt, nbr_test = 5 ):
           f"avg={statistics.mean(token_rates):.2f} tok/s")
     print( "" )
           
-          
+
+ollama_port = find_ollama_port(OLLAMA_ADDR)
 
 prompt = "Hello world, comment ca va et toi je suis malade ?."
 nbr_test = 1
 nbr_test = 5
 
 strModel = "moondream:latest"
-bench_ollama( strModel, prompt, nbr_test )
+bench_ollama( strModel, prompt, nbr_test, OLLAMA_ADDR, ollama_port )
 ollama_ps()
 
 strModel = "llama3.2:1B"
-bench_ollama( strModel, prompt, nbr_test )
+bench_ollama( strModel, prompt, nbr_test, OLLAMA_ADDR, ollama_port )
 ollama_ps()
 
 strModel = "mistral-small:22B"
-bench_ollama( strModel, prompt, nbr_test )
+bench_ollama( strModel, prompt, nbr_test, OLLAMA_ADDR, ollama_port )
 ollama_ps()
 
 print_hardware()
@@ -280,6 +307,8 @@ moondream:latest    55fc3abd3867    1.3 GB    100% CPU     2048       4 minutes 
 --- Materiel ---
 CPU : Intel(R) Core(TM) i7-1065G7 CPU @ 1.30GHz
 GPU : Intel(R) Iris(R) Plus Graphics
+
+
 
 *** Ordi Corto:
 

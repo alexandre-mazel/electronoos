@@ -202,17 +202,76 @@ prompt = "Hello world, comment ca va et toi je suis malade ?."
 nbr_test = 1
 nbr_test = 5
 
-strModel = "llama3.2:1b"
-bench_ollama( strModel, prompt, nbr_test )
-strModel = "mistral-small:22b"
 strModel = "moondream:latest"
 bench_ollama( strModel, prompt, nbr_test )
+
+strModel = "llama3.2:1b"
+bench_ollama( strModel, prompt, nbr_test )
+
+strModel = "mistral-small:22b"
+bench_ollama( strModel, prompt, nbr_test )
+
 
 ollama_ps()
 print_hardware()
 
 
 """
+
+*** MS Tab7
+
+# Benchmark Ollama — moondream:latest
+# 5 appels, generate: 'Hello world, comment ca va et toi je suis malade ?.'
+
+#1 | total=0.913s | prompt=0.068s/23 tok | eval=0.798s/18 tok | speed=22.57 tok/s
+#2 | total=0.924s | prompt=0.052s/23 tok | eval=0.847s/18 tok | speed=21.24 tok/s
+#3 | total=0.915s | prompt=0.056s/23 tok | eval=0.827s/18 tok | speed=21.76 tok/s
+#4 | total=0.907s | prompt=0.056s/23 tok | eval=0.831s/18 tok | speed=21.65 tok/s
+#5 | total=0.951s | prompt=0.070s/23 tok | eval=0.859s/18 tok | speed=20.95 tok/s
+
+--- Résultats ---
+Total       | min=0.907 | max=0.951 | avg=0.922 s
+Prompt      | min=0.052 | max=0.070 | avg=0.060 s
+Tokens eval | min=18.000 | max=18.000 | avg=18.000
+Eval        | min=0.798 | max=0.859 | avg=0.832 s
+Vitesse     | min=20.95 | max=22.57 | avg=21.64 tok/s
+
+
+# Benchmark Ollama — llama3.2:1b
+# 5 appels, generate: 'Hello world, comment ca va et toi je suis malade ?.'
+
+#1 | total=5.623s | prompt=0.090s/38 tok | eval=5.501s/75 tok | speed=13.63 tok/s
+#2 | total=6.118s | prompt=0.083s/38 tok | eval=6.004s/75 tok | speed=12.49 tok/s
+#3 | total=5.652s | prompt=0.090s/38 tok | eval=5.534s/75 tok | speed=13.55 tok/s
+#4 | total=5.634s | prompt=0.072s/38 tok | eval=5.535s/75 tok | speed=13.55 tok/s
+#5 | total=5.942s | prompt=0.100s/38 tok | eval=5.811s/75 tok | speed=12.91 tok/s
+
+--- Résultats ---
+Total       | min=5.623 | max=6.118 | avg=5.794 s
+Prompt      | min=0.072 | max=0.100 | avg=0.087 s
+Tokens eval | min=75.000 | max=75.000 | avg=75.000
+Eval        | min=5.501 | max=6.004 | avg=5.677 s
+Vitesse     | min=12.49 | max=13.63 | avg=13.23 tok/s
+d
+
+# Benchmark Ollama — mistral-small:22b
+# 5 appels, generate: 'Hello world, comment ca va et toi je suis malade ?.'
+
+DBG: ollama_model_exists: current existing model:
+    -  llama3.2:1b
+    -  moondream:latest
+
+WRN: This model isn't present: mistral-small:22b
+
+
+--- Ollama PS ---
+NAME                ID              SIZE      PROCESSOR    CONTEXT    UNTIL              
+llama3.2:1b         baf6a787fdff    1.5 GB    100% CPU     4096       4 minutes from now    
+moondream:latest    55fc3abd3867    1.3 GB    100% CPU     2048       4 minutes from now
+
+--- Matériel ---
+CPU : Intel(R) Core(TM) i7-1065G7 CPU @ 1.30GHz
+GPU : Intel(R) Iris(R) Plus Graphics
         
 *** Ordi Corto:
 

@@ -1,12 +1,14 @@
 import asyncio
 import json
 import random
+import re
 import websockets #  sudo pip install websockets --break-system-packages
 
 pads = {}
 pad_clients = {}
 
 def create_new_pad_id():
+    # ici que avec des lettres
     while 1:
         pad_id = ""
         for i in range(4):
@@ -35,7 +37,8 @@ async def handle_client(websocket):
     print( "DBG: handle_client: pad_id: '%s'" % (pad_id) )
 
 
-    if len(pad_id) != 4 or not pad_id.isascii() or not pad_id.isalpha():
+    #~ if len(pad_id) != 4 or not pad_id.isascii() or not pad_id.isalpha(): # check only 4 chars
+    if len(pad_id) != 4 or not re.match(r'^[A-Z0-9]{4}$', pad_id): # check only combinaison de 4 chars ou 4 numbers
         await websocket.close(code=1008, reason="Invalid pad")
         return
 

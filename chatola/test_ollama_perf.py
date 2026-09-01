@@ -57,7 +57,7 @@ def ollama_ps():
     except Exception as e:
         print(f"Impossible d'executer 'ollama ps' : {e}")	
         
-def print_hardware():
+def print_hardware_win():
     import subprocess
 
     print("\n--- Materiel ---")
@@ -100,6 +100,52 @@ def print_hardware():
 
     except Exception as e:
         print(f"Erreur lors de la detection du materiel : {e}")
+        
+def print_hardware_linux():
+    import subprocess
+
+    print("\n--- Materiel ---")
+
+    try:
+        cpu = subprocess.check_output(
+            ["lscpu"],
+            text=True
+        )
+
+        cpu_name = next(
+            (
+                line.split(":", 1)[1].strip()
+                for line in cpu.splitlines()
+                if line.startswith("Model name:")
+            ),
+            "Inconnu"
+        )
+
+        print(f"CPU : {cpu_name}")
+
+        gpu = subprocess.check_output(
+            ["lspci"],
+            text=True
+        )
+
+        for line in gpu.splitlines():
+            if any(x in line for x in (
+                "VGA compatible controller",
+                "3D controller",
+                "Display controller"
+            )):
+                print(f"GPU : {line.split(':', 2)[-1].strip()}")
+
+    except Exception as e:
+        print(f"Erreur lors de la detection du materiel : {e}")
+        
+def print_hardware():
+    import platform
+    bWindows = "windows" in platform.system().lower()
+    if bWindows:
+        return print_hardware_win()
+    return print_hardware_linux()
+
        
 
 def ollama_model_exists(model_name,addr,port):

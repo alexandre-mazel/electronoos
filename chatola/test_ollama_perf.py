@@ -150,7 +150,7 @@ def bench_ollama( strModel, strPrompt, nbr_test, addr, port ):
 
     #~ print( "(preloading...)" )
     strUrl = f"{strOllamaUrl}api/generate"
-    dOptions = { "temperature": 0, "seed": 42 }
+    dOptions = { "temperature": 0, "seed": 42,"num_ctx": 4096 }
     dJson = { "model": strModel, "prompt": strPrompt, "stream": False, "options": dOptions}
     response = requests.post( strUrl, json=dJson, timeout=600 )
     

@@ -228,12 +228,6 @@
                 set_status("Connected", "connected");
             };
             
-            if(!bPadSpecified )
-            {
-                console.log( "DBG: connect: just asking for a new pad..." )
-                onNewPad() // un peu crado...
-                return
-            }
 
             websocket.onmessage = function(event) {
                 console.log("WS MESSAGE RECEIVED:", event.data);
@@ -340,6 +334,14 @@
     
         update_size();
         connect();
+        
+        if(!bPadSpecified )
+        {
+            console.log( "DBG: connect: just asking for a new pad..." )
+            onNewPad() // un peu crado...
+            return
+        }
+
         pad_text.focus();
         
     </script>

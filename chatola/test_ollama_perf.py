@@ -294,7 +294,8 @@ ret = bench_ollama( strModel, prompt, nbr_test, OLLAMA_ADDR, ollama_port )
 avg_summary.append( ret )
 if ret != -1:
     ollama_ps()
-    
+
+print( "" )    
 print( "Summary: ", end = "" )
 for a in avg_summary:
     print( "%.3f, " % a, end = "" )
@@ -309,40 +310,40 @@ print_hardware()
 # Benchmark Ollama - moondream:latest
 # 5 appels, generate: 'Hello world, comment ca va et toi je suis malade ?.'
 
-#1 | total=0.892s | prompt=0.055s/23 tok | eval=0.815s/18 tok | speed=22.08 tok/s
-#2 | total=0.971s | prompt=0.065s/23 tok | eval=0.880s/18 tok | speed=20.45 tok/s
-#3 | total=0.949s | prompt=0.062s/23 tok | eval=0.868s/18 tok | speed=20.74 tok/s
-#4 | total=0.943s | prompt=0.057s/23 tok | eval=0.856s/18 tok | speed=21.03 tok/s
-#5 | total=0.960s | prompt=0.052s/23 tok | eval=0.881s/18 tok | speed=20.43 tok/s
+#1 | total=0.953s | prompt=0.067s/23 tok | eval=0.864s/18 tok | speed=20.82 tok/s
+#2 | total=0.915s | prompt=0.072s/23 tok | eval=0.820s/18 tok | speed=21.95 tok/s
+#3 | total=0.925s | prompt=0.069s/23 tok | eval=0.831s/18 tok | speed=21.65 tok/s
+#4 | total=0.973s | prompt=0.065s/23 tok | eval=0.862s/18 tok | speed=20.88 tok/s
+#5 | total=1.025s | prompt=0.056s/23 tok | eval=0.926s/18 tok | speed=19.43 tok/s
 
 --- Results ---
-Total       | min=0.892 | max=0.971 | avg=0.943 s
-Prompt      | min=0.052 | max=0.065 | avg=0.058 s
+Total       | min=0.915 | max=1.025 | avg=0.958 s
+Prompt      | min=0.056 | max=0.072 | avg=0.066 s
 Tokens eval | min=18.000 | max=18.000 | avg=18.000
-Eval        | min=0.815 | max=0.881 | avg=0.860 s
-Vitesse     | min=20.43 | max=22.08 | avg=20.94 tok/s
+Eval        | min=0.820 | max=0.926 | avg=0.861 s
+Vitesse     | min=19.43 | max=21.95 | avg=20.95 tok/s
 
 
 --- Ollama PS ---
 NAME                ID              SIZE      PROCESSOR    CONTEXT    UNTIL              
 moondream:latest    55fc3abd3867    1.3 GB    100% CPU     2048       4 minutes from now    
-llama3.2:1b         baf6a787fdff    1.5 GB    100% CPU     4096       4 minutes from now
+llama3.2:1b         baf6a787fdff    1.5 GB    100% CPU     4096       2 minutes from now
 
 # Benchmark Ollama - llama3.2:1B
 # 5 appels, generate: 'Hello world, comment ca va et toi je suis malade ?.'
 
-#1 | total=5.644s | prompt=0.072s/38 tok | eval=5.543s/75 tok | speed=13.53 tok/s
-#2 | total=5.707s | prompt=0.091s/38 tok | eval=5.579s/75 tok | speed=13.44 tok/s
-#3 | total=5.745s | prompt=0.084s/38 tok | eval=5.631s/75 tok | speed=13.32 tok/s
-#4 | total=5.678s | prompt=0.073s/38 tok | eval=5.576s/75 tok | speed=13.45 tok/s
-#5 | total=5.668s | prompt=0.083s/38 tok | eval=5.554s/75 tok | speed=13.50 tok/s
+#1 | total=5.741s | prompt=0.098s/38 tok | eval=5.586s/75 tok | speed=13.43 tok/s
+#2 | total=6.289s | prompt=0.120s/38 tok | eval=6.130s/75 tok | speed=12.24 tok/s
+#3 | total=6.419s | prompt=0.116s/38 tok | eval=6.262s/75 tok | speed=11.98 tok/s
+#4 | total=6.091s | prompt=0.101s/38 tok | eval=5.954s/75 tok | speed=12.60 tok/s
+#5 | total=6.251s | prompt=0.128s/38 tok | eval=6.088s/75 tok | speed=12.32 tok/s
 
 --- Results ---
-Total       | min=5.644 | max=5.745 | avg=5.688 s
-Prompt      | min=0.072 | max=0.091 | avg=0.081 s
+Total       | min=5.741 | max=6.419 | avg=6.158 s
+Prompt      | min=0.098 | max=0.128 | avg=0.113 s
 Tokens eval | min=75.000 | max=75.000 | avg=75.000
-Eval        | min=5.543 | max=5.631 | avg=5.577 s
-Vitesse     | min=13.32 | max=13.53 | avg=13.45 tok/s
+Eval        | min=5.586 | max=6.262 | avg=6.004 s
+Vitesse     | min=11.98 | max=13.43 | avg=12.51 tok/s
 
 
 --- Ollama PS ---
@@ -359,15 +360,14 @@ DBG: ollama_model_exists: current existing model:
 
 WRN: This model isn't present: mistral-small:22B
 
-
---- Ollama PS ---
-NAME                ID              SIZE      PROCESSOR    CONTEXT    UNTIL              
-llama3.2:1b         baf6a787fdff    1.5 GB    100% CPU     4096       4 minutes from now    
-moondream:latest    55fc3abd3867    1.3 GB    100% CPU     2048       4 minutes from now
+Summary: 0.958, 6.158, -1.000, 
 
 --- Materiel ---
 CPU : Intel(R) Core(TM) i7-1065G7 CPU @ 1.30GHz
 GPU : Intel(R) Iris(R) Plus Graphics
+
+
+
 
 
 
@@ -441,27 +441,32 @@ Vitesse     | min=4.62 | max=4.76 | avg=4.73 tok/s
 NAME                 ID              SIZE     PROCESSOR          CONTEXT    UNTIL
 mistral-small:22B    d095cd553b04    13 GB    51%/49% CPU/GPU    4096       4 minutes from now
 
+Summary: 0.136, 0.964, 7.632,
+
 --- Materiel ---
 CPU : Intel(R) Core(TM) Ultra 7 265KF
 GPU : NVIDIA GeForce GTX 1070
+
+
+
 
 *** Champion1:
 
 # Benchmark Ollama - moondream:latest
 # 5 appels, generate: 'Hello world, comment ca va et toi je suis malade ?.'
 
-#1 | total=0.090s | prompt=0.002s/23 tok | eval=0.040s/22 tok | speed=549.14 tok/s
-#2 | total=0.089s | prompt=0.002s/23 tok | eval=0.040s/22 tok | speed=548.88 tok/s
-#3 | total=0.092s | prompt=0.002s/23 tok | eval=0.040s/22 tok | speed=548.08 tok/s
-#4 | total=0.094s | prompt=0.002s/23 tok | eval=0.040s/22 tok | speed=548.97 tok/s
-#5 | total=0.089s | prompt=0.002s/23 tok | eval=0.040s/22 tok | speed=550.48 tok/s
+#1 | total=0.093s | prompt=0.002s/23 tok | eval=0.041s/22 tok | speed=542.26 tok/s
+#2 | total=0.091s | prompt=0.002s/23 tok | eval=0.042s/22 tok | speed=521.34 tok/s
+#3 | total=0.092s | prompt=0.002s/23 tok | eval=0.042s/22 tok | speed=521.82 tok/s
+#4 | total=0.088s | prompt=0.002s/23 tok | eval=0.040s/22 tok | speed=546.83 tok/s
+#5 | total=0.095s | prompt=0.002s/23 tok | eval=0.040s/22 tok | speed=546.93 tok/s
 
 --- Results ---
-Total       | min=0.089 | max=0.094 | avg=0.091 s
+Total       | min=0.088 | max=0.095 | avg=0.092 s
 Prompt      | min=0.002 | max=0.002 | avg=0.002 s
 Tokens eval | min=22.000 | max=22.000 | avg=22.000
-Eval        | min=0.040 | max=0.040 | avg=0.040 s
-Vitesse     | min=548.08 | max=550.48 | avg=549.11 tok/s
+Eval        | min=0.040 | max=0.042 | avg=0.041 s
+Vitesse     | min=521.34 | max=546.93 | avg=535.84 tok/s
 
 
 --- Ollama PS ---
@@ -471,18 +476,18 @@ moondream:latest    55fc3abd3867    1.3 GB    100% GPU     2048       4 minutes 
 # Benchmark Ollama - llama3.2:1B
 # 5 appels, generate: 'Hello world, comment ca va et toi je suis malade ?.'
 
-#1 | total=0.682s | prompt=0.003s/38 tok | eval=0.359s/147 tok | speed=409.12 tok/s
-#2 | total=0.680s | prompt=0.003s/38 tok | eval=0.359s/147 tok | speed=409.10 tok/s
-#3 | total=0.678s | prompt=0.003s/38 tok | eval=0.360s/147 tok | speed=408.38 tok/s
-#4 | total=0.678s | prompt=0.003s/38 tok | eval=0.360s/147 tok | speed=408.39 tok/s
-#5 | total=0.679s | prompt=0.003s/38 tok | eval=0.360s/147 tok | speed=408.38 tok/s
+#1 | total=0.687s | prompt=0.003s/38 tok | eval=0.360s/147 tok | speed=408.32 tok/s
+#2 | total=0.682s | prompt=0.003s/38 tok | eval=0.360s/147 tok | speed=408.42 tok/s
+#3 | total=0.679s | prompt=0.003s/38 tok | eval=0.360s/147 tok | speed=408.28 tok/s
+#4 | total=0.680s | prompt=0.003s/38 tok | eval=0.360s/147 tok | speed=408.40 tok/s
+#5 | total=0.680s | prompt=0.003s/38 tok | eval=0.360s/147 tok | speed=408.48 tok/s
 
 --- Results ---
-Total       | min=0.678 | max=0.682 | avg=0.679 s
+Total       | min=0.679 | max=0.687 | avg=0.682 s
 Prompt      | min=0.003 | max=0.003 | avg=0.003 s
 Tokens eval | min=147.000 | max=147.000 | avg=147.000
-Eval        | min=0.359 | max=0.360 | avg=0.360 s
-Vitesse     | min=408.38 | max=409.12 | avg=408.67 tok/s
+Eval        | min=0.360 | max=0.360 | avg=0.360 s
+Vitesse     | min=408.28 | max=408.48 | avg=408.38 tok/s
 
 
 --- Ollama PS ---
@@ -493,29 +498,38 @@ moondream:latest    55fc3abd3867    1.3 GB    100% GPU     2048       4 minutes 
 # Benchmark Ollama - mistral-small:22B
 # 5 appels, generate: 'Hello world, comment ca va et toi je suis malade ?.'
 
-#1 | total=6.034s | prompt=0.164s/21 tok | eval=5.816s/35 tok | speed=6.02 tok/s
-#2 | total=6.176s | prompt=0.191s/21 tok | eval=5.897s/35 tok | speed=5.94 tok/s
-#3 | total=6.010s | prompt=0.163s/21 tok | eval=5.805s/35 tok | speed=6.03 tok/s
-#4 | total=15.321s | prompt=0.163s/21 tok | eval=15.118s/35 tok | speed=2.32 tok/s
-#5 | total=6.111s | prompt=0.163s/21 tok | eval=5.910s/35 tok | speed=5.92 tok/s
+#1 | total=6.057s | prompt=0.172s/21 tok | eval=5.830s/35 tok | speed=6.00 tok/s
+#2 | total=6.132s | prompt=0.163s/21 tok | eval=5.935s/35 tok | speed=5.90 tok/s
+#3 | total=6.044s | prompt=0.163s/21 tok | eval=5.843s/35 tok | speed=5.99 tok/s
+#4 | total=5.929s | prompt=0.163s/21 tok | eval=5.722s/35 tok | speed=6.12 tok/s
+#5 | total=5.972s | prompt=0.163s/21 tok | eval=5.775s/35 tok | speed=6.06 tok/s
 
 --- Results ---
-Total       | min=6.010 | max=15.321 | avg=7.930 s
-Prompt      | min=0.163 | max=0.191 | avg=0.169 s
+Total       | min=5.929 | max=6.132 | avg=6.027 s
+Prompt      | min=0.163 | max=0.172 | avg=0.165 s
 Tokens eval | min=35.000 | max=35.000 | avg=35.000
-Eval        | min=5.805 | max=15.118 | avg=7.709 s
-Vitesse     | min=2.32 | max=6.03 | avg=5.24 tok/s
+Eval        | min=5.722 | max=5.935 | avg=5.821 s
+Vitesse     | min=5.90 | max=6.12 | avg=6.01 tok/s
 
 
 --- Ollama PS ---
 NAME                 ID              SIZE     PROCESSOR          CONTEXT    UNTIL
 mistral-small:22B    d095cd553b04    13 GB    32%/68% CPU/GPU    4096       4 minutes from now
 
+Summary: 0.092, 0.682, 6.027,
+
 --- Materiel ---
 CPU : Intel(R) Core(TM) i7-9700K CPU @ 3.60GHz
 GPU : Intel Corporation CoffeeLake-S GT2 [UHD Graphics 630] (rev 02)
 GPU : NVIDIA Corporation GA102 [GeForce RTX 3080 Lite Hash Rate] (rev a1)
 
+
+
+####################################################
+Total summary:
+MS Tab7:        0.958, 6.158, -1.000
+Corto:            0.136, 0.964, 7.632
+Champion1:    0.092, 0.682, 6.027,
 
 
 """

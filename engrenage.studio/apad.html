@@ -299,29 +299,31 @@
             }
         });
         
-        document.getElementById("new_pad_button").addEventListener("click", async function() {
-        console.log( "DBG: Asking for a new pad..." )
-        
-        if (!websocket || websocket.readyState !== WebSocket.OPEN) {
-            console.warn( "ERR: Impossible: not connected !" )
-            return;
+        document.getElementById("new_pad_button").addEventListener("click", onNewPad() );
+
+        async function onNewPad() 
+        {
+            console.log( "DBG: Asking for a new pad..." )
+            
+            if (!websocket || websocket.readyState !== WebSocket.OPEN) {
+                console.warn( "ERR: Impossible: not connected !" )
+                return;
+            }
+
+            websocket.send(JSON.stringify({
+                type: "new_pad"
+            }));
+
+    //~         if (!response.ok) {
+    //~             console.warn("Unable to create a new pad");
+    //~             return;
+    //~         }
+
+    //~         const data = await response.json();
+
+    //~         window.location.href = "apad.html?" + data.pad_id;
         }
-
-        websocket.send(JSON.stringify({
-            type: "new_pad"
-        }));
-
-//~         if (!response.ok) {
-//~             console.warn("Unable to create a new pad");
-//~             return;
-//~         }
-
-//~         const data = await response.json();
-
-//~         window.location.href = "apad.html?" + data.pad_id;
-    });
-
-
+    
         update_size();
         connect();
         pad_text.focus();

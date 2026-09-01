@@ -279,19 +279,19 @@ nbr_test = 5
 
 strModel = "moondream:latest"
 ret = bench_ollama( strModel, prompt, nbr_test, OLLAMA_ADDR, ollama_port )
-avg_summary.push( ret )
+avg_summary.append( ret )
 if ret != -1:
     ollama_ps()
 
 strModel = "llama3.2:1B"
 ret = bench_ollama( strModel, prompt, nbr_test, OLLAMA_ADDR, ollama_port )
-avg_summary.push( ret )
+avg_summary.append( ret )
 if ret != -1:
     ollama_ps()
 
 strModel = "mistral-small:22B"
 ret = bench_ollama( strModel, prompt, nbr_test, OLLAMA_ADDR, ollama_port )
-avg_summary.push( ret )
+avg_summary.append( ret )
 if ret != -1:
     ollama_ps()
     

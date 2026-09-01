@@ -97,7 +97,7 @@ def ollama_model_exists(model_name):
         models = data.get("models", [])
 
         ret = any(
-            model.get("name") == model_name
+            model.get("name").upper() == model_name.upper()
             for model in models
         )
         
@@ -205,10 +205,10 @@ nbr_test = 5
 strModel = "moondream:latest"
 bench_ollama( strModel, prompt, nbr_test )
 
-strModel = "llama3.2:1b"
+strModel = "llama3.2:1B"
 bench_ollama( strModel, prompt, nbr_test )
 
-strModel = "mistral-small:22b"
+strModel = "mistral-small:22B"
 bench_ollama( strModel, prompt, nbr_test )
 
 
@@ -274,6 +274,9 @@ CPU : Intel(R) Core(TM) i7-1065G7 CPU @ 1.30GHz
 GPU : Intel(R) Iris(R) Plus Graphics
         
 *** Ordi Corto:
+
+Ollama a lancer ainsi depuis cmd:
+set CUDA_VISIBLE_DEVICES=-1 && set OLLAMA_VULKAN=1 && ollama serve
 
 Benchmark Ollama — mistral-small:22B
 5 appels, stream=false

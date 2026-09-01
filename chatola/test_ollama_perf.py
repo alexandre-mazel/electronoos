@@ -297,7 +297,7 @@ if ret != -1:
     
 print( "Summary: ", end = "" )
 for a in avg_summary:
-    print( "%.4f" % a, end = "" )
+    print( "%.3f, " % a, end = "" )
 print( "" )
 
 print_hardware()

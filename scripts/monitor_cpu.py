@@ -146,9 +146,11 @@ if __name__ == "__main__":
     print( "this pid:", psutil.Process().pid )
 
     while 1:
-        print(f"CPU : {get_cpu_total_usage():.1f}%")
+        print(f"{get_cpu_total_usage():6.1f}%  Global Load") # charge moyenne du cpu
 
         res = compute_top_cpu_processes() # takes around 5 sec and 33% of my cpu !
         print_results( res )
         print("")
+        
+        #~ print(f"{get_cpu_total_usage():6.1f}%  Global Load")
         time.sleep(3.)

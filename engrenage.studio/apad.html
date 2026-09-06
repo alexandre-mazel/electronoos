@@ -275,7 +275,7 @@
                     pad_text.value = message.content || "";
                     suppress_change = false;
                     update_size();
-                    set_status("Connected - " + getCurrentTimeStamp(), "connected");
+                    set_status("Connected - last updated by other: " + getCurrentTimeStamp(), "connected");
                 }
             };
 
@@ -312,6 +312,9 @@
                 type: "content",
                 content: pad_text.value
             }));
+            
+            set_status("Connected - last updated by you on " + getCurrentTimeStamp(), "connected");
+            
         });
 
         pad_text.addEventListener("keydown", function(event) {

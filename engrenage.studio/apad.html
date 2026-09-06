@@ -157,6 +157,24 @@
 
     <script>
     
+    function getCurrentTimeStamp() {
+      const now = new Date();
+
+      const months = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"
+      ];
+
+      const dd = String(now.getDate()).padStart(2, "0");
+      const month = months[now.getMonth()];
+      const yyyy = now.getFullYear();
+      const hh = String(now.getHours()).padStart(2, "0");
+      const mm = String(now.getMinutes()).padStart(2, "0");
+
+      return `${dd} ${month} ${yyyy} at ${hh}:${mm}`;
+    }
+
+    
         console.log("DBG: script started");
     
         const pad_text = document.getElementById("pad_text");
@@ -257,6 +275,7 @@
                     pad_text.value = message.content || "";
                     suppress_change = false;
                     update_size();
+                    set_status("Connected - " + getCurrentTimeStamp(), "connected");
                 }
             };
 

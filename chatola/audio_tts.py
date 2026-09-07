@@ -49,7 +49,7 @@ class AudioSynthesiser:
         )
 
         if USE_CHATTERBOX:
-            audio = self.model.generate( text, language_id = "fr" )
+            audio = self.model.generate( text, language_id = "fr", audio_prompt_path = "datas/voice_fr_ref.wav" )
 
             torchaudio.save(
                 filename,

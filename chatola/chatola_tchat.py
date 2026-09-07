@@ -28,6 +28,7 @@ Gemma 3 4B - très bon modèle généraliste, particulièrement agréable pour l
 Qwen2.5 3B - si tu veux rester très léger ; souvent une amélioration par rapport à Llama 3.2 3B.
 
 TODO: voir dans notre rag la taille moyenne de nos input et baisser la taille du contexte de l'embedding.
+Dans ma base, j'ai 37 de max token, la fable du loup et du chien en fait 552. On est large avec 2k.
 
 """
 
@@ -37,8 +38,9 @@ import http_chat
 
 
 strModel = "gemma3:270m" # un rapide pour tester
-strModel = "llama3.2"
-#~ strModel = "qwen3:4B"
+strModel = "llama3.2" # rapide, pas de merdouillette
+#~ strModel = "qwen3:4B" # trop long
+#~ strModel = "gemma3:4B" # pas trop long mais des merdouilette
 
 class TchatUser:    
     def __init__( self, user_id, firstname = "", name = "" ):

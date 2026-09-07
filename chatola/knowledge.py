@@ -12,7 +12,7 @@ class Knowledge:
         self.details = {} # an info => txt: a long texte about the infos. (info is seen as a summary of infos)
         self.vects = [] # embedding related to each informations
         self.model = "nomic-embed-text" # resultat bof, mais rapide (565MB) (rapide: 13s for 106 sentence)
-        self.model = "qwen3-embedding" # (7GB for 8K context) (plus long: 144s for 106 sentence)
+        self.model = "qwen3-embedding" # (7GB for 8K context) (plus long: 144s for 106 sentence) # pour info dans ma base, le max token que j'ai en connaissance (je l'affiche dans pure_http_embedding_httpclient) c'est: 37
         self.host = "localhost"
         self.port = 11435
         

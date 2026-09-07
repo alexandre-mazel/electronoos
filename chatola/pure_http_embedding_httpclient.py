@@ -17,9 +17,9 @@ def get_embedding(text, model="nomic-embed-text", host=DEFAULT_HOST, port=DEFAUL
     payload = json.dumps({
         "model": model,
         "prompt": text,
-        "truncate": False, # si le texte dépasse il est coupé, avec True ca genererait une erreur
+        "truncate": False, # si le texte depasse il est coupe, avec True ca genererait une erreur
             "options": {
-            "num_ctx": 2048
+            "num_ctx": 1024
         }
     })
 

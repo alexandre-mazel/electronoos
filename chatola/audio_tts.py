@@ -2,12 +2,19 @@ import os
 import time
 import wave
 
+"""
+a lancer depuis le venv-tts dans champion/chatola (utilise un autre python3.11)
+"""
+
 USE_CHATTERBOX = True # 3.5G VRAM
 #~ USE_CHATTERBOX = False
 
 OUTPUT_DIR = os.path.expanduser( "~/recordings/tts" )
 
 if USE_CHATTERBOX:
+    # pour eviter qu'il essaye de recharger a chaque fois (mais si il manque un modele un jour, il faudra commenter cette ligne temporairement bien sur)
+    os.environ["HF_HUB_OFFLINE"] = "1"
+    
     import torchaudio
     from chatterbox.tts import ChatterboxTTS # pip install chatterbox-tts
     
@@ -17,7 +24,10 @@ if USE_CHATTERBOX:
 else:
     import soundfile as sf
     from kokoro_onnx import Kokoro # pip install kokoro-onnx soundfile
-    # a copier a cote: kokoro-v1.0.onnx, voices-v1.0.bin
+    # a copier dans data: kokoro-v1.0.onnx, voices-v1.0.bin
+    # wget https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.onnx
+    # wget https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin
+
 
 
 
@@ -26,15 +36,20 @@ class AudioSynthesiser:
         os.makedirs( OUTPUT_DIR, exist_ok = True )
 
         if USE_CHATTERBOX:
+            print( "INF: AudioSynthesiser: loading Chatterbox model..." )
             #~ self.model = ChatterboxTTS.from_pretrained(
             self.model = ChatterboxMultilingualTTS.from_pretrained( # pour du fr
                 device = "cuda"
                 #~ device = "cpu"
             )
+            
+            self.model.prepare_conditionals("datas/voice_fr_ref.wav") # pour du francais il faut lui faire un modele de francais pour qu'il copie la voix # ici chargé une seule fois
+            
         else:
             self.model = Kokoro(
-                "kokoro-v1.0.onnx",
-                "voices-v1.0.bin"
+                "datas/kokoro-v1.0.onnx",
+                #~ "datas/kokoro-v1.0.int8.onnx", # moins de ram, mais etonnament plus lent...
+                "datas/voices-v1.0.bin"
             )
 
     def synthesise( self, text ):
@@ -49,7 +64,9 @@ class AudioSynthesiser:
         )
 
         if USE_CHATTERBOX:
-            audio = self.model.generate( text, language_id = "fr" )
+            audio = self.model.generate( text, language_id = "fr", 
+                # audio_prompt_path = "datas/voice_fr_ref.wav"  # ne pas le passer a chaque coup, pour gagner du temps...
+            )
 
             torchaudio.save(
                 filename,
@@ -87,11 +104,12 @@ def autotest():
         "entièrement localement sur votre ordinateur."
     )
 
-    time_begin = time.time()
-    filename = synthesiser.synthesise( text )
+    for i in range(2):
+        time_begin = time.time()
+        filename = synthesiser.synthesise( text )
 
-    print( "audio:", filename )
-    print( "duration: %.2fs" % (time.time() - time_begin) ) # cuda sur champion1: 4.7s, cpu sur champion1: 36s
+        print( "audio:", filename )
+        print( "duration: %.2fs" % (time.time() - time_begin) ) # pour un son de 6 sec: chatterbox: cuda sur champion1: 4.7s (3.78 si on charge le modele de voix fr une seule fois avant), cpu sur champion1: 36s, kokoro: 1.60s, kokoro int8: 7.22s ?
 
 
 if __name__ == "__main__":

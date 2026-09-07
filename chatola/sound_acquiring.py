@@ -17,6 +17,30 @@ SAMPLE_RATE = 16000
 CHANNELS = 1
 CHUNK_SIZE = 1024
 
+def send_audio(filename):
+    import http.client
+
+    with open( filename, "rb" ) as f:
+        audio_data = f.read()
+
+    conn = http.client.HTTPSConnection(
+        "https://engrenage.studio",
+        45001
+    )
+
+    conn.request(
+        "POST",
+        "/voice",
+        body = audio_data,
+        headers = {
+            "Content-Type": "audio/wav"
+        }
+    )
+
+    response = conn.getresponse()
+
+print( response.read().decode( "utf-8" ) )
+
 
 def main():
     analyser = AudioAnalyser(

@@ -26,6 +26,9 @@ import traceback
 
 app = Flask(__name__)
 
+import test_whisper
+whisp = test_whisper.Whisper()
+
 @app.route("/data", methods=["POST"])
 def receive():
     data = request.json
@@ -45,6 +48,63 @@ def receivetchat():
         debug_msg += "ERR: " + str(err) + "\nstack: " + traceback.format_exc()
     duration = time.time() - timeBegin
     return {"status": "ok", "ans": ret, "debug": debug_msg, "duration": duration}
+    
+    
+@app.route( "/voice", methods = ["POST"] )
+def receive_voice():
+    timeBegin = time.time()
+
+    try:
+        audio_data = request.get_data()
+
+        if not audio_data:
+            return {
+                "status": "error",
+                "ans": "",
+                "debug": "No audio data"
+            }, 400
+
+        filename = "/tmp/voice_%d.wav" % int( time.time() * 1000 )
+
+        with open( filename, "wb" ) as f:
+            f.write( audio_data )
+
+        print(
+            "INF: Voice: received %.2f KB"
+            % ( len( audio_data ) / 1024 )
+        )
+
+        text = whisp.analyse( filename )
+
+        #~ os.unlink( filename )
+
+        duration = time.time() - timeBegin
+
+        print( "INF: Voice: text:", text )
+        print( "INF: Voice: duration: %.2fs" % duration )
+
+        return {
+            "status": "ok",
+            "ans": text,
+            "duration": duration
+        }
+
+    except BaseException as err:
+        debug_msg = (
+            "ERR: " +
+            str( err ) +
+            "\nstack: " +
+            traceback.format_exc()
+        )
+
+        print( debug_msg )
+
+        return {
+            "status": "error",
+            "ans": "",
+            "debug": debug_msg,
+            "duration": time.time() - timeBegin
+        }, 500
 
 certname = "azure."
 

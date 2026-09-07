@@ -30,6 +30,13 @@ Qwen2.5 3B - si tu veux rester très léger ; souvent une amélioration par rapp
 TODO: voir dans notre rag la taille moyenne de nos input et baisser la taille du contexte de l'embedding.
 Dans ma base, j'ai 37 de max token, la fable du loup et du chien en fait 552. On est large avec 2k.
 
+Au final:
+
+NAME                      ID              SIZE      PROCESSOR    CONTEXT
+llama3.2:latest           a80c4f17acd5    3.4 GB    100% GPU     8192
+qwen3-embedding:latest    64b933495768    5.7 GB    100% GPU     2048
+=> 8.1 GB VRAM
+
 """
 
 import knowledge

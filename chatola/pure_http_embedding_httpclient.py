@@ -13,7 +13,10 @@ def get_embedding(text, model="nomic-embed-text", host=DEFAULT_HOST, port=DEFAUL
 
     payload = json.dumps({
         "model": model,
-        "prompt": text
+        "prompt": text,
+            "options": {
+            "num_ctx": 4096
+        }
     })
 
     headers = {

@@ -1,1 +1,1 @@
-scite chatola_tchat.py chatola_serveur.py chatola_client.py http_chat.py knowledge.py pure_http_embedding_httpclient.py
+scite chatola_tchat.py chatola_serveur.py chatola_client.py http_chat.py knowledge.py pure_http_embedding_httpclient.py & 

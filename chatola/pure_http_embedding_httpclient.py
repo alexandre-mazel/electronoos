@@ -25,7 +25,7 @@ def get_embedding(text, model="nomic-embed-text", host=DEFAULT_HOST, port=DEFAUL
     time_begin = time.time()
     response = conn.getresponse()
     data = response.read()
-    print( "DBG: get_embedding: duration: %.2fs" % (time.time()-time_begin))
+    print( "DBG: get_embedding('%s'): duration: %.2fs" % (model,time.time()-time_begin))
 
     if response.status != 200:
         raise Exception(f"HTTP error {response.status}: {data.decode()}")

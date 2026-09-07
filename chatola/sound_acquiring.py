@@ -12,57 +12,62 @@ import sounddevice as sd
 
 from audio_analyser import AudioAnalyser
 
+import json
+
 
 SAMPLE_RATE = 16000
 CHANNELS = 1
 CHUNK_SIZE = 1024
 
-def send_audio(filename):
+def send_audio(filename, user_id="tester_audio"):
     import http.client
 
     with open( filename, "rb" ) as f:
         audio_data = f.read()
 
-    conn = http.client.HTTPSConnection(
-        "https://engrenage.studio",
-        45001
-    )
+    conn = http.client.HTTPSConnection( "engrenage.studio", 45001 )
 
     conn.request(
         "POST",
         "/voice",
         body = audio_data,
         headers = {
-            "Content-Type": "audio/wav"
+            "Content-Type": "audio/wav",
+            "X-User-Id": user_id
         }
     )
 
     response = conn.getresponse()
 
-print( response.read().decode( "utf-8" ) )
+    #~ print( response.read().decode( "utf-8" ) )
+    
+    data = response.read()
+    data = json.loads( data.decode( "utf-8" ) )
+
+    print( data )
+    print( data["ans"] )
+
 
 
 def main():
-    analyser = AudioAnalyser(
-        sample_rate = SAMPLE_RATE,
-        channels = CHANNELS,
-        sample_width = 2
-    )
+    print( "INF: Main: Starting acquiring..." )
+    
+    analyser = AudioAnalyser( sample_rate = SAMPLE_RATE, channels = CHANNELS, sample_width = 2 )
 
     def audio_callback( indata, frames, time_info, status ):
+
         if status:
             print( status )
 
         audio_data = indata.copy().tobytes()
 
-        filename = analyser.receive_audio_buffer(
-            audio_data
-        )
+        filename = analyser.receive_audio_buffer( audio_data )
 
         if filename:
-            print( "Speech:", filename )
+            print( "Speech saved to:", filename )
+            send_audio( filename )
 
-    print( "Starting microphone..." )
+    print( "Main: Starting microphone..." )
 
     with sd.InputStream(
         samplerate = SAMPLE_RATE,

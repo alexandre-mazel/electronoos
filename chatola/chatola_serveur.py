@@ -1,3 +1,9 @@
+
+"""
+Ne pas oublier de lancer ollama avec les bonnes options:
+(export OLLAMA_HOST=0.0.0.0:11435 && export OLLAMA_NO_CLOUD=1 && export OLLAMA_CONTEXT_LENGTH=8192 && ollama serve)
+"""
+
 from flask import Flask, request # sudo apt install python3-flask
 import time
 

@@ -50,7 +50,7 @@ def index(req):
         </div>
         <div  class='divelem'>
             <img class=imgelem src="/almatools/illus_agent.png"><br>
-            <div class=txtelem>Agent virtuel, Jeu vid&eacute;o et<br>Intelligence Artificielle</div>
+            <div class=txtelem>Agent virtuel, Jeu vid&eacute;o et<br>Intelligence Artificielle frugale</div>
         </div>
         <div class='divelem'>
             <img class=imgelem src="/almatools/illus_web.png"><br>

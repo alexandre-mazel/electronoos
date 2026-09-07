@@ -5,7 +5,6 @@ Ne pas oublier de lancer ollama avec les bonnes options:
 
 Pour voir les ps:
 OLLAMA_HOST=127.0.0.1:11435 ollama ps
-OLLAMA_HOST=127.0.0.1:11435 watch -n 0.5 nvidia-smi
 """
 
 from flask import Flask, request # sudo apt install python3-flask
@@ -97,6 +96,10 @@ def receive_voice():
         duration = time.time() - timeBegin
 
         print( "INF: receive_voice: total duration: %.2fs" % duration )
+        
+        if 0:
+                output_filename = tts_generate_sound(ret) # todo test me !
+                return flask.send_file( output_filename, mimetype = "audio/wav", as_attachment = False )
 
         return {
             "status": "ok",

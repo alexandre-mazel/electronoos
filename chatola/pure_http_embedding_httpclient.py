@@ -33,6 +33,7 @@ def get_embedding(text, model="nomic-embed-text", host=DEFAULT_HOST, port=DEFAUL
     if response.status != 200:
         raise Exception(f"HTTP error {response.status}: {data.decode()}")
 
+    print(result)
     result = json.loads(data)
     return result["embedding"]
 

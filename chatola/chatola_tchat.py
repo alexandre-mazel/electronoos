@@ -27,7 +27,7 @@ Qwen3 4B - probablement mon premier choix. Meilleur en raisonnement et général
 Gemma 3 4B - très bon modèle généraliste, particulièrement agréable pour les conversations et le français.
 Qwen2.5 3B - si tu veux rester très léger ; souvent une amélioration par rapport à Llama 3.2 3B.
 
-TODO: voir dans notre rag la taille moyenne de nos input et baisser la taille du contexte de l'enbedding.
+TODO: voir dans notre rag la taille moyenne de nos input et baisser la taille du contexte de l'embedding.
 
 """
 

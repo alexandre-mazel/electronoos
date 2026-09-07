@@ -12,7 +12,7 @@ class AudioAnalyser:
         sample_rate = 16000,
         channels = 1,
         sample_width = 2,
-        vad_threshold = 700,
+        vad_threshold = 300, # 700
         silence_duration = 0.8,
         min_speech_duration = 0.3
     ):
@@ -43,10 +43,9 @@ class AudioAnalyser:
             self.sample_width
         )
 
-        level = audioop.rms(
-            audio_data,
-            self.sample_width
-        )
+        level = audioop.rms( audio_data, self.sample_width )
+        
+        print( "DBG: receive_audio_buffer: rms level: ", level )
 
         if level >= self.vad_threshold:
             if not self.speech_active:

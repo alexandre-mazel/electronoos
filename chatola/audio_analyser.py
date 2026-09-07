@@ -120,9 +120,7 @@ def loop_audio():
     while True:
         audio_chunk = microphone.read()
 
-        filename = audio_analyser.receive_audio_buffer(
-            audio_chunk
-        )
+        filename = audio_analyser.receive_audio_buffer( audio_chunk )
 
         if filename:
             print( "speech detected:", filename )

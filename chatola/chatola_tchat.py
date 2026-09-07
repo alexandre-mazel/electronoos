@@ -14,6 +14,12 @@ llama3.2:latest           a80c4f17acd5    3.4 GB    100% GPU     8192
 qwen3-embedding:latest    64b933495768    6.2 GB    100% GPU     4096
 
 On arrive a du 145ms pour l'embedding puis du 2.5s pour le tchat. c'est mieux !
+On pourrait reduire l'embedding et muscler plus le chat.
+Par exemple en prenant nomic-embed-text ou bge-m3? ou snowflake-arctic-embed? TODO: a tester!
+Et muscler le chat avec (d'apres chatty):
+Qwen3 4B - probablement mon premier choix. Meilleur en raisonnement et généralement plus solide en français/code que Llama 3.2 3B, tout en restant relativement léger.
+Gemma 3 4B - très bon modèle généraliste, particulièrement agréable pour les conversations et le français.
+Qwen2.5 3B - si tu veux rester très léger ; souvent une amélioration par rapport à Llama 3.2 3B.
 
 """
 

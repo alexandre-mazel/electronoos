@@ -6,6 +6,15 @@ La partie serieuse du tchat.
 - Discussion avec llama3.2 (cf ce fichier ligne 15)
 
 Perf sur Champion1 avec qwen3-embedding, parfois 2sec, c'est un peu long. (car il charge/décharge le modele entre chaque appel pour recharger llama, argh)
+En passant le contexte de qwen3-embedding a 4k (ce qui est normal vu que j'envoie des phrases pas trop longues), ca rentre en ram sur la 3080 (10GB).
+(c'est un peu la honte d'ailleurs d'utiliser un modele aussi gros pour l'embedding comparé a llama3.2 qiu fait un boulot important aussi!)
+
+NAME                      ID              SIZE      PROCESSOR    CONTEXT
+llama3.2:latest           a80c4f17acd5    3.4 GB    100% GPU     8192
+qwen3-embedding:latest    64b933495768    6.2 GB    100% GPU     4096
+
+On arrive a du 145ms pour l'embedding puis du 2.5s pour le tchat. c'est mieux !
+
 """
 
 import knowledge

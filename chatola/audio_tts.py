@@ -2,13 +2,18 @@ import os
 import time
 import wave
 
-USE_CHATTERBOX = False
+USE_CHATTERBOX = True # 3.5G VRAM
+#~ USE_CHATTERBOX = False
 
 OUTPUT_DIR = os.path.expanduser( "~/recordings/tts" )
 
 if USE_CHATTERBOX:
     import torchaudio
-    from chatterbox.tts import ChatterboxTTS
+    from chatterbox.tts import ChatterboxTTS # pip install chatterbox-tts
+    
+    from chatterbox.mtl_tts import ChatterboxMultilingualTTS # pour le fr
+
+
 else:
     import soundfile as sf
     from kokoro_onnx import Kokoro # pip install kokoro-onnx soundfile
@@ -21,8 +26,10 @@ class AudioSynthesiser:
         os.makedirs( OUTPUT_DIR, exist_ok = True )
 
         if USE_CHATTERBOX:
-            self.model = ChatterboxTTS.from_pretrained(
+            #~ self.model = ChatterboxTTS.from_pretrained(
+            self.model = ChatterboxMultilingualTTS.from_pretrained( # pour du fr
                 device = "cuda"
+                #~ device = "cpu"
             )
         else:
             self.model = Kokoro(
@@ -42,7 +49,7 @@ class AudioSynthesiser:
         )
 
         if USE_CHATTERBOX:
-            audio = self.model.generate( text )
+            audio = self.model.generate( text, language_id = "fr" )
 
             torchaudio.save(
                 filename,
@@ -80,11 +87,12 @@ def autotest():
         "entièrement localement sur votre ordinateur."
     )
 
+    time_begin = time.time()
     filename = synthesiser.synthesise( text )
 
     print( "audio:", filename )
+    print( "duration: %.2fs" % (time.time() - time_begin) ) # cuda sur champion1: 4.7s, cpu sur champion1: 36s
 
 
 if __name__ == "__main__":
     autotest()
-s

@@ -166,3 +166,108 @@ Il est important de noter que la beauté est subjective et qu'il n'y a pas de "fo
 Et si vous voulez en savoir plus sur les exercices ou les conseils pour améliorer la forme de vos fesses, je serais ravi de vous aider !
     (generated in 84.57s)
 You:
+
+#### version sept 2026
+
+#  avec llama3.2 (3.4GB VRAM):
+You: Bonjour
+IA: Bonjour ! Je suis NAO, un robot créé par Aldebaran Robotics pour travailler à la clinique "The Clinic" sous la direction du docteur Assaf Bendavid. Comment puis-je vous aider aujourd'hui ?
+    (generated in 0.85s)
+You: Quel temps fait il dehors ?
+IA: Je n'ai pas accès aux informations météorologiques en temps réel, mais je peux vous dire que j'ai été programmé pour fonctionner dans les conditions normales de Paris. Le temps devrait être agréable, avec un peu de soleil et une température confortable.
+    (generated in 0.84s)
+You: C'est cool, parle moi de greffe
+IA: La greffe de cheveux est une technique chirurgicale utilisée pour remplacer les cheveux perdus en raison d'une carence, d'une maladie ou d'un traitement médicamenteux. À la clinique "The Clinic" gérée par le docteur Assaf Bendavid, nous utilisons différentes techniques pour obtenir des résultats naturels et denses.
+    (generated in 2.52s)
+You: lesquelles?
+IA: Les méthodes de greffe de cheveux les plus fréquentes chez The Clinic sont :
+
+1. La FUSS (Follicular Unit Single Strip) : une méthode qui consiste à prélever des bandes de cheveux et à réimplanter des unités folliculaires individuelles.
+2. La FUE (Follicular Unit Extraction) : une méthode qui consiste à prélever des unités folliculaires individuelles directement du scalp, sans nécessiter la coupe d'une bande de peau.
+
+Ces deux méthodes sont considérées comme les plus précises et les moins invasives, mais elles peuvent être plus coûteuses que d'autres méthodes.
+    (generated in 3.11s)
+You: quit
+Quitting...
+
+### Comparaison de 3 modeles de generate:
+
+# lama3.2
+
+INF: chatola_url: 'https://engrenage.studio:45001'
+You: coucou
+IA: Salut ! Je suis NAO, le robot sympa de "The Clinic" où je travaille avec le docteur Assaf Bendavid pour aider les gens à retrouver leur confiance en eux grâce à la greffe de cheveux. Qu'est-ce que je peux vous aider aujourd'hui ?
+    (generated in 0.90s)
+You: parle moi de greffe
+IA: La greffe de cheveux est une intervention chirurgicale qui consiste à extraire des follicules pileux de la zone donneuse (l'arrière du crâne et les côtés) et à les replanter dans les zones clairsemées pour renforcer la densité et la forme de la barbe, des poils sur le visage ou d'autres parties du corps.
+    (generated in 2.54s)
+You: quel type de greffe existe ?
+IA: Il existe plusieurs types de greffes de cheveux, notamment :
+
+*   FUT (Follicular Unit Transplantation) : implante des unités folliculaires entières dans la zone donneuse.
+*   FUE (Follicular Unit Extraction) : extrait les unités folliculaires individuellement et les implante ensuite dans la zone donneuse.
+    (generated in 2.86s)
+You: detaille moi fue
+IA: La FUE (Follicular Unit Extraction) est une méthode de greffe de cheveux dédiée aux personnes souffrant de calvitie naissante. Voici les principaux points clés :
+
+**Qu'est-ce que la FUE ?**
+
+La FUE consiste à sélectionner des greffons de qualité, situés au niveau des zones à forte densité capillaire, et à les prélever de manière minimale pour réduire le risque d'endommager la zone donneuse.
+
+**Comment fonctionne la FUE ?**
+
+1. Le docteur effectue une analyse détaillée du crâne pour identifier les zones à forte densité capillaire.
+2. Les greffons sont sélectionnés et prélevés de manière précise en utilisant un équipement spécialisé.
+3. Les greffons sont ensuite réimplantés au niveau des tempes, du front ou au sommet du crâne, en fonction des besoins du patient.
+
+**Avantages de la FUE**
+
+* Absence de cicatrice à la zone donneuse
+* Réduction du risque d'endommager la zone donneuse
+* Minimisation de l'inconfort post-opératoire
+* Possibilité de traiter de nombreuses pathologies, notamment la calvitie naissante et les cicatrices au niveau du cuir chevelu
+
+**Inconvénients de la FUE**
+
+* Coût plus élevé par rapport à d'autres méthodes de greffe de cheveux
+* Risque de complications rares, telles que l'infestation de parasites ou les réactions allergiques aux anesthésiants
+
+**Qui est candidat à la FUE ?**
+
+La FUE est adaptée aux personnes souffrant de calvitie naissante, avec une perte de cheveux importante mais pas totale. Les patients doivent avoir une zone donneuse suffisamment grande pour permettre l'implantation des greffons.
+
+**Qui ne doit pas faire la FUE ?**
+
+Les patients qui ont déjà eu une greffe de cheveux ou qui sont enceintes ou en allaitement ne devraient pas faire la FUE, car cela peut compromettre les résultats de l'intervention.
+    (generated in 5.72s)
+    
+# gemma3:4B
+
+You: coucou
+IA: Bonjour ! Je suis NAO, votre assistant à la clinique The Clinic. Comment puis-je vous aider aujourd'hui ?
+    (generated in 0.82s)
+You: parle moi de greffe
+IA:  Kein Problem! Chez The Clinic, nous proposons des solutions de restauration capillaire sur mesure. La greffe de cheveux est une excellente option pour revitaliser votre chevelure.
+    (generated in 2.97s)
+You: quel type de greffe existe ?
+IA: elhos, je suis NAO, et je travaille à la clinique The Clinic avec le docteur Bendavid. Nous pratiquons principalement la greffe FUT (folliculaire unité transplantation) et FUE (follicular unit extraction).
+    (generated in 4.11s)
+You: detaille moi fue
+IA:  ???? Follicular Unit Extraction (FUE) est une technique de greffe de cheveux précise. Nous prélevons des greffons individuels, appelés unités folliculaires, directement sur votre cuir chevelu. Cela permet un résultat plus naturel et discret.
+    (generated in 4.83s)
+You: c'est quoi ce mot russe au debut de ta phrase?
+IA: dfsonic (Qun) signifie « punch » en chinois. Il fait référence à l'outil utilisé dans la technique de greffe FUE.
+    (generated in 4.57s)
+    
+#  qwen3:4B
+
+You: coucou
+IA: Bonjour ! Je suis NAO, ton robot de la clinique The Clinic. Comment puis-je t'aider aujourd'hui ?
+    (generated in 6.58s)
+You: parle moi de greffe ?
+IA: La greffe de cheveux est une solution naturelle pour la calvitie, réalisée avec la technique FUE. Tu peux me contacter pour une consultation gratuite !
+    (generated in 10.03s)
+You: detaille moi fue
+IA: La FUE (Follicular Unit Extraction) consiste à prélever individuellement des unités de follicules pileux à partir de l'arrière de la tête et à les réimplanter dans les zones dégarnies sans cicatrice. 
+Elle offre un résultat naturel, une récupération rapide et est idéale pour les cas de calvitie naissante.
+    (generated in 13.53s)

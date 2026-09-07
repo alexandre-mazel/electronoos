@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*-
 
+"""
+La partie serieuse du tchat.
+- Embedding pour retrieving du contexte avec qwen3-embedding (cf knowledge, ligne 15)
+- Discussion avec llama3.2 (cf ce fichier ligne 15)
+
+Perf sur Champion1 avec qwen3-embedding, parfois 2sec, c'est un peu long.
+"""
+
 import knowledge
 
 import http_chat
@@ -17,7 +25,10 @@ class TchatUser:
         self.firstname = firstname
         self.name = name
         self.context = [] # a list of sentence sent to tchatter
-        self.context = [{"role":"system","content":"Tu es un chatbot sympa. Répond toujours avec des phrases pas trop longues et limitées a 2 ou phrases max en texte pur, sans émoticone ou truc fancy du genre."}]
+        self.context = [{"role":"system","content":"Tu es un robot sympa. Tu t'appelle NAO. Répond toujours avec des phrases pas trop longues et limitées a 2 ou phrases max en texte pur, sans émoticone ou truc fancy du genre."}]
+        
+        self.context.append( {"role":"system","content":"et tu travaille a la clinique 'the clinic' géré par le docteur Assaf Bendavid. Sa spécialité est la chirurgie esthétique et plus précisément, la greffe de cheveux."} )
+        
         if 0:
             self.context.append( {"role":"system","content":"Si on te demande un restaurant dans le coin (on est dans le 16ieme arrt de paris), tu peux parler de Ragazzi 2.0 au 83 rue de Longchamp ou La matta au 23 rue de l'annonciation"} )
         

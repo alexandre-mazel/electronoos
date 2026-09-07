@@ -1,5 +1,6 @@
 import http.client
 import json
+import time
 
 def get_embedding(text, model="nomic-embed-text", host="obo-world.com", port=11434):
     conn = http.client.HTTPConnection(host, port)
@@ -15,8 +16,10 @@ def get_embedding(text, model="nomic-embed-text", host="obo-world.com", port=114
 
     conn.request("POST", "/api/embeddings", body=payload, headers=headers)
 
+    time_begin = time.time()
     response = conn.getresponse()
     data = response.read()
+    print( "DBG: get_embedding: duration: %.2fs" % (time.time()-time_begin))
 
     if response.status != 200:
         raise Exception(f"HTTP error {response.status}: {data.decode()}")

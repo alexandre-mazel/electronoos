@@ -7,8 +7,10 @@ import json
 
 import time
 
-def ask_ollama_http( model, messages, strHost = "localhost", port = 11434 ):
-    print( "DBG: ask_ollama_http: model: %s, prompt:\n%s" % (model, messages) )
+OLLAMA_PORT = 11435
+
+def ask_ollama_http( model, messages, strHost = "localhost", port = OLLAMA_PORT ):
+    print( "DBG: ask_ollama_http: port: %s, model: %s, prompt:\n%s" % (port,model, messages) )
     
     """
     /generate ? expects string prompt

@@ -30,7 +30,7 @@ import http_chat
 
 strModel = "gemma3:270m" # un rapide pour tester
 strModel = "llama3.2"
-strModel = "qwen3:4B"
+#~ strModel = "qwen3:4B"
 
 class TchatUser:    
     def __init__( self, user_id, firstname = "", name = "" ):

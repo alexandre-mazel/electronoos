@@ -47,7 +47,7 @@ if __name__ == "__main__":
     print(emb2[:10])
     import numpy as np
     simi = np.dot( emb, emb2 )
-    print( "simi: %.3f" % simi )
+    print( "simi hello: %.3f" % simi )
     
     emb = get_embedding("Qu'est ce que la RAM ?", model)
     emb2 = get_embedding("C'est quoi la RAM?", model)

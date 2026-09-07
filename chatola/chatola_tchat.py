@@ -5,7 +5,7 @@ La partie serieuse du tchat.
 - Embedding pour retrieving du contexte avec qwen3-embedding (cf knowledge, ligne 15)
 - Discussion avec llama3.2 (cf ce fichier ligne 15)
 
-Perf sur Champion1 avec qwen3-embedding, parfois 2sec, c'est un peu long.
+Perf sur Champion1 avec qwen3-embedding, parfois 2sec, c'est un peu long. (car il charge/décharge le modele entre chaque appel pour recharger llama, argh)
 """
 
 import knowledge

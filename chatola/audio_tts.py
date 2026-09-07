@@ -44,6 +44,7 @@ class AudioSynthesiser:
             )
             
             self.model.prepare_conditionals("datas/voice_fr_ref.wav") # pour du francais il faut lui faire un modele de francais pour qu'il copie la voix # ici chargé une seule fois
+            self.model.prepare_conditionals("datas/voice_fr_ref_gaia.wav") # pour du francais il faut lui faire un modele de francais pour qu'il copie la voix # ici chargé une seule fois
             
         else:
             self.model = Kokoro(
@@ -66,6 +67,9 @@ class AudioSynthesiser:
         if USE_CHATTERBOX:
             audio = self.model.generate( text, language_id = "fr", 
                 # audio_prompt_path = "datas/voice_fr_ref.wav"  # ne pas le passer a chaque coup, pour gagner du temps...
+                    exaggeration = 0.3, # default 0.5
+                    cfg_weight = 0.7, # de combien on colle a la ref ? default: 0.5
+                    temperature = 0.2 # default: 0.8
             )
 
             torchaudio.save(
@@ -103,14 +107,16 @@ def autotest():
         "Je peux maintenant parler avec une voix générée "
         "entièrement localement sur votre ordinateur."
     )
+    
+    text = ( "Bonjour ! C'est Gaia! Papa, je te promet que plus jamais je n'oublierai de me laver les dents le soir, meme si j'ai la super flaime. Promis, et si j'oublie une seule fois, je ne mangerai plus jamais de chocolat de ma vie. Promis juré!")
 
-    for i in range(2):
+    for i in range(1):
         time_begin = time.time()
         filename = synthesiser.synthesise( text )
 
         print( "audio:", filename )
         print( "duration: %.2fs" % (time.time() - time_begin) ) # pour un son de 6 sec: chatterbox: cuda sur champion1: 4.7s (3.78 si on charge le modele de voix fr une seule fois avant), cpu sur champion1: 36s, kokoro: 1.60s, kokoro int8: 7.22s ?
-
+        # resultat top quand meme pour le temps sur ordi, c'est le meilleur je trouve, et le clonage c'est ouf !
 
 if __name__ == "__main__":
     autotest()

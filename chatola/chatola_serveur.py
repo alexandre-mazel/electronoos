@@ -55,6 +55,8 @@ def receive_voice():
     timeBegin = time.time()
 
     try:
+        user_id = request.headers.get( "X-User-Id" )
+
         audio_data = request.get_data()
 
         if not audio_data:
@@ -74,18 +76,31 @@ def receive_voice():
             % ( len( audio_data ) / 1024 )
         )
 
-        text = whisp.analyse( filename )
+        recognised_text = whisp.analyse( filename )
+        
+        print( "INF: receive_voice: recognised_text:", recognised_text )
+        print( "INF: receive_voice: speech reco duration: %.3fs" % (time.time() - timeBegin) )
+        
+        ret = ""
+        debug_msg = ""
+        
+        if 1:
+            try:
+                ret = chatola_tchat.handle_user_tchat( user_id, recognised_text )
+            except BaseException as err:
+                ret = "?"
+                debug_msg += "ERR: " + str(err) + "\nstack: " + traceback.format_exc()
 
         #~ os.unlink( filename )
 
         duration = time.time() - timeBegin
 
-        print( "INF: Voice: text:", text )
-        print( "INF: Voice: duration: %.2fs" % duration )
+        print( "INF: receive_voice: total duration: %.2fs" % duration )
 
         return {
             "status": "ok",
-            "ans": text,
+            "recognized": recognised_text,
+            "ans": ret, "debug": debug_msg,
             "duration": duration
         }
 

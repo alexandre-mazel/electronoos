@@ -2,7 +2,13 @@ import http.client
 import json
 import time
 
-def get_embedding(text, model="nomic-embed-text", host="obo-world.com", port=11434):
+DEFAULT_HOST = "obo-world.com"
+DEFAULT_HOST = "localhost"
+
+DEFAULT_PORT = 11434
+DEFAULT_PORT = 11435
+
+def get_embedding(text, model="nomic-embed-text", host=DEFAULT_HOST, port=DEFAULT_PORT):
     conn = http.client.HTTPConnection(host, port)
 
     payload = json.dumps({

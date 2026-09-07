@@ -20,7 +20,7 @@ class Knowledge:
             self.host = "obo-world.com"
             self.port = 11434
             
-        self.savefile = "datas/precomputed.dat"
+        self.savefile = "datas/precomputed_%s.dat" % (self.model.replace(":","_"))
         self._loadPrecalc()
         
     # TODO: move all precalc method to purehttpembedding (else it helps even for students)

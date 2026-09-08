@@ -39,13 +39,30 @@ def send_audio(filename, user_id="tester_audio"):
 
     response = conn.getresponse()
 
-    #~ print( response.read().decode( "utf-8" ) )
-    
     data = response.read()
-    data = json.loads( data.decode( "utf-8" ) )
 
-    print( data )
-    print( data["ans"] )
+    content_type = response.getheader("Content-Type", "")
+
+    if content_type.startswith("audio/wav"):
+        # Réponse TTS
+        print("INF: réponse audio, %.2f KB" % (len(data) / 1024))
+
+        texte = response.getheader("X-Text")
+        print("Texte reponse:", texte)
+
+        with open("/tmp/response.wav", "wb") as f:
+            f.write(data)
+
+        # ici tu peux jouer response.wav
+        # ou traiter directement data
+
+    else:
+        # Réponse JSON normale
+        data = json.loads(data.decode("utf-8"))
+
+        print(data)
+        print(data["ans"])
+
 
 
 

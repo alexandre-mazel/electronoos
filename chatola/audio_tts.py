@@ -47,6 +47,7 @@ class AudioSynthesiser:
             self.model.prepare_conditionals("datas/voice_fr_ref_gaia.wav")
             self.model.prepare_conditionals("datas/voice_fr_ref_gaia2.wav")
             self.model.prepare_conditionals("datas/voice_fr_ref_vieux3.wav")
+            self.model.prepare_conditionals("datas/voice_fr_ref4_charmeur.wav")
             
         else:
             self.model = Kokoro(

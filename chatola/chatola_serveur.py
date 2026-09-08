@@ -7,7 +7,7 @@ Pour voir les ps:
 OLLAMA_HOST=127.0.0.1:11435 ollama ps
 """
 
-from flask import Flask, request # sudo apt install python3-flask
+from flask import Flask, request, send_file # sudo apt install python3-flask ou en venv: pip install flask
 import os
 import time
 
@@ -28,6 +28,12 @@ app = Flask(__name__)
 
 import test_whisper
 whisp = test_whisper.Whisper()
+
+tts = None
+gbUseTTS = 1
+if gbUseTTS:
+    import audio_tts
+    tts = audio_tts.AudioSynthesiser()
 
 @app.route("/data", methods=["POST"])
 def receive():
@@ -97,9 +103,9 @@ def receive_voice():
 
         print( "INF: receive_voice: total duration: %.2fs" % duration )
         
-        if 0:
-                output_filename = tts_generate_sound(ret) # todo test me !
-                return flask.send_file( output_filename, mimetype = "audio/wav", as_attachment = False )
+        if tts:
+            output_filename = tts.synthesise(ret) # todo test me !
+            return send_file( output_filename, mimetype = "audio/wav", as_attachment = False ),  200, {"X-Text": ret }
 
         return {
             "status": "ok",

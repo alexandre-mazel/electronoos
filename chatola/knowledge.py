@@ -13,6 +13,7 @@ class Knowledge:
         self.vects = [] # embedding related to each informations
         self.model = "nomic-embed-text" # resultat bof, mais rapide (565MB) (rapide: 13s for 106 sentence)
         self.model = "qwen3-embedding" # (7GB for 8K context) (plus long: 144s for 106 sentence) # pour info dans ma base, le max token que j'ai en connaissance (je l'affiche dans pure_http_embedding_httpclient) c'est: 37
+        self.model = "qwen3-embedding-mix" # un modele cree avec un modelfile pour avoir une partie en cpu
         self.host = "localhost"
         self.port = 11435
         
@@ -114,7 +115,7 @@ class Knowledge:
             #~ self.infos.append( title + ";" + contents )
             self.infos.append( title )
             self.details[title] = contents
-            # TODO: comparer le vecteur d'un titre et du contenu ? (c'est tellement long le calcul du contenu que ca fait hésiter)
+            # TODO: comparer le vecteur d'un titre et du contenu ? (c'est tellement long le calcul du contenu que ca fait hesiter)
         #~ exit(1)
         
         
@@ -184,7 +185,7 @@ def autotest():
     knowledge.getKnowledgeForQuestion( "Hello", verbose=verbose )
     knowledge.getKnowledgeForQuestion( "Parle moi des exosomes", verbose=verbose )
     
-    # timing pour 12 questions avec details de la clinique (long) (J'ai dépasse les 8k token):  
+    # timing pour 12 questions avec details de la clinique (long) (J'ai depasse les 8k token):  
     # "total_duration":456310328028,"load_duration":3331023098,"prompt_eval_count":8192,"prompt_eval_duration":450818778459,"eval_count":12,"eval_duration":1603491810
     # => 456 sec soit 7.6min
     

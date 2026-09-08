@@ -46,7 +46,7 @@ def get_embedding(text, model="nomic-embed-text", host=DEFAULT_HOST, port=DEFAUL
         nbr_token = data["prompt_eval_count"]
         if global_max_token_since_beginning < nbr_token:
             global_max_token_since_beginning = nbr_token
-        print( "DBG: get_embedding: NbrToken (in input): %s (max since beginning: %s)", (nbr_token,global_max_token_since_beginning) )
+        print( "DBG: get_embedding: NbrToken (in input): %s (max since beginning: %s)" % (nbr_token,global_max_token_since_beginning) )
 
     conn.request("POST", "/api/embeddings", body=payload, headers=headers)
 
@@ -65,10 +65,13 @@ def get_embedding(text, model="nomic-embed-text", host=DEFAULT_HOST, port=DEFAUL
 
 # Exemple
 if __name__ == "__main__":  
+    print("\nHello world en nomic:")
     emb = get_embedding("Hello world")
     print(len(emb))
     print(emb[:10])
+    
     model = "qwen3-embedding"
+    print("\nHello world en qwen3:")
     emb = get_embedding("Hello world", model)
     print(len(emb))
     print(emb[:10])
@@ -82,3 +85,10 @@ if __name__ == "__main__":
     emb2 = get_embedding("C'est quoi la RAM?", model)
     simi = np.dot( emb, emb2 )
     print( "simi RAM: %.3f" % simi )
+    
+    model = "qwen3-embedding-mix"
+    print("\nHello world en qwen3-mix:")
+    emb = get_embedding("Hello world", model)
+    print(len(emb))
+    emb = get_embedding("Hello world", model)
+    print(len(emb))

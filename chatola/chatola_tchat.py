@@ -39,9 +39,25 @@ qwen3-embedding:latest    64b933495768    5.7 GB    100% GPU     2048
 + whisper 2 ou 1.33 en turbo (le 2 rentre pas en vram dommage)
 J'ai pas la place pour rentrer un chatterbox.
 
-Pour passer une partie de qwen3 embedding en cpu et gagner de la vram:
+Pour passer une partie de qwen3 embedding en cpu et gagner de la vram, faire un modele hybride:
 
  OLLAMA_HOST=127.0.0.1:11435 ollama create qwen3-embedding-mix -f modelfile_qwen3_embedding.txt
+ 
+  
+ Avec 20 couches de gpu (PARAMETER num_gpu 20):
+ qwen3-embedding-mix:latest    ac0ed0b52a0b    5.5 GB    54%/46% CPU/GPU    1024 
+ et on passe de 130ms a 140ms
+ Il ne prendrait plus que 2.6GB VRAM!
+ 
+ Avec 15 couches de gpu:
+ qwen3-embedding-mix:latest    6982447e907e    5.5 GB    64%/36% CPU/GPU    1024
+ et on passe de 130ms a 170ms
+ 
+  Avec 10 couches de gpu:
+ qwen3-embedding-mix:latest    6982447e907e    5.5 GB    64%/36% CPU/GPU    1024
+ et on passe de 130ms a 210ms
+
+
 
 
 """

@@ -2,6 +2,10 @@ import requests
 import sys
 import time
 
+"""
+La boucle principale en version audio et tts est depuis audio_analyser.py
+"""
+
 def test_data(url):
     service = url + "/data"
     response = requests.post(service, json={"msg": "hello"})

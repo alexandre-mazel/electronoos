@@ -1,0 +1,2 @@
+FROM qwen3-embedding:latest
+PARAMETER num_gpu 20

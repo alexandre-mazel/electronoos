@@ -5,6 +5,8 @@ export LD_LIBRARY_PATH=$HOME/.local/lib/python3.8/site-packages/nvidia/cublas/li
 
 """
 
+print( "INF: test_whisper.py: importing..." )
+
 from faster_whisper import WhisperModel # pip install faster-whisper # python -m pip install nvidia-cublas-cu12 nvidia-cudnn-cu12
 import time
 
@@ -20,16 +22,24 @@ use_whisper = True # sinon c'est faster_whisper
 use_whisper = False
 if use_whisper:
     import whisper # python -m pip install -U openai-whisper
+    
+    
+print( "INF: test_whisper.py: importing - end" )
 
 class Whisper:
     def __init__( self ):
         if not use_whisper:
+            print( "INF: ASR: Faster_Whisper: initing..." )
             self.model = WhisperModel( DEFAULT_MODEL, device="cuda", compute_type= DEFAULT_COMPUTE_TYPE )
         else:
+            print( "INF: ASR: Whisper: initing..." )
             self.model = whisper.load_model( DEFAULT_MODEL, device="cuda" )
             
         self.initial_prompt = ""
         self.hotwords = ""
+        
+        print( "INF: ASR: Whisper: initing - end" )
+
         
     def add_initial_prompt( self, txt ):
         self.initial_prompt += txt

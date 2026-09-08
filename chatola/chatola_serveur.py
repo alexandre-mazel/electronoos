@@ -25,23 +25,29 @@ def getHostName():
 import chatola_tchat
 import traceback
 
-app = Flask(__name__)
-
-import test_whisper
-whisp = test_whisper.Whisper()
 
 tts = None
 gbUseTTS = 1 # doit alors etre lancer dans le venv qui a tts activable (cf tts_perso sur champion1)
 
+gbUseMMSTTS = 0
 gbUseMMSTTS = 1
 
 if gbUseTTS:
+    print( "INF: Importing tts..." )
     if gbUseMMSTTS:
         import tts_mms
-        tts = tts_mmstts.AudioSynthesiser()
+        tts = tts_mms.AudioSynthesiser()
     else:
         import audio_tts
         tts = audio_tts.AudioSynthesiser()
+        
+        
+# on import whisper apres tts_mms sinon tts_mms core dumped
+import test_whisper
+whisp = test_whisper.Whisper()
+
+app = Flask(__name__)
+
 
 @app.route("/data", methods=["POST"])
 def receive():
@@ -114,7 +120,9 @@ def receive_voice():
         if tts:
             output_filename = tts.synthesise(ret) # todo test me !
             retclean = ret.replace("\n", " " ) # Header values must not contain newline characters.
-            return send_file( output_filename, mimetype = "audio/wav", as_attachment = False ),  200, {"X-Text": retclean }
+            import base64
+            text_b64 = base64.b64encode(retclean.encode("utf-8")).decode("ascii")
+            return send_file( output_filename, mimetype = "audio/wav", as_attachment = False ),  200, {"X-Text-B64": text_b64 }
 
         return {
             "status": "ok",
@@ -154,6 +162,7 @@ keyfn = fullpath + "privkey.pem"
 certfn = fullpath + "cert.pem"
 fullfn = fullpath + "fullchain.pem"
 
+print( "INF: Running app..." )
 app.run(
     host="0.0.0.0",
     port=45001,

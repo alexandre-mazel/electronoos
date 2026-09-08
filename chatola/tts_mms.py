@@ -1,17 +1,23 @@
-
+print( "INF: tts_mms.py: importing..." )
 import torch
 import scipy.io.wavfile
 import os
 import time
 
+print( "INF: tts_mms.py: begin importing - med" )
+
 from transformers import VitsModel, AutoTokenizer, set_seed
+
+print( "INF: tts_mms.py: begin importing - end" )
 
 """
 
 MMS-TTS avec modele francais
 
 cuda: 596MB VRAM pour un son de 8.7s: prend 0.49s puis 0.05s (rapide) (x17.5) (mais caching ou ?)
-(dans le code, ca affiche 287.8 MB)
+(dans le code, ca affiche 287.8 MB de VRAM)
+
+en cpu pur (champion1): pour un son de 13s: 3.11s soit x4.2 ca reste rapide.
 
 a lancer depuis le venv-tts dans champion/chatola
 utilise Python 3.11
@@ -32,6 +38,8 @@ MODEL_NAME = "facebook/mms-tts-fra"
 
 class AudioSynthesiser:
     def __init__(self):
+        print( "INF: tts_mms:AudioSynthesiser: initing..." )
+        
         os.makedirs(OUTPUT_DIR, exist_ok=True)
 
         import torch
@@ -41,30 +49,21 @@ class AudioSynthesiser:
 
         # Utilise CUDA si disponible, sinon CPU.
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        
+        self.device = "cpu" # force cpu
 
-        print(
-            "INF: AudioSynthesiser: loading MMS-TTS model..."
-        )
-        print(
-            "INF: AudioSynthesiser: device:",
-            self.device
-        )
+        print( "INF: AudioSynthesiser: loading MMS-TTS model..." )
+        print( "INF: AudioSynthesiser: device:", self.device )
 
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            MODEL_NAME
-        )
+        self.tokenizer = AutoTokenizer.from_pretrained( MODEL_NAME )
 
-        self.model = VitsModel.from_pretrained(
-            MODEL_NAME
-        ).to(self.device)
+        self.model = VitsModel.from_pretrained( MODEL_NAME ).to(self.device)
 
         self.model.eval()
 
         self.sample_rate = self.model.config.sampling_rate
 
-        print(
-            "INF: AudioSynthesiser: MMS-TTS loaded"
-        )
+        print( "INF: AudioSynthesiser: MMS-TTS loaded" )
 
         print(
             "INF: AudioSynthesiser: sample rate:",
@@ -85,6 +84,8 @@ class AudioSynthesiser:
                     / 1024
                 )
             )
+            
+        print( "INF: tts_mms:AudioSynthesiser: initing - end" )
 
 
     def synthesise(self, text):
@@ -201,6 +202,8 @@ class AudioSynthesiser:
 
 
         return filename
+        
+# class AudioSynthesiser - end
 
 
 def autotest():

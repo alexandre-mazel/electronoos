@@ -12,6 +12,7 @@ import sounddevice as sd
 
 from audio_analyser import AudioAnalyser
 
+import base64
 import json
 import os
 import time
@@ -63,7 +64,9 @@ def send_audio(filename, user_id="tester_audio"):
         # Reponse TTS
         print("INF: reponse audio, %.2f KB" % (len(data) / 1024))
 
-        texte = response.getheader("X-Text")
+        #~ texte = response.getheader("X-Text")
+        text_b64 = response.getheader("X-Text-B64")
+        texte = base64.b64decode(text_b64).decode("utf-8")
         print("Texte reponse:", texte)
         
         if os.name == "nt":

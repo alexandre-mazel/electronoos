@@ -39,6 +39,11 @@ qwen3-embedding:latest    64b933495768    5.7 GB    100% GPU     2048
 + whisper 2 ou 1.33 en turbo (le 2 rentre pas en vram dommage)
 J'ai pas la place pour rentrer un chatterbox.
 
+Pour passer une partie de qwen3 embedding en cpu et gagner de la vram:
+
+ OLLAMA_HOST=127.0.0.1:11435 ollama create qwen3-embedding-mix -f modelfile_qwen3_embedding.txt
+
+
 """
 
 import knowledge

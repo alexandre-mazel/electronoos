@@ -13,14 +13,28 @@ import sounddevice as sd
 from audio_analyser import AudioAnalyser
 
 import json
+import os
+import time
 
 
 SAMPLE_RATE = 16000
 CHANNELS = 1
 CHUNK_SIZE = 1024
 
+def play_sound( soundfilename, bWaitEnd = True ):
+    import winsound
+    flag = winsound.SND_FILENAME
+    if not bWaitEnd:
+        flag |= winsound.SND_ASYNC
+        
+    winsound.PlaySound(soundfilename,  flag )
+
+    
+
 def send_audio(filename, user_id="tester_audio"):
     import http.client
+    
+    time_begin = time.time()
 
     with open( filename, "rb" ) as f:
         audio_data = f.read()
@@ -42,22 +56,28 @@ def send_audio(filename, user_id="tester_audio"):
     data = response.read()
 
     content_type = response.getheader("Content-Type", "")
+    
+    print( "INF: duration before start of play: %.2fs" % (time.time() - time_begin) )
 
     if content_type.startswith("audio/wav"):
-        # Réponse TTS
-        print("INF: réponse audio, %.2f KB" % (len(data) / 1024))
+        # Reponse TTS
+        print("INF: reponse audio, %.2f KB" % (len(data) / 1024))
 
         texte = response.getheader("X-Text")
         print("Texte reponse:", texte)
+        
+        if os.name == "nt":
+            import winsound
+            winsound.PlaySound( data, winsound.SND_MEMORY )
 
-        with open("/tmp/response.wav", "wb") as f:
+        with open("/tmp/response_%d.wav" % int(time.time()), "wb") as f:
             f.write(data)
 
         # ici tu peux jouer response.wav
         # ou traiter directement data
 
     else:
-        # Réponse JSON normale
+        # Reponse JSON normale (juste du texte)
         data = json.loads(data.decode("utf-8"))
 
         print(data)
@@ -82,7 +102,9 @@ def main():
 
         if filename:
             print( "Speech saved to:", filename )
+            play_sound( "datas/singingbowl_84_short.wav", False )
             send_audio( filename )
+            play_sound( "datas/bowl_start.wav" )
 
     print( "Main: Starting microphone..." )
 
@@ -94,6 +116,8 @@ def main():
         callback = audio_callback
     ):
         print( "Listening..." )
+        
+        play_sound( "datas/bowl_start.wav" )
 
         while True:
             sd.sleep( 1000 )

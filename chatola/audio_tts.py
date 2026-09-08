@@ -44,7 +44,9 @@ class AudioSynthesiser:
             )
             
             self.model.prepare_conditionals("datas/voice_fr_ref.wav") # pour du francais il faut lui faire un modele de francais pour qu'il copie la voix # ici chargé une seule fois
-            self.model.prepare_conditionals("datas/voice_fr_ref_gaia.wav") # pour du francais il faut lui faire un modele de francais pour qu'il copie la voix # ici chargé une seule fois
+            self.model.prepare_conditionals("datas/voice_fr_ref_gaia.wav")
+            self.model.prepare_conditionals("datas/voice_fr_ref_gaia2.wav")
+            self.model.prepare_conditionals("datas/voice_fr_ref_vieux3.wav")
             
         else:
             self.model = Kokoro(
@@ -117,6 +119,7 @@ def autotest():
         print( "audio:", filename )
         print( "duration: %.2fs" % (time.time() - time_begin) ) # pour un son de 6 sec: chatterbox: cuda sur champion1: 4.7s (3.78 si on charge le modele de voix fr une seule fois avant), cpu sur champion1: 36s, kokoro: 1.60s, kokoro int8: 7.22s ?
         # resultat top quand meme pour le temps sur ordi, c'est le meilleur je trouve, et le clonage c'est ouf !
+        # mais qwen si on n'est pas préssé et encore plus ouf!
 
 if __name__ == "__main__":
     autotest()

@@ -33,9 +33,15 @@ whisp = test_whisper.Whisper()
 tts = None
 gbUseTTS = 1 # doit alors etre lancer dans le venv qui a tts activable (cf tts_perso sur champion1)
 
+gbUseMMSTTS = 1
+
 if gbUseTTS:
-    import audio_tts
-    tts = audio_tts.AudioSynthesiser()
+    if gbUseMMSTTS:
+        import tts_mmstts
+        tts = tts_mmstts.AudioSynthesiser()
+    else:
+        import audio_tts
+        tts = audio_tts.AudioSynthesiser()
 
 @app.route("/data", methods=["POST"])
 def receive():

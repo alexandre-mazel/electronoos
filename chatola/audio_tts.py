@@ -160,7 +160,7 @@ def autotest():
         print( "audio:", filename )
         print( "duration: %.2fs" % (time.time() - time_begin) ) # pour un son de 6 sec: chatterbox: cuda sur champion1: 4.7s (3.78 si on charge le modele de voix fr une seule fois avant), cpu sur champion1: 36s, kokoro: 1.60s, kokoro int8: 7.22s ?
         # resultat top quand meme pour le temps sur ordi, c'est le meilleur je trouve, et le clonage c'est ouf !
-        # mais qwen si on n'est pas préssé et encore plus ouf!
+        # mais qwen si on n'est pas préssé est encore plus ouf!
 
 if __name__ == "__main__":
     autotest()

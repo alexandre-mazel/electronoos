@@ -37,7 +37,7 @@ gbUseMMSTTS = 1
 
 if gbUseTTS:
     if gbUseMMSTTS:
-        import tts_mmstts
+        import tts_mms
         tts = tts_mmstts.AudioSynthesiser()
     else:
         import audio_tts

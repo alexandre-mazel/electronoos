@@ -5,6 +5,7 @@ Ne pas oublier de lancer ollama avec les bonnes options:
 
 Pour voir les ps:
 OLLAMA_HOST=127.0.0.1:11435 ollama ps
+
 """
 
 from flask import Flask, request, send_file # sudo apt install python3-flask ou en venv: pip install flask
@@ -30,7 +31,8 @@ import test_whisper
 whisp = test_whisper.Whisper()
 
 tts = None
-gbUseTTS = 1
+gbUseTTS = 1 # doit alors etre lancer dans le venv qui a tts activable (cf tts_perso sur champion1)
+
 if gbUseTTS:
     import audio_tts
     tts = audio_tts.AudioSynthesiser()
@@ -105,7 +107,8 @@ def receive_voice():
         
         if tts:
             output_filename = tts.synthesise(ret) # todo test me !
-            return send_file( output_filename, mimetype = "audio/wav", as_attachment = False ),  200, {"X-Text": ret }
+            retclean = ret.replace("\n", " " ) # Header values must not contain newline characters.
+            return send_file( output_filename, mimetype = "audio/wav", as_attachment = False ),  200, {"X-Text": retclean }
 
         return {
             "status": "ok",

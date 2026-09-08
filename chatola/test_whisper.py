@@ -9,7 +9,7 @@ from faster_whisper import WhisperModel # pip install faster-whisper # python -m
 import time
 
 DEFAULT_MODEL = "large-v3-turbo"
-DEFAULT_MODEL = "large-v3"
+#~ DEFAULT_MODEL = "large-v3"
 
 DEFAULT_COMPUTE_TYPE = "float16" # normal => 2.29 GB en turbo, 3.63 en normal
 DEFAULT_COMPUTE_TYPE = "int8_float16" # normal: 1.33 en turbo, 2.0 en normal

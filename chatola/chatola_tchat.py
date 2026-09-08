@@ -36,6 +36,8 @@ NAME                      ID              SIZE      PROCESSOR    CONTEXT
 llama3.2:latest           a80c4f17acd5    3.4 GB    100% GPU     8192
 qwen3-embedding:latest    64b933495768    5.7 GB    100% GPU     2048
 => 8.1 GB VRAM
++ whisper 2 ou 1.33 en turbo (le 2 rentre pas en vram dommage)
+J'ai pas la place pour rentrer un chatterbox.
 
 """
 

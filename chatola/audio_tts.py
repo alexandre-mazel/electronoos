@@ -7,7 +7,7 @@ a lancer depuis le venv-tts dans champion/chatola (utilise un autre python3.11)
 """
 
 USE_CHATTERBOX = True # 3.5G VRAM
-#~ USE_CHATTERBOX = False
+USE_CHATTERBOX = False # => kokoro => RAM
 
 OUTPUT_DIR = os.path.expanduser( "~/recordings/tts" )
 

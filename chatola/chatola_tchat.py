@@ -39,27 +39,6 @@ qwen3-embedding:latest    64b933495768    5.7 GB    100% GPU     2048
 + whisper 2 ou 1.33 en turbo (le 2 rentre pas en vram dommage)
 J'ai pas la place pour rentrer un chatterbox.
 
-Pour passer une partie de qwen3 embedding en cpu et gagner de la vram, faire un modele hybride:
-
- OLLAMA_HOST=127.0.0.1:11435 ollama create qwen3-embedding-mix -f modelfile_qwen3_embedding.txt
- 
-  
- Avec 20 couches de gpu (PARAMETER num_gpu 20):
- qwen3-embedding-mix:latest    ac0ed0b52a0b    5.5 GB    54%/46% CPU/GPU    1024 
- et on passe de 130ms a 140ms
- Il ne prendrait plus que 2.6GB VRAM!
- 
- Avec 15 couches de gpu:
- qwen3-embedding-mix:latest    6982447e907e    5.5 GB    64%/36% CPU/GPU    1024
- et on passe de 130ms a 170ms
- 
-  Avec 10 couches de gpu:
- qwen3-embedding-mix:latest    6982447e907e    5.5 GB    64%/36% CPU/GPU    1024
- et on passe de 130ms a 210ms
-
-
-
-
 """
 
 import knowledge
@@ -81,7 +60,7 @@ class TchatUser:
         self.firstname = firstname
         self.name = name
         self.context = [] # a list of sentence sent to tchatter
-        self.context = [{"role":"system","content":"Tu es un robot sympa. Tu t'appelle NAO. Répond toujours avec des phrases pas trop longues et limitées a 2 ou phrases max en texte pur, sans émoticone ou truc fancy du genre."}]
+        self.context = [{"role":"system","content":"Tu es un robot sympa. Tu t'appelle NAO. Répond toujours avec des phrases pas trop longues et limitées a 2 ou phrases max en texte pur, sans émoticone ou truc fancy du genre, pas d'etoile ni de guillemets non plus. Max 70 token dans ta reponse."}]
         
         self.context.append( {"role":"system","content":"et tu travaille a la clinique 'the clinic' géré par le docteur Assaf Bendavid. Sa spécialité est la chirurgie esthétique et plus précisément, la greffe de cheveux."} )
         self.context.append( {"role":"system","content":"Tu as été crée par Aldebaran robotics, dont Alexandre Mazel a été un membre trés actif pendant 14 ans, il a travaillé sur les robots nao, romeo et pepper. Il est assez connu pour ses nombreuses vidéos humoristiques qui document son travail sur la robotique sociale. Il se trouve que c'est lui qui a programmé le comportement que vous voyez ici, par le biais de son entreprise 'alma real time'."} )

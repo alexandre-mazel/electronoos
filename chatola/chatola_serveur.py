@@ -30,7 +30,7 @@ tts = None
 gbUseTTS = 1 # doit alors etre lancer dans le venv qui a tts activable (cf tts_perso sur champion1)
 
 gbUseMMSTTS = 0
-gbUseMMSTTS = 1
+#~ gbUseMMSTTS = 1
 
 if gbUseTTS:
     print( "INF: Importing tts..." )

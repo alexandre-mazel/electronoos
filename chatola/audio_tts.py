@@ -6,63 +6,24 @@ import wave
 a lancer depuis le venv-tts dans champion/chatola (utilise un autre python3.11)
 """
 
-"""
-install de venv avec python311: sous linux:
- 1831  sudo apt update
- 1832  sudo apt install -y build-essential wget     libssl-dev zlib1g-dev libbz2-dev     libreadline-dev libsqlite3-dev libncursesw5-dev     xz-utils tk-dev libxml2-dev libxmlsec1-dev     libffi-dev liblzma-dev
- 1833  cd /tmp
- 1834  wget https://www.python.org/ftp/python/3.11.9/Python-3.11.9.tgz
- 1835  tar xf Python-3.11.9.tgz
- 1836  cd Python-3.11.9
- 1837  ./configure --prefix="$HOME/python3.11" --with-ensurepip=install
- 1838  make -j$(nproc)
- 1839  make install
- 1840  ~/python3.11/bin/python3.11
- 1841  ~/python3.11/bin/python3.11 --version
- 1842  python --version
- 1843  cd
- 1844  cd dev
- 1845  cd git
- 1846  cd electronoos/
- 1847  mkdir tt
- 1848  rmdir tt
- 1849  mkdir tts_local
- 1850  cd tts_local/
- 1851  ~/python3.11/bin/python3.11 -m venv venv-tts
- 1852  source venv-chatterbox/bin/activate
- 1853  source venv-tts/bin/activate
- 1854  python --version
- 1855  which python
- 1856  python -m pip install --upgrade pip
- 1857  python -m pip install chatterbox-tts
- 1858  pip install chatterbox-tts
- 1859  pip install kokoro-onnx soundfile
- 1860  python -c "from chatterbox.tts import ChatterboxTTS; print('Chatterbox OK')"
- 1861  python ../chatola/audio_tts.py
- 1862  git commit -am "up tts test"
- 
- sur mon windows:
- C:\Users\alexa\dev\git\electronoos\tts_local>d:\python-3.13.15-embed-amd64\python.exe -m venv venv-tts
-
-"""
-
 USE_CHATTERBOX = True # 3.5G VRAM
-USE_CHATTERBOX = False # => kokoro => RAM
+#~ USE_CHATTERBOX = False # => kokoro => RAM
 
 OUTPUT_DIR = os.path.expanduser( "~/recordings/tts" )
 
+import soundfile as sf
+    
 if USE_CHATTERBOX:
     # pour eviter qu'il essaye de recharger a chaque fois (mais si il manque un modele un jour, il faudra commenter cette ligne temporairement bien sur)
     os.environ["HF_HUB_OFFLINE"] = "1"
     
-    import torchaudio
+    #~ import torchaudio
     from chatterbox.tts import ChatterboxTTS # pip install chatterbox-tts
     
     from chatterbox.mtl_tts import ChatterboxMultilingualTTS # pour le fr
 
 
 else:
-    import soundfile as sf
     from kokoro_onnx import Kokoro # pip install kokoro-onnx soundfile
     # a copier dans data: kokoro-v1.0.onnx, voices-v1.0.bin
     # wget https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.onnx
@@ -115,9 +76,15 @@ class AudioSynthesiser:
                     temperature = 0.2 # default: 0.8
             )
 
-            torchaudio.save(
+            #~ torchaudio.save(
+                #~ filename,
+                #~ audio.cpu(),
+                #~ self.model.sr
+            #~ )
+
+            sf.write(
                 filename,
-                audio.cpu(),
+                audio.squeeze().cpu().numpy(),
                 self.model.sr
             )
         else:

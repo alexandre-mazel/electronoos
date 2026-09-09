@@ -30,9 +30,7 @@ class AudioAnalyser:
         self.silence_time = 0.0
         self.speech_time = 0.0
 
-        self.recordings_path = os.path.expanduser(
-            "~/recordings/voice"
-        )
+        self.recordings_path = os.path.expanduser( "~/chatola/")
 
         os.makedirs( self.recordings_path, exist_ok = True )
 
@@ -81,18 +79,9 @@ class AudioAnalyser:
         return filename
 
     def save_recording( self ):
-        timestamp = time.strftime(
-            "%Y%m%d_%H%M%S"
-        )
-
-        timestamp += "_%03d" % (
-            int( ( time.time() % 1 ) * 1000 )
-        )
-
-        filename = os.path.join(
-            self.recordings_path,
-            "voice_%s.wav" % timestamp
-        )
+        timestamp = time.strftime( "%Y%m%d_%H%M%S")
+        timestamp += "_%03d" % (int( ( time.time() % 1 ) * 1000 ))
+        filename = os.path.join( self.recordings_path, "%s_voice.wav" % timestamp  )
 
         with wave.open( filename, "wb" ) as wav:
             wav.setnchannels( self.channels )

@@ -53,11 +53,33 @@ Pour passer une partie de qwen3 embedding en cpu et gagner de la vram, faire un 
  qwen3-embedding-mix:latest    6982447e907e    5.5 GB    64%/36% CPU/GPU    1024
  et on passe de 130ms a 170ms
  
-  Avec 10 couches de gpu:
- qwen3-embedding-mix:latest    6982447e907e    5.5 GB    64%/36% CPU/GPU    1024
- et on passe de 130ms a 210ms
+Avec 10 couches de gpu:
+qwen3-embedding-mix:latest    6982447e907e    5.5 GB    64%/36% CPU/GPU    1024
+et on passe de 130ms a 210ms
+
+Avec 5 couches de gpu:
+qwen3-embedding-mix:latest    a7d2a8f4e683    5.5 GB    86%/14% CPU/GPU    1024
+et on passe de 130ms a 270ms
+(1Go de vRAM)
 
 
+Avec 4 couches de gpu:
+qwen3-embedding-mix:latest    a7d2a8f4e683    5.5 GB    88%/12% CPU/GPU    1024
+et on passe de 130ms a 330ms
+(0.89GB de vRAM)
+
+Avec 3 couches de gpu:
+qwen3-embedding-mix:latest    a7d2a8f4e683    5.5 GB    90%/10% CPU/GPU    1024
+et on passe de 130ms a 210ms !?!
+(0.77GB de vRAM)
+
+Avec 0 couches de gpu:
+et on passe de 130ms a 300ms
+(0 de vRAM)
+
+Et donc dans knowledge, j'ai mis mix et pis voila, ca rentre en ram avec chatterbox (un peu long mais bon).
+
+Python prend 4.7GB de vram entre whisper et chatterbox.
 
 
 """
@@ -83,7 +105,7 @@ class TchatUser:
         self.context = [] # a list of sentence sent to tchatter
         self.context = [{"role":"system","content":"Tu es un robot sympa. Tu t'appelle NAO. Répond toujours avec des phrases pas trop longues et limitées a 2 ou phrases max en texte pur, sans émoticone ou truc fancy du genre."}]
         
-        self.context.append( {"role":"system","content":"et tu travaille a la clinique 'the clinic' géré par le docteur Assaf Bendavid. Sa spécialité est la chirurgie esthétique et plus précisément, la greffe de cheveux."} )
+        self.context.append( {"role":"system","content":"et tu travaille a la clinique 'the clinic' géré par le docteur Assaf Bendavid. Sa spécialité est la chirurgie esthétique et plus précisément, la greffe de cheveux. Ici on se trouve dans la salle d'attente de la clinique."} )
         self.context.append( {"role":"system","content":"Tu as été crée par Aldebaran robotics, dont Alexandre Mazel a été un membre trés actif pendant 14 ans, il a travaillé sur les robots nao, romeo et pepper. Il est assez connu pour ses nombreuses vidéos humoristiques qui document son travail sur la robotique sociale. Il se trouve que c'est lui qui a programmé le comportement que vous voyez ici, par le biais de son entreprise 'alma real time'."} )
         
         if 0:

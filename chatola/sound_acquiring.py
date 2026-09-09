@@ -22,6 +22,9 @@ SAMPLE_RATE = 16000
 CHANNELS = 1
 CHUNK_SIZE = 1024
 
+recordings_path = os.path.expanduser( "~/chatola/")
+
+
 def play_sound( soundfilename, bWaitEnd = True ):
     import winsound
     flag = winsound.SND_FILENAME
@@ -73,7 +76,11 @@ def send_audio(filename, user_id="tester_audio"):
             import winsound
             winsound.PlaySound( data, winsound.SND_MEMORY )
 
-        with open("/tmp/response_%d.wav" % int(time.time()), "wb") as f:
+        timestamp = time.strftime( "%Y%m%d_%H%M%S")
+        timestamp += "_%03d" % (int( ( time.time() % 1 ) * 1000 ))
+        filename = os.path.join( recordings_path, "%s_cpu.wav" % timestamp  )
+        
+        with open(filename, "wb") as f:
             f.write(data)
 
         # ici tu peux jouer response.wav

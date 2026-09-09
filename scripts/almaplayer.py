@@ -93,7 +93,7 @@ def playSongInterruptible(strFilename):
     if ".m4a" in strFilename:
         return playM4a(strFilename)
         
-    if ".webm" in strFilename or ".ogg" in strFilename:
+    if ".webm" in strFilename or ".ogg" in strFilename or ".wav" in strFilename:
         return playWebm(strFilename)
         
     global timeLastNext
@@ -210,7 +210,7 @@ def playAllFileFromFolder( strPath, listToExclude=[], strStartFrom = "" ):
     print( "DBG: playAllFileFromFolder: strPath: %s" % strPath )
 
     for f in listFiles:
-        if ".mp3" not in f and ".mp4" not in f and ".m4a" not in f and ".ogg" not in f and ".webm" not in f :
+        if ".mp3" not in f and ".mp4" not in f and ".m4a" not in f and ".ogg" not in f and ".webm" not in f and ".wav" not in f :
             continue
         if bSearchStart:
             if f != strStartFrom:

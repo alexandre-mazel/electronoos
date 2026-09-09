@@ -39,7 +39,6 @@ qwen3-embedding:latest    64b933495768    5.7 GB    100% GPU     2048
 + whisper 2 ou 1.33 en turbo (le 2 rentre pas en vram dommage)
 J'ai pas la place pour rentrer un chatterbox.
 
-<<<<<<< HEAD
 Pour passer une partie de qwen3 embedding en cpu et gagner de la vram, faire un modele hybride:
 
  OLLAMA_HOST=127.0.0.1:11435 ollama create qwen3-embedding-mix -f modelfile_qwen3_embedding.txt
@@ -82,9 +81,20 @@ Et donc dans knowledge, j'ai mis mix et pis voila, ca rentre en ram avec chatter
 
 Python prend 4.7GB de vram entre whisper et chatterbox.
 
+a tester:
+Mes choix sur mstab7
 
-=======
->>>>>>> 60bb4f1c9ade71e160c632e0df03363652a9a11f
+    🥇 Qwen3 8B — excellent français, bon raisonnement, polyvalent et assez léger pour 16 Go de RAM.
+    🥈 Gemma 3 12B — très bon pour rédaction, compréhension et français, mais plus lourd.
+    🥉 Mistral 7B — particulièrement intéressant si tu veux un modèle rapide et efficace en français.
+    ⚡ Qwen3 4B — à choisir si tu privilégies vraiment la vitesse/autonomie sur la Surface.
+
+pour la 3080:
+🥇 Qwen3 14B — mon premier choix. Excellent français, raisonnement solide et très bon pour rédaction, code et conversation. En quantification adaptée, il peut être utilisé avec 10 Go de VRAM, même si une partie peut passer en RAM.
+🥈 Mistral Small 3.1 24B — meilleure qualité potentielle, mais 24B est trop gros pour être entièrement en VRAM sur une 3080 10 Go. Il faudra compter sur la RAM, donc plus lent.
+🥉 Qwen3 8B — si tu veux quelque chose de très rapide et entièrement ou presque sur GPU.
+Gemma 3 12B — très bon compromis également.
+
 """
 
 import knowledge

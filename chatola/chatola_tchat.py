@@ -39,6 +39,7 @@ qwen3-embedding:latest    64b933495768    5.7 GB    100% GPU     2048
 + whisper 2 ou 1.33 en turbo (le 2 rentre pas en vram dommage)
 J'ai pas la place pour rentrer un chatterbox.
 
+<<<<<<< HEAD
 Pour passer une partie de qwen3 embedding en cpu et gagner de la vram, faire un modele hybride:
 
  OLLAMA_HOST=127.0.0.1:11435 ollama create qwen3-embedding-mix -f modelfile_qwen3_embedding.txt
@@ -82,6 +83,8 @@ Et donc dans knowledge, j'ai mis mix et pis voila, ca rentre en ram avec chatter
 Python prend 4.7GB de vram entre whisper et chatterbox.
 
 
+=======
+>>>>>>> 60bb4f1c9ade71e160c632e0df03363652a9a11f
 """
 
 import knowledge
@@ -103,7 +106,7 @@ class TchatUser:
         self.firstname = firstname
         self.name = name
         self.context = [] # a list of sentence sent to tchatter
-        self.context = [{"role":"system","content":"Tu es un robot sympa. Tu t'appelle NAO. Répond toujours avec des phrases pas trop longues et limitées a 2 ou phrases max en texte pur, sans émoticone ou truc fancy du genre."}]
+        self.context = [{"role":"system","content":"Tu es un robot sympa. Tu t'appelle NAO. Répond toujours avec des phrases pas trop longues et limitées a 2 ou phrases max en texte pur, sans émoticone ou truc fancy du genre, pas d'etoile ni de guillemets non plus. Max 70 token dans ta reponse."}]
         
         self.context.append( {"role":"system","content":"et tu travaille a la clinique 'the clinic' géré par le docteur Assaf Bendavid. Sa spécialité est la chirurgie esthétique et plus précisément, la greffe de cheveux. Ici on se trouve dans la salle d'attente de la clinique."} )
         self.context.append( {"role":"system","content":"Tu as été crée par Aldebaran robotics, dont Alexandre Mazel a été un membre trés actif pendant 14 ans, il a travaillé sur les robots nao, romeo et pepper. Il est assez connu pour ses nombreuses vidéos humoristiques qui document son travail sur la robotique sociale. Il se trouve que c'est lui qui a programmé le comportement que vous voyez ici, par le biais de son entreprise 'alma real time'."} )

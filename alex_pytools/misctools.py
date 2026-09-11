@@ -657,18 +657,21 @@ def getCpuModel(bShort=False):
                 idx = line.find(strLineToSearch)
             if idx != -1:
                 name1 = line[idx+len(strLineToSearch)+1:].strip()
+                #~ print( "DBG: getCpuModel: name1: '%s'" % name1 )
                 if name1[0] == ':':
                     name1 = name1[1:]
                     name1 = name1.strip()
                 break
-        try:
-            f = open( "/sys/class/dmi/id/product_family", "rt" )
-            data = f.read()
-            name1 = data
-            f.close()
-        except FileNotFoundError as err:
-            print( "DBG: getCpuModel: " , err )
-            pass
+        if idx == -1:
+            try:
+                #~ print( "DBG: getCpuModel: trying product_family" )
+                f = open( "/sys/class/dmi/id/product_family", "rt" )
+                data = f.read()
+                name1 = data
+                f.close()
+            except FileNotFoundError as err:
+                print( "DBG: getCpuModel: " , err )
+                pass
         name2 = name1
     else:
         name1, name2 =  "TODO:getCpuModel", "todo"

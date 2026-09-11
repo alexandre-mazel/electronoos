@@ -140,6 +140,7 @@ def print_ram():
             print( "ram              : %.2f / %.2f GB" % (avail/GB,tot/GB))
         except BaseException as err:
             print( "ram              : unknown (2)" )
+    return avail, tot
 
     
 def test_cpu_int( bPrint = True ):
@@ -473,7 +474,9 @@ def test_multithreading():
 def test_perf(nDiskTestSizeMB=200,bTestMultiThreading=True):
     print_version()
     print_cpu()
-    print_ram()
+    cur,tot = print_ram()
+    totGB = tot / (1024*1024*1024)
+    #~ print( totGB )  
     rTotalTime = 0;
     rTotalTime += test_cpu_int();
     rTotalTime += test_cpu_float();
@@ -481,11 +484,17 @@ def test_perf(nDiskTestSizeMB=200,bTestMultiThreading=True):
     rTotalTime += test_ram(2);
     rTotalTime += test_ram(4);
     rTotalTime += test_ram(6);
-    rTotalTime += test_ram(8);
-    rTotalTime += test_ram(10);
-    rTotalTime += test_ram(12);
-    rTotalTime += test_ram(14);
-    rTotalTime += test_ram(16);
+    if totGB > 4:
+        rTotalTime += test_ram(8);
+    if totGB > 5:
+        rTotalTime += test_ram(10);
+    if totGB > 6:
+        rTotalTime += test_ram(12);
+    if totGB > 7:
+        rTotalTime += test_ram(14);
+    if totGB > 8:
+        rTotalTime += test_ram(16);
+        
     rTotalTime += test_numpy();
     rTotalTime += test_opencv_orb();
     rTotalTime += test_opencv_orb_realcase();

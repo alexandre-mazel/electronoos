@@ -111,7 +111,9 @@ def clear_caches():
     
 
 def print_version():
-    print( "python version   : %d.%d.%d (%dbits) (%d core(s))" % (sys.version_info.major,sys.version_info.minor,sys.version_info.micro,8 * struct.calcsize("P"),multiprocessing.cpu_count()) )
+    nbr_cpu = multiprocessing.cpu_count()
+    print( "python version   : %d.%d.%d (%dbits) (%d core(s))" % (sys.version_info.major,sys.version_info.minor,sys.version_info.micro,8 * struct.calcsize("P"),nbr_cpu) )
+    return nbr_cpu
     
 def print_cpu():
     try:
@@ -441,7 +443,7 @@ def test_disk_read( nMB=200, nPacketSize = 1024 ):
 def simple_test(bToto):
     print("test!!!")
 
-def test_multithreading():
+def test_multithreading(nbr_cpu):
     # It shows us that
     import platform
     if platform.system() == 'Windows' or 0:
@@ -449,6 +451,8 @@ def test_multithreading():
 
     rTotalDuration = 0
     for nNbrProcessInParalell in [1,4,8,32]:
+        if nbr_cpu * 4 < nNbrProcessInParalell:
+            continue
         sys.stdout.write( "multiprocess x%-2d:" % nNbrProcessInParalell  )    
         bFirstInLine = True
         all_process = []
@@ -472,7 +476,7 @@ def test_multithreading():
     
 
 def test_perf(nDiskTestSizeMB=200,bTestMultiThreading=True):
-    print_version()
+    nbr_cpu = print_version()
     print_cpu()
     cur,tot = print_ram()
     totGB = tot / (1024*1024*1024)
@@ -501,7 +505,7 @@ def test_perf(nDiskTestSizeMB=200,bTestMultiThreading=True):
     rTotalTime += test_opencv_orb_realcase(); # because on some computer the previous one takes time initialise stuffs
     if bTestMultiThreading:
         # multithreading
-        rTotalTime += test_multithreading();
+        rTotalTime += test_multithreading(nbr_cpu);
             
     rTotalTime += test_disk_write(nMB=nDiskTestSizeMB, nPacketSize=1024);
     rTotalTime += test_disk_read(nMB=nDiskTestSizeMB, nPacketSize=1024);
@@ -1697,6 +1701,40 @@ disk_write    1KB: ####################   4.94s (202.59 Mo/s)
 disk_read     1KB: ####################   2.22s (450.12 Mo/s)
 disk_write 1024KB: ####################   3.40s (294.55 Mo/s)
 disk_read  1024KB: ####################   0.26s (3852.48 Mo/s)
+
+
+*** Del Romeo2: Vostro-230
+
+python version   : 3.8.10 (64bits) (2 core(s))
+cpu              : Intel(R) Core(TM)2 Duo CPU     E7500  @ 2.93GHz
+ram              : 2.35 / 3.79 GB
+test_cpu_int2    : ####################   0.83s
+test_cpu_float2  : ####################   0.16s
+test_crypt       : ####################   5.96s
+test_cpu_ram 2G  : ####################   1.13s
+test_cpu_ram 4G  : ####################   2.23s
+test_cpu_ram 6G  : ####################   6.82s
+test_scipy_xxt   : ####################   3.31s (120.71x)
+test_orb5.0.0    : ####################   0.69s (144.52fps)
+test_orbcv imgs  : ####################   1.71s (58.38fps)
+test_orbcv bis   : ####################   1.49s (67.12fps)
+multiprocess x1 :  0.75s /  0.13s /  5.86s /  3.09s /  0.55s /  1.74s /  1.73s =>   13.85s (per thread:13.85s)
+multiprocess x4 :  1.44s /  0.26s / 11.98s / 11.64s /  1.20s /  3.75s /  3.71s =>   47.83s (per thread:11.96s)
+multiprocess x8 :  2.85s /  0.53s / 23.50s / 23.45s /  2.42s /  7.50s /  7.49s =>  115.58s (per thread:14.45s)
+multiprocess x32: 11.47s /  2.09s / 94.24s / 93.15s / 10.07s / 30.22s / 29.72s =>  386.54s (per thread:12.08s)
+disk_write    1KB: ####################  14.53s (68.82 Mo/s)
+disk_read     1KB: ####################   8.69s (115.11 Mo/s)
+disk_write 1024KB: ####################  13.43s (74.48 Mo/s)
+disk_read  1024KB: ####################   5.67s (176.48 Mo/s)
+
+python version   : 2.7.18 (64bits) (2 core(s))
+cpu              : Intel(R) Core(TM)2 Duo CPU     E7500  @ 2.93GHz
+ram              : 2.86 / 3.79 GB
+test_cpu_int2    : ####################   0.69s
+test_cpu_float2  : ####################   0.15s
+
+
+
 
 
 

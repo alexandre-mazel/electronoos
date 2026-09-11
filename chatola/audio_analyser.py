@@ -3,7 +3,7 @@ import time
 import wave
 import audioop
 
-import test_whisper
+#~ import test_whisper
 
 
 class AudioAnalyser:
@@ -12,7 +12,7 @@ class AudioAnalyser:
         sample_rate = 16000,
         channels = 1,
         sample_width = 2,
-        vad_threshold = 300, # 700
+        vad_threshold = 100, # 700 # 300 ok pour moi 100 pour gamer 
         silence_duration = 0.8,
         min_speech_duration = 0.3
     ):
@@ -103,7 +103,7 @@ class AudioAnalyser:
 
 def loop_audio():
     audio_analyser = AudioAnalyser()
-    whi = test_whisper.Whisper()
+    #~ whi = test_whisper.Whisper()
 
     while True:
         audio_chunk = microphone.read()

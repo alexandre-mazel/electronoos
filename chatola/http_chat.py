@@ -28,6 +28,7 @@ def ask_ollama_http( model, messages, strHost = "localhost", port = OLLAMA_PORT 
                 "temperature": 0.1,   # 0 = deterministe, 1 = plus aleatoire
                 "seed": 42,              # pour reproductibilite
                 #~ "max_tokens": 3        # nombre maximum de tokens a generer (not working?)
+                "thinking": 0,
             }
     }
 

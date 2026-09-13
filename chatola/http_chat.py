@@ -191,6 +191,7 @@ def testperf():
         """
         Azure: 
         cpu: Intel(R) Xeon(R) Platinum 8272CL CPU @ 2.60GHz
+        (lama3.2?)
         
         Hello               : 0.669s # 4.6 si model pas encore charge
         comput           : 0.818s
@@ -198,6 +199,7 @@ def testperf():
         long2              : 190.068s / 246.041s avec get_knowledge_related_to a max=4
         
         ### Champion1 en 100%  cpu:
+        (lama3.2?)
         cpu: Intel(R) Core(TM) i7-9700K CPU @ 3.60GHz
         Load+Hello      : 2.690s
         Hello               : 0.751s
@@ -250,8 +252,8 @@ def testperf():
         PC RTX 4090	70–150
 
 
-        ### DGX Spark (peak a 297w) (idle: 112w)
-        
+        ### DGX Spark (des fois mal orthographie sparx)       (peak a 297w) (idle: 112w)
+        (lama3.2)
         Load+Hello      : 3.476s
         Hello               : 0.297s
         comput            : 0.204s

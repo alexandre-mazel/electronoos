@@ -218,7 +218,7 @@ def autotest():
         # => 456 sec soit 7.6min
         
     if 1:
-        ret = knowledge.get_nearest( "leve toi stp!", ["seat down", "standup"], verbose=verbose )
+        ret = get_nearest( "leve toi stp!", ["seat down", "standup"], verbose=verbose )
         print(ret)
         
     

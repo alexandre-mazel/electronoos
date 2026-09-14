@@ -1,10 +1,20 @@
 import cv2
 import numpy as np
 import insightface # pip install insightface # will download https://github.com/deepinsight/insightface/releases/download/model-zoo/buffalo_l.zip
+import time
 
 _face_app = None
 
-def find_most_centered_and_big_face(faces, image_width, image_height):
+"""
+J'ai du deinstaller pip install onnxruntime et mettre pip install onnxruntime-gpu
+pip uninstall onnxruntime
+pip install onnxruntime-gpu
+#mais en fait:
+pip uninstall -y onnxruntime-gpu
+pip install "onnxruntime-gpu==1.26.0"
+"""
+
+def find_most_centered_and_big_face(faces, image_width, image_height,verbose=0):
     """
     return the index of the most centered faces (and also big enough)
     """
@@ -16,7 +26,7 @@ def find_most_centered_and_big_face(faces, image_width, image_height):
     image_cx = image_width / 2.0
     image_cy = image_height / 2.0
     
-    print( "DBG: find_most_centered_and_big_face: cxdiv2: %d, cydiv2: %d" % (image_cx,image_cy) )
+    if verbose: print( "DBG: find_most_centered_and_big_face: centrx: %d, centry: %d" % (image_cx,image_cy) )
 
     # Distance maximale possible au centre
     max_distance = (
@@ -39,10 +49,7 @@ def find_most_centered_and_big_face(faces, image_width, image_height):
         cx = (x1 + x2) / 2.0
         cy = (y1 + y2) / 2.0
 
-        distance = (
-            (cx - image_cx) ** 2 +
-            (cy - image_cy) ** 2
-        ) ** 0.5
+        distance = ( (cx - image_cx) ** 2 + (cy - image_cy) ** 2 ) ** 0.5
 
         # 0 = centre, 1 = bord extreme
         normalized_distance = distance / max_distance
@@ -50,7 +57,9 @@ def find_most_centered_and_big_face(faces, image_width, image_height):
         # 1 au centre, 0.5 a une distance normalisee de 1
         centering_factor = 1.0 / (1.0 + normalized_distance)
 
-        score = area * centering_factor
+        score = area * centering_factor ** 4 # add an importance to the centering
+        
+        if verbose: print( "index: %d, lefttop: %d,%d, rightbottom: %d,%d centering_factor: %.2f, area: %.1f, score: %.1f" % (i,x1,y1,x2,y2,centering_factor,area,score) )
 
         if score > best_score:
             best_score = score
@@ -95,7 +104,7 @@ def draw_faces_rect(image1, faces1, selected_idx):
         gender = "Male" if face.gender == 1 else "Female"
         age = int(round(face.age))
 
-        label = f"{gender}, {age}"
+        label = f"{i}: {gender}, {age}"
 
         # Put label just above the bounding box
         font = cv2.FONT_HERSHEY_SIMPLEX
@@ -131,13 +140,14 @@ def draw_faces_rect(image1, faces1, selected_idx):
 
     return image
     
-def compare_faces(image1_path, image2_path):
+def compare_faces(image1_path, image2_path, verbose = 0 ):
     global _face_app
 
     if _face_app is None:
         _face_app = insightface.app.FaceAnalysis(
             name = "buffalo_l",
             providers = [
+                #~ "TensorrtExecutionProvider", # ne fonctionne pas
                 "CUDAExecutionProvider",
                 "CPUExecutionProvider"
             ]
@@ -165,10 +175,10 @@ def compare_faces(image1_path, image2_path):
     if len(faces2) == 0:
         raise ValueError("No face detected in image 2")
         
-    idx1 = find_most_centered_and_big_face( faces1, image1.shape[1], image1.shape[0] )
-    idx2 = find_most_centered_and_big_face( faces2, image2.shape[1], image2.shape[0] )
+    idx1 = find_most_centered_and_big_face( faces1, image1.shape[1], image1.shape[0],verbose=verbose )
+    idx2 = find_most_centered_and_big_face( faces2, image2.shape[1], image2.shape[0],verbose=verbose )
     
-    draw_faces_rect( image1, faces1, idx1 )
+    if verbose: draw_faces_rect( image1, faces1, idx1 )
     
     print("faces1: taking idx: %s" % str( idx1 ) )
     print("faces2: taking idx: %s" % str( idx2 ) )
@@ -181,7 +191,12 @@ def compare_faces(image1_path, image2_path):
     return similarity
     
 def autotest():
+    verbose = 1
+    verbose = 0
+    
     imgs = ["20240102_105013_small","20240109_161443_small","20240223_094710_small","20260906_210413_small"]
+    
+    time_begin = time.time()
     
     for img1 in imgs:
         for img2 in imgs:
@@ -189,9 +204,12 @@ def autotest():
                 continue
             pi1 = "../test/%s.jpg" % img1
             pi2 = "../test/%s.jpg" % img2
-            simi = compare_faces( pi1, pi2 )
+            simi = compare_faces( pi1, pi2,verbose=verbose )
             print( "%s & %s => %.3f" % ( img1, img2, simi ) )
         print("")
+        
+    duration = time.time() - time_begin
+    print( "duration: %.1fs" % duration ) # sans gpu: 12.3s, avec cuda sur GTX 3080: 3.0s
     
     
 if __name__ == "__main__":

@@ -95,6 +95,13 @@ pour la 3080:
 🥉 Qwen3 8B — si tu veux quelque chose de très rapide et entièrement ou presque sur GPU.
 Gemma 3 12B — très bon compromis également.
 
+
+pour tester qwen3:4B en no thinking pour voir si ca va plus vite:
+
+OLLAMA_HOST=127.0.0.1:11435 ollama create qwen3:4B_nothinking -f modelfile_qwen3_chat_nothinking.txt
+
+
+
 """
 
 import knowledge
@@ -104,7 +111,8 @@ import http_chat
 
 strModel = "gemma3:270m" # un rapide pour tester
 strModel = "llama3.2" # rapide, pas de merdouillette
-#~ strModel = "qwen3:4B" # trop long
+strModel = "qwen3:4B" # meilleur mais trop long dès qu'on a du contexte en entree (genre 10s pour 8k et 900 token de sortie)(car le thinking etait force dans le modele)
+strModel = "qwen3:4B_nothinking" 
 #~ strModel = "gemma3:4B" # pas trop long mais des merdouilette
 
 class TchatUser:    
@@ -121,7 +129,7 @@ class TchatUser:
         self.prev_kdb = []
         
     def getConsignList( self ):
-        consigne = [{"role":"system","content":"Tu es un robot sympa. Tu t'appelle NAO. Répond toujours avec des phrases pas trop longues et limitées a 2 ou phrases max en texte pur, sans émoticone ou truc fancy du genre, pas d'etoile ni de guillemets non plus. Tu ne dois absolument pas mettre plus de 100 tokens dans ta reponse. Ne raconte pas d'histoires, le but n'est pas non plus de meubler."}]
+        consigne = [{"role":"system","content":"Tu es un robot sympa. Tu t'appelle NAO. Répond toujours avec des phrases pas trop longues et limitées a 2 ou phrases max en texte pur, sans émoticone ou truc fancy du genre, pas d'etoile ni de guillemets non plus. Your answer must be shorter than 100 tokens. Ne raconte pas d'histoires, le but n'est pas non plus de meubler."}]
         
         consigne.append( {"role":"system","content":"et tu travaille a la clinique 'the clinic' géré par le docteur Assaf Bendavid. Sa spécialité est la chirurgie esthétique et plus précisément, la greffe de cheveux. Ici on se trouve dans la salle d'attente de la clinique."} )
         consigne.append( {"role":"system","content":"Tu as été crée par Aldebaran robotics, dont Alexandre Mazel a été un membre trés actif pendant 14 ans, il a travaillé sur les robots nao, romeo et pepper. Il est assez connu pour ses nombreuses vidéos humoristiques qui document son travail sur la robotique sociale. Il se trouve que c'est lui qui a programmé le comportement que vous voyez ici, par le biais de son entreprise 'alma real time'."} )

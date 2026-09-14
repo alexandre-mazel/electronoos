@@ -10,6 +10,16 @@ import time
 OLLAMA_PORT = 11435
 
 def ask_ollama_http( model, messages, strHost = "localhost", port = OLLAMA_PORT ):
+
+    if 1:
+        # pour qwen on lui dit vraiment de pas penser:
+        messages = messages.copy()
+
+        messages[-1] = {
+            **messages[-1],
+            "content": messages[-1]["content"] + "\n/no_think"
+        }
+        
     print( "DBG: http_chat.ask_ollama_http: port: %s, model: %s, prompt:\n%s" % ( port, model, messages) )
     
     """
@@ -23,12 +33,13 @@ def ask_ollama_http( model, messages, strHost = "localhost", port = OLLAMA_PORT 
         #~ "prompt": prompt, # quand on est en mode generate
         "messages": messages,
         "stream": False,        # easier to parse than streaming mode
+        "think": False, # pour qwen c'est important
           "options": 
             {
                 "temperature": 0.,   # 0 = deterministe, 1 = plus aleatoire (ne pas mettre 0.1 car deja ca le fait delirer)
                 "seed": 42,              # pour reproductibilite
                 #~ "max_tokens": 3        # nombre maximum de tokens a generer (not working?)
-                "thinking": 0,
+                "thinking": 0, # ne semble pas etre la bonne option
             }
     }
 

@@ -190,7 +190,7 @@ def get_nearest( question, choice, verbose=0 ):
     for i in range( len( choice ) ):
         v2 = knowledge._get_embed( choice[i] )
         simi = numpy.dot( v2, v )
-        res.append( ( simi, choice[i] ) )
+        res.append( ( float(simi), choice[i] ) )
         
     mosted = sorted( res, reverse=True )
     if verbose:

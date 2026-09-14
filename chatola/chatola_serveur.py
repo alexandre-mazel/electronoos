@@ -166,7 +166,7 @@ fullfn = fullpath + "fullchain.pem"
 context  = (fullfn,keyfn)
 
 if 1:
-    # abaisse le requirement a tls v1.0 pour etre compatible avec les vieux NAO
+    # abaisse le requirement a tls v1.0 pour etre compatible avec les vieux NAO (sur mon 2.1 ca fonctionne meme pas)
     import ssl
 
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
@@ -177,10 +177,13 @@ if 1:
     )
 
     # TEST UNIQUEMENT : accepter TLS 1.0
-    #~ context.minimum_version = ssl.TLSVersion.TLSv1
-    #~ context.maximum_version = ssl.TLSVersion.TLSv1
+    context.minimum_version = ssl.TLSVersion.TLSv1
+    context.maximum_version = ssl.TLSVersion.TLSv1
 
 print( "INF: Running app..." )
+
+context = None # to disable ssl with my old nao 2.1 => http
+
 app.run(
     host="0.0.0.0",
     port=45001,

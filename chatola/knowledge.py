@@ -201,6 +201,7 @@ def get_nearest( question, choice, verbose=0 ):
             
     if mosted[0][0] < 0.64:
         return "",0.
+        
     return mosted[0]
     
     

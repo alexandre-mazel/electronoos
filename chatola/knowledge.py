@@ -181,7 +181,8 @@ def get_knowledge_related_to( question, max=12, verbose = False ):
     
 def get_nearest( question, choice, verbose=0 ):
     """
-    return the nearest choice related to question with similarity
+    compute the nearest choice related to question with similarity.
+    or "" and 0
     """
     global knowledge
     v = knowledge._get_embed( question )
@@ -197,6 +198,10 @@ def get_nearest( question, choice, verbose=0 ):
         print( "\nDBG: get_nearest: res for question '%s'" % (question) )
         for v in mosted:
             print( v )
+            
+    if mosted[0][0] < 0.64:
+        return "",0.
+    return mosted[0]
     
     
 def autotest():

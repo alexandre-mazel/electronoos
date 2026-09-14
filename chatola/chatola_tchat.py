@@ -99,6 +99,7 @@ Gemma 3 12B — très bon compromis également.
 pour tester qwen3:4B en no thinking pour voir si ca va plus vite:
 
 OLLAMA_HOST=127.0.0.1:11435 ollama create qwen3:4B_nothinking -f modelfile_qwen3_chat_nothinking.txt
+=> ca va plus vite, mais souvent il n'y a rien qui sort (si le think etait en premier)
 
 
 
@@ -111,9 +112,14 @@ import http_chat
 
 strModel = "gemma3:270m" # un rapide pour tester
 strModel = "llama3.2" # rapide, pas de merdouillette
-strModel = "qwen3:4B" # meilleur mais trop long dès qu'on a du contexte en entree (genre 10s pour 8k et 900 token de sortie)(car le thinking etait force dans le modele)
-strModel = "qwen3:4B_nothinking" 
+strModel = "qwen3:4B" # meilleur mais trop long des qu'on a du contexte en entree (genre 10s pour 8k et 900 token de sortie)(car le thinking etait force dans le modele)
+strModel = "qwen3:4B_nothinking"  # bien plus rapide mais parfois pas de réponse.
+strModel = "qwen3:8B" # 2s 6.2GB 100%gpu, rapide car pas de thinking, par contre il veut pas parler d'autre choses (peut etre a cause de la consigne tres stricte)
+#~ strModel = "qwen3:14B" # ~15s, 10GB, 27% CPU pas de probleme de thinking en trop donc parfois il le fait en 3s
+#~ strModel = "mistral-small3.1:24b" # autour de 30sec, modele de 16GB a 58% en cpu
+
 #~ strModel = "gemma3:4B" # pas trop long mais des merdouilette
+#~ strModel = "gemma3:12B"
 
 class TchatUser:    
     def __init__( self, user_id, firstname = "", name = "" ):

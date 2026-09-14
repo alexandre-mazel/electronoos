@@ -11,8 +11,8 @@ OLLAMA_PORT = 11435
 
 def ask_ollama_http( model, messages, strHost = "localhost", port = OLLAMA_PORT ):
 
-    if 1:
-        # pour qwen on lui dit vraiment de pas penser:
+    if 0:
+        # pour qwen on lui dit vraiment de pas penser (bon ca fonctionne pas, il vaut mieux refaire un modelfile specifique)
         messages = messages.copy()
 
         messages[-1] = {

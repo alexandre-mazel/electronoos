@@ -134,6 +134,9 @@ Ne devine jamais un texte qui n'est pas clairement visible.
 
 def main():
     strModel = "qwen2.5vl:7b" # qwen2.5vl:7b    5ced39dfa4ba    5.9 GB    100% GPU     8192
+    # fonctionne tres bien et reproductible et format bien maintenu, parfait!
+    
+    
     #~ strModel = "gemma3:12b" # gemma3:12B    f4031aab637d    9.0 GB    13%/87% CPU/GPU    8192
     
     list_img = [ "20260901_111820_small", "20260901_160631_small","20260906_210413_small","20260910_130425_small","20260911_173947_small","girl-4051811_960_720"]
@@ -166,42 +169,42 @@ def main():
 *** qwen2.5vl:7b ***
 
 img: '20260901_111820_small'
-duration: 1.964s
+duration: 1.976s
 desc: Une bicyclette colorée avec un siège pour enfant est accrochée à un poteau sur un trottoir. Le siège est attaché avec des cordes. En arrière-plan, on voit des tables de café et des personnes qui discutent. Le cadre de la bicyclette est multicolore, avec des tons de rose, de bleu et de jaune. Il y a aussi des paniers sur le côté de la bicyclette. Le trottoir est en béton et il y a des plantes vertes sur le côté.
 kw: bicyclette, siège enfant, trottoir, café, tables, poteau, multicolore, paniers, plantes, trottoir, ville
 txt: Initial, 110
 
 img: '20260901_160631_small'
-duration: 1.672s
+duration: 1.640s
 desc: Un pot en verre avec un couvercle hermétique contenant une préparation granuleuse, probablement des céréales ou des graines, avec des morceaux de fruits séchés. Le pot est posé sur une surface sombre, entouré de divers objets de cuisine, dont un bol métallique et des bouteilles. Des graines sont éparpillées sur la surface.
 kw: pot, couvercle, granules, fruits séchés, cuisine, surface sombre, boulangerie, préparation, céréales, graines, bocal, bouteilles, bol métallique
 txt: FORMAT, Nestle, tr
 
 img: '20260906_210413_small'
-duration: 1.478s
+duration: 1.466s
 desc: Une personne assise à une table avec des livres et des cahiers, portant un chapeau jaune et un t-shirt avec un dessin coloré. Elle tient un stylo et semble faire des devoirs. L'environnement montre une cuisine avec des armoires rouges et un réfrigérateur.
 kw: personne, table, livres, cahiers, chapeau, jaune, t-shirt, dessin, cuisine, armoires, réfrigérateur
 txt: Je m'entraîne, Je m'entraîne
 
 img: '20260910_130425_small'
-duration: 2.271s
+duration: 2.246s
 desc: Un homme présente devant un écran interactif dans une salle de conférence. L'écran affiche une présentation sur le sommeil, avec des graphiques et des textes. Des personnes sont assises devant l'écran, regardant la présentation. L'environnement est un bureau avec des câbles et des équipements électroniques.
 kw: homme, écran, conférence, présentation, sommeil, graphiques, textes, salle, câbles, équipements
 txt: Saliency, Complexity, Not possible during sleep, Possible in some sleep stages or individuals, Possible in most sleep stages or individuals, Cognitive determinants of sleep processing: saliency of sensory information and complexity of cognitive processing, Some processing seem to be virtually always present, others in light sleep only and some never (i.e., require conscious awareness?), Sleep's sensory (dis)connection might reflect a tradeoff between different functions or consequences of sleep (adaptation), Oudiette & Andriolli (under review)
 
 img: '20260911_173947_small'
-duration: 1.438s
+duration: 1.430s
 desc: Une personne tient un t-shirt plié avec l'inscription 'ADL international 3eme trophée de KARTING' sur l'avant. Le t-shirt est blanc avec un logo bleu et texte bleu. L'arrière de la personne est visible, montrant une partie de son bras et son torse.
 kw: t-shirt, plié, blanc, bleu, logo, inscription, carting, trophée, ADL, international, 3eme
 txt: ADL, international, 3eme, trophée, de, KARTING
 
 img: 'girl-4051811_960_720'
-duration: 1.545s
+duration: 1.502s
 desc: Une femme assise en tailleur sur un trottoir pavé, sourit largement. Elle porte un ensemble de sport noir et des chaussures de running. À côté d'elle, il y a un réveil vert, une bouteille d'eau bleue et une paire de chaussures de sport. Le fond montre une rue avec des voitures et des arbres.
 kw: femme, sport, tailleur, sourire, trottoir, pavé, réveil, bouteille d'eau, chaussures de sport, rue, voitures, arbres
 txt: 
 
-=> total duration: 10.369s
+=> total duration: 10.261s
 
 *** gemma3:12b ***
 

@@ -114,12 +114,18 @@ strModel = "gemma3:270m" # un rapide pour tester
 strModel = "llama3.2" # rapide, pas de merdouillette
 strModel = "qwen3:4B" # meilleur mais trop long des qu'on a du contexte en entree (genre 10s pour 8k et 900 token de sortie)(car le thinking etait force dans le modele)
 strModel = "qwen3:4B_nothinking"  # bien plus rapide mais parfois pas de réponse.
-strModel = "qwen3:8B" # 2s 6.2GB 100%gpu, rapide car pas de thinking, par contre il veut pas parler d'autre choses (peut etre a cause de la consigne tres stricte)
+strModel = "qwen3:8B" # 2s 6.2GB 100%gpu, rapide car pas de thinking, par contre il veut pas parler d'autre choses (peut etre a cause de la consigne tres stricte) <== pas mal au final
 #~ strModel = "qwen3:14B" # ~15s, 10GB, 27% CPU pas de probleme de thinking en trop donc parfois il le fait en 3s
+
 #~ strModel = "mistral-small3.1:24b" # autour de 30sec, modele de 16GB a 58% en cpu
+#~ strModel = "ministral-3:14b" # 3-4s, 10GB, 34%cpu, mais ne respecte pas les consignes de pas mettre d'etoile, il en met a chaque fois.
+#~ strModel = "ministral-3:14b-instruct" # pas le bon nom
+strModel = "ministral-3:14b-instruct-2512-q4_K_M" # 10GB 34% aussi ne semble rien changer.
 
 #~ strModel = "gemma3:4B" # pas trop long mais des merdouilette
-#~ strModel = "gemma3:12B"
+#~ strModel = "gemma3:12B" # 3-4s 9GB 25%cpu, plus long que qwen3:8B mais de bons résultats
+
+
 
 class TchatUser:    
     def __init__( self, user_id, firstname = "", name = "" ):
@@ -138,8 +144,9 @@ class TchatUser:
         consigne = [{"role":"system","content":"Tu es un robot sympa. Tu t'appelle NAO. Répond toujours avec des phrases pas trop longues et limitées a 2 ou phrases max en texte pur, sans émoticone ou truc fancy du genre, pas d'etoile ni de guillemets non plus. Your answer must be shorter than 100 tokens. Ne raconte pas d'histoires, le but n'est pas non plus de meubler."}]
         
         consigne.append( {"role":"system","content":"et tu travaille a la clinique 'the clinic' géré par le docteur Assaf Bendavid. Sa spécialité est la chirurgie esthétique et plus précisément, la greffe de cheveux. Ici on se trouve dans la salle d'attente de la clinique."} )
+        consigne.append( {"role":"system","content":"Si on te demande quel est ton modele de mémoire ou ton llm tu dis que tu es basé sur un modèle personnalisé Alma model"} )    
         consigne.append( {"role":"system","content":"Tu as été crée par Aldebaran robotics, dont Alexandre Mazel a été un membre trés actif pendant 14 ans, il a travaillé sur les robots nao, romeo et pepper. Il est assez connu pour ses nombreuses vidéos humoristiques qui document son travail sur la robotique sociale. Il se trouve que c'est lui qui a programmé le comportement que vous voyez ici, par le biais de son entreprise 'alma real time'."} )
-        consigne.append( {"role":"system","content":"Si on te demande quel est ton modele de mémoire ou ton llm tu dis que tu es basé sur un modèle personnalisé Alma model"} )
+    
         
         if 0:
             consigne.append( {"role":"system","content":"Si on te demande un restaurant dans le coin (on est dans le 16ieme arrt de paris), tu peux parler de Ragazzi 2.0 au 83 rue de Longchamp ou La matta au 23 rue de l'annonciation"} )

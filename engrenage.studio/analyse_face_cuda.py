@@ -45,3 +45,9 @@ def compare_faces(image1_path, image2_path):
     similarity = float(np.dot(embedding1, embedding2))
 
     return similarity
+    
+def autotest():
+    
+    
+if __name__ == "__main__":
+    autotest()

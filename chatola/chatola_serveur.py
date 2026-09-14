@@ -163,9 +163,26 @@ keyfn = fullpath + "privkey.pem"
 certfn = fullpath + "cert.pem"
 fullfn = fullpath + "fullchain.pem"
 
+context  = (fullfn,keyfn)
+
+if 1:
+    # abaisse le requirement a tls v1.0 pour etre compatible avec les vieux NAO
+    import ssl
+
+    context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+
+    context.load_cert_chain(
+        certfile=fullfn,
+        keyfile=keyfn
+    )
+
+    # TEST UNIQUEMENT : accepter TLS 1.0
+    context.minimum_version = ssl.TLSVersion.TLSv1
+    context.maximum_version = ssl.TLSVersion.TLSv1
+
 print( "INF: Running app..." )
 app.run(
     host="0.0.0.0",
     port=45001,
-    ssl_context=(fullfn,keyfn)
+    ssl_context=context
 )

@@ -116,15 +116,27 @@ class TchatUser:
         self.firstname = firstname
         self.name = name
         self.context = [] # a list of sentence sent to tchatter
-        self.context = [{"role":"system","content":"Tu es un robot sympa. Tu t'appelle NAO. Répond toujours avec des phrases pas trop longues et limitées a 2 ou phrases max en texte pur, sans émoticone ou truc fancy du genre, pas d'etoile ni de guillemets non plus. Tu ne dois absolument pas mettre plus de 100 tokens dans ta reponse. Ne raconte pas d'histoires, le but n'est pas non plus de meubler."}]
+        self.consigne = self.getConsignList()
+
+        self.prev_kdb = []
         
-        self.context.append( {"role":"system","content":"et tu travaille a la clinique 'the clinic' géré par le docteur Assaf Bendavid. Sa spécialité est la chirurgie esthétique et plus précisément, la greffe de cheveux. Ici on se trouve dans la salle d'attente de la clinique."} )
-        self.context.append( {"role":"system","content":"Tu as été crée par Aldebaran robotics, dont Alexandre Mazel a été un membre trés actif pendant 14 ans, il a travaillé sur les robots nao, romeo et pepper. Il est assez connu pour ses nombreuses vidéos humoristiques qui document son travail sur la robotique sociale. Il se trouve que c'est lui qui a programmé le comportement que vous voyez ici, par le biais de son entreprise 'alma real time'."} )
+    def getConsignList( self ):
+        consigne = [{"role":"system","content":"Tu es un robot sympa. Tu t'appelle NAO. Répond toujours avec des phrases pas trop longues et limitées a 2 ou phrases max en texte pur, sans émoticone ou truc fancy du genre, pas d'etoile ni de guillemets non plus. Tu ne dois absolument pas mettre plus de 100 tokens dans ta reponse. Ne raconte pas d'histoires, le but n'est pas non plus de meubler."}]
+        
+        consigne.append( {"role":"system","content":"et tu travaille a la clinique 'the clinic' géré par le docteur Assaf Bendavid. Sa spécialité est la chirurgie esthétique et plus précisément, la greffe de cheveux. Ici on se trouve dans la salle d'attente de la clinique."} )
+        consigne.append( {"role":"system","content":"Tu as été crée par Aldebaran robotics, dont Alexandre Mazel a été un membre trés actif pendant 14 ans, il a travaillé sur les robots nao, romeo et pepper. Il est assez connu pour ses nombreuses vidéos humoristiques qui document son travail sur la robotique sociale. Il se trouve que c'est lui qui a programmé le comportement que vous voyez ici, par le biais de son entreprise 'alma real time'."} )
         
         if 0:
-            self.context.append( {"role":"system","content":"Si on te demande un restaurant dans le coin (on est dans le 16ieme arrt de paris), tu peux parler de Ragazzi 2.0 au 83 rue de Longchamp ou La matta au 23 rue de l'annonciation"} )
+            consigne.append( {"role":"system","content":"Si on te demande un restaurant dans le coin (on est dans le 16ieme arrt de paris), tu peux parler de Ragazzi 2.0 au 83 rue de Longchamp ou La matta au 23 rue de l'annonciation"} )
         
-        self.prev_kdb = []
+        return consigne
+        
+    def storeOnDisk( self ):
+        """
+        enregistre les conversartion en cas de plantage du serveur ?
+        """
+        pass
+        # TODO
         
     def getAns( self, msg ):
         
@@ -190,6 +202,8 @@ class TchatUser:
         }.values())
         
         print( "apres doublons: prompt: %d" % len(prompt) )
+        
+        prompt.extend(self.consigne)
 
         prompt.extend(self.context[:])
 
@@ -197,6 +211,10 @@ class TchatUser:
         
         if "ERR: " not in res:
             self.context.append({"role":"assistant", "content": res})
+            # ici il faudrait reduire le contexte au bout d'un moment.
+            if len(self.context) > 10:
+                self.context = self.context[-10:]
+                
                 
         return res
 

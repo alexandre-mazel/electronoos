@@ -11,9 +11,12 @@ def find_most_centered_and_big_face(faces, image_width, image_height):
     
     if not faces:
         return -1
+    
 
     image_cx = image_width / 2.0
     image_cy = image_height / 2.0
+    
+    print( "DBG: find_most_centered_and_big_face: cxdiv2: %d, cydiv2: %d" % (image_cx,image_cy) )
 
     # Distance maximale possible au centre
     max_distance = (

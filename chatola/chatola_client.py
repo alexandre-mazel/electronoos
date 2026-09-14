@@ -53,6 +53,7 @@ def loop_dialog( chatola_url, user_id ):
 if __name__ == "__main__":
     chatola_url = "https://obo-world.com:10000"
     chatola_url = "https://engrenage.studio:45001"
+    chatola_url = "http://engrenage.studio:45001"
     if len(sys.argv) > 1:
         chatola_url = sys.argv[1]
     print( "INF: chatola_url: '%s'" % chatola_url )

@@ -6,6 +6,8 @@ Ne pas oublier de lancer ollama avec les bonnes options:
 Pour voir les ps:
 OLLAMA_HOST=127.0.0.1:11435 ollama ps
 
+et lancer d'abord le export LD_LIBRARY_PATH cf test_whisper.py
+
 """
 
 from flask import Flask, request, send_file # sudo apt install python3-flask ou en venv: pip install flask

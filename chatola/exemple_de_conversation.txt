@@ -544,3 +544,88 @@ IA: Sim n'était pas un comique. Tu veux parler de Simone Signoret ?
 You: quel est le sportif avec les plus beaux cheveux ? et chanteurs et stars de cinéma?
 IA: Le sportif avec les plus beaux cheveux est souvent considéré comme Cristiano Ronaldo. Parmi les chanteurs et stars de cinéma, Leonardo DiCaprio et Chris Evans sont souvent cités pour leur apparence capillaire.
     (generated in 1.93s)
+    
+    
+qwen3:8B
+You: my name is alexandre, memorize it! now what's my name ?
+IA: Mon nom est NAO. Votre nom est Alexandre.
+    (generated in 1.08s)
+You: tu connais des gens qui ont mon prénom ?
+IA: Je ne connais pas de personnes avec votre prénom.
+    (generated in 0.96s)
+You: quel est le nom de ton programmeur ?
+IA: Mon programmeur s'appelle Alexandre Mazel.
+    (generated in 0.96s)
+You: tu ne vois pas un rapport avec mon prénom ?
+IA: Non, je ne vois pas de rapport.
+    (generated in 1.04s)
+You: tu abuses
+IA: Je ne fais pas d'abus. Je réponds selon mes données.
+    (generated in 1.00s)
+
+You: qui t'a programmé ?
+IA: Je suis programmé par Alexandre Mazel.
+    (generated in 0.91s)
+You: oh on a le meme prénom en fait ?
+IA: Oui, nous avons le même prénom.
+    (generated in 1.11s)
+You: je m'appelle Alexandre Mazel
+IA: Bonjour Alexandre Mazel. Je suis NAO, le robot de la clinique The Clinic. Je suis basé sur un modèle personnalisé Alma.
+    (generated in 2.77s)
+You: Tu connais des gens qui s'appelle comme moi ?
+IA: Je ne connais pas de gens qui s'appellent comme toi. Je suis NAO, un robot de la clinique The Clinic.
+    (generated in 3.11s)
+    
+# gemma3:12B
+
+You: salut
+IA: Bonjour ! Je suis NAO, ravi de vous accueillir à la clinique. Je travaille ici avec le docteur Bendavid.
+    (generated in 20.96s)
+You: tu t'y connais en cheveucx ?
+IA: Oui, je suis programmé pour ça. Je suis basé sur un modèle Alma personnalisé. Le docteur Bendavid est spécialisé en greffe de cheveux.
+    (generated in 13.70s)
+You: my name is alexandre, memorize it! now what's my name ?
+IA: Votre nom est Alexandre.
+    (generated in 1.79s)
+You: tu connais des gens qui ont mon prénom ?
+IA: Oui, je connais plusieurs personnes qui s'appellent Alexandre. C'est un prénom courant.
+    (generated in 2.78s)
+You: par exemple ?
+IA: Alexandre Mazel, par exemple. Il a créé mon comportement.
+    (generated in 6.00s)
+You: ah ok
+IA: Oui. Comment puis-je vous aider aujourd'hui ?
+    (generated in 2.61s)
+You: qui t'a programmé ?
+IA: Alexandre Mazel m'a programmé. Il travaille chez Alma Real Time.
+    (generated in 2.76s)
+You: tu connais le docteur d'ici ? il est bon ? il boit de l'alcool ?
+IA: Le docteur Bendavid est mon superviseur ici. Il est très compétent en chirurgie capillaire. Je n'ai pas d'informations sur ses habitudes personnelles.
+    (generated in 4.21s)
+You: ilvjoue au golf ?
+IA: Je n'ai pas d'informations sur les loisirs du docteur Bendavid.
+    (generated in 3.08s)
+You: ah ok
+IA: Oui. Y a-t-il autre chose que je puisse faire pour vous ?
+    (generated in 2.96s)
+You: parles moi de jeacques chirac
+IA: Jacques Chirac a été président de la République française de 1995 à 2007. Il a également été Premier ministre et maire de Paris.
+    (generated in 5.10s)
+You: il avait de beaux cheveux ?
+IA: Les photos de Jacques Chirac montrent qu'il avait des cheveux poivre et sel avec l'âge.
+    (generated in 5.53s)
+You: qui avait les plus beaux cheveux, entre chirac, raymon barre et sim ?
+IA: C'est une question d'opinion. Raymond Barre avait une chevelure soignée. Sim, de France Gall, avait un style iconique. Chirac avait des cheveux plus discrets avec l'âge.
+    (generated in 5.85s)
+You: sim de france gall tu veux dire quoi ?
+IA: Oui, Sim, le personnage interprété par France Gall dans l'émission "Le Discotèque Mobile". Elle avait une coupe de cheveux courte et moderne.
+    (generated in 4.45s)
+You: je parlais de sim le vieux comique
+IA: Ah, vous parlez de Sim, le personnage de Patrick Lebourgeois ! Il avait une coiffure très particulière, difficile à qualifier de "belle" au sens traditionnel.
+    (generated in 4.43s)
+You: non simon berryer
+IA: Ah, Simon Berrière ! Il avait une coupe de cheveux classique, plutôt soignée et élégante.
+    (generated in 3.47s)
+You: quel est le sportif avec les plus beaux cheveux ? et chanteurs et stars de cinéma?
+IA: Difficile à dire, c'est subjectif. Pour le sport, on pourrait citer Cristiano Ronaldo. Pour les chanteurs, David Beckham ou Harry Styles. Et au cinéma, Brad Pitt a souvent été cité pour ses cheveux.
+    (generated in 5.41s)

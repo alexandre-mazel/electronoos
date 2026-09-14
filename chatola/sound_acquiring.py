@@ -88,7 +88,15 @@ def send_audio(filename, user_id="tester_audio"):
         data = json.loads(data.decode("utf-8"))
 
         print(data)
-        print(data["ans"])
+
+        answer = data["ans"]
+
+        if isinstance(answer, unicode):
+            answer_utf8 = answer.encode("utf-8")
+        else:
+            answer_utf8 = answer
+            
+        print( "answer_utf8: " + answer_utf8 )
 
 
 

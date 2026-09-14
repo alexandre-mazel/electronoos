@@ -1,8 +1,9 @@
 """
 faire ca avant:
 
+si pb cublas, faire:
 export LD_LIBRARY_PATH=$HOME/.local/lib/python3.8/site-packages/nvidia/cublas/lib:$HOME/.local/lib/python3.8/site-packages/nvidia/cudnn/lib:$LD_LIBRARY_PATH
-(mais pas si lancer depuis le venv)
+(mais pas si lancer depuis le venv) (mais en fait si)
 
 """
 

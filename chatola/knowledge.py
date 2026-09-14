@@ -219,8 +219,9 @@ def autotest():
         # => 456 sec soit 7.6min
         
     if 1:
-        ret = get_nearest( "leve toi stp!", ["seat down", "standup"], verbose=verbose )
-        print(ret)
+        for question in ["Hello", "parles moi de cheveux?", "il est bon le docteur ici", "trouve moi un resto", "debout","assis", "nao assis toi!","leve toi stp!"]:
+            ret = get_nearest( question, ["seat down", "standup"], verbose=verbose )
+            print(ret)
         
     
 if __name__ == "__main__":

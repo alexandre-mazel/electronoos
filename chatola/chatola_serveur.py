@@ -177,8 +177,8 @@ if 1:
     )
 
     # TEST UNIQUEMENT : accepter TLS 1.0
-    context.minimum_version = ssl.TLSVersion.TLSv1
-    context.maximum_version = ssl.TLSVersion.TLSv1
+    #~ context.minimum_version = ssl.TLSVersion.TLSv1
+    #~ context.maximum_version = ssl.TLSVersion.TLSv1
 
 print( "INF: Running app..." )
 app.run(

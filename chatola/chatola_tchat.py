@@ -160,7 +160,7 @@ class TchatUser:
         
     def storeOnDisk( self ):
         """
-        enregistre les conversartion en cas de plantage du serveur ?
+        enregistre les conversations en cas de plantage du serveur ?
         """
         pass
         # TODO

@@ -226,7 +226,7 @@ def autotest():
         
     if 1:
         for question in ["Hello", "parles moi de cheveux?", "il est bon le docteur ici", "trouve moi un resto", "debout","assis", "nao assis toi!","leve toi stp!", "allez debout", "c'est l'heure du dodo!"]:
-            ret = get_nearest( question, ["seat down", "standup"], verbose=verbose )
+            ret = get_nearest( question, ["seat down", "standup"], verbose=0 )
             print( "%s => %s" % (question,ret) )
         knowledge._savePrecalc()
             

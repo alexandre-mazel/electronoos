@@ -228,6 +228,77 @@ def autotest():
         for question in ["Hello", "parles moi de cheveux?", "il est bon le docteur ici", "trouve moi un resto", "debout","assis", "nao assis toi!","leve toi stp!", "allez debout", "c'est l'heure du dodo!"]:
             ret = get_nearest( question, ["seat down", "standup"], verbose=verbose )
             print( "%s => %s" % (question,ret) )
+        knowledge._savePrecalc()
+            
+        """
+DBG: get_nearest: res for question 'Hello'
+(0.6035537860696204, 'standup')
+(0.5910555909160848, 'seat down')
+Hello => ('', 0.0)
+DBG: get_embedding: NbrToken (in input): 9 (max since beginning: 9)
+DBG: get_embedding('qwen3-embedding-mix'): duration: 0.17s
+
+DBG: get_nearest: res for question 'parles moi de cheveux?'
+(0.5659121280533812, 'standup')
+(0.5194870154974319, 'seat down')
+parles moi de cheveux? => ('', 0.0)
+DBG: get_embedding: NbrToken (in input): 9 (max since beginning: 9)
+DBG: get_embedding('qwen3-embedding-mix'): duration: 0.17s
+
+DBG: get_nearest: res for question 'il est bon le docteur ici'
+(0.595404097098862, 'standup')
+(0.5448976905782075, 'seat down')
+il est bon le docteur ici => ('', 0.0)
+DBG: get_embedding: NbrToken (in input): 6 (max since beginning: 9)
+DBG: get_embedding('qwen3-embedding-mix'): duration: 0.17s
+
+DBG: get_nearest: res for question 'trouve moi un resto'
+(0.5941454048164818, 'seat down')
+(0.5337451495180264, 'standup')
+trouve moi un resto => ('', 0.0)
+DBG: get_embedding: NbrToken (in input): 3 (max since beginning: 9)
+DBG: get_embedding('qwen3-embedding-mix'): duration: 0.17s
+
+DBG: get_nearest: res for question 'debout'
+(0.804522390441874, 'standup')
+(0.6761277508577411, 'seat down')
+debout => (0.804522390441874, 'standup')
+DBG: get_embedding: NbrToken (in input): 2 (max since beginning: 9)
+DBG: get_embedding('qwen3-embedding-mix'): duration: 0.17s
+
+DBG: get_nearest: res for question 'assis'
+(0.6712820523277601, 'seat down')
+(0.6224483349613694, 'standup')
+assis => (0.6712820523277601, 'seat down')
+DBG: get_embedding: NbrToken (in input): 7 (max since beginning: 9)
+DBG: get_embedding('qwen3-embedding-mix'): duration: 0.17s
+
+DBG: get_nearest: res for question 'nao assis toi!'
+(0.6461200924416253, 'seat down')
+(0.6248739311828067, 'standup')
+nao assis toi! => (0.6461200924416253, 'seat down')
+DBG: get_embedding: NbrToken (in input): 7 (max since beginning: 9)
+DBG: get_embedding('qwen3-embedding-mix'): duration: 0.17s
+
+DBG: get_nearest: res for question 'leve toi stp!'
+(0.6476535241629915, 'standup')
+(0.6220048953197714, 'seat down')
+leve toi stp! => (0.6476535241629915, 'standup')
+DBG: get_embedding: NbrToken (in input): 5 (max since beginning: 9)
+DBG: get_embedding('qwen3-embedding-mix'): duration: 0.18s
+
+DBG: get_nearest: res for question 'allez debout'
+(0.7438686157141826, 'standup')
+(0.6731740054314252, 'seat down')
+allez debout => (0.7438686157141826, 'standup')
+DBG: get_embedding: NbrToken (in input): 10 (max since beginning: 10)
+DBG: get_embedding('qwen3-embedding-mix'): duration: 0.25s
+
+DBG: get_nearest: res for question 'c'est l'heure du dodo!'
+(0.6264739132804591, 'seat down')
+(0.6050113073884316, 'standup')
+c'est l'heure du dodo! => ('', 0.0)
+        """
         
     
 if __name__ == "__main__":

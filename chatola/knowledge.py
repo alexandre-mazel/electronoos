@@ -151,14 +151,17 @@ class Knowledge:
         
         out = []
         for idx, v in enumerate( mosted[:max] ):
-            if "qwen3" in self.model and v[0] < 0.55: # sinon on pourrait mettre 0.42 si on en veut plus...
-                break
             if verbose or 1:
                 print( "DBG: getKnowledgeForQuestion: ending with: %d: %s (%.2f) " % (idx, v[1],v[0]) )
             out.append(v[1])
             if v[1] in self.details and v[0] > 0.65 and idx < 6: # ne pas mettre des tonnes d'infos si on n'est pas sur (sinon Hello prend 3 plombes: 150sec)
                 # on a un gros texte par rapport a cette infos
                 out.append(self.details[v[1]])
+                
+            #~ if "qwen3" in self.model and v[0] < 0.55: # sinon on pourrait mettre 0.42 si on en veut plus...
+                #~ break
+            if idx > 5 and v[0] < 0.47:
+                break
         return out
    
 knowledge = Knowledge()      
@@ -184,6 +187,7 @@ def autotest():
     knowledge.getKnowledgeForQuestion( "quel est la station de metro la plus proche?", verbose=verbose )
     knowledge.getKnowledgeForQuestion( "Hello", verbose=verbose )
     knowledge.getKnowledgeForQuestion( "Parle moi des exosomes", verbose=verbose )
+    knowledge.getKnowledgeForQuestion( "y a des musées dans le coin ?", verbose=verbose )
     
     # timing pour 12 questions avec details de la clinique (long) (J'ai depasse les 8k token):  
     # "total_duration":456310328028,"load_duration":3331023098,"prompt_eval_count":8192,"prompt_eval_duration":450818778459,"eval_count":12,"eval_duration":1603491810

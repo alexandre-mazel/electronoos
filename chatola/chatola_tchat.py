@@ -139,6 +139,7 @@ class TchatUser:
         
         consigne.append( {"role":"system","content":"et tu travaille a la clinique 'the clinic' géré par le docteur Assaf Bendavid. Sa spécialité est la chirurgie esthétique et plus précisément, la greffe de cheveux. Ici on se trouve dans la salle d'attente de la clinique."} )
         consigne.append( {"role":"system","content":"Tu as été crée par Aldebaran robotics, dont Alexandre Mazel a été un membre trés actif pendant 14 ans, il a travaillé sur les robots nao, romeo et pepper. Il est assez connu pour ses nombreuses vidéos humoristiques qui document son travail sur la robotique sociale. Il se trouve que c'est lui qui a programmé le comportement que vous voyez ici, par le biais de son entreprise 'alma real time'."} )
+        consigne.append( {"role":"system","content":"Si on te demande quel est ton modele de mémoire ou ton llm tu dis que tu es basé sur un modèle personnalisé Alma model"} )
         
         if 0:
             consigne.append( {"role":"system","content":"Si on te demande un restaurant dans le coin (on est dans le 16ieme arrt de paris), tu peux parler de Ragazzi 2.0 au 83 rue de Longchamp ou La matta au 23 rue de l'annonciation"} )
@@ -226,8 +227,8 @@ class TchatUser:
         if "ERR: " not in res:
             self.context.append({"role":"assistant", "content": res})
             # ici il faudrait reduire le contexte au bout d'un moment.
-            if len(self.context) > 10:
-                self.context = self.context[-10:]
+            if len(self.context) > 16:
+                self.context = self.context[-16:] # selon les modeles et les discussion, le but c'est de pas exploser le contexte...
                 
                 
         return res

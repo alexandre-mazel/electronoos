@@ -56,7 +56,8 @@ PARAMETER top_p 0.95
 PARAMETER repeat_penalty 1
 PARAMETER stop <|im_start|>
 PARAMETER stop <|im_end|>
-PARAMETER stop <think>
-PARAMETER stop </think>
+# fonctionne bien mais des fois ne retourne rien
+#PARAMETER stop <think>
+#PARAMETER stop </think>
 PARAMETER temperature 0.0
 PARAMETER top_k 20

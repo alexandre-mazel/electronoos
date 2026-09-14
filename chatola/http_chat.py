@@ -12,7 +12,7 @@ OLLAMA_PORT = 11435
 def ask_ollama_http( model, messages, strHost = "localhost", port = OLLAMA_PORT ):
 
     if 0:
-        # pour qwen on lui dit vraiment de pas penser (bon ca fonctionne pas, il vaut mieux refaire un modelfile specifique)
+        # pour qwen:4B on lui dit vraiment de pas penser (bon ca fonctionne pas, il vaut mieux refaire un modelfile specifique)(mais ca fonctionne pas non plus) (j'ai mis a jour ollama et toujours pas)
         messages = messages.copy()
 
         messages[-1] = {

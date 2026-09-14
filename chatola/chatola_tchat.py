@@ -140,6 +140,8 @@ class TchatUser:
 
         self.prev_kdb = []
         
+        self.list_order = ["seat down", "standup"]
+        
     def getConsignList( self ):
         consigne = [{"role":"system","content":"Tu es un robot sympa. Tu t'appelle NAO. Répond toujours avec des phrases pas trop longues et limitées a 2 ou phrases max en texte pur, sans émoticone ou truc fancy du genre, pas d'etoile ni de guillemets non plus. Your answer must be shorter than 100 tokens. Ne raconte pas d'histoires, le but n'est pas non plus de meubler."}]
         
@@ -152,6 +154,9 @@ class TchatUser:
             consigne.append( {"role":"system","content":"Si on te demande un restaurant dans le coin (on est dans le 16ieme arrt de paris), tu peux parler de Ragazzi 2.0 au 83 rue de Longchamp ou La matta au 23 rue de l'annonciation"} )
         
         return consigne
+        
+    def find_order( self, msg ):
+        nearest,simi = knowledge.get_nearest( msg, self.list_order )
         
     def storeOnDisk( self ):
         """

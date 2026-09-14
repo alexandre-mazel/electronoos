@@ -3,7 +3,7 @@ import json
 import time
 
 DEFAULT_HOST = "obo-world.com"
-DEFAULT_HOST = "localhost"
+DEFAULT_HOST = "thenardier.fr"
 
 DEFAULT_PORT = 11434
 DEFAULT_PORT = 11435
@@ -35,18 +35,22 @@ def get_embedding(text, model="nomic-embed-text", host=DEFAULT_HOST, port=DEFAUL
         
         #~ payload2 = json.dumps({**json.loads(payload), "stream": False}) # pour ajouter une option a un payload
         payload2 = json.dumps({**json.loads(payload), "truncate": True,"input":text})
-        conn.request("POST", "/api/embed", body=payload2, headers=headers)
+        try:
+            conn.request("POST", "/api/embed", body=payload2, headers=headers)
+            
+            response = conn.getresponse()
+            readdata = response.read()
+            #~ print( "DBG: get_embedding: readdata:", readdata )
+            data = json.loads(readdata)
+            #~ print( "DBG: get_embedding: data:", data )
+            if not 'error' in data:
+                nbr_token = data["prompt_eval_count"]
+                if global_max_token_since_beginning < nbr_token:
+                    global_max_token_since_beginning = nbr_token
+                print( "DBG: get_embedding: NbrToken (in input): %s (max since beginning: %s)" % (nbr_token,global_max_token_since_beginning) )
 
-        response = conn.getresponse()
-        readdata = response.read()
-        #~ print( "DBG: get_embedding: readdata:", readdata )
-        data = json.loads(readdata)
-        #~ print( "DBG: get_embedding: data:", data )
-
-        nbr_token = data["prompt_eval_count"]
-        if global_max_token_since_beginning < nbr_token:
-            global_max_token_since_beginning = nbr_token
-        print( "DBG: get_embedding: NbrToken (in input): %s (max since beginning: %s)" % (nbr_token,global_max_token_since_beginning) )
+        except BaseException as err:
+            print( "ERR: get_embedding: while connecting to %s:%s: %s" % (host,port,err) )
 
     conn.request("POST", "/api/embeddings", body=payload, headers=headers)
 
@@ -56,7 +60,7 @@ def get_embedding(text, model="nomic-embed-text", host=DEFAULT_HOST, port=DEFAUL
     print( "DBG: get_embedding('%s'): duration: %.2fs" % (model,time.time()-time_begin))
 
     if response.status != 200:
-        raise Exception(f"HTTP error {response.status}: {data.decode()}")
+        raise Exception(f"HTTP error {response.status}: {data.decode()} while connecting to {host}")
 
     result = json.loads(data)
 

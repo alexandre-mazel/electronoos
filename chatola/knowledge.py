@@ -20,6 +20,10 @@ class Knowledge:
         if os.name == "nt":
             self.host = "obo-world.com"
             self.port = 11434
+            self.model = "qwen3-embedding" #pas de version mix sur ce serveur
+            if 0:
+                self.host = "engrenage.studio"
+                self.port = 11435
             
         self.savefile = "datas/precomputed_%s.dat" % (self.model.replace(":","_"))
         self._loadPrecalc()
@@ -175,23 +179,48 @@ def get_knowledge_related_to( question, max=12, verbose = False ):
     global knowledge
     return knowledge.getKnowledgeForQuestion( question, max=max, verbose = verbose )
     
+def get_nearest( question, choice, verbose=0 ):
+    """
+    return the nearest choice related to question with similarity
+    """
+    global knowledge
+    v = knowledge._get_embed( question )
+    
+    res = []
+    for i in range( len( choice ) ):
+        simi = numpy.dot( choice[i], v )
+        res.append( ( simi, choice[i] ) )
+        
+    mosted = sorted( res, reverse=True )
+    if verbose:
+        print( "\nDBG: get_nearest: res for question '%s'" % (question) )
+        for v in mosted:
+            print( v )
+    
+    
 def autotest():
     global knowledge
     classic_init()
     verbose = 1
-    knowledge.getKnowledgeForQuestion( "ou manger une pizza ?", verbose=verbose ) # pas de chance rien au dessus de 0.50!
-    knowledge.getKnowledgeForQuestion( "ou manger une pizza italienne?", verbose=verbose )
-    knowledge.getKnowledgeForQuestion( "j'ai faim, ou aller ?", verbose=verbose )
-    knowledge.getKnowledgeForQuestion( "je veux voir des sculptures de Rodin", verbose=verbose )
-    knowledge.getKnowledgeForQuestion( "je veux manger libanais", verbose=verbose )
-    knowledge.getKnowledgeForQuestion( "quel est la station de metro la plus proche?", verbose=verbose )
-    knowledge.getKnowledgeForQuestion( "Hello", verbose=verbose )
-    knowledge.getKnowledgeForQuestion( "Parle moi des exosomes", verbose=verbose )
-    knowledge.getKnowledgeForQuestion( "y a des musées dans le coin ?", verbose=verbose )
-    
-    # timing pour 12 questions avec details de la clinique (long) (J'ai depasse les 8k token):  
-    # "total_duration":456310328028,"load_duration":3331023098,"prompt_eval_count":8192,"prompt_eval_duration":450818778459,"eval_count":12,"eval_duration":1603491810
-    # => 456 sec soit 7.6min
+    if 0:
+        knowledge.getKnowledgeForQuestion( "ou manger une pizza ?", verbose=verbose ) # pas de chance rien au dessus de 0.50!
+        knowledge.getKnowledgeForQuestion( "ou manger une pizza italienne?", verbose=verbose )
+        knowledge.getKnowledgeForQuestion( "j'ai faim, ou aller ?", verbose=verbose )
+        knowledge.getKnowledgeForQuestion( "je veux voir des sculptures de Rodin", verbose=verbose )
+        knowledge.getKnowledgeForQuestion( "je veux manger libanais", verbose=verbose )
+        knowledge.getKnowledgeForQuestion( "quel est la station de metro la plus proche?", verbose=verbose )
+        knowledge.getKnowledgeForQuestion( "Hello", verbose=verbose )
+        knowledge.getKnowledgeForQuestion( "Parle moi des exosomes", verbose=verbose )
+        knowledge.getKnowledgeForQuestion( "y a des musées dans le coin ?", verbose=verbose )
+        
+        # timing pour 12 questions avec details de la clinique (long) (J'ai depasse les 8k token):  
+        # "total_duration":456310328028,"load_duration":3331023098,"prompt_eval_count":8192,"prompt_eval_duration":450818778459,"eval_count":12,"eval_duration":1603491810
+        # => 456 sec soit 7.6min
+        
+    if 1:
+        ret = knowledge.get_nearest( "leve toi stp!", ["seat down", "standup"], verbose=verbose )
+        print(ret)
+        
     
 if __name__ == "__main__":
     autotest()

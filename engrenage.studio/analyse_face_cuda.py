@@ -6,12 +6,17 @@ import time
 _face_app = None
 
 """
+Pour utiliser le gpu:
 J'ai du deinstaller pip install onnxruntime et mettre pip install onnxruntime-gpu
 pip uninstall onnxruntime
 pip install onnxruntime-gpu
 #mais en fait:
 pip uninstall -y onnxruntime-gpu
 pip install "onnxruntime-gpu==1.26.0"
+
+pour voir la sortie: lancer vcxsrv au lieu de xming
+et lancer sur le remote: xfwm4 --compositor=off &
+afin de pouvoir redimensionner la fenetre scite plus tranquillement
 """
 
 def find_most_centered_and_big_face(faces, image_width, image_height,verbose=0):
@@ -70,7 +75,7 @@ def find_most_centered_and_big_face(faces, image_width, image_height,verbose=0):
 import cv2
 
 
-def draw_faces_rect(image1, faces1, selected_idx):
+def draw_faces_rect(image1, faces1, selected_idx, result = None ):
     """
     Draw all detected faces on image1.
 
@@ -105,6 +110,9 @@ def draw_faces_rect(image1, faces1, selected_idx):
         age = int(round(face.age))
 
         label = f"{i}: {gender}, {age}"
+        
+        if i == selected_idx and result != None:
+            label += " => %s" % result
 
         # Put label just above the bounding box
         font = cv2.FONT_HERSHEY_SIMPLEX
@@ -134,9 +142,6 @@ def draw_faces_rect(image1, faces1, selected_idx):
             thickness,
             cv2.LINE_AA
         )
-
-    cv2.imshow("Faces", image)
-    cv2.waitKey(0)
 
     return image
     
@@ -178,8 +183,6 @@ def compare_faces(image1_path, image2_path, verbose = 0 ):
     idx1 = find_most_centered_and_big_face( faces1, image1.shape[1], image1.shape[0],verbose=verbose )
     idx2 = find_most_centered_and_big_face( faces2, image2.shape[1], image2.shape[0],verbose=verbose )
     
-    if verbose: draw_faces_rect( image1, faces1, idx1 )
-    
     print("faces1: taking idx: %s" % str( idx1 ) )
     print("faces2: taking idx: %s" % str( idx2 ) )
     
@@ -187,12 +190,31 @@ def compare_faces(image1_path, image2_path, verbose = 0 ):
     embedding2 = faces2[idx2].normed_embedding
 
     similarity = float(np.dot(embedding1, embedding2))
+    
+    
+    if verbose: 
+        imdebug1 = draw_faces_rect( image1, faces1, idx1 )
+        imdebug2 = draw_faces_rect( image2, faces2, idx2, similarity )
+        
+        
+        cv2.namedWindow("im1", cv2.WINDOW_NORMAL)
+        cv2.namedWindow("im2", cv2.WINDOW_NORMAL)
+        xr = 1200
+        yr = 1000
+        cv2.resizeWindow("im1", xr, yr)
+        cv2.resizeWindow("im2", xr, yr)
+        cv2.moveWindow( "im1", 0, 0 )
+        cv2.moveWindow( "im2", xr+20, 0 )
+
+        cv2.imshow( "im1", imdebug1 )
+        cv2.imshow( "im2", imdebug2 )
+        cv2.waitKey(0)
 
     return similarity
     
 def autotest():
     verbose = 1
-    verbose = 0
+    #~ verbose = 0
     
     imgs = ["20240102_105013_small","20240109_161443_small","20240223_094710_small","20260906_210413_small"]
     

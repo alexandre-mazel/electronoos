@@ -8,9 +8,6 @@ pip install sounddevice
 (Normalement PortAudio est fourni avec le package Windows.)
 
 """
-import sounddevice as sd
-
-from audio_analyser import AudioAnalyser
 
 import base64
 import json
@@ -99,9 +96,13 @@ def send_audio(filename, user_id="tester_audio"):
 def main():
     print( "INF: Main: Starting acquiring..." )
     
-    analyser = AudioAnalyser( sample_rate = SAMPLE_RATE, channels = CHANNELS, sample_width = 2 )
+    import audio_analyser
+    
+    analyser = audio_analyser.AudioAnalyser( sample_rate = SAMPLE_RATE, channels = CHANNELS, sample_width = 2 )
 
     def audio_callback( indata, frames, time_info, status ):
+        import sounddevice
+
 
         if status:
             print( status )
@@ -118,7 +119,7 @@ def main():
 
     print( "Main: Starting microphone..." )
 
-    with sd.InputStream(
+    with sounddevice.InputStream(
         samplerate = SAMPLE_RATE,
         channels = CHANNELS,
         dtype = "int16",
@@ -130,7 +131,7 @@ def main():
         play_sound( "datas/bowl_start.wav" )
 
         while True:
-            sd.sleep( 1000 )
+            sounddevice.sleep( 1000 )
 
 
 if __name__ == "__main__":

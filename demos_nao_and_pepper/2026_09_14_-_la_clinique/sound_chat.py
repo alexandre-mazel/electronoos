@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 
+"""
+
+ca fonctionne pas sur mon nao 2.1
+
+"""
+
 from naoqi import ALModule, ALProxy, ALBroker
 import qi
 import sys

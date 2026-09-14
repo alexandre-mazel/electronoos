@@ -28,6 +28,7 @@ import traceback
 
 tts = None
 gbUseTTS = 1 # doit alors etre lancer dans le venv qui a tts activable (cf tts_perso sur champion1)
+gbUseTTS = 0 # dans ce cas c'est nao qui fait le tts
 
 gbUseMMSTTS = 0
 #~ gbUseMMSTTS = 1

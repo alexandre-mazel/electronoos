@@ -118,9 +118,11 @@ strModel = "qwen3:8B" # 2s 6.2GB 100%gpu, rapide car pas de thinking, par contre
 #~ strModel = "qwen3:14B" # ~15s, 10GB, 27% CPU pas de probleme de thinking en trop donc parfois il le fait en 3s
 
 #~ strModel = "mistral-small3.1:24b" # autour de 30sec, modele de 16GB a 58% en cpu
+#~ strModel = "ministral-3:8b" # a tester...
+#~ strModel = "ollama pull ministral-3:8b-instruct-2512-q4_K_M" # a tester aussi
 #~ strModel = "ministral-3:14b" # 3-4s, 10GB, 34%cpu, mais ne respecte pas les consignes de pas mettre d'etoile, il en met a chaque fois.
 #~ strModel = "ministral-3:14b-instruct" # pas le bon nom
-#~ strModel = "ministral-3:14b-instruct-2512-q4_K_M" # 10GB 34% aussi ne semble rien changer.
+#~ strModel = "ministral-3:14b-instruct-2512-q4_K_M" # 10GB 34% aussi ne semble rien changer sur les etoiles.
 
 #~ strModel = "gemma3:4B" # pas trop long mais des merdouilette
 #~ strModel = "gemma3:12B" # 3-4s 9GB 25%cpu, plus long que qwen3:8B mais de bons résultats

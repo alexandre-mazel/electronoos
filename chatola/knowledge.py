@@ -226,7 +226,7 @@ def autotest():
     if 1:
         for question in ["Hello", "parles moi de cheveux?", "il est bon le docteur ici", "trouve moi un resto", "debout","assis", "nao assis toi!","leve toi stp!"]:
             ret = get_nearest( question, ["seat down", "standup"], verbose=verbose )
-            print(ret)
+            print( "%s => %s" % (question,ret) )
         
     
 if __name__ == "__main__":

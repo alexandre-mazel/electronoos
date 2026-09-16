@@ -2,6 +2,8 @@ import ctypes
 from ctypes import wintypes
 import shutil
 
+# c'est trop moche, laisse tomber!
+
 
 # =========================================================
 # CONFIGURATION

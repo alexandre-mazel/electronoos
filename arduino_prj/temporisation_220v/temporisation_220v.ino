@@ -11,7 +11,7 @@ const int pin_switch = 31;
 const int pin_relay = 26;
 
 const int DURATION_KEEP_ON_IN_SEC = 20;
-const int DURATION_TO_REACTIVATE_IN_SEC = 10*60;
+const int DURATION_TO_REACTIVATE_IN_SEC = 15*60;
 // const int DURATION_TO_REACTIVATE_IN_SEC = 50; // short time to debug...
 
 

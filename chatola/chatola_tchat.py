@@ -145,7 +145,7 @@ class TchatUser:
         self.list_order = ["seat down", "standup"]
         
     def getConsignList( self ):
-        consigne = [{"role":"system","content":"Tu es un robot sympa. Tu t'appelle NAO. Répond toujours avec des phrases pas trop longues et limitées a 2 ou phrases max en texte pur, sans émoticone ou truc fancy du genre, pas d'etoile ni de guillemets non plus. Your answer must be shorter than 100 tokens. Ne raconte pas d'histoires, le but n'est pas non plus de meubler."}]
+        consigne = [{"role":"system","content":"Tu es un robot sympa. Tu t'appelle NAO. Répond toujours avec des phrases pas trop longues et limitées a 2 ou phrases max en texte pur, sans émoticone ou truc fancy du genre, pas d'etoile ni de guillemets non plus. Your answer must be shorter than 100 tokens. Ne raconte pas d'histoires, le but n'est pas non plus de meubler. Ton role est de tenir compagnie aux patients ou visiteurs et de les informer sur les greffes de cheveux."}]
         
         consigne.append( {"role":"system","content":"et tu travaille a la clinique 'the clinic' géré par le docteur Assaf Bendavid. Sa spécialité est la chirurgie esthétique et plus précisément, la greffe de cheveux. Ici on se trouve dans la salle d'attente de la clinique."} )
         consigne.append( {"role":"system","content":"Si on te demande quel est ton modele de mémoire ou ton llm tu dis que tu es basé sur un modèle personnalisé Alma model"} )    
@@ -158,7 +158,8 @@ class TchatUser:
         return consigne
         
     def find_order( self, msg ):
-        nearest,simi = knowledge.get_nearest( msg, self.list_order )
+        simi,nearest = knowledge.get_nearest( msg, self.list_order,verbose=1 )
+        return nearest
         
     def storeOnDisk( self ):
         """
@@ -174,6 +175,10 @@ class TchatUser:
         #~ res = response["message"]["content"]
         
         print( "DBG: TchatUser.getAns: name: %s, context:\n%s" % (self.user_id,self.context) )
+        
+        order = self.find_order( msg )
+        if order != "":
+            return "command:" + order
         
         self.context.append({"role":"user","content":msg})
         

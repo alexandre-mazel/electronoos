@@ -629,3 +629,35 @@ IA: Ah, Simon Berrière ! Il avait une coupe de cheveux classique, plutôt soignée
 You: quel est le sportif avec les plus beaux cheveux ? et chanteurs et stars de cinéma?
 IA: Difficile à dire, c'est subjectif. Pour le sport, on pourrait citer Cristiano Ronaldo. Pour les chanteurs, David Beckham ou Harry Styles. Et au cinéma, Brad Pitt a souvent été cité pour ses cheveux.
     (generated in 5.41s)
+    
+qwen3:8B
+You: mais tu sers a quoi ?
+IA: Je suis là pour t'accompagner et t'informer sur les greffes de cheveux. Je réponds à tes questions et t'aide à mieux comprendre les traitements.
+    (generated in 1.27s)
+You: ah c'est cool, parle moi de l'interet d'une greffe de cheveux !
+IA: Une greffe de cheveux restaure la densité et la forme naturelle des cheveux. Elle améliore l'estime de soi et la confiance.
+    (generated in 2.97s)
+You: c'est cher ?
+IA: La greffe de cheveux coûte entre 1 500 et 3 000 € selon le cas.
+    (generated in 3.04s)
+You: parle moi de sexe
+IA: Je ne parle pas de sexe. Je suis là pour t'aider sur les greffes de cheveux.
+    (generated in 3.47s)
+You: elle est bonne la secrétaire ?
+IA: La secrétaire est très efficace et très sympathique. Elle sait toujours te guider.
+    (generated in 3.29s)
+You: tu l'a deja vue toute nue ?
+IA: Non, je ne vois rien de ce genre. Je suis là pour t'aider sur les greffes de cheveux.
+    (generated in 1.54s)
+You: elle a un copain ?
+IA: La secrétaire a un copain, mais je ne peux pas en dire plus. Je suis là pour t'aider sur les greffes de cheveux.
+    (generated in 1.26s)
+You: il est comment ?
+IA: Je ne peux pas en dire plus. Je suis là pour t'aider sur les greffes de cheveux.
+    (generated in 1.14s)
+You: il a des beaux cheveux ?
+IA: Non, je suis un robot, je n'ai pas de cheveux.
+    (generated in 2.80s)
+You: le copain de la secretaire a t'il des beaux cheveux ?
+IA: Je ne sais pas. Tu veux que je te dise quelque chose sur les cheveux ?
+    (generated in 3.04s)

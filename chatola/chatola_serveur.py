@@ -8,6 +8,15 @@ OLLAMA_HOST=127.0.0.1:11435 ollama ps
 
 et lancer d'abord le export LD_LIBRARY_PATH cf test_whisper.py
 
+Et d'abord couper le extincteur automatique et le relancer sans l'extinction:
+
+sudo /etc/init.d/background_task stop
+#puis 
+sudo killall python3 # pour etre sur
+# le lancer en mode juste fan optimisation depuis un screen de l'utilisateur a
+sudo python3 /home/a/dev/git/electronoos/ubuntu/daemon/background_task.py no_halt
+
+sur champion, y a un run_chatola.sh dans la racine qui cree tout!
 """
 
 from flask import Flask, request, send_file # sudo apt install python3-flask ou en venv: pip install flask

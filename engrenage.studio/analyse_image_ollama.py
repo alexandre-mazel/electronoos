@@ -13,7 +13,7 @@ def encode_image(filename):
         return base64.b64encode(file.read()).decode("utf-8")
 
 
-def analyze_image( filename, strModel, extra_instruction = "", verbose=False ):
+def analyze_image( host_url, filename, strModel, extra_instruction = "", verbose=False ):
     
     if verbose: print( "INF: analyze_image: '%s'..." % filename )
     
@@ -63,7 +63,7 @@ Ne devine jamais un texte qui n'est pas clairement visible.
     if verbose: print( "INF: analyze_image: posting..." )
 
     response = requests.post(
-        OLLAMA_URL,
+        host_url,
         json = {
             "model": strModel,
             "messages": [
@@ -146,7 +146,7 @@ def main():
 
     # charge un coup
     print("Ensuring model is loaded...")
-    result = analyze_image( "../test/%s.jpg" % list_img[0], strModel )
+    result = analyze_image( OLLAMA_URL, "../test/%s.jpg" % list_img[0], strModel )
 
 
 
@@ -161,7 +161,7 @@ def main():
         
         time_begin = time.time()
         
-        result = analyze_image( "../test/%s.jpg" % img, strModel )
+        result = analyze_image( OLLAMA_URL, "../test/%s.jpg" % img, strModel )
         
         duration = time.time() - time_begin
         print( "duration: %.3fs" % duration )

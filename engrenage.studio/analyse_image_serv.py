@@ -26,7 +26,8 @@ def getHostName():
     
     
 def extract_infos_from_img( img, filename, user_id ):
-    
+    import analyse_image_ollama
+    result = analyse_image_ollama.analyse_image( "localhost:45035", "qwen2.5vl:7b", img )
 
 
 

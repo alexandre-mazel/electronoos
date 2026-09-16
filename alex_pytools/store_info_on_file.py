@@ -1,5 +1,6 @@
 import pickle
 import os
+import time
 
 
 def normaliseFilename(f):
@@ -14,10 +15,41 @@ def normaliseFilename(f):
         return f
     f = f.replace("/",os.sep)
     f = f.replace("\\",os.sep)
-    f=os.path.abspath(f)
+    f = os.path.abspath(f)
     f = f.replace(os.sep+os.sep,os.sep)
     return f
     
+def limitstr( s, max = 57 ):
+    s = str(s).replace("\n", "  " )
+    if len(s) > max:
+        s = s[:max]+ "..."
+    return s
+    
+    
+def dumpstr( o, level = "" ):
+    newlevel = "  " # preline added at each recursion
+    
+    s = ""
+    
+    if isinstance( o, dict ):
+        s += "%sdict with %d elem(s):\n" % ( level, len( o ) )
+        level += newlevel
+        for kk,vv in o.items():
+            s += "%s%s:\n%s\n" % ( level, kk,dumpstr( vv, level + newlevel ) )
+            data = pickle.dumps(kk)
+            print("pickle OK for %s: size: %d (2)" % (str(type(kk)), len( data ) ) )
+    elif isinstance( o, list ):
+        s += "%slist with %d elem(s):\n" % ( level, len( o ) )
+        level += newlevel
+        for i in range(len(o)):
+            s += "%s%s:\n%s\n" % ( level, i, dumpstr( o[i], level + newlevel ) )
+    else:
+        s += level + str(type(o)) + ": " + limitstr( o ) + "\n"
+        #~ print(s)
+        #~ data = pickle.dumps(o)
+        #~ print("pickle OK for %s: size: %d" % (str(type(o)), len( data ) ) )
+        
+    return s
 
 class StoredInfo:
     """
@@ -64,7 +96,7 @@ class StoredInfo:
             self.feats = pickle.load(file)
             file.close()
             print( "INF: StoredFeatures.load: end (loaded user: %d) (duration:%5.2fs)" % (len(self.feats), time.time() - timeBegin) )
-            print( "INF: StoredInfo.load: user "": nbr feats: %d" % (len(self.feats[""]) ) )
+            print( "INF: StoredInfo.load: user "": nbr feats: %d" % (len(self.feats) ) )
             return
 
 
@@ -82,10 +114,112 @@ class StoredInfo:
         
         self.bMustSave = False
         
+        if 0:
+            # debug object type because sometimes, I've got this error dans pickle: TypeError: 'NoneType' object is not callable
+            print( dumpstr( self.feats ) )
+        
+            
+        if 0:
+            # debug juste des faces
+            # pickle crash avec TypeError: 'NoneType' object is not callable.
+            # meme si Faces est un object dict ou qui derive de dict un truc retourne None au lieu d'autre choses. Donc le caster en vrai dict avant !
+            
+            #~ import pickle # si on fait ca dans un if 0: il va supprimer la variable locale et donc oubliera pickle: chelou non !
+                    
+            print("A: dict vide")
+            pickle.dumps({})
+            print("A OK")
+
+            filename = next(iter(self.feats))
+            faces = self.feats[filename]
+            face = faces[0]
+
+            print("B: filename")
+            pickle.dumps(filename)
+            print("B OK")
+            
+            print(type(faces))
+            print(faces.__class__)
+            print(faces.__class__ is list)
+            print(type(faces).__module__)
+            print(type(faces).__name__)
+            
+
+            print("pickle.dump =", pickle.dump)
+            print("pickle.dumps =", pickle.dumps)
+
+            print("callable dump =", callable(pickle.dump))
+            print("callable dumps =", callable(pickle.dumps))
+
+
+            pickle.dumps(123)
+            pickle.dumps([123])
+            pickle.dumps({"a": 123})
+            pickle.dumps([{"a": 123}])
+
+            
+            print("TEST LISTES PROGRESSIVES")
+
+            for i in range(0, len(faces)):
+                print("  testing first", i, "faces...")
+                face = faces[i]
+                pickle.dumps(face["bbox"])
+                pickle.dumps(face["kps"])
+                pickle.dumps(face["det_score"])
+                pickle.dumps(face["landmark_3d_68"])
+                pickle.dumps(face["pose"])
+                pickle.dumps(face["landmark_2d_106"])
+                pickle.dumps(face["gender"])
+                pickle.dumps(face["age"])
+                pickle.dumps(face["embedding"])
+                print("  OK")
+                print(dir(face))
+                print(str(face.keys()))
+                #~ pickle.dumps(face) # crash here!
+                face_dict = dict(face)
+                pickle.dumps(face_dict)
+                
+                print("  OK FACE?")
+
+
+            print("C: faces list")
+            pickle.dumps(faces)
+            print("C OK")
+
+            print("D: face dict")
+            pickle.dumps(face)
+            print("D OK")
+
+            print("E: whole dict")
+            pickle.dumps(self.feats)
+            print("E OK")
+
+            print("TEST 1: whole")
+            pickle.dumps(self.feats)
+            print("TEST 1 OK")
+
+            for filename, faces in self.feats.items():
+                print("TEST 2:", filename)
+
+                pickle.dumps(filename)
+                print("  filename OK")
+
+                pickle.dumps(faces)
+                print("  faces list OK")
+
+                for i, face in enumerate(faces):
+                    print("  TEST 3:", i)
+                    pickle.dumps(face)
+                    print("    face dict OK")
+
+            print("ALL TESTS OK")
+            
+
         if 1:
             # use pickle: faster!
+            datas = pickle.dumps( self.feats, protocol=pickle.HIGHEST_PROTOCOL )
             outfile = open(self.strSaveFileName,'wb')
-            pickle.dump(self.feats,outfile, protocol=pickle.HIGHEST_PROTOCOL)
+            outfile.write( datas )
             outfile.close()
             print( "INF: StoredInfo.save: end" )
             return
@@ -97,6 +231,7 @@ class StoredInfo:
         """
         bVerbose = 1
         bVerbose = 0
+        self.load()
         if bVerbose: print("DBG: getDatas: looking for '%s'" % strFilename )
         strFilename = normaliseFilename(strFilename)
         if bVerbose: print("DBG: getDatas: normalised: '%s'" % strFilename )
@@ -172,6 +307,7 @@ def autotest():
     assert( sto.getDatas( "toto" ) == [] )
     
     sto.save()
+    print( "autotest: end" )
     
     
 

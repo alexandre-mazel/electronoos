@@ -629,12 +629,16 @@ def test_quick_compare():
     print( "duration total: %.1fs" % duration )
     print( "duration just detect: %.2fs (%.3fs per embed)" % (duration_just_detect,duration_just_detect/nbr_embed ) )
     """
+    
     antelopev2
     
                                         Total           just detect             per embed
     mstab7                          33/40         26/30                   2.21/3.75
     champion1 cpu               13.2            10.1                    0.844
     champion1 RTX3080       2.9             0.31                    0.026
+    
+    antelopev2
+    champion1 RTX3080       2.7             0.27                    0.022
     
     """
     

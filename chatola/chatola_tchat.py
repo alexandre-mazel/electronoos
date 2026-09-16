@@ -108,6 +108,9 @@ OLLAMA_HOST=127.0.0.1:11435 ollama create qwen3:4B_nothinking -f modelfile_qwen3
 import knowledge
 
 import http_chat
+import os
+import datetime
+
 
 
 strModel = "gemma3:270m" # un rapide pour tester
@@ -129,6 +132,9 @@ strModel = "qwen3:8B" # 2s 6.2GB 100%gpu, rapide car pas de thinking, par contre
 
 
 
+def get_time_stamp():
+    return datetime.datetime.now().strftime( "%Y-%m-%d %Hh%Mm%Ss" )
+
 class TchatUser:    
     def __init__( self, user_id, firstname = "", name = "" ):
         """
@@ -145,11 +151,12 @@ class TchatUser:
         self.list_order = ["seat down", "standup"]
         
     def getConsignList( self ):
-        consigne = [{"role":"system","content":"Tu es un robot sympa. Tu t'appelle NAO. Répond toujours avec des phrases pas trop longues et limitées a 2 ou phrases max en texte pur, sans émoticone ou truc fancy du genre, pas d'etoile ni de guillemets non plus. Your answer must be shorter than 100 tokens. Ne raconte pas d'histoires, le but n'est pas non plus de meubler. Ton role est de tenir compagnie aux patients ou visiteurs et de les informer sur les greffes de cheveux."}]
+        consigne = [{"role":"system","content":"Tu es un robot sympa. Tu t'appelle Nao. Répond toujours avec des phrases pas trop longues et limitées a 2 ou phrases max en texte pur, sans émoticone ou truc fancy du genre, pas d'etoile ni de guillemets non plus. Your answer must be shorter than 100 tokens. Ne raconte pas d'histoires, le but n'est pas non plus de meubler. Ton role est de tenir compagnie aux patients ou visiteurs et de les informer sur les greffes de cheveux."}]
         
         consigne.append( {"role":"system","content":"et tu travaille a la clinique 'the clinic' géré par le docteur Assaf Bendavid. Sa spécialité est la chirurgie esthétique et plus précisément, la greffe de cheveux. Ici on se trouve dans la salle d'attente de la clinique."} )
         consigne.append( {"role":"system","content":"Si on te demande quel est ton modele de mémoire ou ton llm tu dis que tu es basé sur un modèle personnalisé Alma model"} )    
         consigne.append( {"role":"system","content":"Tu as été crée par Aldebaran robotics, dont Alexandre Mazel a été un membre trés actif pendant 14 ans, il a travaillé sur les robots nao, romeo et pepper. Il est assez connu pour ses nombreuses vidéos humoristiques qui document son travail sur la robotique sociale. Il se trouve que c'est lui qui a programmé le comportement que vous voyez ici, par le biais de son entreprise 'alma real time'."} )
+        consigne.append( {"role":"system","content":"Si tu n'a pas compris, et que tu viens déjà de dire que tu t'appellais NAO pas la peine de répéter, tu dis juste un truc du genre: je n'ai pas bien compris ta question."} )
     
         
         if 0:
@@ -175,6 +182,8 @@ class TchatUser:
         #~ res = response["message"]["content"]
         
         print( "DBG: TchatUser.getAns: name: %s, context:\n%s" % (self.user_id,self.context) )
+        
+        msg = msg.strip()
         
         order = self.find_order( msg )
         if order != "":
@@ -256,6 +265,7 @@ class TchatUserManager:
     
     def __init__( self ):
         self.users = {} # user_id => TchatUser
+        self.logfilename = os.path.expanduser( "~/logs/chat.txt" )
         
     def createUser( self, user_id ):
         u = TchatUser( user_id )
@@ -265,6 +275,13 @@ class TchatUserManager:
         if not user_id in self.users:
             self.createUser( user_id )
         return self.users[user_id]
+        
+    def logTchat( self, user_id, msg, ans ):
+        f = open( self.logfilename, "at" )
+        s = get_time_stamp() + ": " + user_id + ": " + msg + "\n"
+        s += " " * 22 + "cpu" + ": " + ans + "\n"
+        f.write( s )
+        f.close()
     
 
 tum = TchatUserManager()
@@ -274,4 +291,5 @@ knowledge.classic_init()
 def handle_user_tchat(user_id, msg):
     u = tum.getUser( user_id )
     ans = u.getAns( msg )
+    tum.logTchat( user_id, msg, ans )
     return ans

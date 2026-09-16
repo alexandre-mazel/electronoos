@@ -184,8 +184,13 @@ def get_nearest( question, choice, verbose=0 ):
     compute the nearest choice related to question with similarity.
     and return a pair: simi, nearest or 0,"" if nothing near enough
     """
+    nothing = 0. ,""
     global knowledge
     v = knowledge._get_embed( question )
+    
+    if len(question) < 3:
+        if verbose: print( "\nDBG: get_nearest: too short" )
+        return nothing
     
     res = []
     for i in range( len( choice ) ):
@@ -199,8 +204,8 @@ def get_nearest( question, choice, verbose=0 ):
         for v in mosted:
             print( v )
             
-    if mosted[0][0] < 0.64:
-        return 0. ,""
+    if mosted[0][0] < 0.66 or "parti" in question: # c'est parti sort a 0.674 sur standup, ouf, non !
+        return nothing
         
     return mosted[0]
     
@@ -225,31 +230,41 @@ def autotest():
         # => 456 sec soit 7.6min
         
     if 1:
-        for question in ["Hello", "parles moi de cheveux?", "il est bon le docteur ici", "trouve moi un resto", "debout","assis", "nao assis toi!","leve toi stp!", "allez debout", "c'est l'heure du dodo!"]:
+        for question in ["Hello", "au", "C'est parti", "parles moi de cheveux?", "il est bon le docteur ici", "trouve moi un resto", 
+                                    "debout","assis", "nao assis toi!","leve toi stp!", "allez debout", "c'est l'heure du dodo!", "quig"]:
             ret = get_nearest( question, ["seat down", "standup"], verbose=verbose )
             print( "%s => %s" % (question,ret) )
         knowledge._savePrecalc()
             
         """
+
         DBG: get_nearest: res for question 'Hello'
         (0.6035537860696204, 'standup')
         (0.5910555909160848, 'seat down')
-        Hello => ('', 0.0)
+        Hello => (0.0, '')
+
+        DBG: get_nearest: too short
+        au => (0.0, '')
+
+        DBG: get_nearest: res for question 'C'est parti'
+        (0.6746652253521339, 'standup')
+        (0.6365931539726681, 'seat down')
+        C'est parti => (0.0, '')
 
         DBG: get_nearest: res for question 'parles moi de cheveux?'
         (0.5659121280533812, 'standup')
         (0.5194870154974319, 'seat down')
-        parles moi de cheveux? => ('', 0.0)
+        parles moi de cheveux? => (0.0, '')
 
         DBG: get_nearest: res for question 'il est bon le docteur ici'
         (0.595404097098862, 'standup')
         (0.5448976905782075, 'seat down')
-        il est bon le docteur ici => ('', 0.0)
+        il est bon le docteur ici => (0.0, '')
 
         DBG: get_nearest: res for question 'trouve moi un resto'
         (0.5941454048164818, 'seat down')
         (0.5337451495180264, 'standup')
-        trouve moi un resto => ('', 0.0)
+        trouve moi un resto => (0.0, '')
 
         DBG: get_nearest: res for question 'debout'
         (0.804522390441874, 'standup')
@@ -264,12 +279,12 @@ def autotest():
         DBG: get_nearest: res for question 'nao assis toi!'
         (0.6461200924416253, 'seat down')
         (0.6248739311828067, 'standup')
-        nao assis toi! => (0.6461200924416253, 'seat down')
+        nao assis toi! => (0.0, '')
 
         DBG: get_nearest: res for question 'leve toi stp!'
         (0.6476535241629915, 'standup')
         (0.6220048953197714, 'seat down')
-        leve toi stp! => (0.6476535241629915, 'standup')
+        leve toi stp! => (0.0, '')
 
         DBG: get_nearest: res for question 'allez debout'
         (0.7438686157141826, 'standup')
@@ -279,7 +294,14 @@ def autotest():
         DBG: get_nearest: res for question 'c'est l'heure du dodo!'
         (0.6264739132804591, 'seat down')
         (0.6050113073884316, 'standup')
-        c'est l'heure du dodo! => ('', 0.0)
+        c'est l'heure du dodo! => (0.0, '')
+        DBG: get_embedding: NbrToken (in input): 3 (max since beginning: 3)
+        DBG: get_embedding('qwen3-embedding-mix'): duration: 0.18s
+
+        DBG: get_nearest: res for question 'quig'
+        (0.684491657266448, 'standup')
+        (0.6149420191554951, 'seat down')
+        quig => (0.684491657266448, 'standup') # ARGH mais pourquoi ? j'ai tape ca au hasard sur mon clavier!
 
         """
         

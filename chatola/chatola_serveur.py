@@ -21,7 +21,15 @@ sur champion, y a un run_chatola.sh dans la racine qui cree tout!
 
 from flask import Flask, request, send_file # sudo apt install python3-flask ou en venv: pip install flask
 import os
+import re
 import time
+import unicodedata
+
+logdir = os.path.expanduser( "~/voices/" )
+
+import chatola_tchat
+from chatola_tchat import get_time_stamp
+import traceback
 
 def getHostName():
     if os.name == "nt":
@@ -32,9 +40,6 @@ def getHostName():
         hostname = unames[1]
         #~ print(hostname)
     return hostname.replace(" ", "_")
-
-import chatola_tchat
-import traceback
 
 
 tts = None
@@ -57,6 +62,32 @@ if gbUseTTS:
 # on import whisper apres tts_mms sinon tts_mms core dumped
 import test_whisper
 whisp = test_whisper.Whisper()
+
+
+def remove_accents( text ):
+    return "".join(
+        char
+        for char in unicodedata.normalize( "NFD", text )
+        if unicodedata.category( char ) != "Mn"
+    )
+    
+def clean_txt_for_filename( txt ):
+    txt = remove_accents( txt )
+    return re.sub( r"[^a-zA-Z0-9]", "_", txt )
+    
+HALLUCINATIONS = {
+    "sous-titrage st' 501",
+    "sous-titrage st 501",
+}
+
+def is_hallucination( text ):
+    text = text.strip().lower()
+    b = text in HALLUCINATIONS
+    if b: return True
+    if "sous-titrage" in text:
+        return True
+    return False
+
 
 app = Flask(__name__)
 
@@ -98,30 +129,37 @@ def receive_voice():
                 "debug": "No audio data"
             }, 400
 
-        filename = "/tmp/voice_%d.wav" % int( time.time() * 1000 )
+        filename = logdir + get_time_stamp().replace(" ", "_") + "_voice.wav"
 
         with open( filename, "wb" ) as f:
             f.write( audio_data )
 
-        print(
-            "INF: Voice: received %.2f KB"
-            % ( len( audio_data ) / 1024 )
-        )
+        print( "INF: Voice: received %.2f KB" % ( len( audio_data ) / 1024 ) )
 
         recognised_text = whisp.analyse( filename )
         
-        print( "INF: receive_voice: recognised_text:", recognised_text )
+        print( "INF: receive_voice: recognised_text: '%s'" % recognised_text )
         print( "INF: receive_voice: speech reco duration: %.3fs" % (time.time() - timeBegin) )
+        
+        recognised_text = recognised_text.strip()
+        
+        if recognised_text != "":
+            newfilename = filename.replace( ".wav", "__" + clean_txt_for_filename(recognised_text) + ".wav" )
+            os.rename( filename, newfilename )
         
         ret = ""
         debug_msg = ""
         
-        if 1:
-            try:
-                ret = chatola_tchat.handle_user_tchat( user_id, recognised_text )
-            except BaseException as err:
-                ret = "?"
-                debug_msg += "ERR: " + str(err) + "\nstack: " + traceback.format_exc()
+        if is_hallucination(recognised_text):
+            ret = "?"
+        else:
+            if 1:
+                try:
+                    ret = chatola_tchat.handle_user_tchat( user_id, recognised_text )
+                except BaseException as err:
+                    ret = "?"
+                    debug_msg += "ERR: " + str(err) + "\nstack: " + traceback.format_exc()
+                    print( "ERR: debug_msg: %s" % debug_msg )
 
         #~ os.unlink( filename )
 

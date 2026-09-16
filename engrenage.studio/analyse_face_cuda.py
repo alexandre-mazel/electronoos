@@ -58,6 +58,19 @@ def getInsightApp():
         
     return _face_app
     
+    
+def facesToStrReduced( faces ):
+    s = "%d face(s)\n" % len( faces )
+    for i,f in enumerate(faces):
+        s += "face %d:" % i
+        for k,v in f.items():
+            sv = str(v)
+            if len(sv) > 60:
+                sv = sv[:60]+"..."
+            s += "  %s: %s\n" % (k,sv)
+        s += "\n"
+        
+    return s
 
 def find_most_centered_and_big_face(faces, image_width, image_height,verbose=0):
     """
@@ -115,7 +128,7 @@ def find_most_centered_and_big_face(faces, image_width, image_height,verbose=0):
 import cv2
 
 
-def draw_faces_rect(image1, faces1, selected_idx, result = None ):
+def draw_faces_rect(image1, faces1, selected_idx = -1, result = None ):
     """
     Draw all detected faces on image1.
 
@@ -517,7 +530,8 @@ def order_faces( faces ):
         )
         ordered_faces.extend( row["faces"] )
 
-    return list( enumerate( ordered_faces ) )
+    #~ return list( enumerate( ordered_faces ) )
+    return ordered_faces
 
 
 def get_embed_faces( im, bOnlyMostCentered = False ):
@@ -525,15 +539,16 @@ def get_embed_faces( im, bOnlyMostCentered = False ):
         
     faces = fap.get(im)
     
-    #~ print( "DBG: get_embed_faces: faces before: " + str(faces) )
+    print( "DBG: get_embed_faces: faces before: " + facesToStrReduced(faces) )
     
     if bOnlyMostCentered:
         idx = find_most_centered_and_big_face( faces, im.shape[1], im.shape[0] )
         faces = [faces[idx]]
     else:
         faces = order_faces( faces )
+        pass
         
-    #~ print( "DBG: get_embed_faces: faces after: " + str(faces) )
+    print( "DBG: get_embed_faces: faces after: " + facesToStrReduced(faces) )
         
     return faces
     
@@ -643,11 +658,16 @@ def test_quick_compare():
     """
     
 def test_face_ordering():
-    faces = get_embed_faces_from_filename( "../test/20240109_161443_small.jpg" )
-
+    filename = "../test/20240109_161443_small.jpg"
+    #~ faces = get_embed_faces_from_filename( filename )
+    im = cv2.imread(filename)
+    faces = get_embed_faces( im )
+    imdebug = draw_faces_rect( im, faces )
+    cv2.imshow( "debug", imdebug )
+    cv2.waitKey(0)
     
 def autotest():
-    test_quick_compare()
+    #~ test_quick_compare()
     test_face_ordering()
 
     

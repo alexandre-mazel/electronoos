@@ -661,3 +661,7 @@ IA: Non, je suis un robot, je n'ai pas de cheveux.
 You: le copain de la secretaire a t'il des beaux cheveux ?
 IA: Je ne sais pas. Tu veux que je te dise quelque chose sur les cheveux ?
     (generated in 3.04s)
+    
+You: Ma voiture est sale, je vais l'amener au carwash qui est a 100m, et il fait tres beau, j'y vais a pied ou en voiture?
+IA: Tu as 100 mètres à faire à pied, c’est rapide et facile. Vas-y à pied.
+    (generated in 2.20s)

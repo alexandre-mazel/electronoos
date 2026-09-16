@@ -18,38 +18,7 @@ def normaliseFilename(f):
     f = os.path.abspath(f)
     f = f.replace(os.sep+os.sep,os.sep)
     return f
-    
-def limitstr( s, max = 57 ):
-    s = str(s).replace("\n", "  " )
-    if len(s) > max:
-        s = s[:max]+ "..."
-    return s
-    
-    
-def dumpstr( o, level = "" ):
-    newlevel = "  " # preline added at each recursion
-    
-    s = ""
-    
-    if isinstance( o, dict ):
-        s += "%sdict with %d elem(s):\n" % ( level, len( o ) )
-        level += newlevel
-        for kk,vv in o.items():
-            s += "%s%s:\n%s\n" % ( level, kk,dumpstr( vv, level + newlevel ) )
-            data = pickle.dumps(kk)
-            print("pickle OK for %s: size: %d (2)" % (str(type(kk)), len( data ) ) )
-    elif isinstance( o, list ):
-        s += "%slist with %d elem(s):\n" % ( level, len( o ) )
-        level += newlevel
-        for i in range(len(o)):
-            s += "%s%s:\n%s\n" % ( level, i, dumpstr( o[i], level + newlevel ) )
-    else:
-        s += level + str(type(o)) + ": " + limitstr( o ) + "\n"
-        #~ print(s)
-        #~ data = pickle.dumps(o)
-        #~ print("pickle OK for %s: size: %d" % (str(type(o)), len( data ) ) )
-        
-    return s
+
 
 class StoredInfo:
     """

@@ -38,8 +38,8 @@ app = Flask(__name__)
 def receive_img():
     try:
         # Nom du fichier transmis dans le header HTTP
-        filename = request.headers.get("X-Filename")
-        user_id = request.headers.get("X-user_id")
+        filename = request.headers.get("X-Image-Filename")
+        user_id = request.headers.get("X-User-Id")
 
         if not filename:
             return {
@@ -109,7 +109,7 @@ if getHostName() == "champion1":
 fullpath = "/etc/letsencrypt/live/%sobo-world.com/" % certname
 
 if getHostName() == "champion1" or 1: # le vrai test serait: si j'ai pas les droits car on ne m'a pas lance en sudo (ce qui est plutot bien)
-    fullpath = ""
+    fullpath = "../chatola/"
             
 keyfn = fullpath + "privkey.pem"
 certfn = fullpath + "cert.pem"

@@ -102,7 +102,8 @@ OLLAMA_HOST=127.0.0.1:11435 ollama create qwen3:4B_nothinking -f modelfile_qwen3
 => ca va plus vite, mais souvent il n'y a rien qui sort (si le think etait en premier)
 
 
-
+ma voiture est sale, je vais l'amener au carwash qui est a 100m, et il fait tres beau, j'y vais a pied ou en voiture?
+=> a pied
 """
 
 import knowledge

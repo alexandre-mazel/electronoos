@@ -1,15 +1,16 @@
 """
 Pour copier sans repeter le mot de passe:
 
-scp -o HostkeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa -i "C:\Users\alexa\perso\docs\cle_ssh_pour_copier_rapidement_sur_nao_avec_scp" *.py nao@192.168.0.68:/home/nao/dev/git/electronoos/demos_nao_and_pepper/2026_09_14_-_la_clinique/
+scp -o HostkeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa -i "C:\Users\alexa\perso\docs\cle_ssh_pour_copier_rapidement_sur_nao_avec_scp" C:\Users\alexa\dev\git\electronoos\demos_nao_and_pepper\2026_09_14_-_la_clinique\*.py nao@192.168.0.49:/home/nao/dev/git/electronoos/demos_nao_and_pepper/2026_09_14_-_la_clinique/
 
 (le fichier cle_ssh_pour_copier_rapidement_sur_nao_avec_scp a ete cree avec puttygen Conversions > Export OpenSSH key et j'ai copie sur nao ma cle publique (public key for pasting...) dans ~/.ssh/authorized_keys sur une ligne)
 
-# il faut copier ce dossier, ainsi que le sound_analyser_modified
-scp -o HostkeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa -i "C:\Users\alexa\perso\docs\cle_ssh_pour_copier_rapidement_sur_nao_avec_scp" c:\Users\alexa\dev\git\abcdk\sdk\abcdk\sound_analyser.py nao@192.168.0.68:/home/nao/.local/lib/python2.7/site-packages/abcdk/
+# il faut copier aussi le sound_analyser_modified
+scp -o HostkeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa -i "C:\Users\alexa\perso\docs\cle_ssh_pour_copier_rapidement_sur_nao_avec_scp" c:\Users\alexa\dev\git\abcdk\sdk\abcdk\sound_analyser.py nao@192.168.0.49:/home/nao/.local/lib/python2.7/site-packages/abcdk/
 
 """
 
+import os
 import sys
 import time
 
@@ -79,4 +80,6 @@ def run_nao_chatola():
     
 if __name__ == "__main__":
     # syntax: scriptname <server_ip ou pas?
+    print( "INF: nao_chatola.py: prepare to start..." )
+    time.sleep( 5 )
     run_nao_chatola()

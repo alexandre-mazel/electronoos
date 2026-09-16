@@ -47,7 +47,7 @@ def getInsightApp():
             name = strModel,  
             providers = [
                 #~ "TensorrtExecutionProvider", # ne fonctionne pas
-                "CUDAExecutionProvider",
+                #~ "CUDAExecutionProvider",
                 "CPUExecutionProvider"
             ]
         )
@@ -632,7 +632,7 @@ def test_quick_compare():
                                         Total           just detect             per embed
     mstab7                          33/40         26/30                   2.21/3.75
     champion1 cpu               
-    champion1 RTX3080
+    champion1 RTX3080       2.9             0.31                    0.026
     
     """
     

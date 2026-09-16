@@ -627,7 +627,7 @@ def test_quick_compare():
     duration = time.time() - time_begin
     duration_just_detect = time.time() - time_no_load
     print( "duration total: %.1fs" % duration )
-    print( "duration just detect: %.1fs (%.2fs per embed)" % (duration_just_detect,duration_just_detect/nbr_embed ) )
+    print( "duration just detect: %.2fs (%.3fs per embed)" % (duration_just_detect,duration_just_detect/nbr_embed ) )
     """
                                         Total           just detect             per embed
     mstab7                          33/40         26/30                   2.21/3.75

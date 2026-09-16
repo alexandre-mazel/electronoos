@@ -29,6 +29,9 @@ class StoredInfo:
     def __init__( self, infoname ):
         self.feats = {} # a dict for each filename => data stored
         self.strSaveFileName = os.path.expanduser("~/cache/stored_info_" + infoname + ".dat" )
+        try:
+            os.makedirs( os.path.expanduser("~/cache/" ) )
+        except: pass
         self.bLoaded = False
         self.bMustSave = False
         #~ self.load()

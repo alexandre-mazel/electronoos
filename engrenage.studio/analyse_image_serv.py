@@ -26,6 +26,7 @@ def getHostName():
     
     
 def extract_infos_from_img( img, filename, user_id ):
+    
 
 
 

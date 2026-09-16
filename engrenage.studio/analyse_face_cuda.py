@@ -32,7 +32,7 @@ def getInsightApp():
     global _face_app
     
     strModel = "buffalo_l"
-    #~ strModel = "antelopev2" # vaguement meilleur (cf bench_faces_2026 dans le git face_tools) 
+    strModel = "antelopev2" # vaguement meilleur (cf bench_faces_2026 dans le git face_tools) 
     """
     et plus tard:
     git clone https://github.com/yakhyo/adaface-onnx.git
@@ -629,12 +629,16 @@ def test_quick_compare():
     print( "duration total: %.1fs" % duration )
     print( "duration just detect: %.2fs (%.3fs per embed)" % (duration_just_detect,duration_just_detect/nbr_embed ) )
     """
+    
     antelopev2
     
                                         Total           just detect             per embed
     mstab7                          33/40         26/30                   2.21/3.75
     champion1 cpu               13.2            10.1                    0.844
     champion1 RTX3080       2.9             0.31                    0.026
+    
+    buffalo_l
+    champion1 RTX3080       2.7             0.27                    0.022
     
     """
     

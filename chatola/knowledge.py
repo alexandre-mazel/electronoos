@@ -204,7 +204,10 @@ def get_nearest( question, choice, verbose=0 ):
         for v in mosted:
             print( v )
             
-    if mosted[0][0] < 0.66 or "parti" in question: # c'est parti sort a 0.674 sur standup, ouf, non !
+    #~ if mosted[0][0] < 0.66 or "parti" in question: # c'est parti sort a 0.674 sur standup, ouf, non !
+        #~ return nothing
+
+    if mosted[0][0] < 0.74 or "parti" in question: # j'ajoute les mots francais ca hit mieux et je remonte le seuil (car racontes moi une blague hitté a 0.68 sur standup, ben oui standup comedie!)
         return nothing
         
     return mosted[0]
@@ -231,8 +234,8 @@ def autotest():
         
     if 1:
         for question in ["Hello", "au", "C'est parti", "parles moi de cheveux?", "il est bon le docteur ici", "trouve moi un resto", 
-                                    "debout","assis", "nao assis toi!","leve toi stp!", "allez debout", "c'est l'heure du dodo!", "quig"]:
-            ret = get_nearest( question, ["seat down", "standup"], verbose=verbose )
+                                    "debout","assis", "nao assis toi!","leve toi stp!", "allez debout", "c'est l'heure du dodo!", "quig", "contes moi une blague"]:
+            ret = get_nearest( question, ["seat down", "standup","lève toi", "assis toi"], verbose=verbose )
             print( "%s => %s" % (question,ret) )
         knowledge._savePrecalc()
             

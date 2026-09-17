@@ -28,7 +28,7 @@ def getHostName():
     
 def extract_infos_from_img( img_raw, filename, user_id ):
     """
-    img_raw est le buffer compressé direct (eg jpg)
+    img_raw est le buffer compresse' direct (eg jpg)
     """
     sys.path.append( "../../face_tools/")
     import facerecognizer3

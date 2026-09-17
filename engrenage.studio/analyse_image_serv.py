@@ -46,15 +46,15 @@ def extract_infos_from_img( img_raw, filename, user_id ):
     fr.save() # for embedding
     if len(faces) > 0:
         print( "found %d faces" % len(faces) )
-        extra_instruction = "PRENOMS :\nDe haut en bas puis pour chaque ligne de gauche a droite, les personnes ont pour prénom: "
+        extra_instruction = "PRENOMS :\nDe haut en bas puis pour chaque rangée de gauche a droite, les personnes ont pour prénom: "
         for i,face in enumerate( faces ):
-            name = face.reco[0].capitalize()
-            peoples.append( name )
-            extra_instruction += name
-            if i < len( faces ) - 1:
-                extra_instruction += ", "
-            else:
-                extra_instruction += "." 
+            if name != "":
+                name = face.reco[0].capitalize()
+                peoples.append( name )
+                extra_instruction += name
+                if i < len( faces ) - 1:
+                    extra_instruction += ", "
+        extra_instruction += "." 
         extra_instruction +=  " Prend cela en compte dans la génération de la description."
         
         extra_instruction_hardcoded = """PRENOMS :

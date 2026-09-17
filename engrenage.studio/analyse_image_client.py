@@ -51,11 +51,11 @@ def send_image_to_analyse( filename_img ):
     
 def test():
     names = ["20260906_210413_small","WA_corto_niko_et_myr","WA_famille_regarde_film"]
-    for name in names:
+    for name in names[1:]:
         fn = "../test/%s.jpg" % name
         ret = send_image_to_analyse( fn )
         print( "ret: %s" % ret )
-        break
+        #~ break
 
 
 if __name__ == "__main__":

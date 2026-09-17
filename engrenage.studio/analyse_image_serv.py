@@ -26,16 +26,19 @@ def getHostName():
     return hostname.replace(" ", "_")
     
     
-def extract_infos_from_img( img, filename, user_id ):
-    
+def extract_infos_from_img( img_raw, filename, user_id ):
+    """
+    img_raw est le buffer compressé direct (eg jpg)
+    """
     sys.path.append( "../../face_tools/")
     import facerecognizer3
     fr = facerecognizer3.faceRecognizer3
     fr.load()
+    imgbuf = cv2.imdecode( np.frombuffer(img_raw, dtype=np.uint8), cv2.IMREAD_COLOR )
     fr.recognizeFromImg( img, filename, find_match = True )
     
     import analyse_image_ollama
-    result = analyse_image_ollama.analyse_image_buffer( "http://localhost:11435/api/chat", img,"qwen2.5vl:7b", verbose=1 )
+    result = analyse_image_ollama.analyse_image_buffer( "http://localhost:11435/api/chat", img_raw,"qwen2.5vl:7b", verbose=1 )
     description = result["description"]
     keywords = result["keywords"]
     text = result["text"]

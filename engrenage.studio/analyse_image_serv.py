@@ -54,7 +54,7 @@ def extract_infos_from_img( img_raw, filename, user_id ):
                 name = "%s inconnu%d" % (gender,i)
             else:
                 name = name.capitalize()
-            peoples.append( name )
+                peoples.append( name )
             extra_instruction += name
             if i < len( faces ) - 1:
                 extra_instruction += ", "

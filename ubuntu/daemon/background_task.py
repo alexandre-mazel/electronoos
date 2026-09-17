@@ -155,16 +155,16 @@ def auto_off():
             os.system( "halt -p")
     
     
-def main(bDontAutoOff):
-    log("background_task: starting, bDontAutoOff: %s" % bDontAutoOff )
+def main(bAutoOff):
+    log("background_task: starting, bAutoOff: %s" % bAutoOff )
     while 1:
         check_temp()
         ping_other()
-        if not bDontAutoOff:
+        if bAutoOff:
             try: auto_off()
             except BaseException as err: log( "ERR: auto_off: %s" % str(err))
         time.sleep(60)
 
-bDontAutoOff = len(sys.argv) > 1
-print( "INF: bDontAutoOff: %s" % bDontAutoOff )
-main(bDontAutoOff)
+bAutoOff = len(sys.argv) <= 1
+print( "INF: bAutoOff: %s" % bAutoOff )
+main(bAutoOff)

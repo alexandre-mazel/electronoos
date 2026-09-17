@@ -45,7 +45,7 @@ actions, couleurs, textes visibles et éléments importants.
 Ne déduis pas une information qui n'est pas visible.
 La description doit etre naturelle, précise et en francais.
 Omet toute introduction du type "L'image montre ..."
-Si je te passe les prénoms des personnes, inclus les dans la description.
+Si je te précise les prénoms des personnes, inclus les dans la description.
 
 KEYWORDS :
 Produis entre 5 et 20 mots-clés pertinents en francais.

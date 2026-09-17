@@ -54,7 +54,7 @@ def extract_infos_from_img( img_raw, filename, user_id ):
             if i < len( faces ) - 1:
                 extra_instruction += ", "
             else:
-                extra_instruction += "."
+                extra_instruction += " prend cela en compte dans la génération de la description."
         print( "DBG: extract_infos_from_img: extra_instruction: %s" % extra_instruction )
 
         

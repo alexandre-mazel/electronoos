@@ -40,6 +40,7 @@ def extract_infos_from_img( img_raw, filename, user_id ):
         
     fr = facerecognizer3.faceRecognizer3
     filename_for_caching = "%s__%s" % (user_id, filename)
+    filename_for_caching = "" # to disable caching!
     fr.load()
     img = cv2.imdecode( np.frombuffer(img_raw, dtype=np.uint8), cv2.IMREAD_COLOR )
     faces = fr.recognizeFromImg( img, filename_for_caching, find_match = True )

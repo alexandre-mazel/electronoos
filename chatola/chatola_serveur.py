@@ -12,9 +12,10 @@ Et d'abord couper le extincteur automatique et le relancer sans l'extinction:
 
 sudo /etc/init.d/background_task stop
 #puis 
-sudo killall python3 # pour etre sur
+sudo killall /usr/bin/python3 # pour etre sur
 # le lancer en mode juste fan optimisation depuis un screen de l'utilisateur a
 sudo python3 /home/a/dev/git/electronoos/ubuntu/daemon/background_task.py no_halt
+(dans le log il doit y avoir qu'une trace par minute, si 2 c'est que 2 proc tournent (et donc un avec un autohalt potentiellement)
 
 sur champion, y a un run_chatola.sh dans la racine qui cree tout!
 

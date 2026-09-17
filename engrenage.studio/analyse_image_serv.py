@@ -36,7 +36,7 @@ def extract_infos_from_img( img_raw, filename, user_id ):
     import facerecognizer3
     fr = facerecognizer3.faceRecognizer3
     fr.load()
-    imgbuf = cv2.imdecode( np.frombuffer(img_raw, dtype=np.uint8), cv2.IMREAD_COLOR )
+    img = cv2.imdecode( np.frombuffer(img_raw, dtype=np.uint8), cv2.IMREAD_COLOR )
     fr.recognizeFromImg( img, filename, find_match = True )
     
     import analyse_image_ollama

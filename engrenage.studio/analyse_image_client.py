@@ -55,6 +55,7 @@ def test():
         fn = "../test/%s.jpg" % name
         ret = send_image_to_analyse( fn )
         print( "ret: %s" % ret )
+        break
 
 
 if __name__ == "__main__":

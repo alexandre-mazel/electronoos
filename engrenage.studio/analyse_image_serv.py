@@ -49,12 +49,15 @@ def extract_infos_from_img( img_raw, filename, user_id ):
         extra_instruction = "PRENOMS :\nDe haut en bas puis pour chaque rangée de gauche a droite, les personnes ont pour prénom: "
         for i,face in enumerate( faces ):
             name = face.reco[0]
-            if name != "":
+            gender = "homme" if face.gender == 1 else "femme"
+            if name == "":
+                name = "%s inconnu%d" % (gender,i)
+            else:
                 name = name.capitalize()
-                peoples.append( name )
-                extra_instruction += name
-                if i < len( faces ) - 1:
-                    extra_instruction += ", "
+            peoples.append( name )
+            extra_instruction += name
+            if i < len( faces ) - 1:
+                extra_instruction += ", "
         extra_instruction += "." 
         extra_instruction +=  " Prend cela en compte dans la génération de la description."
         

@@ -7,6 +7,7 @@ Un service qui ecoute sur un port et analyse des images serieusement
 from flask import Flask, request, send_file # sudo apt install python3-flask ou en venv: pip install flask
 import os
 import re
+import sys
 import time
 import unicodedata
 
@@ -26,6 +27,12 @@ def getHostName():
     
     
 def extract_infos_from_img( img, filename, user_id ):
+    
+    sys.path.append( "../../face_tools/")
+    import facerecognizer3
+    fr = facerecognizer3.faceRecognizer3
+    fr.load()
+    fr.recognizeFromImg( img, filename, find_match = True )
     
     import analyse_image_ollama
     result = analyse_image_ollama.analyse_image_buffer( "http://localhost:11435/api/chat", img,"qwen2.5vl:7b", verbose=1 )

@@ -15,6 +15,26 @@ import unicodedata
 
 logdir = os.path.expanduser( "~/logs/" )
 
+def getElectronoosPath():
+    if os.name == "nt":
+        strElectroPath = "C:/Users/"+os.getlogin()+"/dev/git/electronoos/"
+        if not os.path.isdir(strElectroPath):
+            strElectroPath = "c:/dev/git/electronoos/"
+    else:
+        if os.path.expanduser("~") == "/var/www": # from modpython
+            strElectroPath = os.path.expanduser("/home/na/dev/git/electronoos/")
+        else:
+            if os.geteuid() == 0:
+                strElectroPath = os.path.expanduser("/home/na/dev/git/electronoos/") # when started in root
+            else:
+                strElectroPath = os.path.expanduser("~/dev/git/electronoos/")
+    return strElectroPath
+        
+sys.path.append( getElectronoosPath()+"alex_pytools/" )
+sys.path.append( getElectronoosPath()+"../face_tools/" )
+print(sys.path)
+import workface_tools
+
 import traceback
 
 def getHostName():
@@ -75,7 +95,7 @@ INCORRECT : "Une personne est assise à une table avec des livres."
 CORRECT : "Gaia est assise à une table avec des livres."
 """
 
-        desc = describe_faces_position()
+        desc = workface_tools.describe_faces_position()
         print( desc )
         
         #~ extra_instruction  = extra_instruction_hardcoded

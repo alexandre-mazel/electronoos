@@ -73,7 +73,9 @@ CORRECT : "Gaia est assise à une table avec des livres."
         
     
     import analyse_image_ollama
-    result = analyse_image_ollama.analyse_image_buffer( "http://localhost:11435/api/chat", img_raw,"qwen2.5vl:7b", 
+    strModel = "qwen2.5vl:7b"
+    strModel = "gemma3:12b"
+    result = analyse_image_ollama.analyse_image_buffer( "http://localhost:11435/api/chat", img_raw,strModel, 
                                                     extra_instruction=extra_instruction, verbose=1 )
     description = result["description"]
     keywords = result["keywords"]

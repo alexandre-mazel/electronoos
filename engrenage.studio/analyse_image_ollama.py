@@ -77,6 +77,8 @@ Ne devine jamais un texte qui n'est pas clairement visible.
 
 """ + extra_instruction
 
+    if verbose: print( "prompt:\n%s" % prompt )
+
     if verbose: print( "INF: analyse_image: posting..." )
 
     response = requests.post(

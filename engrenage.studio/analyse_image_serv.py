@@ -44,13 +44,23 @@ def extract_infos_from_img( img_raw, filename, user_id ):
     img = cv2.imdecode( np.frombuffer(img_raw, dtype=np.uint8), cv2.IMREAD_COLOR )
     faces = fr.recognizeFromImg( img, filename_for_caching, find_match = True )
     fr.save() # for embedding
-    print( "found %d faces" % len(faces) )
-    for face in faces:
-        peoples.append( face.reco[0] )
+    if len(faces) > 0:
+        print( "found %d faces" % len(faces) )
+        extra_instruction = "De haut en bas puis pour chaque ligne de gauche a droite, les personnes sont: "
+        for i,face in enumerate( faces ):
+            name = face.reco[0]
+            peoples.append( name )
+            extra_instruction += name
+            if i < len( faces ) - 1:
+                extra_instruction += ", "
+            else:
+                extra_instruction += "."
+        print( "DBG: extract_infos_from_img: extra_instruction: %s" % extra_instruction )
+
         
     
     import analyse_image_ollama
-    result = analyse_image_ollama.analyse_image_buffer( "http://localhost:11435/api/chat", img_raw,"qwen2.5vl:7b", verbose=1 )
+    result = analyse_image_ollama.analyse_image_buffer( "http://localhost:11435/api/chat", img_raw,"qwen2.5vl:7b", extra_instruction=extra_instructionverbose=1 )
     description = result["description"]
     keywords = result["keywords"]
     text = result["text"]

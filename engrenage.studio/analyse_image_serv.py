@@ -46,7 +46,7 @@ def extract_infos_from_img( img_raw, filename, user_id ):
     fr.save() # for embedding
     if len(faces) > 0:
         print( "found %d faces" % len(faces) )
-        extra_instruction = "De haut en bas puis pour chaque ligne de gauche a droite, les personnes sont: "
+        extra_instruction = "De haut en bas puis pour chaque ligne de gauche a droite, les personnes ont pour prénom: "
         for i,face in enumerate( faces ):
             name = face.reco[0]
             peoples.append( name )

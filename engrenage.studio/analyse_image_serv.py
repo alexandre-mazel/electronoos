@@ -56,7 +56,7 @@ def extract_infos_from_img( img_raw, filename, user_id ):
             else:
                 extra_instruction += ", prend cela en compte dans la génération de la description."
         
-        extra_instruction = """
+        extra_instruction_hardcoded = """PRENOMS :
         Dans cette image, les personnes sont identifiées de haut en bas,
 puis de gauche à droite :
 
@@ -68,6 +68,7 @@ Exemple :
 INCORRECT : "Une personne est assise à une table avec des livres."
 CORRECT : "Gaia est assise à une table avec des livres."
 """
+        #~ extra_instruction  = extra_instruction_hardcoded
         print( "DBG: extract_infos_from_img: extra_instruction: %s" % extra_instruction )
 
         

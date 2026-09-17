@@ -5,21 +5,27 @@ import time
 
 HOST = "engrenage.studio"
 
-OLLAMA_URL = f"http://{HOST}:45035/api/chat"
-
+OLLAMA_DEFAULT_URL = f"http://{HOST}:45035/api/chat"
 
 def encode_image(filename):
     with open(filename, "rb") as file:
         return base64.b64encode(file.read()).decode("utf-8")
 
 
-def analyze_image( host_url, filename, strModel, extra_instruction = "", verbose=False ):
+def analyse_image_from_filename( host_url, image_filename, strModel, extra_instruction = "", verbose=False ):
+    if verbose: print( "INF: analyse_image_from_filename: '%s'..." % image_filename )
+    image = encode_image(image_filename)
+    return analyse_image_buffer_b64( host_url, image, strModel, extra_instruction = extra_instruction, verbose=verbose )
+
+
+
+def analyse_image_buffer( host_url, image, strModel, extra_instruction = "", verbose=False ):
+    img_b64 = base64.b64encode(image).decode("utf-8")
+    return analyse_image_buffer_b64( host_url, img_b64, strModel, extra_instruction = extra_instruction, verbose=verbose )
     
-    if verbose: print( "INF: analyze_image: '%s'..." % filename )
+def analyse_image_buffer_b64( host_url, image, strModel, extra_instruction = "", verbose=False ):
     
     time_begin = time.time()
-    
-    image = encode_image(filename)
 
     prompt = """
 Analyse cette image très précisément.
@@ -60,7 +66,7 @@ Ne devine jamais un texte qui n'est pas clairement visible.
 
 """ + extra_instruction
 
-    if verbose: print( "INF: analyze_image: posting..." )
+    if verbose: print( "INF: analyse_image: posting..." )
 
     response = requests.post(
         host_url,
@@ -146,7 +152,7 @@ def main():
 
     # charge un coup
     print("Ensuring model is loaded...")
-    result = analyze_image( OLLAMA_URL, "../test/%s.jpg" % list_img[0], strModel )
+    result = analyse_image_from_filename( OLLAMA_DEFAULT_URL, "../test/%s.jpg" % list_img[0], strModel )
 
 
 
@@ -161,7 +167,7 @@ def main():
         
         time_begin = time.time()
         
-        result = analyze_image( OLLAMA_URL, "../test/%s.jpg" % img, strModel )
+        result = analyse_image_from_filename( OLLAMA_DEFAULT_URL, "../test/%s.jpg" % img, strModel )
         
         duration = time.time() - time_begin
         print( "duration: %.3fs" % duration )

@@ -26,9 +26,16 @@ def getHostName():
     
     
 def extract_infos_from_img( img, filename, user_id ):
+    
     import analyse_image_ollama
-    result = analyse_image_ollama.analyse_image( "localhost:45035", "qwen2.5vl:7b", img )
-
+    result = analyse_image_ollama.analyse_image_buffer( "http://localhost:11435/api/chat", img,"qwen2.5vl:7b", verbose=1 )
+    description = result["description"]
+    keywords = result["keywords"]
+    text = result["text"]
+    
+    peoples = []
+    
+    return description, keywords, text, peoples
 
 
 app = Flask(__name__)

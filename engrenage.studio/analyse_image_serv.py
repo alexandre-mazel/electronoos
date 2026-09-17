@@ -32,15 +32,19 @@ def extract_infos_from_img( img_raw, filename, user_id ):
     """
     img_raw est le buffer compresse' direct (eg jpg)
     """
+    print( "INF: extract_infos_from_img: filename: '%s', user_id: '%s'" % ( filename, user_id ) )
     sys.path.append( "../../face_tools/")
     import facerecognizer3
     
     peoples = []
         
     fr = facerecognizer3.faceRecognizer3
+    filename_for_caching = "%s__%s" % (user_id, filename)
     fr.load()
     img = cv2.imdecode( np.frombuffer(img_raw, dtype=np.uint8), cv2.IMREAD_COLOR )
-    faces = fr.recognizeFromImg( img, filename, find_match = True )
+    faces = fr.recognizeFromImg( img, filename_for_caching, find_match = True )
+    fr.save() # for embedding
+    print( "found %d faces" % len(faces) )
     for face in faces:
         peoples.append( face.reco[0] )
         

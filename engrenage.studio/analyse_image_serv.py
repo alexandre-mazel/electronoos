@@ -97,6 +97,7 @@ CORRECT : "Gaia est assise à une table avec des livres."
 
         desc = workface_tools.describe_faces_position()
         print( desc )
+        extra_instruction = desc
         
         #~ extra_instruction  = extra_instruction_hardcoded
         print( "DBG: extract_infos_from_img: extra_instruction: %s" % extra_instruction )

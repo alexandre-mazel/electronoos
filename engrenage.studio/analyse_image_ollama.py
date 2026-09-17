@@ -45,7 +45,17 @@ actions, couleurs, textes visibles et éléments importants.
 Ne déduis pas une information qui n'est pas visible.
 La description doit etre naturelle, précise et en francais.
 Omet toute introduction du type "L'image montre ..."
-Si je te précise les prénoms des personnes, inclus les dans la description.
+
+IMPORTANT — IDENTIFICATION DES PERSONNES :
+
+Des prénoms correspondant aux personnes présentes dans l'image
+peuvent être fournis ci-dessous.
+
+Si un prénom est fourni, tu DOIS utiliser ce prénom pour désigner
+la personne correspondante dans la description.
+
+Ne dis PAS "une personne", "un homme", "une femme", "un individu"
+ou "quelqu'un" lorsque cette personne possède un prénom fourni.
 
 KEYWORDS :
 Produis entre 5 et 20 mots-clés pertinents en francais.

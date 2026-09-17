@@ -34,18 +34,22 @@ def extract_infos_from_img( img_raw, filename, user_id ):
     """
     sys.path.append( "../../face_tools/")
     import facerecognizer3
+    
+    peoples = []
+        
     fr = facerecognizer3.faceRecognizer3
     fr.load()
     img = cv2.imdecode( np.frombuffer(img_raw, dtype=np.uint8), cv2.IMREAD_COLOR )
-    fr.recognizeFromImg( img, filename, find_match = True )
+    faces = fr.recognizeFromImg( img, filename, find_match = True )
+    for face in faces:
+        peoples.append( face.reco[0] )
+        
     
     import analyse_image_ollama
     result = analyse_image_ollama.analyse_image_buffer( "http://localhost:11435/api/chat", img_raw,"qwen2.5vl:7b", verbose=1 )
     description = result["description"]
     keywords = result["keywords"]
     text = result["text"]
-    
-    peoples = []
     
     return description, keywords, text, peoples
 

@@ -5,6 +5,7 @@ Un service qui ecoute sur un port et analyse des images serieusement
 """
 
 from flask import Flask, request, send_file # sudo apt install python3-flask ou en venv: pip install flask
+import cv2
 import os
 import re
 import sys

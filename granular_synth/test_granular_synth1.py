@@ -311,12 +311,15 @@ def voix_moteur_granulaire(
 
     print( f"Created: {sortie_wav}" )
 
+
+source = "voice_fr_ref5_torche.wav"
+source = "qwen3_test_fr_ref4_majordome.wav"
 motorfile = "485355__inspectorj__motor-small-fast-front-04-01-loop.wav"
 motorfile = "345348__iut_paris8__gendron_clement_2015_2016_mecanicsound.wav"
 
 
 voix_moteur_granulaire(
-    "voice_fr_ref5_torche.wav", # voix.wav
+    source, # voix.wav
     motorfile,  # moteur.wav"
     "voix_metal_out.wav",
 

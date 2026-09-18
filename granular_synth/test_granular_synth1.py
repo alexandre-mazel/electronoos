@@ -3,6 +3,29 @@ import soundfile as sf
 from scipy.signal import resample
 
 
+""""
+
+c'est quoi un generateur de son avec un moteur granulaire élaboré à partir de microcapsules audios capturées sur les moteurs et les tendons du mécanisme.
+
+        Microcapsules audio : on enregistre de très courts fragments sonores (quelques millisecondes à quelques secondes) captés sur les moteurs, engrenages, articulations, câbles, tendons, vibrations, etc.
+
+        Moteur granulaire : le logiciel découpe ces enregistrements en minuscules morceaux appelés grains et les rejoue en très grand nombre.
+
+        En modifiant la position, la durée, la vitesse, le pitch, le volume et l'ordre des grains, on peut transformer le bruit mécanique original en une matière sonore complètement différente.
+
+        Le résultat peut devenir une sorte de synthétiseur dont l'oscillateur est une machine réelle.
+
+    Par exemple, tu enregistres :
+
+        rrrrr-click-click-vrrrrr
+
+    le bruit d'un moteur et de son mécanisme. Le moteur granulaire peut ensuite prendre 500 micro-fragments de cet enregistrement et les rejouer de manière contrôlée pour produire :
+
+        une nappe → un drone → une texture rythmique → un son métallique → une sorte de « voix » mécanique.
+
+"""
+
+
 def voix_moteur_granulaire(
     voix_wav,
     moteur_wav,

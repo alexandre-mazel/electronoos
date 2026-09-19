@@ -48,7 +48,7 @@ def getHostName():
     return hostname.replace(" ", "_")
     
     
-def extract_infos_from_img( img_raw, filename, user_id ):
+def extract_infos_from_img( img_raw, filename, user_id, lang = "fr" ):
     """
     img_raw est le buffer compresse' direct (eg jpg)
     """
@@ -67,24 +67,33 @@ def extract_infos_from_img( img_raw, filename, user_id ):
     fr.save() # for embedding
     if len(faces) > 0:
         print( "found %d faces" % len(faces) )
-        extra_instruction = "PRENOMS :\nDe haut en bas puis pour chaque rangée de gauche a droite, les personnes ont pour prénom: "
+        
         for i,face in enumerate( faces ):
             name = face.reco[0]
-            gender = "homme" if face.gender == 1 else "femme"
-            if name == "":
-                name = "%s inconnu%d" % (gender,i)
-            else:
+            if name != "":
                 name = name.capitalize()
                 peoples.append( name )
-            extra_instruction += name
-            if i < len( faces ) - 1:
-                extra_instruction += ", "
-        extra_instruction += "." 
-        extra_instruction +=  " Prend cela en compte dans la génération de la description."
+                
+        if 0:
+            extra_instruction = "PRENOMS :\nDe haut en bas puis pour chaque rangée de gauche a droite, les personnes ont pour prénom: "
+            for i,face in enumerate( faces ):
+                name = face.reco[0]
+                gender = "homme" if face.gender == 1 else "femme"
+                if name == "":
+                    name = "%s inconnu%d" % (gender,i)
+                else:
+                    name = name.capitalize()
+                    peoples.append( name )
+                extra_instruction += name
+                if i < len( faces ) - 1:
+                    extra_instruction += ", "
+            extra_instruction += "." 
+            extra_instruction +=  " Prend cela en compte dans la génération de la description."
         
-        desc = workface_tools.describe_faces_position(faces)
+        num_lang = 0 if lang == "en" else 1
+        desc = workface_tools.describe_faces_position(faces, num_lang=num_lang)
         print( desc )
-        extra_instruction = desc
+        people_idenfication = desc
         
         extra_instruction_hardcoded = """PRENOMS :
         Dans cette image, les personnes sont identifiées de haut en bas,
@@ -99,16 +108,18 @@ INCORRECT : "Une personne est assise à une table avec des livres."
 CORRECT : "Gaia est assise à une table avec des livres."
 """
         
+        extra_instruction = ""
         #~ extra_instruction  = extra_instruction_hardcoded
+        print( "DBG: extract_infos_from_img: people_idenfication: %s" % people_idenfication )
         print( "DBG: extract_infos_from_img: extra_instruction: %s" % extra_instruction )
 
         
     
     import analyse_image_ollama
     strModel = "qwen2.5vl:7b"
-    strModel = "gemma3:12b"
+    #~ strModel = "gemma3:12b"
     result = analyse_image_ollama.analyse_image_buffer( "http://localhost:11435/api/chat", img_raw,strModel, 
-                                                    extra_instruction=extra_instruction, verbose=1 )
+                                                    people_idenfication=people_idenfication, extra_instruction=extra_instruction, lang=lang, verbose=1 )
     description = result["description"]
     keywords = result["keywords"]
     text = result["text"]
@@ -125,6 +136,7 @@ def receive_img():
         # Nom du fichier transmis dans le header HTTP
         filename = request.headers.get("X-Image-Filename")
         user_id = request.headers.get("X-User-Id")
+        lang = request.headers.get("Lang")
 
         if not filename:
             return {
@@ -166,7 +178,7 @@ def receive_img():
             )
             
         if 1:
-            description, keywords, text, peoples = extract_infos_from_img( data, filename, user_id )
+            description, keywords, text, peoples = extract_infos_from_img( data, filename, user_id, lang=lang )
 
         return {
             "status": "ok",

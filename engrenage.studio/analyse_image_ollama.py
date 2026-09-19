@@ -12,22 +12,22 @@ def encode_image(filename):
         return base64.b64encode(file.read()).decode("utf-8")
 
 
-def analyse_image_from_filename( host_url, image_filename, strModel, extra_instruction = "", verbose=False ):
+def analyse_image_from_filename( host_url, image_filename, strModel, people_idenfication = "", extra_instruction = "", lang = "fr", verbose=False ):
     if verbose: print( "INF: analyse_image_from_filename: '%s'..." % image_filename )
     image = encode_image(image_filename)
-    return analyse_image_buffer_b64( host_url, image, strModel, extra_instruction = extra_instruction, verbose=verbose )
+    return analyse_image_buffer_b64( host_url, image, strModel, people_idenfication=people_idenfication, extra_instruction = extra_instruction, lang=lang, verbose=verbose )
 
 
 
-def analyse_image_buffer( host_url, image, strModel, extra_instruction = "", verbose=False ):
+def analyse_image_buffer( host_url, image, strModel, people_idenfication = "", extra_instruction = "", lang = "fr", verbose=False ):
     img_b64 = base64.b64encode(image).decode("utf-8")
-    return analyse_image_buffer_b64( host_url, img_b64, strModel, extra_instruction = extra_instruction, verbose=verbose )
+    return analyse_image_buffer_b64( host_url, img_b64, strModel, people_idenfication=people_idenfication, extra_instruction = extra_instruction, lang=lang, verbose=verbose )
     
-def analyse_image_buffer_b64( host_url, image, strModel, extra_instruction = "", verbose=False ):
+def analyse_image_buffer_b64( host_url, image, strModel, people_idenfication = "", extra_instruction = "", lang = "fr", verbose=False ):
     
     time_begin = time.time()
 
-    prompt = """
+    prompt_fr = """
 Analyse cette image très précisément.
 
 Retourne exclusivement un objet JSON valide avec exactement ces trois champs :
@@ -57,6 +57,8 @@ la personne correspondante dans la description.
 Ne dis PAS "une personne", "un homme", "une femme", "un individu"
 ou "quelqu'un" lorsque cette personne possède un prénom fourni.
 
+PEOPLE_IDENTIFICATION
+
 KEYWORDS :
 Produis entre 5 et 20 mots-clés pertinents en francais.
 Les mots-clés doivent correspondre a des éléments réellement visibles.
@@ -75,7 +77,69 @@ séparée dans le tableau.
 Si aucun texte n'est lisible, retourne un tableau vide.
 Ne devine jamais un texte qui n'est pas clairement visible.
 
-""" + extra_instruction
+""" 
+
+    prompt_en = """
+Analyze this image very precisely.
+
+Return exclusively a valid JSON object with exactly these three fields:
+
+{
+  "description": "detailed description of the image",
+  "keywords": ["word1", "word2", "word3"],
+  "text": ["word1", "word2", "word3"],
+}
+
+DESCRIPTION:
+Describe only what is actually visible.
+Describe the people, objects, animals, environment,
+actions, colors, visible text, and important elements.
+Do not infer information that is not visible.
+The description must be natural, precise, and in English.
+Omit any introduction such as "The image shows ..."
+
+IMPORTANT: PEOPLE IDENTIFICATION:
+
+First names corresponding to people present in the image
+may be provided below.
+
+If a first name is provided, you MUST use that first name to refer
+to the corresponding person in the description.
+
+Do NOT say "a person", "a man", "a woman", "an individual"
+or "someone" when that person has a provided first name.
+
+PEOPLE_IDENTIFICATION
+
+KEYWORDS:
+Produce between 5 and 20 relevant keywords in English.
+The keywords must correspond to elements that are actually visible.
+Use simple and useful terms for subsequent searches
+in an image database.
+Avoid overly generic words such as "image", "photo", "object".
+Use singular nouns when appropriate.
+
+TEXT:
+Transcribe exactly all text that is actually readable in the image.
+Do not rephrase or translate the text.
+Preserve spelling, numbers, symbols, and capitalization
+as accurately as possible.
+Each distinct text element must be returned as a separate string
+in the array.
+If no text is readable, return an empty array.
+Never guess text that is not clearly visible.
+
+"""
+
+   
+    if lang == "fr":
+        prompt = prompt_fr.replace( "PEOPLE_IDENTIFICATION", people_idenfication )
+    else:
+        prompt = prompt_en.replace( "PEOPLE_IDENTIFICATION", people_idenfication )
+
+
+    prompt += extra_instruction
+    
 
     if verbose: print( "prompt:\n%s" % prompt )
 
@@ -119,7 +183,7 @@ Ne devine jamais un texte qui n'est pas clairement visible.
                 ]
             },
             "options": {
-                "temperature": 0.,
+                "temperature": 0,
                 "seed": 42,
             }
         },

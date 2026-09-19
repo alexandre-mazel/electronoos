@@ -5,6 +5,8 @@ import sys
 sys.path.append("/home/na/dev/git/obo/altwww/")
 import altcommon
 
+import time
+
    
 def runCommandGetResults( strCommand ):
     strFilename = "/tmp/" + str(time.time())

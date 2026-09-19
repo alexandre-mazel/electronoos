@@ -1,6 +1,8 @@
 # index of engrenage.studio
 # version sept 2023, porting to thenardier.fr
 
+# pour wakeonlan: sudo apt install wakeonlan
+
 import os
 import sys
 import time

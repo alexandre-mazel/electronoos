@@ -65,6 +65,8 @@ def extract_infos_from_img( img_raw, filename, user_id, lang = "fr" ):
     img = cv2.imdecode( np.frombuffer(img_raw, dtype=np.uint8), cv2.IMREAD_COLOR )
     faces = fr.recognizeFromImg( img, filename_for_caching, find_match = True )
     fr.save() # for embedding
+    people_identification = ""
+    extra_instruction = ""
     if len(faces) > 0:
         print( "found %d faces" % len(faces) )
         
@@ -93,7 +95,7 @@ def extract_infos_from_img( img_raw, filename, user_id, lang = "fr" ):
         num_lang = 0 if lang == "en" else 1
         desc = workface_tools.describe_faces_position(faces, num_lang=num_lang)
         print( desc )
-        people_idenfication = desc
+        people_identification = desc
         
         extra_instruction_hardcoded = """PRENOMS :
         Dans cette image, les personnes sont identifiées de haut en bas,
@@ -108,9 +110,8 @@ INCORRECT : "Une personne est assise à une table avec des livres."
 CORRECT : "Gaia est assise à une table avec des livres."
 """
         
-        extra_instruction = ""
         #~ extra_instruction  = extra_instruction_hardcoded
-        print( "DBG: extract_infos_from_img: people_idenfication: %s" % people_idenfication )
+        print( "DBG: extract_infos_from_img: people_identification: %s" % people_identification )
         print( "DBG: extract_infos_from_img: extra_instruction: %s" % extra_instruction )
 
         
@@ -119,7 +120,7 @@ CORRECT : "Gaia est assise à une table avec des livres."
     strModel = "qwen2.5vl:7b"
     #~ strModel = "gemma3:12b"
     result = analyse_image_ollama.analyse_image_buffer( "http://localhost:11435/api/chat", img_raw,strModel, 
-                                                    people_idenfication=people_idenfication, extra_instruction=extra_instruction, lang=lang, verbose=1 )
+                                                    people_identification=people_identification, extra_instruction=extra_instruction, lang=lang, verbose=1 )
     description = result["description"]
     keywords = result["keywords"]
     text = result["text"]

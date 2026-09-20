@@ -12,18 +12,18 @@ def encode_image(filename):
         return base64.b64encode(file.read()).decode("utf-8")
 
 
-def analyse_image_from_filename( host_url, image_filename, strModel, people_idenfication = "", extra_instruction = "", lang = "fr", verbose=False ):
+def analyse_image_from_filename( host_url, image_filename, strModel, people_identification = "", extra_instruction = "", lang = "fr", verbose=False ):
     if verbose: print( "INF: analyse_image_from_filename: '%s'..." % image_filename )
     image = encode_image(image_filename)
-    return analyse_image_buffer_b64( host_url, image, strModel, people_idenfication=people_idenfication, extra_instruction = extra_instruction, lang=lang, verbose=verbose )
+    return analyse_image_buffer_b64( host_url, image, strModel, people_identification=people_identification, extra_instruction = extra_instruction, lang=lang, verbose=verbose )
 
 
 
-def analyse_image_buffer( host_url, image, strModel, people_idenfication = "", extra_instruction = "", lang = "fr", verbose=False ):
+def analyse_image_buffer( host_url, image, strModel, people_identification = "", extra_instruction = "", lang = "fr", verbose=False ):
     img_b64 = base64.b64encode(image).decode("utf-8")
-    return analyse_image_buffer_b64( host_url, img_b64, strModel, people_idenfication=people_idenfication, extra_instruction = extra_instruction, lang=lang, verbose=verbose )
+    return analyse_image_buffer_b64( host_url, img_b64, strModel, people_identification=people_identification, extra_instruction = extra_instruction, lang=lang, verbose=verbose )
     
-def analyse_image_buffer_b64( host_url, image, strModel, people_idenfication = "", extra_instruction = "", lang = "fr", verbose=False ):
+def analyse_image_buffer_b64( host_url, image, strModel, people_identification = "", extra_instruction = "", lang = "fr", verbose=False ):
     
     time_begin = time.time()
 
@@ -133,9 +133,9 @@ Never guess text that is not clearly visible.
 
    
     if lang == "fr":
-        prompt = prompt_fr.replace( "PEOPLE_IDENTIFICATION", people_idenfication )
+        prompt = prompt_fr.replace( "PEOPLE_IDENTIFICATION", people_identification )
     else:
-        prompt = prompt_en.replace( "PEOPLE_IDENTIFICATION", people_idenfication )
+        prompt = prompt_en.replace( "PEOPLE_IDENTIFICATION", people_identification )
 
 
     prompt += extra_instruction

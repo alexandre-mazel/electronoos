@@ -327,6 +327,155 @@ float calculerPourcentageRespiration(float roll)
   return pourcentageRespiration;
 }
 
+// ============================================================
+// Détection respiration à partir du ROLL
+// ============================================================
+
+struct RespirationState {
+  float filteredRoll = 0;
+  float previousRoll = 0;
+
+  float minRoll = 0;
+  float maxRoll = 0;
+
+  bool initialized = false;
+  bool rising = false;
+
+  float percent = 0;
+
+  unsigned long lastPeakTime = 0;
+  unsigned long lastValleyTime = 0;
+};
+
+RespirationState resp;
+
+
+// Paramètres à ajuster
+const float RESP_FILTER = 0.15;      // filtrage roll (0.05 = très filtré)
+const float RESP_THRESHOLD = 0.015;  // seuil de mouvement
+const float RESP_MIN_AMPLITUDE = 2.0; // amplitude minimale en degrés
+const unsigned long RESP_MIN_PERIOD = 800; // ms
+
+
+float updateRespiration(float roll, float gyroX, float gyroY, float gyroZ, float dt)
+{
+  // ------------------------------------------------------------
+  // 1. Filtre passe-bas sur le roll
+  // ------------------------------------------------------------
+  if (!resp.initialized) {
+    resp.filteredRoll = roll;
+    resp.previousRoll = roll;
+    resp.minRoll = roll;
+    resp.maxRoll = roll;
+    resp.initialized = true;
+    return 50.0;
+  }
+
+  resp.filteredRoll += RESP_FILTER * (roll - resp.filteredRoll);
+
+
+  // ------------------------------------------------------------
+  // 2. Vitesse du roll
+  // ------------------------------------------------------------
+  float velocity = (resp.filteredRoll - resp.previousRoll) / dt;
+
+  resp.previousRoll = resp.filteredRoll;
+
+
+  // ------------------------------------------------------------
+  // 3. Détection montée / descente
+  // ------------------------------------------------------------
+  bool newRising = resp.rising;
+
+  if (velocity > RESP_THRESHOLD) {
+    newRising = true;
+  }
+  else if (velocity < -RESP_THRESHOLD) {
+    newRising = false;
+  }
+
+
+  // ------------------------------------------------------------
+  // 4. Changement montée -> descente = PIC
+  // ------------------------------------------------------------
+  if (resp.rising && !newRising) {
+
+    float amplitude = resp.maxRoll - resp.minRoll;
+
+    if (amplitude >= RESP_MIN_AMPLITUDE) {
+
+      unsigned long now = millis();
+
+      if (now - resp.lastPeakTime > RESP_MIN_PERIOD) {
+
+        resp.maxRoll = resp.filteredRoll;
+
+        Serial.print(">>> FIN INSPIRATION / PIC   roll=");
+        Serial.println(resp.filteredRoll, 2);
+
+        resp.lastPeakTime = now;
+      }
+    }
+  }
+
+
+  // ------------------------------------------------------------
+  // 5. Changement descente -> montée = CREUX
+  // ------------------------------------------------------------
+  if (!resp.rising && newRising) {
+
+    float amplitude = resp.maxRoll - resp.minRoll;
+
+    if (amplitude >= RESP_MIN_AMPLITUDE) {
+
+      unsigned long now = millis();
+
+      if (now - resp.lastValleyTime > RESP_MIN_PERIOD) {
+
+        resp.minRoll = resp.filteredRoll;
+
+        Serial.print(">>> FIN EXPIRATION / CREUX   roll=");
+        Serial.println(resp.filteredRoll, 2);
+
+        resp.lastValleyTime = now;
+      }
+    }
+  }
+
+
+  resp.rising = newRising;
+
+
+  // ------------------------------------------------------------
+  // 6. Mise à jour des extrêmes
+  // ------------------------------------------------------------
+
+  if (resp.filteredRoll > resp.maxRoll)
+    resp.maxRoll = resp.filteredRoll;
+
+  if (resp.filteredRoll < resp.minRoll)
+    resp.minRoll = resp.filteredRoll;
+
+
+  // ------------------------------------------------------------
+  // 7. Pourcentage respiration
+  // ------------------------------------------------------------
+
+  float amplitude = resp.maxRoll - resp.minRoll;
+
+  if (amplitude > RESP_MIN_AMPLITUDE) {
+
+    resp.percent =
+      100.0 * (resp.filteredRoll - resp.minRoll) / amplitude;
+
+    resp.percent = constrain(resp.percent, 0, 100);
+  }
+
+
+  return resp.percent;
+}
+
+
 
 // ============================================================
 // LOOP
@@ -427,7 +576,11 @@ void loop()
     (1.0 - alpha) * accelPitch;
 
 
-  float pourcentageRespiration = calculerPourcentageRespiration( roll );
+  // float pourcentageRespiration = calculerPourcentageRespiration( roll );
+
+  // float respPercent = updateRespiration( roll, gx, gy, gz, dt );
+
+
 
 
   // ----------------------------------------------------------
@@ -470,8 +623,12 @@ void loop()
     Serial.print(temperature, 2);
     Serial.print(" C");
 
-    Serial.print(" | % respi=");
-    Serial.print(pourcentageRespiration, 2);
+    // Serial.print(" | % respi=");
+    // Serial.print(pourcentageRespiration, 2);
+
+    Serial.print(", Respiration = ");
+    Serial.print(respPercent, 1);
+    Serial.print(" %");
 
 
     Serial.println("");

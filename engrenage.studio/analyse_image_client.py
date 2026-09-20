@@ -55,10 +55,16 @@ def test():
     #~ names = names[1:2]
     for name in names:
         fn = "../test/%s.jpg" % name
-        ret = send_image_to_analyse( fn, "fr" )
+        ret = send_image_to_analyse( fn, "fr" ) # bizarrement le 2ieme foire des fois quand le client est sur PC avec une liste de mot clé infini avec "séance de photos", "séance de photos", "séance de photos", ... => relancer avec une autre seed si trop pourri.
         #~ print( "ret: %s" % ret )
         #~ break
         
+        
+"""
+la suite: on lance l'extraction, puis on embedde la desc totale dans un texte, ainsi que chaque phrase. ensuite on aura une recherche en mot clé pur et en texte pur.
+on pourrait aussi faire une recherche en enbed de mot clé et en embed de texte pur.
+qu'est ce qui marcherait le mieux ?
+"""
         
 """
 

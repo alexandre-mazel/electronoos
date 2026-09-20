@@ -20,9 +20,11 @@ float yaw   = 0;
 
 unsigned long lastTime;
 
+int displayCounter = 0;
+
 
 // ============================================================
-// Lecture registres
+// Lecture d'un registre
 // ============================================================
 
 uint8_t readRegister(uint8_t reg)
@@ -41,6 +43,10 @@ uint8_t readRegister(uint8_t reg)
   return 0xFF;
 }
 
+
+// ============================================================
+// Lecture de plusieurs registres
+// ============================================================
 
 bool readRegisters(uint8_t reg, uint8_t *buffer, uint8_t length)
 {
@@ -79,7 +85,7 @@ bool initMPU6886()
     return false;
   }
 
-  // Sortie du mode sleep
+  // Réveil du MPU
   Wire.beginTransmission(MPU6886_ADDR);
   Wire.write(REG_PWR_MGMT_1);
   Wire.write(0x00);
@@ -94,7 +100,7 @@ bool initMPU6886()
 
 
 // ============================================================
-// Calibration gyroscope
+// Calibration du gyroscope
 // ============================================================
 
 void calibrateGyro()
@@ -149,7 +155,7 @@ void calibrateGyro()
 
 
 // ============================================================
-// Lecture IMU
+// Lecture complète de l'IMU
 // ============================================================
 
 bool readIMU(
@@ -178,19 +184,30 @@ bool readIMU(
   int16_t rawGz = ((int16_t)data[12] << 8) | data[13];
 
 
-  // Accel ±2g
+  // ----------------------------------------------------------
+  // Accéléromètre
+  // ±2 g = 16384 LSB/g
+  // ----------------------------------------------------------
+
   ax = rawAx / 16384.0;
   ay = rawAy / 16384.0;
   az = rawAz / 16384.0;
 
 
-  // Gyro ±250 deg/s
+  // ----------------------------------------------------------
+  // Gyroscope
+  // ±250 deg/s = 131 LSB/(deg/s)
+  // ----------------------------------------------------------
+
   gx = rawGx / 131.0;
   gy = rawGy / 131.0;
   gz = rawGz / 131.0;
 
 
+  // ----------------------------------------------------------
   // Température
+  // ----------------------------------------------------------
+
   temperature = rawTemp / 326.8 + 25.0;
 
   return true;
@@ -207,14 +224,14 @@ void setup()
 
   Wire.begin();
 
-  // I2C rapide
+  // I2C à 400 kHz
   Wire.setClock(400000);
 
   delay(500);
 
   Serial.println();
   Serial.println("=================================");
-  Serial.println(" MPU6886 - Pitch Roll Yaw");
+  Serial.println(" MPU6886 - Pitch / Roll / Yaw");
   Serial.println("=================================");
 
   if (!initMPU6886())
@@ -225,31 +242,89 @@ void setup()
     }
   }
 
+
+  // ----------------------------------------------------------
   // Calibration gyro
+  // ----------------------------------------------------------
+
   calibrateGyro();
 
+
+  // ----------------------------------------------------------
   // Initialisation des angles avec l'accéléromètre
+  // ----------------------------------------------------------
+
   float ax, ay, az;
   float gx, gy, gz;
   float temperature;
 
   if (readIMU(ax, ay, az, gx, gy, gz, temperature))
   {
-    roll = atan2(ay, az) * 180.0 / PI;
+    roll =
+      atan2(ay, az) * 180.0 / PI;
 
-    pitch = atan2(
-      -ax,
-      sqrt(ay * ay + az * az)
-    ) * 180.0 / PI;
+    pitch =
+      atan2(
+        -ax,
+        sqrt(ay * ay + az * az)
+      ) * 180.0 / PI;
 
     yaw = 0;
   }
+
 
   lastTime = micros();
 
   Serial.println();
   Serial.println("Orientation initiale OK.");
   Serial.println();
+}
+
+
+float dernierCreux = 0;
+float dernierPic = 0;
+float pourcentageRespiration = 0;
+
+float calculerPourcentageRespiration(float roll)
+{
+  static float precedent = 0;
+  static bool monte = true;
+
+  // Détection changement de direction
+  if (roll > precedent)
+  {
+    // On vient de repartir vers le haut : le précédent point
+    // était un creux
+    if (!monte)
+    {
+      dernierCreux = precedent;
+      monte = true;
+    }
+  }
+  else if (roll < precedent)
+  {
+    // On vient de repartir vers le bas : le précédent point
+    // était un pic
+    if (monte)
+    {
+      dernierPic = precedent;
+      monte = false;
+    }
+  }
+
+  // Calcul entre dernier creux et dernier pic
+  float amplitude = dernierPic - dernierCreux;
+
+  if (abs(amplitude) > 0.1)
+  {
+    pourcentageRespiration = (roll - dernierCreux) / amplitude * 100.0;
+
+    pourcentageRespiration = constrain(pourcentageRespiration, 0, 100);
+  }
+
+  precedent = roll;
+
+  return pourcentageRespiration;
 }
 
 
@@ -263,16 +338,28 @@ void loop()
   float gx, gy, gz;
   float temperature;
 
-  if (!readIMU(ax, ay, az, gx, gy, gz, temperature))
+
+  // ----------------------------------------------------------
+  // Lecture IMU
+  // ----------------------------------------------------------
+
+  if (!readIMU(
+        ax,
+        ay,
+        az,
+        gx,
+        gy,
+        gz,
+        temperature))
   {
     Serial.println("Erreur lecture MPU6886");
-    delay(100);
+    delay(10);
     return;
   }
 
 
   // ----------------------------------------------------------
-  // Delta temps
+  // Calcul du vrai dt
   // ----------------------------------------------------------
 
   unsigned long now = micros();
@@ -280,6 +367,7 @@ void loop()
   float dt = (now - lastTime) / 1000000.0;
 
   lastTime = now;
+
 
   // Sécurité
   if (dt <= 0 || dt > 0.1)
@@ -310,23 +398,22 @@ void loop()
 
 
   // ----------------------------------------------------------
-  // Intégration gyroscope
+  // Intégration du gyroscope
   // ----------------------------------------------------------
 
-  float gyroRoll  = roll  + gx * dt;
-  float gyroPitch = pitch + gy * dt;
+  float gyroRoll =
+    roll + gx * dt;
 
+  float gyroPitch =
+    pitch + gy * dt;
+
+
+  // Yaw = intégration pure du gyro Z
   yaw += gz * dt;
 
 
   // ----------------------------------------------------------
   // Filtre complémentaire
-  //
-  // 98% gyro
-  // 2% accélération
-  //
-  // Le gyro donne la dynamique.
-  // L'accéléromètre corrige la dérive du pitch/roll.
   // ----------------------------------------------------------
 
   const float alpha = 0.98;
@@ -340,34 +427,63 @@ void loop()
     (1.0 - alpha) * accelPitch;
 
 
+  float pourcentageRespiration = calculerPourcentageRespiration( roll );
+
+
   // ----------------------------------------------------------
-  // Affichage
+  // Affichage seulement 1 fois sur 10
+  //
+  // La lecture et les calculs continuent à ~100 Hz.
+  // Seul l'affichage est réduit à ~10 Hz.
   // ----------------------------------------------------------
 
-  Serial.print("Pitch: ");
-  Serial.print(pitch, 2);
+  displayCounter++;
 
-  Serial.print(" deg   Roll: ");
-  Serial.print(roll, 2);
+  if (displayCounter >= 10)
+  {
+    displayCounter = 0;
 
-  Serial.print(" deg   Yaw: ");
-  Serial.print(yaw, 2);
+    Serial.print("dt=");
+    Serial.print(dt * 1000.0, 2);
+    Serial.print(" ms");
 
-  Serial.println(" deg");
+    Serial.print(" | Pitch=");
+    Serial.print(pitch, 2);
+    Serial.print(" deg");
+
+    Serial.print(" | Roll=");
+    Serial.print(roll, 2);
+    Serial.print(" deg");
+
+    Serial.print(" | Yaw=");
+    Serial.print(yaw, 2);
+    Serial.print(" deg");
+
+    Serial.print(" | Gyro=");
+    Serial.print(gx, 2);
+    Serial.print(",");
+    Serial.print(gy, 2);
+    Serial.print(",");
+    Serial.print(gz, 2);
+
+    Serial.print(" | Temp=");
+    Serial.print(temperature, 2);
+    Serial.print(" C");
+
+    Serial.print(" | % respi=");
+    Serial.print(pourcentageRespiration, 2);
 
 
-  // Valeurs gyro
-  Serial.print("Gyro: ");
-  Serial.print(gx, 2);
-  Serial.print("  ");
-  Serial.print(gy, 2);
-  Serial.print("  ");
-  Serial.print(gz, 2);
+    Serial.println("");
 
-  Serial.print(" deg/s   Temp: ");
-  Serial.print(temperature, 2);
-  Serial.println(" C");
+  return ;
 
+  }
+
+
+  // ----------------------------------------------------------
+  // ~100 Hz
+  // ----------------------------------------------------------
 
   delay(10);
 }

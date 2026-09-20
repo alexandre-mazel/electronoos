@@ -513,12 +513,14 @@ float computeRespi( float roll )
   int inccountdown = 0;
   int inccountup = 0;
 
-  if( rollavg > roll + 0.1 )
+  const float margin = 0.04;
+
+  if( rollavg > roll + margin )
   {
     ++countdown;
     inccountdown = 1;
   }
-  if( rollavg < roll - 0.1 )
+  if( rollavg < roll - margin )
   {
     ++countup;
     inccountup = 1;
@@ -556,47 +558,66 @@ float computeRespi( float roll )
     }
   }
 
-  Serial.print( "roll: " );
-  Serial.print( roll );
-
-  Serial.print( ", rollavg: " );
-  Serial.print( rollavg );
-
-  Serial.print( ", countdown: " );
-  Serial.print( countdown );
-  Serial.print( ", countup: " );
-  Serial.print( countup );
-
-  Serial.print( ", lastminrollavg: " );
-  Serial.print( lastminrollavg );
-  Serial.print( ", lastmaxrollavg: " );
-  Serial.print( lastmaxrollavg );
 
   float ratio_respi = (rollavg - lastminrollavg ) / (lastmaxrollavg-lastminrollavg);
   ratio_respi = 1 - ratio_respi;
 
   ratio_respi = constrain( ratio_respi, 0, 1);
 
-  Serial.print( ", ratio_respi: " );
-  Serial.print( ratio_respi );
-
-
-  Serial.print( ", " );
-  
-/*
-  if( rollavg < respmin )
+  if( 1 )
   {
-    respmin = roll;
-    Serial.print( "min");
-  }
-  if( rollavg > respmax )
-  {
-    respmax = roll;
-    Serial.print( "max");
-  }
-  */
+    Serial.print( "roll: " );
+    Serial.print( roll );
 
-  Serial.println( state );
+    Serial.print( ", rollavg: " );
+    Serial.print( rollavg );
+
+    Serial.print( ", countdown: " );
+    Serial.print( countdown );
+    Serial.print( ", countup: " );
+    Serial.print( countup );
+
+    Serial.print( ", lastminrollavg: " );
+    Serial.print( lastminrollavg );
+    Serial.print( ", lastmaxrollavg: " );
+    Serial.print( lastmaxrollavg );
+
+    Serial.print( ", ratio_respi: " );
+    Serial.print( ratio_respi );
+
+
+    Serial.print( ", " );
+    
+  /*
+    if( rollavg < respmin )
+    {
+      respmin = roll;
+      Serial.print( "min");
+    }
+    if( rollavg > respmax )
+    {
+      respmax = roll;
+      Serial.print( "max");
+    }
+    */
+
+    Serial.println( state );
+  }
+
+  if( 0 )
+  {
+    // pour tracer la courbe
+
+    Serial.print( "ratio_respi:" ); // ne pas mettre d'espace apres les :
+    Serial.print( ratio_respi );
+
+    // empeche l'autozoom
+    Serial.print("\tMIN:");
+    Serial.print(0);
+
+    Serial.print("\tMAX:");
+    Serial.println(1);
+  }
 
 
 }

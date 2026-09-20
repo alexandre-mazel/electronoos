@@ -476,6 +476,61 @@ float updateRespiration(float roll, float gyroX, float gyroY, float gyroZ, float
 }
 
 
+float computeRespi( float roll )
+{
+  static float respmin = +1000;
+  static float respmax = -1000;
+  static int   countup = 0;
+  static int   countdown = 0;
+  static float rollavg = 0;
+
+  const float coefnew = 0.2;
+  
+  rollavg = roll * coefnew + rollavg * (1-coefnew);
+
+  if( rollavg > roll + 0.1 )
+  {
+    ++countdown;
+  }
+  if( rollavg < roll - 0.1 )
+  {
+    ++countup;
+  }
+
+  if( countdown > 10 )
+  {
+    countup = 0;
+  }
+  if( countup > 10 )
+  {
+    countdown = 0;
+  }
+
+  Serial.print( "countdown: " );
+  Serial.print( countdown );
+  Serial.print( ", countup: " );
+  Serial.print( countup );
+
+
+  Serial.print( ", " );
+  
+
+  if( rollavg < respmin )
+  {
+    respmin = roll;
+    Serial.print( "min");
+  }
+  if( rollavg > respmax )
+  {
+    respmax = roll;
+    Serial.print( "max");
+  }
+
+  Serial.println( "" );
+
+
+}
+
 
 // ============================================================
 // LOOP
@@ -580,6 +635,8 @@ void loop()
 
   // float respPercent = updateRespiration( roll, gx, gy, gz, dt );
 
+  computeRespi( roll );
+
 
 
 
@@ -626,9 +683,9 @@ void loop()
     // Serial.print(" | % respi=");
     // Serial.print(pourcentageRespiration, 2);
 
-    Serial.print(", Respiration = ");
-    Serial.print(respPercent, 1);
-    Serial.print(" %");
+    //Serial.print(", Respiration = ");
+    //Serial.print(respPercent, 1);
+    //Serial.print(" %");
 
 
     Serial.println("");

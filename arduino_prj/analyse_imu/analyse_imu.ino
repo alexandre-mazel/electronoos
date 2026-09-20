@@ -1,3 +1,11 @@
+/*
+ 
+ Plaquer l'imu contre quasi le teton, cable vers le bas, indication IMU contre le torse.
+
+
+
+*/
+
 #include <Wire.h>
 
 #define MPU6886_ADDR 0x68
@@ -478,6 +486,8 @@ float updateRespiration(float roll, float gyroX, float gyroY, float gyroZ, float
 
 float computeRespi( float roll )
 {
+  // version faite a la mimine.
+
   static float respmin = +1000;
   static float respmax = -1000;
   static int   countup = 0;
@@ -486,12 +496,17 @@ float computeRespi( float roll )
   static int   lastmaxcountup = 0;
   static int   lastmaxcountdown = 0;
 
-  static int   lastmaxrollavg = 0;
-  static int   lastminrollavg = 0;
+  static float   lastmaxrollavg = 0;
+  static float   lastminrollavg = 0;
+
+  static float   maxrollavg = 0;
+  static float   minrollavg = 0;
 
   static float rollavg = 0;
 
   const float coefnew = 0.2;
+
+  const char * state = "";
 
   rollavg = roll * coefnew + rollavg * (1-coefnew);
 
@@ -509,15 +524,36 @@ float computeRespi( float roll )
     inccountup = 1;
   }
 
+  if( maxrollavg < rollavg )
+  {
+    maxrollavg = rollavg;
+  }
+  if( minrollavg > rollavg )
+  {
+    minrollavg = rollavg;
+  }
+
   if( inccountdown && countdown > 5 )
   {
     lastmaxcountup = countup;
-    countup = 0;
+    if( countup > 0)
+    {
+      countup = 0;
+      lastminrollavg = minrollavg;
+      minrollavg = 2000;
+      state = "UP";
+    }
   }
   if( inccountup && countup > 5 )
   {
     lastmaxcountdown = countdown;
-    countdown = 0;
+    if( countdown > 0)
+    {
+      countdown = 0;
+      lastmaxrollavg = maxrollavg;
+      maxrollavg = -2000;
+      state = "DOWN";
+    }
   }
 
   Serial.print( "roll: " );
@@ -530,6 +566,19 @@ float computeRespi( float roll )
   Serial.print( countdown );
   Serial.print( ", countup: " );
   Serial.print( countup );
+
+  Serial.print( ", lastminrollavg: " );
+  Serial.print( lastminrollavg );
+  Serial.print( ", lastmaxrollavg: " );
+  Serial.print( lastmaxrollavg );
+
+  float ratio_respi = (rollavg - lastminrollavg ) / (lastmaxrollavg-lastminrollavg);
+  ratio_respi = 1 - ratio_respi;
+
+  ratio_respi = constrain( ratio_respi, 0, 1);
+
+  Serial.print( ", ratio_respi: " );
+  Serial.print( ratio_respi );
 
 
   Serial.print( ", " );
@@ -547,7 +596,7 @@ float computeRespi( float roll )
   }
   */
 
-  Serial.println( "" );
+  Serial.println( state );
 
 
 }
@@ -670,7 +719,7 @@ void loop()
 
   displayCounter++;
 
-  if (displayCounter >= 10)
+  if (displayCounter >= 10 && 0)
   {
     displayCounter = 0;
 

@@ -482,31 +482,51 @@ float computeRespi( float roll )
   static float respmax = -1000;
   static int   countup = 0;
   static int   countdown = 0;
+
+  static int   lastmaxcountup = 0;
+  static int   lastmaxcountdown = 0;
+
+  static int   lastmaxrollavg = 0;
+  static int   lastminrollavg = 0;
+
   static float rollavg = 0;
 
   const float coefnew = 0.2;
-  
+
   rollavg = roll * coefnew + rollavg * (1-coefnew);
+
+  int inccountdown = 0;
+  int inccountup = 0;
 
   if( rollavg > roll + 0.1 )
   {
     ++countdown;
+    inccountdown = 1;
   }
   if( rollavg < roll - 0.1 )
   {
     ++countup;
+    inccountup = 1;
   }
 
-  if( countdown > 10 )
+  if( inccountdown && countdown > 5 )
   {
+    lastmaxcountup = countup;
     countup = 0;
   }
-  if( countup > 10 )
+  if( inccountup && countup > 5 )
   {
+    lastmaxcountdown = countdown;
     countdown = 0;
   }
 
-  Serial.print( "countdown: " );
+  Serial.print( "roll: " );
+  Serial.print( roll );
+
+  Serial.print( ", rollavg: " );
+  Serial.print( rollavg );
+
+  Serial.print( ", countdown: " );
   Serial.print( countdown );
   Serial.print( ", countup: " );
   Serial.print( countup );
@@ -514,7 +534,7 @@ float computeRespi( float roll )
 
   Serial.print( ", " );
   
-
+/*
   if( rollavg < respmin )
   {
     respmin = roll;
@@ -525,6 +545,7 @@ float computeRespi( float roll )
     respmax = roll;
     Serial.print( "max");
   }
+  */
 
   Serial.println( "" );
 

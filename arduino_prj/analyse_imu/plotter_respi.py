@@ -11,8 +11,8 @@ from collections import deque
 PORT = sys.argv[1] if len(sys.argv) > 1 else "COM11"
 BAUDRATE = 115200
 
-WINDOW = 30          # secondes affichées
-MAX_POINTS = 3000
+WINDOW = 10          # secondes affichées
+MAX_POINTS = 300
 
 # ------------------------------------------------------------
 # Série
@@ -61,6 +61,8 @@ ratio_re = re.compile(r"ratio_respi:\s*([-+]?\d*\.?\d+)")
 # ------------------------------------------------------------
 
 try:
+    
+    color = "green"
 
     while True:
 
@@ -77,6 +79,8 @@ try:
 
         if not text:
             continue
+            
+        print( "text: '%s'" % text )
 
         # Cherche ratio_respi
         match = ratio_re.search(text)
@@ -88,6 +92,8 @@ try:
 
         # Sécurité
         ratio = max(0.0, min(1.0, ratio))
+        
+        print( "ratio:%.2f" % ratio )
 
         # Détermine la couleur
         if re.search(r"\bUP\b", text, re.IGNORECASE):
@@ -96,8 +102,8 @@ try:
         elif re.search(r"\bDOWN\b", text, re.IGNORECASE):
             color = "red"
 
-        else:
-            color = "blue"
+        #~ else:
+            #~ color = "blue"
 
         # Ajout
         x.append(sample)

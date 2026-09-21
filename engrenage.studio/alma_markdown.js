@@ -71,17 +71,29 @@ function safeImageUrl(url) {
 
 
 function inlineMarkdown(text) {
+    
+    // on gere les images en premier car elles contiennent des liens:
+    
+    let images = [];
+
+    text = text.replace(
+        /!\[([^\]]*)\]\((https?:\/\/[^)\s]+)\)/gi,
+        (_, alt, url) => {
+            const token = `@@IMAGE_${images.length}@@`;
+
+            images.push(
+                `<img src="${safeImageUrl(url)}" alt="${escapeHtml(alt)}" loading="lazy">`
+            );
+
+            return token;
+        }
+    );
+    
     // IMPORTANT :
     // On echappe d'abord tout HTML fourni par l'utilisateur.
     text = escapeHtml(text);
     
-    text = text.replace(
-        /\{(red|green|blue|orange|purple|yellow|#[0-9a-fA-F]{3,6})\|([^{}]+)\}/g,
-        (_, color, content) => {
-            return `<span style="color:${color}">${content}</span>`;
-        }
-    );
-        
+
     text = text.replace(
         /\{checked\}/g,
         '<span class="md-check">☑</span>'
@@ -101,23 +113,6 @@ function inlineMarkdown(text) {
         code.push("<code>" + value + "</code>");
         return `@@CODE${id}@@`;
     });
-
-    // Images :
-    /*
-    // On choisit ici de NE PAS les autoriser.
-    // Cela evite toute une serie de problemes de securite.
-    text = text.replace(
-        /!\[([^\]]*)\]\(([^)]+)\)/g,
-        (_, alt) => `[${alt}]`
-    );
-    */
-
-    // Images
-    text = text.replace(
-        /!\[([^\]]*)\]\((https?:\/\/[^)\s]+)\)/gi,
-        (_, alt, url) =>
-            `<img src="${safeImageUrl(url)}" alt="${escapeHtml(alt)}" loading="lazy">`
-    );
 
 
     // Liens
@@ -170,6 +165,12 @@ function inlineMarkdown(text) {
     text = text.replace(
         /@@CODE(\d+)@@/g,
         (_, id) => code[Number(id)]
+    );
+    
+    // Restaurer les images:
+    text = text.replace(
+        /@@IMAGE_(\d+)@@/g,
+        (_, index) => images[Number(index)]
     );
 
     return text;
@@ -491,7 +492,7 @@ function hello() {
 }
 \`\`\`
 
-![Une jolie image](https://example.com/image.jpg)
+![Une jolie image sur le web (ca fonctionne ?)](https://engrenage.studio/art/logo_almart_tech1_ret_med.png)
 
 Et meme du script dans des balises script (mais je le met peut etre pas car ca plante mon jsminifieur donc je exceptionne dans mon minifieur):
 

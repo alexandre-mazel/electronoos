@@ -670,7 +670,7 @@ function toggle_check( num_area )
     while ((match = regex.exec(text)) !== null) {
         if (count === num_area) {
             const i = match.index;
-            console.log( "INF: toggle_check: at i:" + i, + ", char: " + text[i] );
+            console.log( "INF: toggle_check: at i:" + i + ", char: " + text[i] );
             if( text[i] == "*" )
                 text[i] == "+"
             else

@@ -59,6 +59,14 @@ function inlineMarkdown(text) {
     // IMPORTANT :
     // On échappe d'abord tout HTML fourni par l'utilisateur.
     text = escapeHtml(text);
+    
+    text = text.replace(
+        /\{(red|green|blue|orange|purple|yellow|#[0-9a-fA-F]{3,6})\|([^{}]+)\}/g,
+        (_, color, content) => {
+            return `<span style="color:${color}">${content}</span>`;
+        }
+    );
+
 
     // Code inline : `quelque chose`
     const code = [];

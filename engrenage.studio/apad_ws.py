@@ -33,15 +33,15 @@ def retrieve_info_on_ip( ip ):
     else:
         operator = org # "unknown"
         
-        
-    info_ip[ip ] = operator
-        
     return operator
 
 
 
 def get_info_on_ip( ip ):
+    global info_ip
     if ip in info_ip: return info_ip[ip]
+    info = retrieve_info_on_ip()
+    info_ip[ip] = info
     
     
 

@@ -281,6 +281,7 @@ function parseMarkdown(markdown) {
     let html = "";
     let paragraph = [];
     let i = 0;
+    let nbr_clickable_area = 0;
 
 
     function flushParagraph() {
@@ -455,11 +456,20 @@ function parseMarkdown(markdown) {
                 }
                 
                 let puceopen = "<li>";
-                if( marker == "+" )
-                    puceopen = "<li class='li_check'>"
-                if( marker == "*" )
-                    puceopen = "<li class='li_checked'>"
-                
+                if( marker == "+" || marker == "*" )
+                {
+                    if( marker == "+" )
+                    {
+                        puceopen = "<li class='li_check'"
+                    }
+                    if( marker == "*" )
+                    {
+                        puceopen = "<li class='li_checked'"
+                    }
+                    puceopen += "onclick=toggle_check('" + nbr_clickable_area + "')>"
+                    nbr_clickable_area += 1;
+                }
+                    
                 console.log(`puceopen: '${puceopen}'`)
 
                 html +=

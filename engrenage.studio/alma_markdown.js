@@ -39,10 +39,10 @@ Don't handle:
 
 function isSamsungBrowser()
 {    
-    return false;
-    //const ua = navigator.userAgent;
-    //const bIsSamsungBrowser = /SamsungBrowser/i.test(ua) && /Android/i.test(ua);
-    //return bIsSamsungBrowser
+    //return false;
+    const ua = navigator.userAgent;
+    const bIsSamsungBrowser = /SamsungBrowser/i.test(ua) && /Android/i.test(ua);
+    return bIsSamsungBrowser
 }
 
 function escapeHtml(text) {

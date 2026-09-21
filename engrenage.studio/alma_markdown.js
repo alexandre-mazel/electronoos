@@ -460,11 +460,8 @@ function hello() {
 
 ![Une jolie image](https://example.com/image.jpg)
 
-Et même ceci :
+Et même du script dans des balises script (mais je le met pas car ca plante mon jsminifieur):
 
-<script>
-    alert("CE CODE NE S'EXECUTERA PAS");
-</script>
 `;
 
 function load_markdown( div_id, markdown_content =  markdown_example )

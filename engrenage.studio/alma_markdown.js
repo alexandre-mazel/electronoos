@@ -458,6 +458,8 @@ function parseMarkdown(markdown) {
                     puceopen = "<li class='li_check'>"
                 if( marker == "*" )
                     puceopen = "<li class='li_checked'>"
+                
+                console.log(`puceopen: '${puceopen}'`)
 
                 html +=
                     puceopen +

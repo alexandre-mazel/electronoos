@@ -278,8 +278,8 @@ dans lequel il passera l'index de la zone a cocher et la passer ici
 
 function parseMarkdown(markdown, toggle_check_name = "toggle_check" ) 
 {
-    dbg( "start parsemarkdown")
-    alert("debug parse")
+    //~ dbg( "start parsemarkdown")
+    //~ alert("debug parse")
     // Normalisation
     markdown = markdown
         .replace(/\r\n/g, "\n")
@@ -475,8 +475,8 @@ function parseMarkdown(markdown, toggle_check_name = "toggle_check" )
                     {
                         puceopen = "<li class='li_checked'"
                     }
-                    //puceopen += " onclick="+toggle_check_name+"(" + nbr_clickable_area + ")>"
-                    puceopen += " data-check-index='" + nbr_clickable_area + "'>"
+                    puceopen += " onclick="+toggle_check_name+"(" + nbr_clickable_area + ")>"
+                    //puceopen += " data-check-index='" + nbr_clickable_area + "'>" // essaye de faire fonctionner sur samsung mais ca fait rien de bien!
                     nbr_clickable_area += 1;
                 }
                     
@@ -503,7 +503,7 @@ function parseMarkdown(markdown, toggle_check_name = "toggle_check" )
 
     flushParagraph();
     
-    alert(html)
+    //~ alert(html)
 
     return html;
 }

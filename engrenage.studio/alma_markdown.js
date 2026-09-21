@@ -522,7 +522,7 @@ function parseMarkdown(markdown, toggle_check_name = "toggle_check" )
 
 // Exemple
 const markdown_example = `
-# Mon document
+# Mon document d'exemple
 
 Voici un texte avec du **gras**, de l'*italique* et du ~~barre~~.
 

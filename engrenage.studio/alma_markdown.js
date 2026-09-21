@@ -77,18 +77,28 @@ function inlineMarkdown(text) {
     let images = [];
 
     text = text.replace(
-        /!\[([^\]]*)\]\((https?:\/\/[^)\s]+)\)/gi,
-        (_, alt, url) => {
+        /!\[([^\]]*)\]\((https?:\/\/[^)\s]+)\)(?:\{(\d+)(?:x(\d+))?\})?/gi,
+        (_, alt, url, width, height) => {
             const token = `@@IMAGE_${images.length}@@`;
 
+            let size = "";
+
+            if (width) {
+                size += ` width="${width}"`;
+            }
+
+            if (height) {
+                size += ` height="${height}"`;
+            }
+
             images.push(
-                `<img src="${safeImageUrl(url)}" alt="${escapeHtml(alt)}" loading="lazy">`
+                `<img src="${safeImageUrl(url)}" alt="${escapeHtml(alt)}" loading="lazy"${size}>`
             );
 
             return token;
         }
     );
-    
+
     // IMPORTANT :
     // On echappe d'abord tout HTML fourni par l'utilisateur.
     text = escapeHtml(text);
@@ -492,7 +502,8 @@ function hello() {
 }
 \`\`\`
 
-![Une jolie image sur le web (ca fonctionne ?)](https://engrenage.studio/art/logo_almart_tech1_ret_med.png)
+![Une jolie image sur le web](https://engrenage.studio/art/logo_almart_tech1_ret_med.png){200}
+![Une jolie image sur le web](https://engrenage.studio/art/logo_almart_tech1_ret_med.png){200x10}
 
 Et meme du script dans des balises script (mais je le met peut etre pas car ca plante mon jsminifieur donc je exceptionne dans mon minifieur):
 

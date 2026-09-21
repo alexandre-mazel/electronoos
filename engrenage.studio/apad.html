@@ -663,6 +663,8 @@ function toggle_check( num_area )
     let match;
     
     let text = pad_text.value;
+    
+    console.log( "INF: toggle_check: looking for num_area:" + num_area );
 
     while ((match = regex.exec(text)) !== null) {
         if (count === num_area) {

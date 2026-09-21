@@ -134,7 +134,7 @@ function inlineMarkdown(text) {
     let replace_check = "☐";
     if( isSamsungBrowser() )
     {
-        replace_check = "▢"; // was ☐ mais sur samsung affiche une urne, \25A2 non plus, alors que ca fonctionne dans le css..., alors je tente: ▢
+        //replace_check = "▢"; // was ☐ mais sur samsung affiche une urne, \25A2 non plus, alors que ca fonctionne dans le css..., alors je tente: ▢
     }
     
     text = text.replace( /\{check\}/g, '<span class="md-check">'+replace_check+'</span>' );

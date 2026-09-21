@@ -112,7 +112,8 @@ async def handle_client(websocket):
 
             response = json.dumps({
                 "type": "content",
-                "content": content
+                "content": content,
+                "author": str(ip)
             })
 
             clients = list(pad_clients.get(pad_id, set()))

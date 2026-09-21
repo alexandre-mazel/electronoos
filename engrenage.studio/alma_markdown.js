@@ -470,7 +470,8 @@ function parseMarkdown(markdown, toggle_check_name = "toggle_check" ) {
                     {
                         puceopen = "<li class='li_checked'"
                     }
-                    puceopen += " onclick="+toggle_check_name+"(" + nbr_clickable_area + ")>"
+                    //puceopen += " onclick="+toggle_check_name+"(" + nbr_clickable_area + ")>"
+                    puceopen += " data-check-index='" + nbr_clickable_area + "'>
                     nbr_clickable_area += 1;
                 }
                     

@@ -696,6 +696,22 @@ window.toggle_check = function( num_area )
     return false;
 }
 
+// bout de code juste pour que ca fonctionne sur samsung browser (le onclick generé a la volée apres le delegate ne fonctionne pas)
+pad_md.addEventListener("click", function(event) {
+    const li = event.target.closest("li.li_check");
+
+    if (!li) {
+        return;
+    }
+
+    const num_area = Number(li.dataset.checkIndex); // envoyer depuis <li data-check-index="3">
+
+    console.log("CLICK CHECK", num_area);
+    alert("CLICK " + num_area);
+
+    toggle_check(num_area);
+});
+
         
     </script>
 

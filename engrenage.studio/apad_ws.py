@@ -57,6 +57,9 @@ def retrieve_info_on_ip( ip ):
 
 def get_info_on_ip( ip ):
     global info_ip
+    
+    if ip.startswith( "192.168."):
+        return ""
     if ip in info_ip: return info_ip[ip]
     info = retrieve_info_on_ip( ip )
     info_ip[ip] = info

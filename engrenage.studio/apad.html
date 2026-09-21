@@ -698,7 +698,13 @@ window.toggle_check = function( num_area )
 
 // bout de code juste pour que ca fonctionne sur samsung browser (le onclick genere a la volee apres le delegate ne fonctionne pas)
 pad_md.addEventListener("click", function(event) {
+    console.log( "DBG: pad_md.addEventListener" )
     const li = event.target.closest("li.li_check");
+    if (!li) {
+        return;
+    }
+    
+    const li = event.target.closest("li.li_checked");
 
     if (!li) {
         return;

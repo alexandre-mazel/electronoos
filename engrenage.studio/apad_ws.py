@@ -25,7 +25,7 @@ def retrieve_info_on_ip( ip ):
         data = received_data.json()
         
         print("INF: retrieve_info_on_ip: data:", str(data) )
-    except BaseException, err:
+    except BaseException as err:
         print("ERR: retrieve_info_on_ip:", str(err) )
         return ""
     

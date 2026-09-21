@@ -115,10 +115,7 @@ function inlineMarkdown(text) {
         (_, color, content) => {
             return `<span style="color:${color}">${content}</span>`;
         }
-    );
-
-
-    
+    );    
 
     text = text.replace(
         /\{checked\}/g,

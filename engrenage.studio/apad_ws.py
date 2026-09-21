@@ -11,6 +11,40 @@ pad_clients = {}
 
 save_path = "./apads/"
 
+info_ip = {}
+
+def retrieve_info_on_ip( ip ):
+    import requests
+
+    print("INF: retrieve_info_on_ip: ip:", str(data) )
+
+    data = requests.get( f"https://ipinfo.io/{ip}/json", timeout=3 ).json()
+
+    print("INF: retrieve_info_on_ip: data:", str(data) )
+    
+    org = data.get("org", "").lower()
+
+    if "orange" in org:
+        operator = "orange"
+    elif "free" in org or "proxad" in org:
+        operator = "free"
+    elif "sfr" in org or "ldcom" in org:
+        operator = "sfr"
+    else:
+        operator = org # "unknown"
+        
+        
+    info_ip[ip ] = operator
+        
+    return operator
+
+
+
+def get_info_on_ip( ip ):
+    if ip in info_ip: return info_ip[ip]
+    
+    
+
 def create_new_pad_id():
     # ici que avec des lettres
     while 1:
@@ -106,6 +140,10 @@ async def handle_client(websocket):
                 ip = strRealIP
             
             print( "Finally: Client:", ip, "port:", port )
+            
+            # pour rigoler on check les ip
+            if ip.startswith( "92.184.140" ):
+                ip += " (orange)"
             
             data = json.loads(message)
 

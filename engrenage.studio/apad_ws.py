@@ -29,7 +29,7 @@ def save_on_disk( pad_id ):
         # backup car plus petit
         fn_backup = fn.replace( ".txt", "_%012d.txt" % int(time.time()*100) )
         os.rename( fn, fn_backup )
-    f = open( fn, "wb" )
+    f = open( fn, "wt", encoding="utf-8" )
     f.write( contents )
     f.close()
     
@@ -37,7 +37,7 @@ def load_from_disk( pad_id, default_contents = "" ):
     fn = save_path + str(pad_id) + ".txt"
     if not os.path.exists( fn ):
         return default_contents
-    f = open( fn, "rb" )
+    f = open( fn, "rt", encoding="utf-8" )
     if f == None:
         return default_contents
     contents = f.read()

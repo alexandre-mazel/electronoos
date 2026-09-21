@@ -412,28 +412,6 @@ function parseMarkdown(markdown) {
         const listMatch = line.match(
             /^\s*([-*+]|\d+\.)\s+(.+)$/
         );
-        /* gestion icone du début de ligne */
-        const listMatch = line.match(
-            /^\s*([-+*]|\d+\.)\s+(.+)$/
-        );
-
-        if (listMatch) {
-            const marker = listMatch[1];
-            let bullet;
-
-            if (marker === "+") {
-                bullet = '<span class="md-check">☐</span>';
-            } else if (marker === "*") {
-                bullet = '<span class="md-check">☑</span>';
-            } else if (marker === "-") {
-                bullet = '<span class="md-bullet">•</span>';
-            } else {
-                bullet = `<span class="md-number">${marker}</span>`;
-            }
-
-            // ...
-        }
-
 
         if (listMatch) {
             flushParagraph();

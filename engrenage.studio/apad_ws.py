@@ -18,8 +18,11 @@ def retrieve_info_on_ip( ip ):
 
     print("INF: retrieve_info_on_ip: ip:", str(data) )
 
-    data = requests.get( f"https://ipinfo.io/{ip}/json", timeout=3 ).json()
-
+    received_data = requests.get( f"https://ipinfo.io/{ip}/json", timeout=3 )
+    print("INF: retrieve_info_on_ip: received_data:", str(received_data) )
+    
+    data = received_data.json()
+    
     print("INF: retrieve_info_on_ip: data:", str(data) )
     
     org = data.get("org", "").lower()

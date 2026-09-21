@@ -644,13 +644,11 @@
 /*
  * Bouton Markdown
  */
-markdown_button.addEventListener(
-    "click",
-    function() {
+markdown_button.addEventListener("click", toggle_markdown );
 
-        page_main.classList.toggle(
-            "markdown-visible"
-        );
+function toggle_markdown(){
+
+        page_main.classList.toggle( "markdown-visible" );
 
         const visible =
             page_main.classList.contains(
@@ -666,7 +664,6 @@ markdown_button.addEventListener(
             updateMarkdownPreview();
         }
     }
-);
 
 function showToast(text) {
     const toast = document.getElementById("toast");
@@ -747,6 +744,13 @@ function dbg(msg) {
         d.textContent += msg + "\n";
     }
 }
+
+const params = new URLSearchParams(window.location.search);
+if (params.has("md")) {
+    // active le md par défaut
+    toggle_markdown()
+}
+
 
         
     </script>

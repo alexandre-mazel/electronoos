@@ -6,7 +6,7 @@ import re
 import time
 import websockets #  sudo pip install websockets --break-system-packages
 
-pads = {}
+pads = {} # pad_id => (last_author,contents) # the last author isn't saved in the backup
 pad_clients = {}
 
 save_path = "./apads/"
@@ -79,7 +79,7 @@ def create_new_pad_id():
     return "XXXX"
     
 def save_on_disk( pad_id ):
-    contents = pads[pad_id]
+    contents = pads[pad_id][1]
     fn = save_path + str(pad_id) + ".txt"
     if os.path.exists( fn ) and os.path.getsize( fn ) > len( contents ):
         # backup car plus petit
@@ -125,7 +125,7 @@ async def handle_client(websocket):
         return
 
     if pad_id not in pads:
-        pads[pad_id] = load_from_disk( pad_id, "" )
+        pads[pad_id] = "?",load_from_disk( pad_id, "" )
 
     if pad_id not in pad_clients:
         pad_clients[pad_id] = set()
@@ -134,7 +134,8 @@ async def handle_client(websocket):
 
     await websocket.send(json.dumps({
         "type": "content",
-        "content": pads[pad_id]
+        "content": pads[pad_id][1],
+        "author": pads[pad_id][0],
     }))
     
     print("DBG: initial content sent")
@@ -173,7 +174,7 @@ async def handle_client(websocket):
 
             if data.get("type") == "new_pad":
                 pad_id = create_new_pad_id()
-                pads[pad_id] = load_from_disk( pad_id, "" )
+                pads[pad_id] = "?",load_from_disk( pad_id, "" )
                 pad_clients[pad_id] = set()
 
                 await websocket.send(json.dumps({
@@ -184,7 +185,7 @@ async def handle_client(websocket):
                 continue
 
             content = data.get("content", "")
-            pads[pad_id] = content
+            pads[pad_id] = str(ip),content
             save_on_disk( pad_id )
 
             response = json.dumps({

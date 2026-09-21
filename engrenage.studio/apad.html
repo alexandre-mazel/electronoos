@@ -225,6 +225,13 @@
             #page_title {
                 font-size: 18px;
             }
+            
+            #header_buttons {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 8px;
+            }
 
             #pad_code {
                 font-size: 16px;
@@ -251,8 +258,10 @@
 
     <header id="page_header">
         <h1 id="page_title">AlmaPads</h1>
-        <button id="new_pad_button">New pad</button>
-        <button id="markdown_button">Markdown</button>
+        <div id="header_buttons">
+            <button id="new_pad_button">New pad</button>
+            <button id="markdown_button">Markdown</button>
+        </div>
         <div id="pad_code">----</div>
     </header>
 

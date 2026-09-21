@@ -37,6 +37,13 @@ Don't handle:
 -  les listes imbriquees, les cellules de tableaux complexes, les references, les footnotes
 */
 
+function isSamsungBrowser()
+{    
+    const ua = navigator.userAgent;
+    const bIsSamsungBrowser = /SamsungBrowser/i.test(ua) && /Android/i.test(ua);
+    return bIsSamsungBrowser
+}
+
 function escapeHtml(text) {
     return text
         .replace(/&/g, "&amp;")
@@ -124,10 +131,13 @@ function inlineMarkdown(text) {
         '<span class="md-check">☑</span>'
     );
 
-    text = text.replace(
-        /\{check\}/g,
-        '<span class="md-check">▢</span>' // was ☐ mais sur samsung affiche une urne, \25A2 non plus, alors que ca fonctionne dans le css..., alors je tente: ▢
-    );
+    let replace_check = "☐";
+    if( isSamsungBrowser() )
+    {
+        replace_check = "▢"; // was ☐ mais sur samsung affiche une urne, \25A2 non plus, alors que ca fonctionne dans le css..., alors je tente: ▢
+    }
+    
+    text = text.replace( /\{check\}/g, '<span class="md-check">'+replace_check+'</span>' );
 
 
     // Code inline : `quelque chose`

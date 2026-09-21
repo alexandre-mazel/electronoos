@@ -16,7 +16,7 @@ info_ip = {}
 def retrieve_info_on_ip( ip ):
     import requests
 
-    print("INF: retrieve_info_on_ip: ip:", str(data) )
+    print("INF: retrieve_info_on_ip: ip:", str(ip) )
 
     try:
         received_data = requests.get( f"https://ipinfo.io/{ip}/json", timeout=3 )

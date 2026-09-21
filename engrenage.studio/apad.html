@@ -264,6 +264,21 @@
                 padding: 7px 12px;
             }
         }
+        
+        
+/* cache la source sur mobile */
+@media (max-width: 600px) {
+    #page_main.markdown-visible #pad_text {
+        display: none;
+    }
+
+    #page_main.markdown-visible #pad_md {
+        display: block;
+        flex: 1 1 100%;
+        width: 100%;
+    }
+}
+
     </style>
 </head>
 

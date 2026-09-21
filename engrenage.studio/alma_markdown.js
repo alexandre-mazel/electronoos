@@ -476,7 +476,7 @@ function parseMarkdown(markdown, toggle_check_name = "toggle_check" )
                         puceopen = "<li class='li_checked'"
                     }
                     //~ puceopen += " onclick="+toggle_check_name+"(" + nbr_clickable_area + ")>"
-                    puceopen += " data-check-index=\"" + nbr_clickable_area + "\">" // essaye de faire fonctionner sur samsung mais ca fait rien de bien!
+                    puceopen += " data-check-index=\"" + (nbr_clickable_area).toString() + "\">" // essaye de faire fonctionner sur samsung mais ca fait rien de bien!
                     nbr_clickable_area += 1;
                 }
                     

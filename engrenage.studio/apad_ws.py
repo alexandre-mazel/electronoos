@@ -19,7 +19,7 @@ def retrieve_info_on_ip( ip ):
     print("INF: retrieve_info_on_ip: ip:", str(ip) )
 
     try:
-        received_data = requests.get( f"https://ipinfo.io/{ip}/json", timeout=3 )
+        received_data = requests.get( f"https://ipinfo.io/{ip}/json", timeout=10 )
         print("INF: retrieve_info_on_ip: received_data:", str(received_data) )
         
         data = received_data.json()
@@ -152,7 +152,7 @@ async def handle_client(websocket):
             #~ if ip.startswith( "92.184.140" ):
                 #~ ip += " (orange)"
             info = get_info_on_ip( ip )
-            if info != "":
+            if info != "" and info != None:
                 ip += " (%s)" % info
             
             data = json.loads(message)

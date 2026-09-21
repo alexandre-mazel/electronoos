@@ -285,6 +285,27 @@
         }
         
         
+    #toast {
+        position: fixed;
+        bottom: 60px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 8px 14px;
+        border-radius: 6px;
+        background: #333;
+        color: #fff;
+        font-size: 14px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.15s;
+        z-index: 1000;
+    }
+
+    #toast.show {
+        opacity: 1;
+    }
+
+        
 /* cache la source sur mobile (en fait a la volee sur tout ecran plus petit que 600 soit un mobile en vertical) */
 @media (max-width: 600px) {
     #page_main.markdown-visible #pad_text {
@@ -321,6 +342,9 @@
         <div id="connection_status">Connecting...</div>
         <div id="pad_size">0 chars</div>
     </footer>
+    
+    <div id="toast"></div>
+
 
     <script>
     
@@ -352,7 +376,7 @@
       const mm = String(now.getMinutes()).padStart(2, "0");
       const ss = String(now.getSeconds()).padStart(2, "0");
 
-      return `${yyyy}_${month}_${dd}__${hh}_${mm}_${ss}`;
+      return `${yyyy}_${month}_${dd}__${hh}h${mm}m${ss}`;
     }
 
     
@@ -536,10 +560,12 @@
 
                 const a = document.createElement("a");
                 a.href = url;
-                a.download = pad_id + "_" + getCurrentTimeStampSortable() + ".txt";
+                const filename_to_save = pad_id + "__" + getCurrentTimeStampSortable() + ".txt";
+                a.download = filename_to_save;
                 a.click();
 
                 URL.revokeObjectURL(url);
+                showToast( "Saved to " + filename_to_save )
             }
         });
         
@@ -616,6 +642,20 @@ markdown_button.addEventListener(
         }
     }
 );
+
+function showToast(text) {
+    const toast = document.getElementById("toast");
+
+    toast.textContent = text;
+    toast.classList.add("show");
+
+    clearTimeout(toast.timer);
+
+    toast.timer = setTimeout(function() {
+        toast.classList.remove("show");
+    }, 2000);
+}
+
         
     </script>
 

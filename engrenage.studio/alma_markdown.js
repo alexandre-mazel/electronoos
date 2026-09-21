@@ -503,7 +503,7 @@ function hello() {
 \`\`\`
 
 ![Une jolie image sur le web](https://engrenage.studio/art/logo_almart_tech1_ret_med.png){200}
-![Une jolie image sur le web](https://engrenage.studio/art/logo_almart_tech1_ret_med.png){200x10}
+![Une jolie image sur le web](https://engrenage.studio/art/logo_almart_tech1_ret_med.png){200x100}
 
 Et meme du script dans des balises script (mais je le met peut etre pas car ca plante mon jsminifieur donc je exceptionne dans mon minifieur):
 

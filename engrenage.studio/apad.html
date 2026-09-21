@@ -656,6 +656,31 @@ function showToast(text) {
     }, 2000);
 }
 
+function toggle_check( num_area )
+{
+    const regex = /\n [*+]/g;
+    let count = 0;
+    let match;
+    
+    let text = pad_text.value;
+
+    while ((match = regex.exec(text)) !== null) {
+        if (count === num_area) {
+            const i = match.index;
+            console.log( "INF: toggle_check: at i:" + i, + ", char: " + text[i] );
+            if( text[i] == "*" )
+                text[i] == "+"
+            else
+                text[i] = "*"
+            pad_text.value = text;
+            return true;
+        }
+        count++;
+    }
+
+    return false;
+}
+
         
     </script>
 

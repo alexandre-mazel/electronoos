@@ -45,6 +45,10 @@ def retrieve_info_on_ip( ip ):
     if  postal != "":
         operator += " - " + postal
         
+    loc = data.get("loc", "")
+    if  loc != "":
+        operator += " - " + loc
+        
     print("INF: retrieve_info_on_ip: operator:", str(operator) )
         
     return operator

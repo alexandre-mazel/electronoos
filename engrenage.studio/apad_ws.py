@@ -119,7 +119,7 @@ async def handle_client(websocket):
     print( "DBG: handle_client: pad_id: '%s'" % (pad_id) )
 
 
-    #~ if len(pad_id) != 4 or not pad_id.isascii() or not pad_id.isalpha(): # check only 4 chars (en fait jusqu'a 8 c'est plus pratique pour d'autres prénoms ou une sorte d'obfuscation)
+    #~ if len(pad_id) != 4 or not pad_id.isascii() or not pad_id.isalpha(): # check only 4 chars (en fait jusqu'a 8 c'est plus pratique pour d'autres prenoms ou une sorte d'obfuscation)
     if len(pad_id) > 8 or not re.match(r'^[A-Z0-9]{1,8}$', pad_id): 
         await websocket.close(code=1008, reason="Invalid pad")
         return

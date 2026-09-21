@@ -10,29 +10,29 @@ Sinon on pourrait aussi utiliser marked ou markdown-it.
 Currently implemented:
 
 - # Titres
--  ## Sous-titres jusqu'à ######
+-  ## Sous-titres jusqu'a ######
 -  paragraphes
--  retours à la ligne
+-  retours a la ligne
 -  gras
 -  italique
 -  gras italique
--  barré
+-  barre
 -  code inline
 -  blocs de code avec ```
 -  listes -, *, +
--  listes numérotées
+-  listes numerotees
 -  liens HTTP/HTTPS
 -  citations >
 -  tableaux
--  séparateurs ---
+-  separateurs ---
 - images
 
 
--  échappement du HTML
+-  echappement du HTML
 -  protection contre les URL javascript
 
 Don't handle:
--  les listes imbriquées, les cellules de tableaux complexes, les références, les footnotes
+-  les listes imbriquees, les cellules de tableaux complexes, les references, les footnotes
 */
 
 function escapeHtml(text) {
@@ -57,7 +57,7 @@ function safeUrl(url) {
 
 function inlineMarkdown(text) {
     // IMPORTANT :
-    // On échappe d'abord tout HTML fourni par l'utilisateur.
+    // On echappe d'abord tout HTML fourni par l'utilisateur.
     text = escapeHtml(text);
     
     text = text.replace(
@@ -65,6 +65,16 @@ function inlineMarkdown(text) {
         (_, color, content) => {
             return `<span style="color:${color}">${content}</span>`;
         }
+    );
+        
+    text = text.replace(
+        /\{checked\}/g,
+        '<span class="md-check">â˜‘</span>'
+    );
+
+    text = text.replace(
+        /\{check\}/g,
+        '<span class="md-check">â˜</span>'
     );
 
 
@@ -80,7 +90,7 @@ function inlineMarkdown(text) {
     // Images :
     /*
     // On choisit ici de NE PAS les autoriser.
-    // Cela évite toute une série de problèmes de sécurité.
+    // Cela evite toute une serie de problemes de securite.
     text = text.replace(
         /!\[([^\]]*)\]\(([^)]+)\)/g,
         (_, alt) => `[${alt}]`
@@ -135,7 +145,7 @@ function inlineMarkdown(text) {
         "<em>$1</em>"
     );
 
-    // Barré
+    // Barre
     text = text.replace(
         /~~(.+?)~~/g,
         "<del>$1</del>"
@@ -297,7 +307,7 @@ function parseMarkdown(markdown) {
         }
 
 
-        // Titres # à ######
+        // Titres # a ######
         const heading = line.match(
             /^\s*(#{1,6})\s+(.+?)\s*#*\s*$/
         );
@@ -316,7 +326,7 @@ function parseMarkdown(markdown) {
         }
 
 
-        // Séparateur ---
+        // Separateur ---
         if (/^\s*((\*\s*){3,}|(-\s*){3,}|(_\s*){3,})$/.test(line)) {
             flushParagraph();
 
@@ -429,19 +439,19 @@ function parseMarkdown(markdown) {
 const markdown_example = `
 # Mon document
 
-Voici un texte avec du **gras**, de l'*italique* et du ~~barré~~.
+Voici un texte avec du **gras**, de l'*italique* et du ~~barre~~.
 
 ## Une liste
 
-- Premier élément
-- Deuxième élément
-- **Troisième élément**
+- Premier element
+- Deuxieme element
+- **Troisieme element**
 
-## Une liste numérotée
+## Une liste numerotee
 
-1. Première étape
-2. Deuxième étape
-3. Troisième étape
+1. Premiere etape
+2. Deuxieme etape
+3. Troisieme etape
 
 ## Un lien
 
@@ -468,7 +478,7 @@ function hello() {
 
 ![Une jolie image](https://example.com/image.jpg)
 
-Et même du script dans des balises script (mais je le met peut etre pas car ca plante mon jsminifieur donc je exceptionné dans mon minifieur):
+Et même du script dans des balises script (mais je le met peut etre pas car ca plante mon jsminifieur donc je exceptionne dans mon minifieur):
 
 <script>
     alert("CE CODE NE S'EXECUTERA PAS");

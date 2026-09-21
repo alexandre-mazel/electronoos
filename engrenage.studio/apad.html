@@ -675,11 +675,13 @@ function toggle_check( num_area )
             else
                 text[i] = "*"
             pad_text.value = text;
+            console.log( "INF: toggle_check: ret: true" );
             return true;
         }
         count++;
     }
 
+    console.log( "INF: toggle_check: ret: false" );
     return false;
 }
 

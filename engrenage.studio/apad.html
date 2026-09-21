@@ -701,13 +701,11 @@ pad_md.addEventListener("click", function(event) {
     console.log( "DBG: pad_md.addEventListener" )
     let li = event.target.closest("li.li_check");
     if (!li) {
-        return;
-    }
-    
-    li = event.target.closest("li.li_checked");
+        li = event.target.closest("li.li_checked");
 
-    if (!li) {
-        return;
+        if (!li) {
+            return;
+        }
     }
 
     const num_area = Number(li.dataset.checkIndex); // envoyer depuis <li data-check-index="3">

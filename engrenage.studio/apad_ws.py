@@ -94,9 +94,15 @@ async def handle_client(websocket):
             
             headers = websocket.request.headers
 
-            print("X-Forwarded-For:", headers.get("X-Forwarded-For"))
-            print("X-Real-IP:", headers.get("X-Real-IP"))
-
+            strForwardedFor = headers.get("X-Forwarded-For")
+            strRealIP = headers.get("X-Real-IP")
+            print("X-Forwarded-For:", strForwardedFor )
+            print("X-Real-IP:", strRealIP)
+            
+            if strForwardedFor != "":
+                ip = strForwardedFor
+            if strRealIP != "":
+                ip = strRealIP
             
             data = json.loads(message)
 

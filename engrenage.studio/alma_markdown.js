@@ -446,8 +446,7 @@ function parseMarkdown(markdown) {
                     break;
                 }
 
-                const currentOrdered =
-                    /^\d+\./.test(item[1]);
+                const currentOrdered = /^\d+\./.test(item[1]);
 
                 if (currentOrdered !== ordered) {
                     break;
@@ -456,6 +455,8 @@ function parseMarkdown(markdown) {
                 puceopen = "<li>"
                 if( marker == "+" )
                     puceopen = "<li class='li_check'>"
+                if( marker == "*" )
+                    puceopen = "<li class='li_checked'>"
 
                 html +=
                     puceopen +

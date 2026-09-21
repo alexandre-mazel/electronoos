@@ -29,6 +29,7 @@ def save_on_disk( pad_id ):
     if os.path.exists( fn ) and os.path.getsize( fn ) > len( contents ):
         # backup car plus petit
         fn_backup = fn.replace( ".txt", "_%012d.txt" % int(time.time()*100) )
+        print("INF: save_on_disk: moving '%s' to '%s'" % (fn,fn_backup) )
         os.rename( fn, fn_backup )
     f = open( fn, "wt", encoding="utf-8" )
     f.write( contents )

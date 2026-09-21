@@ -23,26 +23,26 @@ def create_new_pad_id():
     return "XXXX"
     
 def save_on_disk( pad_id ):
-    content = pads[pad_id]
+    contents = pads[pad_id]
     fn = save_path + str(pad_id) + ".txt"
     if os.path.exists( fn ) and os.path.getsize( fn ) > len( contents ):
         # backup car plus petit
         fn_backup = fn.replace( ".txt", "_%012d.txt" % int(time.time()*100) )
         os.rename( fn, fn_backup )
     f = open( fn, "wb" )
-    f.write( content )
+    f.write( contents )
     f.close()
     
-def load_from_disk( pad_id, default_content = "" ):
+def load_from_disk( pad_id, default_contents = "" ):
     fn = save_path + str(pad_id) + ".txt"
     if not os.path.exists( fn ):
-        return default_content
+        return default_contents
     f = open( fn, "rb" )
     if f == None:
-        return default_content
-    content = f.read()
+        return default_contents
+    contents = f.read()
     f.close()
-    return content
+    return contents
 
 
 async def handle_client(websocket):

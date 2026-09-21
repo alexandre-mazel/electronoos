@@ -1,0 +1,474 @@
+/*
+
+Gestion legere d'un affichage markdown.
+
+Sinon on pourrait aussi utiliser marked ou markdown-it.
+
+
+(c) A.Mazel, sept 2026
+
+Currently implemented:
+
+- # Titres
+-  ## Sous-titres jusqu'à ######
+-  paragraphes
+-  retours à la ligne
+-  gras
+-  italique
+-  gras italique
+-  barré
+-  code inline
+-  blocs de code avec ```
+-  listes -, *, +
+-  listes numérotées
+-  liens HTTP/HTTPS
+-  citations >
+-  tableaux
+-  séparateurs ---
+- images
+
+
+-  échappement du HTML
+-  protection contre les URL javascript
+
+Don't handle:
+-  les listes imbriquées, les cellules de tableaux complexes, les références, les footnotes
+*/
+
+function escapeHtml(text) {
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function safeUrl(url) {
+    url = url.trim();
+
+    // On n'autorise que HTTP(S)
+    if (/^https?:\/\//i.test(url)) {
+        return escapeHtml(url);
+    }
+
+    return "#";
+}
+
+function inlineMarkdown(text) {
+    // IMPORTANT :
+    // On échappe d'abord tout HTML fourni par l'utilisateur.
+    text = escapeHtml(text);
+
+    // Code inline : `quelque chose`
+    const code = [];
+
+    text = text.replace(/`([^`]+)`/g, (_, value) => {
+        const id = code.length;
+        code.push("<code>" + value + "</code>");
+        return `@@CODE${id}@@`;
+    });
+
+    // Images :
+    /*
+    // On choisit ici de NE PAS les autoriser.
+    // Cela évite toute une série de problèmes de sécurité.
+    text = text.replace(
+        /!\[([^\]]*)\]\(([^)]+)\)/g,
+        (_, alt) => `[${alt}]`
+    );
+    */
+
+    // Images
+    text = text.replace(
+        /!\[([^\]]*)\]\((https?:\/\/[^)\s]+)\)/gi,
+        (_, alt, url) =>
+            `<img src="${safeUrl(url)}" alt="${alt}" loading="lazy">`
+    );
+
+
+    // Liens
+    text = text.replace(
+        /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/gi,
+        (_, label, url) =>
+            `<a href="${safeUrl(url)}" target="_blank" rel="noopener noreferrer">${label}</a>`
+    );
+
+    // Gras + italique
+    text = text.replace(
+        /\*\*\*(.+?)\*\*\*/g,
+        "<strong><em>$1</em></strong>"
+    );
+
+    text = text.replace(
+        /___(.+?)___/g,
+        "<strong><em>$1</em></strong>"
+    );
+
+    // Gras
+    text = text.replace(
+        /\*\*(.+?)\*\*/g,
+        "<strong>$1</strong>"
+    );
+
+    text = text.replace(
+        /__(.+?)__/g,
+        "<strong>$1</strong>"
+    );
+
+    // Italique
+    text = text.replace(
+        /(?<!\*)\*([^*\n]+)\*(?!\*)/g,
+        "<em>$1</em>"
+    );
+
+    text = text.replace(
+        /(?<!_)_([^_\n]+)_(?!_)/g,
+        "<em>$1</em>"
+    );
+
+    // Barré
+    text = text.replace(
+        /~~(.+?)~~/g,
+        "<del>$1</del>"
+    );
+
+    // Restaurer le code inline
+    text = text.replace(
+        /@@CODE(\d+)@@/g,
+        (_, id) => code[Number(id)]
+    );
+
+    return text;
+}
+
+
+function isTableSeparator(line) {
+    return /^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)+\|?\s*$/.test(line);
+}
+
+
+function parseTable(lines, start) {
+    const header = lines[start];
+    const separator = lines[start + 1];
+
+    if (!separator || !isTableSeparator(separator)) {
+        return null;
+    }
+
+    function splitRow(row) {
+        row = row.trim();
+
+        if (row.startsWith("|")) {
+            row = row.slice(1);
+        }
+
+        if (row.endsWith("|")) {
+            row = row.slice(0, -1);
+        }
+
+        return row.split("|").map(cell => cell.trim());
+    }
+
+    const headers = splitRow(header);
+
+    let html = "<table><thead><tr>";
+
+    for (const cell of headers) {
+        html += "<th>" + inlineMarkdown(cell) + "</th>";
+    }
+
+    html += "</tr></thead><tbody>";
+
+    let i = start + 2;
+
+    while (i < lines.length) {
+        const line = lines[i];
+
+        if (!line.trim() || !line.includes("|")) {
+            break;
+        }
+
+        const cells = splitRow(line);
+
+        html += "<tr>";
+
+        for (let j = 0; j < headers.length; j++) {
+            html += "<td>" +
+                inlineMarkdown(cells[j] ?? "") +
+                "</td>";
+        }
+
+        html += "</tr>";
+
+        i++;
+    }
+
+    html += "</tbody></table>";
+
+    return {
+        html,
+        next: i
+    };
+}
+
+
+function parseMarkdown(markdown) {
+    // Normalisation
+    markdown = markdown
+        .replace(/\r\n/g, "\n")
+        .replace(/\r/g, "\n");
+
+    const lines = markdown.split("\n");
+
+    let html = "";
+    let paragraph = [];
+    let i = 0;
+
+
+    function flushParagraph() {
+        if (paragraph.length === 0) {
+            return;
+        }
+
+        const text = paragraph.join("\n");
+
+        html += "<p>" +
+            inlineMarkdown(text).replace(/\n/g, "<br>") +
+            "</p>";
+
+        paragraph = [];
+    }
+
+
+    while (i < lines.length) {
+        const line = lines[i];
+
+
+        // Ligne vide
+        if (!line.trim()) {
+            flushParagraph();
+            i++;
+            continue;
+        }
+
+
+        // Bloc de code ```
+        if (/^\s*```/.test(line)) {
+            flushParagraph();
+
+            const language =
+                line.replace(/^\s*```/, "").trim();
+
+            const codeLines = [];
+
+            i++;
+
+            while (
+                i < lines.length &&
+                !/^\s*```/.test(lines[i])
+            ) {
+                codeLines.push(lines[i]);
+                i++;
+            }
+
+            if (i < lines.length) {
+                i++;
+            }
+
+            const className = language
+                ? ` class="language-${escapeHtml(language)}"`
+                : "";
+
+            html +=
+                `<pre><code${className}>` +
+                escapeHtml(codeLines.join("\n")) +
+                "</code></pre>";
+
+            continue;
+        }
+
+
+        // Titres # à ######
+        const heading = line.match(
+            /^\s*(#{1,6})\s+(.+?)\s*#*\s*$/
+        );
+
+        if (heading) {
+            flushParagraph();
+
+            const level = heading[1].length;
+            const content = heading[2];
+
+            html +=
+                `<h${level}>${inlineMarkdown(content)}</h${level}>`;
+
+            i++;
+            continue;
+        }
+
+
+        // Séparateur ---
+        if (/^\s*((\*\s*){3,}|(-\s*){3,}|(_\s*){3,})$/.test(line)) {
+            flushParagraph();
+
+            html += "<hr>";
+
+            i++;
+            continue;
+        }
+
+
+        // Citation >
+        if (/^\s*>/.test(line)) {
+            flushParagraph();
+
+            const quoteLines = [];
+
+            while (
+                i < lines.length &&
+                /^\s*>/.test(lines[i])
+            ) {
+                quoteLines.push(
+                    lines[i].replace(/^\s*>\s?/, "")
+                );
+
+                i++;
+            }
+
+            html +=
+                "<blockquote>" +
+                parseMarkdown(quoteLines.join("\n")) +
+                "</blockquote>";
+
+            continue;
+        }
+
+
+        // Tableau
+        if (
+            i + 1 < lines.length &&
+            line.includes("|") &&
+            isTableSeparator(lines[i + 1])
+        ) {
+            flushParagraph();
+
+            const table = parseTable(lines, i);
+
+            if (table) {
+                html += table.html;
+                i = table.next;
+                continue;
+            }
+        }
+
+
+        // Liste
+        const listMatch = line.match(
+            /^\s*([-*+]|\d+\.)\s+(.+)$/
+        );
+
+        if (listMatch) {
+            flushParagraph();
+
+            const ordered = /^\d+\./.test(listMatch[1]);
+            const tag = ordered ? "ol" : "ul";
+
+            html += `<${tag}>`;
+
+            while (i < lines.length) {
+                const item = lines[i].match(
+                    /^\s*([-*+]|\d+\.)\s+(.+)$/
+                );
+
+                if (!item) {
+                    break;
+                }
+
+                const currentOrdered =
+                    /^\d+\./.test(item[1]);
+
+                if (currentOrdered !== ordered) {
+                    break;
+                }
+
+                html +=
+                    "<li>" +
+                    inlineMarkdown(item[2]) +
+                    "</li>";
+
+                i++;
+            }
+
+            html += `</${tag}>`;
+
+            continue;
+        }
+
+
+        // Sinon : paragraphe
+        paragraph.push(line);
+        i++;
+    }
+
+    flushParagraph();
+
+    return html;
+}
+
+
+// Exemple
+const markdown_example = `
+# Mon document
+
+Voici un texte avec du **gras**, de l'*italique* et du ~~barré~~.
+
+## Une liste
+
+- Premier élément
+- Deuxième élément
+- **Troisième élément**
+
+## Une liste numérotée
+
+1. Première étape
+2. Deuxième étape
+3. Troisième étape
+
+## Un lien
+
+[OpenAI](https://openai.com)
+
+## Une citation
+
+> Ceci est une citation.
+
+## Un tableau
+
+| Nom | Age | Ville |
+| --- | ---: | --- |
+| Alice | 25 | Paris |
+| Bob | 31 | Lyon |
+
+## Du code
+
+\`\`\`javascript
+function hello() {
+    console.log("Bonjour");
+}
+\`\`\`
+
+![Une jolie image](https://example.com/image.jpg)
+
+Et même ceci :
+
+<script>
+    alert("CE CODE NE S'EXECUTERA PAS");
+</script>
+`;
+
+function load_markdown( div_id, markdown_content =  markdown_example )
+{
+    document.getElementById( div_id ).innerHTML = parseMarkdown(markdown);
+}
+

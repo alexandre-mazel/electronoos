@@ -7,6 +7,8 @@ import websockets #  sudo pip install websockets --break-system-packages
 pads = {}
 pad_clients = {}
 
+save_path = "./apads/"
+
 def create_new_pad_id():
     # ici que avec des lettres
     while 1:
@@ -18,6 +20,26 @@ def create_new_pad_id():
             return pad_id
     print( "ERR: create_new_pad_id: impossible to read this message (no more combination?)" )
     return "XXXX"
+    
+def save_on_disk( pad_id ):
+    content = pads[pad_id]
+    fn = save_path + str(pad_id) + ".txt"
+    if os.path.exists( fn ) and os.path.getsize( fn ) > len( contents ):
+        # backup car plus petit
+        fn_backup = fn.replace( ".txt", "_%012d.txt" % int(time.time()*100) )
+        os.rename( fn, fn_backup )
+    f = open( fn, "wb" )
+    f.write( content )
+    f.close()
+    
+def load_from_disk( pad_id, default_content = "" ):
+    fn = save_path + str(pad_id) + ".txt"
+    f = open( fn, "rb" )
+    if f == None:
+        return default_content
+    content = f.read()
+    f.close()
+    return content
 
 
 async def handle_client(websocket):
@@ -43,7 +65,7 @@ async def handle_client(websocket):
         return
 
     if pad_id not in pads:
-        pads[pad_id] = ""
+        pads[pad_id] = load_from_disk( pad_id, "" )
 
     if pad_id not in pad_clients:
         pad_clients[pad_id] = set()
@@ -59,13 +81,17 @@ async def handle_client(websocket):
 
     try:
         async for message in websocket:
-            print("DBG: received:", message)
+            print("DBG: received:", message )
+            
+
+            ip, port = websocket.remote_address
+            print( "Client:", ip, "port:", port )
             
             data = json.loads(message)
 
             if data.get("type") == "new_pad":
                 pad_id = create_new_pad_id()
-                pads[pad_id] = ""
+                pads[pad_id] = load_from_disk( pad_id, "" )
                 pad_clients[pad_id] = set()
 
                 await websocket.send(json.dumps({
@@ -77,6 +103,7 @@ async def handle_client(websocket):
 
             content = data.get("content", "")
             pads[pad_id] = content
+            save_on_disk( pad_id )
 
             response = json.dumps({
                 "type": "content",

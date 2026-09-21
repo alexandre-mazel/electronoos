@@ -403,7 +403,7 @@
             if( bPadSpecified )
             {
                 //if (!pad_id || !/^[A-Z]{4}$/.test(pad_id)) {
-                if (!pad_id || !/^[A-Z0-9]{4}$/.test(pad_id)) {
+                if (!pad_id || !/^[A-Z0-9]{1,8}$/.test(pad_id)) {
                     console.log("DBG: invalid pad_id =", pad_id);
                     set_status("Invalid pad", "disconnected");
                     return;

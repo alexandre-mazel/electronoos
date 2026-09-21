@@ -528,6 +528,12 @@ function hello() {
 }
 \`\`\`
 
+Du python
+\`\`\`python
+def hello():
+    print("Bonjour")
+\`\`\`
+
 ![Une jolie image sur le web](https://engrenage.studio/art/logo_almart_tech1_ret_med.png){200}
 ![Une jolie image sur le web](https://engrenage.studio/art/logo_almart_tech1_ret_med.png){200x100}
 

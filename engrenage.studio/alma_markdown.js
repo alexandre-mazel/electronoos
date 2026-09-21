@@ -278,6 +278,7 @@ dans lequel il passera l'index de la zone a cocher et la passer ici
 
 function parseMarkdown(markdown, toggle_check_name = "toggle_check" ) 
 {
+    dbg( "start parsemarkdown")
     alert("debug parse")
     // Normalisation
     markdown = markdown

@@ -337,6 +337,22 @@
         <textarea id="pad_text" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
         <div id="pad_md"></div>
     </main>
+    
+<pre id="debug" style="
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-height: 30%;
+    overflow: auto;
+    background: #000;
+    color: #0f0;
+    padding: 8px;
+    margin: 0;
+    z-index: 99999;
+    font-size: 12px;
+"></pre>
+
 
     <footer id="page_footer">
         <div id="connection_status">Connecting...</div>
@@ -716,6 +732,15 @@ pad_md.addEventListener("click", function(event) {
 
     toggle_check(num_area);
 });
+
+
+function dbg(msg) {
+    const d = document.getElementById("debug");
+
+    if (d) {
+        d.textContent += msg + "\n";
+    }
+}
 
         
     </script>

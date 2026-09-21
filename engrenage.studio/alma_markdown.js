@@ -126,7 +126,7 @@ function inlineMarkdown(text) {
 
     text = text.replace(
         /\{check\}/g,
-        '<span class="md-check">☐</span>'
+        '<span class="md-check">\25A2</span>' // was ☐
     );
 
 

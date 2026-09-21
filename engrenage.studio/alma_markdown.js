@@ -428,7 +428,8 @@ function parseMarkdown(markdown) {
 
         if (listMatch) {
             const marker = listMatch[1];
-            console.log("marker: " + marker)
+            console.log(`marker: '${marker}'`)
+            
             
             flushParagraph();
 

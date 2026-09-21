@@ -142,8 +142,11 @@ async def handle_client(websocket):
             print( "Finally: Client:", ip, "port:", port )
             
             # pour rigoler on check les ip
-            if ip.startswith( "92.184.140" ):
-                ip += " (orange)"
+            #~ if ip.startswith( "92.184.140" ):
+                #~ ip += " (orange)"
+            info = get_info_on_ip( ip )
+            if info != "":
+                ip += " (%s)" % info
             
             data = json.loads(message)
 

@@ -104,6 +104,8 @@ async def handle_client(websocket):
             if strRealIP != "":
                 ip = strRealIP
             
+            print( "Finally: Client:", ip, "port:", port )
+            
             data = json.loads(message)
 
             if data.get("type") == "new_pad":

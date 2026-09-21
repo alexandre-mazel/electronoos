@@ -450,7 +450,7 @@ function parseMarkdown(markdown, toggle_check_name = "toggle_check" ) {
                 }
                 
                 const marker = item[1];
-                console.log(`marker: '${marker}'`)
+                //~ console.log(`marker: '${marker}'`)
 
 
                 const currentOrdered = /^\d+\./.test(item[1]);
@@ -474,7 +474,7 @@ function parseMarkdown(markdown, toggle_check_name = "toggle_check" ) {
                     nbr_clickable_area += 1;
                 }
                     
-                console.log(`puceopen: '${puceopen}'`)
+                //~ console.log(`puceopen: '${puceopen}'`)
 
                 html +=
                     puceopen +

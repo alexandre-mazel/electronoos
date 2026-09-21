@@ -274,7 +274,9 @@ Pour la partie clickage, l'utilisateur doit implémenter une fonction
 dans lequel il passera l'index de la zone a cocher et la passer ici
 */
 
-function parseMarkdown(markdown, toggle_check_name = "toggle_check" ) {
+function parseMarkdown(markdown, toggle_check_name = "toggle_check" ) 
+{
+    alert("debug parse")
     // Normalisation
     markdown = markdown
         .replace(/\r\n/g, "\n")

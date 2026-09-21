@@ -671,18 +671,18 @@ function toggle_check( num_area )
         if (count === num_area) {
             const i = match.index + 1;
             console.log( "INF: toggle_check: at i:" + i + ", char: " + text[i] );
-            console.log( "INF: toggle_check: at i:" + (i+1).toString() + ", char: " + text[i+1] );
-            console.log( "INF: toggle_check: at i:" + (i+2).toString() + ", char: " + text[i+2] );
+            console.log( "INF: toggle_check: at i+1:" + (i+1).toString() + ", char: " + text[i+1] );
+            console.log( "INF: toggle_check: at i+2:" + (i+2).toString() + ", char: " + text[i+2] );
+            
+            // toggle * et +
+            let newchar = "*";
             if( text[i] == "*" )
             {
-                text[i] = "+"
+                newchar = "+"
             }
-            else
-            {
-                text[i] = "*"
-            }
-            pad_text.value = text;
-            pad_text.dispatchEvent(new Event("input"));
+            pad_text.value = text.substring(0, i) + new_char + text.substring(i + 1)
+                
+            pad_text.dispatchEvent(new Event("input")); // simule une modif par l'user
             console.log( "INF: toggle_check: ret: true" );
             return true;
         }

@@ -102,6 +102,22 @@ function inlineMarkdown(text) {
     // IMPORTANT :
     // On echappe d'abord tout HTML fourni par l'utilisateur.
     text = escapeHtml(text);
+        
+    /*
+     * Couleurs personnalisées
+     *
+     * {red|Texte rouge}
+     * {green|Texte vert}
+     * {#ff8800|Texte orange}
+     */
+    text = text.replace(
+        /\{(red|green|blue|orange|purple|yellow|#[0-9a-fA-F]{3,6})\|([^{}]+)\}/g,
+        (_, color, content) => {
+            return `<span style="color:${color}">${content}</span>`;
+        }
+    );
+
+
     
 
     text = text.replace(

@@ -30,6 +30,7 @@ def retrieve_info_on_ip( ip ):
         return ""
     
     org = data.get("org", "").lower()
+    print("INF: retrieve_info_on_ip: org:", str(org) )
 
     if "orange" in org:
         operator = "orange"
@@ -39,6 +40,12 @@ def retrieve_info_on_ip( ip ):
         operator = "sfr"
     else:
         operator = org # "unknown"
+       
+    postal = data.get("postal", "")
+    if  postal != "":
+        operator += " - " + postal
+        
+    print("INF: retrieve_info_on_ip: operator:", str(operator) )
         
     return operator
 

@@ -750,6 +750,12 @@ if (params.has("md")) {
     // active le md par défaut
     toggle_markdown()
 }
+if (params.has("mdonly")) {
+    // active le md par défaut
+    toggle_markdown()
+    pad_text.style.display = "none";
+    pad_md.style.width = "100%";
+}
 
 
         

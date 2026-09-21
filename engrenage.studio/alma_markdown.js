@@ -427,6 +427,8 @@ function parseMarkdown(markdown) {
         );
 
         if (listMatch) {
+            const marker = listMatch[1];
+            
             flushParagraph();
 
             const ordered = /^\d+\./.test(listMatch[1]);
@@ -449,9 +451,13 @@ function parseMarkdown(markdown) {
                 if (currentOrdered !== ordered) {
                     break;
                 }
+                
+                puceopen = "<li>"
+                if( marker == "+" )
+                    puceopen = "<li class='li_check'>"
 
                 html +=
-                    "<li>" +
+                    puceopen +
                     inlineMarkdown(item[2]) +
                     "</li>";
 

@@ -505,6 +505,14 @@ Voici un texte avec du **gras**, de l'*italique* et du ~~barre~~.
 2. Deuxieme etape
 3. Troisieme etape
 
+## Une liste cochable
+
+* Premiere etape
++ Deuxieme etape
++ Troisieme etape
+
+Une coche n'importe ou {checked}
+
 ## Un lien
 
 [Mangedisque](https://mangedisque.com)

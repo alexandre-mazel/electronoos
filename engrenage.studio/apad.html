@@ -512,6 +512,21 @@
 
                 pad_text.dispatchEvent(new Event("input"));
             }
+            if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
+                event.preventDefault();
+
+                const text = pad_text.value;
+
+                const blob = new Blob([text], { type: "text/plain" });
+                const url = URL.createObjectURL(blob);
+
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = pad_id + ".txt";
+                a.click();
+
+                URL.revokeObjectURL(url);
+            }
         });
         
         document.getElementById("new_pad_button").addEventListener("click", onNewPad );

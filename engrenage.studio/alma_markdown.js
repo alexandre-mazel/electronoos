@@ -533,7 +533,7 @@ Voici un texte avec du **gras**, de l'*italique* et du ~~barre~~.
 + Deuxieme etape
 + Troisieme etape
 
-Une coche n'importe ou {checked}
+Une coche n'importe ou {checked} (mais en fait c'est pas utile, car maintenant on gere + et * en début de liste et c'est tout mieux)
 
 ## Un lien
 

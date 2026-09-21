@@ -657,7 +657,8 @@ function showToast(text) {
     }, 2000);
 }
 
-function toggle_check( num_area )
+//function toggle_check(num_area ) // fonctionne pas sur samsung browser (semble pas vu)
+window.toggle_check = function( num_area )
 {
     alert("CLICK " + num_area);
     const regex = /\n[*+] /g;

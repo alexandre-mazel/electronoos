@@ -92,6 +92,12 @@ async def handle_client(websocket):
             ip, port = websocket.remote_address
             print( "Client:", ip, "port:", port )
             
+            headers = websocket.request.headers
+
+            print("X-Forwarded-For:", headers.get("X-Forwarded-For"))
+            print("X-Real-IP:", headers.get("X-Real-IP"))
+
+            
             data = json.loads(message)
 
             if data.get("type") == "new_pad":

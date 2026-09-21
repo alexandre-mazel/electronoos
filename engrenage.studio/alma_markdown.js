@@ -426,10 +426,7 @@ function parseMarkdown(markdown) {
             /^\s*([-*+]|\d+\.)\s+(.+)$/
         );
 
-        if (listMatch) {
-            const marker = listMatch[1];
-            console.log(`marker: '${marker}'`)
-            
+        if (listMatch) {            
             
             flushParagraph();
 
@@ -446,6 +443,10 @@ function parseMarkdown(markdown) {
                 if (!item) {
                     break;
                 }
+                
+                const marker = item[1];
+                console.log(`marker: '${marker}'`)
+
 
                 const currentOrdered = /^\d+\./.test(item[1]);
 

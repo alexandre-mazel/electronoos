@@ -99,9 +99,9 @@ async def handle_client(websocket):
             print("X-Forwarded-For:", strForwardedFor )
             print("X-Real-IP:", strRealIP)
             
-            if strForwardedFor != "":
+            if strForwardedFor != "" and strRealIP != None:
                 ip = strForwardedFor
-            if strRealIP != "":
+            if strRealIP != "" and strRealIP != None:
                 ip = strRealIP
             
             print( "Finally: Client:", ip, "port:", port )

@@ -522,7 +522,7 @@
 
                 const a = document.createElement("a");
                 a.href = url;
-                a.download = pad_id + ".txt";
+                a.download = pad_id + "_" + getCurrentTimeStamp().replaceAll( " ", "_") + ".txt";
                 a.click();
 
                 URL.revokeObjectURL(url);

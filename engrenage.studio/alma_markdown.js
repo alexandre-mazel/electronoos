@@ -452,7 +452,7 @@ function parseMarkdown(markdown) {
                     break;
                 }
                 
-                let puceopen = "<li>"
+                let puceopen = "<li>";
                 if( marker == "+" )
                     puceopen = "<li class='li_check'>"
                 if( marker == "*" )

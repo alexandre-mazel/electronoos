@@ -497,6 +497,8 @@ function parseMarkdown(markdown, toggle_check_name = "toggle_check" ) {
     }
 
     flushParagraph();
+    
+    alert(html)
 
     return html;
 }

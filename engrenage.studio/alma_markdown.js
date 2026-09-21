@@ -126,7 +126,7 @@ function inlineMarkdown(text) {
 
     text = text.replace(
         /\{check\}/g,
-        '<span class="md-check">☐</span>' // was ☐ mais fonctionne pas sur samsung (mais \25A2 non plus, alors que ca fonctionne dans le css...)
+        '<span class="md-check">▢</span>' // was ☐ mais sur samsung affiche une urne, \25A2 non plus, alors que ca fonctionne dans le css..., alors je tente: ▢
     );
 
 

@@ -340,6 +340,20 @@
 
       return `${dd} ${month} ${yyyy} at ${hh}:${mm}`;
     }
+    
+    function getCurrentTimeStampSortable()
+    {
+      const now = new Date();
+
+      const dd = String(now.getDate()).padStart(2, "0");
+      const month = String(now.getDate()).padStart(2, "0");
+      const yyyy = now.getFullYear();
+      const hh = String(now.getHours()).padStart(2, "0");
+      const mm = String(now.getMinutes()).padStart(2, "0");
+      const ss = String(now.getSeconds()).padStart(2, "0");
+
+      return `${yyyy}_${month}_${dd}__${hh}_${mm}_${ss}`;
+    }
 
     
         console.log("DBG: script started");
@@ -522,7 +536,7 @@
 
                 const a = document.createElement("a");
                 a.href = url;
-                a.download = pad_id + "_" + getCurrentTimeStamp().replaceAll( " ", "_") + ".txt";
+                a.download = pad_id + "_" + getCurrentTimeStampSortable() + ".txt";
                 a.click();
 
                 URL.revokeObjectURL(url);

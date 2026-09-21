@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AlmaPads</title>
     <link rel='icon' type='image/png' href='img/ico_engrenage2.png'>
+    <script src="alma_markdown.js"></script>
 
     <style>
         * {
@@ -75,10 +76,17 @@
             line-height: 1.45;
             tab-size: 4;
         }
+        
 
         #pad_text:focus {
             box-shadow: 0 0 0 2px #555555;
         }
+        
+        #pad_md {
+            padding: 14px;
+            font-size: 16px;
+        }
+
 
         #page_footer {
             display: flex;
@@ -143,11 +151,13 @@
     <header id="page_header">
         <h1 id="page_title">AlmaPads</h1>
         <button id="new_pad_button">New pad</button>
+        <button id="markdown_button">Markdown</button>
         <div id="pad_code">----</div>
     </header>
 
     <main id="page_main">
         <textarea id="pad_text" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+        <div id="pad_md"></div>
     </main>
 
     <footer id="page_footer">
@@ -181,6 +191,11 @@
         const pad_code = document.getElementById("pad_code");
         const connection_status = document.getElementById("connection_status");
         const pad_size = document.getElementById("pad_size");
+        
+        const page_main = document.getElementById("page_main");
+        const pad_md = document.getElementById("pad_md");
+        const markdown_button = document.getElementById("markdown_button");
+
         
         console.log("DBG: DOM elements =", pad_text, pad_code, connection_status, pad_size);
 
@@ -373,6 +388,42 @@
         {
             pad_text.focus();
         }
+        
+    function updateMarkdownPreview() {
+
+    if (!page_main.classList.contains("markdown-visible")) {
+        return;
+    }
+
+    pad_md.innerHTML = parseMarkdown(pad_text.value);
+}
+
+/*
+ * Bouton Markdown
+ */
+markdown_button.addEventListener(
+    "click",
+    function() {
+
+        page_main.classList.toggle(
+            "markdown-visible"
+        );
+
+        const visible =
+            page_main.classList.contains(
+                "markdown-visible"
+            );
+
+        markdown_button.textContent =
+            visible
+                ? "Hide Markdown"
+                : "Markdown";
+
+        if (visible) {
+            updateMarkdownPreview();
+        }
+    }
+);
         
     </script>
 

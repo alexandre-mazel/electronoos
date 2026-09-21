@@ -34,6 +34,8 @@ def save_on_disk( pad_id ):
     
 def load_from_disk( pad_id, default_content = "" ):
     fn = save_path + str(pad_id) + ".txt"
+    if not os.path.exists( fn ):
+        return default_content
     f = open( fn, "rb" )
     if f == None:
         return default_content

@@ -55,6 +55,21 @@ function safeUrl(url) {
     return "#";
 }
 
+function safeImageUrl(url) {
+    try {
+        const parsed = new URL(url, window.location.href);
+
+        if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+            return "";
+        }
+
+        return parsed.href;
+    } catch {
+        return "";
+    }
+}
+
+
 function inlineMarkdown(text) {
     // IMPORTANT :
     // On echappe d'abord tout HTML fourni par l'utilisateur.
@@ -101,7 +116,7 @@ function inlineMarkdown(text) {
     text = text.replace(
         /!\[([^\]]*)\]\((https?:\/\/[^)\s]+)\)/gi,
         (_, alt, url) =>
-            `<img src="${safeUrl(url)}" alt="${alt}" loading="lazy">`
+            `<img src="${safeImageUrl(url)}" alt="${escapeHtml(alt)}" loading="lazy">`
     );
 
 
@@ -455,7 +470,7 @@ Voici un texte avec du **gras**, de l'*italique* et du ~~barre~~.
 
 ## Un lien
 
-[OpenAI](https://openai.com)
+[Mangedisque](https://mangedisque.com)
 
 ## Une citation
 
@@ -478,7 +493,7 @@ function hello() {
 
 ![Une jolie image](https://example.com/image.jpg)
 
-Et même du script dans des balises script (mais je le met peut etre pas car ca plante mon jsminifieur donc je exceptionne dans mon minifieur):
+Et meme du script dans des balises script (mais je le met peut etre pas car ca plante mon jsminifieur donc je exceptionne dans mon minifieur):
 
 <script>
     alert("CE CODE NE S'EXECUTERA PAS");

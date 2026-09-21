@@ -427,6 +427,8 @@
             
             set_status("Connected - last updated by you on " + getCurrentTimeStamp(), "connected");
             
+            updateMarkdownPreview();
+            
         });
 
         pad_text.addEventListener("keydown", function(event) {
@@ -445,7 +447,6 @@
                 pad_text.selectionEnd = start + 4;
 
                 pad_text.dispatchEvent(new Event("input"));
-                updateMarkdownPreview();
             }
         });
         

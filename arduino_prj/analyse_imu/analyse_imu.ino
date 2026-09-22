@@ -504,7 +504,7 @@ float computeRespi( float roll )
 
   static float rollavg = 0;
 
-  const float coefnew = 0.2;
+  const float coefnew = 0.1;
 
   const char * state = "";
 

@@ -20,8 +20,8 @@ DEFAULT_COMPUTE_TYPE = "int8_float16" # normal: 1.33 en turbo, 2.0 en normal
 #~ DEFAULT_COMPUTE_TYPE = "int8" # normal: 1.33 en turbo, 2.0 en normal
 
 
-use_whisper = True # sinon c'est faster_whisper
-use_whisper = False
+use_whisper = True
+use_whisper = False # si false on utilise  faster_whisper
 if use_whisper:
     import whisper # python -m pip install -U openai-whisper
     
@@ -53,6 +53,8 @@ class Whisper:
         time_begin = time.time()
         segments, info = self.model.transcribe( audio_filename, language="fr", condition_on_previous_text=True,
                                                 initial_prompt = self.initial_prompt, hotwords=self.hotwords, 
+                                                # temperature=0.0, # par défaut il essaye 0.0 puis en cas d'echec 0.2 ...
+                                                no_speech_threshold=0.8, # a essayer ! was 0.6
                                                 #~ hotwords_sensitivity=0.8 
                                                 )
         duration = time.time() - time_begin
@@ -60,6 +62,15 @@ class Whisper:
         print( "processing duration: %.3fs" % (duration) )
         print( "info:", info )
         print( "segments: ", segments )
+        if 1:
+            for segment in segments:
+                print(
+                    f"[{segment.start:.2f} -> {segment.end:.2f}] "
+                    f"no_speech={segment.no_speech_prob:.3f} "
+                    f"logprob={segment.avg_logprob:.3f} "
+                    f"compression={segment.compression_ratio:.3f} "
+                    f"text={segment.text!r}"
+                )
         text = "".join(segment.text for segment in segments)
         return text
 

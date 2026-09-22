@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AlmaPads</title>
     <link rel='icon' type='image/png' href='img/ico_engrenage2.png'>
+    <script src="alma_markdown.js"></script>
 
     <style>
         * {
@@ -60,12 +61,12 @@
             padding: 12px;
         }
 
-        #pad_text {
-            width: 100%;
-            height: 100%;
-            resize: none;
-            border: 0;
-            outline: none;
+        #pad_text,#pad_md {
+            flex: 1 1 0;
+            width: 0;
+            height: auto;
+            min-width: 0;
+            min-height: 0;
             border-radius: 8px;
             padding: 20px;
             background: #101010;
@@ -75,10 +76,154 @@
             line-height: 1.45;
             tab-size: 4;
         }
+        
+        #pad_text {
+            resize: none;
+            border: 0;
+            outline: none;
+            overflow: auto;
+        }
+
 
         #pad_text:focus {
             box-shadow: 0 0 0 2px #555555;
         }
+        
+        #pad_md {
+            padding: 14px;
+            font-size: 16px;
+            display: none;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        
+        #page_main.markdown-visible #pad_md {
+            display: block;
+        }
+
+        
+        #page_main.markdown-visible #pad_md {
+            display: block;
+        }
+        
+    /* Markdown */
+    #pad_md h1,
+    #pad_md h2,
+    #pad_md h3,
+    #pad_md h4,
+    #pad_md h5,
+    #pad_md h6 {
+        margin-top: 1em;
+        margin-bottom: 0.5em;
+    }
+
+    #pad_md h1 {
+        font-size: 2em;
+        border-bottom: 1px solid #444;
+        padding-bottom: 8px;
+    }
+
+    #pad_md h2 {
+        font-size: 1.6em;
+        border-bottom: 1px solid #333;
+        padding-bottom: 6px;
+    }
+
+    #pad_md p {
+        margin: 0.8em 0;
+    }
+
+    #pad_md a {
+        color: #66aaff;
+    }
+
+    #pad_md img {
+        max-width: 100%;
+        /*height: auto;*/
+        border-radius: 6px;
+    }
+
+    #pad_md code {
+        padding: 2px 5px;
+        border-radius: 4px;
+        background: #292929;
+        font-family: monospace;
+    }
+
+    #pad_md pre {
+        padding: 14px;
+        overflow-x: auto;
+        border-radius: 6px;
+        background: #080808;
+    }
+
+    #pad_md pre code {
+        padding: 0;
+        background: none;
+    }
+
+    #pad_md blockquote {
+        margin: 1em 0;
+        padding: 8px 16px;
+        border-left: 4px solid #555;
+        color: #bbbbbb;
+        background: #202020;
+    }
+
+    #pad_md table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1em 0;
+    }
+
+    #pad_md th,
+    #pad_md td {
+        padding: 8px 12px;
+        border: 1px solid #444;
+        text-align: left;
+    }
+
+    #pad_md th {
+        background: #292929;
+    }
+
+    #pad_md hr {
+        border: 0;
+        border-top: 1px solid #444;
+        margin: 1.5em 0;
+    }
+    
+    .md-check {
+        display: inline-block;
+        font-size: 1.1em;
+        margin-right: 5px;
+    }
+
+    li.li_check {
+      list-style: none;
+    }
+
+    li.li_check::before {
+        content: "\2610";            /* "\2610" fonctionne bien, sauf sur samsung browser ou ca affiche une sorte d'urne de vote => on y met \25A2 */
+        margin-right: 5px;
+        margin-left: -17px;
+    }
+    
+    body.samsung-browser li.li_check::before {
+        content: "\25A2";
+    }
+    
+    li.li_checked {
+      list-style: none;
+    }
+
+    li.li_checked::before {
+        content: "\2611";
+        margin-right: 5px;
+        margin-left: -17px;
+    }
+
+
 
         #page_footer {
             display: flex;
@@ -116,6 +261,13 @@
             #page_title {
                 font-size: 18px;
             }
+            
+            #header_buttons {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 8px;
+            }
 
             #pad_code {
                 font-size: 16px;
@@ -135,6 +287,42 @@
                 padding: 7px 12px;
             }
         }
+        
+        
+    #toast {
+        position: fixed;
+        bottom: 50%;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 8px 14px;
+        border-radius: 6px;
+        background: #229;
+        color: #fff;
+        font-size: 14px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.15s;
+        z-index: 1000;
+    }
+
+    #toast.show {
+        opacity: 1;
+    }
+
+        
+/* cache la source sur mobile (en fait a la volee sur tout ecran plus petit que 600 soit un mobile en vertical) */
+@media (max-width: 600px) {
+    #page_main.markdown-visible #pad_text {
+        display: none;
+    }
+
+    #page_main.markdown-visible #pad_md {
+        display: block;
+        flex: 1 1 100%;
+        width: 100%;
+    }
+}
+
     </style>
 </head>
 
@@ -142,20 +330,47 @@
 
     <header id="page_header">
         <h1 id="page_title">AlmaPads</h1>
-        <button id="new_pad_button">New pad</button>
+        <div id="header_buttons">
+            <button id="new_pad_button">New pad</button>
+            <button id="markdown_button">Markdown</button>
+        </div>
         <div id="pad_code">----</div>
     </header>
 
     <main id="page_main">
         <textarea id="pad_text" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+        <div id="pad_md"></div>
     </main>
+
 
     <footer id="page_footer">
         <div id="connection_status">Connecting...</div>
         <div id="pad_size">0 chars</div>
     </footer>
+    
+<pre id="debug" style="
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-height: 30%;
+    overflow: auto;
+    background: #000;
+    color: #0f0;
+    padding: 8px;
+    margin: 0;
+    z-index: 99999;
+    font-size: 12px;"></pre>
+    
+    <div id="toast"></div>
+
 
     <script>
+    
+    if( isSamsungBrowser() )
+    {
+        document.body.classList.add("samsung-browser");
+    }
     
     function getCurrentTimeStamp() {
       const now = new Date();
@@ -173,6 +388,20 @@
 
       return `${dd} ${month} ${yyyy} at ${hh}:${mm}`;
     }
+    
+    function getCurrentTimeStampSortable()
+    {
+      const now = new Date();
+
+      const dd = String(now.getDate()).padStart(2, "0");
+      const month = String(now.getMonth()+1).padStart(2, "0");
+      const yyyy = now.getFullYear();
+      const hh = String(now.getHours()).padStart(2, "0");
+      const mm = String(now.getMinutes()).padStart(2, "0");
+      const ss = String(now.getSeconds()).padStart(2, "0");
+
+      return `${yyyy}_${month}_${dd}_${hh}h${mm}m${ss}`;
+    }
 
     
         console.log("DBG: script started");
@@ -182,10 +411,15 @@
         const connection_status = document.getElementById("connection_status");
         const pad_size = document.getElementById("pad_size");
         
+        const page_main = document.getElementById("page_main");
+        const pad_md = document.getElementById("pad_md");
+        const markdown_button = document.getElementById("markdown_button");
+
+        
         console.log("DBG: DOM elements =", pad_text, pad_code, connection_status, pad_size);
 
 
-        var pad_id = window.location.search.substring(1).toUpperCase();
+        var pad_id = window.location.search.substring(1).split("&")[0].toUpperCase();
         
         console.log("DBG: pad_id =", pad_id);
         
@@ -197,6 +431,9 @@
         let suppress_change = false;
 
         pad_code.textContent = pad_id || "----";
+
+        document.title = "AlmaPads - " + pad_id;
+
         
         if(!pad_id)
         {
@@ -228,7 +465,7 @@
             if( bPadSpecified )
             {
                 //if (!pad_id || !/^[A-Z]{4}$/.test(pad_id)) {
-                if (!pad_id || !/^[A-Z0-9]{4}$/.test(pad_id)) {
+                if (!pad_id || !/^[A-Z0-9]{1,8}$/.test(pad_id)) {
                     console.log("DBG: invalid pad_id =", pad_id);
                     set_status("Invalid pad", "disconnected");
                     return;
@@ -254,7 +491,7 @@
             
 
             websocket.onmessage = function(event) {
-                console.log("WS MESSAGE RECEIVED:", event.data);
+                //console.log("WS MESSAGE RECEIVED:", event.data);
                 let message;
 
                 try 
@@ -275,7 +512,9 @@
                     pad_text.value = message.content || "";
                     suppress_change = false;
                     update_size();
-                    set_status("Connected - last updated by other on " + getCurrentTimeStamp(), "connected");
+                    str_author = message.author;
+                    set_status("Connected - last updated by " + str_author + " on " + getCurrentTimeStamp(), "connected");
+                    updateMarkdownPreview();
                 }
             };
 
@@ -315,6 +554,8 @@
             
             set_status("Connected - last updated by you on " + getCurrentTimeStamp(), "connected");
             
+            updateMarkdownPreview();
+            
         });
 
         pad_text.addEventListener("keydown", function(event) {
@@ -333,6 +574,23 @@
                 pad_text.selectionEnd = start + 4;
 
                 pad_text.dispatchEvent(new Event("input"));
+            }
+            if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
+                event.preventDefault();
+
+                const text = pad_text.value;
+
+                const blob = new Blob([text], { type: "text/plain" });
+                const url = URL.createObjectURL(blob);
+
+                const a = document.createElement("a");
+                a.href = url;
+                const filename_to_save = pad_id + "__" + getCurrentTimeStampSortable() + ".txt";
+                a.download = filename_to_save;
+                a.click();
+
+                URL.revokeObjectURL(url);
+                showToast( "Saved to " + filename_to_save )
             }
         });
         
@@ -373,6 +631,134 @@
         {
             pad_text.focus();
         }
+        
+    function updateMarkdownPreview() {
+
+    if (!page_main.classList.contains("markdown-visible")) {
+        return;
+    }
+
+    pad_md.innerHTML = parseMarkdown(pad_text.value);
+}
+
+/*
+ * Bouton Markdown
+ */
+markdown_button.addEventListener("click", toggle_markdown );
+
+function toggle_markdown(){
+
+        page_main.classList.toggle( "markdown-visible" );
+
+        const visible =
+            page_main.classList.contains(
+                "markdown-visible"
+            );
+
+        markdown_button.textContent =
+            visible
+                ? "Hide Markdown"
+                : "Markdown";
+
+        if (visible) {
+            updateMarkdownPreview();
+        }
+    }
+
+function showToast(text) {
+    const toast = document.getElementById("toast");
+
+    toast.textContent = text;
+    toast.classList.add("show");
+
+    clearTimeout(toast.timer);
+
+    toast.timer = setTimeout(function() {
+        toast.classList.remove("show");
+    }, 2000);
+}
+
+//function toggle_check(num_area ) // fonctionne pas sur samsung browser (semble pas vu)
+window.toggle_check = function( num_area )
+{
+//~     alert("CLICK " + num_area);
+    const regex = /\n[*+] /g;
+    let count = 0;
+    let match;
+    
+    let text = pad_text.value;
+    
+//~     console.log( "INF: toggle_check: looking in text:" + text );
+    console.log( "INF: toggle_check: looking for num_area:" + num_area );
+
+    while ((match = regex.exec(text)) !== null) {
+        if (count === num_area) {
+            const i = match.index + 1;
+            console.log( "INF: toggle_check: at i:" + i + ", char: " + text[i] );
+            console.log( "INF: toggle_check: at i+1:" + (i+1).toString() + ", char: " + text[i+1] );
+            console.log( "INF: toggle_check: at i+2:" + (i+2).toString() + ", char: " + text[i+2] );
+            
+            // toggle * et +
+            let newchar = "*";
+            if( text[i] == "*" )
+            {
+                newchar = "+"
+            }
+            pad_text.value = text.substring(0, i) + newchar + text.substring(i + 1)
+                
+            pad_text.dispatchEvent(new Event("input")); // simule une modif par l'user
+            console.log( "INF: toggle_check: ret: true" );
+            return true;
+        }
+        count++;
+    }
+
+    console.log( "INF: toggle_check: ret: false" );
+    return false;
+}
+
+// bout de code juste pour que ca fonctionne sur samsung browser (le onclick genere a la volee apres le delegate ne fonctionne pas)
+pad_md.addEventListener("click", function(event) {
+    console.log( "DBG: pad_md.addEventListener" )
+    // alert("CLICK event ");
+    let li = event.target.closest("li.li_check");
+    if (!li) {
+        li = event.target.closest("li.li_checked");
+
+        if (!li) 
+        {
+            return;
+        }
+    }
+
+    const num_area = Number(li.dataset.checkIndex); // envoyer depuis <li data-check-index="3">
+
+    toggle_check(num_area);
+});
+
+
+function dbg(msg) {
+    const d = document.getElementById("debug");
+
+    if (d) {
+        d.textContent += msg + "\n";
+    }
+}
+
+const params = new URLSearchParams(window.location.search);
+if (params.has("md")) {
+    // active le md par defaut
+    toggle_markdown()
+}
+if (params.has("mdonly")) {
+    // active le md par defaut et cache le texte
+    toggle_markdown()
+    pad_text.style.display = "none";
+    pad_md.style.width = "100%";
+    markdown_button.style.display = "none";
+}
+
+
         
     </script>
 

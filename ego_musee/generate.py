@@ -70,12 +70,12 @@ def main():
 
     print("Loading model...")
 
-    pipe = QwenImageEditPlusPipeline.from_pretrained( MODEL, torch_dtype=torch.bfloat16 )
+    pipe = QwenImageEditPlusPipeline.from_pretrained( MODEL, torch_dtype=torch.bfloat16, device_map="cuda" )
 
     # Important pour une RTX 3080 10 GB :
     # les différentes parties du modèle sont déplacées
     # automatiquement entre GPU et RAM.
-    pipe.enable_model_cpu_offload()
+    #~ pipe.enable_model_cpu_offload()
 
     pipe.set_progress_bar_config(disable=False)
 

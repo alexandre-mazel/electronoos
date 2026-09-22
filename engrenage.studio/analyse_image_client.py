@@ -54,7 +54,7 @@ def test():
     names = ["20260906_210413_small","WA_corto_niko_et_myr","WA_famille_regarde_film"]; template = "../test/%s.jpg"
     names = ["2025_03_19-02h20m14s148114ms","side_boobs_07","2024_06_10-09h20m08s449379ms","2020_10_05-10h35m32s214730ms","2021_11_30-14h44m50s655809ms"]; template = "/tmp/%s.jpg"
     names = ["IMG-20260815-WA0020","WhatsApp Image 2026-08-26 at 10.34.01","WhatsApp Image 2026-07-08 at 22.03.15","20260806_011012_top_crop"]
-    #~ names = names[-1:]
+    #~ names = names[-2:]
     for name in names:
         fn = template % name
         ret = send_image_to_analyse( fn, "fr" ) # bizarrement le 2ieme foire des fois quand le client est sur PC avec une liste de mot cle infini avec "seance de photos", "seance de photos", "seance de photos", ... => relancer avec une autre seed si trop pourri.

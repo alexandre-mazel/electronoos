@@ -3,8 +3,10 @@
 """
 Change one face in a tableau containing many face with another one passed as a ref.
 
-python3 -m venv venv
+/opt/python3.11/bin/python3.11 -m venv venv
 source venv/bin/activate
+
+python --version
 
 pip install -r requirements.txt
 

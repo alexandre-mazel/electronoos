@@ -67,10 +67,7 @@ def main():
 
     print("Loading model...")
 
-    pipe = QwenImageEditPlusPipeline.from_pretrained(
-        MODEL,
-        torch_dtype=torch.bfloat16,
-    )
+    pipe = QwenImageEditPlusPipeline.from_pretrained( MODEL, torch_dtype=torch.bfloat16 )
 
     # Important pour une RTX 3080 10 GB :
     # les différentes parties du modèle sont déplacées
@@ -85,6 +82,8 @@ def main():
     generator = torch.Generator(device="cpu").manual_seed(args.seed)
 
     print("Generating...")
+    
+    scene = "painting.jpg"
 
     result = pipe(
         image=[scene, face],

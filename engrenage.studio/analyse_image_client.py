@@ -52,8 +52,8 @@ def send_image_to_analyse( filename_img, lang = "en" ):
     
 def test():
     names = ["20260906_210413_small","WA_corto_niko_et_myr","WA_famille_regarde_film"]; template = "../test/%s.jpg"
-    #~ names = ["2025_03_19-02h20m14s148114ms","side_boobs_07","2024_06_10-09h20m08s449379ms","2020_10_05-10h35m32s214730ms","2021_11_30-14h44m50s655809ms"]; template = "/tmp/%s.jpg"
-    #~ names = ["IMG-20260815-WA0020"]
+    names = ["2025_03_19-02h20m14s148114ms","side_boobs_07","2024_06_10-09h20m08s449379ms","2020_10_05-10h35m32s214730ms","2021_11_30-14h44m50s655809ms"]; template = "/tmp/%s.jpg"
+    names = ["IMG-20260815-WA0020","WhatsApp Image 2026-08-26 at 10.34.01","WhatsApp Image 2026-07-08 at 22.03.15"]
     #~ names = names[1:2]
     for name in names:
         fn = template % name

@@ -118,7 +118,7 @@ CORRECT : "Gaia est assise à une table avec des livres."
     
     import analyse_image_ollama
     strModel = "qwen2.5vl:7b"
-    #~ strModel = "gemma3:12b"
+    strModel = "gemma3:12b"
     #~ strModel = "Qwen3-VL 8B"
     #~ strModel = "qwen3-vl:30b-a3b"
     result = analyse_image_ollama.analyse_image_buffer( "http://localhost:11435/api/chat", img_raw,strModel, 

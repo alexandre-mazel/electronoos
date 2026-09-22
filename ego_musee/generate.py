@@ -28,16 +28,19 @@ def main():
 
     parser.add_argument(
         "scene",
+        default="painting.jpg",
         help="Image principale contenant les personnages"
     )
 
     parser.add_argument(
         "face",
+        default="visitor.jpg",
         help="Image contenant le visage de référence"
     )
 
     parser.add_argument(
         "prompt",
+        default="The first image is the original scene. The second image contains the face to use. Replace only the face of the second person from the left with the face from the second image. Preserve the person's body, clothes, pose and position. Preserve the other people and the background exactly.",
         help="Instruction d'édition"
     )
 

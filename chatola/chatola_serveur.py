@@ -23,6 +23,9 @@ scp a@192.168.0.45:/home/a/voices/* d:\voices\
 
 # wake
 https://engrenage.studio/eng_index.py?wake=champion1
+
+PB actuel:
+si il comprend rien ou ... il répond en boucle la meme chose: d'accord je t'attend n"hésites pas si tu as besoin de qqchose.
 """
 
 from flask import Flask, request, send_file # sudo apt install python3-flask ou en venv: pip install flask
@@ -68,6 +71,10 @@ if gbUseTTS:
 # on import whisper apres tts_mms sinon tts_mms core dumped
 import test_whisper
 whisp = test_whisper.Whisper()
+
+# pourquoi j'ai pas ajouté ca ?!? # a tester! TODO
+#~ whisp.add_initial_prompt( "on parle de chirurgie estethique du cheveux par exemple: greffe des cheveux, et FUE." )
+#~ whisp.add_hotwords( "assis toi!", "debout!" )
 
 
 def remove_accents( text ):

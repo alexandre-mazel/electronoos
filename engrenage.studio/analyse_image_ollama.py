@@ -241,8 +241,10 @@ def main():
     # super long et parfois ne donne pas de resultat (car part en boucle dans le thinking alors que j'avais essayé de le desactiver)
     
     strModel = "gemma4:12b" # gemma4:12B    4eb23ef187e2    8.1 GB    100% GPU 
+    # super long
     
-    strModel = "qwen3-vl:30b-a3b" # Qwen3-VL:30b-a3b    eda0be100877    20 GB    60%/40% CPU/GPU    8192 
+    strModel = "qwen3-vl:30b-a3b" # Qwen3-VL:30b-a3b    eda0be100877    20 GB    60%/40% CPU/GPU    8192
+    # ultra long
 
 
     list_img = [ "20260901_111820_small", "20260901_160631_small","20260906_210413_small","20260910_130425_small","20260911_173947_small","girl-4051811_960_720"]

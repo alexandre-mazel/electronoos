@@ -1,0 +1,9 @@
+torch
+torchvision
+transformers
+accelerate
+bitsandbytes
+safetensors
+Pillow
+huggingface_hub
+git+https://github.com/huggingface/diffusers.git

@@ -153,6 +153,7 @@ class MyClass(GeneratedClass):
                           <content>
                             <![CDATA[import random
 import re
+import time
 
 
 def separate_uppercase_letters( text ):
@@ -177,7 +178,7 @@ class MyClass(GeneratedClass):
 
     def onLoad(self):
         #put initialization code here
-        pass
+        self.last_noise_done = time.time()
 
     def onUnload(self):
         #put clean-up code here
@@ -197,7 +198,9 @@ class MyClass(GeneratedClass):
                 self.log( "Unknown command: " + c )
             return
         if p == "?":
-            self.output_justsay( random.choice( [ "hun", "ho", "hun hun", "éh", "hé bé" ] ) )
+            if time.time() - self.last_noise_done > 8:
+                self.last_noise_done = time.time()
+                self.output_justsay( random.choice( [ "hun", "ho", "hun hun", "éh", "hé bé" ] ) )
             return
 
         s = preprocess_for_tts(p)
@@ -655,7 +658,7 @@ pass]]>
                         <Input name="onSay" type="3" type_size="1" nature="1" inner="0" tooltip="automatic say and animate imput: just send some text, and it will say them while talking, if the text is enough long..." id="5" />
                         <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="6" />
                         <Parameter name="bUseHead" inherits_from_parent="0" content_type="0" value="1" default_value="1" tooltip="Do we send movements to the head ?" id="7" />
-                        <Parameter name="rElevation" inherits_from_parent="0" content_type="2" value="0" default_value="0" min="-0.5" max="0.5" tooltip="" id="8" />
+                        <Parameter name="rElevation" inherits_from_parent="0" content_type="2" value="-0.1" default_value="0" min="-0.5" max="0.5" tooltip="" id="8" />
                         <Parameter name="rSide" inherits_from_parent="0" content_type="2" value="0" default_value="0" min="-1" max="1" tooltip="" id="9" />
                         <Parameter name="bTrackFace" inherits_from_parent="0" content_type="0" value="0" default_value="0" tooltip="Mario use face tracking to look at human" id="10" />
                         <Parameter name="astrJointsToExclude" inherits_from_parent="0" content_type="3" value='[&quot;Legs&quot;]' default_value='[&quot;RArm&quot;]' custom_choice="1" tooltip="a string to evaluate as an array: it&apos;s a list of obstacles" id="11">
@@ -762,7 +765,7 @@ class MyClass(GeneratedClass):
               <Input name="onStart" type="1" type_size="1" nature="1" inner="0" tooltip="To send the text on the output." id="2" />
               <Output name="onStopped" type="3" type_size="1" nature="2" inner="0" tooltip="The text you entered." id="3" />
             </Box>
-            <Box name="run_sound_acquire" id="2" localization="8" tooltip="" x="335" y="439">
+            <Box name="run_sound_acquire" id="2" localization="8" tooltip="" x="256" y="516">
               <bitmap>media/images/box/box-python-script.png</bitmap>
               <script language="4">
                 <content>

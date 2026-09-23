@@ -230,6 +230,19 @@ If the text is visually ambiguous, make your best reading and stop.
 
 
 def main():
+    """
+    Temps d'apres le web pour une image 1000x1000:
+    
+        GPU	            VRAM	    Temps estimé
+        RTX 3080    10 GB	    ~1-3 s
+        RTX 4060	    8 Go	        ~2-4 s
+        RTX 5060	    8 Go	        ~1.5-3 s
+        RTX 4070	    12 Go	    ~1-2.5 s
+        RTX 5070	    12 Go	    ~1-2 s
+        RTX 4080	    16 Go	    ~0.8-2 s
+        RTX 5080	    16 Go	    ~0.6-1.5 s
+
+    """
     strModel = "qwen2.5vl:7b" # qwen2.5vl:7b    5ced39dfa4ba    5.9 GB    100% GPU     8192 5.9 ca fait 8.4 dans la ram avec ollama, auquel tu peux ajouter 1.4 d'analyse de visage... c'est un peu juste.
     # fonctionne tres bien et reproductible et format bien maintenu, parfait!
     

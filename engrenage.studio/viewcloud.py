@@ -288,7 +288,7 @@ def index(req):
             hashed = misctools.getEnv( id +"_pwd", bVerbose = 1 ) # generate by hashed = bcrypt.hashpw(password, bcrypt.gensalt())
             # hashed = bcrypt.hashpw( password_test.encode("utf-8"), bcrypt.gensalt()); print( "DBG: un bon hashage pour cet id pourrait etre: '%s'" % hashed )
             print( "DBG: index: id: '%s', password_test: '%s', hashed: '%s'" % (id,password_test,hashed) )
-            if bcrypt.checkpw(password_test.encode("utf-8"), hashed):
+            if bcrypt.checkpw( password_test.encode("utf-8"), hashed.encode("utf-8") ):
                 return send_json(scan())
         
     print( "DBG: access denied!" )

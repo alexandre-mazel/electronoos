@@ -1,6 +1,7 @@
 
 """
-Un service qui ecoute sur un port et analyse des images serieusement
+Un service qui ecoute sur un port et analyse des images serieusement.
+A faire avant: lancer le venv tts_local (oui c'est moche)
 
 """
 

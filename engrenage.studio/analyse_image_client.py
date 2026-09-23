@@ -2,7 +2,7 @@ import cv2
 import requests
 
 
-def send_image_to_analyse( filename_img, lang = "en" ):
+def send_image_to_analyse( filename_img, user_id = "test, lang = "en" ):
     print( "\nINF: analyse_image_client: send_image_to_analyse..." )
 
     # Non c'est le binaire tel quel qu'il faut envoyer
@@ -20,7 +20,7 @@ def send_image_to_analyse( filename_img, lang = "en" ):
     
     headers = {
         "X-Image-Filename": filename_img,
-        "X-User-Id": "tester",
+        "X-User-Id": user_id,
         "Lang": lang,
         "Content-Type": "application/octet-stream",
     }

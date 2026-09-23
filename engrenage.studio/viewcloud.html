@@ -478,8 +478,8 @@ const pageSize = 20;
 
 function sortByDate( pictureslist )
 {
-    console.log( pictureslist[0] )
-    return pictureslist
+// sort sur le champ date
+    return pictureslist.sort( (a, b) => b.date >a.date) );
 }
 
 async function loadMedia(){
@@ -494,6 +494,17 @@ async function loadMedia(){
     console.log( "Response:", response )
 
     mediaFiles = await response.json();
+    
+    /*
+        Format d'un mediaFile:
+            - date: "2023-03-11T21:01:03"
+            - folder: "/home/na/dev/git/electronoos/engrenage.studio/files/alex/A52s/internal/bech oct 21"
+            - name: "IMG_2046.JPEG"
+            - size: 1507464
+            - thumbnail: "/files/../thumb/alex/A52s/internal/bech%20oct%2021/IMG_2046.jpg"
+            - type: "image"
+            - url: "/files/alex/A52s/internal/bech%20oct%2021/IMG_2046.JPEG" 
+    */
     
     mediaFiles.files = sortByDate( mediaFiles.files )
     

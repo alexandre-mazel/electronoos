@@ -72,7 +72,7 @@ if gbUseTTS:
 import test_whisper
 whisp = test_whisper.Whisper()
 
-# pourquoi j'ai pas ajouté ca ?!? # a tester! TODO
+# pourquoi j'ai pas ajoute ca ?!? # a tester! TODO
 #~ whisp.add_initial_prompt( "on parle de chirurgie estethique du cheveux par exemple: greffe des cheveux, et FUE." )
 #~ whisp.add_hotwords( "assis toi!", "debout!" )
 

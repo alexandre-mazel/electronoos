@@ -264,6 +264,13 @@ class TchatUser:
             if len(self.context) > 16:
                 self.context = self.context[-16:] # selon les modeles et les discussion, le but c'est de pas exploser le contexte...
                 
+        # une fois il m'a retourne un think, donc on le vire
+        end_think = "</think>"
+        idx = res.find( end_think )
+        if idx != -1:
+            print( "WRN: removing a think session in: %s" % str(res) )
+            res = res[idx+len(end_think):]
+            
                 
         return res
 

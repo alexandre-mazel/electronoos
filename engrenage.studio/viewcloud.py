@@ -291,11 +291,13 @@ def index(req):
             if bcrypt.checkpw( password_test.encode("utf-8"), hashed.encode("utf-8") ):
                 return send_json(scan())
         
-    print( "DBG: access denied!" )
+        strError = "access denied"
+    else:
+        strError = "unknown command"
 
     return send_json({
         "success": False,
-        "error": "unknown command"
+        "error": strError
     })
 
 

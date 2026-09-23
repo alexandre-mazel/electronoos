@@ -13,7 +13,22 @@ ROOT_DIR = "/home/pi/media"
 ROOT_DIR = "/home/na/dev/git/electronoos/engrenage.studio/files/"
 URL_PREFIX = "/files/"
 
-sys.path.append( "../../electronoos/alex_pytools" )
+def getElectronoosPath():
+    if os.name == "nt":
+        strElectroPath = "C:/Users/"+os.getlogin()+"/dev/git/electronoos/"
+        if not os.path.isdir(strElectroPath):
+            strElectroPath = "c:/dev/git/electronoos/"
+    else:
+        if os.path.expanduser("~") == "/var/www": # from modpython
+            strElectroPath = os.path.expanduser("/home/na/dev/git/electronoos/")
+        else:
+            if os.geteuid() == 0:
+                strElectroPath = os.path.expanduser("/home/na/dev/git/electronoos/") # when started in root
+            else:
+                strElectroPath = os.path.expanduser("~/dev/git/electronoos/")
+    return strElectroPath
+        
+sys.path.append( getElectronoosPath()+"alex_pytools/" )
 import misctools
 
 

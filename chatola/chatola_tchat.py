@@ -132,6 +132,9 @@ strModel = "qwen3:8B" # 2s 6.2GB 100%gpu, rapide car pas de thinking, par contre
 #~ strModel = "gemma3:4B" # pas trop long mais des merdouilette
 #~ strModel = "gemma3:12B" # 3-4s 9GB 25%cpu, plus long que qwen3:8B mais de bons résultats
 
+def remove_non_french_chars(text):
+    text = re.sub(r'[^A-Za-zÀ-ÖØ-öø-ÿ0-9\s.,;:!?\'"()\-]', '', text)
+    return text.strip()
 
 
 def get_time_stamp():
@@ -291,6 +294,8 @@ class TchatUser:
             print( "WRN: removing a think session in: %s" % str(res) )
             res = res[idx+len(end_think):]
             
+        #vire le japonais:
+        res = remove_non_french_chars(res)
                 
         return res
 

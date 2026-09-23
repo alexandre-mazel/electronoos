@@ -28,7 +28,8 @@ def getElectronoosPath():
                 strElectroPath = os.path.expanduser("~/dev/git/electronoos/")
     return strElectroPath
         
-sys.path.append( getElectronoosPath()+"alex_pytools/" )
+print("DBG: getElectronoosPath: returning '%s'" % getElectronoosPath() )
+sys.path.append( getElectronoosPath() + "alex_pytools/" )
 import misctools
 
 

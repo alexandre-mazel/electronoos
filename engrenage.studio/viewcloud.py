@@ -261,6 +261,7 @@ def index(req):
     
     
     dArgs = ( decode_param( req.args ) )
+    print( "DBG: index: dArgs: %s" % str(dArgs) )
     
     if req.args[:4] == "list":
         if  "id" in dArgs and "pwd" in dArgs:

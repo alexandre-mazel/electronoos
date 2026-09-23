@@ -111,6 +111,7 @@ import knowledge
 import http_chat
 import os
 import datetime
+import re
 import time
 
 

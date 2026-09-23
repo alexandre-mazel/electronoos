@@ -37,7 +37,7 @@ import unicodedata
 logdir = os.path.expanduser( "~/voices/" )
 
 import chatola_tchat
-from chatola_tchat import get_time_stamp
+from chatola_tchat import get_time_stamp, remove_non_french_chars
 import traceback
 
 def getHostName():
@@ -156,14 +156,18 @@ def receive_voice():
         
         recognised_text = recognised_text.strip()
         
+        # des fois whisper renvoir des trucs en japonais ! genre: アーティー (en utf8)
+        recognised_text = remove_non_french_chars( recognised_text )
+        
         if recognised_text != "":
             newfilename = filename.replace( ".wav", "__" + clean_txt_for_filename(recognised_text) + ".wav" )
             os.rename( filename, newfilename )
         
         ret = ""
         debug_msg = ""
+
         
-        if is_hallucination(recognised_text):
+        if is_hallucination(recognised_text) or recognised_text == "":
             ret = "?"
         else:
             if 1:

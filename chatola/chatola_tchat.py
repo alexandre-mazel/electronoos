@@ -295,8 +295,8 @@ class TchatUser:
             print( "WRN: removing a think session in: %s" % str(res) )
             res = res[idx+len(end_think):]
             
-        #vire le japonais:
-        res = remove_non_french_chars(res)
+        # vire les chars foireux (quoi que c'est juste dans l'asr en fait)
+        #~ res = remove_non_french_chars(res)
                 
         return res
 

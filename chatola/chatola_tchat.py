@@ -139,7 +139,7 @@ def get_time_stamp():
     
 def get_day_and_time():
     day = datetime.datetime.now().strftime( "%d %m %Y" )
-    hour = datetime.datetime.now().strftime( "Hh heures %Mm%" )
+    hour = datetime.datetime.now().strftime( "%Hh heures %Mm" )
     return day,hour
 
 class TchatUser:    

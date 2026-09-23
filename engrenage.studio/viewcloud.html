@@ -511,6 +511,14 @@ async function loadMedia(){
     */
     
     console.log( "mediaFiles:", mediaFiles )
+    console.log("pipi")
+    console.log(Object.getPrototypeOf(mediaFiles));
+    
+    if ( Object.prototype.hasOwnProperty.call( mediaFiles, "error" ) )
+    {
+        document.getElementById("loading_container").textContent = "ERR:" + mediaFiles.error;
+        return;
+    }
     
     mediaFiles.files = sortByDate( mediaFiles.files )
     
@@ -519,16 +527,7 @@ async function loadMedia(){
     
     console.log( "mediaFiles:", mediaFiles )
     
-    console.log("pipi")
-    
-    console.log(Object.getPrototypeOf(mediaFiles));
 
-    
-    if ( Object.prototype.hasOwnProperty.call( mediaFiles, "error" ) )
-    {
-        document.getElementById("loading_container").textContent = "ERR:" + mediaFiles.error;
-        return;
-    }
     
 
     document.getElementById("stats_files_value").textContent = mediaFiles.count;

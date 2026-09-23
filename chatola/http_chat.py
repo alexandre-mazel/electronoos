@@ -36,12 +36,12 @@ def ask_ollama_http( model, messages, strHost = "localhost", port = OLLAMA_PORT 
         "think": False, # pour qwen c'est important
           "options": 
             {
-                "temperature": 0.001,   # 0 = deterministe, 1 = plus aleatoire (ne pas mettre 0.1 car deja ca le fait delirer) # 0.001 pour eviter les repetitions aussi
+                "temperature": 0.003,   # 0 = deterministe, 1 = plus aleatoire (ne pas mettre 0.1 car deja ca le fait delirer) # 0.001 pour eviter les repetitions aussi
                 "seed": 42,              # pour reproductibilite
                 #~ "max_tokens": 3        # nombre maximum de tokens a generer (not working?)
                 "thinking": 0, # ne semble pas etre la bonne option
                 "repeat_last_n": 128, # combien de tokens récents sont examinés pour détecter les répétitions.
-                "repeat_penalty": 1.15, # à quel point le modèle est pénalisé lorsqu'il réutilise ces tokens. (defaut 1.1)
+                "repeat_penalty": 1.2, # à quel point le modèle est pénalisé lorsqu'il réutilise ces tokens. (defaut 1.1)
             }
     }
 

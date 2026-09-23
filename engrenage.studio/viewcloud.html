@@ -519,7 +519,10 @@ async function loadMedia(){
     
     console.log( "mediaFiles:", mediaFiles )
     
-    if ( Object.prototype.hasOwnProperty.call(mediaFiles, "error") )
+    console.log(Object.getPrototypeOf(mediaFiles));
+
+    
+    if ( Object.prototype.hasOwnProperty.call( mediaFiles, "error" ) )
     {
         document.getElementById("loading_container").textContent = "ERR:" + mediaFiles.error;
         return;

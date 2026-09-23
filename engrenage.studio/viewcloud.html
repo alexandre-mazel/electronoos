@@ -476,6 +476,12 @@ let filteredFiles = [];
 let currentIndex = 0;
 const pageSize = 20;
 
+function sortByDate( pictureslist )
+{
+    console.log( pictureslist[0] )
+    return pictureslist
+}
+
 async function loadMedia(){
 
 
@@ -488,6 +494,8 @@ async function loadMedia(){
     console.log( "Response:", response )
 
     mediaFiles = await response.json();
+    
+    mediaFiles.files = sortByDate( mediaFiles.files )
     
     filteredFiles = mediaFiles.files;
     document.getElementById("stats_files_found_box").classList.add("hidden")

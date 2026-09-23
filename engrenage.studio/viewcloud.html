@@ -518,6 +518,13 @@ async function loadMedia(){
     document.getElementById("stats_files_found_box").classList.add("hidden")
     
     console.log( "mediaFiles:", mediaFiles )
+    
+    if ("error" in mediaFiles )
+    {
+        document.getElementById("loading_container").textContent = "ERR:" + mediaFiles["error"];
+        return;
+    }
+    
 
     document.getElementById("stats_files_value").textContent = mediaFiles.count;
 

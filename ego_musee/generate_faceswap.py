@@ -8,9 +8,11 @@ from insightface.model_zoo import get_model
 mkdir -p models && wget -O models/inswapper_128.onnx https://github.com/deepinsight/insightface/releases/download/model-zoo/inswapper_128.onnx
 
 syntaxe:
-python generate_faceswap.py painting.jpg visitor.jpg -n 1 -o result.png
+python generate_faceswap.py painting.jpg visitor.jpg -n 1 -o result.jpg
 
 scp a@192.168.0.45:/home/a/dev/git/electronoos/ego_musee/result.png \tmp
+
+Ca rocks serieux, et on peut cascader en reutilisant la sortie comme ref d'entree
 """
 
 

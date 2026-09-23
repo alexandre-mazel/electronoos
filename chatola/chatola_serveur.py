@@ -25,7 +25,7 @@ scp a@192.168.0.45:/home/a/voices/* d:\voices\
 https://engrenage.studio/eng_index.py?wake=champion1
 
 PB actuel:
-si il comprend rien ou ... il répond en boucle la meme chose: d'accord je t'attend n"hésites pas si tu as besoin de qqchose.
+si il comprend rien ou ... il repond en boucle la meme chose: d'accord je t'attend n"hesites pas si tu as besoin de qqchose.
 """
 
 from flask import Flask, request, send_file # sudo apt install python3-flask ou en venv: pip install flask

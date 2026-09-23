@@ -283,11 +283,10 @@ def index(req):
     if req.args[:4] == "list":
         if  "id" in dArgs and "pwd" in dArgs:
             id = dArgs["id"]
-            pwd = dArgs["pwd"]
-            pwdmd = misctools.getEnv( id +"_pwdmd" )
-            computedpwdmd = bcrypt.hashpw( pwd )
-            print( "DBG: index: id: '%s', pwd: '%s', computedpwdmd: '%s' compared to '%s'" % (id,pwd,computedpwdmd,pwdmd) )
-            if pwdmd == computedpwdmd:
+            password_test = dArgs["pwd"]
+            hashed = misctools.getEnv( id +"_pwdmd" ) #generate by hashed = bcrypt.hashpw(password, bcrypt.gensalt())
+            print( "DBG: index: id: '%s', password_test: '%s', hashed: '%s'" % (id,password_test,hashed) )
+            if bcrypt.checkpw(password_test, hashed):
                 return send_json(scan())
         
     print( "DBG: access denied!" )

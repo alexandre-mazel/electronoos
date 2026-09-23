@@ -45,8 +45,11 @@ def send_image_to_analyse( filename_img, user_id = "test", lang = "en" ):
     }
 
     url = "https://engrenage.studio:45003/anaimg"
-    response = requests.post( url, data=image_bytes, headers=headers )
-
+    try:
+        response = requests.post( url, data=image_bytes, headers=headers )
+    except requests.exceptions.ConnectionError as err:
+        print( "ERR: in requests.post: error: %s" % str(err) )
+        return emptyret
 
     if response.status_code != 200:
         print("ERREUR SERVEUR:", response.status_code)

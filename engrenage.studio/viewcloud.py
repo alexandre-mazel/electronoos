@@ -247,10 +247,10 @@ def scan(nNbrMaxThumbNailToGenerate=6):
         "files": files
     }
 
-def decode_param( url ):
+def decode_param( query ):
     dict_params = {
         k: v[0]
-        for k, v in urllib.parse.parse_qs(urllib.parse.urlparse(url).query).items()
+        for k, v in urllib.parse.parse_qs(query).items()
     }
     
     return dict_params

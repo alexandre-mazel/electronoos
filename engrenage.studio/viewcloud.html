@@ -516,7 +516,7 @@ async function loadMedia(){
     
     if ( Object.prototype.hasOwnProperty.call( mediaFiles, "error" ) )
     {
-        document.getElementById("loading_container").textContent = "ERR:" + mediaFiles.error;
+        document.getElementById("loading_container").textContent = "ERR: " + mediaFiles.error;
         return;
     }
     

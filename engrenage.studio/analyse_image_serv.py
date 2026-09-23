@@ -57,7 +57,7 @@ def extract_infos_from_img( img_raw, filename, user_id, lang = "fr" ):
     sys.path.append( "../../face_tools/")
     import facerecognizer3
     import analyse_face_cuda
-    analyse_face_cuda.getInsightApp() # force le chargement sinon quand on voudra le charger y aura plus de place en mémoire (alors que ollama peut charger en mix si quand il arrive il y a moins)
+    analyse_face_cuda.getInsightApp() # force le chargement sinon quand on voudra le charger y aura plus de place en memoire (alors que ollama peut charger en mix si quand il arrive il y a moins)
     
     peoples = []
         

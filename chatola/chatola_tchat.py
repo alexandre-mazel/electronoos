@@ -172,7 +172,7 @@ class TchatUser:
             consigne.append( {"role":"system","content":"Si on te demande un restaurant dans le coin (on est dans le 16ieme arrt de paris), tu peux parler de Ragazzi 2.0 au 83 rue de Longchamp ou La matta au 23 rue de l'annonciation"} )
             
         # todo: ajouter date et heure
-        day,hour = get_day_and_time
+        day,hour = get_day_and_time()
         hour_content = "Nous sommes actuellement le %s et il est %s." % (day,hour)
         consigne.append( {"role":"system", "content": hour_content } )
         

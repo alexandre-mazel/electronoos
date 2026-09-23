@@ -77,7 +77,7 @@ def test():
     #~ names = names[-2:]
     for name in names:
         fn = template % name
-        ret = send_image_to_analyse( fn, "fr" ) # bizarrement le 2ieme foire des fois quand le client est sur PC avec une liste de mot cle infini avec "seance de photos", "seance de photos", "seance de photos", ... => relancer avec une autre seed si trop pourri.
+        ret = send_image_to_analyse( fn, lang = "fr" ) # bizarrement le 2ieme foire des fois quand le client est sur PC avec une liste de mot cle infini avec "seance de photos", "seance de photos", "seance de photos", ... => relancer avec une autre seed si trop pourri.
         #~ print( "ret: %s" % ret )
         if 1:
             im = cv2.imread( fn )

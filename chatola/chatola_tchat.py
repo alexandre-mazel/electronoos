@@ -136,6 +136,11 @@ strModel = "qwen3:8B" # 2s 6.2GB 100%gpu, rapide car pas de thinking, par contre
 
 def get_time_stamp():
     return datetime.datetime.now().strftime( "%Y-%m-%d %Hh%Mm%Ss" )
+    
+def get_day_and_time():
+    day = datetime.datetime.now().strftime( "%d %m %Y" )
+    hour = datetime.datetime.now().strftime( "Hh heures %Mm%" )
+    return day,hour
 
 class TchatUser:    
     def __init__( self, user_id, firstname = "", name = "" ):
@@ -167,6 +172,8 @@ class TchatUser:
             consigne.append( {"role":"system","content":"Si on te demande un restaurant dans le coin (on est dans le 16ieme arrt de paris), tu peux parler de Ragazzi 2.0 au 83 rue de Longchamp ou La matta au 23 rue de l'annonciation"} )
             
         # todo: ajouter date et heure
+        day,hour = get_day_and_time
+        consigne.append( {"role":"system", "Nous sommes le %s et il est %s" % (day,hour) }
         
         return consigne
         

@@ -13,6 +13,8 @@ python generate_faceswap.py painting.jpg visitor.jpg -n 1 -o result.jpg
 scp a@192.168.0.45:/home/a/dev/git/electronoos/ego_musee/result.png \tmp
 
 Ca rocks serieux, et on peut cascader en reutilisant la sortie comme ref d'entree
+
+A faire avant: lancer le venv de ce dossier
 """
 
 

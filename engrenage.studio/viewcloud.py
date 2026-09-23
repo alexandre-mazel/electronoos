@@ -13,6 +13,9 @@ ROOT_DIR = "/home/pi/media"
 ROOT_DIR = "/home/na/dev/git/electronoos/engrenage.studio/files/"
 URL_PREFIX = "/files/"
 
+sys.path.append( "../../alex_pytools" )
+import misctools
+
 
 IMAGE_EXT = {
     ".jpg",
@@ -228,6 +231,13 @@ def scan(nNbrMaxThumbNailToGenerate=6):
         "files": files
     }
 
+def decode_param( query )
+    dict_params = {
+        k: v[0]
+        for k, v in urllib.parseparse_qs(urllib.parse.urlparse(url).query).items()
+    }
+    
+    return dict_params
 
 def send_json(obj):
 
@@ -242,6 +252,7 @@ def send_json(obj):
 
 
 def index(req):
+    # format: list?id=nom&pwd=lemotdepasse
 
     qs = os.environ.get("QUERY_STRING", "")
     
@@ -249,9 +260,17 @@ def index(req):
     print("DBG: viewcloud.py.index: req.args: '%s'" % req.args )
     
     
-
-    if req.args == "list&pwd=alex":        
-        return send_json(scan())
+    dArgs = ( decode_param( req.args ) )
+    
+    if req.args[:4] == "list":
+        if  "id" in dArgs and "pwd" in dArgs:
+            id = dArgs["id"]
+            pwd = dArgs["pwd"]
+            pwdmd = misctools.getEnv( id +"_pwdmd" )
+            computedpwdmd = md5( pwd )
+            print( "DBG: index: id: '%s', pwd: '%s', computedpwdmd: '%s' compared to '%s'" % (id,pwd,computedpwdmd,pwdmd) )
+            if pwdmd == computedpwdmd:
+                return send_json(scan())
         
     print( "DBG: access denied!" )
 

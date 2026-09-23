@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import bcrypt
 import os
 import sys
 import json
@@ -284,7 +285,7 @@ def index(req):
             id = dArgs["id"]
             pwd = dArgs["pwd"]
             pwdmd = misctools.getEnv( id +"_pwdmd" )
-            computedpwdmd = md5( pwd )
+            computedpwdmd = bcrypt.hashpw( pwd )
             print( "DBG: index: id: '%s', pwd: '%s', computedpwdmd: '%s' compared to '%s'" % (id,pwd,computedpwdmd,pwdmd) )
             if pwdmd == computedpwdmd:
                 return send_json(scan())

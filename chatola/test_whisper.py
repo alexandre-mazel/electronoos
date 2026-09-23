@@ -63,6 +63,7 @@ class Whisper:
         print( "info:", info )
         print( "segments: ", segments )
         if 0:
+            # attention cette boucle bouffe le generateur est apres on peut plus recuperer le texte!
             for segment in segments:
                 print(
                     f"[{segment.start:.2f} -> {segment.end:.2f}] "

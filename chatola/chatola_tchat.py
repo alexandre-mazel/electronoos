@@ -111,6 +111,7 @@ import knowledge
 import http_chat
 import os
 import datetime
+import time
 
 
 
@@ -145,6 +146,9 @@ class TchatUser:
         self.firstname = firstname
         self.name = name
         self.context = [] # a list of sentence sent to tchatter
+        
+        self.time_last_question = time.time()
+        
         self.consigne = self.getConsignList()
 
         self.prev_kdb = []
@@ -184,6 +188,14 @@ class TchatUser:
         #~ res = response["message"]["content"]
         
         print( "DBG: TchatUser.getAns: name: %s, context:\n%s" % (self.user_id,self.context) )
+        
+
+        # ne pas redonner le context si c'est trop loin dans le temps (pour des patients, sujets sensible...)
+        if self.user_id == "nao" and time.time() - self.time_last_question > 5*60:
+            print( "WRN: Je kille le context par soucis de confidentialite..." )
+            self.context = []
+            
+        self.time_last_question = time.time()
         
         msg = msg.strip()
         
@@ -253,7 +265,7 @@ class TchatUser:
         print( "apres doublons: prompt: %d" % len(prompt) )
         
         prompt.extend(self.consigne)
-
+        
         prompt.extend(self.context[:])
 
         res = http_chat.ask_ollama_http( strModel, prompt )

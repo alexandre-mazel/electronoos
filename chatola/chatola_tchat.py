@@ -264,7 +264,7 @@ class TchatUser:
         
         print( "apres doublons: prompt: %d" % len(prompt) )
         
-        prompt.extend(getConsignList())
+        prompt.extend( self.getConsignList() )
         
         prompt.extend(self.context[:])
 

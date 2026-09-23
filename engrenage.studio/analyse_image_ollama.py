@@ -230,7 +230,7 @@ If the text is visually ambiguous, make your best reading and stop.
 
 
 def main():
-    strModel = "qwen2.5vl:7b" # qwen2.5vl:7b    5ced39dfa4ba    5.9 GB    100% GPU     8192
+    strModel = "qwen2.5vl:7b" # qwen2.5vl:7b    5ced39dfa4ba    5.9 GB    100% GPU     8192 5.9 ca fait 8.4 dans la ram avec ollama, auquel tu peux ajouter 1.4 d'analyse de visage... c'est un peu juste.
     # fonctionne tres bien et reproductible et format bien maintenu, parfait!
     
     

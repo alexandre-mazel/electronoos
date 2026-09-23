@@ -51,7 +51,7 @@ def send_image_to_analyse( filename_img, user_id = "test", lang = "en" ):
     if response.status_code != 200:
         print("ERREUR SERVEUR:", response.status_code)
         print(response.text)
-        return
+        return emptyret
 
     result = response.json()
     

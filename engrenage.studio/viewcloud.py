@@ -13,7 +13,7 @@ ROOT_DIR = "/home/pi/media"
 ROOT_DIR = "/home/na/dev/git/electronoos/engrenage.studio/files/"
 URL_PREFIX = "/files/"
 
-sys.path.append( "../../alex_pytools" )
+sys.path.append( "../alex_pytools" )
 import misctools
 
 

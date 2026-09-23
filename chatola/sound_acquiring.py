@@ -12,6 +12,7 @@ pip install sounddevice
 import base64
 import json
 import os
+import sys
 import time
 
 
@@ -40,7 +41,7 @@ def send_audio(filename, user_id="tester_audio"):
     with open( filename, "rb" ) as f:
         audio_data = f.read()
 
-    conn = http.client.HTTPSConnection( "engrenage.studio", 45001 )
+    conn = http.client.HTTPConnection( "engrenage.studio", 45001 ) # selon le serveur https ou http, changer ici
 
     conn.request(
         "POST",
@@ -91,9 +92,11 @@ def send_audio(filename, user_id="tester_audio"):
         
         answer = data["ans"]
 
-        # que si python2
-        if isinstance( answer, unicode ):
-            answer_utf8 = answer.encode("utf-8")
+        if sys.version_info[0] == 2:
+            if isinstance( answer, unicode ):
+                answer_utf8 = answer.encode("utf-8")
+            else:
+                answer_utf8 = answer
         else:
             answer_utf8 = answer
             
@@ -103,6 +106,8 @@ def send_audio(filename, user_id="tester_audio"):
 
 
 def main():
+    import sounddevice
+    
     print( "INF: Main: Starting acquiring..." )
     
     import audio_analyser
@@ -110,8 +115,6 @@ def main():
     analyser = audio_analyser.AudioAnalyser( sample_rate = SAMPLE_RATE, channels = CHANNELS, sample_width = 2 )
 
     def audio_callback( indata, frames, time_info, status ):
-        import sounddevice
-
 
         if status:
             print( status )

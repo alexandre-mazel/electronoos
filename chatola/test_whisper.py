@@ -62,7 +62,7 @@ class Whisper:
         print( "processing duration: %.3fs" % (duration) )
         print( "info:", info )
         print( "segments: ", segments )
-        if 1:
+        if 0:
             for segment in segments:
                 print(
                     f"[{segment.start:.2f} -> {segment.end:.2f}] "

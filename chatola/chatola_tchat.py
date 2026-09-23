@@ -173,7 +173,7 @@ class TchatUser:
             
         # todo: ajouter date et heure
         day,hour = get_day_and_time
-        consigne.append( {"role":"system", "Nous sommes le %s et il est %s" % (day,hour) }
+        consigne.append( {"role":"system", "content":"Nous sommes le %s et il est %s" % (day,hour) }
         
         return consigne
         

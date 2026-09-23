@@ -1,8 +1,13 @@
 import cv2
+import numpy as np
 import requests
 
 
 def send_image_to_analyse( filename_img, lang = "en" ):
+    """
+    return a desc and list of keywords, text and peoples
+    """
+    emptyret = None,[],[],[]
     print( "\nINF: analyse_image_client: send_image_to_analyse..." )
 
     # Non c'est le binaire tel quel qu'il faut envoyer
@@ -10,12 +15,25 @@ def send_image_to_analyse( filename_img, lang = "en" ):
         image_bytes = cv2.imread( filename_img )
         if image_bytes is None:
             print( "ERR: send_image_to_analyse: can't open '%s'" % filename_img )
-            return 
+            return emptyret
         success, encoded = cv2.imencode(".jpg", image_bytes)  # ou alors le reencoder en jpg, mais c'est dommage
     
     with open( filename_img, "rb" ) as f:
         image_bytes = f.read()
         
+    if 1:
+        # check size
+        if len(image_bytes) < 40:
+            print( "ERR: send_image_to_analyse: img looks quite empty (size:%d)" % len(image_bytes) )
+            return emptyret
+            
+            
+        # check it's an image
+        img = cv2.imdecode(np.frombuffer(image_bytes, dtype=np.uint8), cv2.IMREAD_COLOR )
+        if img is None:
+            print( "ERR: send_image_to_analyse: img isn't an image" )
+            return emptyret
+            
 
     
     headers = {
@@ -48,6 +66,7 @@ def send_image_to_analyse( filename_img, lang = "en" ):
     print( "keywords: %s" % keywords )
     print( "text: %s" % text )
     print( "peoples: %s" % peoples )
+    return description, keywords, text, peoples
     
     
 def test():

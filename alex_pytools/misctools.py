@@ -187,7 +187,7 @@ def getEnv(strName, strDefault = None, bVerbose = 0 ):
         return dLocal1[strName]
     except KeyError as err:
         pass
-    dLocal2 = loadLocalEnv(os.environ['USERPROFILE']+os.sep+".env",bVerbose=bVerbose) # from user dir
+    dLocal2 = loadLocalEnv(os.path.expanduser("~") + os.sep + ".env",bVerbose=bVerbose) # from user dir (attention si c'est root ca fait /root/.env, c'est moche)
     try:
         return dLocal2[strName]
     except KeyError as err:

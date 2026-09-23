@@ -110,12 +110,12 @@
             color:white;
             opacity:0;
             transition:.25s;
-            padding:22px;
+            padding: 10px 22px;
             display:flex;
             flex-direction:column;
             justify-content:center;
             gap:10px;
-            font-size:18px;
+            font-size:10px;
         }
 
         .media_card:hover .media_overlay{
@@ -418,8 +418,8 @@
     </div>
     
     <div id="viewer_overlay">
-        <button id="viewer_close">×</button>
-        <button id="viewer_prev">‹</button>
+        <button id="viewer_close">&#x00D7;</button>
+        <button id="viewer_prev">&#x2039;</button>
         <div id="viewer_content">
             <img id="viewer_image">
             <video id="viewer_video" controls></video>
@@ -429,7 +429,7 @@
             </div>
             <div id="viewer_counter"></div>
         </div>
-        <button id="viewer_next">›</button>
+        <button id="viewer_next">&#x203A;</button>
     </div>
 
 <script>
@@ -439,7 +439,7 @@ const language = navigator.language.toLowerCase().startsWith("fr") ? "fr" : "en"
 const text = {
 
     fr:{
-        title:"Galerie média",
+        title:"Galerie",
         files:"Fichiers",
         filesfound:"Fichier(s) trouvÃ©((s)",
         size:"Taille totale",
@@ -451,7 +451,7 @@ const text = {
     },
 
     en:{
-        title:"Media Gallery",
+        title:"Gallery",
         files:"Files",
         filesfound:"Found File(s)",
         size:"Total size",
@@ -476,23 +476,58 @@ let filteredFiles = [];
 let currentIndex = 0;
 const pageSize = 20;
 
+function sortByDate( pictureslist )
+{
+// sort sur le champ date
+    return pictureslist.sort( (a, b) => b.date > a.date);
+}
+
 async function loadMedia(){
 
 
     const params = new URLSearchParams(window.location.search);
 
+    const id = params.get("id") || "";
     const pwd = params.get("pwd") || "";
+    
+    let addr = "/viewcloud.py?list&id=" + encodeURIComponent(id);
+    addr += "&pwd=" + encodeURIComponent(pwd);
 
-    const response = await fetch( "/viewcloud.py?list&pwd=" + encodeURIComponent(pwd) );
+    const response = await fetch( addr );
     
     console.log( "Response:", response )
 
     mediaFiles = await response.json();
     
+    /*
+        Format d'un mediaFile:
+            - date: "2023-03-11T21:01:03"
+            - folder: "/home/na/dev/git/electronoos/engrenage.studio/files/alex/A52s/internal/bech oct 21"
+            - name: "IMG_2046.JPEG"
+            - size: 1507464
+            - thumbnail: "/files/../thumb/alex/A52s/internal/bech%20oct%2021/IMG_2046.jpg"
+            - type: "image"
+            - url: "/files/alex/A52s/internal/bech%20oct%2021/IMG_2046.JPEG" 
+    */
+    
+    console.log( "mediaFiles:", mediaFiles )
+//~     console.log(Object.getPrototypeOf(mediaFiles));
+    
+    if ( Object.prototype.hasOwnProperty.call( mediaFiles, "error" ) )
+    {
+        document.getElementById("loading_container").textContent = "ERR: " + mediaFiles.error;
+        return;
+    }
+    
+    mediaFiles.files = sortByDate( mediaFiles.files )
+    
     filteredFiles = mediaFiles.files;
     document.getElementById("stats_files_found_box").classList.add("hidden")
     
     console.log( "mediaFiles:", mediaFiles )
+    
+
+    
 
     document.getElementById("stats_files_value").textContent = mediaFiles.count;
 

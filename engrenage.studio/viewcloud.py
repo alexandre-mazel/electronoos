@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import bcrypt
 import os
 import sys
 import json
@@ -12,6 +13,25 @@ import time
 ROOT_DIR = "/home/pi/media"
 ROOT_DIR = "/home/na/dev/git/electronoos/engrenage.studio/files/"
 URL_PREFIX = "/files/"
+
+def getElectronoosPath():
+    if os.name == "nt":
+        strElectroPath = "C:/Users/"+os.getlogin()+"/dev/git/electronoos/"
+        if not os.path.isdir(strElectroPath):
+            strElectroPath = "c:/dev/git/electronoos/"
+    else:
+        if os.path.expanduser("~") == "/var/www": # from modpython
+            strElectroPath = os.path.expanduser("/home/na/dev/git/electronoos/")
+        else:
+            if os.geteuid() == 0:
+                strElectroPath = os.path.expanduser("/home/na/dev/git/electronoos/") # when started in root
+            else:
+                strElectroPath = os.path.expanduser("~/dev/git/electronoos/")
+    return strElectroPath
+        
+print("DBG: getElectronoosPath: returning '%s'" % getElectronoosPath() )
+sys.path.append( getElectronoosPath() + "alex_pytools/" )
+import misctools
 
 
 IMAGE_EXT = {
@@ -228,6 +248,13 @@ def scan(nNbrMaxThumbNailToGenerate=6):
         "files": files
     }
 
+def decode_param( query ):
+    dict_params = {
+        k: v[0]
+        for k, v in urllib.parse.parse_qs(query).items()
+    }
+    
+    return dict_params
 
 def send_json(obj):
 
@@ -242,6 +269,7 @@ def send_json(obj):
 
 
 def index(req):
+    # format: list?id=nom&pwd=lemotdepasse
 
     qs = os.environ.get("QUERY_STRING", "")
     
@@ -249,15 +277,27 @@ def index(req):
     print("DBG: viewcloud.py.index: req.args: '%s'" % req.args )
     
     
-
-    if req.args == "list&pwd=alex":        
-        return send_json(scan())
+    dArgs = ( decode_param( req.args ) )
+    print( "DBG: index: dArgs: %s" % str(dArgs) )
+    
+    if req.args[:4] == "list":
+        if  "id" in dArgs and "pwd" in dArgs:
+            id = dArgs["id"]
+            password_test = dArgs["pwd"]
+            print( "DBG: index: id: '%s', password_test: '%s'" % (id,password_test) )
+            hashed = misctools.getEnv( id +"_pwd", bVerbose = 1 ) # generate by hashed = bcrypt.hashpw(password, bcrypt.gensalt())
+            # hashed = bcrypt.hashpw( password_test.encode("utf-8"), bcrypt.gensalt()); print( "DBG: un bon hashage pour cet id pourrait etre: '%s'" % hashed )
+            print( "DBG: index: id: '%s', password_test: '%s', hashed: '%s'" % (id,password_test,hashed) )
+            if bcrypt.checkpw( password_test.encode("utf-8"), hashed.encode("utf-8") ):
+                return send_json(scan())
         
-    print( "DBG: access denied!" )
+        strError = "access denied"
+    else:
+        strError = "unknown command"
 
     return send_json({
         "success": False,
-        "error": "unknown command"
+        "error": strError
     })
 
 

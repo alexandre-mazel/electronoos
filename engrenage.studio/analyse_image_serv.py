@@ -128,6 +128,8 @@ CORRECT : "Gaia est assise à une table avec des livres."
     keywords = result["keywords"]
     text = result["text"]
     
+    keywords = list(dict.fromkeys(keywords)) # remove duplicate but keep order
+    
     return description, keywords, text, peoples
 
 

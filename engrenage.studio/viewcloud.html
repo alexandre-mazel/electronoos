@@ -491,7 +491,7 @@ async function loadMedia(){
     const pwd = params.get("pwd") || "";
     
     let addr = "/viewcloud.py?list&id=" + encodeURIComponent(id);
-    let addr += "&pwd=" + encodeURIComponent(pwd);
+    addr += "&pwd=" + encodeURIComponent(pwd);
 
     const response = await fetch( addr );
     

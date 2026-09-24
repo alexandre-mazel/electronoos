@@ -58,6 +58,7 @@ def index( req ):
     receive ?id=toto&q=coucou
     """
     sys.path.append("../engrenage.studio")
+    sys.path.append("/home/na/dev/git/electronoos/engrenage.studio/")
     import viewcloud
     print("DBG: chatola_client.py.index: req.args: '%s'" % req.args )
 

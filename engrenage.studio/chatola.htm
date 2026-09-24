@@ -245,8 +245,8 @@
 <body>
     <main id="chat_app">
         <header id="chat_header">
-            <h1 id="chat_title">Computer</h1>
-            <div id="chat_status">Ready</div>
+            <h1 id="chat_title">Robot</h1>
+            <div id="chat_status">Mode clinic</div>
         </header>
 
         <section id="chat_messages" aria-live="polite">
@@ -280,16 +280,16 @@
     <script id="page_script">
         const language_data = {
             en: {
-                title: "Computer",
-                status: "Ready",
+                title: "Alma Robot",
+                status: "Clinic Mode",
                 thinking: "Thinking...",
                 placeholder: "Write a message...",
                 send: "Send",
                 initial: "Hello. How can I help you?"
             },
             fr: {
-                title: "Ordinateur",
-                status: "Prêt",
+                title: "Alma Robot",
+                status: "Mode clinique priv&eacute;e",
                 thinking: "En cours...",
                 placeholder: "Écrivez un message...",
                 send: "Envoyer",
@@ -316,20 +316,15 @@
             document.documentElement.lang = current_language;
             document.title = language.title;
 
-            document.getElementById("chat_title").textContent =
-                language.title;
+            document.getElementById("chat_title").textContent = language.title;
 
-            document.getElementById("chat_status").textContent =
-                language.status;
+            document.getElementById("chat_status").textContent = language.status;
 
-            document.getElementById("user_input").placeholder =
-                language.placeholder;
+            document.getElementById("user_input").placeholder = language.placeholder;
 
-            document.getElementById("send_button").textContent =
-                language.send;
+            document.getElementById("send_button").textContent = language.send;
 
-            document.getElementById("message_bubble_initial").textContent =
-                language.initial;
+            document.getElementById("message_bubble_initial").textContent = language.initial;
 
             set_message_metadata(
                 document.getElementById("message_bubble_initial"),

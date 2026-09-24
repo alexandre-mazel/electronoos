@@ -662,6 +662,7 @@
         }
 
         async function computer_process_input( computer_input ) {
+            console.log( "INF: computer_process_input: input:", computer_input )
             let response_text =
                 current_language === "fr"
                     ? "J'ai reçu votre message : " +
@@ -675,7 +676,7 @@
                 const id = "web"
                 const q = computer_input.message;
                 
-                let addr = "../chatola/chatola_client.py?id=" + encodeURIComponent(id);
+                let addr = "/chatola/chatola_client.py?id=" + encodeURIComponent(id);
                 addr += "&q=" + encodeURIComponent(q);
 
                 const response = await fetch( addr );

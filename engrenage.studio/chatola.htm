@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page_title">Computer Chat</title>
+    <style id="page_style">
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f4f4;
+            color: #171717;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #chat_app {
+            width: 100%;
+            max-width: 900px;
+            height: 100vh;
+            max-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+        }
+
+        #chat_header {
+            flex: 0 0 auto;
+            padding: 22px 24px;
+            border-bottom: 1px solid #dedede;
+            background: #ffffff;
+        }
+
+        #chat_title {
+            margin: 0;
+            font-size: clamp(24px, 5vw, 38px);
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        #chat_status {
+            margin-top: 5px;
+            color: #777777;
+            font-size: clamp(14px, 3vw, 17px);
+        }
+
+        #chat_messages {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            scroll-behavior: smooth;
+        }
+
+        #message_computer,
+        #message_user {
+            max-width: 78%;
+            padding: 15px 18px;
+            border-radius: 18px;
+            font-size: clamp(18px, 4vw, 25px);
+            line-height: 1.35;
+            overflow-wrap: anywhere;
+            white-space: pre-wrap;
+        }
+
+        #message_computer {
+            align-self: flex-start;
+            background: #e9e9e9;
+            border-bottom-left-radius: 5px;
+        }
+
+        #message_user {
+            align-self: flex-end;
+            background: #171717;
+            color: #ffffff;
+            border-bottom-right-radius: 5px;
+        }
+
+        #chat_input_area {
+            flex: 0 0 auto;
+            display: flex;
+            gap: 10px;
+            padding: 14px;
+            border-top: 1px solid #dedede;
+            background: #ffffff;
+        }
+
+        #user_input {
+            flex: 1;
+            min-width: 0;
+            min-height: 56px;
+            max-height: 180px;
+            resize: vertical;
+            border: 2px solid #cccccc;
+            border-radius: 14px;
+            padding: 12px 15px;
+            font-family: inherit;
+            font-size: 20px;
+            line-height: 1.3;
+            outline: none;
+        }
+
+        #user_input:focus {
+            border-color: #171717;
+        }
+
+        #send_button {
+            flex: 0 0 auto;
+            min-width: 90px;
+            border: 0;
+            border-radius: 14px;
+            background: #171717;
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 0 18px;
+        }
+
+        #send_button:hover {
+            background: #333333;
+        }
+
+        #send_button:active {
+            transform: scale(0.98);
+        }
+
+        @media (max-width: 600px) {
+            #chat_header {
+                padding: 17px 18px;
+            }
+
+            #chat_messages {
+                padding: 16px;
+            }
+
+            #message_computer,
+            #message_user {
+                max-width: 88%;
+                font-size: 19px;
+            }
+
+            #chat_input_area {
+                padding: 10px;
+            }
+
+            #send_button {
+                min-width: 70px;
+                padding: 0 12px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main id="chat_app">
+        <header id="chat_header">
+            <h1 id="chat_title">Computer</h1>
+            <div id="chat_status">Ready</div>
+        </header>
+
+        <section id="chat_messages" aria-live="polite">
+            <div id="message_computer">Hello. How can I help you?</div>
+        </section>
+
+        <form id="chat_input_area">
+            <textarea
+                id="user_input"
+                autocomplete="off"
+                spellcheck="true"
+                rows="1"
+                placeholder="Write a message..."
+            ></textarea>
+            <button id="send_button" type="submit">Send</button>
+        </form>
+    </main>
+
+    <script id="page_script">
+        const language_data = {
+            en: {
+                title: "Computer",
+                status: "Ready",
+                placeholder: "Write a message...",
+                send: "Send",
+                initial: "Hello. How can I help you?"
+            },
+            fr: {
+                title: "Ordinateur",
+                status: "Prêt",
+                placeholder: "Écrivez un message...",
+                send: "Envoyer",
+                initial: "Bonjour. Comment puis-je vous aider ?"
+            }
+        };
+
+        let current_language = "en";
+
+        function detect_language() {
+            const browser_language = (
+                navigator.language ||
+                navigator.userLanguage ||
+                "en"
+            ).toLowerCase();
+
+            current_language = browser_language.startsWith("fr") ? "fr" : "en";
+        }
+
+        function apply_language() {
+            const language = language_data[current_language];
+
+            document.documentElement.lang = current_language;
+            document.title = language.title;
+            document.getElementById("chat_title").textContent = language.title;
+            document.getElementById("chat_status").textContent = language.status;
+            document.getElementById("user_input").placeholder = language.placeholder;
+            document.getElementById("send_button").textContent = language.send;
+            document.getElementById("message_computer").textContent = language.initial;
+        }
+
+        function add_message(message_text, sender_type) {
+            const message_element = document.createElement("div");
+
+            message_element.id =
+                sender_type === "user"
+                    ? "message_user_" + Date.now()
+                    : "message_computer_" + Date.now();
+
+            message_element.textContent = message_text;
+
+            if (sender_type === "user") {
+                message_element.style.alignSelf = "flex-end";
+                message_element.style.background = "#171717";
+                message_element.style.color = "#ffffff";
+                message_element.style.borderBottomRightRadius = "5px";
+            } else {
+                message_element.style.alignSelf = "flex-start";
+                message_element.style.background = "#e9e9e9";
+                message_element.style.color = "#171717";
+                message_element.style.borderBottomLeftRadius = "5px";
+            }
+
+            message_element.style.maxWidth = "78%";
+            message_element.style.padding = "15px 18px";
+            message_element.style.borderRadius = "18px";
+            message_element.style.fontSize = "clamp(18px, 4vw, 25px)";
+            message_element.style.lineHeight = "1.35";
+            message_element.style.overflowWrap = "anywhere";
+            message_element.style.whiteSpace = "pre-wrap";
+
+            document.getElementById("chat_messages").appendChild(message_element);
+
+            message_element.scrollIntoView({
+                behavior: "smooth",
+                block: "end"
+            });
+
+            return message_element;
+        }
+
+        function add_user_message(message_text) {
+            return add_message(message_text, "user");
+        }
+
+        function add_computer_message(message_text) {
+            return add_message(message_text, "computer");
+        }
+
+        function prepare_computer_input(user_text) {
+            const computer_input = {
+                message: user_text,
+                language: current_language,
+                timestamp: new Date().toISOString()
+            };
+
+            return computer_input;
+        }
+
+        function receive_user_input(user_text) {
+            const clean_text = user_text.trim();
+
+            if (!clean_text) {
+                return null;
+            }
+
+            add_user_message(clean_text);
+
+            const computer_input = prepare_computer_input(clean_text);
+
+            document.getElementById("chat_status").textContent =
+                current_language === "fr" ? "En cours..." : "Thinking...";
+
+            return computer_input;
+        }
+
+        function answer_from_computer(computer_text) {
+            const clean_text = String(computer_text || "").trim();
+
+            if (!clean_text) {
+                return;
+            }
+
+            add_computer_message(clean_text);
+
+            document.getElementById("chat_status").textContent =
+                language_data[current_language].status;
+        }
+
+        function handle_user_message(user_text) {
+            const computer_input = receive_user_input(user_text);
+
+            if (!computer_input) {
+                return;
+            }
+
+            /*
+             * This is the point where the user's text is handed to the computer.
+             * Replace the following example with your real computer/API call.
+             */
+            computer_process_input(computer_input);
+        }
+
+        function computer_process_input(computer_input) {
+            /*
+             * Example response.
+             * Replace this function with your computer's actual processing.
+             */
+            const response_text =
+                current_language === "fr"
+                    ? "J'ai reçu votre message : " + computer_input.message
+                    : "I received your message: " + computer_input.message;
+
+            setTimeout(function () {
+                answer_from_computer(response_text);
+            }, 400);
+        }
+
+        document.getElementById("chat_input_area").addEventListener(
+            "submit",
+            function (event) {
+                event.preventDefault();
+
+                const input_element = document.getElementById("user_input");
+                const user_text = input_element.value;
+
+                input_element.value = "";
+                handle_user_message(user_text);
+                input_element.focus();
+            }
+        );
+
+        document.getElementById("user_input").addEventListener(
+            "keydown",
+            function (event) {
+                if (event.key === "Enter" && !event.shiftKey) {
+                    event.preventDefault();
+                    document.getElementById("chat_input_area").requestSubmit();
+                }
+            }
+        );
+
+        detect_language();
+        apply_language();
+    </script>
+</body>
+</html>

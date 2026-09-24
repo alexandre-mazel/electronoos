@@ -661,19 +661,32 @@
             );
         }
 
-        function computer_process_input(
-            computer_input
-        ) {
-            const response_text =
+        function computer_process_input( computer_input ) {
+            let response_text =
                 current_language === "fr"
                     ? "J'ai reçu votre message : " +
                       computer_input.message
                     : "I received your message: " +
                       computer_input.message;
 
-            answer_from_computer(
-                response_text
-            );
+            if( true )
+            {
+                // real answer:
+                const id = "web"
+                const q = computer_input.message;
+                
+                let addr = "../chatola/chatola_client.py?id=" + encodeURIComponent(id);
+                addr += "&q=" + encodeURIComponent(q);
+
+                const response = await fetch( addr );
+                console.log( "response:", response );
+                
+                answer = await response.json();
+                console.log( "answer:", answer );
+                
+                response_text = answer.ans;
+    
+            answer_from_computer( response_text );
         }
 
         document.getElementById("chat_input_area")

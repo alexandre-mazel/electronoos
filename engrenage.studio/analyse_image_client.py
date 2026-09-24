@@ -70,6 +70,8 @@ def send_image_to_analyse( filename_img, user_id = "test", lang = "en" ):
     print( "keywords: %s" % keywords )
     print( "text: %s" % text )
     print( "peoples: %s" % peoples )
+    if description == "":
+        description = None # y a surement eu un probleme...
     return description, keywords, text, peoples
     
     

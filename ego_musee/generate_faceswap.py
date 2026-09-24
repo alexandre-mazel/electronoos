@@ -16,6 +16,7 @@ python generate_faceswap.py painting.jpg visitor.jpg -n 1 -o result.jpg
 scp a@192.168.0.45:/home/a/dev/git/electronoos/ego_musee/result.png \tmp
 
 scp -P 45022 C:/Users/alexa/dev/git/electronoos/ego_musee/paintings/* a@engrenage.studio:/home/a/dev/git/electronoos/ego_musee/paintings/
+scp -P 45022 a@engrenage.studio:/home/a/dev/git/electronoos/ego_musee/generated/* C:/Users/alexa/dev/git/electronoos/ego_musee/generated/
 
 Ca rocks serieux, et on peut cascader en reutilisant la sortie comme ref d'entree
 

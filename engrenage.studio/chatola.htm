@@ -629,10 +629,45 @@
             const typing_message =
                 create_typing_message();
 
-            setTimeout(function () {
-                typing_message.bubble.textContent =
-                    computer_text;
 
+            it( false )
+            {
+                // simulate
+                setTimeout(function () {
+                    typing_message.bubble.textContent =
+                        computer_text;
+                    set_message_metadata(
+                        typing_message.bubble,
+                        typing_message.metadata,
+                        typing_message.date,
+                        typing_message.time
+                    );
+
+                    document.getElementById("chat_status")
+                        .textContent =
+                        language_data[current_language].status;
+
+                    scroll_to_bottom();
+                }, 2000);
+            }
+            else
+            {
+                // real answer:
+                const id = "web"
+                const q = computer_input.message;
+                
+                let addr = "/chatola/chatola_client.py?id=" + encodeURIComponent(id);
+                addr += "&q=" + encodeURIComponent(q);
+
+                const response = await fetch( addr );
+                console.log( "response:", response );
+                
+                answer = await response.json();
+                console.log( "answer:", answer );
+                
+                computer_text = answer.ans;
+            
+                typing_message.bubble.textContent = computer_text;
                 set_message_metadata(
                     typing_message.bubble,
                     typing_message.metadata,
@@ -645,7 +680,7 @@
                     language_data[current_language].status;
 
                 scroll_to_bottom();
-            }, 2000);
+            }
         }
 
         function handle_user_message(user_text) {
@@ -669,24 +704,6 @@
                       computer_input.message
                     : "I received your message: " +
                       computer_input.message;
-
-            if( true )
-            {
-                // real answer:
-                const id = "web"
-                const q = computer_input.message;
-                
-                let addr = "/chatola/chatola_client.py?id=" + encodeURIComponent(id);
-                addr += "&q=" + encodeURIComponent(q);
-
-                const response = await fetch( addr );
-                console.log( "response:", response );
-                
-                answer = await response.json();
-                console.log( "answer:", answer );
-                
-                response_text = answer.ans;
-            }
     
             answer_from_computer( response_text );
         }

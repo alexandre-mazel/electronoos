@@ -3,8 +3,9 @@ import cv2
 import numpy as np
 import random
 import os
-from insightface.app import FaceAnalysis
-from insightface.model_zoo import get_model
+if os.name != "nt":
+    from insightface.app import FaceAnalysis
+    from insightface.model_zoo import get_model
 
 
 """
@@ -56,18 +57,60 @@ def create_generator():
         MODEL,
         providers=["CUDAExecutionProvider", "CPUExecutionProvider"]
     )
+    
+    
+
+def image_fullscreen_contain(image, screen_width, screen_height):
+    """
+    adapte l'image a la taille de l'ecran sans la deformer
+    """
+    image_height, image_width = image.shape[:2]
+
+    scale = min(
+        screen_width / image_width,
+        screen_height / image_height
+    )
+
+    new_width = int(image_width * scale)
+    new_height = int(image_height * scale)
+
+    resized_image = cv2.resize(
+        image,
+        (new_width, new_height),
+        interpolation=cv2.INTER_AREA
+    )
+
+    fullscreen_image = np.zeros(
+        (screen_height, screen_width, 3),
+        dtype=np.uint8
+    )
+
+    x = (screen_width - new_width) // 2
+    y = (screen_height - new_height) // 2
+
+    fullscreen_image[
+        y:y + new_height,
+        x:x + new_width
+    ] = resized_image
+
+    return fullscreen_image
 
 
 
 def fade_images(image1_filename, image2_filename, duration=5.0):
+    """
+    Return False if user want to quit
+    """
     
     img1 = cv2.imread(image1_filename)
     img2 = cv2.imread(image2_filename)
 
     if img1 is None:
-        raise ValueError(f"Cannot load image: {image1_filename}")
+        print( f"ERR: Cannot load image: {image1_filename}")
+        return True
     if img2 is None:
-        raise ValueError(f"Cannot load image: {image2_filename}")
+        print( f"ERR: Cannot load image: {image2_filename}")
+        return True
 
     if img1.shape != img2.shape:
         raise ValueError("The two images must have exactly the same format/size.")
@@ -81,10 +124,22 @@ def fade_images(image1_filename, image2_filename, duration=5.0):
         cv2.WND_PROP_FULLSCREEN,
         cv2.WINDOW_FULLSCREEN
     )
+    
+    sx,sy = 2736, 1824
+    img1 = image_fullscreen_contain( img1, sx, sy )
+    img2 = image_fullscreen_contain( img2, sx, sy )
 
     # Display first image
     cv2.imshow(window_name, img1)
-    cv2.waitKey(5000)
+    key = cv2.waitKey(5000) & 0xFF
+    
+    # ESC to interrupt
+    if key == 27:
+        return False
+        
+    # n to go to next image
+    if key == ord("n"):
+        return True
 
     # Smooth fade
     start = time.perf_counter()
@@ -108,15 +163,19 @@ def fade_images(image1_filename, image2_filename, duration=5.0):
         # ESC to interrupt
         if key == 27:
             return False
+            
+        # n to go to next image
+        if key == ord("n"):
+            return True
 
         if progress >= 1.0:
             break
 
     # Leave the second image displayed
     cv2.imshow(window_name, img2)
-    cv2.waitKey(1)
+    cv2.waitKey(5000)
 
-    return window_name
+    #~ return window_name
     return True
 
 def generate_swap( painting, person, output, num_face ):
@@ -236,7 +295,7 @@ def render_pair_loop():
         print("'%s' and '%s'" % (asrc,adst) )
         if os.path.isfile( asrc ) and os.path.isfile( adst ):
             print( "fading..." )
-            if not fade_images( asrc, adst ):
+            if not fade_images( asrc, adst, 10 ):
                 break
 
 def generate_all():
@@ -252,5 +311,5 @@ def generate_all():
 
 if __name__ == "__main__":
     # main()
-    generate_all()
-    #~ render_pair_loop()
+    #~ generate_all()
+    render_pair_loop()

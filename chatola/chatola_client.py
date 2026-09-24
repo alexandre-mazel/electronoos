@@ -87,7 +87,7 @@ def test_index():
     
 if __name__ == "__main__":
     
-    if 1:
+    if 0:
         test_index()
         return
 

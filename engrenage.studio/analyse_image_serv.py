@@ -66,8 +66,12 @@ def extract_infos_from_img( img_raw, filename, user_id, lang = "fr" ):
     #~ filename_for_caching = "" # to disable caching!
     fr.load()
     img = cv2.imdecode( np.frombuffer(img_raw, dtype=np.uint8), cv2.IMREAD_COLOR )
-    faces = fr.recognizeFromImg( img, filename_for_caching, find_match = True )
+    faces = fr.recognizeFromImg( img, filename_for_caching, find_match = True, verbose = 1 )
     fr.save() # for embedding
+    if 0:
+        # on fait d'un coup que de la fr puis plus tard on faira la vl en full gpu
+        print( "WRN: just face analyse done (nbr faces found: %d)" % len(faces) )
+        return "",[],[],[]
     people_identification = ""
     extra_instruction = ""
     if len(faces) > 0:
@@ -127,7 +131,8 @@ CORRECT : "Gaia est assise à une table avec des livres."
     
     # on se fait un modele hybride car sinon onnx eclate la ram:
     # ollama create qwen2.5vl-mixed -f modelfile_hybrid_qwen25_vl_7b.txt => 6.1GB 20%/80% CPU/GPU soit 4.9 pris par ollama
-    strModel = "qwen2.5vl-mixed"
+    # par contre on passe de 4s a 80s ... (a verifier,mais quasi sur)
+    #~ strModel = "qwen2.5vl-mixed"
     
     result = analyse_image_ollama.analyse_image_buffer( "http://localhost:11435/api/chat", img_raw,strModel, 
                                                     people_identification=people_identification, extra_instruction=extra_instruction, lang=lang, verbose=1 )
@@ -145,6 +150,9 @@ app = Flask(__name__)
 
 @app.route("/anaimg", methods=["POST"])
 def receive_img():
+    
+    print( "DBG: receive_img: begin..." )
+    
     try:
         # Nom du fichier transmis dans le header HTTP
         filename = request.headers.get("X-Image-Filename")
@@ -158,6 +166,8 @@ def receive_img():
 
         # Lire les donnees binaires de l'image
         data = request.get_data()
+        
+        print( "DBG: receive_img: end get data" )
 
         if not data:
             return {
@@ -169,9 +179,7 @@ def receive_img():
         filename = os.path.basename(filename)
 
         if filename in ("", ".", ".."):
-            return {
-                "error": "Invalid filename"
-            }, 400
+            return { "error": "Invalid filename" }, 400
             
             
         if 0:
@@ -185,10 +193,7 @@ def receive_img():
             with open(filepath, "wb") as outfile:
                 outfile.write(data)
 
-            print(
-                "INF: receive_img: received '%s' (%d bytes)"
-                % (filepath, len(data))
-            )
+            print( "INF: receive_img: received '%s' (%d bytes)" % (filepath, len(data)) )
             
         if 1:
             description, keywords, text, peoples = extract_infos_from_img( data, filename, user_id, lang=lang )

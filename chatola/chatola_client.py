@@ -24,6 +24,7 @@ print(requests.__version__)
 
 """
 La boucle principale en version audio et tts est depuis audio_analyser.py
+La version web est depuis ici, appellé depuis chatola.htm (mais ca fonctionne pas depuis obor que depuis python server
 """
 
 chatola_url = "https://obo-world.com:10000"

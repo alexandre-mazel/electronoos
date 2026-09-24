@@ -661,7 +661,7 @@
             );
         }
 
-        function computer_process_input( computer_input ) {
+        async function computer_process_input( computer_input ) {
             let response_text =
                 current_language === "fr"
                     ? "J'ai reçu votre message : " +
@@ -685,6 +685,7 @@
                 console.log( "answer:", answer );
                 
                 response_text = answer.ans;
+            }
     
             answer_from_computer( response_text );
         }

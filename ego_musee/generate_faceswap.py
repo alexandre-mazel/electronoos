@@ -2,7 +2,6 @@ import argparse
 import cv2
 import numpy as np
 import random
-import os
 from insightface.app import FaceAnalysis
 from insightface.model_zoo import get_model
 
@@ -16,6 +15,7 @@ python generate_faceswap.py painting.jpg visitor.jpg -n 1 -o result.jpg
 scp a@192.168.0.45:/home/a/dev/git/electronoos/ego_musee/result.png \tmp
 
 scp -P 45022 C:/Users/alexa/dev/git/electronoos/ego_musee/paintings/* a@engrenage.studio:/home/a/dev/git/electronoos/ego_musee/paintings/
+scp -P 45022 a@engrenage.studio:/home/a/dev/git/electronoos/ego_musee/generated/* C:/Users/alexa/dev/git/electronoos/ego_musee/generated/
 
 Ca rocks serieux, et on peut cascader en reutilisant la sortie comme ref d'entree
 
@@ -28,38 +28,8 @@ MODEL = "models/inswapper_128.onnx"
 import cv2
 import time
 
-app = None
-swapper = None
-
-def create_generator():
-    global app, swapper
-    
-    if app != None:
-        return
-    
-    print("Chargement du détecteur...")
-
-    app = FaceAnalysis(
-        name="buffalo_l",
-        providers=["CUDAExecutionProvider", "CPUExecutionProvider"]
-    )
-
-    app.prepare(
-        ctx_id=0,
-        det_size=(640, 640)
-    )
-
-    print("Chargement du modèle face swap...")
-
-    swapper = get_model(
-        MODEL,
-        providers=["CUDAExecutionProvider", "CPUExecutionProvider"]
-    )
-
-
 
 def fade_images(image1_filename, image2_filename, duration=5.0):
-    
     img1 = cv2.imread(image1_filename)
     img2 = cv2.imread(image2_filename)
 
@@ -122,26 +92,15 @@ def generate_swap( painting, person, output, num_face ):
     """
     num_face: 0..n-1
     """
-    
-    create_generator()
-
-    print("Lecture des images...")
 
     scene = cv2.imread(painting)
     reference = cv2.imread(person)
-    
-    print( "size painting: %dx%d" % (scene.shape[1],scene.shape[0]) )
-    print( "size person: %dx%d" % (reference.shape[1],reference.shape[0]) )
-    
-    if scene.shape[1] > 10000: # j'ai une image a 20k x 20k
-        print( "ERR: sceen too big" )
-        return
 
     if scene is None:
-        raise RuntimeError(f"Impossible de lire {painting}")
+        raise RuntimeError(f"Impossible de lire {args.scene}")
 
     if reference is None:
-        raise RuntimeError(f"Impossible de lire {person}")
+        raise RuntimeError(f"Impossible de lire {args.face}")
 
     print("Détection des visages...")
 
@@ -161,7 +120,7 @@ def generate_swap( painting, person, output, num_face ):
 
     if face_index < 0 or face_index >= len(scene_faces):
         raise RuntimeError(
-            f"Visage {num_face} inexistant. "
+            f"Visage {args.face_number} inexistant. "
             f"La scène contient {len(scene_faces)} visage(s)."
         )
 
@@ -171,7 +130,7 @@ def generate_swap( painting, person, output, num_face ):
     target_face = scene_faces[face_index]
 
     print(
-        f"Remplacement du visage {num_face}..."
+        f"Remplacement du visage {args.face_number}..."
     )
 
     result = swapper.get(
@@ -183,7 +142,7 @@ def generate_swap( painting, person, output, num_face ):
 
     cv2.imwrite( output, result)
 
-    print(f"Résultat enregistré : {output}")
+    print(f"Résultat enregistré : {args.output}")
 
 def main():
 
@@ -218,7 +177,27 @@ def main():
     )
 
     args = parser.parse_args()
-    
+
+    print("Chargement du détecteur...")
+
+    app = FaceAnalysis(
+        name="buffalo_l",
+        providers=["CUDAExecutionProvider", "CPUExecutionProvider"]
+    )
+
+    app.prepare(
+        ctx_id=0,
+        det_size=(640, 640)
+    )
+
+    print("Chargement du modèle face swap...")
+
+    swapper = get_model(
+        MODEL,
+        providers=["CUDAExecutionProvider", "CPUExecutionProvider"]
+    )
+
+    print("Lecture des images...")
     
     generate_swap( args.scene, args.face, args.output, args.face_number - 1 )
     
@@ -245,11 +224,11 @@ def generate_all():
     for f in listfiles:
         asrc = srcpath + f
         adst = dstpath + f.replace(".jpg","_generated.jpg").replace(".png","_generated.png" )
-        if os.path.isfile( asrc ) and not os.path.isfile( adst ):
+        if os.path.isfile( asrc ):
             generate_swap( asrc, "visitor.jpg", adst, 0 )
     
 
 if __name__ == "__main__":
     # main()
-    generate_all()
-    #~ render_pair_loop()
+    
+    render_pair_loop()

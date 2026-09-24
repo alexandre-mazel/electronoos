@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # evite que le requests pris soit celui du dossier obo/requests! C'est moche et pas de chance!
 # ca fonctionne pas car en fait c'est dans le dossier courant qu'on a un requests
 
@@ -12,8 +14,13 @@
 
 #~ sys.path.extend(obo_paths) # on le remet a la fin, c'est pas si pire...
 
-# j'ai juste dupliqué la lib en un autre nom
-import requestsdup as requests
+import os
+
+# j'ai juste duplique la lib en un autre nom
+if __name__ == "__main__" and os.name == "nt":
+    import requests
+else:
+    import requestsdup as requests
 
 import sys
 import time
@@ -24,7 +31,7 @@ print(requests.__version__)
 
 """
 La boucle principale en version audio et tts est depuis audio_analyser.py
-La version web est depuis ici, appellé depuis chatola.htm (mais ca fonctionne pas depuis obor que depuis python server
+La version web est depuis ici, appelle depuis chatola.htm (mais ca fonctionne pas depuis obor que depuis python server
 """
 
 chatola_url = "https://obo-world.com:10000"

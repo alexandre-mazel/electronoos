@@ -2,6 +2,10 @@ import requests
 import sys
 import time
 
+print(requests)
+print(requests.__file__)
+print(requests.__version__)
+
 """
 La boucle principale en version audio et tts est depuis audio_analyser.py
 """

@@ -367,8 +367,10 @@ def render_pair_loop():
         idx = random.randint(0,len(listfiles)-1)
         asrc = srcpath+listfiles[idx]
         postfix = "_generated"
-        if random.random() > 0.5 and 0:
-            postfix += "2"
+        if random.random() > 0.5:
+            postfix += "3"
+            if random.random() > 0.3 and 0:
+                postfix += "2"
         adst = dstpath+add_postfix( listfiles[idx], postfix )
         print("'%s' and '%s'" % (asrc,adst) )
         if os.path.isfile( asrc ) and os.path.isfile( adst ):
@@ -389,5 +391,5 @@ def generate_all():
 
 if __name__ == "__main__":
     # main()
-    generate_all()
-    #~ render_pair_loop()
+    #~ generate_all()
+    render_pair_loop()

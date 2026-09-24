@@ -1,4 +1,4 @@
-# evite que requests pris soit celui du dossier obo/requests!
+# evite que le requests pris soit celui du dossier obo/requests! C'est moche et pas de chance!
 import sys
 obo_paths = []
 for path in sys.path[:]:
@@ -6,10 +6,10 @@ for path in sys.path[:]:
         sys.path.remove(path)
         obo_paths.append(path)
 
-sys.path.extend(obo_paths)
-
-
 import requests
+
+sys.path.extend(obo_paths) # on le remet a la fin, c'est pas si pire...
+
 import sys
 import time
 

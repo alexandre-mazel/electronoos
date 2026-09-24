@@ -95,7 +95,17 @@ def image_fullscreen_contain(image, screen_width, screen_height):
 
     return fullscreen_image
 
-
+def get_painting_title(filename):
+    #~ name = Path(filename).stem
+    name = os.path.splitext( os.path.basename(filename) )[0]
+    name = name.replace("_generated", "")
+    name = name.replace("_-_", " - ")
+    name = name.replace("_", " ")
+    
+    idx = name.find( " - Google" )
+    if idx != -1:
+        name = name[:idx]
+    return name
 
 def fade_images(image1_filename, image2_filename, duration=5.0):
     """
@@ -128,6 +138,10 @@ def fade_images(image1_filename, image2_filename, duration=5.0):
     sx,sy = 2736, 1824
     img1 = image_fullscreen_contain( img1, sx, sy )
     img2 = image_fullscreen_contain( img2, sx, sy )
+    
+    txt = get_painting_title( image1_filename )
+    img1 = add_bottom_text( img1, txt )
+    img2 = add_bottom_text( img2, txt )
 
     # Display first image
     cv2.imshow(window_name, img1)
@@ -287,6 +301,64 @@ def add_postfix( filename, postfix ):
     new_filename = base + postfix + extension
     return new_filename
     
+def add_bottom_text(image, text):
+    height, width = image.shape[:2]
+
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = 1.0
+    thickness = 2
+
+    text_size, baseline = cv2.getTextSize(
+        text,
+        font,
+        font_scale,
+        thickness
+    )
+
+    text_width, text_height = text_size
+
+    padding_top = 15
+    padding_bottom = 15
+
+    banner_height = (
+        text_height +
+        baseline +
+        padding_top +
+        padding_bottom
+    )
+
+    result = image.copy()
+
+    # Bandeau noir en bas
+    cv2.rectangle(
+        result,
+        (0, height - banner_height),
+        (width, height),
+        (0, 0, 0),
+        -1
+    )
+
+    # Texte centré horizontalement
+    text_x = (width - text_width) // 2
+    text_y = (
+        height -
+        padding_bottom -
+        baseline
+    )
+
+    cv2.putText(
+        result,
+        text,
+        (text_x, text_y),
+        font,
+        font_scale,
+        (255, 255, 255),
+        thickness,
+        cv2.LINE_AA
+    )
+
+    return result
+    
 def render_pair_loop():
     srcpath = "paintings/"
     dstpath = "generated/"
@@ -294,7 +366,10 @@ def render_pair_loop():
     while 1:
         idx = random.randint(0,len(listfiles)-1)
         asrc = srcpath+listfiles[idx]
-        adst = dstpath+add_postfix( listfiles[idx], "_generated" )
+        postfix = "_generated"
+        if random.random() > 0.5:
+            postfix += "2"
+        adst = dstpath+add_postfix( listfiles[idx], postfix )
         print("'%s' and '%s'" % (asrc,adst) )
         if os.path.isfile( asrc ) and os.path.isfile( adst ):
             print( "fading..." )
@@ -314,5 +389,5 @@ def generate_all():
 
 if __name__ == "__main__":
     # main()
-    generate_all()
-    #~ render_pair_loop()
+    #~ generate_all()
+    render_pair_loop()

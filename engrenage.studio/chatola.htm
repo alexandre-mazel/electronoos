@@ -102,12 +102,61 @@
             border-bottom-left-radius: 5px;
         }
 
-        .message_timestamp {
+        .message_metadata {
+            display: flex;
+            flex-direction: column;
+            align-items: inherit;
             margin-top: 3px;
             padding: 0 5px;
             color: #999999;
             font-size: 11px;
-            line-height: 1.2;
+            line-height: 1.25;
+        }
+
+        .message_date {
+            font-weight: 500;
+        }
+
+        .message_time {
+            opacity: 0.9;
+        }
+
+        .typing_dots {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            height: 24px;
+            min-width: 38px;
+        }
+
+        .typing_dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #777777;
+            animation: typing_animation 1.2s infinite ease-in-out;
+        }
+
+        .typing_dot:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .typing_dot:nth-child(3) {
+            animation-delay: 0.30s;
+        }
+
+        @keyframes typing_animation {
+            0%,
+            60%,
+            100% {
+                opacity: 0.3;
+                transform: translateY(0);
+            }
+
+            30% {
+                opacity: 1;
+                transform: translateY(-3px);
+            }
         }
 
         #chat_input_area {
@@ -198,10 +247,13 @@
 
         <section id="chat_messages" aria-live="polite">
             <div id="message_container_initial" class="message_container message_container_computer">
-                <div id="message_computer_initial" class="message_bubble message_bubble_computer">
+                <div id="message_bubble_initial" class="message_bubble message_bubble_computer">
                     Hello. How can I help you?
                 </div>
-                <div id="message_timestamp_initial" class="message_timestamp"></div>
+                <div id="message_metadata_initial" class="message_metadata">
+                    <div id="message_date_initial" class="message_date"></div>
+                    <div id="message_time_initial" class="message_time"></div>
+                </div>
             </div>
         </section>
 
@@ -246,7 +298,8 @@
                 "en"
             ).toLowerCase();
 
-            current_language = browser_language.startsWith("fr") ? "fr" : "en";
+            current_language =
+                browser_language.startsWith("fr") ? "fr" : "en";
         }
 
         function apply_language() {
@@ -254,15 +307,37 @@
 
             document.documentElement.lang = current_language;
             document.title = language.title;
-            document.getElementById("chat_title").textContent = language.title;
-            document.getElementById("chat_status").textContent = language.status;
-            document.getElementById("user_input").placeholder = language.placeholder;
-            document.getElementById("send_button").textContent = language.send;
-            document.getElementById("message_computer_initial").textContent = language.initial;
 
-            set_timestamp(
-                document.getElementById("message_timestamp_initial")
+            document.getElementById("chat_title").textContent =
+                language.title;
+
+            document.getElementById("chat_status").textContent =
+                language.status;
+
+            document.getElementById("user_input").placeholder =
+                language.placeholder;
+
+            document.getElementById("send_button").textContent =
+                language.send;
+
+            document.getElementById("message_bubble_initial").textContent =
+                language.initial;
+
+            set_message_metadata(
+                document.getElementById("message_date_initial"),
+                document.getElementById("message_time_initial")
             );
+        }
+
+        function get_current_date() {
+            return new Intl.DateTimeFormat(
+                current_language === "fr" ? "fr-FR" : "en-US",
+                {
+                    weekday: "short",
+                    day: "numeric",
+                    month: "short"
+                }
+            ).format(new Date());
         }
 
         function get_current_time() {
@@ -275,61 +350,197 @@
             ).format(new Date());
         }
 
-        function set_timestamp(timestamp_element) {
-            timestamp_element.textContent = get_current_time();
+        function set_message_metadata(
+            date_element,
+            time_element
+        ) {
+            date_element.textContent = get_current_date();
+            time_element.textContent = get_current_time();
+        }
+
+        function scroll_to_bottom() {
+            const messages_element =
+                document.getElementById("chat_messages");
+
+            messages_element.scrollTo({
+                top: messages_element.scrollHeight,
+                behavior: "smooth"
+            });
+        }
+
+        function create_message_container(sender_type) {
+            const unique_id =
+                Date.now() +
+                "_" +
+                Math.random()
+                    .toString(36)
+                    .substring(2, 8);
+
+            const container_element =
+                document.createElement("div");
+
+            const bubble_element =
+                document.createElement("div");
+
+            const metadata_element =
+                document.createElement("div");
+
+            const date_element =
+                document.createElement("div");
+
+            const time_element =
+                document.createElement("div");
+
+            container_element.id =
+                "message_container_" +
+                sender_type +
+                "_" +
+                unique_id;
+
+            bubble_element.id =
+                "message_bubble_" +
+                sender_type +
+                "_" +
+                unique_id;
+
+            metadata_element.id =
+                "message_metadata_" +
+                sender_type +
+                "_" +
+                unique_id;
+
+            date_element.id =
+                "message_date_" +
+                sender_type +
+                "_" +
+                unique_id;
+
+            time_element.id =
+                "message_time_" +
+                sender_type +
+                "_" +
+                unique_id;
+
+            container_element.className =
+                "message_container message_container_" +
+                sender_type;
+
+            bubble_element.className =
+                "message_bubble message_bubble_" +
+                sender_type;
+
+            metadata_element.className =
+                "message_metadata";
+
+            date_element.className =
+                "message_date";
+
+            time_element.className =
+                "message_time";
+
+            metadata_element.appendChild(date_element);
+            metadata_element.appendChild(time_element);
+
+            container_element.appendChild(bubble_element);
+            container_element.appendChild(metadata_element);
+
+            return {
+                container: container_element,
+                bubble: bubble_element,
+                date: date_element,
+                time: time_element
+            };
         }
 
         function add_message(message_text, sender_type) {
-            const unique_id = Date.now() + "_" + Math.random()
-                .toString(36)
-                .substring(2, 8);
+            const message_elements =
+                create_message_container(sender_type);
 
-            const container_element = document.createElement("div");
-            const bubble_element = document.createElement("div");
-            const timestamp_element = document.createElement("div");
+            message_elements.bubble.textContent =
+                message_text;
 
-            container_element.id =
-                "message_container_" + sender_type + "_" + unique_id;
-
-            bubble_element.id =
-                "message_bubble_" + sender_type + "_" + unique_id;
-
-            timestamp_element.id =
-                "message_timestamp_" + sender_type + "_" + unique_id;
-
-            container_element.className =
-                "message_container message_container_" + sender_type;
-
-            bubble_element.className =
-                "message_bubble message_bubble_" + sender_type;
-
-            timestamp_element.className =
-                "message_timestamp";
-
-            bubble_element.textContent = message_text;
-
-            set_timestamp(timestamp_element);
-
-            container_element.appendChild(bubble_element);
-            container_element.appendChild(timestamp_element);
+            set_message_metadata(
+                message_elements.date,
+                message_elements.time
+            );
 
             document.getElementById("chat_messages")
-                .appendChild(container_element);
+                .appendChild(message_elements.container);
 
-            container_element.scrollIntoView({
-                behavior: "smooth",
-                block: "end"
-            });
+            scroll_to_bottom();
 
-            return container_element;
+            return message_elements;
         }
 
         function add_user_message(message_text) {
             return add_message(message_text, "user");
         }
 
-        function add_computer_message(message_text) {
-            return add_message(message_text, "computer");
+        function create_typing_message() {
+            const message_elements =
+                create_message_container("computer");
+
+            message_elements.bubble.innerHTML = "";
+
+            const typing_container =
+                document.createElement("span");
+
+            const first_dot =
+                document.createElement("span");
+
+            const second_dot =
+                document.createElement("span");
+
+            const third_dot =
+                document.createElement("span");
+
+            typing_container.id =
+                "typing_indicator_" +
+                Date.now();
+
+            first_dot.id =
+                "typing_dot_1_" +
+                Date.now();
+
+            second_dot.id =
+                "typing_dot_2_" +
+                Date.now();
+
+            third_dot.id =
+                "typing_dot_3_" +
+                Date.now();
+
+            typing_container.className =
+                "typing_dots";
+
+            first_dot.className =
+                "typing_dot";
+
+            second_dot.className =
+                "typing_dot";
+
+            third_dot.className =
+                "typing_dot";
+
+            typing_container.appendChild(first_dot);
+            typing_container.appendChild(second_dot);
+            typing_container.appendChild(third_dot);
+
+            message_elements.bubble.appendChild(
+                typing_container
+            );
+
+            set_message_metadata(
+                message_elements.date,
+                message_elements.time
+            );
+
+            document.getElementById("chat_messages")
+                .appendChild(message_elements.container);
+
+            scroll_to_bottom();
+
+            return message_elements;
         }
 
         function prepare_computer_input(user_text) {
@@ -341,7 +552,8 @@
         }
 
         function receive_user_input(user_text) {
-            const clean_text = user_text.trim();
+            const clean_text =
+                user_text.trim();
 
             if (!clean_text) {
                 return null;
@@ -349,77 +561,118 @@
 
             add_user_message(clean_text);
 
-            const computer_input = prepare_computer_input(clean_text);
+            const computer_input =
+                prepare_computer_input(clean_text);
 
-            document.getElementById("chat_status").textContent =
+            document.getElementById("chat_status")
+                .textContent =
                 language_data[current_language].thinking;
 
             return computer_input;
         }
 
         function answer_from_computer(computer_text) {
-            const clean_text = String(computer_text || "").trim();
+            const clean_text =
+                String(computer_text || "").trim();
 
             if (!clean_text) {
                 return;
             }
 
-            add_computer_message(clean_text);
+            add_computer_message_after_typing(
+                clean_text
+            );
+        }
 
-            document.getElementById("chat_status").textContent =
-                language_data[current_language].status;
+        function add_computer_message_after_typing(
+            computer_text
+        ) {
+            const typing_message =
+                create_typing_message();
+
+            setTimeout(function () {
+                typing_message.bubble.textContent =
+                    computer_text;
+
+                set_message_metadata(
+                    typing_message.date,
+                    typing_message.time
+                );
+
+                document.getElementById("chat_status")
+                    .textContent =
+                    language_data[current_language].status;
+
+                scroll_to_bottom();
+            }, 2000);
         }
 
         function handle_user_message(user_text) {
-            const computer_input = receive_user_input(user_text);
+            const computer_input =
+                receive_user_input(user_text);
 
             if (!computer_input) {
                 return;
             }
 
-            computer_process_input(computer_input);
+            computer_process_input(
+                computer_input
+            );
         }
 
-        function computer_process_input(computer_input) {
+        function computer_process_input(
+            computer_input
+        ) {
             const response_text =
                 current_language === "fr"
-                    ? "J'ai reçu votre message : " + computer_input.message
-                    : "I received your message: " + computer_input.message;
+                    ? "J'ai reçu votre message : " +
+                      computer_input.message
+                    : "I received your message: " +
+                      computer_input.message;
 
-            setTimeout(function () {
-                answer_from_computer(response_text);
-            }, 400);
+            answer_from_computer(
+                response_text
+            );
         }
 
-        document.getElementById("chat_input_area").addEventListener(
-            "submit",
-            function (event) {
-                event.preventDefault();
-
-                const input_element =
-                    document.getElementById("user_input");
-
-                const user_text = input_element.value;
-
-                input_element.value = "";
-
-                handle_user_message(user_text);
-
-                input_element.focus();
-            }
-        );
-
-        document.getElementById("user_input").addEventListener(
-            "keydown",
-            function (event) {
-                if (event.key === "Enter" && !event.shiftKey) {
+        document.getElementById("chat_input_area")
+            .addEventListener(
+                "submit",
+                function (event) {
                     event.preventDefault();
 
-                    document.getElementById("chat_input_area")
-                        .requestSubmit();
+                    const input_element =
+                        document.getElementById("user_input");
+
+                    const user_text =
+                        input_element.value;
+
+                    input_element.value = "";
+
+                    handle_user_message(
+                        user_text
+                    );
+
+                    input_element.focus();
                 }
-            }
-        );
+            );
+
+        document.getElementById("user_input")
+            .addEventListener(
+                "keydown",
+                function (event) {
+                    if (
+                        event.key === "Enter" &&
+                        !event.shiftKey
+                    ) {
+                        event.preventDefault();
+
+                        document.getElementById(
+                            "chat_input_area"
+                        ).requestSubmit();
+                    }
+                }
+            );
 
         detect_language();
         apply_language();

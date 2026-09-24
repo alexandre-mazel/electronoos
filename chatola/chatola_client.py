@@ -89,7 +89,7 @@ if __name__ == "__main__":
     
     if 0:
         test_index()
-        return
+        exit(0)
 
 
     if len(sys.argv) > 1:

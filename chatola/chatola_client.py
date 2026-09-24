@@ -6,6 +6,10 @@ import time
 La boucle principale en version audio et tts est depuis audio_analyser.py
 """
 
+chatola_url = "https://obo-world.com:10000"
+chatola_url = "https://engrenage.studio:45001"
+chatola_url = "http://engrenage.studio:45001"
+
 def test_data(url):
     service = url + "/data"
     response = requests.post(service, json={"msg": "hello"})
@@ -48,12 +52,46 @@ def loop_dialog( chatola_url, user_id ):
         print( "IA: %s" % ans )
         duration = time.time() - time_begin
         print( "    (generated in %.2fs)" % duration )
-                
+        
+def index( req ):
+    """
+    receive ?id=toto&q=coucou
+    """
+    sys.path.append("../engrenage.studio")
+    import viewcloud
+    print("DBG: chatola_client.py.index: req.args: '%s'" % req.args )
+
+
+    dArgs = ( viewcloud.decode_param( req.args ) )
+    print( "DBG: index: dArgs: %s" % str(dArgs) )
+    
+    user_id = dArgs["id"]
+    msg = dArgs["q"]
+    ask_tchat( chatola_url, user_id, msg )
+    ans = ask_tchat( chatola_url, user_id, msg )
+    print( "INF: chatola_client.index: IA: %s" % ans )
+    
+    return viewcloud.send_json({
+    "success": False,
+    "ans": ans
+})
+
+    
+           
+def test_index():
+    class Req:
+        pass
+    req = Req()
+    req.args = "id=toto&q=coucou"
+    index( req )
     
 if __name__ == "__main__":
-    chatola_url = "https://obo-world.com:10000"
-    chatola_url = "https://engrenage.studio:45001"
-    chatola_url = "http://engrenage.studio:45001"
+    
+    if 1:
+        test_index()
+        return
+
+
     if len(sys.argv) > 1:
         chatola_url = sys.argv[1]
     print( "INF: chatola_url: '%s'" % chatola_url )

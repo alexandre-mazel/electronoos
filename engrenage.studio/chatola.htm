@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="page_title">Computer Chat</title>
+
     <style id="page_style">
         * {
             box-sizing: border-box;
@@ -111,14 +112,17 @@
             color: #999999;
             font-size: 11px;
             line-height: 1.25;
+            white-space: nowrap;
         }
 
-        .message_date {
-            font-weight: 500;
+        .message_metadata_inline {
+            flex-direction: row;
+            gap: 6px;
         }
 
+        .message_date,
         .message_time {
-            opacity: 0.9;
+            display: block;
         }
 
         .typing_dots {
@@ -250,6 +254,7 @@
                 <div id="message_bubble_initial" class="message_bubble message_bubble_computer">
                     Hello. How can I help you?
                 </div>
+
                 <div id="message_metadata_initial" class="message_metadata">
                     <div id="message_date_initial" class="message_date"></div>
                     <div id="message_time_initial" class="message_time"></div>
@@ -265,7 +270,10 @@
                 rows="1"
                 placeholder="Write a message..."
             ></textarea>
-            <button id="send_button" type="submit">Send</button>
+
+            <button id="send_button" type="submit">
+                Send
+            </button>
         </form>
     </main>
 
@@ -324,6 +332,8 @@
                 language.initial;
 
             set_message_metadata(
+                document.getElementById("message_bubble_initial"),
+                document.getElementById("message_metadata_initial"),
                 document.getElementById("message_date_initial"),
                 document.getElementById("message_time_initial")
             );
@@ -351,11 +361,41 @@
         }
 
         function set_message_metadata(
+            bubble_element,
+            metadata_element,
             date_element,
             time_element
         ) {
             date_element.textContent = get_current_date();
             time_element.textContent = get_current_time();
+
+            metadata_element.classList.remove(
+                "message_metadata_inline"
+            );
+
+            requestAnimationFrame(function () {
+                const bubble_width =
+                    bubble_element.getBoundingClientRect().width;
+
+                const date_width =
+                    date_element.getBoundingClientRect().width;
+
+                const time_width =
+                    time_element.getBoundingClientRect().width;
+
+                const gap_width = 6;
+
+                const metadata_width =
+                    date_width +
+                    time_width +
+                    gap_width;
+
+                if (metadata_width <= bubble_width) {
+                    metadata_element.classList.add(
+                        "message_metadata_inline"
+                    );
+                }
+            });
         }
 
         function scroll_to_bottom() {
@@ -447,6 +487,7 @@
             return {
                 container: container_element,
                 bubble: bubble_element,
+                metadata: metadata_element,
                 date: date_element,
                 time: time_element
             };
@@ -459,13 +500,15 @@
             message_elements.bubble.textContent =
                 message_text;
 
+            document.getElementById("chat_messages")
+                .appendChild(message_elements.container);
+
             set_message_metadata(
+                message_elements.bubble,
+                message_elements.metadata,
                 message_elements.date,
                 message_elements.time
             );
-
-            document.getElementById("chat_messages")
-                .appendChild(message_elements.container);
 
             scroll_to_bottom();
 
@@ -480,8 +523,6 @@
             const message_elements =
                 create_message_container("computer");
 
-            message_elements.bubble.innerHTML = "";
-
             const typing_container =
                 document.createElement("span");
 
@@ -495,20 +536,16 @@
                 document.createElement("span");
 
             typing_container.id =
-                "typing_indicator_" +
-                Date.now();
+                "typing_indicator_" + Date.now();
 
             first_dot.id =
-                "typing_dot_1_" +
-                Date.now();
+                "typing_dot_1_" + Date.now();
 
             second_dot.id =
-                "typing_dot_2_" +
-                Date.now();
+                "typing_dot_2_" + Date.now();
 
             third_dot.id =
-                "typing_dot_3_" +
-                Date.now();
+                "typing_dot_3_" + Date.now();
 
             typing_container.className =
                 "typing_dots";
@@ -530,13 +567,15 @@
                 typing_container
             );
 
+            document.getElementById("chat_messages")
+                .appendChild(message_elements.container);
+
             set_message_metadata(
+                message_elements.bubble,
+                message_elements.metadata,
                 message_elements.date,
                 message_elements.time
             );
-
-            document.getElementById("chat_messages")
-                .appendChild(message_elements.container);
 
             scroll_to_bottom();
 
@@ -595,6 +634,8 @@
                     computer_text;
 
                 set_message_metadata(
+                    typing_message.bubble,
+                    typing_message.metadata,
                     typing_message.date,
                     typing_message.time
                 );
@@ -673,6 +714,54 @@
                     }
                 }
             );
+
+        window.addEventListener(
+            "resize",
+            function () {
+                const message_elements =
+                    document.querySelectorAll(
+                        ".message_container"
+                    );
+
+                message_elements.forEach(
+                    function (message_element) {
+                        const bubble_element =
+                            message_element.querySelector(
+                                ".message_bubble"
+                            );
+
+                        const metadata_element =
+                            message_element.querySelector(
+                                ".message_metadata"
+                            );
+
+                        const date_element =
+                            message_element.querySelector(
+                                ".message_date"
+                            );
+
+                        const time_element =
+                            message_element.querySelector(
+                                ".message_time"
+                            );
+
+                        if (
+                            bubble_element &&
+                            metadata_element &&
+                            date_element &&
+                            time_element
+                        ) {
+                            set_message_metadata(
+                                bubble_element,
+                                metadata_element,
+                                date_element,
+                                time_element
+                            );
+                        }
+                    }
+                );
+            }
+        );
 
         detect_language();
         apply_language();

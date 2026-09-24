@@ -282,6 +282,11 @@ def main():
     
     generate_swap( args.scene, args.face, args.output, args.face_number - 1 )
     
+def add_postfix( filename, postfix ):
+    base, extension = os.path.splitext(filename)
+    new_filename = base + postfix + extension
+    return new_filename
+    
 def render_pair_loop():
     srcpath = "paintings/"
     dstpath = "generated/"
@@ -289,9 +294,7 @@ def render_pair_loop():
     while 1:
         idx = random.randint(0,len(listfiles)-1)
         asrc = srcpath+listfiles[idx]
-        adst = dstpath+listfiles[idx]
-        adst = adst.replace( ".jpg", "_generated.jpg" )
-        adst = adst.replace( ".png", "_generated.png" )
+        adst = dstpath+add_postfix( listfiles[idx], "_generated" )
         print("'%s' and '%s'" % (asrc,adst) )
         if os.path.isfile( asrc ) and os.path.isfile( adst ):
             print( "fading..." )
@@ -304,9 +307,9 @@ def generate_all():
     listfiles = os.listdir( srcpath )
     for f in listfiles:
         asrc = srcpath + f
-        adst = dstpath + f.replace(".jpg","_generated.jpg").replace(".png","_generated.png" )
+        adst = dstpath+add_postfix( f, "_generated2" )
         if os.path.isfile( asrc ) and not os.path.isfile( adst ):
-            generate_swap( asrc, "visitor.jpg", adst, 0 )
+            generate_swap( asrc, "visitor2.jpg", adst, 0 )
     
 
 if __name__ == "__main__":

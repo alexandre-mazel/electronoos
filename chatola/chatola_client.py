@@ -1,3 +1,14 @@
+# evite que requests pris soit celui du dossier obo/requests!
+import sys
+obo_paths = []
+for path in sys.path[:]:
+    if path.endswith("/obo") or path.endswith("/obo/"):
+        sys.path.remove(path)
+        obo_paths.append(path)
+
+sys.path.extend(obo_paths)
+
+
 import requests
 import sys
 import time

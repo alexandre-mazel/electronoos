@@ -177,9 +177,12 @@ def runManyTimes( nNbrTimes = 50 ):
         try:
             dst_fn = "c:/tmp/wia-test2.png"
             dst_fn = "c:/tmp/wia-test_%d.png" % int( time.time() )
+            #~ dst_fn = "c:/tmp/wia-test_%d.jpg" % int( time.time() )
+            reso = 1200
             #~ reso = 750
-            reso = 600
-            #~ reso = 300
+            #~ reso = 600
+            reso = 300
+            #~ reso = 150
             print("INF: Writing to '%s'" % dst_fn )
             bRet = acquire_image_wia( dst_fn, nResolution=reso )
             if bRet:

@@ -663,10 +663,26 @@
                 const response = await fetch( addr );
                 console.log( "response:", response );
                 
-                answer = await response.json();
-                console.log( "answer:", answer );
+                  const raw_response = await response.text();
+
+                console.log("raw response:", JSON.stringify(raw_response));
+
+                if (!raw_response.trim()) {
+                    console.log("Réponse vide");
+                    answer = null;
+                } else {
+                    try {
+                        answer = JSON.parse(raw_response);
+                        console.log("answer:", answer);
+                        computer_text = answer.ans;
+                    } catch (error) {
+                        console.log("Réponse non JSON:", raw_response);
+                        answer = raw_response;
+                        computer_text = "?"
+                    }
+                }
                 
-                computer_text = answer.ans;
+                
             
                 typing_message.bubble.textContent = computer_text;
                 set_message_metadata(

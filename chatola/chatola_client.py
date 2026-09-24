@@ -1,14 +1,19 @@
 # evite que le requests pris soit celui du dossier obo/requests! C'est moche et pas de chance!
-import sys
-obo_paths = []
-for path in sys.path[:]:
-    if path.endswith("/obo") or path.endswith("/obo/"):
-        sys.path.remove(path)
-        obo_paths.append(path)
+# ca fonctionne pas car en fait c'est dans le dossier courant qu'on a un requests
 
-import requests
+#~ import sys
+#~ obo_paths = []
+#~ for path in sys.path[:]:
+    #~ if path.endswith("/obo") or path.endswith("/obo/"):
+        #~ sys.path.remove(path)
+        #~ obo_paths.append(path)
 
-sys.path.extend(obo_paths) # on le remet a la fin, c'est pas si pire...
+#~ import requests
+
+#~ sys.path.extend(obo_paths) # on le remet a la fin, c'est pas si pire...
+
+# j'ai juste dupliqué la lib en un autre nom
+import requestsdup as requests
 
 import sys
 import time

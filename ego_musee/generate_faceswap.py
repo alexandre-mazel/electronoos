@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import random
 import os
+import sys
 if os.name != "nt":
     from insightface.app import FaceAnalysis
     from insightface.model_zoo import get_model
@@ -23,6 +24,9 @@ Ca rocks serieux, et on peut cascader en reutilisant la sortie comme ref d'entre
 
 A faire avant: lancer le venv de ce dossier
 """
+
+sys.path.append("../alex_pytools")
+import misctools
 
 
 MODEL = "models/inswapper_128.onnx"
@@ -367,10 +371,14 @@ def render_pair_loop():
         idx = random.randint(0,len(listfiles)-1)
         asrc = srcpath+listfiles[idx]
         postfix = "_generated"
-        if random.random() > 0.5:
-            postfix += "3"
-            if random.random() > 0.3 and 0:
-                postfix += "2"
+        #~ if random.random() > 0.33:
+            #~ postfix += "2"
+            #~ if random.random() > 0.50 and 1:
+                #~ postfix += "3"
+        id = misctools.shuffle_int_mem( 3 )
+        if id != 0:
+            postfix += str(id+1)
+        
         adst = dstpath+add_postfix( listfiles[idx], postfix )
         print("'%s' and '%s'" % (asrc,adst) )
         if os.path.isfile( asrc ) and os.path.isfile( adst ):

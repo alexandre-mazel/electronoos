@@ -250,14 +250,30 @@
         </header>
 
         <section id="chat_messages" aria-live="polite">
-            <div id="message_container_initial" class="message_container message_container_computer">
-                <div id="message_bubble_initial" class="message_bubble message_bubble_computer">
+            <div
+                id="message_container_initial"
+                class="message_container message_container_computer"
+            >
+                <div
+                    id="message_bubble_initial"
+                    class="message_bubble message_bubble_computer"
+                >
                     Hello. How can I help you?
                 </div>
 
-                <div id="message_metadata_initial" class="message_metadata">
-                    <div id="message_date_initial" class="message_date"></div>
-                    <div id="message_time_initial" class="message_time"></div>
+                <div
+                    id="message_metadata_initial"
+                    class="message_metadata"
+                >
+                    <div
+                        id="message_date_initial"
+                        class="message_date"
+                    ></div>
+
+                    <div
+                        id="message_time_initial"
+                        class="message_time"
+                    ></div>
                 </div>
             </div>
         </section>
@@ -287,9 +303,10 @@
                 send: "Send",
                 initial: "Hello. How can I help you?"
             },
+
             fr: {
                 title: "Alma Robot",
-                status: "Mode clinique priv&eacute;e",
+                status: "Mode clinique privée",
                 thinking: "En cours...",
                 placeholder: "Écrivez un message...",
                 send: "Envoyer",
@@ -299,6 +316,7 @@
 
         let current_language = "en";
 
+
         function detect_language() {
             const browser_language = (
                 navigator.language ||
@@ -307,76 +325,183 @@
             ).toLowerCase();
 
             current_language =
-                browser_language.startsWith("fr") ? "fr" : "en";
+                browser_language.startsWith("fr")
+                    ? "fr"
+                    : "en";
         }
 
+
         function apply_language() {
-            const language = language_data[current_language];
+            const language =
+                language_data[current_language];
 
-            document.documentElement.lang = current_language;
-            document.title = language.title;
+            document.documentElement.lang =
+                current_language;
 
-            document.getElementById("chat_title").textContent = language.title;
+            document.title =
+                language.title;
 
-            document.getElementById("chat_status").textContent = language.status;
+            document.getElementById(
+                "chat_title"
+            ).textContent =
+                language.title;
 
-            document.getElementById("user_input").placeholder = language.placeholder;
+            document.getElementById(
+                "chat_status"
+            ).textContent =
+                language.status;
 
-            document.getElementById("send_button").textContent = language.send;
+            document.getElementById(
+                "user_input"
+            ).placeholder =
+                language.placeholder;
 
-            document.getElementById("message_bubble_initial").textContent = language.initial;
+            document.getElementById(
+                "send_button"
+            ).textContent =
+                language.send;
+
+            document.getElementById(
+                "message_bubble_initial"
+            ).textContent =
+                language.initial;
+
+
+            /*
+             * Le message initial possède lui aussi son timestamp.
+             *
+             * IMPORTANT :
+             * On ne le recalcule pas à chaque appel de
+             * apply_language(). On lui attribue uniquement
+             * un timestamp s'il n'en possède pas encore.
+             */
+            const initial_bubble =
+                document.getElementById(
+                    "message_bubble_initial"
+                );
+
+            const initial_metadata =
+                document.getElementById(
+                    "message_metadata_initial"
+                );
+
+            const initial_date =
+                document.getElementById(
+                    "message_date_initial"
+                );
+
+            const initial_time =
+                document.getElementById(
+                    "message_time_initial"
+                );
+
+            if (!initial_bubble.dataset.timestamp) {
+                initial_bubble.dataset.timestamp =
+                    new Date().toISOString();
+            }
 
             set_message_metadata(
-                document.getElementById("message_bubble_initial"),
-                document.getElementById("message_metadata_initial"),
-                document.getElementById("message_date_initial"),
-                document.getElementById("message_time_initial")
+                initial_bubble,
+                initial_metadata,
+                initial_date,
+                initial_time
             );
         }
 
-        function get_current_date() {
+
+        /*
+         * Formate une date à partir d'un timestamp.
+         *
+         * IMPORTANT :
+         * Cette fonction ne fait PAS new Date() toute seule.
+         * Elle reçoit toujours le timestamp du message.
+         */
+        function get_date_from_timestamp(timestamp) {
             return new Intl.DateTimeFormat(
-                current_language === "fr" ? "fr-FR" : "en-US",
+                current_language === "fr"
+                    ? "fr-FR"
+                    : "en-US",
                 {
                     weekday: "short",
                     day: "numeric",
                     month: "short"
                 }
-            ).format(new Date());
+            ).format(
+                new Date(timestamp)
+            );
         }
 
-        function get_current_time() {
+
+        function get_time_from_timestamp(timestamp) {
             return new Intl.DateTimeFormat(
-                current_language === "fr" ? "fr-FR" : "en-US",
+                current_language === "fr"
+                    ? "fr-FR"
+                    : "en-US",
                 {
                     hour: "2-digit",
                     minute: "2-digit"
                 }
-            ).format(new Date());
+            ).format(
+                new Date(timestamp)
+            );
         }
 
+
+        /*
+         * Met à jour uniquement l'affichage du timestamp
+         * fourni.
+         *
+         * Le timestamp est donc immuable pour le message.
+         */
         function set_message_metadata(
             bubble_element,
             metadata_element,
             date_element,
             time_element
         ) {
-            date_element.textContent = get_current_date();
-            time_element.textContent = get_current_time();
+            let timestamp =
+                bubble_element.dataset.timestamp;
+
+            /*
+             * Sécurité : si aucun timestamp n'existe encore,
+             * on en crée un une seule fois.
+             */
+            if (!timestamp) {
+                timestamp =
+                    new Date().toISOString();
+
+                bubble_element.dataset.timestamp =
+                    timestamp;
+            }
+
+
+            date_element.textContent =
+                get_date_from_timestamp(timestamp);
+
+            time_element.textContent =
+                get_time_from_timestamp(timestamp);
+
 
             metadata_element.classList.remove(
                 "message_metadata_inline"
             );
 
+
             requestAnimationFrame(function () {
                 const bubble_width =
-                    bubble_element.getBoundingClientRect().width;
+                    bubble_element
+                        .getBoundingClientRect()
+                        .width;
 
                 const date_width =
-                    date_element.getBoundingClientRect().width;
+                    date_element
+                        .getBoundingClientRect()
+                        .width;
 
                 const time_width =
-                    time_element.getBoundingClientRect().width;
+                    time_element
+                        .getBoundingClientRect()
+                        .width;
 
                 const gap_width = 6;
 
@@ -385,7 +510,11 @@
                     time_width +
                     gap_width;
 
-                if (metadata_width <= bubble_width) {
+
+                if (
+                    metadata_width <=
+                    bubble_width
+                ) {
                     metadata_element.classList.add(
                         "message_metadata_inline"
                     );
@@ -393,23 +522,32 @@
             });
         }
 
+
         function scroll_to_bottom() {
             const messages_element =
-                document.getElementById("chat_messages");
+                document.getElementById(
+                    "chat_messages"
+                );
 
             messages_element.scrollTo({
-                top: messages_element.scrollHeight,
+                top:
+                    messages_element.scrollHeight,
                 behavior: "smooth"
             });
         }
 
-        function create_message_container(sender_type) {
+
+        function create_message_container(
+            sender_type,
+            timestamp = null
+        ) {
             const unique_id =
                 Date.now() +
                 "_" +
                 Math.random()
                     .toString(36)
                     .substring(2, 8);
+
 
             const container_element =
                 document.createElement("div");
@@ -425,6 +563,7 @@
 
             const time_element =
                 document.createElement("div");
+
 
             container_element.id =
                 "message_container_" +
@@ -456,6 +595,7 @@
                 "_" +
                 unique_id;
 
+
             container_element.className =
                 "message_container message_container_" +
                 sender_type;
@@ -473,11 +613,32 @@
             time_element.className =
                 "message_time";
 
-            metadata_element.appendChild(date_element);
-            metadata_element.appendChild(time_element);
 
-            container_element.appendChild(bubble_element);
-            container_element.appendChild(metadata_element);
+            /*
+             * Le timestamp est stocké directement dans
+             * le DOM du message.
+             */
+            bubble_element.dataset.timestamp =
+                timestamp ||
+                new Date().toISOString();
+
+
+            metadata_element.appendChild(
+                date_element
+            );
+
+            metadata_element.appendChild(
+                time_element
+            );
+
+            container_element.appendChild(
+                bubble_element
+            );
+
+            container_element.appendChild(
+                metadata_element
+            );
+
 
             return {
                 container: container_element,
@@ -488,15 +649,29 @@
             };
         }
 
-        function add_message(message_text, sender_type) {
+
+        function add_message(
+            message_text,
+            sender_type,
+            timestamp = null
+        ) {
             const message_elements =
-                create_message_container(sender_type);
+                create_message_container(
+                    sender_type,
+                    timestamp
+                );
+
 
             message_elements.bubble.textContent =
                 message_text;
 
-            document.getElementById("chat_messages")
-                .appendChild(message_elements.container);
+
+            document.getElementById(
+                "chat_messages"
+            ).appendChild(
+                message_elements.container
+            );
+
 
             set_message_metadata(
                 message_elements.bubble,
@@ -505,18 +680,47 @@
                 message_elements.time
             );
 
+
             scroll_to_bottom();
+
 
             return message_elements;
         }
 
-        function add_user_message(message_text) {
-            return add_message(message_text, "user");
+
+        function add_user_message(
+            message_text,
+            timestamp = null
+        ) {
+            return add_message(
+                message_text,
+                "user",
+                timestamp
+            );
         }
 
+
         function create_typing_message() {
+            /*
+             * Le timestamp du message ordinateur doit
+             * correspondre à l'heure de réception de la réponse,
+             * pas à l'heure où l'animation "..." commence.
+             *
+             * On ne lui donne donc PAS encore de timestamp.
+             */
             const message_elements =
-                create_message_container("computer");
+                create_message_container(
+                    "computer",
+                    null
+                );
+
+
+            /*
+             * On retire le timestamp provisoire.
+             * Il sera défini lorsque la vraie réponse arrivera.
+             */
+            delete message_elements.bubble.dataset.timestamp;
+
 
             const typing_container =
                 document.createElement("span");
@@ -530,17 +734,27 @@
             const third_dot =
                 document.createElement("span");
 
+
+            const typing_id =
+                Date.now();
+
+
             typing_container.id =
-                "typing_indicator_" + Date.now();
+                "typing_indicator_" +
+                typing_id;
 
             first_dot.id =
-                "typing_dot_1_" + Date.now();
+                "typing_dot_1_" +
+                typing_id;
 
             second_dot.id =
-                "typing_dot_2_" + Date.now();
+                "typing_dot_2_" +
+                typing_id;
 
             third_dot.id =
-                "typing_dot_3_" + Date.now();
+                "typing_dot_3_" +
+                typing_id;
+
 
             typing_container.className =
                 "typing_dots";
@@ -554,84 +768,166 @@
             third_dot.className =
                 "typing_dot";
 
-            typing_container.appendChild(first_dot);
-            typing_container.appendChild(second_dot);
-            typing_container.appendChild(third_dot);
+
+            typing_container.appendChild(
+                first_dot
+            );
+
+            typing_container.appendChild(
+                second_dot
+            );
+
+            typing_container.appendChild(
+                third_dot
+            );
+
 
             message_elements.bubble.appendChild(
                 typing_container
             );
 
-            document.getElementById("chat_messages")
-                .appendChild(message_elements.container);
 
-            set_message_metadata(
-                message_elements.bubble,
-                message_elements.metadata,
-                message_elements.date,
-                message_elements.time
+            document.getElementById(
+                "chat_messages"
+            ).appendChild(
+                message_elements.container
             );
 
+
+            /*
+             * Pas de set_message_metadata ici :
+             * l'heure définitive sera celle de réception
+             * de la réponse.
+             */
+
+
             scroll_to_bottom();
+
 
             return message_elements;
         }
 
-        function prepare_computer_input(user_text) {
+
+        function prepare_computer_input(
+            user_text,
+            message_timestamp
+        ) {
             return {
                 message: user_text,
                 language: current_language,
-                timestamp: new Date().toISOString()
+
+                /*
+                 * Timestamp exact du moment où
+                 * l'utilisateur envoie son message.
+                 */
+                timestamp:
+                    message_timestamp ||
+                    new Date().toISOString()
             };
         }
+
 
         function receive_user_input(user_text) {
             const clean_text =
                 user_text.trim();
 
+
             if (!clean_text) {
                 return null;
             }
 
-            add_user_message(clean_text);
+
+            /*
+             * Le timestamp est créé UNE SEULE FOIS,
+             * au moment de l'envoi.
+             */
+            const sent_timestamp =
+                new Date().toISOString();
+
+
+            const user_message =
+                add_user_message(
+                    clean_text,
+                    sent_timestamp
+                );
+
 
             const computer_input =
-                prepare_computer_input(clean_text);
+                prepare_computer_input(
+                    clean_text,
+                    sent_timestamp
+                );
 
-            document.getElementById("chat_status")
-                .textContent =
-                language_data[current_language].thinking;
+
+            document.getElementById(
+                "chat_status"
+            ).textContent =
+                language_data[
+                    current_language
+                ].thinking;
+
 
             return computer_input;
         }
 
-        // on trimballe computer_input juste pour pouvoir lenvoyer pendant l'anim
-        function answer_from_computer(computer_text,computer_input) {
+
+        function answer_from_computer(
+            computer_text,
+            computer_input
+        ) {
             const clean_text =
-                String(computer_text || "").trim();
+                String(
+                    computer_text || ""
+                ).trim();
+
 
             if (!clean_text) {
                 return;
             }
 
+
             add_computer_message_after_typing(
-                clean_text,computer_input
+                clean_text,
+                computer_input
             );
         }
 
+
         async function add_computer_message_after_typing(
-            computer_text,computer_input
+            computer_text,
+            computer_input
         ) {
             const typing_message =
                 create_typing_message();
 
 
-            if( false )
-            {
-                // simulate
+            /*
+             * Cette fonction représente l'heure à laquelle
+             * la réponse informatique est réellement reçue.
+             *
+             * Si le serveur fournit un timestamp,
+             * on pourra le remplacer par celui-ci.
+             */
+            let computer_timestamp =
+                new Date().toISOString();
+
+
+            if (false) {
+                /*
+                 * Mode simulation.
+                 */
                 setTimeout(function () {
+
+                    computer_timestamp =
+                        new Date().toISOString();
+
                     typing_message.bubble.textContent =
                         computer_text;
+
+                    typing_message.bubble.dataset.timestamp =
+                        computer_timestamp;
+
+
                     set_message_metadata(
                         typing_message.bubble,
                         typing_message.metadata,
@@ -639,47 +935,148 @@
                         typing_message.time
                     );
 
-                    document.getElementById("chat_status")
-                        .textContent =
-                        language_data[current_language].status;
+
+                    document.getElementById(
+                        "chat_status"
+                    ).textContent =
+                        language_data[
+                            current_language
+                        ].status;
+
 
                     scroll_to_bottom();
+
                 }, 2000);
+
+                return;
             }
-            else
-            {
-                // real answer:
-                const id = "web"
-                const q = computer_input.message;
-                
-                let addr = "/chatola/chatola_client.py?id=" + encodeURIComponent(id);
-                addr += "&q=" + encodeURIComponent(q);
 
-                const response = await fetch( addr );
-                console.log( "response:", response );
-                
-                  const raw_response = await response.text();
 
-                console.log("raw response:", JSON.stringify(raw_response));
+            /*
+             * REAL ANSWER
+             */
+            const id = "web";
+
+            const q =
+                computer_input.message;
+
+
+            let addr =
+                "/chatola/chatola_client.py?id=" +
+                encodeURIComponent(id);
+
+            addr +=
+                "&q=" +
+                encodeURIComponent(q);
+
+
+            try {
+                const response =
+                    await fetch(addr);
+
+
+                console.log(
+                    "response:",
+                    response
+                );
+
+
+                const raw_response =
+                    await response.text();
+
+
+                console.log(
+                    "raw response:",
+                    JSON.stringify(
+                        raw_response
+                    )
+                );
+
+
+                let answer = null;
+
 
                 if (!raw_response.trim()) {
-                    console.log("Réponse vide");
+                    console.log(
+                        "Réponse vide"
+                    );
+
                     answer = null;
+
                 } else {
                     try {
-                        answer = JSON.parse(raw_response);
-                        console.log("answer:", answer);
-                        computer_text = answer.ans;
+                        answer =
+                            JSON.parse(
+                                raw_response
+                            );
+
+                        console.log(
+                            "answer:",
+                            answer
+                        );
+
+                        computer_text =
+                            answer.ans;
+
+
+                        /*
+                         * SI ton serveur renvoie un timestamp,
+                         * on l'utilise.
+                         *
+                         * Exemple accepté :
+                         *
+                         * {
+                         *     "ans": "...",
+                         *     "timestamp": "2026-09-29T10:15:23.123Z"
+                         * }
+                         */
+                        if (
+                            answer.timestamp
+                        ) {
+                            computer_timestamp =
+                                answer.timestamp;
+                        }
+
+                        /*
+                         * Variante possible si ton backend
+                         * appelle le champ "updated_at".
+                         */
+                        else if (
+                            answer.updated_at
+                        ) {
+                            computer_timestamp =
+                                answer.updated_at;
+                        }
+
                     } catch (error) {
-                        console.log("Réponse non JSON:", raw_response);
-                        answer = raw_response;
-                        computer_text = "?"
+                        console.log(
+                            "Réponse non JSON:",
+                            raw_response
+                        );
+
+                        answer =
+                            raw_response;
+
+                        computer_text = "?";
                     }
                 }
-                
-                
-            
-                typing_message.bubble.textContent = computer_text;
+
+
+                /*
+                 * La réponse est maintenant définitive.
+                 */
+                typing_message.bubble.textContent =
+                    computer_text;
+
+
+                /*
+                 * On enregistre définitivement
+                 * l'heure de la réponse.
+                 */
+                typing_message.bubble.dataset.timestamp =
+                    computer_timestamp;
+
+
                 set_message_metadata(
                     typing_message.bubble,
                     typing_message.metadata,
@@ -687,88 +1084,182 @@
                     typing_message.time
                 );
 
-                document.getElementById("chat_status")
-                    .textContent =
-                    language_data[current_language].status;
+
+                document.getElementById(
+                    "chat_status"
+                ).textContent =
+                    language_data[
+                        current_language
+                    ].status;
+
+
+                scroll_to_bottom();
+
+
+            } catch (error) {
+
+                console.error(
+                    "Erreur lors de la requête:",
+                    error
+                );
+
+
+                computer_text =
+                    current_language === "fr"
+                        ? "Erreur lors de la communication."
+                        : "Communication error.";
+
+
+                computer_timestamp =
+                    new Date().toISOString();
+
+
+                typing_message.bubble.textContent =
+                    computer_text;
+
+
+                typing_message.bubble.dataset.timestamp =
+                    computer_timestamp;
+
+
+                set_message_metadata(
+                    typing_message.bubble,
+                    typing_message.metadata,
+                    typing_message.date,
+                    typing_message.time
+                );
+
+
+                document.getElementById(
+                    "chat_status"
+                ).textContent =
+                    language_data[
+                        current_language
+                    ].status;
+
 
                 scroll_to_bottom();
             }
         }
 
-        function handle_user_message(user_text) {
+
+        function handle_user_message(
+            user_text
+        ) {
             const computer_input =
-                receive_user_input(user_text);
+                receive_user_input(
+                    user_text
+                );
+
 
             if (!computer_input) {
                 return;
             }
+
 
             computer_process_input(
                 computer_input
             );
         }
 
-        async function computer_process_input( computer_input ) {
-            console.log( "INF: computer_process_input: input:", computer_input )
+
+        async function computer_process_input(
+            computer_input
+        ) {
+            console.log(
+                "INF: computer_process_input: input:",
+                computer_input
+            );
+
+
             let response_text =
                 current_language === "fr"
                     ? "J'ai reçu votre message : " +
                       computer_input.message
+
                     : "I received your message: " +
                       computer_input.message;
-    
-            answer_from_computer( response_text,computer_input );
+
+
+            answer_from_computer(
+                response_text,
+                computer_input
+            );
         }
 
-        document.getElementById("chat_input_area")
-            .addEventListener(
-                "submit",
-                function (event) {
-                    event.preventDefault();
 
-                    const input_element =
-                        document.getElementById("user_input");
+        document.getElementById(
+            "chat_input_area"
+        ).addEventListener(
+            "submit",
+            function (event) {
 
-                    const user_text =
-                        input_element.value;
+                event.preventDefault();
 
-                    input_element.value = "";
 
-                    handle_user_message(
-                        user_text
+                const input_element =
+                    document.getElementById(
+                        "user_input"
                     );
 
-                    input_element.focus();
+
+                const user_text =
+                    input_element.value;
+
+
+                input_element.value = "";
+
+
+                handle_user_message(
+                    user_text
+                );
+
+
+                input_element.focus();
+            }
+        );
+
+
+        document.getElementById(
+            "user_input"
+        ).addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Enter" &&
+                    !event.shiftKey
+                ) {
+                    event.preventDefault();
+
+
+                    document.getElementById(
+                        "chat_input_area"
+                    ).requestSubmit();
                 }
-            );
+            }
+        );
 
-        document.getElementById("user_input")
-            .addEventListener(
-                "keydown",
-                function (event) {
-                    if (
-                        event.key === "Enter" &&
-                        !event.shiftKey
-                    ) {
-                        event.preventDefault();
 
-                        document.getElementById(
-                            "chat_input_area"
-                        ).requestSubmit();
-                    }
-                }
-            );
-
+        /*
+         * Lors d'un resize :
+         *
+         * On réaffiche les timestamps existants.
+         * On ne crée JAMAIS un nouveau timestamp.
+         */
         window.addEventListener(
             "resize",
             function () {
+
                 const message_elements =
                     document.querySelectorAll(
                         ".message_container"
                     );
 
+
                 message_elements.forEach(
                     function (message_element) {
+
                         const bubble_element =
                             message_element.querySelector(
                                 ".message_bubble"
@@ -789,12 +1280,18 @@
                                 ".message_time"
                             );
 
+
                         if (
                             bubble_element &&
                             metadata_element &&
                             date_element &&
                             time_element
                         ) {
+
+                            /*
+                             * Le timestamp est déjà dans
+                             * bubble_element.dataset.timestamp.
+                             */
                             set_message_metadata(
                                 bubble_element,
                                 metadata_element,
@@ -807,7 +1304,9 @@
             }
         );
 
+
         detect_language();
+
         apply_language();
     </script>
 </body>

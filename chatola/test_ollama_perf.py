@@ -6,6 +6,18 @@ import statistics
 
 OLLAMA_ADDR = "http://127.0.0.1"
 
+
+"""
+Vu sur le web:
+
+3080  < 5070  <  4080  <  5080
+
+3080 : 29,8 TFLOPS / 10 Go / 320 W
+4080 : 48,7 TFLOPS / 16 Go / 320 W
+5080 : 56,3 TFLOPS / 16 Go / 360 W
+
+"""
+
 def test_ollama_port( addr, port ):
     import urllib3
     url = "%s:%s/api/tags" % (addr, port)

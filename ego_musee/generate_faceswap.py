@@ -216,10 +216,14 @@ def generate_swap( painting, person, output, num_face ):
         return
 
     if scene is None:
-        raise RuntimeError(f"Impossible de lire {painting}")
+        #~ raise RuntimeError(f"Impossible de lire {painting}")
+        print( f"ERR: Impossible de lire {painting}" )
+        return
 
     if reference is None:
-        raise RuntimeError(f"Impossible de lire {person}")
+        #~ raise RuntimeError(f"Impossible de lire {person}")
+        print( f"ERR: Impossible de lire {person}" )
+        return
 
     print("Détection des visages...")
 
@@ -230,10 +234,12 @@ def generate_swap( painting, person, output, num_face ):
     print(f"Visages dans la référence : {len(reference_faces)}")
 
     if len(scene_faces) == 0:
-        raise RuntimeError("Aucun visage trouvé dans la scène '%s'" % painting )
+        print( "ERR: Aucun visage trouvé dans la scène '%s'" % painting )
+        return
 
     if len(reference_faces) == 0:
-        raise RuntimeError("Aucun visage trouvé dans l'image de référence '%s'" % person)
+        print( "ERR: Aucun visage trouvé dans l'image de référence '%s'" % person)
+        return
 
     face_index = num_face
 

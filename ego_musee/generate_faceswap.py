@@ -413,11 +413,12 @@ def generate_all():
     srcpath = "paintings/"
     dstpath = "generated/"
     listfiles = os.listdir( srcpath )
-    for f in listfiles:
-        asrc = srcpath + f
-        adst = dstpath+add_postfix( f, "_generated3" )
-        if os.path.isfile( asrc ) and not os.path.isfile( adst ):
-            generate_swap( asrc, "visitor3.jpg", adst, 0 )
+    for num in ["","2","3","4","5"]:
+        for f in listfiles:
+            asrc = srcpath + f
+            adst = dstpath+add_postfix( f, "_generated" + num )
+            if os.path.isfile( asrc ) and not os.path.isfile( adst ):
+                generate_swap( asrc, "visitor%s.jpg" % num, adst, 0 )
     
 
 if __name__ == "__main__":

@@ -191,7 +191,7 @@ def fade_images(image1_filename, image2_filename, duration=5.0):
 
     # Leave the second image displayed
     cv2.imshow(window_name, img2)
-    cv2.waitKey(5000)
+    cv2.waitKey(8000)
 
     #~ return window_name
     return True

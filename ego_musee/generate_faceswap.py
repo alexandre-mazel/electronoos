@@ -230,10 +230,10 @@ def generate_swap( painting, person, output, num_face ):
     print(f"Visages dans la référence : {len(reference_faces)}")
 
     if len(scene_faces) == 0:
-        raise RuntimeError("Aucun visage trouvé dans la scène.")
+        raise RuntimeError("Aucun visage trouvé dans la scène '%s'" % painting )
 
     if len(reference_faces) == 0:
-        raise RuntimeError("Aucun visage trouvé dans l'image de référence.")
+        raise RuntimeError("Aucun visage trouvé dans l'image de référence '%s'" % person)
 
     face_index = num_face
 
@@ -367,17 +367,26 @@ def render_pair_loop():
     srcpath = "paintings/"
     dstpath = "generated/"
     listfiles = os.listdir( srcpath )
+    
     while 1:
-        idx = random.randint(0,len(listfiles)-1)
+        idx = misctools.shuffle_int_mem( len(listfiles)-1 )
         asrc = srcpath+listfiles[idx]
         postfix = "_generated"
         #~ if random.random() > 0.33:
             #~ postfix += "2"
             #~ if random.random() > 0.50 and 1:
                 #~ postfix += "3"
-        id = misctools.shuffle_int_mem( 3 )
-        if id != 0:
-            postfix += str(id+1)
+        
+        if 0:
+            # les n premiers
+            id = misctools.shuffle_int_mem( 3 )
+            if id != 0:
+                postfix += str(id+1)
+        if 1:
+            # defaut image ou une certaine (une chance sur 2 alterne)
+            id = misctools.shuffle_int_mem( 2 )
+            if id != 0:
+                postfix += "4"
         
         adst = dstpath+add_postfix( listfiles[idx], postfix )
         print("'%s' and '%s'" % (asrc,adst) )

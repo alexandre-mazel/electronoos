@@ -203,7 +203,7 @@ def generate_swap( painting, person, output, num_face ):
     
     create_generator()
 
-    print("Lecture des images...")
+    print("Lecture des images '%s' and '%s'..." % (painting, person) )
 
     scene = cv2.imread(painting)
     reference = cv2.imread(person)

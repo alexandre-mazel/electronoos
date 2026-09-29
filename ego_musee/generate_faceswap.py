@@ -388,12 +388,20 @@ def render_pair_loop():
             id = misctools.shuffle_int_mem( 3 )
             if id != 0:
                 postfix += str(id+1)
-        if 1:
+        if 0:
             # defaut image ou une certaine (une chance sur 2 alterne)
             id = misctools.shuffle_int_mem( 2 )
             if id != 0:
-                postfix += "4"
-        
+                postfix += "3"
+                
+        if 1:
+            # defaut image ou 2 certaine (une chance sur 2 alterne)
+            id = misctools.shuffle_int_mem( 3 )
+            if id == 1:
+                postfix += "3"
+            if id == 2:
+                postfix += "5"
+                
         adst = dstpath+add_postfix( listfiles[idx], postfix )
         print("'%s' and '%s'" % (asrc,adst) )
         if os.path.isfile( asrc ) and os.path.isfile( adst ):

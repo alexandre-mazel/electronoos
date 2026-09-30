@@ -20,6 +20,7 @@ sudo python3 /home/a/dev/git/electronoos/ubuntu/daemon/background_task.py no_hal
 sur champion, y a un run_chatola.sh dans la racine qui cree tout!
 
 scp a@192.168.0.45:/home/a/voices/* d:\voices\
+scp a@192.168.0.45:/home/a/logs/* c:\logs\
 
 # wake
 https://engrenage.studio/eng_index.py?wake=champion1

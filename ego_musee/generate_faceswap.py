@@ -423,7 +423,7 @@ def generate_all():
 
 if __name__ == "__main__":
     # main()
-    generate_all()
-    #~ render_pair_loop()
+    #~ generate_all()
+    render_pair_loop()
     
     

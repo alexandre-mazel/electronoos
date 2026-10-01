@@ -92,6 +92,7 @@
             aspect-ratio: 4 / 3;
             overflow: hidden;
             background: #dedcd5;
+            background: #888;
         }
 
         .gallery_widget_image {
@@ -423,7 +424,6 @@
 <script id="script_gallery">
     function createImagePingPong(widgetId, imageA, imageB, duration = 10000) {
         const widgetElement = document.getElementById(widgetId);
-
         const imageElements = widgetElement.querySelectorAll(
             ".gallery_widget_image"
         );
@@ -441,38 +441,40 @@
         imageAElement.style.opacity = "1";
         imageBElement.style.opacity = "0";
 
+        imageAElement.style.transition = "none";
+        imageBElement.style.transition = "none";
+
         const transitionDuration = duration / 2;
 
-        function fadeToB() {
+        function transitionTo(targetA, targetB, callback) {
             imageAElement.style.transition =
                 `opacity ${transitionDuration}ms ease-in-out`;
 
             imageBElement.style.transition =
                 `opacity ${transitionDuration}ms ease-in-out`;
 
-            imageBElement.style.opacity = "1";
-            imageAElement.style.opacity = "0";
+            requestAnimationFrame(function () {
+                imageAElement.style.opacity = targetA;
+                imageBElement.style.opacity = targetB;
+            });
 
-            setTimeout(fadeToA, transitionDuration);
+            setTimeout(callback, transitionDuration);
+        }
+
+        function fadeToB() {
+            transitionTo(0, 1, fadeToA);
         }
 
         function fadeToA() {
-            imageAElement.style.transition =
-                `opacity ${transitionDuration}ms ease-in-out`;
-
-            imageBElement.style.transition =
-                `opacity ${transitionDuration}ms ease-in-out`;
-
-            imageAElement.style.opacity = "1";
-            imageBElement.style.opacity = "0";
-
-            setTimeout(fadeToB, transitionDuration);
+            transitionTo(1, 0, fadeToB);
         }
 
-        requestAnimationFrame(fadeToB);
+        requestAnimationFrame(function () {
+            setTimeout(fadeToB, 100);
+        });
     }
 
-    document.querySelectorAll(".gallery_widget").forEach(function(widgetElement) {
+    document.querySelectorAll(".gallery_widget").forEach(function (widgetElement) {
         createImagePingPong(
             widgetElement.id,
             widgetElement.dataset.imageA,
@@ -480,6 +482,7 @@
         );
     });
 </script>
+
 </body>
 </html>
 ```

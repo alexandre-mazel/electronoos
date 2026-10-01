@@ -1,9 +1,11 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="page_title">Ego Musee</title>
+
     <style id="style_main">
         * {
             box-sizing: border-box;
@@ -83,19 +85,26 @@
             gap: 2rem;
         }
 
-        #gallery_image_01,
-        #gallery_image_02,
-        #gallery_image_03,
-        #gallery_image_04,
-        #gallery_image_05        {
+        .gallery_widget {
+            position: relative;
             display: block;
             width: 100%;
             aspect-ratio: 4 / 3;
-            object-fit: cover;
+            overflow: hidden;
             background: #dedcd5;
         }
 
-        #gallery_image_01 {
+        .gallery_widget_image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #gallery_widget_01 {
             grid-column: span 2;
             aspect-ratio: 16 / 8;
         }
@@ -204,7 +213,7 @@
                 gap: 1rem;
             }
 
-            #gallery_image_01 {
+            #gallery_widget_01 {
                 grid-column: auto;
                 aspect-ratio: 4 / 3;
             }
@@ -216,28 +225,7 @@
             #contact_section {
                 min-height: 45vh;
             }
-
-        } // media 700
-            
-    .art_widget {
-        position: relative;
-        display: block;
-        width: 100%;
-        aspect-ratio: 4 / 3;
-        overflow: hidden;
-        background: #dedcd5;
-    }
-
-    .art_image {
-        position: absolute;
-        top: 0;
-        left: 0;
-        display: block;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }    
-    
+        }
     </style>
 </head>
 
@@ -247,77 +235,143 @@
         <section id="hero_section">
             <div id="hero_content">
                 <h1 id="hero_title">EGO MUSEE</h1>
-                <p id="hero_subtitle" data-en="Review classical paintings, with a personnal motivation." 
-                        data-fr="Redécouvrez des oeuvres classiques avec une motivation toute personnelle.">
-                    placeholder...
+
+                <p id="hero_subtitle"
+                   data-en="Review classical paintings, with a personal motivation."
+                   data-fr="Redécouvrez des œuvres classiques avec une motivation toute personnelle.">
+                    Review classical paintings, with a personal motivation.
                 </p>
             </div>
         </section>
 
         <section id="intro_section">
-            <p id="intro_text" data-en="A beautiful flat-screen display shows one or more classical paintings. When a group of visitors looks at the painting, it transforms: the visitors’ faces gradually appear within the artwork." 
-                data-fr="Un bel écran à bords plats diffuse un ou plusieurs peintures classiques. Lorsqu'un groupe de visiteurs regardent le tableau, le tableau se transforme: les visages des visiteurs apparaissent progressivement dans le tableau.">
-                placeholder...
+            <p id="intro_text"
+               data-en="A beautiful flat-screen display shows one or more classical paintings. When a group of visitors looks at the painting, it transforms: the visitors’ faces gradually appear within the artwork."
+               data-fr="Un bel écran à bords plats diffuse une ou plusieurs peintures classiques. Lorsqu'un groupe de visiteurs regarde le tableau, le tableau se transforme : les visages des visiteurs apparaissent progressivement dans l'œuvre.">
+                A beautiful flat-screen display shows one or more classical paintings. When a group of visitors looks at the painting, it transforms: the visitors’ faces gradually appear within the artwork.
             </p>
         </section>
 
         <section id="gallery_section">
             <div id="gallery_grid">
-                <!-- gallery_image_01 -->
-                <img id="gallery_image_01" src="images/project_01.jpg" alt="Artwork">
 
-                <img id="gallery_image_02" src="images/project_02.jpg" alt="Artwork">
-                <img id="gallery_image_03" src="images/project_03.jpg" alt="Artwork">
-                <img id="gallery_image_04" src="images/project_04.jpg" alt="Artwork">
-                <img id="gallery_image_05" src="images/project_05.jpg" alt="Artwork">
-                
-                <div id="art_widget_01"
-                     class="art_widget"
+                <div id="gallery_widget_01"
+                     class="gallery_widget"
                      data-image-a="paintings/Gustave_Courbet_-_Le_Désespéré_(1843).jpg"
                      data-image-b="paintings/Gustave_Courbet_-_Le_Désespéré_(1843)_generated.jpg">
-                    <img id="art_image_01_a" class="art_image" src="" alt="">
-                    <img id="art_image_01_b" class="art_image" src="" alt="">
+                    <img id="gallery_image_01_a"
+                         class="gallery_widget_image"
+                         src=""
+                         alt="Artwork">
+                    <img id="gallery_image_01_b"
+                         class="gallery_widget_image"
+                         src=""
+                         alt="Artwork">
                 </div>
+
+                <div id="gallery_widget_02"
+                     class="gallery_widget"
+                     data-image-a="paintings/painting_02.jpg"
+                     data-image-b="paintings/painting_02_generated.jpg">
+                    <img id="gallery_image_02_a"
+                         class="gallery_widget_image"
+                         src=""
+                         alt="Artwork">
+                    <img id="gallery_image_02_b"
+                         class="gallery_widget_image"
+                         src=""
+                         alt="Artwork">
+                </div>
+
+                <div id="gallery_widget_03"
+                     class="gallery_widget"
+                     data-image-a="paintings/painting_03.jpg"
+                     data-image-b="paintings/painting_03_generated.jpg">
+                    <img id="gallery_image_03_a"
+                         class="gallery_widget_image"
+                         src=""
+                         alt="Artwork">
+                    <img id="gallery_image_03_b"
+                         class="gallery_widget_image"
+                         src=""
+                         alt="Artwork">
+                </div>
+
+                <div id="gallery_widget_04"
+                     class="gallery_widget"
+                     data-image-a="paintings/painting_04.jpg"
+                     data-image-b="paintings/painting_04_generated.jpg">
+                    <img id="gallery_image_04_a"
+                         class="gallery_widget_image"
+                         src=""
+                         alt="Artwork">
+                    <img id="gallery_image_04_b"
+                         class="gallery_widget_image"
+                         src=""
+                         alt="Artwork">
+                </div>
+
+                <div id="gallery_widget_05"
+                     class="gallery_widget"
+                     data-image-a="paintings/painting_05.jpg"
+                     data-image-b="paintings/painting_05_generated.jpg">
+                    <img id="gallery_image_05_a"
+                         class="gallery_widget_image"
+                         src=""
+                         alt="Artwork">
+                    <img id="gallery_image_05_b"
+                         class="gallery_widget_image"
+                         src=""
+                         alt="Artwork">
+                </div>
+
             </div>
         </section>
 
         <section id="text_section">
             <div id="text_content">
-                <h2 id="text_title" data-en="The project" data-fr="Le projet">The project</h2>
+                <h2 id="text_title"
+                    data-en="The project"
+                    data-fr="Le projet">
+                    The project
+                </h2>
 
                 <div id="text_body">
                     <p id="description_paragraph_01"
                        data-en="This project explores the relationship between the subject of an artwork and its representation, allowing visitors to imagine themselves in the past, within a scene from the artist’s time."
                        data-fr="Ce projet explore la relation entre le sujet d’une œuvre et sa représentation, en invitant les visiteurs à s’y projeter et à s’imaginer dans le passé, au cœur d’une scène telle qu’elle aurait pu exister à l’époque de l’artiste.">
-                        (placeholder)
+                        This project explores the relationship between the subject of an artwork and its representation, allowing visitors to imagine themselves in the past, within a scene from the artist’s time.
                     </p>
 
                     <p id="description_paragraph_02"
                        data-en="It subtly encourages younger visitors to spend more time observing an artwork, giving them a sense of purpose and motivation as they look closely."
-                       data-fr="Il permet subtilement de motiver les visiteurs plus jeunes à passer du temps à scruter une oeuvre avec une certaine motivation.">
-                        (placeholder)
+                       data-fr="Il permet subtilement de motiver les visiteurs plus jeunes à passer du temps à scruter une œuvre avec une certaine motivation.">
+                        It subtly encourages younger visitors to spend more time observing an artwork, giving them a sense of purpose and motivation as they look closely.
                     </p>
 
                     <ul id="characteristics_list">
                         <li id="characteristic_01"
                             data-en="The ability to select and display any artwork on the fly."
                             data-fr="Possibilité de sélectionner et d’afficher n’importe quelle œuvre à la volée.">
-                            (placeholder)
+                            The ability to select and display any artwork on the fly.
                         </li>
+
                         <li id="characteristic_02"
                             data-en="No privacy concerns: no personal data is stored or transmitted. Captured images are processed locally and immediately deleted after being displayed."
-                            data-fr="Pas de problème de confidentialité: Aucune donnée personnelle n’est conservée ni transmise: les images captées sont traitées localement puis supprimées immédiatement après leur affichage.">
-                            (placeholder)
+                            data-fr="Pas de problème de confidentialité : aucune donnée personnelle n’est conservée ni transmise. Les images captées sont traitées localement puis supprimées immédiatement après leur affichage.">
+                            No privacy concerns: no personal data is stored or transmitted. Captured images are processed locally and immediately deleted after being displayed.
                         </li>
+
                         <li id="characteristic_03"
-                            data-en="Possibility of offering derivative products, such as a printed personalized version of the artwork featuring the visitor"
+                            data-en="Possibility of offering derivative products, such as a printed personalized version of the artwork featuring the visitor."
                             data-fr="Possibilité de proposer des objets dérivés, comme l’impression d’une version personnalisée de l’œuvre intégrant le visiteur.">
-                            (placeholder)
+                            Possibility of offering derivative products, such as a printed personalized version of the artwork featuring the visitor.
                         </li>
+
                         <li id="characteristic_04"
                             data-en="Creates a shared experience by bringing strangers together within the same artwork."
                             data-fr="Permet de créer une expérience collective en réunissant des inconnus au sein d’une même œuvre.">
-                            (placeholder)
+                            Creates a shared experience by bringing strangers together within the same artwork.
                         </li>
                     </ul>
                 </div>
@@ -325,8 +379,13 @@
         </section>
 
         <section id="video_section">
-            <video id="project_video" controls playsinline preload="metadata">
-                <source id="video_source" src="video/project.mp4" type="video/mp4">
+            <video id="project_video"
+                   controls
+                   playsinline
+                   preload="metadata">
+                <source id="video_source"
+                        src="video/project.mp4"
+                        type="video/mp4">
             </video>
         </section>
 
@@ -357,71 +416,70 @@
                 element.textContent = element.getAttribute("data-" + language);
             });
 
-            const titleElement = document.getElementById("page_title");
-
-            if (language === "fr") {
-                titleElement.textContent = "Ego Musee";
-            } else {
-                titleElement.textContent = "Ego Musee";
-            }
+            document.getElementById("page_title").textContent = "Ego Musee";
         })();
     </script>
-    
-    <script>
 
-function createImagePingPong(widgetId, imageA, imageB, duration = 10000) {
-    const widget = document.getElementById(widgetId);
-    const imageElements = widget.querySelectorAll(".art_image");
+<script id="script_gallery">
+    function createImagePingPong(widgetId, imageA, imageB, duration = 10000) {
+        const widgetElement = document.getElementById(widgetId);
 
-    if (imageElements.length !== 2) {
-        throw new Error("The widget must contain exactly two images.");
-    }
+        const imageElements = widgetElement.querySelectorAll(
+            ".gallery_widget_image"
+        );
 
-    const imageAElement = imageElements[0];
-    const imageBElement = imageElements[1];
+        if (imageElements.length !== 2) {
+            return;
+        }
 
-    imageAElement.src = imageA;
-    imageBElement.src = imageB;
+        const imageAElement = imageElements[0];
+        const imageBElement = imageElements[1];
 
-    imageAElement.style.opacity = "1";
-    imageBElement.style.opacity = "0";
-
-    function fadeToB() {
-        imageBElement.style.transition = `opacity ${duration / 2}ms ease-in-out`;
-        imageBElement.style.opacity = "1";
-
-        setTimeout(fadeToA, duration / 2);
-    }
-
-    function fadeToA() {
-        imageAElement.style.transition = `opacity ${duration / 2}ms ease-in-out`;
-        imageAElement.style.opacity = "0";
-
-        setTimeout(reset, duration / 2);
-    }
-
-    function reset() {
-        imageAElement.style.transition = "none";
-        imageBElement.style.transition = "none";
+        imageAElement.src = imageA;
+        imageBElement.src = imageB;
 
         imageAElement.style.opacity = "1";
         imageBElement.style.opacity = "0";
 
+        const transitionDuration = duration / 2;
+
+        function fadeToB() {
+            imageAElement.style.transition =
+                `opacity ${transitionDuration}ms ease-in-out`;
+
+            imageBElement.style.transition =
+                `opacity ${transitionDuration}ms ease-in-out`;
+
+            imageBElement.style.opacity = "1";
+            imageAElement.style.opacity = "0";
+
+            setTimeout(fadeToA, transitionDuration);
+        }
+
+        function fadeToA() {
+            imageAElement.style.transition =
+                `opacity ${transitionDuration}ms ease-in-out`;
+
+            imageBElement.style.transition =
+                `opacity ${transitionDuration}ms ease-in-out`;
+
+            imageAElement.style.opacity = "1";
+            imageBElement.style.opacity = "0";
+
+            setTimeout(fadeToB, transitionDuration);
+        }
+
         requestAnimationFrame(fadeToB);
     }
 
-    requestAnimationFrame(fadeToB);
-}
-
-document.querySelectorAll(".art_widget").forEach(function(widget) {
-    createImagePingPong(
-        widget.id,
-        widget.dataset.imageA,
-        widget.dataset.imageB
-    );
-});
-
-    </script>
+    document.querySelectorAll(".gallery_widget").forEach(function(widgetElement) {
+        createImagePingPong(
+            widgetElement.id,
+            widgetElement.dataset.imageA,
+            widgetElement.dataset.imageB
+        );
+    });
+</script>
 </body>
 </html>
 ```

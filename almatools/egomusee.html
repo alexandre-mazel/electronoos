@@ -216,27 +216,28 @@
             #contact_section {
                 min-height: 45vh;
             }
+
+        } // media 700
             
-            .art_widget {
-                position: relative;
-                width: 100%;
-                overflow: hidden;
-            }
+    .art_widget {
+        position: relative;
+        display: block;
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        overflow: hidden;
+        background: #dedcd5;
+    }
 
-            .art_image {
-                display: block;
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-            }
-
-            .art_image + .art_image {
-                position: absolute;
-                top: 0;
-                left: 0;
-            }
-
-        }
+    .art_image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }    
+    
     </style>
 </head>
 
@@ -367,55 +368,59 @@
     </script>
     
     <script>
-        function createImagePingPong(widgetId, imageA, imageB, duration = 10000) {
-            const widget = document.getElementById(widgetId);
-            const images = widget.querySelectorAll(".art_image");
 
-            if (images.length !== 2) {
-                throw new Error("The widget must contain exactly two images.");
-            }
+function createImagePingPong(widgetId, imageA, imageB, duration = 10000) {
+    const widget = document.getElementById(widgetId);
+    const imageElements = widget.querySelectorAll(".art_image");
 
-            images[0].src = imageA;
-            images[1].src = imageB;
+    if (imageElements.length !== 2) {
+        throw new Error("The widget must contain exactly two images.");
+    }
 
-            images[0].style.opacity = "1";
-            images[1].style.opacity = "0";
+    const imageAElement = imageElements[0];
+    const imageBElement = imageElements[1];
 
-            images[0].style.transition = "none";
-            images[1].style.transition = "none";
+    imageAElement.src = imageA;
+    imageBElement.src = imageB;
 
-            function animate() {
-                const halfDuration = duration / 2;
+    imageAElement.style.opacity = "1";
+    imageBElement.style.opacity = "0";
 
-                images[1].style.transition = `opacity ${halfDuration}ms ease-in-out`;
-                images[1].style.opacity = "1";
+    function fadeToB() {
+        imageBElement.style.transition = `opacity ${duration / 2}ms ease-in-out`;
+        imageBElement.style.opacity = "1";
 
-                setTimeout(function() {
-                    images[0].style.transition = `opacity ${halfDuration}ms ease-in-out`;
-                    images[0].style.opacity = "0";
+        setTimeout(fadeToA, duration / 2);
+    }
 
-                    setTimeout(function() {
-                        images[0].style.transition = "none";
-                        images[1].style.transition = "none";
+    function fadeToA() {
+        imageAElement.style.transition = `opacity ${duration / 2}ms ease-in-out`;
+        imageAElement.style.opacity = "0";
 
-                        images[0].style.opacity = "1";
-                        images[1].style.opacity = "0";
+        setTimeout(reset, duration / 2);
+    }
 
-                        requestAnimationFrame(animate);
-                    }, halfDuration);
-                }, halfDuration);
-            }
+    function reset() {
+        imageAElement.style.transition = "none";
+        imageBElement.style.transition = "none";
 
-            requestAnimationFrame(animate);
-        }
+        imageAElement.style.opacity = "1";
+        imageBElement.style.opacity = "0";
 
-        document.querySelectorAll(".art_widget").forEach(function(widget) {
-            createImagePingPong(
-                widget.id,
-                widget.dataset.imageA,
-                widget.dataset.imageB
-            );
-        });
+        requestAnimationFrame(fadeToB);
+    }
+
+    requestAnimationFrame(fadeToB);
+}
+
+document.querySelectorAll(".art_widget").forEach(function(widget) {
+    createImagePingPong(
+        widget.id,
+        widget.dataset.imageA,
+        widget.dataset.imageB
+    );
+});
+
     </script>
 </body>
 </html>

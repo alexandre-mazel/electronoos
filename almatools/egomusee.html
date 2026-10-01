@@ -1,10 +1,9 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="page_title">Art Project</title>
+    <title id="page_title">Ego Musee</title>
     <style id="style_main">
         * {
             box-sizing: border-box;
@@ -87,7 +86,8 @@
         #gallery_image_01,
         #gallery_image_02,
         #gallery_image_03,
-        #gallery_image_04 {
+        #gallery_image_04,
+        #gallery_image_05        {
             display: block;
             width: 100%;
             aspect-ratio: 4 / 3;
@@ -225,16 +225,18 @@
 
         <section id="hero_section">
             <div id="hero_content">
-                <h1 id="hero_title">FRAGMENTS<br>OF MEMORY</h1>
-                <p id="hero_subtitle" data-en="An exploration between matter, memory and imagination." data-fr="Une exploration entre matière, mémoire et imagination.">
-                    An exploration between matter, memory and imagination.
+                <h1 id="hero_title">EGO MUSEE</h1>
+                <p id="hero_subtitle" data-en="Review classical paintings, with a personnal motivation." 
+                        data-fr="RedÃ©couvrez des oeuvres classiques avec une motivation toute personnelle.">
+                    placeholder...
                 </p>
             </div>
         </section>
 
         <section id="intro_section">
-            <p id="intro_text" data-en="A visual experiment where physical objects become traces of imagined worlds." data-fr="Une expérience visuelle où les objets physiques deviennent les traces de mondes imaginaires.">
-                A visual experiment where physical objects become traces of imagined worlds.
+            <p id="intro_text" data-en="A beautiful flat-screen display shows one or more classical paintings. When a group of visitors looks at the painting, it transforms: the visitorsâ€™ faces gradually appear within the artwork." 
+                data-fr="Un bel Ã©cran Ã  bords plats diffuse un ou plusieurs peintures classiques. Lorsqu'un groupe de visiteurs regardent le tableau, le tableau se transforme: les visages des visiteurs apparaissent progressivement dans le tableau.">
+                placeholder...
             </p>
         </section>
 
@@ -243,14 +245,10 @@
                 <!-- gallery_image_01 -->
                 <img id="gallery_image_01" src="images/project_01.jpg" alt="Artwork">
 
-                <!-- gallery_image_02 -->
                 <img id="gallery_image_02" src="images/project_02.jpg" alt="Artwork">
-
-                <!-- gallery_image_03 -->
                 <img id="gallery_image_03" src="images/project_03.jpg" alt="Artwork">
-
-                <!-- gallery_image_04 -->
                 <img id="gallery_image_04" src="images/project_04.jpg" alt="Artwork">
+                <img id="gallery_image_05" src="images/project_05.jpg" alt="Artwork">
             </div>
         </section>
 
@@ -338,9 +336,9 @@
             const titleElement = document.getElementById("page_title");
 
             if (language === "fr") {
-                titleElement.textContent = "Fragments de mémoire";
+                titleElement.textContent = "Ego Musee";
             } else {
-                titleElement.textContent = "Fragments of Memory";
+                titleElement.textContent = "Ego Musee";
             }
         })();
     </script>

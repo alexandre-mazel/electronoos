@@ -1,0 +1,349 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page_title">Art Project</title>
+    <style id="style_main">
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            background: #f5f4f0;
+            color: #171717;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 18px;
+            line-height: 1.55;
+        }
+
+        #page_main {
+            width: 100%;
+            overflow: hidden;
+        }
+
+        #hero_section {
+            min-height: 92vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5vw;
+            background: #111;
+            color: #f5f4f0;
+        }
+
+        #hero_content {
+            width: min(1200px, 100%);
+        }
+
+        #hero_title {
+            margin: 0;
+            max-width: 1100px;
+            font-size: clamp(4rem, 12vw, 11rem);
+            line-height: 0.88;
+            font-weight: 700;
+            letter-spacing: -0.07em;
+        }
+
+        #hero_subtitle {
+            margin: 3rem 0 0;
+            max-width: 650px;
+            font-size: clamp(1.2rem, 2.2vw, 2rem);
+            line-height: 1.3;
+            color: #c8c6bf;
+        }
+
+        #intro_section {
+            width: min(1000px, calc(100% - 40px));
+            margin: 0 auto;
+            padding: 10rem 0 8rem;
+        }
+
+        #intro_text {
+            margin: 0;
+            font-size: clamp(1.6rem, 3.5vw, 3rem);
+            line-height: 1.2;
+            letter-spacing: -0.025em;
+        }
+
+        #gallery_section {
+            width: min(1200px, calc(100% - 40px));
+            margin: 0 auto;
+            padding: 0 0 10rem;
+        }
+
+        #gallery_grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 2rem;
+        }
+
+        #gallery_image_01,
+        #gallery_image_02,
+        #gallery_image_03,
+        #gallery_image_04 {
+            display: block;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            object-fit: cover;
+            background: #dedcd5;
+        }
+
+        #gallery_image_01 {
+            grid-column: span 2;
+            aspect-ratio: 16 / 8;
+        }
+
+        #text_section {
+            background: #dedcd5;
+            padding: 9rem 20px;
+        }
+
+        #text_content {
+            width: min(900px, 100%);
+            margin: 0 auto;
+        }
+
+        #text_title {
+            margin: 0 0 3rem;
+            font-size: clamp(2.5rem, 6vw, 5.5rem);
+            line-height: 0.95;
+            letter-spacing: -0.05em;
+        }
+
+        #text_body {
+            font-size: clamp(1.2rem, 2vw, 1.5rem);
+            line-height: 1.55;
+        }
+
+        #characteristics_list {
+            margin: 3rem 0 0;
+            padding-left: 1.3em;
+        }
+
+        #characteristic_01,
+        #characteristic_02,
+        #characteristic_03,
+        #characteristic_04,
+        #characteristic_05 {
+            margin: 0 0 0.7rem;
+        }
+
+        #video_section {
+            width: 100%;
+            padding: 0;
+            background: #000;
+        }
+
+        #project_video {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: 90vh;
+            object-fit: contain;
+        }
+
+        #contact_section {
+            min-height: 55vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6rem 20px;
+            text-align: center;
+            background: #111;
+        }
+
+        #contact_content {
+            width: min(900px, 100%);
+        }
+
+        #contact_title {
+            margin: 0 0 3rem;
+            color: #f5f4f0;
+            font-size: clamp(2rem, 5vw, 4rem);
+            line-height: 1;
+        }
+
+        #email_image {
+            display: block;
+            width: min(650px, 90vw);
+            height: auto;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 700px) {
+            body {
+                font-size: 16px;
+            }
+
+            #hero_section {
+                min-height: 85vh;
+                padding: 2rem 20px;
+            }
+
+            #hero_title {
+                font-size: clamp(4rem, 20vw, 7rem);
+            }
+
+            #intro_section {
+                padding: 6rem 0;
+            }
+
+            #gallery_section {
+                padding-bottom: 6rem;
+            }
+
+            #gallery_grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            #gallery_image_01 {
+                grid-column: auto;
+                aspect-ratio: 4 / 3;
+            }
+
+            #text_section {
+                padding: 6rem 20px;
+            }
+
+            #contact_section {
+                min-height: 45vh;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main id="page_main">
+
+        <section id="hero_section">
+            <div id="hero_content">
+                <h1 id="hero_title">FRAGMENTS<br>OF MEMORY</h1>
+                <p id="hero_subtitle" data-en="An exploration between matter, memory and imagination." data-fr="Une exploration entre matière, mémoire et imagination.">
+                    An exploration between matter, memory and imagination.
+                </p>
+            </div>
+        </section>
+
+        <section id="intro_section">
+            <p id="intro_text" data-en="A visual experiment where physical objects become traces of imagined worlds." data-fr="Une expérience visuelle où les objets physiques deviennent les traces de mondes imaginaires.">
+                A visual experiment where physical objects become traces of imagined worlds.
+            </p>
+        </section>
+
+        <section id="gallery_section">
+            <div id="gallery_grid">
+                <!-- gallery_image_01 -->
+                <img id="gallery_image_01" src="images/project_01.jpg" alt="Artwork">
+
+                <!-- gallery_image_02 -->
+                <img id="gallery_image_02" src="images/project_02.jpg" alt="Artwork">
+
+                <!-- gallery_image_03 -->
+                <img id="gallery_image_03" src="images/project_03.jpg" alt="Artwork">
+
+                <!-- gallery_image_04 -->
+                <img id="gallery_image_04" src="images/project_04.jpg" alt="Artwork">
+            </div>
+        </section>
+
+        <section id="text_section">
+            <div id="text_content">
+                <h2 id="text_title" data-en="The project" data-fr="Le projet">The project</h2>
+
+                <div id="text_body">
+                    <p id="description_paragraph_01"
+                       data-en="This project investigates the relationship between technology and the traces we leave behind. Images, objects and generated forms are combined to create a visual language somewhere between archaeology and fiction."
+                       data-fr="Ce projet explore la relation entre la technologie et les traces que nous laissons derrière nous. Images, objets et formes générées se combinent pour créer un langage visuel situé quelque part entre archéologie et fiction.">
+                        This project investigates the relationship between technology and the traces we leave behind. Images, objects and generated forms are combined to create a visual language somewhere between archaeology and fiction.
+                    </p>
+
+                    <p id="description_paragraph_02"
+                       data-en="Each element is treated as a fragment rather than a finished object. Together they suggest a larger story without ever completely revealing it."
+                       data-fr="Chaque élément est traité comme un fragment plutôt que comme un objet terminé. Ensemble, ils suggèrent une histoire plus vaste sans jamais la révéler complètement.">
+                        Each element is treated as a fragment rather than a finished object. Together they suggest a larger story without ever completely revealing it.
+                    </p>
+
+                    <ul id="characteristics_list">
+                        <li id="characteristic_01"
+                            data-en="Mixed digital and physical processes"
+                            data-fr="Mélange de procédés numériques et physiques">
+                            Mixed digital and physical processes
+                        </li>
+                        <li id="characteristic_02"
+                            data-en="Original images and generated forms"
+                            data-fr="Images originales et formes générées">
+                            Original images and generated forms
+                        </li>
+                        <li id="characteristic_03"
+                            data-en="Experimental material research"
+                            data-fr="Recherche expérimentale autour de la matière">
+                            Experimental material research
+                        </li>
+                        <li id="characteristic_04"
+                            data-en="Combination of photography, sculpture and computation"
+                            data-fr="Combinaison de photographie, sculpture et informatique">
+                            Combination of photography, sculpture and computation
+                        </li>
+                        <li id="characteristic_05"
+                            data-en="Designed as an evolving installation"
+                            data-fr="Conçu comme une installation évolutive">
+                            Designed as an evolving installation
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="video_section">
+            <video id="project_video" controls playsinline preload="metadata">
+                <source id="video_source" src="video/project.mp4" type="video/mp4">
+            </video>
+        </section>
+
+        <section id="contact_section">
+            <div id="contact_content">
+                <h2 id="contact_title"
+                    data-en="For more information"
+                    data-fr="Pour plus d'informations">
+                    For more information
+                </h2>
+
+                <img id="email_image"
+                     src="images/alexandre.zelma@gmail.com.png"
+                     alt="alexandre.zelma@gmail.com">
+            </div>
+        </section>
+
+    </main>
+
+    <script id="script_language">
+        (function () {
+            const browserLanguage = navigator.language.toLowerCase();
+            const language = browserLanguage.startsWith("fr") ? "fr" : "en";
+
+            document.documentElement.lang = language;
+
+            document.querySelectorAll("[data-en][data-fr]").forEach(function (element) {
+                element.textContent = element.getAttribute("data-" + language);
+            });
+
+            const titleElement = document.getElementById("page_title");
+
+            if (language === "fr") {
+                titleElement.textContent = "Fragments de mémoire";
+            } else {
+                titleElement.textContent = "Fragments of Memory";
+            }
+        })();
+    </script>
+</body>
+</html>
+```

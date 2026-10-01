@@ -216,6 +216,26 @@
             #contact_section {
                 min-height: 45vh;
             }
+            
+            .art_widget {
+                position: relative;
+                width: 100%;
+                overflow: hidden;
+            }
+
+            .art_image {
+                display: block;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .art_image + .art_image {
+                position: absolute;
+                top: 0;
+                left: 0;
+            }
+
         }
     </style>
 </head>
@@ -249,6 +269,14 @@
                 <img id="gallery_image_03" src="images/project_03.jpg" alt="Artwork">
                 <img id="gallery_image_04" src="images/project_04.jpg" alt="Artwork">
                 <img id="gallery_image_05" src="images/project_05.jpg" alt="Artwork">
+                
+                <div id="art_widget_01"
+                     class="art_widget"
+                     data-image-a="paintings/Gustave_Courbet_-_Le_Désespéré_(1843).jpg"
+                     data-image-b="paintings/Gustave_Courbet_-_Le_Désespéré_(1843)_generated.jpg">
+                    <img id="art_image_01_a" class="art_image" src="" alt="">
+                    <img id="art_image_01_b" class="art_image" src="" alt="">
+                </div>
             </div>
         </section>
 
@@ -258,42 +286,37 @@
 
                 <div id="text_body">
                     <p id="description_paragraph_01"
-                       data-en="This project investigates the relationship between technology and the traces we leave behind. Images, objects and generated forms are combined to create a visual language somewhere between archaeology and fiction."
-                       data-fr="Ce projet explore la relation entre la technologie et les traces que nous laissons derri�re nous. Images, objets et formes g�n�r�es se combinent pour cr�er un langage visuel situ� quelque part entre arch�ologie et fiction.">
-                        This project investigates the relationship between technology and the traces we leave behind. Images, objects and generated forms are combined to create a visual language somewhere between archaeology and fiction.
+                       data-en="This project explores the relationship between the subject of an artwork and its representation, allowing visitors to imagine themselves in the past, within a scene from the artist’s time."
+                       data-fr="Ce projet explore la relation entre le sujet d’une œuvre et sa représentation, en invitant les visiteurs à s’y projeter et à s’imaginer dans le passé, au cœur d’une scène telle qu’elle aurait pu exister à l’époque de l’artiste.">
+                        (placeholder)
                     </p>
 
                     <p id="description_paragraph_02"
-                       data-en="Each element is treated as a fragment rather than a finished object. Together they suggest a larger story without ever completely revealing it."
-                       data-fr="Chaque �l�ment est trait� comme un fragment plut�t que comme un objet termin�. Ensemble, ils sugg�rent une histoire plus vaste sans jamais la r�v�ler compl�tement.">
-                        Each element is treated as a fragment rather than a finished object. Together they suggest a larger story without ever completely revealing it.
+                       data-en="It subtly encourages younger visitors to spend more time observing an artwork, giving them a sense of purpose and motivation as they look closely."
+                       data-fr="Il permet subtilement de motiver les visiteurs plus jeunes à passer du temps à scruter une oeuvre avec une certaine motivation.">
+                        (placeholder)
                     </p>
 
                     <ul id="characteristics_list">
                         <li id="characteristic_01"
-                            data-en="Mixed digital and physical processes"
-                            data-fr="M�lange de proc�d�s num�riques et physiques">
-                            Mixed digital and physical processes
+                            data-en="The ability to select and display any artwork on the fly."
+                            data-fr="Possibilité de sélectionner et d’afficher n’importe quelle œuvre à la volée.">
+                            (placeholder)
                         </li>
                         <li id="characteristic_02"
-                            data-en="Original images and generated forms"
-                            data-fr="Images originales et formes g�n�r�es">
-                            Original images and generated forms
+                            data-en="No privacy concerns: no personal data is stored or transmitted. Captured images are processed locally and immediately deleted after being displayed."
+                            data-fr="Pas de problème de confidentialité: Aucune donnée personnelle n’est conservée ni transmise: les images captées sont traitées localement puis supprimées immédiatement après leur affichage.">
+                            (placeholder)
                         </li>
                         <li id="characteristic_03"
-                            data-en="Experimental material research"
-                            data-fr="Recherche exp�rimentale autour de la mati�re">
-                            Experimental material research
+                            data-en="Possibility of offering derivative products, such as a printed personalized version of the artwork featuring the visitor"
+                            data-fr="Possibilité de proposer des objets dérivés, comme l’impression d’une version personnalisée de l’œuvre intégrant le visiteur.">
+                            (placeholder)
                         </li>
                         <li id="characteristic_04"
-                            data-en="Combination of photography, sculpture and computation"
-                            data-fr="Combinaison de photographie, sculpture et informatique">
-                            Combination of photography, sculpture and computation
-                        </li>
-                        <li id="characteristic_05"
-                            data-en="Designed as an evolving installation"
-                            data-fr="Con�u comme une installation �volutive">
-                            Designed as an evolving installation
+                            data-en="Creates a shared experience by bringing strangers together within the same artwork."
+                            data-fr="Permet de créer une expérience collective en réunissant des inconnus au sein d’une même œuvre.">
+                            (placeholder)
                         </li>
                     </ul>
                 </div>
@@ -341,6 +364,58 @@
                 titleElement.textContent = "Ego Musee";
             }
         })();
+    </script>
+    
+    <script>
+        function createImagePingPong(widgetId, imageA, imageB, duration = 10000) {
+            const widget = document.getElementById(widgetId);
+            const images = widget.querySelectorAll(".art_image");
+
+            if (images.length !== 2) {
+                throw new Error("The widget must contain exactly two images.");
+            }
+
+            images[0].src = imageA;
+            images[1].src = imageB;
+
+            images[0].style.opacity = "1";
+            images[1].style.opacity = "0";
+
+            images[0].style.transition = "none";
+            images[1].style.transition = "none";
+
+            function animate() {
+                const halfDuration = duration / 2;
+
+                images[1].style.transition = `opacity ${halfDuration}ms ease-in-out`;
+                images[1].style.opacity = "1";
+
+                setTimeout(function() {
+                    images[0].style.transition = `opacity ${halfDuration}ms ease-in-out`;
+                    images[0].style.opacity = "0";
+
+                    setTimeout(function() {
+                        images[0].style.transition = "none";
+                        images[1].style.transition = "none";
+
+                        images[0].style.opacity = "1";
+                        images[1].style.opacity = "0";
+
+                        requestAnimationFrame(animate);
+                    }, halfDuration);
+                }, halfDuration);
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        document.querySelectorAll(".art_widget").forEach(function(widget) {
+            createImagePingPong(
+                widget.id,
+                widget.dataset.imageA,
+                widget.dataset.imageB
+            );
+        });
     </script>
 </body>
 </html>

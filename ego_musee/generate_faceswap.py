@@ -23,6 +23,8 @@ scp -P 45022 a@engrenage.studio:/home/a/dev/git/electronoos/ego_musee/generated/
 Ca rocks serieux, et on peut cascader en reutilisant la sortie comme ref d'entree
 
 A faire avant: lancer le venv de ce dossier
+
+
 """
 
 sys.path.append("../alex_pytools")

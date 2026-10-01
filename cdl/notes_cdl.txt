@@ -1,0 +1,113 @@
+Je reviens au sujet des photomatons ;
+
+Il faudrait que l’on se munisse de 4 tablettes supplémentaires - as- tu des suggestions de modèles plus performants?  ( avec caméra en haut style smartphone) ‘l’idée est d’en laisser 2 à demeure dans les photomatons
+
+Aussi en vue de soirées privées ont souhaite vendre des mises à dispo des photomaton, comme le ferais une boite qui loue des photomaton
+-> photos aves cadre personnalisés, possibilité de s’envoyer les photos, les imprimer et accéder ensuite à une galerie sur un site internet.
+
+Pour les cadres personnalisés peux tu me faire un ’tuto’ , quel logiciel, avec les dimensions, les formats fichiers., comment créer l’espace ‘vide’ pour que la photo s’intègre correcmenet ...etc à utiliser pour créer un cadre stp ? L’idée est que je puisse faire faire en interne des cadres perso
+
+Penses tu que le site internet que tu as mis en ligne pour l’upload des photos depuis le smartphone puisse avec une page avec les galeries pour les partager aux clients suites au soirées privés?
+
+( je t’ai fais un sms WhatsApp, l’upload des photos ne fonctionne pas en ce moment.) 
+
+
+epuis la semaine dernière, Alexandre à modifié le système d’upload de photos perso depuis son tel vers les tablettes pr les ateliers wmk, le système fonctionne bien et c’est très rapide.
+
+Est ce que lorsque les clients se partage la photo ( comme je l’ai fait plus bas) , on en profiterai pas pour leurs mettre un lien et un code promo ? 
+Pour les remercier pour leur visite. Et leur donner un code WMKCDL10 pour RDV IN PARIS.
+
+Ce qui serait top, c’est que les clients puissent sur une autre page en lien dans le mail avec la photo ; nous donner leur assemblage et payer pour déclencher de la commande bouteilles supplémentaires
+
+
+@Nicolas, le site itsmywine ou une version MAJ, serai parfait, est il toujours activable? 
+
+Je vous laisse me donner vos vues sur la chose, 
+
+
+----------------------------
+30 sept - Reunion de rentrée (NB,AM)
+
+Des tablettes en plus, si possible avec camera sur petit coté. On s'en fiche des dimensions précise, on garde les vieilles pour le photobooth.
+Mais bon ce genre de dimension c'est bien.
+Quali, robuste, sans pertes de réseau...
+
+Service mariage: Une version event tout pareil, imprimable sur etiquette.
+
+- partage d'email avant impression, l'impression devient optionnel, facon polaroid, mais pas brandé etiquette de vin. (cadre+filtre polaroid?).
+  "Trop bonne soirée avec mon entreprise".
+  envoi d'email, puis apres un ecran imprimer ou j'ai fini. 
+  
+- site web pour revoir les photos
+Puis sur un site lié au cave une page avec toutes les photos de l'evenement, lien généré et on voit pas facilement d'autres sites.
+photo téléchargeable.
+De base: site valide 3 mois, on pourrait vendre une option ou on les garde x ans.
+Dans un coin en haut, on peut tres bien ajouter des liens sur d'autres sites a vous que vous voulez mettre en avant.
+Branding a décider, voire meme on reprend le bandeau existant d'un autre site par exemple rendezvous.
+Mettre un code promo.
+L'organisateur de la soirée envoie le lien de la gallery le lendemain.
+
+Suggestion de nom de site:
+Soit un sous domaine d'un de vos sites existants, par exemple:
+- parties.cavesdulouvre.com
+- soiree.cavesdulouvre.com
+- fun.edonist.com
+- partie.rendezvous-in-paris.com
+...
+(en fait c'est n'importe quoi avec un point devant votre nom de domaine actuel)
+
+Soit un autre site dédié avec le nom que vous voulez completement:
+- jemeclateaparisenbuvantduvin.com
+- soireedentreprisetropcool.com
+...
+(parmi les noms de domaines disponibles)
+
+A décider: 
+- nom du site.
+- look and feel des galleries (on copiera le design d'un de vos sites existants, mais lequel?)
+- est ce qu'on se garde les emails sur lesquelles ils s'ecrivent pour faire une base de données de visiteurs.
+(avec une case précoché vendeuse: "j'accepte de recevoir l'actualité/des promos des caves du louvres").
+
+Une page de configuration sur internet avec:
+- nom du client
+- date de l'event (du debut de l'event, meme si ca deborde sur un autre jour)
+- upload des cadres, des photos de bibliotheques (le(s) cadre(s) est créé par ailleurs) (4 cadres maxi sinon crash de l'application
+(avec preview pour checker la transparence)
+- choix des options:
+  - possibilité de zapper l'ecran d'edition du message (le logo boite et cdl serait deja dans le cadre).
+  - desactiver le upload mobile
+  - desactiver l'insertion de date automatique
+- lien de la gallery autogénéré et copiable pour l'envoyer au client. par exemple:
+http://soiree.cavesdulouvre.com/2026_aout_19__ibm/
+
+Au niveau tablette: une seule option "mode event", et si coché, au démarrage de l'application elle va chercher
+les infos de cet event. (ainsi on n'a pas a configurer toutes les options sur toutes les tablettes a chaque fois).
+
+Sujets connexes: sauvegarder quelques parts les mails des visiteurs avec l'occasion de la visite
+eg:
+- jeanpierre@gmail.com, 15 mars 2020, visite guidé
+- jannette@gmail.com, 15 mars 2020, soirée privée ibm, photomaton
+Ces informations seraient récupérables quelques part et exportable en excel ou ...
+
+gimp:
+- Un fichier xcf, c'est un fichier master qui sert a refaire des images: il y a les calques en mode calque, des polices... 
+Avec ce fichier xcf, on peut facilement changer un texte...
+Quand on veut generer une photo avec la version actuelle de l'image, on fait exporter (en png pour les cadres photos).
+
+- redimensionner un calque: selectionner un calque puis maj+S pour une redimension simple en live.
+(Outils / Outils de transformation / Mise à l’échelle (Maj+S))
+- on deplace avec l'outil en forme de croix (gros plus) (en haut a gauche)
+
+Upload sur ordi de Nicholas: FileZilla fonctionne pas, on utilise Cyberduck.
+
+Notes stickers:
+- si je met 5 cadres, l'application crash, et la tablette devient inutilisable (comme si elle etait en mode fantome devant l'ecran).
+(il faudrait desactiver le mode kiosk ou un truc comme ca quand l'appli plante (juste avant de planter))
+- corriger si plus de 4 cadres, ne prendre que les 4 premiers!
+- si pas png ni jpg, ne pas traiter le fichier (ne meme pas le downloader quand on fait l'update web)
+- effacer le email par défaut des que clique
+
+A livrer le 16 oct.
+
+
+

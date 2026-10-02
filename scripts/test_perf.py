@@ -123,10 +123,36 @@ def print_cpu():
         strCpuModel = "TODO"
     print( "cpu              : %s" % strCpuModel )
     
+def get_ram_windows_alt():
+    import ctypes
+
+    class MEMORYSTATUSEX(ctypes.Structure):
+        _fields_ = [
+            ("dwLength", ctypes.c_ulong),
+            ("dwMemoryLoad", ctypes.c_ulong),
+            ("ullTotalPhys", ctypes.c_ulonglong),
+            ("ullAvailPhys", ctypes.c_ulonglong),
+            ("ullTotalPageFile", ctypes.c_ulonglong),
+            ("ullAvailPageFile", ctypes.c_ulonglong),
+            ("ullTotalVirtual", ctypes.c_ulonglong),
+            ("ullAvailVirtual", ctypes.c_ulonglong),
+            ("ullAvailExtendedVirtual", ctypes.c_ulonglong),
+        ]
+
+    mem = MEMORYSTATUSEX()
+    mem.dwLength = ctypes.sizeof(mem)
+
+    ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(mem))
+
+    avail = mem.ullAvailPhys
+    tot = mem.ullTotalPhys
+    return avail,tot
+    
 def print_ram():
     GB=1024*1024*1024.
+    avail, tot = -1,-1
     try:
-        import psutil
+        import psutilcaca
         infomem = psutil.virtual_memory()
         avail = infomem.available
         tot = infomem.total
@@ -141,7 +167,16 @@ def print_ram():
             tot = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') 
             print( "ram              : %.2f / %.2f GB" % (avail/GB,tot/GB))
         except BaseException as err:
-            print( "ram              : unknown (2)" )
+            serr = "WRN: print_ram: err(1): %s" % err
+            try:
+                import platform
+                if "windows" in platform.system().lower():
+                    avail, tot = get_ram_windows_alt()
+            except BaseException as err2:
+                serr += "\nWRN: print_ram: err(2): %s" % err2
+                
+    if avail == -1:
+        print( "ram              : unknown %s" % serr )
     return avail, tot
 
     

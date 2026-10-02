@@ -96,7 +96,6 @@ def index( req ):
     
     user_id = dArgs["id"]
     msg = dArgs["q"]
-    ask_tchat( chatola_url, user_id, msg )
     ans = ask_tchat( chatola_url, user_id, msg )
     print( "INF: chatola_client.index: IA: %s" % ans )
     

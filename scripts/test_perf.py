@@ -1535,7 +1535,6 @@ disk_read  1024KB: ####################   1.23s (4078 Mo/s)
 
 
 *** don de concept: gros
-C:\dev\git\electronoos\scripts>python test_perf.py
 python version   : 3.10.6 (64bits) (2 core(s))
 cpu              : Intel(R) Pentium(R) CPU G4400 @ 3.30GHz
 test_cpu_int2    : ####################   0.52s

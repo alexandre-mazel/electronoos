@@ -7,7 +7,10 @@ import time
 import websockets #  sudo pip install websockets --break-system-packages
 
 pads = {} # pad_id => (last_author,contents) # the last author isn't saved in the backup
-pad_clients = {}
+pad_clients = {} # current connected client websocket
+
+pads_last_backuped = {} # for each pad ids, the last content backuped (not saved, the one in the file with the time stamp).
+
 
 save_path = "./apads/"
 
@@ -81,8 +84,12 @@ def create_new_pad_id():
 def save_on_disk( pad_id ):
     contents = pads[pad_id][1]
     fn = save_path + str(pad_id) + ".txt"
+    
+    # TODO: garder en memoire le dernier save est si il contient tout ce qui est dans l'actuel, ne pas sauver l'actuel
+    
     if os.path.exists( fn ) and os.path.getsize( fn ) > len( contents ):
         # backup car plus petit
+        print("os.path.getsize( fn ): %s, len( contents ): %s" % (os.path.getsize( fn ),len( contents )) )
         fn_backup = fn.replace( ".txt", "_%012d.txt" % int(time.time()*100) )
         print("INF: save_on_disk: moving '%s' to '%s'" % (fn,fn_backup) )
         os.rename( fn, fn_backup )
@@ -197,7 +204,7 @@ async def handle_client(websocket):
             clients = list(pad_clients.get(pad_id, set()))
             
             print(
-                f"DBG: BROADCAST: {len(clients)} clients, "
+                f"DBG: BROADCAST: {len(clients)} clients (including me), "
                 f"sender={websocket.remote_address}, "
                 f"response={response!r}",
                 flush=True,

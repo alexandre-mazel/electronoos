@@ -805,7 +805,7 @@ disk_read     1KB: ####################   4.77s (209.54 Mo/s)
 disk_write 1024KB: ####################  13.26s (75.44 Mo/s)
 disk_read  1024KB: ####################   4.32s (231.54 Mo/s)
 
-*** biga (gros xeon precision T7500) windows aout 2026
+*** biga (gros dell xeon precision T7500) windows aout 2026
 python version   : 3.13.15 (64bits) (4 core(s))
 cpu              : Intel(R) Xeon(R) CPU           X5647  @ 2.93GHz
 ram              : 41.18 / 48.00 GB
@@ -1677,8 +1677,7 @@ test_orbcv bis   : ####################   1.31s (76.55fps)
 disk_write    1KB: ####################   erreur: immediat (windows7 caching?)
 
 
-corto
-  C:\dev\git\electronoos\scripts>python test_perf.py
+*** Corto 18 ans
 python version   : 3.13.15 (64bits) (20 core(s))
 cpu              : Intel(R) Core(TM) Ultra 7 265KF
 ram              : 10.57 / 15.63 GB
@@ -1703,8 +1702,7 @@ disk_write 1024KB: ####################   3.40s (294.55 Mo/s)
 disk_read  1024KB: ####################   0.26s (3852.48 Mo/s)
 
 
-*** Del Romeo2: Vostro-230
-
+*** Dell Romeo2: Vostro-230
 python version   : 3.8.10 (64bits) (2 core(s))
 cpu              : Intel(R) Core(TM)2 Duo CPU     E7500  @ 2.93GHz
 ram              : 2.35 / 3.79 GB
@@ -1734,6 +1732,31 @@ test_cpu_int2    : ####################   0.69s
 test_cpu_float2  : ####################   0.15s
 
 
+*** New pc jbm HP 2026
+python version   : 3.14.8 (64bits) (28 core(s))
+cpu              : Intel(R) Core(TM) i7-14700 (2.10 GHz) -- cache 1/2/3: 1.8MB, 28MB, 33MB
+ram              : 7.81 / 15.69 GB
+test_cpu_int2    : ####################   0.26s
+test_cpu_float2  : ####################   0.03s
+test_crypt       : ####################   3.29s
+test_cpu_ram 2G  : ####################   0.36s
+test_cpu_ram 4G  : ####################   0.70s
+test_cpu_ram 6G  : ####################   1.04s
+test_cpu_ram 8G  : ####################   1.31s
+test_cpu_ram10G  : ####################   2.64s
+test_cpu_ram12G  : ####################   2.60s
+test_cpu_ram14G  : ####################   3.43s
+test_cpu_ram16G  : ####################   3.85s
+test_scipy_xxt   : ####################   0.58s (691.30x)
+test_orb5.0.0    : ####################   0.11s (949.77fps)
+test_orbcv imgs  : ####################   0.53s (188.20fps)
+test_orbcv bis   : ####################   0.33s (306.82fps)
+disk_write    1KB: ####################   3.17s (315.17 Mo/s)
+disk_read     1KB: ####################   1.63s (615.21 Mo/s)
+disk_write 1024KB: ####################   1.16s (859.70 Mo/s)
+disk_read  1024KB: ####################   0.23s (4278.27 Mo/s)
+
+
 
 
 
@@ -1741,21 +1764,6 @@ test_cpu_float2  : ####################   0.15s
 ###########################################
 ### compilation des meilleurs:
 ###########################################
-
-*** Champion1
-python version   : 3.8.10 (64bits) (8 core(s))
-cpu              : Intel(R) Core(TM) i7-9700K CPU @ 3.60GHz
-ram              : 13.37 / 15.49 GB
-test_cpu_int2    : ####################   0.24s
-test_cpu_float2  : ####################   0.06s
-test_crypt       : ####################   3.24s
-test_cpu_ram 2G  : ####################   0.33s
-test_cpu_ram 4G  : ####################   0.81s
-test_scipy_xxt   : ####################   0.60s (661.39x)
-test_orb4.2.0    : ####################   0.12s (830.89fps)
-test_orbcv imgs  : ####################   0.95s (105.79fps)
-test_orbcv bis   : ####################   0.67s (148.16fps)
-multiprocess x8 :  0.26s /  0.07s /  3.46s /  4.86s /  0.23s /  0.85s /  0.90s =>   24.20s (per thread:3.02s)
 
 
 *** Azure Server2cpu - Standard F4as v6 (4 vcpus, 16 GiB memory) - "8 cores" 16 GB
@@ -1773,17 +1781,6 @@ test_orb4.6.0    : ####################   0.08s (1249.10fps)
 test_orbcv imgs  : ####################   0.32s (313.66fps)
 test_orbcv bis   : ####################   0.32s (315.63fps)
 
-*** Dell kakashi Corto/Elsa (si sur batterie, mettre sur mode perf elevée):
-windows disk size 5000
-python version   : 3.10.4 (64bits) (16 core(s))
-cpu              :  11th Gen Intel(R) Core(TM) i7-11800H CPU @ 2.30GHz
-test_cpu_int2    : ####################   0.35s
-test_cpu_float2  : ####################   0.06s
-test_scipy_xxt   : ####################   0.64s (622x)
-test_orb4.5.5    : ####################   0.13s (768.35fps)
-test_orbcv imgs  : ####################   0.66s (151fps)
-test_orbcv bis   : ####################   0.54s (183.35fps)
-
 *** ms tab7
 python version   : 3.9.5 (64bits) (8 core(s))
 cpu              : Intel(R) Core(TM) i7-1065G7 CPU @ 1.30GHz
@@ -1799,40 +1796,73 @@ test_orb4.5.2    : ####################   0.20s (490.18fps)
 test_orbcv imgs  : ####################   1.10s (91.16fps)
 test_orbcv bis   : ####################   1.11s (90.49fps)
 
-*** don de concept: gros
-C:\dev\git\electronoos\scripts>python test_perf.py
-python version   : 3.10.6 (64bits) (2 core(s))
-cpu              : Intel(R) Pentium(R) CPU G4400 @ 3.30GHz
-test_cpu_int2    : ####################   0.52s
-test_cpu_float2  : ####################   0.08s
-test_scipy_xxt   : ####################   2.17s (184.08x)
-test_orb4.6.0    : ####################   0.29s (350.74fps)
-test_orbcv imgs  : ####################   1.62s (61.63fps)
-test_orbcv bis   : ####################   0.90s (110.84fps)
 
-*** biga ubuntu18, ssd 120Go ***
+*** Dell kakashi Corto/Elsa (si sur batterie, mettre sur mode perf elevée):
+windows disk size 5000
+python version   : 3.10.4 (64bits) (16 core(s))
+cpu              :  11th Gen Intel(R) Core(TM) i7-11800H CPU @ 2.30GHz
+test_cpu_int2    : ####################   0.35s
+test_cpu_float2  : ####################   0.06s
+test_scipy_xxt   : ####################   0.64s (622x)
+test_orb4.5.5    : ####################   0.13s (768.35fps)
+test_orbcv imgs  : ####################   0.66s (151fps)
+test_orbcv bis   : ####################   0.54s (183.35fps)
 
-python version   : 2.7.17 (64bits) (8 core(s))
-test_cpu_int2    : ####################   0.57s
-test_cpu_float2  : ####################   0.11s
-scipy.fftpack    : not found
-test_orb3.2.0    : ####################   0.26s (387.43fps)
-test_orbcv imgs  : test_perf_vga_*.png: not found
-test_orbcv bis   : test_perf_vga_*.png: not found
 
-*** biga (gros dell precision T7500 xeon) windows aout 2026
-python version   : 3.13.15 (64bits) (4 core(s))
-cpu              : Intel(R) Xeon(R) CPU           X5647  @ 2.93GHz
-ram              : 41.18 / 48.00 GB
-test_cpu_int2    : ####################   0.59s
-test_cpu_float2  : ####################   0.11s
-test_crypt       : ####################   6.28s
-test_cpu_ram 2G  : ####################   0.47s
-test_cpu_ram 4G  : ####################   0.94s
-test_scipy_xxt   : ####################   1.55s (258.10x)
-test_orb5.0.0    : ####################   0.29s (345.55fps)
-test_orbcv imgs  : ####################   1.30s (76.93fps)
-test_orbcv bis   : ####################   1.14s (88.07fps)
+*** Champion1
+python version   : 3.8.10 (64bits) (8 core(s))
+cpu              : Intel(R) Core(TM) i7-9700K CPU @ 3.60GHz
+ram              : 13.37 / 15.49 GB
+test_cpu_int2    : ####################   0.24s
+test_cpu_float2  : ####################   0.06s
+test_crypt       : ####################   3.24s
+test_cpu_ram 2G  : ####################   0.33s
+test_cpu_ram 4G  : ####################   0.81s
+test_cpu_ram16G  : ####################   3.24s
+test_scipy_xxt   : ####################   0.60s (661.39x)
+test_orb4.2.0    : ####################   0.12s (830.89fps)
+test_orbcv imgs  : ####################   0.95s (105.79fps)
+test_orbcv bis   : ####################   0.67s (148.16fps)
+multiprocess x8 :  0.26s /  0.07s /  3.46s /  4.86s /  0.23s /  0.85s /  0.90s =>   24.20s (per thread:3.02s)
+
+*** Corto 18 ans
+python version   : 3.13.15 (64bits) (20 core(s))
+cpu              : Intel(R) Core(TM) Ultra 7 265KF
+ram              : 10.57 / 15.63 GB
+test_cpu_int2    : ####################   0.26s
+test_cpu_float2  : ####################   0.03s
+test_crypt       : ####################   3.21s
+test_cpu_ram 2G  : ####################   0.32s
+test_cpu_ram 4G  : ####################   0.59s
+test_cpu_ram16G  : ####################   4.28s
+test_scipy_xxt   : ####################   0.56s (718.73x)
+test_orb5.0.0    : ####################   0.13s (755.06fps)
+test_orbcv imgs  : ####################   0.58s (172.16fps)
+test_orbcv bis   : ####################   0.30s (331.75fps)
+disk_write    1KB: ####################   4.94s (202.59 Mo/s)
+disk_read     1KB: ####################   2.22s (450.12 Mo/s)
+disk_write 1024KB: ####################   3.40s (294.55 Mo/s)
+disk_read  1024KB: ####################   0.26s (3852.48 Mo/s)
+
+
+*** New pc jbm HP 2026
+python version   : 3.14.8 (64bits) (28 core(s))
+cpu              : Intel(R) Core(TM) i7-14700 (2.10 GHz)
+ram              : 7.81 / 15.69 GB
+test_cpu_int2    : ####################   0.26s
+test_cpu_float2  : ####################   0.03s
+test_crypt       : ####################   3.29s
+test_cpu_ram 2G  : ####################   0.36s
+test_cpu_ram 4G  : ####################   0.70s
+test_cpu_ram16G  : ####################   3.85s
+test_scipy_xxt   : ####################   0.58s (691.30x)
+test_orb5.0.0    : ####################   0.11s (949.77fps)
+test_orbcv imgs  : ####################   0.53s (188.20fps)
+test_orbcv bis   : ####################   0.33s (306.82fps)
+disk_write    1KB: ####################   3.17s (315.17 Mo/s)
+disk_read     1KB: ####################   1.63s (615.21 Mo/s)
+disk_write 1024KB: ####################   1.16s (859.70 Mo/s)
+disk_read  1024KB: ####################   0.23s (4278.27 Mo/s)
 
 
 """

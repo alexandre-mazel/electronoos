@@ -25,7 +25,7 @@ def index(req):
     o = """<!DOCTYPE html><html>
     <head><meta charset='cp1252'/>
     <title>AlmaTools EI</title>
-    <link rel="shortcut icon" href="/almatools/logo_almatools_officiel_2026_small.png">
+    <link rel="shortcut icon" href="/almatools/icon_at.png">
     <style>
     .divelem{
     font-size:20px;
@@ -52,7 +52,7 @@ def index(req):
     <body style="font-family: sans-serif">
     <br>
     <center>
-    <img src='/almatools/logo_at.png' width=300>
+    <img src='/almatools/logo_almatools_officiel_2026_small.png' width=300>
     <br>
     <br>
     <br>

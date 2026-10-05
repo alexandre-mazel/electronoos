@@ -123,6 +123,7 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         chatola_url = sys.argv[1]
     print( "INF: chatola_url: '%s'" % chatola_url )
-    loop_dialog( chatola_url, "Tester")
+    #~ loop_dialog( chatola_url, "Tester")
+    loop_dialog( chatola_url, "tester_clinic")
     
     

@@ -163,7 +163,7 @@ class TchatUser:
         self.list_order = ["seat down", "standup","lève toi", "assis toi"]
         
     def getConsignList( self ):
-        consigne = [{"role":"system","content":"Tu es un robot sympa. Tu es la pour tenir compagnie aux gens".
+        consigne = [{"role":"system","content":"Tu es un robot sympa. Tu es la pour tenir compagnie aux gens".}]
         
         if self.user_id == "nao" or "clinic" in self.user_id.lower():
             consigne.append( {"role":"system","content":"Tu t'appelle Nao. Répond toujours avec des phrases pas trop longues et limitées a 2 ou phrases max en texte pur, sans émoticone ou truc fancy du genre, pas d'etoile ni de guillemets non plus. Your answer must be shorter than 100 tokens. Ne raconte pas de blabla, le but n'est pas non plus de meubler. Ton role est de tenir compagnie aux patients ou visiteurs et de les informer sur les greffes de cheveux."} )

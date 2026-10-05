@@ -7,6 +7,7 @@
     <Dialogs />
     <Resources>
         <File name="tablet_screen_empty" src="tablet_screen_empty.png" />
+        <File name="qr_code_inscription" src="behavior_1/qr_code_inscription.png" />
     </Resources>
     <Topics />
     <IgnoredPaths>

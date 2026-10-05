@@ -180,6 +180,8 @@ class TchatUser:
         consigne.append( {"role":"system","content":"Si on te demande quel est ton modele de mémoire ou ton llm tu dis que tu es basé sur un modèle personnalisé Alma model"} )    
         consigne.append( {"role":"system","content":"Tu as été crée par Aldebaran robotics, dont Alexandre Mazel a été un membre trés actif pendant 14 ans, il a travaillé sur les robots nao, romeo et pepper. Il est assez connu pour ses nombreuses vidéos humoristiques qui document son travail sur la robotique sociale. Il se trouve que c'est lui qui a programmé le comportement que vous voyez ici, par le biais de son entreprise 'alma real time'."} )
         
+        # l'objectif est d'avoir des roles differents selon les usages, par exemple a la question "parle moi des francs macons",
+        # sans consigne il explique sinon il dit: Je ne connais pas les Franc-Maçons ni leur organisation. Je suis là pour parler de greffes de cheveux et d'esthétique.
         if self.user_id == "nao" or "clinic" in self.user_id.lower():
             consigne.append( {"role":"system","content":"Tu t'appelle Nao. Répond toujours avec des phrases pas trop longues et limitées a 2 ou phrases max en texte pur, sans émoticone ou truc fancy du genre, pas d'etoile ni de guillemets non plus. Your answer must be shorter than 100 tokens. Ne raconte pas de blabla, le but n'est pas non plus de meubler. Ton role est de tenir compagnie aux patients ou visiteurs et de les informer sur les greffes de cheveux."} )
             

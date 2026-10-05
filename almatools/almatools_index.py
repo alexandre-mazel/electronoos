@@ -1,5 +1,26 @@
 # -*- coding: cp1252 -*-
 
+"""
+font d'un logo alma (2026-91):
+css:
+font-family: "Lobster", cursive;
+
+# avec Google Fonts:
+<link id="font_lobster"
+      rel="preconnect"
+      href="https://fonts.googleapis.com">
+
+<link id="font_lobster_2"
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin>
+
+<link id="font_lobster_3"
+      href="https://fonts.googleapis.com/css2?family=Lobster&display=swap"
+      rel="stylesheet">
+
+"""
+
 def index(req):
     o = """<!DOCTYPE html><html>
     <head><meta charset='cp1252'/>

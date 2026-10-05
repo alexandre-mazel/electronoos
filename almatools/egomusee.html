@@ -184,8 +184,24 @@
             display: block;
             width: min(650px, 90vw);
             height: auto;
-            margin: 0 auto;
+            margin: 0 auto 2rem;
         }
+        
+        #contact_content a {
+            display: block;
+            width: fit-content;
+            margin: 3rem auto 0;
+            font-size: 28px;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        #contact_content a:hover {
+            text-decoration: underline;
+        }
+        
+        
+        
 
         @media (max-width: 700px) {
             body {
@@ -402,11 +418,17 @@
 
                 <img id="email_image"
                      src="adr_email_art_white.svg"
-                     alt="mon email">
+                     alt="mon email" />
+                     
+                     <a href='https://engrenage.studio/art/projects.html'>Other projects</a>
             </div>
         </section>
+        
+        
 
     </main>
+    
+    
 
     <script id="script_language">
         (function () {

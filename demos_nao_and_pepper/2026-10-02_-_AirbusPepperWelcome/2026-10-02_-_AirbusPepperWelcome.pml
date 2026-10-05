@@ -15,6 +15,7 @@
         <File name="explosion" src="explosion.mp3" />
         <File name="hard_rock_guitar" src="hard_rock_guitar.mp3" />
         <File name="retro_disco" src="retro_disco.mp3" />
+        <File name="qr_out" src="behavior_1/qr_out.png" />
     </Resources>
     <Topics />
     <IgnoredPaths>

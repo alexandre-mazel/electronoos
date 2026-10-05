@@ -52,7 +52,7 @@ def index(req):
     <body style="font-family: sans-serif">
     <br>
     <center>
-    <img src='/almatools/logo_almatools_officiel_2026_small.png' width=300>
+    <img src='/almatools/logo_almatools_officiel_2026_small.png' width=360>
     <br>
     <br>
     <br>

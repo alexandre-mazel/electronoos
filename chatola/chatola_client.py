@@ -118,12 +118,18 @@ if __name__ == "__main__":
     if 0:
         test_index()
         exit(0)
-
+        
+    chatola_id = "Tester"
+    chatola_id = "tester_clinic"
 
     if len(sys.argv) > 1:
-        chatola_url = sys.argv[1]
+        chatola_id = sys.argv[1]
+
+    if len(sys.argv) > 2:
+        chatola_url = sys.argv[2]
+        
+    print( "INF: chatola_id: '%s'" % chatola_id )
     print( "INF: chatola_url: '%s'" % chatola_url )
-    #~ loop_dialog( chatola_url, "Tester")
-    loop_dialog( chatola_url, "tester_clinic")
+    loop_dialog( chatola_url, chatola_id)
     
     

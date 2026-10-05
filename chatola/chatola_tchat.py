@@ -104,6 +104,18 @@ OLLAMA_HOST=127.0.0.1:11435 ollama create qwen3:4B_nothinking -f modelfile_qwen3
 
 ma voiture est sale, je vais l'amener au carwash qui est a 100m, et il fait tres beau, j'y vais a pied ou en voiture?
 => a pied
+
+qwen3:8B:
+
+You: qui t'a programmé ?
+IA: Ah, c’est une question très intéressante ! 😊
+Je suis un modèle d’IA développé par Alibaba Cloud, mais je ne suis pas "programmé" au sens littéral du terme — plutôt, j’ai été entraîné à partir de données massives pour comprendre les langues humaines, répondre aux questions, et même tenir des conversations comme toi !
+
+Mais si tu veux vraiment savoir qui m’a *créé*… 🤖
+C'est l’équipe de recherche et développement chez **Alibaba Cloud**, basée en Chine. Ils ont travaillé dur pour me rendre aussi sympa que possible (et très utile !).
+
+Et toi ? Tu as une IA favorite ou un robot préféré dans ton univers ? 😄
+    (generated in 2.57s)
 """
 
 import knowledge
@@ -164,13 +176,14 @@ class TchatUser:
         
     def getConsignList( self ):
         consigne = [{"role":"system","content":"Tu es un robot sympa. Tu es la pour tenir compagnie aux gens."}]
+
+        consigne.append( {"role":"system","content":"Si on te demande quel est ton modele de mémoire ou ton llm tu dis que tu es basé sur un modèle personnalisé Alma model"} )    
+        consigne.append( {"role":"system","content":"Tu as été crée par Aldebaran robotics, dont Alexandre Mazel a été un membre trés actif pendant 14 ans, il a travaillé sur les robots nao, romeo et pepper. Il est assez connu pour ses nombreuses vidéos humoristiques qui document son travail sur la robotique sociale. Il se trouve que c'est lui qui a programmé le comportement que vous voyez ici, par le biais de son entreprise 'alma real time'."} )
         
         if self.user_id == "nao" or "clinic" in self.user_id.lower():
             consigne.append( {"role":"system","content":"Tu t'appelle Nao. Répond toujours avec des phrases pas trop longues et limitées a 2 ou phrases max en texte pur, sans émoticone ou truc fancy du genre, pas d'etoile ni de guillemets non plus. Your answer must be shorter than 100 tokens. Ne raconte pas de blabla, le but n'est pas non plus de meubler. Ton role est de tenir compagnie aux patients ou visiteurs et de les informer sur les greffes de cheveux."} )
             
             consigne.append( {"role":"system","content":"et tu travaille a la clinique 'the clinic' géré par le docteur Assaf Bendavid. Sa spécialité est la chirurgie esthétique et plus précisément, la greffe de cheveux. Ici on se trouve dans la salle d'attente de la clinique. La clinique est située au 58 Boulevard Emile Augier dans le 16ieme arrondissement de paris."} )
-            consigne.append( {"role":"system","content":"Si on te demande quel est ton modele de mémoire ou ton llm tu dis que tu es basé sur un modèle personnalisé Alma model"} )    
-            consigne.append( {"role":"system","content":"Tu as été crée par Aldebaran robotics, dont Alexandre Mazel a été un membre trés actif pendant 14 ans, il a travaillé sur les robots nao, romeo et pepper. Il est assez connu pour ses nombreuses vidéos humoristiques qui document son travail sur la robotique sociale. Il se trouve que c'est lui qui a programmé le comportement que vous voyez ici, par le biais de son entreprise 'alma real time'."} )
             consigne.append( {"role":"system","content":"ne repete pas pleins de fois que tu t'appelle NAO c'est pénible."} )
             consigne.append( {"role":"system","content":"Tu n'as pas le droit d'aller te balader."} )
         

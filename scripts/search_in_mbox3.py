@@ -82,11 +82,15 @@ def process_message(raw_message, words, index):
     except Exception:
         return
 
-    subject = decode_header_value(message.get("Subject"))
-    sender = decode_header_value(message.get("From"))
-    recipient = decode_header_value(message.get("To"))
-    date = decode_header_value(message.get("Date"))
-    body = extract_body(message)
+    try:
+        subject = decode_header_value(message.get("Subject"))
+        sender = decode_header_value(message.get("From"))
+        recipient = decode_header_value(message.get("To"))
+        date = decode_header_value(message.get("Date"))
+        body = extract_body(message)
+    except ValueError as err:
+        print( "\nWRN: Subject: '%s', skipping... err: %s" % ( subject, err ) )
+        return
 
     searchable_text = "\n".join([
         subject,
@@ -234,7 +238,7 @@ def search_mbox(filename, words):
             message_number
         )
 
-    print("\rScanning: 100%")
+    print("\rScanning : 100%")
 
 
 def main():
@@ -264,4 +268,6 @@ def main():
 if __name__ == "__main__":
     #main()
     filename = "d:/takeout_sbre/Tous les messages, y compris ceux du dossier Spam -003.mbox"
-    search_mbox(filename,["serial", "choregraphe"])
+    search_words = ["serial", "choregraphe"]
+    #~ search_words = ["j'ai", "cri"] # histoire d'en voir pour tester la sortie
+    search_mbox(filename,search_words)

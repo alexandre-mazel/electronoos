@@ -480,8 +480,8 @@ def handle_upload(
     
     if hasattr( req, "form" ):
         print( "DBG: handle_upload: got a form from server.py" )
-        filename = args["file"]
-        filedata = req.form["file"]
+        filename = req.form["file"].filename
+        filedata = req.form["file"].value
         print( "DBG: handle_upload: filedata type: %s" % type(filedata) )
         print( "DBG: handle_upload: filedata len: %s" % len(filedata) )
         print( "DBG: handle_upload: filedata: %s" % filedata[0:10] )

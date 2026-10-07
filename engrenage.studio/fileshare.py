@@ -344,7 +344,9 @@ def save_uploaded_file(
             while True:
                 if hasattr( uploaded_file, "from_aserver" ):
                     print( "DBG: save_uploaded_file: writing directly all datas" )
-                    output.write( uploaded_file.filedata )
+                    filedata = uploaded_file.filedata
+                    output.write( filedata )
+                    written += len( filedata )
                     break
                 chunk = uploaded_file.read(
                     1024 * 1024
@@ -484,7 +486,7 @@ def handle_upload(
         filedata = req.form["file"].value
         print( "DBG: handle_upload: filedata type: %s" % type(filedata) )
         print( "DBG: handle_upload: filedata len: %s" % len(filedata) )
-        print( "DBG: handle_upload: filedata: %s" % filedata[0:10] )
+        print( "DBG: handle_upload: filedata: %s..." % filedata[0:10] )
         # compat classes
         class UploadedDataFile:
             def __init__( self, filedata ):

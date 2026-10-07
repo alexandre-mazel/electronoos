@@ -478,11 +478,21 @@ def handle_upload(
         print( "DBG: handle_upload: got a form from server.py" )
         filename = args["file"]
         filedata = req.form["file"]
+        # compat classes
+        class UploadedDataFile:
+            def __init__( self, filedata ):
+                self.filedata = filedata
+            def read( self, chunksizenotused ):
+                return self.filedata
+                
         class UploadedFile:
             def __init__( self, filename, filedata ):
                 self.filename = filename
-                self.file = filedata
+                self.filedata = filedata
+                self.file = UploadedDataFile(filedata)
+                
         uploaded_file = UploadedFile(filename,filedata)
+        
     else:
         if len(
             metadata["files"]

@@ -342,6 +342,10 @@ def save_uploaded_file(
         ) as output:
 
             while True:
+                if hasattr( uploaded_file, "from_aserver" ):
+                    print( "DBG: save_uploaded_file: writing directly all datas" )
+                    output.write( uploaded_file.filedata )
+                    break
                 chunk = uploaded_file.read(
                     1024 * 1024
                 )
@@ -482,7 +486,9 @@ def handle_upload(
         class UploadedDataFile:
             def __init__( self, filedata ):
                 self.filedata = filedata
-            def read( self, chunksizenotused ):
+                self.from_aserver = True
+                
+            def read( self, chunksizenotused ): # sert a rien car au final on a ajouter le flag from_aserver
                 return self.filedata
                 
         class UploadedFile:

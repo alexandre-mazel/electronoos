@@ -471,26 +471,32 @@ def handle_upload(
         return error_body(
             "Share not found."
         )
+        
+    uploaded_file = None
+    
+    if hasattr( req, "form" ):
+        print( "DBG: handle_upload: got a form from server.py" )
+        filename = req.args["file"]
+        filedata = req.form["file"]
+        class UploadedFile:
+            def __init__( self, filename, filedata ):
+                self.filename = filename
+                self.file = filedata
+        uploaded_file = UploadedFile(filename,filedata)
+    else:
+        if len(
+            metadata["files"]
+        ) >= MAX_FILES_PER_SHARE:
+            return error_body(
+                "Too many files."
+            )
 
-    if len(
-        metadata["files"]
-    ) >= MAX_FILES_PER_SHARE:
-        return error_body(
-            "Too many files."
-        )
-
-    uploaded_file = (
-        get_multipart_file()
-    )
+        uploaded_file = (get_multipart_file())
 
     if uploaded_file is None:
-        return error_body(
-            "No file received."
-        )
+        return error_body("No file received.")
 
-    original_name = safe_filename(
-        uploaded_file.filename
-    )
+    original_name = safe_filename(uploaded_file.filename)
 
     try:
         file_info = save_uploaded_file(
@@ -763,10 +769,7 @@ def index( req ):
     
     print( "INF: index: form: %s" % form )
 
-    action = args.get(
-        "action",
-        ""
-    )
+    action = args.get("action", "")
 
     share_id = args.get(
         "id",

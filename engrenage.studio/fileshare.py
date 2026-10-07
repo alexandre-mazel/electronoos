@@ -757,11 +757,11 @@ def index( req ):
     
     print( "INF: index: req: %s" % req )
     print( "INF: index: args: %s" % args )
-    forms = {}
-    if hasattr( req, "forms"):
-        forms = req.forms
+    form = {}
+    if hasattr( req, "form"):
+        forms = req.form
     
-    print( "INF: index: forms: %s" % forms )
+    print( "INF: index: form: %s" % form )
 
     action = args.get(
         "action",

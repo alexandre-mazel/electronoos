@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import argparse
 import email
 import os
@@ -7,13 +8,6 @@ from email.header import decode_header, make_header
 from email.parser import BytesParser
 from email.policy import default
 
-
-SEARCH_WORDS = [
-    "serial",
-    "choregraphe",
-    "pepper",
-    "headbang"
-]
 
 BLOCK_SIZE = 8 * 1024 * 1024
 
@@ -117,8 +111,18 @@ def process_message(raw_message, words, index):
     print(f"Subject : {subject}")
     print(f"Matches : {', '.join(matches)}")
     print("-" * 80)
-    print(body)
+    
+    if 1:
+        # qd je redirige dans un fichier, ca faisait bugger sinon
+        charset = "ascii"
+        charset = "utf-8"
+        charset = "cp1252"
+        body = body.encode( charset, errors = "replace")
+        body = body.decode( charset )
+        
+    print( body )
     print("=" * 80)
+    
     sys.stdout.flush()
 
 
@@ -162,7 +166,7 @@ def process_chunk(chunk, words, message_number):
     return chunk[remaining_start:], message_number
 
 
-def search_mbox(filename, words):
+def search_mbox(filename, words, offset_MB = 0 ):
     print("Search in mbox: '%s'" % filename ) 
     
     words = [w.lower() for w in words]
@@ -170,14 +174,22 @@ def search_mbox(filename, words):
     
     file_size = os.path.getsize(filename)
     print( "file size: %dMB" % (file_size/(1024*1024)) )
-    processed = 0
+    print( "starting at offset: %dMB" % offset_MB )
+    if offset_MB > 0:
+        print( "(message number will be false)" )
+    processed = offset_MB * 1024 * 1024
     message_number = 1
     remaining = b""
     last_percent = -1
+    
+    print("")
 
     with open(filename, "rb", buffering = BLOCK_SIZE) as file:
+        
+        file.seek( offset_MB * 1024 * 1024 )
+        
         while True:
-            chunk = file.read(BLOCK_SIZE)
+            chunk = file.read( BLOCK_SIZE )
 
             if not chunk:
                 break
@@ -192,17 +204,11 @@ def search_mbox(filename, words):
 
             if len(positions) < 2:
                 remaining = data
-
                 percent = int(processed * 100 / file_size)
 
                 if percent != last_percent:
-                    print(
-                        f"\rScanning: {percent:3d}%",
-                        end = "",
-                        flush = True
-                    )
+                    print( f"\rScanning: {percent:3d}%", end = "", flush = True )
                     last_percent = percent
-
                 continue
 
             for index in range(len(positions) - 1):
@@ -257,7 +263,7 @@ def main():
 
     args = parser.parse_args()
 
-    words = args.words if args.words else SEARCH_WORDS
+    words = args.words if args.words else ["riri","fifi"]
 
     search_mbox(
         args.filename,
@@ -270,4 +276,4 @@ if __name__ == "__main__":
     filename = "d:/takeout_sbre/Tous les messages, y compris ceux du dossier Spam -003.mbox"
     search_words = ["serial", "choregraphe"]
     #~ search_words = ["j'ai", "cri"] # histoire d'en voir pour tester la sortie
-    search_mbox(filename,search_words)
+    search_mbox(filename,search_words, int(6*39072/100) ) # ajoute un decalage en % de la taille maxi

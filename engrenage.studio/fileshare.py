@@ -476,7 +476,7 @@ def handle_upload(
     
     if hasattr( req, "form" ):
         print( "DBG: handle_upload: got a form from server.py" )
-        filename = req.args["file"]
+        filename = args["file"]
         filedata = req.form["file"]
         class UploadedFile:
             def __init__( self, filename, filedata ):

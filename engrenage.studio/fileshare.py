@@ -748,14 +748,15 @@ def handle_download_all(
     }
 
 
-def index(
-    req
-):
+def index( req ):
     ensure_storage()
 
     args = parse_args(
         req
     )
+    
+    print( "INF: index: req: %s" % req )
+    print( "INF: index: args: %s" % args )
 
     action = args.get(
         "action",

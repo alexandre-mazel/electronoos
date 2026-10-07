@@ -395,7 +395,7 @@
                 upload_description: "Select one or more files to create a download link.",
                 drop_zone_text: "Choose files or drop them here",
                 upload_action: "Upload files",
-                result_title: "Your download link",
+                result_title: "Your download link (valid for 7 days)",
                 footer_text: "AlmaFileShare",
                 upload_error: "The upload could not be completed.",
                 upload_waiting: "Waiting",
@@ -415,7 +415,7 @@
                 upload_description: "Sélectionnez un ou plusieurs fichiers pour créer un lien de téléchargement.",
                 drop_zone_text: "Choisir des fichiers ou déposez-les ici",
                 upload_action: "Envoyer les fichiers",
-                result_title: "Votre lien de téléchargement",
+                result_title: "Votre lien de téléchargement (valable 7 jours)",
                 footer_text: "AlmaFileShare",
                 upload_error: "L'envoi des fichiers a échoué.",
                 upload_waiting: "En attente",
@@ -1141,8 +1141,11 @@
                     "block";
 
             } finally {
-                upload_action.disabled =
-                    state.files.length === 0;
+                // upload_action.disabled = state.files.length === 0; // non, une fois uploade, on ne veut pas réactiver le button
+                if( state.files.length === 0 )
+                {
+                    upload_action.disabled = false;
+                }
             }
         }
 

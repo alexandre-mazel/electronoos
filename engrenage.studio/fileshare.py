@@ -1,3 +1,10 @@
+"""
+Avec mon serveur, quand on upload, ca prend pendant l'upload la ram de la taille du fichier.
+Quand on upload, ca fait un peak: de 3-4 fois la taille (surement a cause de la compression zip)
+puis le fichier reste dans le cache disque du serveur a l'infini.
+(en fait non, car ca ne passe pas par loadfile)
+"""
+
 import cgi
 import hashlib
 import io
@@ -469,7 +476,7 @@ def handle_download_all(share_id):
 time_last_cleanup = time.time() - 24 * 60 * 60
 
 
-def cleanup_expired_shares(max_age_days=3):
+def cleanup_expired_shares(max_age_days=7):
     global time_last_cleanup
 
     if time.time() - time_last_cleanup < 24 * 60 * 60:

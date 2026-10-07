@@ -875,318 +875,296 @@
             );
         };
 
-        const upload_one_file = (
-            file_state,
-            share_id
-        ) => {
-            return new Promise(
-                (resolve, reject) => {
-                    log_inf(
-                        "Starting file upload:",
-                        {
-                            share_id,
-                            index: file_state.index,
-                            name: file_state.file.name,
-                            size: file_state.file.size,
-                            type: file_state.file.type
-                        }
-                    );
+const upload_one_file = (file_state, share_id) => {
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        const started_at = performance.now();
 
-                    const xhr =
-                        new XMLHttpRequest();
+        const upload_url = new URL("fileshare.py", window.location.href);
+        upload_url.searchParams.set("action", "upload");
+        upload_url.searchParams.set("share_id", share_id);
 
-                    const started_at =
-                        performance.now();
+        xhr.open(
+            "POST",
+            upload_url.toString(),
+            true
+        );
 
-                    const url =
-                        "fileshare.py";
+        log_info(
+            "upload_one_file() started",
+            {
+                name: file_state.file.name,
+                size: file_state.file.size,
+                url: upload_url.toString()
+            }
+        );
 
-                    log_inf(
-                        "Opening XHR:",
-                        {
-                            method: "POST",
-                            url
-                        }
-                    );
-
-                    xhr.open(
-                        "POST",
-                        url,
-                        true
-                    );
-
-                    xhr.onreadystatechange =
-                        () => {
-                            log_inf(
-                                "XHR state changed:",
-                                {
-                                    name: file_state.file.name,
-                                    readyState: xhr.readyState,
-                                    status: xhr.status,
-                                    statusText: xhr.statusText
-                                }
-                            );
-                        };
-
-                    xhr.upload.addEventListener(
-                        "loadstart",
-                        () => {
-                            log_inf(
-                                "Upload loadstart:",
-                                file_state.file.name
-                            );
-                        }
-                    );
-
-                    xhr.upload.addEventListener(
-                        "progress",
-                        (event) => {
-                            if (!event.lengthComputable) {
-                                log_wrn(
-                                    "Upload progress is not computable:",
-                                    file_state.file.name
-                                );
-
-                                return;
-                            }
-
-                            update_file_progress(
-                                file_state,
-                                event.loaded,
-                                event.total,
-                                started_at
-                            );
-                        }
-                    );
-
-                    xhr.upload.addEventListener(
-                        "load",
-                        () => {
-                            log_inf(
-                                "Upload transport completed:",
-                                file_state.file.name
-                            );
-                        }
-                    );
-
-                    xhr.upload.addEventListener(
-                        "error",
-                        (event) => {
-                            log_err(
-                                "Upload transport error:",
-                                {
-                                    name: file_state.file.name,
-                                    event
-                                }
-                            );
-                        }
-                    );
-
-                    xhr.upload.addEventListener(
-                        "abort",
-                        () => {
-                            log_wrn(
-                                "Upload transport aborted:",
-                                file_state.file.name
-                            );
-                        }
-                    );
-
-                    xhr.upload.addEventListener(
-                        "timeout",
-                        () => {
-                            log_err(
-                                "Upload transport timeout:",
-                                file_state.file.name
-                            );
-                        }
-                    );
-
-                    xhr.addEventListener(
-                        "load",
-                        () => {
-                            log_inf(
-                                "XHR load:",
-                                {
-                                    name: file_state.file.name,
-                                    status: xhr.status,
-                                    statusText: xhr.statusText,
-                                    response: xhr.responseText
-                                }
-                            );
-
-                            if (
-                                xhr.status >= 200 &&
-                                xhr.status < 300
-                            ) {
-                                file_state.status =
-                                    "complete";
-
-                                const status_element =
-                                    document.getElementById(
-                                        `file_item_status_${file_state.index}`
-                                    );
-
-                                if (status_element) {
-                                    status_element.textContent =
-                                        text(
-                                            "upload_complete"
-                                        );
-                                }
-
-                                log_inf(
-                                    "File upload successful:",
-                                    file_state.file.name
-                                );
-
-                                resolve(
-                                    xhr.responseText
-                                );
-
-                                return;
-                            }
-
-                            file_state.status =
-                                "failed";
-
-                            log_err(
-                                "Server rejected upload:",
-                                {
-                                    name: file_state.file.name,
-                                    status: xhr.status,
-                                    statusText: xhr.statusText,
-                                    response: xhr.responseText
-                                }
-                            );
-
-                            reject(
-                                new Error(
-                                    `HTTP ${xhr.status}: ${xhr.statusText}`
-                                )
-                            );
-                        }
-                    );
-
-                    xhr.addEventListener(
-                        "error",
-                        (event) => {
-                            file_state.status =
-                                "failed";
-
-                            log_err(
-                                "XHR network error:",
-                                {
-                                    name: file_state.file.name,
-                                    event
-                                }
-                            );
-
-                            reject(
-                                new Error(
-                                    "Network error"
-                                )
-                            );
-                        }
-                    );
-
-                    xhr.addEventListener(
-                        "abort",
-                        () => {
-                            file_state.status =
-                                "failed";
-
-                            log_wrn(
-                                "XHR aborted:",
-                                file_state.file.name
-                            );
-
-                            reject(
-                                new Error(
-                                    "Upload aborted"
-                                )
-                            );
-                        }
-                    );
-
-                    xhr.addEventListener(
-                        "timeout",
-                        () => {
-                            file_state.status =
-                                "failed";
-
-                            log_err(
-                                "XHR timeout:",
-                                file_state.file.name
-                            );
-
-                            reject(
-                                new Error(
-                                    "Upload timeout"
-                                )
-                            );
-                        }
-                    );
-
-                    const form_data =
-                        new FormData();
-
-                    form_data.append(
-                        "action",
-                        "upload"
-                    );
-
-                    form_data.append(
-                        "share_id",
-                        share_id
-                    );
-
-                    form_data.append(
-                        "file",
-                        file_state.file,
-                        file_state.file.name
-                    );
-
-                    log_inf(
-                        "FormData prepared:",
-                        {
-                            action: "upload",
-                            share_id,
-                            filename: file_state.file.name,
-                            size: file_state.file.size,
-                            type: file_state.file.type
-                        }
-                    );
-
-                    const status_element =
-                        document.getElementById(
-                            `file_item_status_${file_state.index}`
-                        );
-
-                    if (status_element) {
-                        status_element.textContent =
-                            text(
-                                "upload_uploading"
-                            );
+        xhr.upload.addEventListener("progress", (event) => {
+            if (!event.lengthComputable) {
+                log_warning(
+                    "Upload progress is not computable",
+                    {
+                        name: file_state.file.name
                     }
+                );
 
-                    log_inf(
-                        "Calling xhr.send():",
-                        file_state.file.name
-                    );
+                return;
+            }
 
-                    xhr.send(
-                        form_data
-                    );
+            update_file_progress(
+                file_state,
+                event.loaded,
+                event.total,
+                started_at
+            );
+        });
 
-                    log_inf(
-                        "xhr.send() returned:",
-                        file_state.file.name
-                    );
+        xhr.addEventListener("load", () => {
+            log_info(
+                "Upload response",
+                {
+                    name: file_state.file.name,
+                    status: xhr.status,
+                    statusText: xhr.statusText,
+                    contentType: xhr.getResponseHeader("Content-Type"),
+                    response: xhr.responseText
                 }
             );
-        };
 
-        const create_share = async () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                file_state.status = "complete";
+
+                const status_element = document.getElementById(
+                    `file_item_status_${file_state.index}`
+                );
+
+                if (status_element) {
+                    status_element.textContent = text("upload_complete");
+                }
+
+                resolve(xhr.responseText);
+                return;
+            }
+
+            file_state.status = "failed";
+
+            reject(
+                new Error(
+                    `Upload failed: HTTP ${xhr.status}`
+                )
+            );
+        });
+
+        xhr.addEventListener("error", () => {
+            file_state.status = "failed";
+
+            log_error(
+                "Upload network error",
+                {
+                    name: file_state.file.name,
+                    url: upload_url.toString()
+                }
+            );
+
+            reject(
+                new Error("Network error")
+            );
+        });
+
+        const form_data = new FormData();
+
+        form_data.append(
+            "file",
+            file_state.file,
+            file_state.file.name
+        );
+
+        const status_element = document.getElementById(
+            `file_item_status_${file_state.index}`
+        );
+
+        if (status_element) {
+            status_element.textContent = text("upload_uploading");
+        }
+
+        xhr.send(form_data);
+    });
+};
+
+
+const create_share = async () => {
+    const upload_error = document.getElementById("upload_error");
+    const upload_action = document.getElementById("upload_action");
+
+    upload_error.style.display = "none";
+    upload_action.disabled = true;
+
+    log_info(
+        "create_share() started",
+        {
+            files: state.files.length
+        }
+    );
+
+    try {
+        const create_url = new URL(
+            "fileshare.py",
+            window.location.href
+        );
+
+        create_url.searchParams.set(
+            "action",
+            "create"
+        );
+
+        log_info(
+            "Creating share",
+            {
+                method: "POST",
+                url: create_url.toString()
+            }
+        );
+
+        const response = await fetch(
+            create_url.toString(),
+            {
+                method: "POST"
+            }
+        );
+
+        log_info(
+            "Create-share response",
+            {
+                status: response.status,
+                statusText: response.statusText,
+                url: response.url,
+                contentType: response.headers.get(
+                    "Content-Type"
+                )
+            }
+        );
+
+        const raw_response = await response.text();
+
+        log_info(
+            "Create-share raw response",
+            raw_response
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                `Unable to create share: HTTP ${response.status}`
+            );
+        }
+
+        let data;
+
+        try {
+            data = JSON.parse(
+                raw_response
+            );
+        } catch (error) {
+            log_error(
+                "Create-share response is not valid JSON",
+                {
+                    response: raw_response,
+                    error: String(error)
+                }
+            );
+
+            throw new Error(
+                "Invalid create-share response"
+            );
+        }
+
+        log_info(
+            "Create-share JSON",
+            data
+        );
+
+        if (!data.id) {
+            throw new Error(
+                "Missing share id"
+            );
+        }
+
+        state.share_id = data.id;
+
+        log_info(
+            "Share created",
+            {
+                share_id: state.share_id
+            }
+        );
+
+        await Promise.all(
+            state.files.map(
+                (file_state) => {
+                    return upload_one_file(
+                        file_state,
+                        state.share_id
+                    );
+                }
+            )
+        );
+
+        const result_url = new URL(
+            window.location.href
+        );
+
+        result_url.search = "";
+        result_url.hash = "";
+
+        result_url.searchParams.set(
+            "id",
+            state.share_id
+        );
+
+        const result_link = document.getElementById(
+            "result_link"
+        );
+
+        result_link.href =
+            result_url.toString();
+
+        result_link.textContent =
+            result_url.toString();
+
+        document.getElementById(
+            "result_panel"
+        ).style.display = "block";
+
+        log_info(
+            "Upload process completed",
+            {
+                share_id: state.share_id,
+                url: result_url.toString()
+            }
+        );
+
+    } catch (error) {
+        log_error(
+            "Upload process failed",
+            {
+                error: String(error),
+                stack: error && error.stack
+                    ? error.stack
+                    : null
+            }
+        );
+
+        upload_error.textContent =
+            text("upload_error");
+
+        upload_error.style.display =
+            "block";
+
+    } finally {
+        upload_action.disabled =
+            state.files.length === 0;
+    }
+};
+
             const upload_error =
                 document.getElementById(
                     "upload_error"

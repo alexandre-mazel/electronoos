@@ -1,13 +1,10 @@
 import cgi
 import hashlib
-import html
 import io
 import json
 import mimetypes
 import os
 import secrets
-import shutil
-import tempfile
 import urllib.parse
 import zipfile
 from datetime import datetime, timezone
@@ -24,13 +21,28 @@ MAX_FILES_PER_SHARE = 100
 
 
 def ensure_storage():
-    STORAGE_DIR.mkdir(parents=True, exist_ok=True)
-    METADATA_DIR.mkdir(parents=True, exist_ok=True)
-    FILES_DIR.mkdir(parents=True, exist_ok=True)
+    STORAGE_DIR.mkdir(
+        parents=True,
+        exist_ok=True
+    )
+
+    METADATA_DIR.mkdir(
+        parents=True,
+        exist_ok=True
+    )
+
+    FILES_DIR.mkdir(
+        parents=True,
+        exist_ok=True
+    )
 
 
 def parse_args(req):
-    args = getattr(req, "args", "")
+    args = getattr(
+        req,
+        "args",
+        ""
+    )
 
     if isinstance(args, dict):
         return {
@@ -49,97 +61,60 @@ def parse_args(req):
     }
 
 
-def json_response(data, status=200):
-    return {
-        "status": status,
-        "content_type": "application/json; charset=utf-8",
-        "body": json.dumps(
-            data,
-            ensure_ascii=False
-        )
-    }
-
-
-def error_response(message, status=400):
-    return json_response(
-        {
-            "error": message
-        },
-        status
+def json_body(data):
+    return json.dumps(
+        data,
+        ensure_ascii=False
     )
 
 
-def html_response(body, status=200):
-    return {
-        "status": status,
-        "content_type": "text/html; charset=utf-8",
-        "body": body
-    }
-
-
-def file_response(
-    path,
-    download_name=None,
-    content_type=None
+def error_body(
+    message
 ):
-    path = Path(path)
-
-    if not path.is_file():
-        return error_response(
-            "File not found.",
-            404
-        )
-
-    if content_type is None:
-        content_type = (
-            mimetypes.guess_type(path.name)[0]
-            or "application/octet-stream"
-        )
-
-    with path.open("rb") as file_handle:
-        body = file_handle.read()
-
-    response = {
-        "status": 200,
-        "content_type": content_type,
-        "body": body,
-        "headers": {
-            "Content-Length": str(len(body))
+    return json_body(
+        {
+            "error": message
         }
-    }
+    )
 
-    if download_name:
-        safe_name = (
-            Path(download_name).name
-            .replace('"', "")
-            .replace("\r", "")
-            .replace("\n", "")
-        )
 
-        response["headers"]["Content-Disposition"] = (
-            f'attachment; filename="{safe_name}"'
-        )
-
-    return response
+def html_body(
+    body
+):
+    return body
 
 
 def generate_share_id():
     while True:
         share_id = secrets.token_urlsafe(9)
 
-        if not metadata_path(share_id).exists():
+        if not metadata_path(
+            share_id
+        ).exists():
             return share_id
 
 
-def metadata_path(share_id):
-    return METADATA_DIR / f"{share_id}.json"
+def metadata_path(
+    share_id
+):
+    return (
+        METADATA_DIR
+        / f"{share_id}.json"
+    )
 
 
-def share_file_directory(share_id):
-    return FILES_DIR / share_id
+def share_file_directory(
+    share_id
+):
+    return (
+        FILES_DIR
+        / share_id
+    )
 
 
-def valid_share_id(share_id):
+def valid_share_id(
+    share_id
+):
     if not share_id:
         return False
 
@@ -158,15 +133,25 @@ def valid_share_id(share_id):
     )
 
 
-def valid_file_id(file_id):
-    return valid_share_id(file_id)
+def valid_file_id(
+    file_id
+):
+    return valid_share_id(
+        file_id
+    )
 
 
-def load_metadata(share_id):
-    if not valid_share_id(share_id):
+def load_metadata(
+    share_id
+):
+    if not valid_share_id(
+        share_id
+    ):
         return None
 
-    path = metadata_path(share_id)
+    path = metadata_path(
+        share_id
+    )
 
     if not path.is_file():
         return None
@@ -176,7 +161,10 @@ def load_metadata(share_id):
             "r",
             encoding="utf-8"
         ) as file_handle:
-            return json.load(file_handle)
+            return json.load(
+                file_handle
+            )
+
     except (
         OSError,
         ValueError,
@@ -185,9 +173,17 @@ def load_metadata(share_id):
         return None
 
 
-def save_metadata(share_id, metadata):
-    path = metadata_path(share_id)
-    temporary_path = path.with_suffix(".tmp")
+def save_metadata(
+    share_id,
+    metadata
+):
+    path = metadata_path(
+        share_id
+    )
+
+    temporary_path = (
+        path.with_suffix(".tmp")
+    )
 
     with temporary_path.open(
         "w",
@@ -200,13 +196,16 @@ def save_metadata(share_id, metadata):
             indent=4
         )
 
-    temporary_path.replace(path)
+    temporary_path.replace(
+        path
+    )
 
 
 def create_share():
     ensure_storage()
 
     share_id = generate_share_id()
+
     now = datetime.now(
         timezone.utc
     ).isoformat()
@@ -217,8 +216,10 @@ def create_share():
         "files": []
     }
 
-    share_directory = share_file_directory(
-        share_id
+    share_directory = (
+        share_file_directory(
+            share_id
+        )
     )
 
     share_directory.mkdir(
@@ -234,8 +235,12 @@ def create_share():
     return metadata
 
 
-def get_share(share_id):
-    return load_metadata(share_id)
+def get_share(
+    share_id
+):
+    return load_metadata(
+        share_id
+    )
 
 
 def get_file_metadata(
@@ -246,7 +251,9 @@ def get_file_metadata(
         "files",
         []
     ):
-        if file_info.get("id") == file_id:
+        if file_info.get(
+            "id"
+        ) == file_id:
             return file_info
 
     return None
@@ -265,11 +272,15 @@ def calculate_file_id(
     )
 
     return hashlib.sha256(
-        value.encode("utf-8")
+        value.encode(
+            "utf-8"
+        )
     ).hexdigest()[:24]
 
 
-def safe_filename(filename):
+def safe_filename(
+    filename
+):
     filename = Path(
         str(filename)
     ).name
@@ -296,8 +307,10 @@ def save_uploaded_file(
             "File is too large."
         )
 
-    share_directory = share_file_directory(
-        share_id
+    share_directory = (
+        share_file_directory(
+            share_id
+        )
     )
 
     share_directory.mkdir(
@@ -312,7 +325,8 @@ def save_uploaded_file(
     )
 
     destination = (
-        share_directory / file_id
+        share_directory
+        / file_id
     )
 
     temporary_path = (
@@ -322,34 +336,43 @@ def save_uploaded_file(
 
     written = 0
 
-    with temporary_path.open("wb") as output:
-        while True:
-            chunk = uploaded_file.read(
-                1024 * 1024
-            )
+    try:
+        with temporary_path.open(
+            "wb"
+        ) as output:
 
-            if not chunk:
-                break
-
-            written += len(chunk)
-
-            if written > MAX_FILE_SIZE:
-                output.close()
-
-                try:
-                    temporary_path.unlink()
-                except OSError:
-                    pass
-
-                raise ValueError(
-                    "File is too large."
+            while True:
+                chunk = uploaded_file.read(
+                    1024 * 1024
                 )
 
-            output.write(chunk)
+                if not chunk:
+                    break
 
-    temporary_path.replace(
-        destination
-    )
+                written += len(
+                    chunk
+                )
+
+                if written > MAX_FILE_SIZE:
+                    raise ValueError(
+                        "File is too large."
+                    )
+
+                output.write(
+                    chunk
+                )
+
+        temporary_path.replace(
+            destination
+        )
+
+    except Exception:
+        try:
+            temporary_path.unlink()
+        except OSError:
+            pass
+
+        raise
 
     return {
         "id": file_id,
@@ -389,7 +412,10 @@ def get_multipart_file():
 
     field = form["file"]
 
-    if isinstance(field, list):
+    if isinstance(
+        field,
+        list
+    ):
         field = field[0]
 
     if not getattr(
@@ -414,23 +440,27 @@ def get_multipart_file():
 def handle_create():
     metadata = create_share()
 
-    return json_response(
+    return json_body(
         {
             "id": metadata["id"]
         }
     )
 
 
-def handle_upload(args, req):
+def handle_upload(
+    args,
+    req
+):
     share_id = args.get(
         "share_id",
         ""
     )
 
-    if not valid_share_id(share_id):
-        return error_response(
-            "Invalid share id.",
-            400
+    if not valid_share_id(
+        share_id
+    ):
+        return error_body(
+            "Invalid share id."
         )
 
     metadata = get_share(
@@ -438,23 +468,24 @@ def handle_upload(args, req):
     )
 
     if metadata is None:
-        return error_response(
-            "Share not found.",
-            404
+        return error_body(
+            "Share not found."
         )
 
-    if len(metadata["files"]) >= MAX_FILES_PER_SHARE:
-        return error_response(
-            "Too many files.",
-            400
+    if len(
+        metadata["files"]
+    ) >= MAX_FILES_PER_SHARE:
+        return error_body(
+            "Too many files."
         )
 
-    uploaded_file = get_multipart_file()
+    uploaded_file = (
+        get_multipart_file()
+    )
 
     if uploaded_file is None:
-        return error_response(
-            "No file received.",
-            400
+        return error_body(
+            "No file received."
         )
 
     original_name = safe_filename(
@@ -468,15 +499,15 @@ def handle_upload(args, req):
             original_name,
             0
         )
+
     except ValueError as error:
-        return error_response(
-            str(error),
-            413
+        return error_body(
+            str(error)
         )
+
     except OSError:
-        return error_response(
-            "Unable to store file.",
-            500
+        return error_body(
+            "Unable to store file."
         )
 
     metadata["files"].append(
@@ -488,7 +519,7 @@ def handle_upload(args, req):
         metadata
     )
 
-    return json_response(
+    return json_body(
         {
             "id": file_info["id"],
             "name": file_info["name"],
@@ -498,11 +529,14 @@ def handle_upload(args, req):
     )
 
 
-def handle_info(share_id):
-    if not valid_share_id(share_id):
-        return error_response(
-            "Invalid share id.",
-            400
+def handle_info(
+    share_id
+):
+    if not valid_share_id(
+        share_id
+    ):
+        return error_body(
+            "Invalid share id."
         )
 
     metadata = get_share(
@@ -510,12 +544,11 @@ def handle_info(share_id):
     )
 
     if metadata is None:
-        return error_response(
-            "Share not found.",
-            404
+        return error_body(
+            "Share not found."
         )
 
-    return json_response(
+    return json_body(
         {
             "id": metadata["id"],
             "created": metadata["created"],
@@ -524,18 +557,95 @@ def handle_info(share_id):
     )
 
 
+def create_file_response(
+    path,
+    download_name=None,
+    content_type=None
+):
+    path = Path(
+        path
+    )
+
+    if not path.is_file():
+        return None
+
+    if content_type is None:
+        content_type = (
+            mimetypes.guess_type(
+                path.name
+            )[0]
+            or "application/octet-stream"
+        )
+
+    with path.open(
+        "rb"
+    ) as file_handle:
+        body = file_handle.read()
+
+    headers = {
+        "Content-Length": str(
+            len(body)
+        )
+    }
+
+    if download_name:
+        safe_name = (
+            Path(
+                download_name
+            ).name
+            .replace(
+                '"',
+                ""
+            )
+            .replace(
+                "\r",
+                ""
+            )
+            .replace(
+                "\n",
+                ""
+            )
+        )
+
+        headers[
+            "Content-Disposition"
+        ] = (
+            f'attachment; filename="{safe_name}"'
+        )
+
+    return {
+        "status": 200,
+        "content_type": content_type,
+        "body": body,
+        "headers": headers
+    }
+
+
 def handle_download(
     share_id,
     file_id
 ):
+    if not valid_share_id(
+        share_id
+    ):
+        return error_body(
+            "Invalid share id."
+        )
+
+    if not valid_file_id(
+        file_id
+    ):
+        return error_body(
+            "Invalid file id."
+        )
+
     metadata = get_share(
         share_id
     )
 
     if metadata is None:
-        return error_response(
-            "Share not found.",
-            404
+        return error_body(
+            "Share not found."
         )
 
     file_info = get_file_metadata(
@@ -544,45 +654,54 @@ def handle_download(
     )
 
     if file_info is None:
-        return error_response(
-            "File not found.",
-            404
+        return error_body(
+            "File not found."
         )
 
     stored_file = (
-        share_file_directory(share_id)
+        share_file_directory(
+            share_id
+        )
         / file_id
     )
 
-    if not stored_file.is_file():
-        return error_response(
-            "File not found.",
-            404
-        )
-
-    return file_response(
+    response = create_file_response(
         stored_file,
         download_name=file_info["name"]
     )
+
+    if response is None:
+        return error_body(
+            "File not found."
+        )
+
+    return response
 
 
 def handle_download_all(
     share_id
 ):
+    if not valid_share_id(
+        share_id
+    ):
+        return error_body(
+            "Invalid share id."
+        )
+
     metadata = get_share(
         share_id
     )
 
     if metadata is None:
-        return error_response(
-            "Share not found.",
-            404
+        return error_body(
+            "Share not found."
         )
 
-    if not metadata.get("files"):
-        return error_response(
-            "No files found.",
-            404
+    if not metadata.get(
+        "files"
+    ):
+        return error_body(
+            "No files found."
         )
 
     output = io.BytesIO()
@@ -592,16 +711,23 @@ def handle_download_all(
         "w",
         compression=zipfile.ZIP_DEFLATED
     ) as archive:
-        for file_info in metadata["files"]:
+
+        for file_info in metadata[
+            "files"
+        ]:
             stored_file = (
-                share_file_directory(share_id)
+                share_file_directory(
+                    share_id
+                )
                 / file_info["id"]
             )
 
             if stored_file.is_file():
                 archive.write(
                     stored_file,
-                    arcname=file_info["name"]
+                    arcname=file_info[
+                        "name"
+                    ]
                 )
 
     body = output.getvalue()
@@ -611,18 +737,25 @@ def handle_download_all(
         "content_type": "application/zip",
         "body": body,
         "headers": {
-            "Content-Length": str(len(body)),
+            "Content-Length": str(
+                len(body)
+            ),
             "Content-Disposition": (
-                f'attachment; filename="fileshare-{share_id}.zip"'
+                f'attachment; '
+                f'filename="fileshare-{share_id}.zip"'
             )
         }
     }
 
 
-def index(req):
+def index(
+    req
+):
     ensure_storage()
 
-    args = parse_args(req)
+    args = parse_args(
+        req
+    )
 
     action = args.get(
         "action",
@@ -644,20 +777,12 @@ def index(req):
         )
 
     if action == "download":
-        file_id = args.get(
-            "file",
-            ""
-        )
-
-        if not valid_file_id(file_id):
-            return error_response(
-                "Invalid file id.",
-                400
-            )
-
         return handle_download(
             share_id,
-            file_id
+            args.get(
+                "file",
+                ""
+            )
         )
 
     if action == "download_all":
@@ -677,7 +802,9 @@ def index(req):
                 file_id
             )
 
-        if args.get("download") == "all":
+        if args.get(
+            "download"
+        ) == "all":
             return handle_download_all(
                 share_id
             )
@@ -686,7 +813,7 @@ def index(req):
             share_id
         )
 
-    return html_response(
+    return html_body(
         "<!DOCTYPE html>"
         "<html>"
         "<head>"
@@ -705,23 +832,34 @@ def test_index():
         pass
 
     req = Req()
+
     req.args = "id=toto&q=coucou"
 
-    result = index(req)
+    result = index(
+        req
+    )
 
-    print("TEST RESULT")
-    print("status:", result["status"])
-    print("content_type:", result["content_type"])
-    print("body:", result["body"])
+    print(
+        "TEST INFO:"
+    )
+
+    print(
+        result
+    )
 
     req.args = "action=create"
 
-    result = index(req)
+    result = index(
+        req
+    )
 
-    print("CREATE RESULT")
-    print("status:", result["status"])
-    print("content_type:", result["content_type"])
-    print("body:", result["body"])
+    print(
+        "TEST CREATE:"
+    )
+
+    print(
+        result
+    )
 
 
 if __name__ == "__main__":

@@ -750,12 +750,12 @@ def handle_download_all(
 
 def index( req ):
     ensure_storage()
-
-    args = parse_args(
-        req
-    )
     
     print( "INF: index: req: %s" % req )
+    print( "INF: index: dir req: %s" % dir(req) )
+
+    args = parse_args(req)
+    
     print( "INF: index: args: %s" % args )
     form = {}
     if hasattr( req, "form"):

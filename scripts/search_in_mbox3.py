@@ -88,7 +88,7 @@ def process_message(raw_message, words, index):
         recipient = decode_header_value(message.get("To"))
         date = decode_header_value(message.get("Date"))
         body = extract_body(message)
-    except ValueError as err:
+    except (ValueError,TypeError) as err:
         print( "\nWRN: Subject: '%s', skipping... err: %s" % ( subject, err ) )
         return
 

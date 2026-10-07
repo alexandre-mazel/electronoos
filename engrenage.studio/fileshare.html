@@ -1,34 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html id="html_root" lang="en">
+<head id="page_head">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="page_title">AlmaFileShare</title>
+
     <style id="page_style">
         :root {
             color-scheme: light dark;
-            --color_background: #f5f5f5;
-            --color_surface: #ffffff;
-            --color_text: #161616;
-            --color_muted: #666666;
-            --color_border: #d9d9d9;
-            --color_primary: #1769ff;
-            --color_primary_hover: #0757e8;
-            --color_success: #159447;
-            --color_error: #c62828;
-            --size_radius: 14px;
-            --size_max_width: 760px;
+            --background: #f5f5f5;
+            --surface: #ffffff;
+            --text: #161616;
+            --muted: #666666;
+            --border: #d9d9d9;
+            --primary: #1769ff;
+            --primary_hover: #0757e8;
+            --success: #159447;
+            --error: #c62828;
+            --radius: 14px;
+            --max_width: 760px;
         }
 
         @media (prefers-color-scheme: dark) {
             :root {
-                --color_background: #101010;
-                --color_surface: #1b1b1b;
-                --color_text: #f2f2f2;
-                --color_muted: #a8a8a8;
-                --color_border: #383838;
-                --color_primary: #4f8cff;
-                --color_primary_hover: #72a2ff;
+                --background: #101010;
+                --surface: #1b1b1b;
+                --text: #f2f2f2;
+                --muted: #a8a8a8;
+                --border: #383838;
+                --primary: #4f8cff;
+                --primary_hover: #72a2ff;
             }
         }
 
@@ -44,14 +45,18 @@
         body {
             margin: 0;
             min-height: 100vh;
-            background: var(--color_background);
-            color: var(--color_text);
+            background: var(--background);
+            color: var(--text);
             font-size: 18px;
         }
 
         button,
         input {
             font: inherit;
+        }
+
+        button {
+            cursor: pointer;
         }
 
         #page_root {
@@ -64,14 +69,10 @@
             padding: 28px 20px 10px;
         }
 
-        #header_content {
-            width: 100%;
-            max-width: var(--size_max_width);
-            margin: 0 auto;
-        }
-
         #page_logo {
-            margin: 0;
+            width: 100%;
+            max-width: var(--max_width);
+            margin: 0 auto;
             font-size: clamp(2rem, 8vw, 3.5rem);
             line-height: 1;
             letter-spacing: -0.04em;
@@ -79,7 +80,7 @@
 
         #page_main {
             width: 100%;
-            max-width: var(--size_max_width);
+            max-width: var(--max_width);
             margin: 0 auto;
             padding: 30px 20px 60px;
         }
@@ -93,9 +94,9 @@
         #download_panel {
             width: 100%;
             padding: clamp(20px, 5vw, 40px);
-            background: var(--color_surface);
-            border: 1px solid var(--color_border);
-            border-radius: var(--size_radius);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
         }
 
         #upload_title,
@@ -103,13 +104,12 @@
             margin: 0 0 12px;
             font-size: clamp(1.8rem, 7vw, 2.8rem);
             line-height: 1.1;
-            letter-spacing: -0.03em;
         }
 
         #upload_description,
         #download_description {
             margin: 0 0 28px;
-            color: var(--color_muted);
+            color: var(--muted);
             line-height: 1.5;
         }
 
@@ -119,25 +119,23 @@
 
         #file_drop_zone {
             display: flex;
-            min-height: 220px;
+            min-height: 200px;
             align-items: center;
             justify-content: center;
             padding: 30px;
             text-align: center;
-            border: 2px dashed var(--color_border);
-            border-radius: var(--size_radius);
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
             cursor: pointer;
-            transition: border-color 0.15s, background 0.15s;
         }
 
         #file_drop_zone:hover,
         #file_drop_zone.file_drag_active {
-            border-color: var(--color_primary);
-            background: color-mix(in srgb, var(--color_primary) 8%, transparent);
+            border-color: var(--primary);
+            background: color-mix(in srgb, var(--primary) 8%, transparent);
         }
 
         #drop_zone_text {
-            margin: 0;
             font-size: clamp(1.3rem, 5vw, 1.8rem);
             font-weight: 600;
         }
@@ -145,27 +143,23 @@
         #file_list {
             display: flex;
             flex-direction: column;
-            gap: 14px;
-            margin-top: 24px;
-        }
-
-        #file_list:empty {
-            display: none;
+            gap: 12px;
+            margin-top: 20px;
         }
 
         .file_item {
-            padding: 16px;
-            border: 1px solid var(--color_border);
+            padding: 14px;
+            border: 1px solid var(--border);
             border-radius: 10px;
         }
 
-        .file_item_header {
+        .file_header {
             display: flex;
             justify-content: space-between;
             gap: 12px;
         }
 
-        .file_item_name {
+        .file_name {
             min-width: 0;
             overflow: hidden;
             font-weight: 650;
@@ -173,55 +167,56 @@
             white-space: nowrap;
         }
 
-        .file_item_size {
+        .file_size {
             flex: 0 0 auto;
-            color: var(--color_muted);
+            color: var(--muted);
         }
 
         .file_progress {
             width: 100%;
             height: 10px;
-            margin-top: 14px;
+            margin-top: 12px;
             overflow: hidden;
             border-radius: 999px;
-            background: var(--color_border);
+            background: var(--border);
         }
 
         .file_progress_bar {
             width: 0;
             height: 100%;
-            background: var(--color_primary);
-            transition: width 0.1s linear;
+            background: var(--primary);
         }
 
-        .file_item_info {
+        .file_info {
             display: flex;
             justify-content: space-between;
             gap: 12px;
-            margin-top: 8px;
-            color: var(--color_muted);
+            margin-top: 7px;
+            color: var(--muted);
             font-size: 0.9rem;
         }
 
-        .file_item_status {
-            margin-top: 8px;
-            color: var(--color_muted);
+        .file_status {
+            margin-top: 7px;
+            color: var(--muted);
         }
 
-        #upload_action {
+        #upload_action,
+        #download_all_action {
             width: 100%;
-            margin-top: 24px;
+            margin-top: 20px;
             padding: 16px 20px;
             border: 0;
             border-radius: 10px;
-            background: var(--color_primary);
+            background: var(--primary);
             color: #ffffff;
             font-weight: 700;
-            cursor: pointer;
         }
 
-        #upload_action:hover {
-            background: var(--color_primary_hover);
+        #upload_action:hover,
+        #download_all_action:hover,
+        .download_button:hover {
+            background: var(--primary_hover);
         }
 
         #upload_action:disabled {
@@ -229,24 +224,30 @@
             cursor: not-allowed;
         }
 
+        #upload_error,
+        #download_error {
+            display: none;
+            margin-top: 18px;
+            color: var(--error);
+            font-weight: 600;
+        }
+
         #result_panel {
             display: none;
-            margin-top: 24px;
-            padding: 20px;
-            border: 1px solid var(--color_border);
+            margin-top: 20px;
+            padding: 18px;
+            border: 1px solid var(--border);
             border-radius: 10px;
         }
 
         #result_title {
             margin: 0 0 10px;
-            font-size: 1.4rem;
         }
 
         #result_link {
             display: block;
-            width: 100%;
             overflow-wrap: anywhere;
-            color: var(--color_primary);
+            color: var(--primary);
             font-weight: 600;
         }
 
@@ -258,71 +259,47 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            margin-top: 24px;
+            margin-top: 20px;
         }
 
-        .download_file_item {
+        .download_item {
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 16px;
-            padding: 16px;
-            border: 1px solid var(--color_border);
+            padding: 14px;
+            border: 1px solid var(--border);
             border-radius: 10px;
         }
 
-        .download_file_details {
+        .download_name {
             min-width: 0;
-        }
-
-        .download_file_name {
             overflow: hidden;
             font-weight: 650;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
 
-        .download_file_meta {
+        .download_meta {
             margin-top: 4px;
-            color: var(--color_muted);
+            color: var(--muted);
             font-size: 0.9rem;
         }
 
-        .download_file_button {
+        .download_button {
             flex: 0 0 auto;
             padding: 12px 16px;
             border: 0;
             border-radius: 8px;
-            background: var(--color_primary);
+            background: var(--primary);
             color: #ffffff;
-            cursor: pointer;
-        }
-
-        #download_all_action {
-            width: 100%;
-            margin-top: 20px;
-            padding: 16px 20px;
-            border: 0;
-            border-radius: 10px;
-            background: var(--color_primary);
-            color: #ffffff;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        #download_error,
-        #upload_error {
-            display: none;
-            margin-top: 20px;
-            color: var(--color_error);
-            font-weight: 600;
         }
 
         #page_footer {
             width: 100%;
             padding: 0 20px 30px;
             text-align: center;
-            color: var(--color_muted);
+            color: var(--muted);
             font-size: 0.85rem;
         }
 
@@ -340,23 +317,22 @@
                 padding: 20px;
             }
 
-            .download_file_item {
+            .download_item {
                 align-items: stretch;
                 flex-direction: column;
             }
 
-            .download_file_button {
+            .download_button {
                 width: 100%;
             }
         }
     </style>
 </head>
-<body>
+
+<body id="page_body">
     <div id="page_root">
         <header id="page_header">
-            <div id="header_content">
-                <h1 id="page_logo">AlmaFileShare</h1>
-            </div>
+            <h1 id="page_logo">AlmaFileShare</h1>
         </header>
 
         <main id="page_main">
@@ -388,8 +364,11 @@
                 <div id="download_panel">
                     <h2 id="download_title"></h2>
                     <p id="download_description"></p>
+
                     <div id="download_file_list"></div>
+
                     <button id="download_all_action" type="button"></button>
+
                     <div id="download_error"></div>
                 </div>
             </section>
@@ -403,26 +382,8 @@
     <script id="page_script">
         const verbose = true;
 
-        const log_inf = (...args) => {
-            if (verbose) {
-                console.log("INF:", ...args);
-            }
-        };
-
-        const log_wrn = (...args) => {
-            if (verbose) {
-                console.warn("WRN:", ...args);
-            }
-        };
-
-        const log_err = (...args) => {
-            if (verbose) {
-                console.error("ERR:", ...args);
-            }
-        };
-
         const state = {
-            language: navigator.language && navigator.language.toLowerCase().startsWith("fr") ? "fr" : "en",
+            language: "en",
             files: [],
             share_id: null
         };
@@ -430,7 +391,7 @@
         const translations = {
             en: {
                 upload_title: "Share your files",
-                upload_description: "Select one or more files to create a temporary download link.",
+                upload_description: "Select one or more files to create a download link.",
                 drop_zone_text: "Choose files or drop them here",
                 upload_action: "Upload files",
                 result_title: "Your download link",
@@ -447,6 +408,7 @@
                 download_error: "These files could not be found.",
                 unknown_date: "Unknown date"
             },
+
             fr: {
                 upload_title: "Partagez vos fichiers",
                 upload_description: "Sélectionnez un ou plusieurs fichiers pour créer un lien de téléchargement.",
@@ -468,36 +430,87 @@
             }
         };
 
-        const text = (key) => {
-            return translations[state.language][key];
-        };
+        function log_info(message, data) {
+            if (!verbose) {
+                return;
+            }
 
-        const format_size = (bytes) => {
+            if (typeof data === "undefined") {
+                console.log("INF:", message);
+            } else {
+                console.log("INF:", message, data);
+            }
+        }
+
+        function log_warning(message, data) {
+            if (!verbose) {
+                return;
+            }
+
+            if (typeof data === "undefined") {
+                console.warn("WRN:", message);
+            } else {
+                console.warn("WRN:", message, data);
+            }
+        }
+
+        function log_error(message, data) {
+            if (!verbose) {
+                return;
+            }
+
+            if (typeof data === "undefined") {
+                console.error("ERR:", message);
+            } else {
+                console.error("ERR:", message, data);
+            }
+        }
+
+        function text(key) {
+            return translations[state.language][key];
+        }
+
+        function format_size(bytes) {
             if (bytes === 0) {
                 return "0 B";
             }
 
-            const units = ["B", "KB", "MB", "GB", "TB"];
+            const units = [
+                "B",
+                "KB",
+                "MB",
+                "GB",
+                "TB"
+            ];
 
             const index = Math.min(
-                Math.floor(Math.log(bytes) / Math.log(1024)),
+                Math.floor(
+                    Math.log(bytes) / Math.log(1024)
+                ),
                 units.length - 1
             );
 
-            const value = bytes / Math.pow(1024, index);
+            const value = bytes / Math.pow(
+                1024,
+                index
+            );
 
-            return `${value.toFixed(index === 0 ? 0 : 2)} ${units[index]}`;
-        };
+            return value.toFixed(
+                index === 0 ? 0 : 2
+            ) + " " + units[index];
+        }
 
-        const format_bandwidth = (bytes_per_second) => {
+        function format_bandwidth(bytes_per_second) {
             if (!bytes_per_second || bytes_per_second <= 0) {
                 return "—";
             }
 
-            return `${format_size(bytes_per_second)}/s`;
-        };
+            return format_size(
+                bytes_per_second
+            ) + "/s";
+        }
 
-        const format_date = (value) => {
+        function format_date(value) {
             if (!value) {
                 return text("unknown_date");
             }
@@ -509,25 +522,28 @@
             }
 
             return new Intl.DateTimeFormat(
-                state.language === "fr" ? "fr-FR" : "en-US",
+                state.language === "fr"
+                    ? "fr-FR"
+                    : "en-US",
                 {
                     dateStyle: "medium",
                     timeStyle: "short"
                 }
             ).format(date);
-        };
+        }
 
-        const apply_language = () => {
-            log_inf(
-                "Applying language:",
-                state.language
-            );
+        function apply_language() {
+            const browser_language = (
+                navigator.language || ""
+            ).toLowerCase();
+
+            state.language =
+                browser_language.startsWith("fr")
+                    ? "fr"
+                    : "en";
 
             document.documentElement.lang =
                 state.language;
-
-            document.title =
-                "AlmaFileShare";
 
             document.getElementById(
                 "upload_title"
@@ -555,11 +571,6 @@
                 text("result_title");
 
             document.getElementById(
-                "footer_text"
-            ).textContent =
-                text("footer_text");
-
-            document.getElementById(
                 "download_title"
             ).textContent =
                 text("download_title");
@@ -574,289 +585,181 @@
             ).textContent =
                 text("download_all_action");
 
-            render_files();
-        };
+            document.getElementById(
+                "footer_text"
+            ).textContent =
+                text("footer_text");
+        }
 
-        const create_file_item = (file) => {
-            log_inf(
-                "Creating file UI item:",
-                {
-                    index: file.index,
-                    name: file.file.name,
-                    size: file.file.size,
-                    type: file.file.type
-                }
+        function create_file_item(file_state) {
+            const item = document.createElement("div");
+            item.id = "file_item_" + file_state.index;
+            item.className = "file_item";
+
+            const header = document.createElement("div");
+            header.id = "file_header_" + file_state.index;
+            header.className = "file_header";
+
+            const name = document.createElement("span");
+            name.id = "file_name_" + file_state.index;
+            name.className = "file_name";
+            name.textContent = file_state.file.name;
+
+            const size = document.createElement("span");
+            size.id = "file_size_" + file_state.index;
+            size.className = "file_size";
+            size.textContent = format_size(
+                file_state.file.size
             );
 
-            const file_item =
-                document.createElement("div");
+            const progress = document.createElement("div");
+            progress.id = "file_progress_" + file_state.index;
+            progress.className = "file_progress";
 
-            file_item.className =
-                "file_item";
+            const progress_bar = document.createElement("div");
+            progress_bar.id = "file_progress_bar_" + file_state.index;
+            progress_bar.className = "file_progress_bar";
 
-            file_item.id =
-                `file_item_${file.index}`;
+            const info = document.createElement("div");
+            info.id = "file_info_" + file_state.index;
+            info.className = "file_info";
 
-            const file_item_header =
-                document.createElement("div");
+            const percent = document.createElement("span");
+            percent.id = "file_percent_" + file_state.index;
+            percent.textContent = "0%";
 
-            file_item_header.className =
-                "file_item_header";
+            const bandwidth = document.createElement("span");
+            bandwidth.id = "file_bandwidth_" + file_state.index;
+            bandwidth.textContent = "—";
 
-            file_item_header.id =
-                `file_item_header_${file.index}`;
+            const status = document.createElement("div");
+            status.id = "file_status_" + file_state.index;
+            status.className = "file_status";
+            status.textContent = text("upload_waiting");
 
-            const file_item_name =
-                document.createElement("div");
+            header.appendChild(name);
+            header.appendChild(size);
 
-            file_item_name.className =
-                "file_item_name";
+            progress.appendChild(progress_bar);
 
-            file_item_name.id =
-                `file_item_name_${file.index}`;
+            info.appendChild(percent);
+            info.appendChild(bandwidth);
 
-            file_item_name.textContent =
-                file.file.name;
+            item.appendChild(header);
+            item.appendChild(progress);
+            item.appendChild(info);
+            item.appendChild(status);
 
-            const file_item_size =
-                document.createElement("div");
+            return item;
+        }
 
-            file_item_size.className =
-                "file_item_size";
-
-            file_item_size.id =
-                `file_item_size_${file.index}`;
-
-            file_item_size.textContent =
-                format_size(file.file.size);
-
-            const file_progress =
-                document.createElement("div");
-
-            file_progress.className =
-                "file_progress";
-
-            file_progress.id =
-                `file_progress_${file.index}`;
-
-            const file_progress_bar =
-                document.createElement("div");
-
-            file_progress_bar.className =
-                "file_progress_bar";
-
-            file_progress_bar.id =
-                `file_progress_bar_${file.index}`;
-
-            const file_item_info =
-                document.createElement("div");
-
-            file_item_info.className =
-                "file_item_info";
-
-            file_item_info.id =
-                `file_item_info_${file.index}`;
-
-            const file_item_percent =
-                document.createElement("span");
-
-            file_item_percent.id =
-                `file_item_percent_${file.index}`;
-
-            file_item_percent.textContent =
-                "0%";
-
-            const file_item_bandwidth =
-                document.createElement("span");
-
-            file_item_bandwidth.id =
-                `file_item_bandwidth_${file.index}`;
-
-            file_item_bandwidth.textContent =
-                "—";
-
-            const file_item_status =
-                document.createElement("div");
-
-            file_item_status.className =
-                "file_item_status";
-
-            file_item_status.id =
-                `file_item_status_${file.index}`;
-
-            file_item_status.textContent =
-                text("upload_waiting");
-
-            file_progress.appendChild(
-                file_progress_bar
+        function render_files() {
+            const list = document.getElementById(
+                "file_list"
             );
 
-            file_item_info.appendChild(
-                file_item_percent
-            );
+            list.replaceChildren();
 
-            file_item_info.appendChild(
-                file_item_bandwidth
-            );
-
-            file_item_header.appendChild(
-                file_item_name
-            );
-
-            file_item_header.appendChild(
-                file_item_size
-            );
-
-            file_item.appendChild(
-                file_item_header
-            );
-
-            file_item.appendChild(
-                file_progress
-            );
-
-            file_item.appendChild(
-                file_item_info
-            );
-
-            file_item.appendChild(
-                file_item_status
-            );
-
-            return file_item;
-        };
-
-        const render_files = () => {
-            log_inf(
-                "Rendering selected files:",
-                state.files.length
-            );
-
-            const file_list =
-                document.getElementById(
-                    "file_list"
+            for (let index = 0; index < state.files.length; index++) {
+                list.appendChild(
+                    create_file_item(
+                        state.files[index]
+                    )
                 );
+            }
 
-            file_list.replaceChildren();
-
-            state.files.forEach(
-                (file) => {
-                    file_list.appendChild(
-                        create_file_item(file)
-                    );
-                }
-            );
-
-            const upload_action =
-                document.getElementById(
-                    "upload_action"
-                );
-
-            upload_action.disabled =
+            document.getElementById(
+                "upload_action"
+            ).disabled =
                 state.files.length === 0;
+        }
 
-            log_inf(
-                "Upload button state:",
-                upload_action.disabled
-                    ? "disabled"
-                    : "enabled"
-            );
-        };
+        function set_files(file_list) {
+            state.files = [];
 
-        const set_files = (file_list) => {
-            log_inf(
-                "Files selected:",
-                file_list.length
-            );
-
-            state.files =
-                Array.from(file_list).map(
-                    (file, index) => {
-                        log_inf(
-                            "Selected file:",
-                            {
-                                index,
-                                name: file.name,
-                                size: file.size,
-                                type: file.type,
-                                lastModified: file.lastModified
-                            }
-                        );
-
-                        return {
-                            file,
-                            index,
-                            progress: 0,
-                            bandwidth: 0,
-                            status: "waiting"
-                        };
-                    }
-                );
+            for (
+                let index = 0;
+                index < file_list.length;
+                index++
+            ) {
+                state.files.push({
+                    file: file_list[index],
+                    index: index,
+                    progress: 0,
+                    bandwidth: 0,
+                    status: "waiting"
+                });
+            }
 
             document.getElementById(
                 "upload_error"
-            ).style.display =
-                "none";
+            ).style.display = "none";
 
             document.getElementById(
                 "result_panel"
-            ).style.display =
-                "none";
+            ).style.display = "none";
+
+            log_info(
+                "Files selected",
+                {
+                    count: state.files.length
+                }
+            );
 
             render_files();
-        };
+        }
 
-        const update_file_progress = (
+        function update_file_progress(
             file_state,
             loaded,
             total,
             started_at
-        ) => {
-            const elapsed_seconds =
+        ) {
+            const elapsed =
                 Math.max(
                     (performance.now() - started_at) / 1000,
                     0.001
                 );
 
             const bandwidth =
-                loaded / elapsed_seconds;
+                loaded / elapsed;
 
             const progress =
                 total > 0
                     ? Math.round(
-                        (loaded / total) * 100
+                        loaded / total * 100
                     )
                     : 0;
 
-            file_state.progress =
-                progress;
-
-            file_state.bandwidth =
-                bandwidth;
+            file_state.progress = progress;
+            file_state.bandwidth = bandwidth;
 
             const progress_bar =
                 document.getElementById(
-                    `file_progress_bar_${file_state.index}`
+                    "file_progress_bar_" +
+                    file_state.index
                 );
 
             const percent =
                 document.getElementById(
-                    `file_item_percent_${file_state.index}`
+                    "file_percent_" +
+                    file_state.index
                 );
 
             const bandwidth_element =
                 document.getElementById(
-                    `file_item_bandwidth_${file_state.index}`
+                    "file_bandwidth_" +
+                    file_state.index
                 );
 
             if (progress_bar) {
                 progress_bar.style.width =
-                    `${progress}%`;
+                    progress + "%";
             }
 
             if (percent) {
                 percent.textContent =
-                    `${progress}%`;
+                    progress + "%";
             }
 
             if (bandwidth_element) {
@@ -865,306 +768,203 @@
                         bandwidth
                     );
             }
+        }
 
-            log_inf(
-                "Upload progress:",
-                file_state.file.name,
-                `${progress}%`,
-                `${loaded}/${total}`,
-                format_bandwidth(bandwidth)
-            );
-        };
+        function upload_one_file(
+            file_state,
+            share_id
+        ) {
+            return new Promise(
+                function(resolve, reject) {
+                    const xhr =
+                        new XMLHttpRequest();
 
-const upload_one_file = (file_state, share_id) => {
-    return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        const started_at = performance.now();
+                    const started_at =
+                        performance.now();
 
-        const upload_url = new URL("fileshare.py", window.location.href);
-        upload_url.searchParams.set("action", "upload");
-        upload_url.searchParams.set("share_id", share_id);
+                    const upload_url =
+                        new URL(
+                            "fileshare.py",
+                            window.location.href
+                        );
 
-        xhr.open(
-            "POST",
-            upload_url.toString(),
-            true
-        );
+                    upload_url.searchParams.set(
+                        "action",
+                        "upload"
+                    );
 
-        log_info(
-            "upload_one_file() started",
-            {
-                name: file_state.file.name,
-                size: file_state.file.size,
-                url: upload_url.toString()
-            }
-        );
+                    upload_url.searchParams.set(
+                        "share_id",
+                        share_id
+                    );
 
-        xhr.upload.addEventListener("progress", (event) => {
-            if (!event.lengthComputable) {
-                log_warning(
-                    "Upload progress is not computable",
-                    {
-                        name: file_state.file.name
+                    log_info(
+                        "Starting file upload",
+                        {
+                            name: file_state.file.name,
+                            size: file_state.file.size,
+                            url: upload_url.toString()
+                        }
+                    );
+
+                    xhr.open(
+                        "POST",
+                        upload_url.toString(),
+                        true
+                    );
+
+                    xhr.upload.addEventListener(
+                        "progress",
+                        function(event) {
+                            if (!event.lengthComputable) {
+                                log_warning(
+                                    "Upload size is not computable",
+                                    file_state.file.name
+                                );
+
+                                return;
+                            }
+
+                            update_file_progress(
+                                file_state,
+                                event.loaded,
+                                event.total,
+                                started_at
+                            );
+                        }
+                    );
+
+                    xhr.addEventListener(
+                        "load",
+                        function() {
+                            log_info(
+                                "Upload response",
+                                {
+                                    name: file_state.file.name,
+                                    status: xhr.status,
+                                    content_type:
+                                        xhr.getResponseHeader(
+                                            "Content-Type"
+                                        ),
+                                    response:
+                                        xhr.responseText
+                                }
+                            );
+
+                            if (
+                                xhr.status >= 200 &&
+                                xhr.status < 300
+                            ) {
+                                file_state.status =
+                                    "complete";
+
+                                const status =
+                                    document.getElementById(
+                                        "file_status_" +
+                                        file_state.index
+                                    );
+
+                                if (status) {
+                                    status.textContent =
+                                        text(
+                                            "upload_complete"
+                                        );
+                                }
+
+                                resolve(
+                                    xhr.responseText
+                                );
+
+                                return;
+                            }
+
+                            file_state.status =
+                                "failed";
+
+                            const status =
+                                document.getElementById(
+                                    "file_status_" +
+                                    file_state.index
+                                );
+
+                            if (status) {
+                                status.textContent =
+                                    text(
+                                        "upload_failed"
+                                    );
+                            }
+
+                            reject(
+                                new Error(
+                                    "Upload failed: HTTP " +
+                                    xhr.status
+                                )
+                            );
+                        }
+                    );
+
+                    xhr.addEventListener(
+                        "error",
+                        function() {
+                            file_state.status =
+                                "failed";
+
+                            const status =
+                                document.getElementById(
+                                    "file_status_" +
+                                    file_state.index
+                                );
+
+                            if (status) {
+                                status.textContent =
+                                    text(
+                                        "upload_failed"
+                                    );
+                            }
+
+                            log_error(
+                                "Network error during upload",
+                                file_state.file.name
+                            );
+
+                            reject(
+                                new Error(
+                                    "Network error"
+                                )
+                            );
+                        }
+                    );
+
+                    const form_data =
+                        new FormData();
+
+                    form_data.append(
+                        "file",
+                        file_state.file,
+                        file_state.file.name
+                    );
+
+                    const status =
+                        document.getElementById(
+                            "file_status_" +
+                            file_state.index
+                        );
+
+                    if (status) {
+                        status.textContent =
+                            text(
+                                "upload_uploading"
+                            );
                     }
-                );
 
-                return;
-            }
-
-            update_file_progress(
-                file_state,
-                event.loaded,
-                event.total,
-                started_at
-            );
-        });
-
-        xhr.addEventListener("load", () => {
-            log_info(
-                "Upload response",
-                {
-                    name: file_state.file.name,
-                    status: xhr.status,
-                    statusText: xhr.statusText,
-                    contentType: xhr.getResponseHeader("Content-Type"),
-                    response: xhr.responseText
-                }
-            );
-
-            if (xhr.status >= 200 && xhr.status < 300) {
-                file_state.status = "complete";
-
-                const status_element = document.getElementById(
-                    `file_item_status_${file_state.index}`
-                );
-
-                if (status_element) {
-                    status_element.textContent = text("upload_complete");
-                }
-
-                resolve(xhr.responseText);
-                return;
-            }
-
-            file_state.status = "failed";
-
-            reject(
-                new Error(
-                    `Upload failed: HTTP ${xhr.status}`
-                )
-            );
-        });
-
-        xhr.addEventListener("error", () => {
-            file_state.status = "failed";
-
-            log_error(
-                "Upload network error",
-                {
-                    name: file_state.file.name,
-                    url: upload_url.toString()
-                }
-            );
-
-            reject(
-                new Error("Network error")
-            );
-        });
-
-        const form_data = new FormData();
-
-        form_data.append(
-            "file",
-            file_state.file,
-            file_state.file.name
-        );
-
-        const status_element = document.getElementById(
-            `file_item_status_${file_state.index}`
-        );
-
-        if (status_element) {
-            status_element.textContent = text("upload_uploading");
-        }
-
-        xhr.send(form_data);
-    });
-};
-
-
-const create_share = async () => {
-    const upload_error = document.getElementById("upload_error");
-    const upload_action = document.getElementById("upload_action");
-
-    upload_error.style.display = "none";
-    upload_action.disabled = true;
-
-    log_info(
-        "create_share() started",
-        {
-            files: state.files.length
-        }
-    );
-
-    try {
-        const create_url = new URL(
-            "fileshare.py",
-            window.location.href
-        );
-
-        create_url.searchParams.set(
-            "action",
-            "create"
-        );
-
-        log_info(
-            "Creating share",
-            {
-                method: "POST",
-                url: create_url.toString()
-            }
-        );
-
-        const response = await fetch(
-            create_url.toString(),
-            {
-                method: "POST"
-            }
-        );
-
-        log_info(
-            "Create-share response",
-            {
-                status: response.status,
-                statusText: response.statusText,
-                url: response.url,
-                contentType: response.headers.get(
-                    "Content-Type"
-                )
-            }
-        );
-
-        const raw_response = await response.text();
-
-        log_info(
-            "Create-share raw response",
-            raw_response
-        );
-
-        if (!response.ok) {
-            throw new Error(
-                `Unable to create share: HTTP ${response.status}`
-            );
-        }
-
-        let data;
-
-        try {
-            data = JSON.parse(
-                raw_response
-            );
-        } catch (error) {
-            log_error(
-                "Create-share response is not valid JSON",
-                {
-                    response: raw_response,
-                    error: String(error)
-                }
-            );
-
-            throw new Error(
-                "Invalid create-share response"
-            );
-        }
-
-        log_info(
-            "Create-share JSON",
-            data
-        );
-
-        if (!data.id) {
-            throw new Error(
-                "Missing share id"
-            );
-        }
-
-        state.share_id = data.id;
-
-        log_info(
-            "Share created",
-            {
-                share_id: state.share_id
-            }
-        );
-
-        await Promise.all(
-            state.files.map(
-                (file_state) => {
-                    return upload_one_file(
-                        file_state,
-                        state.share_id
+                    xhr.send(
+                        form_data
                     );
                 }
-            )
-        );
+            );
+        }
 
-        const result_url = new URL(
-            window.location.href
-        );
-
-        result_url.search = "";
-        result_url.hash = "";
-
-        result_url.searchParams.set(
-            "id",
-            state.share_id
-        );
-
-        const result_link = document.getElementById(
-            "result_link"
-        );
-
-        result_link.href =
-            result_url.toString();
-
-        result_link.textContent =
-            result_url.toString();
-
-        document.getElementById(
-            "result_panel"
-        ).style.display = "block";
-
-        log_info(
-            "Upload process completed",
-            {
-                share_id: state.share_id,
-                url: result_url.toString()
-            }
-        );
-
-    } catch (error) {
-        log_error(
-            "Upload process failed",
-            {
-                error: String(error),
-                stack: error && error.stack
-                    ? error.stack
-                    : null
-            }
-        );
-
-        upload_error.textContent =
-            text("upload_error");
-
-        upload_error.style.display =
-            "block";
-
-    } finally {
-        upload_action.disabled =
-            state.files.length === 0;
-    }
-};
-
+        async function create_share() {
             const upload_error =
                 document.getElementById(
                     "upload_error"
@@ -1175,105 +975,88 @@ const create_share = async () => {
                     "upload_action"
                 );
 
-            log_inf(
-                "create_share() started"
-            );
-
-            log_inf(
-                "Number of files:",
-                state.files.length
-            );
-
             upload_error.style.display =
                 "none";
 
             upload_action.disabled =
                 true;
 
+            log_info(
+                "create_share() started",
+                {
+                    files: state.files.length
+                }
+            );
+
             try {
-                log_inf(
-                    "Creating share:",
+                const create_url =
+                    new URL(
+                        "fileshare.py",
+                        window.location.href
+                    );
+
+                create_url.searchParams.set(
+                    "action",
+                    "create"
+                );
+
+                log_info(
+                    "Creating share",
                     {
                         method: "POST",
-                        url: "fileshare.py",
-                        body: "action=create"
+                        url: create_url.toString()
                     }
                 );
 
                 const response =
                     await fetch(
-                        "fileshare.py",
+                        create_url.toString(),
                         {
-                            method: "POST",
-                            headers: {
-                                "Content-Type":
-                                    "application/x-www-form-urlencoded"
-                            },
-                            body:
-                                "action=create"
+                            method: "POST"
                         }
                     );
 
-                log_inf(
-                    "Create-share response:",
+                const raw_response =
+                    await response.text();
+
+                log_info(
+                    "Create-share response",
                     {
                         status: response.status,
-                        statusText: response.statusText,
-                        url: response.url,
-                        contentType:
+                        content_type:
                             response.headers.get(
-                                "content-type"
-                            )
+                                "Content-Type"
+                            ),
+                        response:
+                            raw_response
                     }
                 );
 
-                const response_text =
-                    await response.text();
-
-                log_inf(
-                    "Create-share raw response:",
-                    response_text
-                );
-
                 if (!response.ok) {
-                    log_err(
-                        "Create-share HTTP error:",
-                        response.status,
-                        response.statusText
-                    );
-
                     throw new Error(
-                        `Unable to create share: HTTP ${response.status}`
+                        "Create failed: HTTP " +
+                        response.status
                     );
                 }
 
                 let data;
 
                 try {
-                    data =
-                        JSON.parse(
-                            response_text
-                        );
+                    data = JSON.parse(
+                        raw_response
+                    );
                 } catch (error) {
-                    log_err(
-                        "Create-share response is not valid JSON:",
-                        error
+                    log_error(
+                        "Invalid JSON from create",
+                        raw_response
                     );
 
-                    throw error;
+                    throw new Error(
+                        "Invalid JSON response"
+                    );
                 }
 
-                log_inf(
-                    "Create-share parsed JSON:",
-                    data
-                );
-
                 if (!data.id) {
-                    log_err(
-                        "Create-share response has no id:",
-                        data
-                    );
-
                     throw new Error(
                         "Missing share id"
                     );
@@ -1282,58 +1065,33 @@ const create_share = async () => {
                 state.share_id =
                     data.id;
 
-                log_inf(
-                    "Share created:",
+                log_info(
+                    "Share created",
                     state.share_id
                 );
 
                 for (
-                    const file_state
-                    of state.files
+                    let index = 0;
+                    index < state.files.length;
+                    index++
                 ) {
-                    log_inf(
-                        "Uploading file:",
-                        {
-                            index: file_state.index,
-                            name: file_state.file.name,
-                            size: file_state.file.size
-                        }
-                    );
-
                     await upload_one_file(
-                        file_state,
+                        state.files[index],
                         state.share_id
                     );
-
-                    log_inf(
-                        "File upload finished:",
-                        file_state.file.name
-                    );
                 }
-
-                log_inf(
-                    "All file uploads completed."
-                );
 
                 const result_url =
                     new URL(
                         window.location.href
                     );
 
-                result_url.search =
-                    "";
-
-                result_url.hash =
-                    "";
+                result_url.search = "";
+                result_url.hash = "";
 
                 result_url.searchParams.set(
                     "id",
                     state.share_id
-                );
-
-                log_inf(
-                    "Generated share URL:",
-                    result_url.toString()
                 );
 
                 const result_link =
@@ -1352,170 +1110,224 @@ const create_share = async () => {
                 ).style.display =
                     "block";
 
-                log_inf(
-                    "create_share() completed successfully"
+                log_info(
+                    "All uploads completed",
+                    {
+                        share_id:
+                            state.share_id,
+                        url:
+                            result_url.toString()
+                    }
                 );
+
             } catch (error) {
-                log_err(
-                    "create_share() failed:",
-                    error
+                log_error(
+                    "Upload process failed",
+                    {
+                        message:
+                            error.message,
+                        stack:
+                            error.stack
+                    }
                 );
 
                 upload_error.textContent =
-                    text("upload_error");
+                    text(
+                        "upload_error"
+                    );
 
                 upload_error.style.display =
                     "block";
+
             } finally {
                 upload_action.disabled =
                     state.files.length === 0;
-
-                log_inf(
-                    "create_share() finished"
-                );
             }
-        };
+        }
 
-        const render_download_files = (
+        function render_download_files(
             files
-        ) => {
-            log_inf(
-                "Rendering download files:",
-                files.length
-            );
-
-            const download_file_list =
+        ) {
+            const list =
                 document.getElementById(
                     "download_file_list"
                 );
 
-            download_file_list.replaceChildren();
+            list.replaceChildren();
 
-            files.forEach(
-                (file, index) => {
-                    log_inf(
-                        "Download file:",
-                        file
+            for (
+                let index = 0;
+                index < files.length;
+                index++
+            ) {
+                const file =
+                    files[index];
+
+                const item =
+                    document.createElement(
+                        "div"
                     );
 
-                    const file_item =
-                        document.createElement(
-                            "div"
+                item.id =
+                    "download_item_" +
+                    index;
+
+                item.className =
+                    "download_item";
+
+                const details =
+                    document.createElement(
+                        "div"
+                    );
+
+                details.id =
+                    "download_details_" +
+                    index;
+
+                const name =
+                    document.createElement(
+                        "div"
+                    );
+
+                name.id =
+                    "download_name_" +
+                    index;
+
+                name.className =
+                    "download_name";
+
+                name.textContent =
+                    file.name;
+
+                const meta =
+                    document.createElement(
+                        "div"
+                    );
+
+                meta.id =
+                    "download_meta_" +
+                    index;
+
+                meta.className =
+                    "download_meta";
+
+                meta.textContent =
+                    format_size(
+                        file.size
+                    ) +
+                    " · " +
+                    format_date(
+                        file.date
+                    );
+
+                const button =
+                    document.createElement(
+                        "button"
+                    );
+
+                button.id =
+                    "download_button_" +
+                    index;
+
+                button.className =
+                    "download_button";
+
+                button.type =
+                    "button";
+
+                button.textContent =
+                    text(
+                        "download_action"
+                    );
+
+                button.addEventListener(
+                    "click",
+                    function() {
+                        download_file(
+                            file.id
                         );
+                    }
+                );
 
-                    file_item.className =
-                        "download_file_item";
+                details.appendChild(
+                    name
+                );
 
-                    file_item.id =
-                        `download_file_item_${index}`;
+                details.appendChild(
+                    meta
+                );
 
-                    const file_details =
-                        document.createElement(
-                            "div"
-                        );
+                item.appendChild(
+                    details
+                );
 
-                    file_details.className =
-                        "download_file_details";
+                item.appendChild(
+                    button
+                );
 
-                    file_details.id =
-                        `download_file_details_${index}`;
+                list.appendChild(
+                    item
+                );
+            }
+        }
 
-                    const file_name =
-                        document.createElement(
-                            "div"
-                        );
+        function download_file(
+            file_id
+        ) {
+            const url =
+                new URL(
+                    "fileshare.py",
+                    window.location.href
+                );
 
-                    file_name.className =
-                        "download_file_name";
-
-                    file_name.id =
-                        `download_file_name_${index}`;
-
-                    file_name.textContent =
-                        file.name;
-
-                    const file_meta =
-                        document.createElement(
-                            "div"
-                        );
-
-                    file_meta.className =
-                        "download_file_meta";
-
-                    file_meta.id =
-                        `download_file_meta_${index}`;
-
-                    file_meta.textContent =
-                        `${format_size(file.size)} · ${format_date(file.date)}`;
-
-                    const download_button =
-                        document.createElement(
-                            "button"
-                        );
-
-                    download_button.className =
-                        "download_file_button";
-
-                    download_button.id =
-                        `download_file_button_${index}`;
-
-                    download_button.type =
-                        "button";
-
-                    download_button.textContent =
-                        text("download_action");
-
-                    download_button.addEventListener(
-                        "click",
-                        () => {
-                            log_inf(
-                                "Downloading file:",
-                                {
-                                    share_id:
-                                        state.share_id,
-                                    file_id:
-                                        file.id,
-                                    name:
-                                        file.name
-                                }
-                            );
-
-                            window.location.href =
-                                `fileshare.py?id=${encodeURIComponent(state.share_id)}&file=${encodeURIComponent(file.id)}`;
-                        }
-                    );
-
-                    file_details.appendChild(
-                        file_name
-                    );
-
-                    file_details.appendChild(
-                        file_meta
-                    );
-
-                    file_item.appendChild(
-                        file_details
-                    );
-
-                    file_item.appendChild(
-                        download_button
-                    );
-
-                    download_file_list.appendChild(
-                        file_item
-                    );
-                }
+            url.searchParams.set(
+                "id",
+                state.share_id
             );
-        };
 
-        const load_share = async (
+            url.searchParams.set(
+                "file",
+                file_id
+            );
+
+            log_info(
+                "Downloading file",
+                url.toString()
+            );
+
+            window.location.href =
+                url.toString();
+        }
+
+        function download_all() {
+            const url =
+                new URL(
+                    "fileshare.py",
+                    window.location.href
+                );
+
+            url.searchParams.set(
+                "id",
+                state.share_id
+            );
+
+            url.searchParams.set(
+                "download",
+                "all"
+            );
+
+            log_info(
+                "Downloading all files",
+                url.toString()
+            );
+
+            window.location.href =
+                url.toString();
+        }
+
+        async function load_share(
             share_id
-        ) => {
-            log_inf(
-                "Loading share:",
-                share_id
-            );
-
+        ) {
             document.getElementById(
                 "upload_section"
             ).style.display =
@@ -1526,86 +1338,74 @@ const create_share = async () => {
             ).style.display =
                 "block";
 
-            const download_error =
+            const error =
                 document.getElementById(
                     "download_error"
                 );
 
-            try {
-                const url =
-                    `fileshare.py?id=${encodeURIComponent(share_id)}`;
-
-                log_inf(
-                    "Requesting share:",
-                    url
+            const url =
+                new URL(
+                    "fileshare.py",
+                    window.location.href
                 );
 
-                const response =
-                    await fetch(url);
+            url.searchParams.set(
+                "id",
+                share_id
+            );
 
-                log_inf(
-                    "Share response:",
+            log_info(
+                "Loading share",
+                url.toString()
+            );
+
+            try {
+                const response =
+                    await fetch(
+                        url.toString()
+                    );
+
+                const raw_response =
+                    await response.text();
+
+                log_info(
+                    "Share response",
                     {
                         status:
                             response.status,
-                        statusText:
-                            response.statusText,
-                        url:
-                            response.url,
-                        contentType:
-                            response.headers.get(
-                                "content-type"
-                            )
+                        response:
+                            raw_response
                     }
-                );
-
-                const response_text =
-                    await response.text();
-
-                log_inf(
-                    "Share raw response:",
-                    response_text
                 );
 
                 if (!response.ok) {
                     throw new Error(
-                        `Share not found: HTTP ${response.status}`
+                        "Share not found"
                     );
                 }
 
                 let data;
 
                 try {
-                    data =
-                        JSON.parse(
-                            response_text
-                        );
-                } catch (error) {
-                    log_err(
-                        "Share response is not valid JSON:",
-                        error
+                    data = JSON.parse(
+                        raw_response
                     );
-
-                    throw error;
-                }
-
-                log_inf(
-                    "Share JSON:",
-                    data
-                );
-
-                if (
-                    !Array.isArray(
-                        data.files
-                    )
-                ) {
-                    log_err(
-                        "Share response has invalid files:",
-                        data
+                } catch (parse_error) {
+                    log_error(
+                        "Invalid JSON from share",
+                        raw_response
                     );
 
                     throw new Error(
-                        "Invalid response"
+                        "Invalid JSON response"
+                    );
+                }
+
+                if (!Array.isArray(
+                    data.files
+                )) {
+                    throw new Error(
+                        "Invalid file list"
                     );
                 }
 
@@ -1619,59 +1419,32 @@ const create_share = async () => {
                 document.getElementById(
                     "download_all_action"
                 ).onclick =
-                    () => {
-                        log_inf(
-                            "Downloading all files:",
-                            state.share_id
-                        );
+                    download_all;
 
-                        window.location.href =
-                            `fileshare.py?id=${encodeURIComponent(state.share_id)}&download=all`;
-                    };
-
-                log_inf(
-                    "Share loaded successfully:",
-                    share_id
-                );
-            } catch (error) {
-                log_err(
-                    "Unable to load share:",
-                    error
+            } catch (error_value) {
+                log_error(
+                    "Unable to load share",
+                    {
+                        message:
+                            error_value.message,
+                        stack:
+                            error_value.stack
+                    }
                 );
 
-                download_error.textContent =
+                error.textContent =
                     text(
                         "download_error"
                     );
 
-                download_error.style.display =
+                error.style.display =
                     "block";
             }
-        };
+        }
 
-        const initialize = () => {
-            log_inf(
-                "AlmaFileShare initialization started"
-            );
-
-            log_inf(
-                "Browser language:",
-                navigator.language
-            );
-
-            log_inf(
-                "Selected language:",
-                state.language
-            );
-
-            log_inf(
-                "Current URL:",
-                window.location.href
-            );
-
-            log_inf(
-                "Current origin:",
-                window.location.origin
+        function initialize() {
+            log_info(
+                "Initializing AlmaFileShare"
             );
 
             apply_language();
@@ -1681,7 +1454,7 @@ const create_share = async () => {
                     "file_input"
                 );
 
-            const file_drop_zone =
+            const drop_zone =
                 document.getElementById(
                     "file_drop_zone"
                 );
@@ -1693,60 +1466,40 @@ const create_share = async () => {
 
             file_input.addEventListener(
                 "change",
-                () => {
-                    log_inf(
-                        "File input changed"
-                    );
-
+                function() {
                     set_files(
                         file_input.files
                     );
                 }
             );
 
-            file_drop_zone.addEventListener(
+            drop_zone.addEventListener(
                 "dragover",
-                (event) => {
+                function(event) {
                     event.preventDefault();
 
-                    log_inf(
-                        "Dragover detected"
-                    );
-
-                    file_drop_zone.classList.add(
+                    drop_zone.classList.add(
                         "file_drag_active"
                     );
                 }
             );
 
-            file_drop_zone.addEventListener(
+            drop_zone.addEventListener(
                 "dragleave",
-                () => {
-                    log_inf(
-                        "Dragleave detected"
-                    );
-
-                    file_drop_zone.classList.remove(
+                function() {
+                    drop_zone.classList.remove(
                         "file_drag_active"
                     );
                 }
             );
 
-            file_drop_zone.addEventListener(
+            drop_zone.addEventListener(
                 "drop",
-                (event) => {
+                function(event) {
                     event.preventDefault();
 
-                    file_drop_zone.classList.remove(
+                    drop_zone.classList.remove(
                         "file_drag_active"
-                    );
-
-                    log_inf(
-                        "Drop detected:",
-                        {
-                            files:
-                                event.dataTransfer.files.length
-                        }
                     );
 
                     if (
@@ -1755,21 +1508,13 @@ const create_share = async () => {
                         set_files(
                             event.dataTransfer.files
                         );
-                    } else {
-                        log_wrn(
-                            "Drop contained no files"
-                        );
                     }
                 }
             );
 
             upload_action.addEventListener(
                 "click",
-                () => {
-                    log_inf(
-                        "Upload button clicked"
-                    );
-
+                function() {
                     create_share();
                 }
             );
@@ -1782,29 +1527,22 @@ const create_share = async () => {
             const share_id =
                 params.get("id");
 
-            log_inf(
-                "URL parameter id:",
-                share_id
-            );
-
             if (share_id) {
                 load_share(
                     share_id
                 );
-            } else {
-                log_inf(
-                    "No share id, displaying upload mode"
-                );
             }
 
-            log_inf(
-                "AlmaFileShare initialization completed"
+            log_info(
+                "Initialization complete"
             );
-        };
+        }
 
         document.addEventListener(
             "DOMContentLoaded",
-            initialize
+            function() {
+                initialize();
+            }
         );
     </script>
 </body>

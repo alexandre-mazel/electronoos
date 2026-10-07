@@ -774,9 +774,92 @@ def handle_download_all(
         }
     }
 
+global time_last_cleanup = time.time() - 24*60*60
+
+def cleanup_expired_shares(max_age_days=3):
+    global time_last_cleanup
+    
+    if time.time() - time_last_cleanup < 24*60*60:
+        return
+        
+    time_last_cleanup = time.time()
+        
+    ensure_storage()
+    
+    
+
+    now = datetime.now(timezone.utc)
+    deleted = 0
+    errors = 0
+
+    for metadata_file in METADATA_DIR.glob("*.json"):
+        try:
+            with metadata_file.open(
+                "r",
+                encoding="utf-8"
+            ) as file_handle:
+                metadata = json.load(file_handle)
+
+            created_value = metadata.get("created")
+
+            if not created_value:
+                continue
+
+            created = datetime.fromisoformat(
+                created_value
+            )
+
+            if created.tzinfo is None:
+                created = created.replace(
+                    tzinfo=timezone.utc
+                )
+
+            age = now - created
+
+            if age.total_seconds() <= max_age_days * 86400:
+                continue
+
+            share_id = metadata.get("id")
+
+            if not valid_share_id(share_id):
+                continue
+
+            metadata_path_value = metadata_path(
+                share_id
+            )
+
+            share_directory = share_file_directory(
+                share_id
+            )
+
+            if share_directory.exists():
+                shutil.rmtree(
+                    share_directory
+                )
+
+            if metadata_path_value.exists():
+                metadata_path_value.unlink()
+
+            deleted += 1
+
+        except (
+            OSError,
+            ValueError,
+            json.JSONDecodeError
+        ):
+            errors += 1
+            
+    print( "INF: Cleanup:", result["deleted"], "shares deleted,", result["errors"], "errors" )
+
+    return {
+        "deleted": deleted,
+        "errors": errors
+    }
+
 
 def index( req ):
-    ensure_storage()
+    # ensure_storage() # sera fait dans cleanup
+    cleanup_expired_shares()
     
     print( "INF: index: req: %s" % req )
     print( "INF: index: dir req: %s" % dir(req) )

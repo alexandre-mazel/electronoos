@@ -69,8 +69,8 @@ class StoredInfo:
             file = open(self.strSaveFileName, "rb" )
             self.feats = pickle.load(file)
             file.close()
-            print( "INF: StoredFeatures.load: end (loaded user: %d) (duration:%5.2fs)" % (len(self.feats), time.time() - timeBegin) )
-            print( "INF: StoredInfo.load: user "": nbr element(s): %d" % (len(self.feats) ) )
+            print( "INF: StoredFeatures.load: end (loaded element(s): %d) (duration:%5.2fs)" % (len(self.feats), time.time() - timeBegin) )
+            #~ print( "INF: StoredInfo.load: nbr element(s): %d" % (len(self.feats) ) )
             return
 
 

@@ -206,15 +206,17 @@ def find( sentence, keywords, texts, peoples ):
     
     print( "\nINF: find: nbr_find: %s / %s" % ( len( out ), cache.getNbrElement() ) )
     out = sorted( out, reverse=True )
+    num = 0
     for pt,f in out:
         name = pathlib.Path(f).name
-        print( "%.02f: %s" % (pt,name) )
+        print( "\n%4d: %.02f: %s" % (num,pt,name) )
         if 1:
                 infos = cache.getDatas(f)
                 print(infos)
         
         if bRenderImage and not render_image( f ):
             break
+        num += 1
                 
     print( "stats_keyword:" + str( sorted( filter(lambda x:x[1]>2,list(stats_keyword.items()) ), key=lambda x:-x[1] ) ) )
     print( "stats_text:" + str( sorted( filter(lambda x:x[1]>2,list(stats_text.items()) ), key=lambda x:-x[1] ) ) )
@@ -303,10 +305,11 @@ if __name__ == "__main__":
         generate_desc_for_cloud("files/")
     
     sentence = ""
+    sentence = "geste avec les mains"
     
     keywords = []
-    keywords = ["arbres"]
-    keywords = ["robe"]
+    #~ keywords = ["arbres"]
+    #~ keywords = ["robe","bleu"]
     
     texts = []
     

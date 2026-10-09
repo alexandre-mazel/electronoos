@@ -206,8 +206,11 @@ def bench_ollama( strModel, strPrompt, nbr_test, addr, port ):
     token_rates = []
 
 
+    # un petit coup pour charger le modele:
     #~ print( "(preloading...)" )
     strUrl = f"{strOllamaUrl}api/generate"
+    if "embed" in strModel:
+        strUrl = f"{strOllamaUrl}api/embed"
     dOptions = { "temperature": 0, "seed": 42,"num_ctx": 4096 }
     dJson = { "model": strModel, "prompt": strPrompt, "stream": False, "options": dOptions}
     response = requests.post( strUrl, json=dJson, timeout=600 )
@@ -223,9 +226,6 @@ def bench_ollama( strModel, strPrompt, nbr_test, addr, port ):
         
     print("")
     
-    
-    # un petit coup pour charger le modele:
-
     for i in range(1, nbr_test + 1):
         start = time.perf_counter()
 
@@ -288,6 +288,12 @@ ollama_port = find_ollama_port(OLLAMA_ADDR)
 prompt = "Hello world, comment ca va et toi je suis malade ?."
 nbr_test = 1
 nbr_test = 5
+
+strModel = "qwen3-embedding:latest"
+ret = bench_ollama( strModel, prompt, nbr_test, OLLAMA_ADDR, ollama_port )
+avg_summary.append( ret )
+if ret != -1:
+    ollama_ps()
 
 strModel = "moondream:latest"
 ret = bench_ollama( strModel, prompt, nbr_test, OLLAMA_ADDR, ollama_port )
@@ -535,13 +541,92 @@ CPU : Intel(R) Core(TM) i7-9700K CPU @ 3.60GHz
 GPU : Intel Corporation CoffeeLake-S GT2 [UHD Graphics 630] (rev 02)
 GPU : NVIDIA Corporation GA102 [GeForce RTX 3080 Lite Hash Rate] (rev a1)
 
+*** RPI5
+
+# Benchmark Ollama - qwen3-embedding:latest
+# 5 appels, generate: 'Hello world, comment ca va et toi je suis malade ?.'
+
+#1 | total=0.269s | prompt=0.000s/0 tok | eval=0.000s/0 tok | speed=0.00 tok/s
+#2 | total=0.267s | prompt=0.000s/0 tok | eval=0.000s/0 tok | speed=0.00 tok/s
+#3 | total=0.257s | prompt=0.000s/0 tok | eval=0.000s/0 tok | speed=0.00 tok/s
+#4 | total=0.267s | prompt=0.000s/0 tok | eval=0.000s/0 tok | speed=0.00 tok/s
+#5 | total=0.270s | prompt=0.000s/0 tok | eval=0.000s/0 tok | speed=0.00 tok/s
+
+--- Results ---
+Total       | min=0.257 | max=0.270 | avg=0.266 s
+Prompt      | min=0.000 | max=0.000 | avg=0.000 s
+Tokens eval | min=0.000 | max=0.000 | avg=0.000
+Eval        | min=0.000 | max=0.000 | avg=0.000 s
+Vitesse     | min=0.00 | max=0.00 | avg=0.00 tok/s
+
+
+--- Ollama PS ---
+NAME                      ID              SIZE      PROCESSOR    CONTEXT    UNTIL
+qwen3-embedding:latest    64b933495768    6.6 GB    100% CPU     4096       4 minutes from now
+
+# Benchmark Ollama - moondream:latest
+# 5 appels, generate: 'Hello world, comment ca va et toi je suis malade ?.'
+
+#1 | total=1.483s | prompt=0.081s/23 tok | eval=1.231s/11 tok | speed=8.93 tok/s
+#2 | total=1.056s | prompt=0.083s/23 tok | eval=0.809s/11 tok | speed=13.59 tok/s
+#3 | total=1.041s | prompt=0.081s/23 tok | eval=0.811s/11 tok | speed=13.57 tok/s
+#4 | total=1.053s | prompt=0.088s/23 tok | eval=0.807s/11 tok | speed=13.64 tok/s
+#5 | total=1.739s | prompt=0.088s/23 tok | eval=1.493s/11 tok | speed=7.37 tok/s
+
+--- Results ---
+Total       | min=1.041 | max=1.739 | avg=1.274 s
+Prompt      | min=0.081 | max=0.088 | avg=0.084 s
+Tokens eval | min=11.000 | max=11.000 | avg=11.000
+Eval        | min=0.807 | max=1.493 | avg=1.030 s
+Vitesse     | min=7.37 | max=13.64 | avg=11.42 tok/s
+
+
+--- Ollama PS ---
+NAME                      ID              SIZE      PROCESSOR    CONTEXT    UNTIL
+moondream:latest          55fc3abd3867    1.3 GB    100% CPU     2048       4 minutes from now
+qwen3-embedding:latest    64b933495768    6.6 GB    100% CPU     4096       4 minutes from now
+
+# Benchmark Ollama - llama3.2:1B
+# 5 appels, generate: 'Hello world, comment ca va et toi je suis malade ?.'
+
+DBG: ollama_model_exists: current existing model:
+    -  qwen3-embedding:latest
+    -  qwen2.5vl:latest
+    -  moondream:latest
+    -  llama3.1:8b
+
+WRN: This model isn't present: llama3.2:1B
+
+
+# Benchmark Ollama - mistral-small:22B
+# 5 appels, generate: 'Hello world, comment ca va et toi je suis malade ?.'
+
+DBG: ollama_model_exists: current existing model:
+    -  qwen3-embedding:latest
+    -  qwen2.5vl:latest
+    -  moondream:latest
+    -  llama3.1:8b
+
+WRN: This model isn't present: mistral-small:22B
+
+
+Summary: 0.266, 1.274, -1.000, -1.000,
+
+--- Materiel ---
+CPU : Cortex-A76
+
+
+
 
 
 ####################################################
 Total summary:
-MS Tab7:        0.958, 6.158, -1.000
-Corto:            0.136, 0.964, 7.632
-Champion1:    0.092, 0.682, 6.027,
+                        qwen3-embedding, moondream:latest, llama3.2:1B, mistral-small:22B
+
+RPI5:              0.266, 1.273, -1.000, -1.000,
+MS Tab7:        todo, 0.958, 6.158, -1.000
+Corto:            todo, 0.136, 0.964, 7.632
+Champion1:    todo, 0.092, 0.682, 6.027,
 
 
 """

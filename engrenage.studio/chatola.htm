@@ -122,7 +122,7 @@
         }
 
         .message_date,
-        .message_time
+        .message_time,
         .message_duration {
             display: block;
         }
@@ -484,7 +484,7 @@ function set_message_metadata(
     const duration = bubble_element.dataset.duration;
 
     duration_element.textContent = duration
-        ? format_duration(Number(duration))
+        ? "( in " + format_duration(Number(duration)) + ")"
         : "";
 
     metadata_element.classList.remove("message_metadata_inline");
@@ -778,17 +778,23 @@ function set_message_metadata(
             computer_timestamp,
             response_time
         ) {
-            // Remplace les trois points par le texte reçu.
+            // Remplace les trois points par la réponse du robot.
             typing_message.bubble.textContent = computer_text;
             typing_message.bubble.dataset.timestamp = computer_timestamp;
-            typing_message.bubble.dataset.duration = response_time.toString();
+
+            // Enregistre la durée de la requête.
+            if (response_time >= 0) {
+                typing_message.bubble.dataset.duration = response_time;
+            } else {
+                delete typing_message.bubble.dataset.duration;
+            }
 
             set_message_metadata(
                 typing_message.bubble,
                 typing_message.metadata,
                 typing_message.date,
                 typing_message.time,
-                response_time
+                typing_message.duration
             );
 
             scroll_to_bottom();
@@ -844,12 +850,15 @@ function set_message_metadata(
                 const time_element = message_element.querySelector(
                     ".message_time"
                 );
+                
+                const duration_element = message_element.querySelector( ".message_duration" );
 
                 if (
                     bubble_element &&
                     metadata_element &&
                     date_element &&
                     time_element &&
+                    duration_element &&
                     bubble_element.dataset.timestamp
                 ) {
                     set_message_metadata(

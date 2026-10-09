@@ -4,6 +4,8 @@ import sys
 import time
 import analyse_image_client
 
+import pathlib
+
 """
 Necessite analyse_image_serv.py running sur le serveur
 """
@@ -30,6 +32,13 @@ import store_info_on_file
 def getHourMin():
     dtn = datetime.datetime.now()
     return dtn.hour, dtn.minute
+    
+    
+def inc_dic( d, k, inc_val = 1 ):
+    if k in d:
+        d[k] += inc_val
+    else:
+        d[k] = inc_val
     
 def listdirrec( path ):
     o = []
@@ -87,51 +96,126 @@ def render_image( filename ):
 
     root.mainloop()
     
+    print( "DBG: render_image: returning:" + retvalue )
     return retvalue
     
+def find_element( alist, list_to_find, bAnd, bComputePoint ):
+    """
+    find in alist if element of list_to_find are present.
+    - bAnd: if set, all element of list_to_find must be present.
+    - bComputePoint: give more point if found element are in start of list 
     
-def find( sentence, keyword, text, peoples ):
-    print( "INF: find: '%s', kw: %s, text: %s, peoples: %s" % (sentence, keyword, text, peoples) )
+    return 0 if no match, or 1 or more if bComputePoint is set
+    """
+    if len(alist) < 1 or len(list_to_find) < 1:
+        return 0
+        
+    pt = 0
+    for e in list_to_find:
+        try:
+            idx = alist.index( e )
+        except ValueError as err:
+            if bAnd:
+                return 0
+            continue
+            
+        score = ( len(alist) - idx ) / len( alist )
+        score += 1 / len(alist) # plus la liste est courte plus il y a un bonus
+        pt += score
+        
+    return pt
+    
+    
+def find( sentence, keywords, texts, peoples ):
+    print( "INF: find: '%s', kw: %s, text: %s, peoples: %s" % (sentence, keywords, texts, peoples) )
+    
+    bRenderImage = 1
+    #~ bRenderImage = 0
+    
+    out = [] # filename then nbr point
+    
+    
+    stats_keyword = {}
+    stats_text = {}
     stats_name = {}
+    
     cache = store_info_on_file.StoredInfo( "img_desc_qwen2_5vl_7b_fr" )
     cache.load()
-    d = cache.getAllDatas()
-    for filename,v in d.items():
-        print( "%s => %s" % (filename,str(v)) )
-        s,k,t,ps = v
-        found = 0
-        
-        if 0:
-            # or
-            for people in peoples:
-                if people in ps:
-                    print( "found '%s' in '%s'" % (people, ps ) )
-                    found = 1
-                    break
-        else:
-            # and
-            if ps == []:
+    d = cache.getAllDatas().items()
+
+    for filename,v in d:
+        #~ print( "%s => %s" % (filename,str(v)) )
+        s,ks,ts,ps = v
+        found = False
+        pts = 0
+
+        if len(keywords) > 0:
+            #~ print( "INF: find: filtering on keywords" )
+            
+            # les keyword semblent etre par ordre d'importance, on prend ca en compte
+            
+            if ks == []:
                 continue
                 
-            for people in peoples:
-                if people not in ps:
-                    break
-                print("found '%s' in '%s'" % (people, ps) )
+            pt = find_element( ks, keywords, True, False )
+            if pt > 0:
+                found = True
+                pts += pt
+            
+        if len(peoples) > 0 and found:
+            print( "INF: find: filtering on people" )
+                
+            if 0:
+                # or
+                for people in peoples:
+                    if people in ps:
+                        print( "found '%s' in '%s'" % (people, ps ) )
+                        found = True
+                        break
             else:
-                found = 1
-               
+                # and
+                if ps == []:
+                    continue
+                    
+                for people in peoples:
+                    if people not in ps:
+                        break
+                    print("found '%s' in '%s'" % (people, ps) )
+                else:
+                    found = True
+                       
+        # stats
 
+        for k in ks:
+            inc_dic( stats_keyword, k )
+            
+        for t in ts:
+            inc_dic( stats_text, t )
+            
         for p in ps:
-            if p in stats_name:
-                stats_name[p] += 1
-            else:
-                stats_name[p] = 1
+            inc_dic( stats_name, p )
             
         if found:
-            if 1 and not render_image( filename ):
-                break
+            if 0:
+                if bRenderImage and not render_image( filename ):
+                    break
                 
-    print( "stats_name:" + str(stats_name) )
+            out.append( (pts,filename) )
+
+    # for each file - end
+    
+    print( "\nINF: find: nbr_find: %s / %s" % ( len( out ), cache.getNbrElement() ) )
+    out = sorted( out, reverse=True )
+    for pt,f in out:
+        name = pathlib.Path(f).name
+        print( "%.02f: %s" % (pt,name) )
+        # rend les images a la fin
+        if bRenderImage and not render_image( f ):
+            break
+                
+    print( "stats_keyword:" + str( sorted( filter(lambda x:x[1]>2,list(stats_keyword.items()) ), key=lambda x:-x[1] ) ) )
+    print( "stats_text:" + str( sorted( filter(lambda x:x[1]>2,list(stats_text.items()) ), key=lambda x:-x[1] ) ) )
+    print( "stats_name:" + str( sorted( list(stats_name.items()), key=lambda x:-x[1] ) ) )
 
 def generate_desc_for_cloud( path ):
     """
@@ -212,9 +296,19 @@ def generate_desc_for_cloud( path ):
     
 
 if __name__ == "__main__":
-    if 1:
+    if len(sys.argv) < 2:
         generate_desc_for_cloud("files/")
     
-    peoples = ["Gaia","Alexandre"]
-    peoples = ["Jc"] # que des bugs
-    find( "toto", "tutu", "titi", peoples)
+    sentence = ""
+    
+    keywords = []
+    keywords = ["arbres"]
+    keywords = ["robe"]
+    
+    texts = []
+    
+    peoples = []
+    #~ peoples = ["Jc"] # que des gars qui sont pas Jc
+    #~ peoples = ["Gaia","Alexandre"]
+    
+    find( sentence, keywords, texts, peoples)

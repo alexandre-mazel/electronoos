@@ -212,7 +212,9 @@ def generate_desc_for_cloud( path ):
     
 
 if __name__ == "__main__":
-    #~ generate_desc_for_cloud("files/")
+    if 1:
+        generate_desc_for_cloud("files/")
+    
     peoples = ["Gaia","Alexandre"]
     peoples = ["Jc"] # que des bugs
     find( "toto", "tutu", "titi", peoples)

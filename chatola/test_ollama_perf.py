@@ -629,7 +629,7 @@ Total summary:
                         qwen3-embedding, moondream:latest, llama3.2:1B, mistral-small:22B
 
 RPI5:              0.768, 1.273, -1.000, -1.000,
-MS Tab7:        todo, 0.958, 6.158, -1.000
+MS Tab7:        0.374, 0.958, 6.158, -1.000
 Corto:            todo, 0.136, 0.964, 7.632
 Champion1:    todo, 0.092, 0.682, 6.027,
 

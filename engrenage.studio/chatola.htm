@@ -698,7 +698,7 @@ function set_message_metadata(
             
             const start_time = performance.now();
             
-            val response_time = -1;
+            let response_time = -1;
 
             try {
                 const response = await fetch(addr);

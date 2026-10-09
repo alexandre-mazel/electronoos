@@ -101,7 +101,10 @@ def index( req ):
     ans = ask_tchat( chatola_url, user_id, msg )
     duration = time.time() - time_begin
     print( "INF: chatola_client.index: IA: %s" % ans )
-    print( "INF: chatola_client.index: duration just IA: %.2fs" % duration )
+    print( "INF: chatola_client.index: duration just IA: %.2fs" % duration ) 
+    # truc chelou: quand appelé depuis page web, ca prend 3s, alors que chat ne prend que INF: duration: just chat/complete ans: 0.05s, 0.15s (et en cli, on a aussi 15s)
+    # requests.post serait plus long en python 2.7 ? (mais je crois pas qu'on soit encore en python2.7 en wsgi?)
+    # Piste: en fait depuis cli sur rpi, ca fait 3.45 alors que depuis mon pc (meme en wifi), j'ai: 0.31 (au meme moment)
     
     return viewcloud.send_json({
     "success": False,

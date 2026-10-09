@@ -122,8 +122,13 @@
         }
 
         .message_date,
-        .message_time {
+        .message_time
+        .message_duration {
             display: block;
+        }
+        
+        .message_duration:empty {
+            display: none;
         }
 
         .typing_dots {
@@ -317,6 +322,11 @@
                         id="message_time_initial"
                         class="message_time"
                     ></div>
+                    
+                    <div
+                        id="message_duration_initial"
+                        class="message_duration"
+                    ></div>
                 </div>
             </div>
         </section>
@@ -392,6 +402,7 @@
             document.getElementById("user_input").placeholder = language.placeholder;
             document.getElementById("send_button").textContent = language.send;
             document.getElementById("user_id_label").textContent = "User ID";
+            
 
             document.getElementById("message_bubble_initial").textContent =
                 language.initial;
@@ -400,6 +411,7 @@
             const initial_metadata = document.getElementById("message_metadata_initial");
             const initial_date = document.getElementById("message_date_initial");
             const initial_time = document.getElementById("message_time_initial");
+            const initial_duration = document.getElementById("message_duration_initial");
 
             if (!initial_bubble.dataset.timestamp) {
                 initial_bubble.dataset.timestamp = new Date().toISOString();
@@ -409,7 +421,8 @@
                 initial_bubble,
                 initial_metadata,
                 initial_date,
-                initial_time
+                initial_time,
+                initial_duration
             );
         }
 
@@ -435,37 +448,61 @@
                 }
             ).format(new Date(timestamp));
         }
+        
 
-
-        function set_message_metadata(
-            bubble_element,
-            metadata_element,
-            date_element,
-            time_element
-        ) {
-            let timestamp = bubble_element.dataset.timestamp;
-
-            if (!timestamp) {
-                timestamp = new Date().toISOString();
-                bubble_element.dataset.timestamp = timestamp;
+    function format_duration(duration_seconds) {
+        const formatted_duration = new Intl.NumberFormat(
+            current_language === "fr" ? "fr-FR" : "en-US",
+            {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
             }
+        ).format(duration_seconds);
 
-            date_element.textContent = get_date_from_timestamp(timestamp);
-            time_element.textContent = get_time_from_timestamp(timestamp);
+        return formatted_duration + " s";
+    }
 
-            metadata_element.classList.remove("message_metadata_inline");
 
-            requestAnimationFrame(function () {
-                const bubble_width = bubble_element.getBoundingClientRect().width;
-                const date_width = date_element.getBoundingClientRect().width;
-                const time_width = time_element.getBoundingClientRect().width;
-                const metadata_width = date_width + time_width + 6;
 
-                if (metadata_width <= bubble_width) {
-                    metadata_element.classList.add("message_metadata_inline");
-                }
-            });
+function set_message_metadata(
+    bubble_element,
+    metadata_element,
+    date_element,
+    time_element,
+    duration_element
+) {
+    let timestamp = bubble_element.dataset.timestamp;
+
+    if (!timestamp) {
+        timestamp = new Date().toISOString();
+        bubble_element.dataset.timestamp = timestamp;
+    }
+
+    date_element.textContent = get_date_from_timestamp(timestamp);
+    time_element.textContent = get_time_from_timestamp(timestamp);
+
+    const duration = bubble_element.dataset.duration;
+
+    duration_element.textContent = duration
+        ? format_duration(Number(duration))
+        : "";
+
+    metadata_element.classList.remove("message_metadata_inline");
+
+    requestAnimationFrame(function () {
+        const bubble_width = bubble_element.getBoundingClientRect().width;
+        const date_width = date_element.getBoundingClientRect().width;
+        const time_width = time_element.getBoundingClientRect().width;
+        const duration_width = duration_element.getBoundingClientRect().width;
+
+        const metadata_width = date_width + time_width + duration_width +
+            (duration ? 12 : 6);
+
+        if (metadata_width <= bubble_width) {
+            metadata_element.classList.add("message_metadata_inline");
         }
+    });
+}
 
 
         function scroll_to_bottom() {
@@ -487,23 +524,27 @@
             const metadata_element = document.createElement("div");
             const date_element = document.createElement("div");
             const time_element = document.createElement("div");
+            const duration_element = document.createElement("div");
 
             container_element.id = "message_container_" + sender_type + "_" + unique_id;
             bubble_element.id = "message_bubble_" + sender_type + "_" + unique_id;
             metadata_element.id = "message_metadata_" + sender_type + "_" + unique_id;
             date_element.id = "message_date_" + sender_type + "_" + unique_id;
             time_element.id = "message_time_" + sender_type + "_" + unique_id;
+            duration_element.id = "message_duration_" + sender_type + "_" + unique_id;
 
             container_element.className = "message_container message_container_" + sender_type;
             bubble_element.className = "message_bubble message_bubble_" + sender_type;
             metadata_element.className = "message_metadata";
             date_element.className = "message_date";
             time_element.className = "message_time";
+            duration_element.className = "message_duration";
 
             bubble_element.dataset.timestamp = timestamp || new Date().toISOString();
 
             metadata_element.appendChild(date_element);
             metadata_element.appendChild(time_element);
+            metadata_element.appendChild(duration_element);
             container_element.appendChild(bubble_element);
             container_element.appendChild(metadata_element);
 
@@ -512,7 +553,8 @@
                 bubble: bubble_element,
                 metadata: metadata_element,
                 date: date_element,
-                time: time_element
+                time: time_element,
+                duration: duration_element
             };
         }
 
@@ -530,7 +572,8 @@
                 message_elements.bubble,
                 message_elements.metadata,
                 message_elements.date,
-                message_elements.time
+                message_elements.time,
+                message_elements.duration
             );
 
             scroll_to_bottom();
@@ -654,6 +697,8 @@
             const addr = "/chatola/chatola_client.py?" + query_parameters.toString();
             
             const start_time = performance.now();
+            
+            val response_time = -1;
 
             try {
                 const response = await fetch(addr);
@@ -664,9 +709,9 @@
 
                 const raw_response = await response.text();
                 
-                const response_time = (performance.now() - start_time) / 1000;
+                response_time = (performance.now() - start_time) / 1000;
 
-                console.log("Raw response:", raw_response, ", in:", ${response_time.toFixed(2)}, "s" );
+                console.log("Raw response:", raw_response, ", in:", response_time.toFixed(2), "s" );
 
                 if (!raw_response.trim()) {
                     throw new Error("Empty server response");
@@ -703,7 +748,7 @@
                 display_computer_answer(
                     typing_message,
                     String(computer_text).trim(),
-                    computer_timestamp
+                    computer_timestamp,response_time
                 );
 
             } catch (error) {
@@ -717,7 +762,7 @@
                 display_computer_answer(
                     typing_message,
                     error_message,
-                    new Date().toISOString()
+                    new Date().toISOString(), response_time
                 );
 
             } finally {
@@ -730,17 +775,20 @@
         function display_computer_answer(
             typing_message,
             computer_text,
-            computer_timestamp
+            computer_timestamp,
+            response_time
         ) {
             // Remplace les trois points par le texte reçu.
             typing_message.bubble.textContent = computer_text;
             typing_message.bubble.dataset.timestamp = computer_timestamp;
+            typing_message.bubble.dataset.duration = response_time.toString();
 
             set_message_metadata(
                 typing_message.bubble,
                 typing_message.metadata,
                 typing_message.date,
-                typing_message.time
+                typing_message.time,
+                response_time
             );
 
             scroll_to_bottom();
@@ -808,7 +856,8 @@
                         bubble_element,
                         metadata_element,
                         date_element,
-                        time_element
+                        time_element,
+                        duration_element
                     );
                 }
             });

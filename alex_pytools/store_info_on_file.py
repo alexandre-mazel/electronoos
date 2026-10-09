@@ -2,7 +2,7 @@ import pickle
 import os
 import time
 
-from builtins import open as builtin_open # to know it even from the del
+from builtins import open as builtin_open # to know it even from save when called from del
 
 
 def normaliseFilename(f):

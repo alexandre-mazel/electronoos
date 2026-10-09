@@ -87,6 +87,7 @@ def index( req ):
     """
     sys.path.append("../engrenage.studio")
     sys.path.append("/home/na/dev/git/electronoos/engrenage.studio/")
+    
     import viewcloud
     print("DBG: chatola_client.py.index: req.args: '%s'" % req.args )
 
@@ -96,8 +97,11 @@ def index( req ):
     
     user_id = dArgs["id"]
     msg = dArgs["q"]
+    time_begin = time.time()
     ans = ask_tchat( chatola_url, user_id, msg )
+    duration = time.time() - time_begin
     print( "INF: chatola_client.index: IA: %s" % ans )
+    print( "INF: chatola_client.index: duration just IA: .2fs" % duration )
     
     return viewcloud.send_json({
     "success": False,

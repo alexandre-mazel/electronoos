@@ -1,11 +1,12 @@
 import datetime
 import os
-import sys
-import time
-import analyse_image_client
-
+import numpy
 import pathlib
 import requests
+import sys
+import time
+
+import analyse_image_client
 
 
 """
@@ -79,7 +80,7 @@ def ollama_local_embed( s ):
     cache_embed.saveSometimes( 100 )
     return embed
     
-if 1:
+if 0:
     ret = ollama_local_embed( "hello") # 0.75-0.95s on RPI5 sur hello
     #~ print( ret )
     exit(1)
@@ -179,15 +180,33 @@ def find( sentence, keywords, texts, peoples ):
     if len(sentence) > 0:
         embed_sentence = ollama_local_embed( sentence )
 
+    num_file = 0
+    
     for filename,v in d:
-        #~ print( "%s => %s" % (filename,str(v)) )
+        num_file += 1
+        
+        if num_file > 50 and 0:
+            break # pour voir deja ce qu'on a 
+        
+        print( "%d: %s => %s" % (num_file, filename,str(v)) )
         s,ks,ts,ps = v
         found = False
         pts = 0
         
         if len(sentence) > 0 and len(s) > 0:
-            v2 = ollama_local_embed( sentence )
-            simi = numpy.dot( embed_sentence, v2 )
+            # s peut contenir plusieurs phrases.
+            ss = s.split(".")
+            ss.append(s)
+            for eachs in ss:
+                eachs = eachs.strip()
+                if len(eachs) < 2:
+                    continue
+                v2 = ollama_local_embed( eachs )
+                simi = numpy.dot( embed_sentence, v2 )
+                print( "simi %.3f for '%s' and '%s'" % (simi, sentence, eachs ) )
+                if simi > 0.65:
+                    found = True
+                    pts += simi
             
 
         if len(keywords) > 0:
@@ -347,6 +366,8 @@ if __name__ == "__main__":
     
     sentence = ""
     sentence = "geste avec les mains"
+    sentence = "forme orange suspendu"
+    sentence = "une personne promene un chien"
     
     keywords = []
     #~ keywords = ["arbres"]

@@ -39,8 +39,8 @@ class StoredInfo:
     def __del__( self ):
         try:
             self.save()
-        except ImportError as err:
-            pass
+        except (ImportError,NameError) as err:
+            print( "WRN: StoredInfo.del: err: %s" % str(err) )
             
     def isLoaded(self):
         return self.bLoaded

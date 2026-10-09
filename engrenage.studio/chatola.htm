@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/almatools/icon_at.png">
     <title id="page_title">Computer Chat</title>
 
     <style id="page_style">
@@ -277,7 +278,18 @@
     <main id="chat_app">
         <header id="chat_header">
             <h1 id="chat_title">Robot</h1>
-            <div id="chat_status">Mode clinic</div>
+            <!-- <div id="chat_status">Mode clinic</div>-->
+            <div id="chat_user_settings">
+                <label id="user_id_label" for="user_id">
+                    User ID
+                </label>
+
+                <select id="user_id" name="user_id">
+                    <option value="web">web</option>
+                    <option value="web_clinic" selected>web_clinic</option>
+                </select>
+            </div>
+            
         </header>
 
         <section id="chat_messages" aria-live="polite">
@@ -310,16 +322,6 @@
         </section>
 
         <div id="chat_controls">
-            <div id="chat_user_settings">
-                <label id="user_id_label" for="user_id">
-                    User ID
-                </label>
-
-                <select id="user_id" name="user_id">
-                    <option value="web">web</option>
-                    <option value="web_clinic" selected>web_clinic</option>
-                </select>
-            </div>
 
             <form id="chat_input_area">
                 <textarea

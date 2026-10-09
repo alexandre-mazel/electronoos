@@ -101,7 +101,7 @@ def index( req ):
     ans = ask_tchat( chatola_url, user_id, msg )
     duration = time.time() - time_begin
     print( "INF: chatola_client.index: IA: %s" % ans )
-    print( "INF: chatola_client.index: duration just IA: .2fs" % duration )
+    print( "INF: chatola_client.index: duration just IA: %.2fs" % duration )
     
     return viewcloud.send_json({
     "success": False,

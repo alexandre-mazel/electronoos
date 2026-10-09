@@ -5,6 +5,8 @@ import time
 import analyse_image_client
 
 import pathlib
+import requests
+
 
 """
 Necessite analyse_image_serv.py running sur le serveur
@@ -50,6 +52,38 @@ def listdirrec( path ):
             o.extend( listdirrec(absf) )
         # sinon: on fait rien sur les liens symbolique ou ...
     return o
+    
+cache_embed = None
+
+def ollama_local_embed( s ):
+    global cache_embed
+    print("INF: ollama_local_embed: compute embedding for '%s'..." % s )
+    if cache_embed == None:
+        cache_embed = store_info_on_file.StoredInfo( "embed_qwen3-embedding" )
+        cache_embed.load()
+    emb = cache_embed.getDatas( s )
+    if emb != None:
+        return emb
+        
+    time_begin = time.time()
+    strModel = "qwen3-embedding:latest"
+    strUrl = "http://127.0.0.1:11434/api/embed"
+    dOptions = { "temperature": 0, "seed": 42,"num_ctx": 4096 }
+    dJson = { "model": strModel, "input": s, "stream": False, "options": dOptions}
+    response = requests.post( strUrl, json=dJson, timeout=600 )
+    print( response )
+    embed = response.json()["embeddings"][0]
+    duration  = time.time() - time_begin
+    print( "embed len: %s" % len(embed) )
+    print( "duration: %.2fs" % duration )
+    cache_embed.storeDatas( s, embed )
+    cache_embed.saveSometimes( 100 )
+    return embed
+    
+if 1:
+    ret = ollama_local_embed( "hello") # 0.75-0.95s on RPI5 sur hello
+    #~ print( ret )
+    exit(1)
     
 def render_image( filename ):
     """
@@ -142,12 +176,20 @@ def find( sentence, keywords, texts, peoples ):
     cache = store_info_on_file.StoredInfo( "img_desc_qwen2_5vl_7b_fr" )
     cache.load()
     d = cache.getAllDatas().items()
+    
+    if len(sentence) > 0:
+        embed_sentence = ollama_local_embed( sentence )
 
     for filename,v in d:
         #~ print( "%s => %s" % (filename,str(v)) )
         s,ks,ts,ps = v
         found = False
         pts = 0
+        
+        if len(sentence) > 0 and len(s) > 0:
+            v2 = ollama_local_embed( sentence )
+            simi = numpy.dot( embed_sentence, v2 )
+            
 
         if len(keywords) > 0:
             #~ print( "INF: find: filtering on keywords" )
@@ -318,3 +360,6 @@ if __name__ == "__main__":
     #~ peoples = ["Gaia","Alexandre"]
     
     find( sentence, keywords, texts, peoples)
+    
+    if cache_embed != None:
+        cache_embed.save()

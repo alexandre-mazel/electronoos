@@ -209,10 +209,14 @@ def bench_ollama( strModel, strPrompt, nbr_test, addr, port ):
     # un petit coup pour charger le modele:
     #~ print( "(preloading...)" )
     strUrl = f"{strOllamaUrl}api/generate"
-    if "embed" in strModel:
-        strUrl = f"{strOllamaUrl}api/embed"
     dOptions = { "temperature": 0, "seed": 42,"num_ctx": 4096 }
     dJson = { "model": strModel, "prompt": strPrompt, "stream": False, "options": dOptions}
+    
+    if "embed" in strModel:
+        strUrl = f"{strOllamaUrl}api/embed"
+        del dJson["prompt"]
+        dJson["input"] = strPrompt
+    
     response = requests.post( strUrl, json=dJson, timeout=600 )
     
     print("")
@@ -541,24 +545,25 @@ CPU : Intel(R) Core(TM) i7-9700K CPU @ 3.60GHz
 GPU : Intel Corporation CoffeeLake-S GT2 [UHD Graphics 630] (rev 02)
 GPU : NVIDIA Corporation GA102 [GeForce RTX 3080 Lite Hash Rate] (rev a1)
 
+
+
 *** RPI5
 
 # Benchmark Ollama - qwen3-embedding:latest
 # 5 appels, generate: 'Hello world, comment ca va et toi je suis malade ?.'
 
-#1 | total=0.269s | prompt=0.000s/0 tok | eval=0.000s/0 tok | speed=0.00 tok/s
-#2 | total=0.267s | prompt=0.000s/0 tok | eval=0.000s/0 tok | speed=0.00 tok/s
-#3 | total=0.257s | prompt=0.000s/0 tok | eval=0.000s/0 tok | speed=0.00 tok/s
-#4 | total=0.267s | prompt=0.000s/0 tok | eval=0.000s/0 tok | speed=0.00 tok/s
-#5 | total=0.270s | prompt=0.000s/0 tok | eval=0.000s/0 tok | speed=0.00 tok/s
+#1 | total=0.767s | prompt=0.000s/14 tok | eval=0.000s/0 tok | speed=0.00 tok/s
+#2 | total=0.805s | prompt=0.000s/14 tok | eval=0.000s/0 tok | speed=0.00 tok/s
+#3 | total=0.756s | prompt=0.000s/14 tok | eval=0.000s/0 tok | speed=0.00 tok/s
+#4 | total=0.753s | prompt=0.000s/14 tok | eval=0.000s/0 tok | speed=0.00 tok/s
+#5 | total=0.757s | prompt=0.000s/14 tok | eval=0.000s/0 tok | speed=0.00 tok/s
 
 --- Results ---
-Total       | min=0.257 | max=0.270 | avg=0.266 s
+Total       | min=0.753 | max=0.805 | avg=0.768 s
 Prompt      | min=0.000 | max=0.000 | avg=0.000 s
 Tokens eval | min=0.000 | max=0.000 | avg=0.000
 Eval        | min=0.000 | max=0.000 | avg=0.000 s
 Vitesse     | min=0.00 | max=0.00 | avg=0.00 tok/s
-
 
 --- Ollama PS ---
 NAME                      ID              SIZE      PROCESSOR    CONTEXT    UNTIL
@@ -610,7 +615,7 @@ DBG: ollama_model_exists: current existing model:
 WRN: This model isn't present: mistral-small:22B
 
 
-Summary: 0.266, 1.274, -1.000, -1.000,
+Summary: 0.768, 1.274, -1.000, -1.000,
 
 --- Materiel ---
 CPU : Cortex-A76
@@ -623,7 +628,7 @@ CPU : Cortex-A76
 Total summary:
                         qwen3-embedding, moondream:latest, llama3.2:1B, mistral-small:22B
 
-RPI5:              0.266, 1.273, -1.000, -1.000,
+RPI5:              0.768, 1.273, -1.000, -1.000,
 MS Tab7:        todo, 0.958, 6.158, -1.000
 Corto:            todo, 0.136, 0.964, 7.632
 Champion1:    todo, 0.092, 0.682, 6.027,

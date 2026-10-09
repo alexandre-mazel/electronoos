@@ -652,6 +652,8 @@
             });
 
             const addr = "/chatola/chatola_client.py?" + query_parameters.toString();
+            
+            const start_time = performance.now();
 
             try {
                 const response = await fetch(addr);
@@ -661,8 +663,10 @@
                 }
 
                 const raw_response = await response.text();
+                
+                const response_time = (performance.now() - start_time) / 1000;
 
-                console.log("Raw response:", raw_response);
+                console.log("Raw response:", raw_response, ", in:", ${response_time.toFixed(2)}, "s" );
 
                 if (!raw_response.trim()) {
                     throw new Error("Empty server response");

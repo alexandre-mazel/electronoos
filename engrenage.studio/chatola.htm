@@ -810,6 +810,19 @@
             });
         });
 
+document.getElementById("user_id").addEventListener("change", function () {
+    const messages_element = document.getElementById("chat_messages");
+
+    messages_element.innerHTML = "";
+
+    const initial_message = add_message(
+        language_data[current_language].initial,
+        "computer"
+    );
+
+    pending_requests = 0;
+    update_chat_status();
+});
 
         detect_language();
         apply_language();

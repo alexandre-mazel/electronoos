@@ -33,7 +33,7 @@ class StoredInfo:
             os.makedirs( os.path.expanduser("~/cache/" ) )
         except: pass
         self.bLoaded = False
-        self.bMustSave = False
+        self.bNbrStoredWithoutSave = 0
         #~ self.load()
         
     def __del__( self ):
@@ -55,7 +55,7 @@ class StoredInfo:
         import ast
         timeBegin = time.time()
         self.bLoaded = True
-        self.bMustSave = False
+        self.bNbrStoredWithoutSave = 0
         try:
             file = open(self.strSaveFileName, "rt" )
         except: return
@@ -72,10 +72,14 @@ class StoredInfo:
             return
 
 
+    def saveSometimes( self, nbr_element_min = 20 ):
+        if self.bNbrStoredWithoutSave >= nbr_element_min:
+            return self.save( bForceWrite = True )
+    
     def save( self, bForceWrite = False ):
         # WRN: the order in the file is different than the format in memory (feature at the end instead in [1])
         
-        if not self.bMustSave and not bForceWrite:
+        if self.bNbrStoredWithoutSave == 0  and not bForceWrite:
             return
         print( "INF: StoredInfo.save: starting..." )
         
@@ -84,7 +88,7 @@ class StoredInfo:
             return
         
         
-        self.bMustSave = False
+        self.bNbrStoredWithoutSave = 0
         
         if 0:
             # debug object type because sometimes, I've got this error dans pickle: TypeError: 'NoneType' object is not callable
@@ -231,7 +235,7 @@ class StoredInfo:
         
         print( "INF: StoredInfo.storeDatas: adding info for '%s': %s" % (strFilename,strDebug) )
         self.feats[strFilename] = datas
-        self.bMustSave = True
+        self.bNbrStoredWithoutSave += 1
         return True
         
     def informFileRenamed( self, strOldFilename, strNewFilename ):

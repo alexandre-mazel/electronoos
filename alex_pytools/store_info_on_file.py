@@ -2,6 +2,8 @@ import pickle
 import os
 import time
 
+from builtins import open as builtin_open # to know it even from the del
+
 
 def normaliseFilename(f):
     """
@@ -79,11 +81,13 @@ class StoredInfo:
     def save( self, bForceWrite = False ):
         # WRN: the order in the file is different than the format in memory (feature at the end instead in [1])
         
+        from builtins import open
+        
         if self.bNbrStoredWithoutSave == 0  and not bForceWrite:
             return
         print( "INF: StoredInfo.save: starting..." )
         
-        if not self.isLoaded:
+        if not self.isLoaded():
             print( "INF: StoredInfo.save: StoredInfo not loaded => not saving" )
             return
         
@@ -194,7 +198,7 @@ class StoredInfo:
         if 1:
             # use pickle: faster!
             datas = pickle.dumps( self.feats, protocol=pickle.HIGHEST_PROTOCOL )
-            outfile = open(self.strSaveFileName,'wb')
+            outfile = builtin_open( self.strSaveFileName,'wb' )
             outfile.write( datas )
             outfile.close()
             print( "INF: StoredInfo.save: end" )

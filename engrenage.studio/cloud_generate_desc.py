@@ -64,9 +64,9 @@ def render_image( filename ):
     retvalue = True
     
     def close_image(event=None):
-        global retvalue
+        nonlocal retvalue # global serait dans le module, hors ici on veut celle de la fonction du dessus
         retvalue = False
-        print( "DBG: close_image: retvalue False" ) # pb de thread ?
+        #~ print( "DBG: close_image: retvalue False" )
         root.destroy()
         
     import tkinter as tk
@@ -96,7 +96,7 @@ def render_image( filename ):
 
     root.mainloop()
     
-    print( "DBG: render_image: returning:" + retvalue )
+    #~ print( "DBG: render_image: returning: %s" % retvalue )
     return retvalue
     
 def find_element( alist, list_to_find, bAnd, bComputePoint ):
@@ -209,7 +209,10 @@ def find( sentence, keywords, texts, peoples ):
     for pt,f in out:
         name = pathlib.Path(f).name
         print( "%.02f: %s" % (pt,name) )
-        # rend les images a la fin
+        if 1:
+                infos = cache.getDatas(f)
+                print(infos)
+        
         if bRenderImage and not render_image( f ):
             break
                 
@@ -278,9 +281,9 @@ def generate_desc_for_cloud( path ):
             
         cache.storeDatas( absf, ret )
         
-        if 0:
+        if 1:
             print("sleeping...")
-            time.sleep(0.5) # laisse le gpu respirer... (en fait on a deja 2s pour envoyer l'image alors bon...)(a cause d'un bug qu'on avait dans la resolution du dns)
+            time.sleep(1.) # laisse le gpu respirer... (en fait on a deja 2s pour envoyer l'image alors bon...)(a cause d'un bug qu'on avait dans la resolution du dns)
         
         num_processed += 1
         if num_processed % 10 == 0:

@@ -198,7 +198,7 @@ class StoredInfo:
         
     def getDatas( self, strFilename ):
         """
-        return info associated to this user or [] if this file has been precomputed with no result
+        return info associated to this data or [] if this file has been precomputed with no result
         or None if not found
         """
         bVerbose = 1
@@ -249,6 +249,14 @@ class StoredInfo:
 
         # this filename is unknown
         return False
+        
+        
+    def getAllDatas( self ):
+        """
+        return (a copy of) all infos about this cache 
+        """
+        import copy
+        return copy.deepcopy( self.feats )
 
                 
 # class StoredInfo - end
@@ -277,6 +285,8 @@ def autotest():
     
     print( sto.getDatas( "toto" ) )
     assert( sto.getDatas( "toto" ) == [] )
+    
+    print( "getAllDatas:" + str( sto.getAllDatas() ) )
     
     sto.save()
     print( "autotest: end" )

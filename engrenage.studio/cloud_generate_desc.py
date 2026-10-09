@@ -71,7 +71,6 @@ def ollama_local_embed( s ):
     dOptions = { "temperature": 0, "seed": 42,"num_ctx": 4096 }
     dJson = { "model": strModel, "input": s, "stream": False, "options": dOptions}
     response = requests.post( strUrl, json=dJson, timeout=600 )
-    print( response )
     embed = response.json()["embeddings"][0]
     duration  = time.time() - time_begin
     print( "embed len: %s" % len(embed) )

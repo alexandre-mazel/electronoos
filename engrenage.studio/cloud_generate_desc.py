@@ -41,6 +41,97 @@ def listdirrec( path ):
             o.extend( listdirrec(absf) )
         # sinon: on fait rien sur les liens symbolique ou ...
     return o
+    
+def render_image( filename ):
+    """
+    return False si l'user veut quitter
+    """
+    if 0:
+        import cv2
+        cv2.imread(filename)
+        cv2.imshow("gaia")
+        cv2.waitKey(100)
+        
+    retvalue = True
+    
+    def close_image(event=None):
+        global retvalue
+        retvalue = False
+        print( "DBG: close_image: retvalue False" ) # pb de thread ?
+        root.destroy()
+        
+    import tkinter as tk
+    from PIL import Image, ImageTk
+    import pathlib
+
+    image = Image.open( filename ).convert("RGB")
+    image.thumbnail((1200, 800))
+
+    root = tk.Tk()
+    root.title("Image Viewer")
+
+    photo = ImageTk.PhotoImage(image)
+    
+    image_path = pathlib.Path(filename)
+
+    title_text = f"{image_path.parent.parent.name}/{image_path.parent.name}/{image_path.name}"
+
+    title = tk.Label(root, text=title_text, font=("Arial", 12, "bold"))
+    title.pack(padx=5, pady=5)
+
+    label = tk.Label(root, image=photo)
+    label.pack()
+    
+    label.bind("<Button-1>", lambda event: root.destroy())
+    root.bind("<Escape>", close_image)
+
+    root.mainloop()
+    
+    return retvalue
+    
+    
+def find( sentence, keyword, text, peoples ):
+    print( "INF: find: '%s', kw: %s, text: %s, peoples: %s" % (sentence, keyword, text, peoples) )
+    stats_name = {}
+    cache = store_info_on_file.StoredInfo( "img_desc_qwen2_5vl_7b_fr" )
+    cache.load()
+    d = cache.getAllDatas()
+    for filename,v in d.items():
+        print( "%s => %s" % (filename,str(v)) )
+        s,k,t,ps = v
+        found = 0
+        
+        if 0:
+            # or
+            for people in peoples:
+                if people in ps:
+                    print( "found '%s' in '%s'" % (people, ps ) )
+                    found = 1
+                    break
+        else:
+            # and
+            if ps == []:
+                continue
+                
+            for people in peoples:
+                if people not in ps:
+                    break
+                print("found '%s' in '%s'" % (people, ps) )
+            else:
+                found = 1
+               
+
+        for p in ps:
+            if p in stats_name:
+                stats_name[p] += 1
+            else:
+                stats_name[p] = 1
+            
+        if found:
+            if 1 and not render_image( filename ):
+                break
+                
+    print( "stats_name:" + str(stats_name) )
 
 def generate_desc_for_cloud( path ):
     """
@@ -121,4 +212,7 @@ def generate_desc_for_cloud( path ):
     
 
 if __name__ == "__main__":
-    generate_desc_for_cloud("files/")
+    #~ generate_desc_for_cloud("files/")
+    peoples = ["Gaia","Alexandre"]
+    peoples = ["Jc"] # que des bugs
+    find( "toto", "tutu", "titi", peoples)

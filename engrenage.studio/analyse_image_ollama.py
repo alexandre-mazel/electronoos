@@ -221,8 +221,71 @@ If the text is visually ambiguous, make your best reading and stop.
             
     if verbose: print( "ans: " + ans_utf8 )
     
-    print( "DBG: done_reason: " + result["done_reason"] )
-    if ans == "":
+    done_reason = result["done_reason"]
+    print( "DBG: done_reason: " + done_reason )
+    bError = "length" in done_reason
+
+        
+    # est ce qu'on renvoie un truc different en cas d'erreur, ainsi je reessage pas a l'infini sur des images qui font buggé le machin ?
+    if bError:
+        print( "WRN: ans is error!" )
+        """
+        j'ai eu un truc de ce genre: qui bugge le parser, et pourtant y a des infos interessantes dedans, dommage!
+        
+'{\n  "description": "L\'image montre une installation artistique avec des rouleaux de papier orange suspendus à la hauteur du plafond. Des projecteurs illuminent les rouleaux, créant un effe
+t lumineux. À droite, des personnes interagissent avec un équipement, et un écran projecteur affiche des images abstraites. Le sol est en béton, et le mur à droite est recouvert de vêtements suspendus.",\n  "keywords": ["installation", "papier", "rouleaux", "lumière", "projecteur", "équipement", "écran", "mur", "vêt
+ements", "suspension", "sol", "béton"],\n  "text": ["MUSEE", "DES", "SCIENCES", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS
+", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIV
+ERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'U
+NIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L
+\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE",
+ "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "D
+E", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS",
+ "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVER
+S", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNI
+VERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'
+UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "
+L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE"
+, "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "
+DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS"
+, "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVE
+RS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UN
+IVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\
+'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE",
+"L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE
+", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS",
+"DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS
+", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIV
+ERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'U
+NIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L
+\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UNIVERS", "DE", "L\'UN'
+
+
+ans: {
+  "description": "Cette image montre un tableau blanc avec un planning de permanences pour un bar. Le tableau est divisé en semaines et jours de la semaine, avec des noms de personnes et des horaires écrits à l'intérieur des cases. En bas, il y a des instructions pour aider et des notes personnelles.",
+  "keywords": ["planning", "permanences", "bar", "tableau blanc", "horaire", "instructions"],
+  "text": ["PLANNING", "PERMANENCES", "BAR", "TU PEUX AUSSI NOUS AIDER", "laver les Tordons", "acheter des chips, du lait", "faire du ménage", "faire du rangement", "faire les poussières", "Brain is the new Sexy", "TU VIENS QUAND", "JOUER AU BARMAN", "MARDI", "MER", "CREDI", "JEUDI", "VEN", "DREDI", "SAM", "EDI", "D
+IM", "ANCHE", "ELIE", "SYLVIE", "ALEXANDRE", "10-17", "17-23", "10-16", "17-23", "16-23", "10-16", "17-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "1
+6-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-
+23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16
+", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23",
+ "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "
+16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17
+-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-1
+6", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23"
+, "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23",
+"16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "1
+7-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-
+16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23
+", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23",
+ "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "17-23", "16-23", "10-16", "1"
+DBG: done_reason: length
+
+
+        """
+        return {"description":"(error)","keywords":"","text":""} 
+        
+    if ans == "" or bError:
         print( "WRN: ans is empty!" )
         return {"description":"","keywords":"","text":""} 
 

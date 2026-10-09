@@ -14,6 +14,10 @@ import sys
 import time
 import unicodedata
 
+sys.path.append( "../../face_tools/")
+import facerecognizer3
+import analyse_face_cuda
+
 logdir = os.path.expanduser( "~/logs/" )
 
 def getElectronoosPath():
@@ -49,14 +53,16 @@ def getHostName():
     return hostname.replace(" ", "_")
     
     
+nbr_count_face_extracted = 0
+
 def extract_infos_from_img( img_raw, filename, user_id, lang = "fr" ):
     """
     img_raw est le buffer compresse' direct (eg jpg)
     """
     print( "INF: extract_infos_from_img: filename: '%s', user_id: '%s'" % ( filename, user_id ) )
-    sys.path.append( "../../face_tools/")
-    import facerecognizer3
-    import analyse_face_cuda
+    
+    #~ analyse_face_cuda.debug_trace_vram()
+
     analyse_face_cuda.preload() # force le chargement sinon quand on voudra le charger y aura plus de place en memoire (alors que ollama peut charger en mix si quand il arrive il y a moins)
     
     peoples = []
@@ -66,11 +72,26 @@ def extract_infos_from_img( img_raw, filename, user_id, lang = "fr" ):
     #~ filename_for_caching = "" # to disable caching!
     fr.load()
     img = cv2.imdecode( np.frombuffer(img_raw, dtype=np.uint8), cv2.IMREAD_COLOR )
-    faces = fr.recognizeFromImg( img, filename_for_caching, find_match = True, verbose = 1 )
-    fr.save() # for embedding
+    print( "IMG size: %dx%d" % ( img.shape[1],img.shape[0] ) )
+    faces = fr.recognizeFromImg( img, filename_for_caching, find_match = True, verbose = 1, force_recompute_embed = False )
+    
+    global nbr_count_face_extracted
+    nbr_count_face_extracted += 1
+    if nbr_count_face_extracted % 50 == 0:
+        fr.save() # for embedding
+        
     if 0:
-        # on fait d'un coup que de la fr puis plus tard on faira la vl en full gpu
+        # on fait d'un coup que de la face reco puis plus tard on faira la vl en full gpu
         print( "WRN: just face analyse done (nbr faces found: %d)" % len(faces) )
+        
+        if 0:
+            # recherche les fuites memoire VRA:
+            del faces
+            import gc
+            gc.collect()
+            
+            analyse_face_cuda.debug_trace_vram()
+            
         return "",[],[],[]
     people_identification = ""
     extra_instruction = ""

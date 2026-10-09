@@ -222,6 +222,8 @@ class TchatUser:
         
         print( "DBG: TchatUser.getAns: name: %s, context:\n%s" % (self.user_id,self.context) )
         
+        time_begin_total_ans = time.time()
+        
 
         # ne pas redonner le context si c'est trop loin dans le temps (pour des patients, sujets sensible...)
         if self.user_id == "nao" and time.time() - self.time_last_question > 5*60:
@@ -300,6 +302,8 @@ class TchatUser:
         prompt.extend( self.getConsignList() )
         
         prompt.extend(self.context[:])
+        
+        time_begin_chat = time.time()
 
         res = http_chat.ask_ollama_http( strModel, prompt )
         
@@ -318,6 +322,11 @@ class TchatUser:
             
         # vire les chars foireux (quoi que c'est juste dans l'asr en fait)
         #~ res = remove_non_french_chars(res)
+        
+        duration_tot = time.time() - time_begin_total_ans
+        duration_chat = time.time() - time_begin_chat
+        
+        print( "INF: duration: just chat/complete ans: %.2fs, %.2fs" % (duration_chat,duration_tot) )
                 
         return res
 

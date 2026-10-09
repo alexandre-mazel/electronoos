@@ -484,7 +484,7 @@ function set_message_metadata(
     const duration = bubble_element.dataset.duration;
 
     duration_element.textContent = duration
-        ? "( in " + format_duration(Number(duration)) + ")"
+        ? "(in " + format_duration(Number(duration)) + ")"
         : "";
 
     metadata_element.classList.remove("message_metadata_inline");

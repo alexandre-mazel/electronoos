@@ -257,6 +257,9 @@ class StoredInfo:
         """
         import copy
         return copy.deepcopy( self.feats )
+        
+    def getNbrElement( self ):
+        return len(self.feats)
 
                 
 # class StoredInfo - end

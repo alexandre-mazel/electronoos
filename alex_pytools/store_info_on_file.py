@@ -81,8 +81,6 @@ class StoredInfo:
     def save( self, bForceWrite = False ):
         # WRN: the order in the file is different than the format in memory (feature at the end instead in [1])
         
-        from builtins import open
-        
         if self.bNbrStoredWithoutSave == 0  and not bForceWrite:
             return
         print( "INF: StoredInfo.save: starting..." )

@@ -4,7 +4,7 @@ import numpy as np
 import random
 import os
 import sys
-if os.name != "nt":
+if os.name != "nt" or 1:
     from insightface.app import FaceAnalysis
     from insightface.model_zoo import get_model
 
@@ -113,7 +113,7 @@ def get_painting_title(filename):
         name = name[:idx]
     return name
 
-def fade_images(image1_filename, image2_filename, duration=5.0):
+def fade_images( image1_filename, image2_filename, duration=5.0, bPortrait=0, bSkipWait = False ):
     """
     Return False if user want to quit
     """
@@ -127,6 +127,14 @@ def fade_images(image1_filename, image2_filename, duration=5.0):
     if img2 is None:
         print( f"ERR: Cannot load image: {image2_filename}")
         return True
+        
+    caption = get_painting_title( image1_filename )
+    return fade_images_buf( img1, img2, caption, duration, bPortrait,bSkipWait )
+    
+def fade_images_buf( img1, img2, caption, duration=5.0, bPortrait=0, bSkipWait = False ):
+    """
+    Return False if user want to quit
+    """
 
     if img1.shape != img2.shape:
         raise ValueError("The two images must have exactly the same format/size.")
@@ -135,23 +143,24 @@ def fade_images(image1_filename, image2_filename, duration=5.0):
 
     # Create a borderless fullscreen window
     cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
-    cv2.setWindowProperty(
-        window_name,
-        cv2.WND_PROP_FULLSCREEN,
-        cv2.WINDOW_FULLSCREEN
-    )
+    cv2.setWindowProperty( window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN )
     
     sx,sy = 2736, 1824
+    if bPortrait:
+        sx,sy = sy,sx
     img1 = image_fullscreen_contain( img1, sx, sy )
     img2 = image_fullscreen_contain( img2, sx, sy )
     
-    txt = get_painting_title( image1_filename )
-    img1 = add_bottom_text( img1, txt )
-    img2 = add_bottom_text( img2, txt )
+    
+    img1 = add_bottom_text( img1, caption + "  " )
+    img2 = add_bottom_text( img2, caption + " *" )
 
     # Display first image
     cv2.imshow(window_name, img1)
-    key = cv2.waitKey(5000) & 0xFF
+    time_wait = int(duration*1000)
+    if bSkipWait:
+        time_wait = 100
+    key = cv2.waitKey( time_wait ) & 0xFF
     
     # ESC to interrupt
     if key == 27:
@@ -193,7 +202,10 @@ def fade_images(image1_filename, image2_filename, duration=5.0):
 
     # Leave the second image displayed
     cv2.imshow(window_name, img2)
-    cv2.waitKey(8000)
+    time_wait = int(duration*1600)
+    if bSkipWait:
+        time_wait = 100
+    cv2.waitKey( time_wait )
 
     #~ return window_name
     return True
@@ -259,6 +271,8 @@ def generate_swap( painting, person, output, num_face ):
     print(
         f"Remplacement du visage {num_face}..."
     )
+    
+    time_begin = time.time()
 
     result = swapper.get(
         scene,
@@ -269,7 +283,8 @@ def generate_swap( painting, person, output, num_face ):
 
     cv2.imwrite( output, result)
 
-    print(f"Résultat enregistré : {output}")
+    duration = time.time() - time_begin
+    print( "Résultat enregistré in %.2fs: %s" % (duration,output) )
 
 def main():
 
@@ -425,7 +440,7 @@ def generate_all():
 
 if __name__ == "__main__":
     # main()
-    #~ generate_all()
-    render_pair_loop()
+    generate_all()
+    #~ render_pair_loop()
     
     
